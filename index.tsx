@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module react-material-input */
+/** @module react-input-material */
 'use strict'
 /* !
     region header

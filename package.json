@@ -3,7 +3,7 @@
   "version": "0.0.5",
   "license": "CC-BY-3.0",
   "description": "Reusable material design based input field with spport for (richt-)text, code, selections, numbers, dates and so on.",
-  "homepage": "https://torben.website/react-material-input",
+  "homepage": "https://torben.website/react-input-material",
   "documentationWebsite": {
     "languages": [
       "deDE",
@@ -25,7 +25,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/thaibault/react-material-input"
+    "url": "https://github.com/thaibault/react-input-material"
   },
   "scripts": {
     "build": "touch index.js || weboptimizer build",
