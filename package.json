@@ -22,13 +22,13 @@
   "files": [
     "index.tsx"
   ],
-  "main": "index.tsx",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/thaibault/react-material-input"
   },
   "scripts": {
-    "build": "weboptimizer build",
+    "build": "touch index.js || weboptimizer build",
     "build:export": "weboptimizer build '{__reference__: \"target:export\"}'",
     "check": "yarn check:types; yarn lint",
     "check:types": "weboptimizer check:types",
