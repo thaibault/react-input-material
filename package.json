@@ -1,5 +1,5 @@
 {
-  "name": "react-material-input",
+  "name": "react-input-material",
   "version": "0.0.4",
   "license": "CC-BY-3.0",
   "description": "Reusable material design based input field with spport for (richt-)text, code, selections, numbers, dates and so on.",
