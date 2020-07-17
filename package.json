@@ -28,7 +28,7 @@
     "url": "https://github.com/thaibault/react-input-material"
   },
   "scripts": {
-    "build": "touch index.js || weboptimizer build",
+    "build": "weboptimizer build",
     "build:export": "weboptimizer build '{__reference__: \"target:export\"}'",
     "check": "yarn check:types; yarn lint",
     "check:types": "weboptimizer check:types",
@@ -48,6 +48,7 @@
   "devDependencies": {
     "@babel/plugin-transform-proto-to-assign": "*",
     "@babel/preset-env": "*",
+    "@babel/preset-react": "*",
     "@types/ejs": "*",
     "@types/html-minifier": "*",
     "@types/jest": "*",
@@ -83,6 +84,18 @@
           "jsdom",
           "node"
         ]
+      }
+    },
+    "module": {
+      "preprocessor": {
+        "javaScript": {
+          "options": {
+            "presets": {
+              "#": "NOTE: We have to disable module export/import transformation to allow tree shaking by the final (minimizer).",
+              "__evaluate__": "['@babel/preset-react', ['@babel/preset-env', {loose: true, modules: false, targets: self.targetTechnology === 'node' ? {node: 'current'} : {browsers: self.generic.supportedBrowsers, node: 'current'}}], '@babel/typescript'].concat((self.debug || !self.module.optimizer.babelMinify.module || 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'document') ? [] : [['minify', self.module.optimizer.babelMinify.module]])"
+            }
+          }
+        }
       }
     },
     "target:export": {

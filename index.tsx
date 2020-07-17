@@ -18,7 +18,8 @@
 */
 // region imports
 // endregion
-console.log('TODO')
+export const a = 2
+console.log('JAU', a)
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
