@@ -17,8 +17,13 @@
     endregion
 */
 // region imports
+import {Component} from 'react'
 // endregion
-export const a = <div/>
+export class SimpleInput extends Component {
+    render() {
+        return <div>SimpleInput</div>
+    }
+}
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:

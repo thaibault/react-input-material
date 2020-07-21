@@ -49,6 +49,12 @@
     "@babel/plugin-transform-proto-to-assign": "*",
     "@babel/preset-env": "*",
     "@babel/preset-react": "*",
+    "@rmwc/card": "*",
+    "@rmwc/formfield": "*",
+    "@rmwc/icon-button": "*",
+    "@rmwc/select": "*",
+    "@rmwc/textfield": "*",
+    "@rmwc/tooltip": "*",
     "@types/ejs": "*",
     "@types/html-minifier": "*",
     "@types/jest": "*",
@@ -67,6 +73,8 @@
     "jest": "*",
     "jquery": "*",
     "jsdoc": "*",
+    "react": "*",
+    "react-dom": "*",
     "weboptimizer": "*",
     "webpack": "*",
     "webpack-cli": "*",
@@ -74,7 +82,15 @@
   },
   "peerDependencies": {
     "@babel/runtime": "*",
-    "clientnode": "*"
+    "@rmwc/card": "*",
+    "@rmwc/formfield": "*",
+    "@rmwc/icon-button": "*",
+    "@rmwc/select": "*",
+    "@rmwc/textfield": "*",
+    "@rmwc/tooltip": "*",
+    "clientnode": "*",
+    "react": "*",
+    "react-dom": "*"
   },
   "sideEffects": false,
   "webOptimizer": {
