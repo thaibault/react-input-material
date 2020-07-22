@@ -27,9 +27,12 @@
         </script>
     </head>
     <script>
-        const index = reactInputMaterial.index;
         window.onload = () => {
-            
+            for (const name in reactInputMaterial.index.register)
+                if (Object.hasOwnProperty.call(
+                    reactInputMaterial.index.register, name
+                ))
+                    reactInputMaterial.index.register[name]()
         };
     </script>
     <body class="no-javascript">
@@ -39,8 +42,14 @@
                     /(^|\s)no-javascript(\s|$)/, '$1javascript$2'
                 );
         </script>
-        <simple-input style="height: 100px; width: 100px; border: 1px solid red; display: block;">
-        </simple-input>
+
+        <simple-input name="simpleInput1"></simple-input>
+        <simple-input name="simpleInput2" value="value2"></simple-input>
+        <simple-input
+            model="{name: 'simpleInput3Model', value: 'value3Model'}"
+            name="simpleInput3"
+            value="value3"
+        ></simple-input>
     </body>
 <html>
 <%_ /*

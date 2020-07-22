@@ -16,8 +16,8 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports
-import Tools from 'clientnode'
+// region imports 
+import Tools, {globalContext, PlainObject} from 'clientnode'
 // endregion
 // region polyfills
 // Polyfill for template strings in dynamic function constructs in simple cases
@@ -50,11 +50,13 @@ const Function:typeof Function = (
  *
  * @property root - Hosting dom node.
  */
-export class GenericWebComponent<TElement = HTMLElement> extends HTMLElement {
+export class Web<TElement = HTMLElement> extends HTMLElement {
     static content:string = ''
-    static self:typeof GenericWebComponent = GenericWebComponent
-    static observedAttributes:Array<string> = []
+    static readonly observedAttributes:Array<string> = []
+    dynamicAttributeNames:Array<string> = []
+    properties:PlainObject = {}
     root:TElement
+    readonly self:typeof Web = Web
     // region live cycle hooks
     /**
      * Initializes host dom content by attaching a shadow dom to it. Triggers
@@ -74,8 +76,47 @@ export class GenericWebComponent<TElement = HTMLElement> extends HTMLElement {
      * configured host dom content.
      * @returns Nothing.
      */
-    attributeChangedCallback():void {
-        return this.render()
+    attributeChangedCallback(
+        name:string,
+        oldValue:string,
+        newValue:string,
+        attributeNames:Array<string> = Web.observedAttributes,
+        dynamicAttributeNames?:Array<string>
+    ):void {
+        for (const name of attributeNames)
+            if (this.getAttribute(name))
+                this.properties[name] = this.getAttribute(name)
+            else
+                this.properties[name] = null
+        if (!dynamicAttributeNames)
+            dynamicAttributeNames = this.dynamicAttributeNames
+        for (const name of dynamicAttributeNames)
+            if (this.getAttribute(name)) {
+                let get:Function
+                try {
+                    get = new Function(`return ${this.getAttribute(name)}`)
+                } catch (error) {
+                    console.warn(
+                        `Error occured during compiling given "${name}" ` +
+                        `attribute configuration "` +
+                        `${this.getAttribute(name)}": "` +
+                        `${Tools.represent(error)}".`
+                    )
+                    break
+                }
+                let value:any
+                try {
+                    value = get()
+                } catch (error) {
+                    console.warn(
+                        `Error occured durring interpreting given "${name}" ` +
+                        `attribute object "${this.getAttribute(name)}": "` +
+                        `${Tools.represent(error)}".`
+                    )
+                    break
+                }
+                this.properties[name] = value
+            }
     }
     /**
      * Method which does the rendering job. Should be called when ever state
@@ -89,7 +130,7 @@ export class GenericWebComponent<TElement = HTMLElement> extends HTMLElement {
     }
     // endregion
 }
-export default GenericWebComponent
+export default Web
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:

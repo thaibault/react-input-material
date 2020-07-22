@@ -17,16 +17,20 @@
     endregion
 */
 // region imports
-export React from 'react'
-import ReactDOM from 'ReactDOM'
-
 import SimpleInput from './components/SimpleInput'
+import ReactWeb from './components/ReactWeb'
 // endregion
-export const components:Mapping<(name:string) => Function> = {}
-ReactDOM.render(<SimpleInput a={2}/>, document.querySelector('simple-input'))
-export React from 'react'
-export ReactDOM from 'ReactDOM'
-export default components
+export class SimpleInputWeb extends ReactWeb {
+    static readonly observedAttributes:Array<string> = ['name', 'value']
+    component:typeof SimpleInput = SimpleInput
+    dynamicAttributeNames:Array<string> = ['model']
+    readonly self:typeof SimpleInputWeb = SimpleInputWeb
+}
+export const register:Mapping<(name:string) => Function> = {
+    simpleInput: (name:string = 'simple-input'):void =>
+        customElements.define(name, SimpleInputWeb)
+}
+export default register
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:

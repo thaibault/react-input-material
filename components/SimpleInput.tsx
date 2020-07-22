@@ -17,15 +17,11 @@
     endregion
 */
 // region imports
-import {Component} from 'react'
+import React, {Component} from 'react'
 // endregion
 export class SimpleInput extends Component {
-    constructor(props) {
-        super(props)
-        console.log('Props', props)
-    }
-    render() {
-        return (<div>test</div>)
+    render():Component {
+        return (<div>{this.props.name}: {this.props.value}</div>)
     }
 }
 export default SimpleInput

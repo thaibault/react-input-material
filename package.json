@@ -102,6 +102,9 @@
         ]
       }
     },
+    "injection": {
+      "entry": "./index.tsx"
+    },
     "module": {
       "preprocessor": {
         "javaScript": {
