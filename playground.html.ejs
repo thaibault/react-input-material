@@ -27,11 +27,9 @@
         </script>
     </head>
     <script>
+        const index = reactInputMaterial.index;
         window.onload = () => {
-            ReactDOM.render(
-                reactInputMaterial.index.SimpleInput,
-                document.querySelector('simple-input')
-            )
+            
         };
     </script>
     <body class="no-javascript">
@@ -41,8 +39,8 @@
                     /(^|\s)no-javascript(\s|$)/, '$1javascript$2'
                 );
         </script>
-        <simple-input></simple-input>
-        <!--<script src="./node_modules/react-dom/umd/react-dom.development.js"></script>-->
+        <simple-input style="height: 100px; width: 100px; border: 1px solid red; display: block;">
+        </simple-input>
     </body>
 <html>
 <%_ /*

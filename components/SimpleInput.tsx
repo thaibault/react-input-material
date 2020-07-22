@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module react-input-material */
+/** @module simple-input */
 'use strict'
 /* !
     region header
@@ -17,16 +17,18 @@
     endregion
 */
 // region imports
-export React from 'react'
-import ReactDOM from 'ReactDOM'
-
-import SimpleInput from './components/SimpleInput'
+import {Component} from 'react'
 // endregion
-export const components:Mapping<(name:string) => Function> = {}
-ReactDOM.render(<SimpleInput a={2}/>, document.querySelector('simple-input'))
-export React from 'react'
-export ReactDOM from 'ReactDOM'
-export default components
+export class SimpleInput extends Component {
+    constructor(props) {
+        super(props)
+        console.log('Props', props)
+    }
+    render() {
+        return (<div>test</div>)
+    }
+}
+export default SimpleInput
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
