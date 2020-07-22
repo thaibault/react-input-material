@@ -18,10 +18,27 @@
 */
 // region imports
 import React, {Component} from 'react'
+import {TextField} from '@rmwc/textfield'
 // endregion
 export class SimpleInput extends Component {
+    constructor(properties) {
+        super(properties)
+        this.state = {
+            value: ''
+        }
+    }
+    onChange(event:Event):void {
+        this.setState({value: event.target.value})
+    }
     render():Component {
-        return (<div>{this.props.name}: {this.props.value}</div>)
+        return (
+            <TextField
+                label="Validate Pattern"
+                onChange={this.onChange.bind(this)}
+                pattern="[A-Za-z]{3}"
+                value={this.state.value}
+            />
+        )
     }
 }
 export default SimpleInput

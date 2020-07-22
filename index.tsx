@@ -24,7 +24,7 @@ import ReactWeb from './web/ReactWeb'
 // endregion
 export const components:Mapping<{
     component:ReactWeb;
-    register:(name:string) => Function
+    register:(tagName:string) => void;
 }> = {}
 const modules = require.context('./components/', true, /[a-zA-Z0-9]\.tsx$/)
 for (const key of modules.keys()) {
