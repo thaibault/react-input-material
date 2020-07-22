@@ -25,7 +25,9 @@ import Web from './Web'
 export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
     component:Component = 'div'
     readonly self:typeof ReactWeb = ReactWeb
-    attributeChangedCallback(name:string, oldValue:string, newValue:string):void {
+    attributeChangedCallback(
+        name:string, oldValue:string, newValue:string
+    ):void {
         super.attributeChangedCallback(
             name, oldValue, newValue, this.self.observedAttributes
         )

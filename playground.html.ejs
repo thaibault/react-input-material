@@ -28,11 +28,9 @@
     </head>
     <script>
         window.onload = () => {
-            for (const name in reactInputMaterial.index.register)
-                if (Object.hasOwnProperty.call(
-                    reactInputMaterial.index.register, name
-                ))
-                    reactInputMaterial.index.register[name]()
+            console.log(reactInputMaterial.index)
+            Object.values(reactInputMaterial.index.default)
+                .map((component) => component.register())
         };
     </script>
     <body class="no-javascript">

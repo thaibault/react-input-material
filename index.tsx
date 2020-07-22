@@ -17,20 +17,32 @@
     endregion
 */
 // region imports
-import SimpleInput from './components/SimpleInput'
-import ReactWeb from './components/ReactWeb'
+import Tools from 'clientnode'
+import {Component} from 'react'
+
+import ReactWeb from './web/ReactWeb'
 // endregion
-export class SimpleInputWeb extends ReactWeb {
-    static readonly observedAttributes:Array<string> = ['name', 'value']
-    component:typeof SimpleInput = SimpleInput
-    dynamicAttributeNames:Array<string> = ['model']
-    readonly self:typeof SimpleInputWeb = SimpleInputWeb
+export const components:Mapping<{
+    component:ReactWeb;
+    register:(name:string) => Function
+}> = {}
+const modules = require.context('./components/', true, /[a-zA-Z0-9]\.tsx$/)
+for (const key of modules.keys()) {
+    const name = key.replace(/^(.*\/+)?([^\/]+)\.tsx$/, '$2')
+    components[name] = {
+        component: class extends ReactWeb {
+            static readonly observedAttributes:Array<string> = ['name', 'value']
+
+            component:typeof Component = modules(key).default
+            dynamicAttributeNames:Array<string> = ['model']
+            readonly self:typeof ReactWeb = components[name].component
+        },
+        register: (
+            tagName:string = Tools.stringCamelCaseToDelimited(name)
+        ):void => customElements.define(tagName, components[name].component)
+    }
 }
-export const register:Mapping<(name:string) => Function> = {
-    simpleInput: (name:string = 'simple-input'):void =>
-        customElements.define(name, SimpleInputWeb)
-}
-export default register
+export default components
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
