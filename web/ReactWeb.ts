@@ -28,9 +28,7 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
     attributeChangedCallback(
         name:string, oldValue:string, newValue:string
     ):void {
-        super.attributeChangedCallback(
-            name, oldValue, newValue, this.self.observedAttributes
-        )
+        super.attributeChangedCallback(name, oldValue, newValue)
         this.render()
     }
     /**

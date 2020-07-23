@@ -16,8 +16,50 @@
     endregion
 */
 // region imports
+import {Mapping} from 'clientnode/type'
+
+import {ReactWeb} from '../web/ReactWeb'
 // endregion
 // region exports
+export type BaseModel<Type = any> = {
+    declaration:string;
+    defaultValue:Type;
+    description:string;
+    editor:'auto'|'code'|'raw'|'text';
+    emtyEqualsNull:boolean;
+    maximum:number;
+    maximumLength:number;
+    minimum:number;
+    minimumLength:number;
+    mutable:boolean;
+    name:string;
+    nullable:boolean;
+    regularExpressionPattern:string;
+    selection:Array<number|string>|Mapping<any>;
+    trim:boolean;
+    type:'date'|'datetime-local'|'month'|'number'|'range'|'string'|'time'|'week';
+    value:Type;
+}
+export type Model<Type = any> = BaseModel<Type> & {
+    writable:boolean;
+}
+export type Properties<Type = any> = BaseModel<Type> & {
+    fullWidth:boolean;
+    model:Model<Type>;
+    outlined:boolean;
+    placeholder:string;
+    rows:number;
+}
+export type WebComponentAPI = {
+    component:ReactWeb;
+    register:(tagName:string) => void;
+}
+export type WebComponentAttributes = {
+    any:Array<string>;
+    boolean:Array<string>;
+    number:Array<string>;
+    string:Array<string>;
+}
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

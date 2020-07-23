@@ -53,7 +53,12 @@ const Function:typeof Function = (
 export class Web<TElement = HTMLElement> extends HTMLElement {
     static content:string = ''
     static readonly observedAttributes:Array<string> = []
-    dynamicAttributeNames:Array<string> = []
+    attributeNames:WebComponentAttributes = {
+        any: [],
+        boolean: [],
+        number: [],
+        string: []
+    }
     properties:PlainObject = {}
     root:TElement
     useShadowDOM:boolean = false
@@ -83,17 +88,11 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         name:string,
         oldValue:string,
         newValue:string,
-        attributeNames:Array<string> = Web.observedAttributes,
-        dynamicAttributeNames?:Array<string>
+        attributeNames:null|WebComponentAttributes = null
     ):void {
-        for (const name of attributeNames)
-            if (this.getAttribute(name))
-                this.properties[name] = this.getAttribute(name)
-            else
-                this.properties[name] = null
-        if (!dynamicAttributeNames)
-            dynamicAttributeNames = this.dynamicAttributeNames
-        for (const name of dynamicAttributeNames)
+        if (attributeNames === null)
+            attributeNames = this.attributeNames
+        for (const name of attributeNames.any)
             if (this.getAttribute(name)) {
                 let get:Function
                 try {
@@ -120,6 +119,18 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                 }
                 this.properties[name] = value
             }
+        for (const name of attributeNames.boolean)
+            if (this.hasAttribute(name))
+                this.properties[name] = this.getAttribute(name) !== 'false'
+        for (const name of attributeNames.number)
+            if (this.hasAttribute(name)) {
+                const number:number = parseFloat(this.getAttribute(name))
+                if (!isNaN(number))
+                    this.properties[name] = number
+            }
+        for (const name of attributeNames.string)
+            if (this.hasAttribute(name) && this.getAttribute(name))
+                this.properties[name] = this.getAttribute(name) || ''
     }
     /**
      * Method which does the rendering job. Should be called when ever state

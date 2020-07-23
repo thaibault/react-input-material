@@ -40,13 +40,31 @@
                 );
         </script>
 
-        <simple-input name="simpleInput1"></simple-input>
-        <simple-input name="simpleInput2" value="'value2'"></simple-input>
-        <simple-input
-            model="{name: 'simpleInput3Model', value: 'value3Model'}"
-            name="simpleInput3"
-            value="'value3'"
-        ></simple-input>
+        <generic-input name="input1"></generic-input>
+        <generic-input model="{name: 'input1Model'}"></generic-input>
+
+        <generic-input name="input2" value="'value2'"></generic-input>
+        <generic-input model="{name: 'input2Model', value: 'value2Model'}">
+        </generic-input>
+
+        <generic-input disabled name="input3" value="'value3'"></generic-input>
+        <generic-input
+            model="{mutable: false, name: 'input3Model', value: 'value3Model'}"
+        ></generic-input>
+
+        <generic-input name="input4" placeholder="input4" required>
+        </generic-input>
+        <generic-input
+            model="{name: 'input4Model', nullable: false, value: 'value4Model'}"
+            placholder="input4Model"
+        ></generic-input>
+
+        <generic-input name="input5" pattern="a+" value="'only a`s allowed'">
+        </generic-input>
+        <generic-input
+            model="{regularExpressionPattern: 'a+', value: 'only a`s allowed'}"
+            name="input5Model"
+        ></generic-input>
     </body>
 <html>
 <%_ /*
