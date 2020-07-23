@@ -18,17 +18,32 @@
 */
 // region imports
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
+import {Mapping} from 'clientnode/type'
 import React, {FunctionComponent, setState, useState} from 'react'
 import {TextField} from '@rmwc/textfield'
 import '@rmwc/textfield/styles'
 // endregion
 export type Properties<Type = any> = {
+    declaration:string;
     defaultValue:Type;
+    description:string;
+    editor:'auto'|'code'|'raw'|'text';
+    emtyEqualsNull:boolean;
+    maximum:number;
+    maximumLength:number;
+    minimum:number;
+    minimumLength:number;
+    mutable:boolean;
     model:Properties<Type>;
     name:string;
-    pattern:string;
+    nullable:boolean;
+    placeholder:string;
+    regularExpressionPattern:string;
+    selection:Array<number|string>|Mapping<any>;
+    trim:boolean;
     type:'number'|'string';
     value:Type;
+    writable:boolean;
 }
 export const SimpleInput:FunctionComponent<Properties<Type>> = <Type = string>(
     properties:Properties<Type>
@@ -38,11 +53,25 @@ export const SimpleInput:FunctionComponent<Properties<Type>> = <Type = string>(
         Tools.extend(
             IgnoreNullAndUndefinedSymbol,
             {
+                declaration: '',
                 defaultValue: '',
+                description: '',
+                editor: 'auto',
+                emptyEqualsNull: true,
+                maximum: Infinity;
+                maximumLength: Infinity;
+                minimum: 0,
+                minimumLength: 0;
+                mutable: boolean;
                 name: 'NO_NAME',
-                pattern: '.*',
+                nullable: true,
+                placeholder: '',
+                regularExpressionPattern: '.*',
+                selection: null,
+                trim: true,
                 type: 'string',
-                value: ''
+                value: '',
+                writable: true
             },
             properties.model || {}
         ),
