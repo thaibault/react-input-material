@@ -17,29 +17,48 @@
     endregion
 */
 // region imports
-import React, {Component} from 'react'
+import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
+import React, {FunctionComponent, setState, useState} from 'react'
 import {TextField} from '@rmwc/textfield'
+import '@rmwc/textfield/styles'
 // endregion
-export class SimpleInput extends Component {
-    constructor(properties) {
-        super(properties)
-        this.state = {
-            value: ''
-        }
-    }
-    onChange(event:Event):void {
-        this.setState({value: event.target.value})
-    }
-    render():Component {
-        return (
-            <TextField
-                label="Validate Pattern"
-                onChange={this.onChange.bind(this)}
-                pattern="[A-Za-z]{3}"
-                value={this.state.value}
-            />
-        )
-    }
+export type Properties<Type = any> = {
+    defaultValue:Type;
+    model:Properties<Type>;
+    name:string;
+    pattern:string;
+    type:'number'|'string';
+    value:Type;
+}
+export const SimpleInput:FunctionComponent<Properties<Type>> = <Type = string>(
+    properties:Properties<Type>
+) => {
+    const [model, setModel] = useState(Tools.extend(
+        IgnoreNullAndUndefinedSymbol,
+        Tools.extend(
+            IgnoreNullAndUndefinedSymbol,
+            {
+                defaultValue: '',
+                name: 'NO_NAME',
+                pattern: '.*',
+                type: 'string',
+                value: ''
+            },
+            properties.model || {}
+        ),
+        properties
+    ))
+
+    return (
+        <TextField
+            label={model.name}
+            onChange={(event):void =>
+                setModel(Tools.extend({}, model, {value: event.target.value}))
+            }
+            pattern={model.pattern}
+            value={model.value}
+        />
+    )
 }
 export default SimpleInput
 // region vim modline

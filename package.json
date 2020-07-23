@@ -65,16 +65,28 @@
     "@typescript-eslint/eslint-plugin": "*",
     "@typescript-eslint/parser": "*",
     "babel-eslint": "*",
+    "babel-plugin-extract-react-types": "*",
     "clientnode": "*",
+    "css-loader": "*",
+    "cssnano": "*",
     "documentation-website": "*",
     "eslint": "*",
     "eslint-config-google": "*",
     "eslint-plugin-jsdoc": "*",
     "jest": "*",
-    "jquery": "*",
     "jsdoc": "*",
+    "mini-css-extract-plugin": "*",
+    "postcss-fontpath": "*",
+    "postcss-import": "*",
+    "postcss-loader": "*",
+    "postcss-preset-env": "*",
+    "postcss-sprites": "*",
+    "postcss-url": "*",
     "react": "*",
     "react-dom": "*",
+    "style-loader": "*",
+    "stylelint": "*",
+    "stylelint-config-standard": "*",
     "weboptimizer": "*",
     "webpack": "*",
     "webpack-cli": "*",
@@ -106,12 +118,18 @@
       "entry": "./index.tsx"
     },
     "module": {
+      "cascadingStyleSheet": {
+        "exclude": "false"
+      },
       "preprocessor": {
         "javaScript": {
           "options": {
             "presets": {
               "#": "NOTE: We have to disable module export/import transformation to allow tree shaking by the final (minimizer).",
               "__evaluate__": "['@babel/preset-react', ['@babel/preset-env', {loose: true, modules: false, targets: self.targetTechnology === 'node' ? {node: 'current'} : {browsers: self.generic.supportedBrowsers, node: 'current'}}], '@babel/typescript'].concat((self.debug || !self.module.optimizer.babelMinify.module || 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'document') ? [] : [['minify', self.module.optimizer.babelMinify.module]])"
+            },
+            "plugins": {
+              "__prepend__": "babel-plugin-extract-react-types"
             }
           }
         }

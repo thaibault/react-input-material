@@ -56,6 +56,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     dynamicAttributeNames:Array<string> = []
     properties:PlainObject = {}
     root:TElement
+    useShadowDOM:boolean = false
     readonly self:typeof Web = Web
     // region live cycle hooks
     /**
@@ -65,11 +66,13 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      */
     constructor() {
         super()
-        this.root = (
-            (!('attachShadow' in this) && 'ShadyDOM' in window) ?
-                window.ShadyDOM.wrap(this) :
-                this
-        ).attachShadow({mode: 'open'})
+        this.root = this.useShadowDOM ?
+            (
+                (!('attachShadow' in this) && 'ShadyDOM' in window) ?
+                    window.ShadyDOM.wrap(this) :
+                    this
+            ).attachShadow({mode: 'open'}) :
+            this
     }
     /**
      * Triggered when ever a given attribute has changed and triggers to update
