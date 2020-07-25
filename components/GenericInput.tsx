@@ -31,7 +31,8 @@ const nameMapping:Mapping = Object.entries({
     fullWitdh: 'full-width',
     maximumLength: 'maximum-length',
     minimumLength: 'minimum-length',
-    regularExpressionPattern: 'pattern'
+    regularExpressionPattern: 'pattern',
+    trailingIcon: 'trailing-icon'
 })
 export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
     properties:Properties<Type>
@@ -79,6 +80,7 @@ export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
             disabled={!model.mutable}
             fullwidth={properties.fullWidth}
             helpText={model.declaration}
+            icon={properties.icon}
             label={model.description || model.name}
             maxLength={model.maximumLength}
             minLength={model.minimumLength}
@@ -90,6 +92,7 @@ export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
             placeholder={properties.placeholder}
             required={!model.nullable}
             rows={properties.rows}
+            trailingIcon={properties.trailingIcon}
             value={model.value}
         />
     )
@@ -107,7 +110,15 @@ GenericInput.properties = {
         'trim'
     ],
     number: ['maximum-length', 'maximum', 'minimum-length', 'minimum', 'rows'],
-    string: ['editor', 'name', 'pattern', 'placeholder', 'type']
+    string: [
+        'editor',
+        'icon',
+        'name',
+        'pattern',
+        'placeholder',
+        'trailing-icon',
+        'type'
+    ]
 }
 export default GenericInput
 // region vim modline

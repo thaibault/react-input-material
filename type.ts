@@ -25,7 +25,6 @@ export type BaseModel<Type = any> = {
     declaration:string;
     defaultValue:Type;
     description:string;
-    editor:'auto'|'code'|'raw'|'text';
     emtyEqualsNull:boolean;
     maximum:number;
     maximumLength:number;
@@ -44,11 +43,14 @@ export type Model<Type = any> = BaseModel<Type> & {
     writable:boolean;
 }
 export type Properties<Type = any> = BaseModel<Type> & {
+    editor:'auto'|'code'|'raw'|'text';
     fullWidth:boolean;
+    icon:string;
     model:Model<Type>;
     outlined:boolean;
     placeholder:string;
     rows:number;
+    trailingIcon;
 }
 export type WebComponentAPI = {
     component:ReactWeb;
