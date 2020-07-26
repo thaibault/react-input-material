@@ -37,8 +37,11 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
      * @returns Nothing.
      */
     render():void {
+        const properties:object = {}
+        for (const [name, value] of Object.entries(this.properties))
+            properties[Tools.stringDelimitedToCamelCase(name)] = value
         ReactDOM.render(
-            React.createElement(this.component, this.properties), this.root
+            React.createElement(this.component, properties), this.root
         )
     }
 }

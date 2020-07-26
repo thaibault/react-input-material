@@ -25,58 +25,104 @@ import '@rmwc/textfield/styles'
 
 import {Model, Properties} from '../types'
 // endregion
-const nameMapping:Mapping = Object.entries({
-    defaultValue: 'default',
-    emptyEqualsNull: 'empty-equals-null',
-    fullWitdh: 'full-width',
-    maximumLength: 'maximum-length',
-    minimumLength: 'minimum-length',
-    regularExpressionPattern: 'pattern',
-    trailingIcon: 'trailing-icon'
+export const defaultModelState:ModelState = {
+    dirty: false,
+    invalid: false,
+    pristine: true,
+    touched: false,
+    untouched: true,
+    value: true
+}
+export const defaultModel:Model<string> = {
+    declaration: '',
+    defaultValue: '',
+    description: '',
+    editor: 'auto',
+    emptyEqualsNull: true,
+    maximum: Infinity,
+    maximumLength: Infinity,
+    minimum: 0,
+    minimumLength: 0,
+    mutable: true,
+    name: 'NO_NAME_DEFINED',
+    nullable: true,
+    placeholder: '',
+    regularExpressionPattern: '.*',
+    selection: null,
+    state: defaultModelState,
+    trim: true,
+    type: 'string',
+    value: null,
+    writable: true
+}
+export const defaultProperties:Partial<Properties<string>> = {
+    hideInputText: 'Hide password.',
+    hidden: false,
+    maximumLengthText:
+        'Please type less or equal than ${maximumLength} symbols.',
+    maximumText: 'Please give a number less or equal than ${maximum}.',
+    minimumLengthText:
+        'Please type at least or equal ${minimumLength} symbols.',
+    minimumText: 'Please give a number at least or equal to ${minimum}.',
+    patternText:
+        'Your string have to match the regular expression: "' +
+        '${regularExpressionPattern}".',
+    requiredText: 'Please fill this field.',
+    rows: 8,
+    selectableEditor: false,
+    showDeclaration: false,
+    showInputText: 'Show password.',
+    showValidationState: false
+}
+export const propertiesNameMapping:Mapping = Object.entries({
+    defaultValue: 'default'
 })
 export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
-    properties:Properties<Type>
+    givenProperties:Partial<Properties<Type>>
 ) => {
     /*
-        Properties overwrites model properties which overwrites default
-        properties.
+        Properties overwrites default properties which overwrites default
+        model properties.
     */
-    const givenModel:Model<Type> = properties.model || {}
-    if (properties.disabled)
-        givenModel.mutable = !properties.disabled
-    if (properties.required)
-        givenModel.nullable = !properties.required
+    // region consolidate properties
+    const properties:Properties<Type> = Tools.extend(
+        true,
+        defaultProperties,
+        givenProperties
+    )
+    if (givenProperties.disabled) {
+        delete properties.disabled
+        properties.mutable = !givenProperties.disabled
+    }
+    if (givenProperties.required) {
+        delete properties.required
+        properties.nullable = !givenProperties.required
+    }
     for (const [key, value] of nameMapping)
-        if (![null, undefined].includes(properties[value]))
-            givenModel[key] = properties[value]
-    const [model, setModel] = useState(Tools.extend(
-        {
-            declaration: '',
-            defaultValue: '',
-            description: '',
-            editor: 'auto',
-            emptyEqualsNull: true,
-            maximum: Infinity,
-            maximumLength: Infinity,
-            minimum: 0,
-            minimumLength: 0,
-            mutable: true,
-            name: 'NO_NAME',
-            nullable: true,
-            placeholder: '',
-            regularExpressionPattern: '.*',
-            selection: null,
-            trim: true,
-            type: 'string',
-            value: '',
-            writable: true
-        },
-        givenModel,
-        properties
-    ))
-
+        if (![null, undefined].includes(givenProperties[value])) {
+            delete properties[key]
+            properties[key] = givenProperties[value]
+        }
+    // / region consolidate model properties
+    const model:Model<Type> = Tools.extend(
+        {}, defaultModel, properties.model || {}
+    )
+    for (const [name, value] of Object.entries(model))
+        if (Object.prototype.hasOwnProperty.call(properties, name))
+            model[name] = properties[name]
+    // / endregion
+    // endregion
+    // region determine state
+    const [modelState, setModelState] = useState(defaultModelState)
+    const [value, setValue] = useState(defaultModel.value)
+    model.state = modelState
+    if (model.value && value !== model.value)
+        setValue(model.value)
+    model.value = value
+    // endregion
     return (
         <TextField
+            textarea={type === 'string' && model.editor === 'text'}
             disabled={!model.mutable}
             fullwidth={properties.fullWidth}
             helpText={model.declaration}
@@ -84,8 +130,8 @@ export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
             label={model.description || model.name}
             maxLength={model.maximumLength}
             minLength={model.minimumLength}
-            onChange={(event):void =>
-                setModel(Tools.extend({}, model, {value: event.target.value}))
+            onChange={(event:Event):void =>
+                setValue(event.target.value)
             }
             outlined={properties.outlined}
             pattern={model.regularExpressionPattern}
@@ -98,24 +144,36 @@ export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
     )
 }
 GenericInput.properties = {
-    any: [
-        'declaration', 'default', 'description', 'model', 'selection', 'value'
-    ],
+    any: ['default', 'model', 'selection', 'value'],
     boolean: [
         'disabled',
         'empty-equals-null',
         'full-width',
+        'hidden',
         'outlined',
         'required',
-        'trim'
+        'trim',
+        'selectable-editor',
+        'show-declaration',
+        'show-validation-state'
     ],
     number: ['maximum-length', 'maximum', 'minimum-length', 'minimum', 'rows'],
     string: [
+        'declaration', 
+        'description', 
         'editor',
+        'hide-input-text',
         'icon',
+        'maximum-length-text',
+        'maximum-text',
+        'minimum-length-text',
+        'minimum-text',
         'name',
         'pattern',
+        'pattern-text',
         'placeholder',
+        'required-text',
+        'show-input-text',
         'trailing-icon',
         'type'
     ]

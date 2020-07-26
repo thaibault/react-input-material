@@ -21,10 +21,15 @@ import {Mapping} from 'clientnode/type'
 import {ReactWeb} from '../web/ReactWeb'
 // endregion
 // region exports
+export type ModelState = {
+    invalid:boolean;
+    value:boolean;
+}
 export type BaseModel<Type = any> = {
     declaration:string;
     defaultValue:Type;
     description:string;
+    editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'text(simple)'|'text(advanced)';
     emtyEqualsNull:boolean;
     maximum:number;
     maximumLength:number;
@@ -35,22 +40,34 @@ export type BaseModel<Type = any> = {
     nullable:boolean;
     regularExpressionPattern:string;
     selection:Array<number|string>|Mapping<any>;
+    state:ModelState;
     trim:boolean;
     type:'date'|'datetime-local'|'month'|'number'|'range'|'string'|'time'|'week';
-    value:Type;
+    value:null|Type;
 }
 export type Model<Type = any> = BaseModel<Type> & {
     writable:boolean;
 }
 export type Properties<Type = any> = BaseModel<Type> & {
-    editor:'auto'|'code'|'raw'|'text';
     fullWidth:boolean;
     icon:string;
+    hidden:boolean;
+    hideInputText:string;
+    maximumLengthText:string;
+    maximumText:string;
+    minimumLengthText:string;
+    minimumText:string;
     model:Model<Type>;
+    patternText:string;
     outlined:boolean;
     placeholder:string;
+    requiredText:string;
     rows:number;
-    trailingIcon;
+    selectableEditor:boolean;
+    showDeclaration:boolean;
+    showInputText:string;
+    showValidationState:boolean;
+    trailingIcon:string;
 }
 export type WebComponentAPI = {
     component:ReactWeb;
