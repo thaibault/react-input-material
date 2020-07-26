@@ -17,6 +17,7 @@
     endregion
 */
 // region imports
+import Tools from 'clientnode'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 

@@ -23,7 +23,7 @@ import React, {FunctionComponent, setState, useState} from 'react'
 import {TextField} from '@rmwc/textfield'
 import '@rmwc/textfield/styles'
 
-import {Model, Properties} from '../types'
+import {Model, ModelState, Properties} from '../types'
 // endregion
 export const defaultModelState:ModelState = {
     dirty: false,
@@ -64,6 +64,8 @@ export const defaultProperties:Partial<Properties<string>> = {
     minimumLengthText:
         'Please type at least or equal ${minimumLength} symbols.',
     minimumText: 'Please give a number at least or equal to ${minimum}.',
+    onValueChange: (value:string):void => {},
+    onStateChange: (state:ModelState):void => {},
     patternText:
         'Your string have to match the regular expression: "' +
         '${regularExpressionPattern}".',
@@ -86,9 +88,7 @@ export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
     */
     // region consolidate properties
     const properties:Properties<Type> = Tools.extend(
-        true,
-        defaultProperties,
-        givenProperties
+        true, {}, defaultProperties, givenProperties
     )
     if (givenProperties.disabled) {
         delete properties.disabled
@@ -98,7 +98,7 @@ export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
         delete properties.required
         properties.nullable = !givenProperties.required
     }
-    for (const [key, value] of nameMapping)
+    for (const [key, value] of propertiesNameMapping)
         if (![null, undefined].includes(givenProperties[value])) {
             delete properties[key]
             properties[key] = givenProperties[value]
@@ -114,15 +114,19 @@ export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
     // endregion
     // region determine state
     const [modelState, setModelState] = useState(defaultModelState)
-    const [value, setValue] = useState(defaultModel.value)
     model.state = modelState
-    if (model.value && value !== model.value)
-        setValue(model.value)
+
+    const [value, setValue] = useState(model.value || defaultModel.value)
+    const [lastSetValue, setLastSetValue] = useState(
+        {initialized: false, value}
+    )
+    if (!lastSetValue.initialized)
+        setLastSetValue({initialized: true, value})
     model.value = value
     // endregion
     return (
         <TextField
-            textarea={type === 'string' && model.editor === 'text'}
+            textarea={model.type === 'string' && model.editor === 'text'}
             disabled={!model.mutable}
             fullwidth={properties.fullWidth}
             helpText={model.declaration}
@@ -149,10 +153,11 @@ export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
             required={!model.nullable}
             rows={properties.rows}
             trailingIcon={properties.trailingIcon}
-            value={model.value}
+            value={model.value || ''}
         />
     )
 }
+// region define external property interface (e.g. as web-component)
 GenericInput.properties = {
     any: ['default', 'model', 'selection', 'value'],
     boolean: [
@@ -188,6 +193,7 @@ GenericInput.properties = {
         'type'
     ]
 }
+// endregion
 export default GenericInput
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
