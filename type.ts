@@ -58,8 +58,10 @@ export type Properties<Type = any> = BaseModel<Type> & {
     minimumLengthText:string;
     minimumText:string;
     model:Model<Type>;
-    patternText:string;
+    onValueChange:(event:Event) => void;
+    onStateChange:(state:ModelState) => void;
     outlined:boolean;
+    patternText:string;
     placeholder:string;
     requiredText:string;
     rows:number;

@@ -130,9 +130,19 @@ export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
             label={model.description || model.name}
             maxLength={model.maximumLength}
             minLength={model.minimumLength}
-            onChange={(event:Event):void =>
-                setValue(event.target.value)
-            }
+            onChange={(event:Event):void => {
+                let value:any = event.target.value
+                if (model.trim && typeof value === 'string')
+                    value = value.trim()
+                /*
+                    TODO validate ...
+                    const newState:ModelState = {invalid: , valid: , ...modelState}
+                    setState(newState)
+                    properties.onStateChange(newState)
+                */
+                setValue(value)
+                properties.onValueChange(value)
+            }}
             outlined={properties.outlined}
             pattern={model.regularExpressionPattern}
             placeholder={properties.placeholder}
