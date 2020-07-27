@@ -91,14 +91,14 @@ for (const key of modules.keys()) {
             tagName:string = Tools.stringCamelCaseToDelimited(name)
         ):void => customElements.define(tagName, components[name].component)
     }
-    console.log(allPropertyNames)
+    // TODO
     for (const propertyName of allPropertyNames)
         Object.defineProperty(
             components[name].component.prototype,
             propertyName,
             {
                 get: function():any {
-                    console.log('GET', propertyName, 'from', name)
+                    console.log('GET', propertyName, 'from', name, this, this.properties)
                     return this.properties[propertyName]
                 },
                 set: function(value:any):void {
