@@ -19,181 +19,209 @@
 // region imports
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
 import {Mapping} from 'clientnode/type'
-import React, {FunctionComponent, setState, useState} from 'react'
+import React, {Component} from 'react'
 import {TextField} from '@rmwc/textfield'
 import '@rmwc/textfield/styles'
 
 import {Model, ModelState, Properties} from '../types'
 // endregion
-export const defaultModelState:ModelState = {
-    dirty: false,
-    invalid: false,
-    pristine: true,
-    touched: false,
-    untouched: true,
-    value: true
-}
-export const defaultModel:Model<string> = {
-    declaration: '',
-    defaultValue: '',
-    description: '',
-    editor: 'auto',
-    emptyEqualsNull: true,
-    maximum: Infinity,
-    maximumLength: Infinity,
-    minimum: 0,
-    minimumLength: 0,
-    mutable: true,
-    name: 'NO_NAME_DEFINED',
-    nullable: true,
-    placeholder: '',
-    regularExpressionPattern: '.*',
-    selection: null,
-    state: defaultModelState,
-    trim: true,
-    type: 'string',
-    value: null,
-    writable: true
-}
-export const defaultProperties:Partial<Properties<string>> = {
-    hideInputText: 'Hide password.',
-    hidden: false,
-    maximumLengthText:
-        'Please type less or equal than ${maximumLength} symbols.',
-    maximumText: 'Please give a number less or equal than ${maximum}.',
-    minimumLengthText:
-        'Please type at least or equal ${minimumLength} symbols.',
-    minimumText: 'Please give a number at least or equal to ${minimum}.',
-    onValueChange: (value:string):void => {},
-    onStateChange: (state:ModelState):void => {},
-    patternText:
-        'Your string have to match the regular expression: "' +
-        '${regularExpressionPattern}".',
-    requiredText: 'Please fill this field.',
-    rows: 8,
-    selectableEditor: false,
-    showDeclaration: false,
-    showInputText: 'Show password.',
-    showValidationState: false
-}
-export const propertiesNameMapping:Mapping = Object.entries({
-    defaultValue: 'default'
-})
-export const GenericInput:FunctionComponent<Properties<Type>> = <Type = any>(
-    givenProperties:Partial<Properties<Type>>
-) => {
-    /*
-        Properties overwrites default properties which overwrites default
-        model properties.
+/**
+ * @property static:defaultModelState - Initial model state.
+ * @property static:defaultModel - Initial model properties.
+ * @property static:defaultProps - Initial property configuration.
+ * @property static:properties - Defines external property interface (e.g. as
+ * web-component).
+ * @property static:propertiesNameMapping - Mapping of alternate property
+ * names.
+ * @property static:self - Back-reference to this class.
+ *
+ * @property model - Current model configuration.
+ * @property properties - Current properties.
+ * @property state - Current state.
+ */
+export class GenericInput<Type = any> extends Component<Properties<Type>> {
+    // region static properties
+    static readonly defaultModelState:ModelState = {
+        dirty: false,
+        invalid: false,
+        pristine: true,
+        touched: false,
+        untouched: true,
+        value: true
+    }
+    static readonly defaultModel:Model<string>  = {
+        declaration: '',
+        defaultValue: '',
+        description: '',
+        editor: 'auto',
+        emptyEqualsNull: true,
+        maximum: Infinity,
+        maximumLength: Infinity,
+        minimum: 0,
+        minimumLength: 0,
+        mutable: true,
+        name: 'NO_NAME_DEFINED',
+        nullable: true,
+        placeholder: '',
+        regularExpressionPattern: '.*',
+        selection: null,
+        state: GenericInput.defaultModelState,
+        trim: true,
+        type: 'string',
+        value: undefined,
+        writable: true
+    }
+    static readonly defaultProps:Partial<Properties<string>> = {
+        hideInputText: 'Hide password.',
+        hidden: false,
+        maximumLengthText:
+            'Please type less or equal than ${maximumLength} symbols.',
+        maximumText: 'Please give a number less or equal than ${maximum}.',
+        minimumLengthText:
+            'Please type at least or equal ${minimumLength} symbols.',
+        minimumText: 'Please give a number at least or equal to ${minimum}.',
+        onValueChange: (value:string):void => {},
+        onStateChange: (state:ModelState):void => {},
+        patternText:
+            'Your string have to match the regular expression: "' +
+            '${regularExpressionPattern}".',
+        requiredText: 'Please fill this field.',
+        rows: 8,
+        selectableEditor: false,
+        showDeclaration: false,
+        showInputText: 'Show password.',
+        showValidationState: false
+    }
+    static readonly properties = {
+        any: ['default', 'model', 'selection', 'value'],
+        boolean: [
+            'disabled',
+            'empty-equals-null',
+            'full-width',
+            'hidden',
+            'outlined',
+            'required',
+            'trim',
+            'selectable-editor',
+            'show-declaration',
+            'show-validation-state'
+        ],
+        number: ['maximum-length', 'maximum', 'minimum-length', 'minimum', 'rows'],
+        string: [
+            'declaration',
+            'description',
+            'editor',
+            'hide-input-text',
+            'icon',
+            'maximum-length-text',
+            'maximum-text',
+            'minimum-length-text',
+            'minimum-text',
+            'name',
+            'pattern',
+            'pattern-text',
+            'placeholder',
+            'required-text',
+            'show-input-text',
+            'trailing-icon',
+            'type'
+        ]
+    }
+    static readonly propertiesNameMapping:Mapping = Object.entries({
+        defaultValue: 'default'
+    })
+    // endregion
+    // region properties
+    model:Model<Type>
+    properties:Properties<Type>
+    self:typeof GenericInput = GenericInput
+    state:{
+        model:ModelState;
+        value:Type;
+    } = {
+        model: GenericInput.defaultModelState,
+        value: null
+    }
+    // endregion
+    // region helper
+    /**
+     * Synchronizes property, state and model configuration:
+     * Properties overwrites default properties which overwrites default model
+     * properties.
+     * @returns Nothing.
     */
-    // region consolidate properties
-    const properties:Properties<Type> = Tools.extend(
-        true, {}, defaultProperties, givenProperties
-    )
-    if (givenProperties.disabled) {
-        delete properties.disabled
-        properties.mutable = !givenProperties.disabled
-    }
-    if (givenProperties.required) {
-        delete properties.required
-        properties.nullable = !givenProperties.required
-    }
-    for (const [key, value] of propertiesNameMapping)
-        if (![null, undefined].includes(givenProperties[value])) {
-            delete properties[key]
-            properties[key] = givenProperties[value]
+    consolidateProperties():void {
+        this.properties = Tools.copy(this.props)
+        if (this.props.disabled) {
+            delete this.properties.disabled
+            this.properties.mutable = !this.props.disabled
         }
-    // / region consolidate model properties
-    const model:Model<Type> = Tools.extend(
-        {}, defaultModel, properties.model || {}
-    )
-    for (const [name, value] of Object.entries(model))
-        if (Object.prototype.hasOwnProperty.call(properties, name))
-            model[name] = properties[name]
-    // / endregion
+        if (this.props.required) {
+            delete this.properties.required
+            this.properties.nullable = !this.props.required
+        }
+        for (const [key, value] of this.self.propertiesNameMapping)
+            if (![null, undefined].includes(this.props[value]))
+                this.properties[key] = this.props[value]
+        this.model = Tools.extend(
+            {}, this.self.defaultModel, this.properties.model || {}
+        )
+        for (const [name, value] of Object.entries(this.model))
+            if (Object.prototype.hasOwnProperty.call(this.properties, name))
+                this.model[name] = this.properties[name]
+        this.model.state = this.state.model
+        if (Object.prototype.hasOwnProperty.call(this.properties, 'value'))
+            // Controlled component via "value" property.
+            this.model.value = this.properties.value
+        else if (
+            !Object.prototype.hasOwnProperty.call(this.model, 'value') ||
+            this.model.value === undefined
+        )
+            this.model.value = this.state.value
+        // else -> Controlled component via models's "value" property.
+    }
     // endregion
-    // region determine state
-    const [modelState, setModelState] = useState(defaultModelState)
-    model.state = modelState
-
-    const [value, setValue] = useState(model.value || defaultModel.value)
-    const [lastSetValue, setLastSetValue] = useState(
-        {initialized: false, value}
-    )
-    if (!lastSetValue.initialized)
-        setLastSetValue({initialized: true, value})
-    model.value = value
-    // endregion
-    return (
-        <TextField
-            textarea={model.type === 'string' && model.editor === 'text'}
-            disabled={!model.mutable}
-            fullwidth={properties.fullWidth}
-            helpText={model.declaration}
-            icon={properties.icon}
-            label={model.description || model.name}
-            maxLength={model.maximumLength}
-            minLength={model.minimumLength}
-            onChange={(event:Event):void => {
-                let value:any = event.target.value
-                if (model.trim && typeof value === 'string')
-                    value = value.trim()
-                /*
-                    TODO validate ...
-                    const newState:ModelState = {invalid: , valid: , ...modelState}
-                    setState(newState)
-                    properties.onStateChange(newState)
-                */
-                setValue(value)
-                properties.onValueChange(value)
-            }}
-            outlined={properties.outlined}
-            pattern={model.regularExpressionPattern}
-            placeholder={properties.placeholder}
-            required={!model.nullable}
-            rows={properties.rows}
-            trailingIcon={properties.trailingIcon}
-            value={model.value || ''}
-        />
-    )
+    /**
+     * Renders current's component state.
+     * @returns Current component's representation.
+     */
+    render():Component {
+        this.consolidateProperties()
+        const {model, properties} = this
+        return (
+            <TextField
+                disabled={!model.mutable}
+                fullwidth={properties.fullWidth}
+                helpText={model.declaration}
+                icon={properties.icon}
+                label={model.description || model.name}
+                maxLength={model.maximumLength}
+                minLength={model.minimumLength}
+                onChange={(event:Event):void => {
+                    let value:any = event.target.value
+                    if (model.trim && typeof value === 'string')
+                        value = value.trim()
+                    /*
+                        TODO validate ...
+                        const newState:ModelState = {invalid: , valid: , ...modelState}
+                        setState(newState)
+                        properties.onStateChange(newState)
+                    */
+                    this.setState({value})
+                    properties.onValueChange(value)
+                }}
+                outlined={properties.outlined}
+                pattern={model.regularExpressionPattern}
+                placeholder={properties.placeholder}
+                required={!model.nullable}
+                rows={properties.rows}
+                textarea={model.type === 'string' && model.editor === 'text'}
+                trailingIcon={properties.trailingIcon}
+                value={model.value || ''}
+            />
+        )
+    }
 }
-// region define external property interface (e.g. as web-component)
-GenericInput.properties = {
-    any: ['default', 'model', 'selection', 'value'],
-    boolean: [
-        'disabled',
-        'empty-equals-null',
-        'full-width',
-        'hidden',
-        'outlined',
-        'required',
-        'trim',
-        'selectable-editor',
-        'show-declaration',
-        'show-validation-state'
-    ],
-    number: ['maximum-length', 'maximum', 'minimum-length', 'minimum', 'rows'],
-    string: [
-        'declaration', 
-        'description', 
-        'editor',
-        'hide-input-text',
-        'icon',
-        'maximum-length-text',
-        'maximum-text',
-        'minimum-length-text',
-        'minimum-text',
-        'name',
-        'pattern',
-        'pattern-text',
-        'placeholder',
-        'required-text',
-        'show-input-text',
-        'trailing-icon',
-        'type'
-    ]
-}
-// endregion
 export default GenericInput
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

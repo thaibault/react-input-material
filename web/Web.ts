@@ -44,25 +44,41 @@ const Function:typeof Function = (
 // endregion
 /**
  * Generic web component to render a content against instance specific values.
- * @property static:content - Content template to render on property changes.
+ * @property static:defaultAttributeNames - Default configuration for
+ * property "_attributeNames".
  * @property static:observedAttributes - Attribute names to observe for
  * changes.
+ * @property static:useShadowDOM - Configures if a shadow dom should be used
+ * during web-component instantiation.
  *
+ * @property properties - Holds currently evaluated properties.
  * @property root - Hosting dom node.
+ * @property self - Back-reference to this class.
+ *
+ * @property _attributeNames - Configuration got defining how to convert
+ * attributes into properties.
+ * @property _attributeNames.any - Attribute names to evaluate.
+ * @property _attributeNames.boolean - Attribute names to evaluate as boolean.
+ * @property _attributeNames.number - Attribute names to evaluate as number.
+ * @property _attributeNames.string - Attribute names to evaluate as strings.
+ * @property _content - Content template to render on property changes.
  */
 export class Web<TElement = HTMLElement> extends HTMLElement {
-    static content:string = ''
-    static readonly observedAttributes:Array<string> = []
-    attributeNames:WebComponentAttributes = {
+    static readonly defaultAttributeNames:WebComponentAttributes = {
         any: [],
         boolean: [],
         number: [],
         string: []
     }
+    static readonly observedAttributes:Array<string> = []
+    static useShadowDOM:boolean = false
+
     properties:PlainObject = {}
     root:TElement
-    useShadowDOM:boolean = false
     readonly self:typeof Web = Web
+
+    _attributeNames:WebComponentAttributes = Web.defaultAttributeNames
+    _content:string = ''
     // region live cycle hooks
     /**
      * Initializes host dom content by attaching a shadow dom to it. Triggers
@@ -71,7 +87,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      */
     constructor() {
         super()
-        this.root = this.useShadowDOM ?
+        this.root = this.self.useShadowDOM ?
             (
                 (!('attachShadow' in this) && 'ShadyDOM' in window) ?
                     window.ShadyDOM.wrap(this) :
@@ -91,7 +107,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         attributeNames:null|WebComponentAttributes = null
     ):void {
         if (attributeNames === null)
-            attributeNames = this.attributeNames
+            attributeNames = this._attributeNames
         for (const name of attributeNames.any)
             if (this.getAttribute(name)) {
                 let get:Function
@@ -132,6 +148,25 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
             if (this.hasAttribute(name) && this.getAttribute(name))
                 this.properties[name] = this.getAttribute(name) || ''
     }
+    // endregion
+    // region getter/setter
+    get attributeNames():WebComponentAttributes {
+        return this._attributeNames
+    }
+    set attributeNames(value:Partial<WebComponentAttributes>):void {
+        this._attributeNames = Tools.extend(
+            {}, this.self.defaultAttributeNames, value
+        )
+        this.attributeChangedCallback('', '', '')
+    }
+    get content():string {
+        return this._content
+    }
+    set content(value:string):void {
+        this._content = value
+        this.render()
+    }
+    // endregion
     /**
      * Method which does the rendering job. Should be called when ever state
      * changes should be projected to the hosts dom content.
@@ -139,10 +174,9 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      */
     render():void {
         this.root.innerHTML = (new Function(
-            ...Object.keys(this), `return \`${this.self.content}\``
+            ...Object.keys(this), `return \`${this._content}\``
         ))(...Object.values(this))
     }
-    // endregion
 }
 export default Web
 // region vim modline

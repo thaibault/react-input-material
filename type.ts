@@ -43,7 +43,7 @@ export type BaseModel<Type = any> = {
     state:ModelState;
     trim:boolean;
     type:'date'|'datetime-local'|'month'|'number'|'range'|'string'|'time'|'week';
-    value:null|Type;
+    value?:null|Type;
 }
 export type Model<Type = any> = BaseModel<Type> & {
     writable:boolean;

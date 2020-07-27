@@ -78,9 +78,10 @@ for (const key of modules.keys()) {
                     component.properties.string
                 ))
 
-            attributeNames:WebComponentAttributes = component.properties
-            component:typeof Component = modules(key).default
             readonly self:typeof ReactWeb = components[name].component
+
+            _attributeNames:WebComponentAttributes = component.properties
+            _content:typeof Component = modules(key).default
         },
         register: (
             tagName:string = Tools.stringCamelCaseToDelimited(name)
