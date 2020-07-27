@@ -75,7 +75,7 @@ export type WebComponentAPI = {
     component:ReactWeb;
     register:(tagName:string) => void;
 }
-export type WebComponentAttributes = {
+export type WebComponentAttributeEvaluationTypes = {
     any:Array<string>;
     boolean:Array<string>;
     number:Array<string>;

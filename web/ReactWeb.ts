@@ -36,40 +36,13 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
 
     _content:typeof Component = 'div'
     /**
-     * Will be called on every attribute change. Calls render method after
-     * current properties have been determined by inherited generic
-     * web-component adapter.
-     *
-     * @param name - Changed attribute name.
-     * @param oldValue - Previous value of changed attribute.
-     * @param newValue - Recently set value of changed attribute.
-     * @returns Nothing.
-     */
-    attributeChangedCallback(
-        name:string, oldValue:string, newValue:string
-    ):void {
-        super.attributeChangedCallback(name, oldValue, newValue)
-        this.render()
-    }
-    /**
-     * Reflects reacts component state back to web-component's attributes and
-     * properties.
-     * @returns Nothing.
-     */
-    reflectProperties():void {
-        console.log('Reflect', this.instance)
-    }
-    /**
      * Method which does the rendering job. Should be called when ever state
      * changes should be projected to the hosts dom content.
      * @returns Nothing.
      */
     render():void {
-        const properties:object = {}
-        for (const [name, value] of Object.entries(this.properties))
-            properties[Tools.stringDelimitedToCamelCase(name)] = value
         this.instance = ReactDOM.render(
-            React.createElement(this._content, properties),
+            React.createElement(this._content, this.properties),
             this.root,
             ():void => {
                 if (this.instance)

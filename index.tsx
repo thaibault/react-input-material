@@ -21,7 +21,7 @@ import Tools from 'clientnode'
 import {Component} from 'react'
 
 import ReactWeb from './web/ReactWeb'
-import {WebComponentAPI, WebComponentAttributes} from './types'
+import {WebComponentAPI, WebComponentAttributeEvaluationTypes} from './types'
 // endregion
 export const determineComponentProperties = (
     component:typeof Component,
@@ -84,7 +84,8 @@ for (const key of modules.keys()) {
 
             readonly self:typeof ReactWeb = components[name].component
 
-            _attributeNames:WebComponentAttributes = component.properties
+            _attributeEvaluationTypes:WebComponentAttributeEvaluationTypes =
+                component.properties
             _content:typeof Component = modules(key).default
         },
         register: (
@@ -92,14 +93,22 @@ for (const key of modules.keys()) {
         ):void => customElements.define(tagName, components[name].component)
     }
     // TODO
-    for (const propertyName of allPropertyNames)
+    for (const propertyName of allPropertyNames) {
+        if (['model', 'properties'].includes(propertyName))
+            continue
         Object.defineProperty(
             components[name].component.prototype,
             propertyName,
             {
                 get: function():any {
                     console.log('GET', propertyName, 'from', name, this, this.properties)
-                    return this.properties[propertyName]
+                    return
+                        this.model &&
+                        Object.prototype.hasOwnProperty.call(
+                            this.model, propertyName
+                        ) ?
+                            this.model[propertyName] :
+                            this.properties[propertyName]
                 },
                 set: function(value:any):void {
                     console.log('SET', propertyName, 'to', value, 'on', name)
@@ -108,6 +117,7 @@ for (const key of modules.keys()) {
                 }
             }
         )
+    }
 }
 export default components
 // region vim modline
