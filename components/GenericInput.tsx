@@ -96,34 +96,36 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
         any: ['default', 'model', 'selection', 'value'],
         boolean: [
             'disabled',
-            'empty-equals-null',
-            'full-width',
+            'emptyEqualsNull',
+            'fullWidth',
             'hidden',
             'outlined',
             'required',
             'trim',
-            'selectable-editor',
-            'show-declaration',
-            'show-validation-state'
+            'selectableEditor',
+            'showDeclaration',
+            'showValidationState'
         ],
-        number: ['maximum-length', 'maximum', 'minimum-length', 'minimum', 'rows'],
+        number: [
+            'maximumLength', 'maximum', 'minimumLength', 'minimum', 'rows'
+        ],
         string: [
             'declaration',
             'description',
             'editor',
-            'hide-input-text',
+            'hideInputText',
             'icon',
-            'maximum-length-text',
-            'maximum-text',
-            'minimum-length-text',
-            'minimum-text',
+            'maximumLengthText',
+            'maximumText',
+            'minimumLengthText',
+            'minimumText',
             'name',
             'pattern',
-            'pattern-text',
+            'patternText',
             'placeholder',
-            'required-text',
-            'show-input-text',
-            'trailing-icon',
+            'requiredText',
+            'showInputText',
+            'trailingIcon',
             'type'
         ]
     }

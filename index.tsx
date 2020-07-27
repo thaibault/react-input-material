@@ -68,15 +68,19 @@ for (const key of modules.keys()) {
         if (!component.properties[type])
             component.properties[type] =
                 determineComponentProperties(component, type)
+    const allPropertyNames:Array<string> =
+        Tools.arrayUnique(([] as Array<string>).concat(
+            component.properties.any,
+            component.properties.boolean,
+            component.properties.number,
+            component.properties.string
+        ))
     components[name] = {
         component: class extends ReactWeb {
             static readonly observedAttributes:Array<string> =
-                Tools.arrayUnique(([] as Array<string>).concat(
-                    component.properties.any,
-                    component.properties.boolean,
-                    component.properties.number,
-                    component.properties.string
-                ))
+                allPropertyNames.map((name:string):string =>
+                    Tools.stringCamelCaseToDelimited(name)
+                )
 
             readonly self:typeof ReactWeb = components[name].component
 
@@ -87,6 +91,23 @@ for (const key of modules.keys()) {
             tagName:string = Tools.stringCamelCaseToDelimited(name)
         ):void => customElements.define(tagName, components[name].component)
     }
+    console.log(allPropertyNames)
+    for (const propertyName of allPropertyNames)
+        Object.defineProperty(
+            components[name].component.prototype,
+            propertyName,
+            {
+                get: function():any {
+                    console.log('GET', propertyName, 'from', name)
+                    return this.properties[propertyName]
+                },
+                set: function(value:any):void {
+                    console.log('SET', propertyName, 'to', value, 'on', name)
+                    this.properties[propertyName] = value
+                    this.render()
+                }
+            }
+        )
 }
 export default components
 // region vim modline
