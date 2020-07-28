@@ -92,9 +92,9 @@ for (const key of modules.keys()) {
             tagName:string = Tools.stringCamelCaseToDelimited(name)
         ):void => customElements.define(tagName, components[name].component)
     }
-    // TODO
     for (const propertyName of allPropertyNames) {
-        if (['model', 'properties'].includes(propertyName))
+        // NOTE: Avoid an endless loop.
+        if (propertyName === 'properties')
             continue
         Object.defineProperty(
             components[name].component.prototype,
@@ -102,13 +102,23 @@ for (const key of modules.keys()) {
             {
                 get: function():any {
                     console.log('GET', propertyName, 'from', name, this, this.properties)
-                    return
-                        this.model &&
-                        Object.prototype.hasOwnProperty.call(
-                            this.model, propertyName
-                        ) ?
-                            this.model[propertyName] :
-                            this.properties[propertyName]
+                    // TODO should be configurable how to retrieve data.
+                    return (
+                        this.instance &&
+                        (
+                            this.instance.model &&
+                            Object.prototype.hasOwnProperty.call(
+                                this.instance.model, propertyName
+                            ) &&
+                            this.instance.model[propertyName] ||
+                            this.instance.properties &&
+                            Object.prototype.hasOwnProperty.call(
+                                this.instance.properties, propertyName
+                            ) &&
+                            this.instance.properties[propertyName]
+                        ) ||
+                        this.properties[propertyName]
+                    )
                 },
                 set: function(value:any):void {
                     console.log('SET', propertyName, 'to', value, 'on', name)

@@ -91,7 +91,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
 
     _attributeEvaluationTypes:WebComponentAttributeEvaluationTypes =
         Web.defaultAttributeEvaluationTypes
-    _attributeTypeMappingIndex:Mapping = {}
+    _attributeTypeMappingIndex:Mapping|null = null
     _content:string = ''
     // region live cycle hooks
     /**
@@ -108,9 +108,6 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                     this
             ).attachShadow({mode: 'open'}) :
             this
-        // TODO
-        console.log('A', this._attributeEvaluationTypes)
-        this.generateAttributeTypeMapping()
     }
     /**
      * Triggered when ever a given attribute has changed and triggers to update
@@ -164,9 +161,19 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         this._attributeEvaluationTypes = Tools.extend(
             {}, this.self.defaultAttributeEvaluationTypes, value
         )
-        this.generateAttributeTypeMapping()
         this.updateAllAttributeEvaluations()
         this.render()
+    }
+    /**
+     * Returns cached attribute type mapping or generates if not determined
+     * yet.
+     * @returns Requested mapping.
+     */
+    get attributeTypeMappingIndex():Mapping {
+        if (this._attributeTypeMappingIndex === null)
+            this._attributeTypeMappingIndex =
+                this.generateAttributeTypeMapping()
+        return this._attributeTypeMappingIndex
     }
     /**
      * Just forwards internal content to render.
@@ -210,15 +217,16 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     /**
      * Generates a mapping if attribute names and their evaluation type to
      * quickly load an attribute value into instance properties.
-     * @returns Nothing.
+     * @returns Mapping of attribute name to corresponding evaluation type.
      */
-    generateAttributeTypeMapping():void {
-        this._attributeTypeMappingIndex = {}
+    generateAttributeTypeMapping():Mapping {
+        const result:Mapping = {}
         for (const [type, names] of Object.entries(
             this._attributeEvaluationTypes
         ))
             for (const name of names)
-                this._attributeTypeMappingIndex[name] = type
+                result[name] = type
+        return result
     }
     /**
      * Evaluates given property value depending on its type specification and
@@ -229,11 +237,11 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      */
     evaluateStringAndSetAsProperty(name:string, value:string):void {
         name = Tools.stringDelimitedToCamelCase(name)
-        console.log(name, value, this._attributeTypeMappingIndex)
+        console.log(name, value, this.attributeTypeMappingIndex)
         if (Object.prototype.hasOwnProperty.call(
-            this._attributeTypeMappingIndex, name
+            this.attributeTypeMappingIndex, name
         ))
-            switch (this._attributeTypeMappingIndex[name]) {
+            switch (this.attributeTypeMappingIndex[name]) {
                 case 'any':
                     if (value) {
                         let get:Function
