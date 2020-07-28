@@ -54,8 +54,13 @@ const Function:typeof Function = (
  * @property batchAttributeUpdates - Indicates whether to directly update dom
  * after each attribute mutation or to wait and batch mutations after current
  * queue has been finished.
- * @property batchedAttributeUpdates - A list of triple collecting mutations
- * on attributes.
+ * @property batchedAttributeUpdateRunning - A boolean indicator to identify
+ * if an attribute update is currently batched.
+ * @property batchPropertyUpdates - Indicates whether to directly update dom
+ * after each property mutation or to wait and batch mutations after current
+ * queue has been finished.
+ * @property batchedPropertyUpdateRunning - A boolean indicator to identify
+ * if an property update is currently batched.
  * @property properties - Holds currently evaluated properties.
  * @property root - Hosting dom node.
  * @property self - Back-reference to this class.
@@ -74,6 +79,7 @@ const Function:typeof Function = (
  * @property _content - Content template to render on property changes.
  */
 export class Web<TElement = HTMLElement> extends HTMLElement {
+    // region properties
     static readonly defaultAttributeEvaluationTypes:WebComponentAttributeEvaluationTypes = {
         any: [],
         boolean: [],
@@ -84,7 +90,9 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     static useShadowDOM:boolean = false
 
     batchAttributeUpdates:boolean = true
-    batchedAttributeUpdates:Array<[string, any, any]> = []
+    batchedAttributeUpdateRunning:boolean = false
+    batchPropertyUpdates:boolean = true
+    batchedPropertyUpdateRunning:boolean = false
     properties:PlainObject = {}
     root:TElement
     readonly self:typeof Web = Web
@@ -93,6 +101,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         Web.defaultAttributeEvaluationTypes
     _attributeTypeMappingIndex:Mapping|null = null
     _content:string = ''
+    // endregion
     // region live cycle hooks
     /**
      * Initializes host dom content by attaching a shadow dom to it. Triggers
@@ -120,28 +129,34 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     attributeChangedCallback(
         name:string, oldValue:string, newValue:string
     ):void {
-        if (this.batchAttributeUpdates)
-            if (this.batchedAttributeUpdates.length > 0)
-                this.batchedAttributeUpdates.push([name, oldValue, newValue])
-            else {
-                this.batchedAttributeUpdates = [[name, oldValue, newValue]]
-                Tools.timeout(():void => {
-                    for (
-                        const [name, oldValue, newValue] of
-                            this.batchedAttributeUpdates
-                    )
-                        this.evaluateStringAndSetAsProperty(name, newValue)
-                    this.batchedAttributeUpdates = []
-                    this.render()
-                })
-            }
-        else {
-            this.evaluateStringAndSetAsProperty(name, newValue)
+        this.evaluateStringAndSetAsProperty(name, newValue)
+        if (
+            this.batchAttributeUpdates && !this.batchedAttributeUpdateRunning
+        ) {
+            this.batchedAttributeUpdateRunning = true
+            Tools.timeout(():void => {
+                this.batchedAttributeUpdateRunning = false
+                this.render()
+            })
+        } else
             this.render()
-        }
     }
     // endregion
     // region getter/setter
+    getPropertyValue(name:string):any {
+        return this.properties[name]
+    }
+    setPropertyValue(name:string, value:any):void {
+        this.properties[name] = value
+        if (this.batchPropertyUpdates && !this.batchedPropertyUpdateRunning) {
+            this.batchedPropertyUpdateRunning = true
+            Tools.timeout(():void => {
+                this.batchedPropertyUpdateRunning = false
+                this.render()
+            })
+        } else
+            this.render()
+    }
     /**
      * Just forwards internal attribute name evaluation configuration.
      * @returns Internal attribute property value.
@@ -194,13 +209,13 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     }
     // endregion
     // region helper
-    // TODO
     /**
      * Reflects reacts component state back to web-component's attributes and
      * properties.
      * @returns Nothing.
      */
     reflectProperties():void {
+        // TODO
         console.log('Reflect', this.instance)
     }
     /**
@@ -237,7 +252,6 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      */
     evaluateStringAndSetAsProperty(name:string, value:string):void {
         name = Tools.stringDelimitedToCamelCase(name)
-        console.log(name, value, this.attributeTypeMappingIndex)
         if (Object.prototype.hasOwnProperty.call(
             this.attributeTypeMappingIndex, name
         ))

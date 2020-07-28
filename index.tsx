@@ -92,42 +92,19 @@ for (const key of modules.keys()) {
             tagName:string = Tools.stringCamelCaseToDelimited(name)
         ):void => customElements.define(tagName, components[name].component)
     }
-    for (const propertyName of allPropertyNames) {
-        // NOTE: Avoid an endless loop.
-        if (propertyName === 'properties')
-            continue
+    for (const propertyName of allPropertyNames)
         Object.defineProperty(
             components[name].component.prototype,
             propertyName,
             {
                 get: function():any {
-                    console.log('GET', propertyName, 'from', name, this, this.properties)
-                    // TODO should be configurable how to retrieve data.
-                    return (
-                        this.instance &&
-                        (
-                            this.instance.model &&
-                            Object.prototype.hasOwnProperty.call(
-                                this.instance.model, propertyName
-                            ) &&
-                            this.instance.model[propertyName] ||
-                            this.instance.properties &&
-                            Object.prototype.hasOwnProperty.call(
-                                this.instance.properties, propertyName
-                            ) &&
-                            this.instance.properties[propertyName]
-                        ) ||
-                        this.properties[propertyName]
-                    )
+                    return this.getPropertyValue(propertyName)
                 },
                 set: function(value:any):void {
-                    console.log('SET', propertyName, 'to', value, 'on', name)
-                    this.properties[propertyName] = value
-                    this.render()
+                    this.setPropertyValue(propertyName, value)
                 }
             }
         )
-    }
 }
 export default components
 // region vim modline
