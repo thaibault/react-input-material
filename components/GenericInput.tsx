@@ -26,12 +26,14 @@ import '@rmwc/textfield/styles'
 import {Model, ModelState, Properties} from '../types'
 // endregion
 /**
+ * Generic input wrapper component which automatically determines a useful
+ * input field depending on given model specification.
+ * @property static:attributeEvaluationTypes - Defines external property
+ * interface (e.g. as web-component).
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultModel - Initial model properties.
  * @property static:defaultProps - Initial property configuration.
- * @property static:properties - Defines external property interface (e.g. as
- * web-component).
- * @property static:propertiesNameMapping - Mapping of alternate property
+ * @property static:propertyNameMappings - Mapping of alternate property
  * names.
  * @property static:self - Back-reference to this class.
  *
@@ -41,6 +43,43 @@ import {Model, ModelState, Properties} from '../types'
  */
 export class GenericInput<Type = any> extends Component<Properties<Type>> {
     // region static properties
+    static readonly attributeEvaluationTypes = {
+        any: ['default', 'model', 'selection', 'value'],
+        boolean: [
+            'disabled',
+            'emptyEqualsNull',
+            'fullWidth',
+            'hidden',
+            'outlined',
+            'required',
+            'trim',
+            'selectableEditor',
+            'showDeclaration',
+            'showValidationState'
+        ],
+        number: [
+            'maximumLength', 'maximum', 'minimumLength', 'minimum', 'rows'
+        ],
+        string: [
+            'declaration',
+            'description',
+            'editor',
+            'hideInputText',
+            'icon',
+            'maximumLengthText',
+            'maximumText',
+            'minimumLengthText',
+            'minimumText',
+            'name',
+            'pattern',
+            'patternText',
+            'placeholder',
+            'requiredText',
+            'showInputText',
+            'trailingIcon',
+            'type'
+        ]
+    }
     static readonly defaultModelState:ModelState = {
         dirty: false,
         invalid: false,
@@ -92,44 +131,7 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
         showInputText: 'Show password.',
         showValidationState: false
     }
-    static readonly properties = {
-        any: ['default', 'model', 'selection', 'value'],
-        boolean: [
-            'disabled',
-            'emptyEqualsNull',
-            'fullWidth',
-            'hidden',
-            'outlined',
-            'required',
-            'trim',
-            'selectableEditor',
-            'showDeclaration',
-            'showValidationState'
-        ],
-        number: [
-            'maximumLength', 'maximum', 'minimumLength', 'minimum', 'rows'
-        ],
-        string: [
-            'declaration',
-            'description',
-            'editor',
-            'hideInputText',
-            'icon',
-            'maximumLengthText',
-            'maximumText',
-            'minimumLengthText',
-            'minimumText',
-            'name',
-            'pattern',
-            'patternText',
-            'placeholder',
-            'requiredText',
-            'showInputText',
-            'trailingIcon',
-            'type'
-        ]
-    }
-    static readonly propertiesNameMapping:Mapping = Object.entries({
+    static readonly propertyNameMappings:Mapping = Object.entries({
         defaultValue: 'default'
     })
     // endregion
@@ -162,7 +164,7 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
             delete this.properties.required
             this.properties.nullable = !this.props.required
         }
-        for (const [key, value] of this.self.propertiesNameMapping)
+        for (const [key, value] of this.self.propertyNameMappings)
             if (![null, undefined].includes(this.props[value]))
                 this.properties[key] = this.props[value]
         this.model = Tools.extend(
@@ -191,6 +193,7 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
         this.consolidateProperties()
         const {model, properties} = this
         return (
+            //<React.StrictMode>
             <TextField
                 disabled={!model.mutable}
                 fullwidth={properties.fullWidth}
@@ -221,6 +224,7 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
                 trailingIcon={properties.trailingIcon}
                 value={model.value || ''}
             />
+            //</React.StrictMode>
         )
     }
 }

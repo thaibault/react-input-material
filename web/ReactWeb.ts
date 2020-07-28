@@ -25,7 +25,7 @@ import Web from './Web'
 // endregion
 /**
  * Adapter for exposing a react component as web-component.
- * @property instance - Holds the current components instance.
+ * @property instance - Holds the current component instance.
  * @property self - Back-reference to this class.
  *
  * @property _content - React component to wrap.
@@ -41,15 +41,18 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
      * @returns Nothing.
      */
     render():void {
+        // TODO should be configurable.
+        this.properties.onValueChange = (value) => this.reflectProperties({value})
+
         this.instance = ReactDOM.render(
             React.createElement(this._content, this.properties),
             this.root,
             ():void => {
                 if (this.instance)
-                    this.reflectProperties()
+                    this.reflectProperties({})
             }
         )
-        this.reflectProperties()
+        this.reflectProperties({})
     }
 }
 export default ReactWeb

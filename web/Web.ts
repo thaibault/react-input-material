@@ -143,9 +143,22 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     }
     // endregion
     // region getter/setter
+    /**
+     * Generic property getter. Forwards properties from the "properties"
+     * field.
+     * @param name - Property name to retrieve.
+     * @returns Retrieved property value.
+     */
     getPropertyValue(name:string):any {
         return this.properties[name]
     }
+    /**
+     * Generic property setter. Forwards field writes into "properties" field
+     * and triggers re-rendering (optionally batched).
+     * @param name - Property name to write.
+     * @param value - New value to write.
+     * @returns Nothing.
+     */
     setPropertyValue(name:string, value:any):void {
         this.properties[name] = value
         if (this.batchPropertyUpdates && !this.batchedPropertyUpdateRunning) {
@@ -187,7 +200,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     get attributeTypeMappingIndex():Mapping {
         if (this._attributeTypeMappingIndex === null)
             this._attributeTypeMappingIndex =
-                this.generateAttributeTypeMapping()
+                this.generateAttributeTypeMappingIndex()
         return this._attributeTypeMappingIndex
     }
     /**
@@ -214,9 +227,9 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * properties.
      * @returns Nothing.
      */
-    reflectProperties():void {
+    reflectProperties(properties:Mapping<any>):void {
         // TODO
-        console.log('Reflect', this.instance)
+        Tools.extend(this.properties, properties)
     }
     /**
      * Triggers a re-evaluation of all attributes.
@@ -234,7 +247,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * quickly load an attribute value into instance properties.
      * @returns Mapping of attribute name to corresponding evaluation type.
      */
-    generateAttributeTypeMapping():Mapping {
+    generateAttributeTypeMappingIndex():Mapping {
         const result:Mapping = {}
         for (const [type, names] of Object.entries(
             this._attributeEvaluationTypes

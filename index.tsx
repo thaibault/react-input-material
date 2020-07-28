@@ -62,18 +62,18 @@ for (const key of modules.keys()) {
         component.___types.name.name ?
             component.___types.name.name :
             key.replace(/^(.*\/+)?([^\/]+)\.tsx$/, '$2')
-    if (!component.properties)
-        component.properties = {}
+    if (!component.attributeEvaluationTypes)
+        component.attributeEvaluationTypes = {}
     for (const type of ['any', 'boolean', 'number', 'string'])
-        if (!component.properties[type])
-            component.properties[type] =
+        if (!component.attributeEvaluationTypes[type])
+            component.attributeEvaluationTypes[type] =
                 determineComponentProperties(component, type)
     const allPropertyNames:Array<string> =
         Tools.arrayUnique(([] as Array<string>).concat(
-            component.properties.any,
-            component.properties.boolean,
-            component.properties.number,
-            component.properties.string
+            component.attributeEvaluationTypes.any,
+            component.attributeEvaluationTypes.boolean,
+            component.attributeEvaluationTypes.number,
+            component.attributeEvaluationTypes.string
         ))
     components[name] = {
         component: class extends ReactWeb {
@@ -85,7 +85,7 @@ for (const key of modules.keys()) {
             readonly self:typeof ReactWeb = components[name].component
 
             _attributeEvaluationTypes:WebComponentAttributeEvaluationTypes =
-                component.properties
+                component.attributeEvaluationTypes
             _content:typeof Component = modules(key).default
         },
         register: (
