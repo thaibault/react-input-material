@@ -72,6 +72,8 @@ const Function:typeof Function = (
  * boolean.
  * @property _attributeEvaluationTypes.number - Attribute names to evaluate as
  * number.
+ * @property _attributeEvaluationTypes.output - Attribute names to evaluate as
+ * event handler.
  * @property _attributeEvaluationTypes.string - Attribute names to evaluate as
  * strings.
  * @property _attributeTyoeMappingIndex - Index to retrieve evaluation type
@@ -84,6 +86,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         any: [],
         boolean: [],
         number: [],
+        output: {},
         string: []
     }
     static readonly observedAttributes:Array<string> = []
@@ -228,8 +231,10 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @returns Nothing.
      */
     reflectProperties(properties:Mapping<any>):void {
-        // TODO
+        console.log('Reflect', properties)
         Tools.extend(this.properties, properties)
+        // TODO set attributes.
+        this.render()
     }
     /**
      * Triggers a re-evaluation of all attributes.
@@ -251,9 +256,13 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         const result:Mapping = {}
         for (const [type, names] of Object.entries(
             this._attributeEvaluationTypes
-        ))
-            for (const name of names)
+        )) {
+            const keys:Array<string> = (type === 'output') ?
+                Object.keys(names) :
+                names
+            for (const name of keys)
                 result[name] = type
+        }
         return result
     }
     /**
@@ -306,6 +315,37 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                         this.properties[name] = undefined
                     else
                         this.properties[name] = number
+                    break
+                case 'output':
+                    let callback:Function
+                    try {
+                        callback = new Function('parameter', `return ${value}`)
+                    } catch (error) {
+                        console.warn(
+                            `'Failed to compile event handler "${name}" with` +
+                            ` expression "${value}": "` +
+                            `${Tools.represent(error)}".`
+                        )
+                    }
+                    properties[name] = (...parameter:Array<any>):void => {
+                        this.reflectProperties(
+                            this._attributeEvaluationTypes.output[name](
+                                ...parameter
+                            )
+                        )
+                        if (callback)
+                            try {
+                                callback(parameter)
+                            } catch (error) {
+                                console.warn(
+                                    `'Failed to evaluate event handler "` +
+                                    `${name}" with expression "${value}" and` +
+                                    ` scope variable "parameter" set to "` +
+                                    `${Tools.represent(parameter)}": "` +
+                                    `${Tools.represent(error)}".`
+                                )
+                            }
+                    }
                     break
                 case 'string':
                     this.properties[name] = value

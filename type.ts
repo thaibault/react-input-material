@@ -22,7 +22,11 @@ import {ReactWeb} from '../web/ReactWeb'
 // endregion
 // region exports
 export type ModelState = {
+    dirty:boolean;
     invalid:boolean;
+    pristine:boolean;
+    touched:boolean;
+    untouched:boolean;
     value:boolean;
 }
 export type BaseModel<Type = any> = {
@@ -58,8 +62,8 @@ export type Properties<Type = any> = BaseModel<Type> & {
     minimumLengthText:string;
     minimumText:string;
     model:Model<Type>;
-    onValueChange:(value:Type) => void;
-    onStateChange:(state:ModelState) => void;
+    onChangeValue:(value:Type) => void;
+    onChangeState:(state:ModelState) => void;
     outlined:boolean;
     patternText:string;
     placeholder:string;
@@ -79,6 +83,7 @@ export type WebComponentAttributeEvaluationTypes = {
     any:Array<string>;
     boolean:Array<string>;
     number:Array<string>;
+    output:Mapping<(...parameter:Array<any>) => Mapping<any>>;
     string:Array<string>;
 }
 // endregion

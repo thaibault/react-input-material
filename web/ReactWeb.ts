@@ -41,18 +41,27 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
      * @returns Nothing.
      */
     render():void {
-        // TODO should be configurable.
-        this.properties.onValueChange = (value) => this.reflectProperties({value})
-
+        for (const [name, mapping] of Object.entries(
+            this._attributeEvaluationTypes.output
+        ))
+            if (!Object.prototype.hasOwnProperty.call(this.properties, name))
+                this.properties[name] = (...parameter:Array<any>):void =>
+                    this.reflectProperties(
+                        this._attributeEvaluationTypes.output[name](
+                            ...parameter
+                        )
+                    )
+        // TODO how to initially reflect?
         this.instance = ReactDOM.render(
             React.createElement(this._content, this.properties),
             this.root,
             ():void => {
                 if (this.instance)
-                    this.reflectProperties({})
+                    return
+                    // this.reflectProperties({})
             }
         )
-        this.reflectProperties({})
+        // this.reflectProperties({})
     }
 }
 export default ReactWeb

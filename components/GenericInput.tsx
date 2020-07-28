@@ -46,20 +46,30 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
     static readonly attributeEvaluationTypes = {
         any: ['default', 'model', 'selection', 'value'],
         boolean: [
+            'dirty',
             'disabled',
             'emptyEqualsNull',
             'fullWidth',
             'hidden',
+            'invalid',
             'outlined',
+            'pristine',
             'required',
-            'trim',
             'selectableEditor',
             'showDeclaration',
-            'showValidationState'
+            'showValidationState',
+            'touched',
+            'trim',
+            'untouched',
+            'valid'
         ],
         number: [
             'maximumLength', 'maximum', 'minimumLength', 'minimum', 'rows'
         ],
+        output: {
+            onChangeState: (state:ModelState):ModelState => state,
+            onChangeValue: (value:Type):{value:Type} => ({value}),
+        },
         string: [
             'declaration',
             'description',
@@ -86,7 +96,7 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
         pristine: true,
         touched: false,
         untouched: true,
-        value: true
+        valid: true
     }
     static readonly defaultModel:Model<string>  = {
         declaration: '',
@@ -119,8 +129,6 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
         minimumLengthText:
             'Please type at least or equal ${minimumLength} symbols.',
         minimumText: 'Please give a number at least or equal to ${minimum}.',
-        onValueChange: (value:string):void => {},
-        onStateChange: (state:ModelState):void => {},
         patternText:
             'Your string have to match the regular expression: "' +
             '${regularExpressionPattern}".',
@@ -208,12 +216,12 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
                         value = value.trim()
                     /*
                         TODO validate ...
-                        const newState:ModelState = {invalid: , valid: , ...modelState}
-                        setState(newState)
-                        properties.onStateChange(newState)
+                        const state:ModelState = {invalid: , valid: , ...modelState}
+                        setState({model: state})
+                        properties.onChangeState && properties.onChangeState(state)
                     */
                     this.setState({value})
-                    properties.onValueChange(value)
+                    properties.onChangeValue && properties.onChangeValue(value)
                 }}
                 outlined={properties.outlined}
                 pattern={model.regularExpressionPattern}
