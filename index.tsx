@@ -23,29 +23,6 @@ import {Component} from 'react'
 import ReactWeb from './web/ReactWeb'
 import {WebComponentAPI, WebComponentAttributeEvaluationTypes} from './types'
 // endregion
-export const determineComponentProperties = (
-    component:typeof Component,
-    type:'any'|'boolean'|'number'|'string' = 'string'
-):Array<string> => {
-    if (
-        component.___types &&
-        component.___types.value &&
-        component.___types.value.members
-    )
-        return component.___types.value.members
-            .filter((property):boolean =>
-                property.kind === 'property' &&
-                (
-                    property.value.kind === type ||
-                    type === 'any' &&
-                    !['boolean', 'number', 'string'].includes(
-                        property.value.kind
-                    )
-                )
-            )
-            .map((property):string => property.key.name)
-    return []
-}
 export const components:Mapping<WebComponentAPI> = {}
 /*
     Import all react components and extract a dynamically created web-component
@@ -57,24 +34,17 @@ for (const key of modules.keys()) {
     const component:typeof Component = modules(key).default
     // Determine class / function name.
     const name:string =
+        component._name ||
+        component.name ||
         component.___types &&
         component.___types.name &&
-        component.___types.name.name ?
-            component.___types.name.name :
-            key.replace(/^(.*\/+)?([^\/]+)\.tsx$/, '$2')
-    if (!component.attributeEvaluationTypes)
-        component.attributeEvaluationTypes = {}
-    for (const type of ['any', 'boolean', 'number', 'string'])
-        if (!component.attributeEvaluationTypes[type])
-            component.attributeEvaluationTypes[type] =
-                determineComponentProperties(component, type)
-    const allPropertyNames:Array<string> =
-        Tools.arrayUnique(([] as Array<string>).concat(
-            component.attributeEvaluationTypes.any,
-            component.attributeEvaluationTypes.boolean,
-            component.attributeEvaluationTypes.number,
-            component.attributeEvaluationTypes.string
-        ))
+        component.___types.name.name ||
+        key.replace(/^(.*\/+)?([^\/]+)\.tsx$/, '$2')
+    let propertyTypes:PropertyTypes = {}
+    if (component.propTypes) {
+        propertyTypes = component.propTypes
+    }
+    const allPropertyNames:Array<string> = Object.keys(propertyTypes)
     components[name] = {
         component: class extends ReactWeb {
             static readonly observedAttributes:Array<string> =
@@ -84,8 +54,8 @@ for (const key of modules.keys()) {
 
             readonly self:typeof ReactWeb = components[name].component
 
-            _attributeEvaluationTypes:WebComponentAttributeEvaluationTypes =
-                component.attributeEvaluationTypes
+            _attributeEvaluationTypes:PropertyTypes =
+                attributeEvaluationTypes
             _content:typeof Component = modules(key).default
         },
         register: (

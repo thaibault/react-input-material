@@ -44,8 +44,6 @@ const Function:typeof Function = (
 // endregion
 /**
  * Generic web component to render a content against instance specific values.
- * @property static:defaultAttributeEvaluationTypes - Default configuration for
- * property "_attributeEvaluationTypes".
  * @property static:observedAttributes - Attribute names to observe for
  * changes.
  * @property static:useShadowDOM - Configures if a shadow dom should be used
@@ -65,30 +63,12 @@ const Function:typeof Function = (
  * @property root - Hosting dom node.
  * @property self - Back-reference to this class.
  *
- * @property _attributeEvaluationTypes - Configuration got defining how to
- * convert attributes into properties.
- * @property _attributeEvaluationTypes.any - Attribute names to evaluate.
- * @property _attributeEvaluationTypes.boolean - Attribute names to evaluate as
- * boolean.
- * @property _attributeEvaluationTypes.number - Attribute names to evaluate as
- * number.
- * @property _attributeEvaluationTypes.output - Attribute names to evaluate as
- * event handler.
- * @property _attributeEvaluationTypes.string - Attribute names to evaluate as
- * strings.
- * @property _attributeTyoeMappingIndex - Index to retrieve evaluation type
- * of a given property in constant time effort.
+ * @property _attributeEvaluationTypes - Configuration defining how to convert
+ * attributes into properties and reflect property changes back to attributes.
  * @property _content - Content template to render on property changes.
  */
 export class Web<TElement = HTMLElement> extends HTMLElement {
     // region properties
-    static readonly defaultAttributeEvaluationTypes:WebComponentAttributeEvaluationTypes = {
-        any: [],
-        boolean: [],
-        number: [],
-        output: {},
-        string: []
-    }
     static readonly observedAttributes:Array<string> = []
     static useShadowDOM:boolean = false
 
@@ -100,9 +80,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     root:TElement
     readonly self:typeof Web = Web
 
-    _attributeEvaluationTypes:WebComponentAttributeEvaluationTypes =
-        Web.defaultAttributeEvaluationTypes
-    _attributeTypeMappingIndex:Mapping|null = null
+    _attributeEvaluationTypes:WebComponentAttributeEvaluationTypes = {}
     _content:string = ''
     // endregion
     // region live cycle hooks
@@ -189,9 +167,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     set attributeEvaluationTypes(
         value:Partial<WebComponentAttributeEvaluationTypes>
     ):void {
-        this._attributeEvaluationTypes = Tools.extend(
-            {}, this.self.defaultAttributeEvaluationTypes, value
-        )
+        this._attributeEvaluationTypes = value
         this.updateAllAttributeEvaluations()
         this.render()
     }
@@ -248,24 +224,6 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
             }
     }
     /**
-     * Generates a mapping if attribute names and their evaluation type to
-     * quickly load an attribute value into instance properties.
-     * @returns Mapping of attribute name to corresponding evaluation type.
-     */
-    generateAttributeTypeMappingIndex():Mapping {
-        const result:Mapping = {}
-        for (const [type, names] of Object.entries(
-            this._attributeEvaluationTypes
-        )) {
-            const keys:Array<string> = (type === 'output') ?
-                Object.keys(names) :
-                names
-            for (const name of keys)
-                result[name] = type
-        }
-        return result
-    }
-    /**
      * Evaluates given property value depending on its type specification and
      * registers in properties mapping object.
      * @param name - Name of given value.
@@ -275,9 +233,9 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     evaluateStringAndSetAsProperty(name:string, value:string):void {
         name = Tools.stringDelimitedToCamelCase(name)
         if (Object.prototype.hasOwnProperty.call(
-            this.attributeTypeMappingIndex, name
+            this._attributeEvaluationTypes, name
         ))
-            switch (this.attributeTypeMappingIndex[name]) {
+            switch (this._attributeEvaluationTypes[name]) {
                 case 'any':
                     if (value) {
                         let get:Function

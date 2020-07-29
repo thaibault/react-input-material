@@ -16,7 +16,8 @@
     endregion
 */
 // region imports
-import {Mapping} from 'clientnode/type'
+import {Mapping, ValueOf} from 'clientnode/type'
+import PropTypes from 'prop-types'
 
 import {ReactWeb} from '../web/ReactWeb'
 // endregion
@@ -31,7 +32,7 @@ export type ModelState = {
 }
 export type BaseModel<Type = any> = {
     declaration:string;
-    defaultValue:Type;
+    default:Type;
     description:string;
     editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'text(simple)'|'text(advanced)';
     emtyEqualsNull:boolean;
@@ -53,7 +54,7 @@ export type Model<Type = any> = BaseModel<Type> & {
     writable:boolean;
 }
 export type Properties<Type = any> = BaseModel<Type> & {
-    fullWidth:boolean;
+    >fullWidth:boolean;
     icon:string;
     hidden:boolean;
     hideInputText:string;
@@ -75,17 +76,12 @@ export type Properties<Type = any> = BaseModel<Type> & {
     showValidationState:boolean;
     trailingIcon:string;
 }
+export type Props<Type = any> = Partial<Properties<Type>>
 export type WebComponentAPI = {
     component:ReactWeb;
     register:(tagName:string) => void;
 }
-export type WebComponentAttributeEvaluationTypes = {
-    any:Array<string>;
-    boolean:Array<string>;
-    number:Array<string>;
-    output:Mapping<(...parameter:Array<any>) => Mapping<any>>;
-    string:Array<string>;
-}
+export type WebComponentAttributeEvaluationTypes = Mapping<ValueOf<PropTypes>|string>
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

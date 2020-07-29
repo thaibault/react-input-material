@@ -23,25 +23,72 @@ import React, {Component} from 'react'
 import {TextField} from '@rmwc/textfield'
 import '@rmwc/textfield/styles'
 
-import {Model, ModelState, Properties} from '../types'
+import {Model, ModelState, Properties} from '../type'
 // endregion
+/*
+    NOTE: Using an imported "Props" type (which consists of a "Partial"
+    modifier) is not yet working with "babel-plugin-typescript-to-proptypes".
+*/
+export type Props<Type = any> = {
+    // BaseModel
+    declaration?:string;
+    default?:Type;
+    description?:string;
+    editor?:'code'|'code(css)'|'code(script)'|'plain'|'text'|'text(simple)'|'text(advanced)';
+    emtyEqualsNull?:boolean;
+    maximum?:number;
+    maximumLength?:number;
+    minimum?:number;
+    minimumLength?:number;
+    mutable?:boolean;
+    name?:string;
+    nullable?:boolean;
+    regularExpressionPattern?:string;
+    selection?:Array<number|string>|Mapping<any>;
+    state?:ModelState;
+    trim?:boolean;
+    type?:'date'|'datetime-local'|'month'|'number'|'range'|'string'|'time'|'week';
+    value?:null|Type;
+
+    // Properties
+    fullWidth?:boolean;
+    icon?:string;
+    hidden?:boolean;
+    hideInputText?:string;
+    maximumLengthText?:string;
+    maximumText?:string;
+    minimumLengthText?:string;
+    minimumText?:string;
+    // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
+    // model?:Model<Type>;
+    model:any;
+    onChangeValue?:(value:Type) => void;
+    onChangeState?:(state:ModelState) => void;
+    outlined?:boolean;
+    patternText?:string;
+    placeholder?:string;
+    requiredText?:string;
+    rows?:number;
+    selectableEditor?:boolean;
+    showDeclaration?:boolean;
+    showInputText?:string;
+    showValidationState?:boolean;
+    trailingIcon?:string;
+}
 /**
  * Generic input wrapper component which automatically determines a useful
  * input field depending on given model specification.
  * @property static:attributeEvaluationTypes - Defines external property
  * interface (e.g. as web-component).
  * @property static:defaultModelState - Initial model state.
- * @property static:defaultModel - Initial model properties.
  * @property static:defaultProps - Initial property configuration.
- * @property static:propertyNameMappings - Mapping of alternate property
- * names.
  * @property static:self - Back-reference to this class.
  *
  * @property model - Current model configuration.
  * @property properties - Current properties.
  * @property state - Current state.
  */
-export class GenericInput<Type = any> extends Component<Properties<Type>> {
+export class GenericInput<Type = any> extends Component<Props<Type>> {
     // region static properties
     static readonly attributeEvaluationTypes = {
         any: ['default', 'model', 'selection', 'value'],
@@ -98,28 +145,6 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
         untouched: true,
         valid: true
     }
-    static readonly defaultModel:Model<string>  = {
-        declaration: '',
-        defaultValue: '',
-        description: '',
-        editor: 'auto',
-        emptyEqualsNull: true,
-        maximum: Infinity,
-        maximumLength: Infinity,
-        minimum: 0,
-        minimumLength: 0,
-        mutable: true,
-        name: 'NO_NAME_DEFINED',
-        nullable: true,
-        placeholder: '',
-        regularExpressionPattern: '.*',
-        selection: null,
-        state: GenericInput.defaultModelState,
-        trim: true,
-        type: 'string',
-        value: undefined,
-        writable: true
-    }
     static readonly defaultProps:Partial<Properties<string>> = {
         hideInputText: 'Hide password.',
         hidden: false,
@@ -129,6 +154,28 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
         minimumLengthText:
             'Please type at least or equal ${minimumLength} symbols.',
         minimumText: 'Please give a number at least or equal to ${minimum}.',
+        model: {
+            declaration: '',
+            default: '',
+            description: '',
+            editor: 'auto',
+            emptyEqualsNull: true,
+            maximum: Infinity,
+            maximumLength: Infinity,
+            minimum: 0,
+            minimumLength: 0,
+            mutable: true,
+            name: 'NO_NAME_DEFINED',
+            nullable: true,
+            placeholder: '',
+            regularExpressionPattern: '.*',
+            selection: null,
+            state: GenericInput.defaultModelState,
+            trim: true,
+            type: 'string',
+            value: undefined,
+            writable: true
+        },
         patternText:
             'Your string have to match the regular expression: "' +
             '${regularExpressionPattern}".',
@@ -139,12 +186,8 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
         showInputText: 'Show password.',
         showValidationState: false
     }
-    static readonly propertyNameMappings:Mapping = Object.entries({
-        defaultValue: 'default'
-    })
     // endregion
     // region properties
-    model:Model<Type>
     properties:Properties<Type>
     self:typeof GenericInput = GenericInput
     state:{
@@ -172,24 +215,20 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
             delete this.properties.required
             this.properties.nullable = !this.props.required
         }
-        for (const [key, value] of this.self.propertyNameMappings)
-            if (![null, undefined].includes(this.props[value]))
-                this.properties[key] = this.props[value]
-        this.model = Tools.extend(
-            {}, this.self.defaultModel, this.properties.model || {}
-        )
-        for (const [name, value] of Object.entries(this.model))
+        for (const [name, value] of Object.entries(this.properties.model))
             if (Object.prototype.hasOwnProperty.call(this.properties, name))
-                this.model[name] = this.properties[name]
-        this.model.state = this.state.model
+                this.properties.model[name] = this.properties[name]
+        this.properties.model.state = this.state.model
         if (Object.prototype.hasOwnProperty.call(this.properties, 'value'))
             // Controlled component via "value" property.
-            this.model.value = this.properties.value
+            this.properties.model.value = this.properties.value
         else if (
-            !Object.prototype.hasOwnProperty.call(this.model, 'value') ||
-            this.model.value === undefined
+            !Object.prototype.hasOwnProperty.call(
+                this.properties.model, 'value'
+            ) ||
+            this.properties.model.value === undefined
         )
-            this.model.value = this.state.value
+            this.properties.model.value = this.state.value
         // else -> Controlled component via models's "value" property.
     }
     // endregion
@@ -199,20 +238,20 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
      */
     render():Component {
         this.consolidateProperties()
-        const {model, properties} = this
+        const properties:Properties = this.properties
         return (
             //<React.StrictMode>
             <TextField
-                disabled={!model.mutable}
+                disabled={!properties.model.mutable}
                 fullwidth={properties.fullWidth}
-                helpText={model.declaration}
+                helpText={properties.model.declaration}
                 icon={properties.icon}
-                label={model.description || model.name}
-                maxLength={model.maximumLength}
-                minLength={model.minimumLength}
+                label={properties.model.description || properties.model.name}
+                maxLength={properties.model.maximumLength}
+                minLength={properties.model.minimumLength}
                 onChange={(event:Event):void => {
                     let value:any = event.target.value
-                    if (model.trim && typeof value === 'string')
+                    if (properties.model.trim && typeof value === 'string')
                         value = value.trim()
                     /*
                         TODO validate ...
@@ -224,13 +263,16 @@ export class GenericInput<Type = any> extends Component<Properties<Type>> {
                     properties.onChangeValue && properties.onChangeValue(value)
                 }}
                 outlined={properties.outlined}
-                pattern={model.regularExpressionPattern}
+                pattern={properties.model.regularExpressionPattern}
                 placeholder={properties.placeholder}
-                required={!model.nullable}
+                required={!properties.model.nullable}
                 rows={properties.rows}
-                textarea={model.type === 'string' && model.editor === 'text'}
+                textarea={
+                    properties.model.type === 'string' &&
+                    properties.model.editor === 'text'
+                }
                 trailingIcon={properties.trailingIcon}
-                value={model.value || ''}
+                value={properties.model.value || ''}
             />
             //</React.StrictMode>
         )
