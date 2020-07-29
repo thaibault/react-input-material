@@ -45,16 +45,18 @@ export type BaseModel<Type = any> = {
     nullable:boolean;
     regularExpressionPattern:string;
     selection:Array<number|string>|Mapping<any>;
-    state:ModelState;
     trim:boolean;
     type:'date'|'datetime-local'|'month'|'number'|'range'|'string'|'time'|'week';
     value?:null|Type;
 }
 export type Model<Type = any> = BaseModel<Type> & {
+    state:ModelState;
     writable:boolean;
 }
-export type Properties<Type = any> = BaseModel<Type> & {
-    >fullWidth:boolean;
+export type Output = Mapping<(...parameter:Array<any>) => Mapping<any>>
+export type Properties<Type = any> = BaseModel<Type> & ModelState & {
+    disabled?:boolean;
+    fullWidth:boolean;
     icon:string;
     hidden:boolean;
     hideInputText:string;
@@ -65,9 +67,12 @@ export type Properties<Type = any> = BaseModel<Type> & {
     model:Model<Type>;
     onChangeValue:(value:Type) => void;
     onChangeState:(state:ModelState) => void;
+    onInitialize:(properties:Properties<Type>) => void;
+    onTouch:(event:Event) => void;
     outlined:boolean;
     patternText:string;
     placeholder:string;
+    required?:boolean;
     requiredText:string;
     rows:number;
     selectableEditor:boolean;
@@ -76,12 +81,12 @@ export type Properties<Type = any> = BaseModel<Type> & {
     showValidationState:boolean;
     trailingIcon:string;
 }
+export type PropertyTypes = Mapping<ValueOf<PropTypes>|string>
 export type Props<Type = any> = Partial<Properties<Type>>
 export type WebComponentAPI = {
     component:ReactWeb;
     register:(tagName:string) => void;
 }
-export type WebComponentAttributeEvaluationTypes = Mapping<ValueOf<PropTypes>|string>
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

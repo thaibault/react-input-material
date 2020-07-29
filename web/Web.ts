@@ -16,8 +16,11 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports 
+// region imports
+import PropTypes from 'prop-types'
 import Tools, {globalContext, PlainObject} from 'clientnode'
+
+import {Output, PropertyTypes} from '../types'
 // endregion
 // region polyfills
 // Polyfill for template strings in dynamic function constructs in simple cases
@@ -63,8 +66,10 @@ const Function:typeof Function = (
  * @property root - Hosting dom node.
  * @property self - Back-reference to this class.
  *
- * @property _attributeEvaluationTypes - Configuration defining how to convert
- * attributes into properties and reflect property changes back to attributes.
+ * @property _propertiesToReflectAsAttributes - A mapping of property names to
+ * set as attributes when they are set/updated.
+ * @property _propertyTypes - Configuration defining how to convert attributes
+ * into properties and reflect property changes back to attributes.
  * @property _content - Content template to render on property changes.
  */
 export class Web<TElement = HTMLElement> extends HTMLElement {
@@ -76,17 +81,18 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     batchedAttributeUpdateRunning:boolean = false
     batchPropertyUpdates:boolean = true
     batchedPropertyUpdateRunning:boolean = false
+    output:Output = {}
     properties:PlainObject = {}
     root:TElement
     readonly self:typeof Web = Web
 
-    _attributeEvaluationTypes:WebComponentAttributeEvaluationTypes = {}
+    _propertiesToReflectAsAttributes:Mapping<boolean> = new Map()
+    _propertyTypes:PropertyTypes = {}
     _content:string = ''
     // endregion
     // region live cycle hooks
     /**
-     * Initializes host dom content by attaching a shadow dom to it. Triggers
-     * initial attribute changed reaction callback.
+     * Initializes host dom content by attaching a shadow dom to it.
      * @returns Nothing.
      */
     constructor() {
@@ -125,6 +131,22 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     // endregion
     // region getter/setter
     /**
+     * Forwards "_propertiesToReflectAsAttributes" property value.
+     * @returns Property value.
+     */
+    get propertiesToReflectAsAttributes():Mapping<boolean> {
+        return this._propertiesToReflectAsAttributes
+    }
+    /**
+     * Sets "_propertiesToReflectAsAttributes" property value.
+     * @param value - New value to set.
+     * @returns Nothing.
+     */
+    set propertiesToReflectAsAttributes(value:Mapping<boolean>):void {
+        this._propertiesToReflectAsAttributes = value
+        this.reflectProperties(this.properties)
+    }
+    /**
      * Generic property getter. Forwards properties from the "properties"
      * field.
      * @param name - Property name to retrieve.
@@ -152,35 +174,22 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
             this.render()
     }
     /**
-     * Just forwards internal attribute name evaluation configuration.
-     * @returns Internal attribute property value.
+     * Just forwards internal property types.
+     * @returns Internal "propertyTypes" property value.
      */
-    get attributeEvaluationTypes():WebComponentAttributeEvaluationTypes {
-        return this._attributeEvaluationTypes
+    get propertyTypes():WebComponentAttributeEvaluationTypes {
+        return this._propertyTypes
     }
     /**
-     * Set internal attribute names as re-generates an attribute type mapping
-     * index.
-     * @param value - New attribute evaluation configuration.
+     * Set internal property types. Triggers a re-evaluation of all given
+     * attributes and re-renders current content.
+     * @param value - New property types configuration.
      * @returns Nothing.
      */
-    set attributeEvaluationTypes(
-        value:Partial<WebComponentAttributeEvaluationTypes>
-    ):void {
-        this._attributeEvaluationTypes = value
+    set propertyTypes(value:PropertyTypes):void {
+        this._propertyTypes = value
         this.updateAllAttributeEvaluations()
         this.render()
-    }
-    /**
-     * Returns cached attribute type mapping or generates if not determined
-     * yet.
-     * @returns Requested mapping.
-     */
-    get attributeTypeMappingIndex():Mapping {
-        if (this._attributeTypeMappingIndex === null)
-            this._attributeTypeMappingIndex =
-                this.generateAttributeTypeMappingIndex()
-        return this._attributeTypeMappingIndex
     }
     /**
      * Just forwards internal content to render.
@@ -206,10 +215,58 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * properties.
      * @returns Nothing.
      */
+    // TODO check of properties has to be sorted?
     reflectProperties(properties:Mapping<any>):void {
-        console.log('Reflect', properties)
-        Tools.extend(this.properties, properties)
-        // TODO set attributes.
+        for (const [name, value] of Object.entries(properties)) {
+            this.properties[name] = value
+            if (this._propertiesToReflectAsAttributes.has(name))
+                switch (this._propertyTypes[name]) {
+                    case PropTypes.any:
+                    case PropTypes.array:
+                    case PropTypes.arrayOf:
+                    case PropTypes.element:
+                    case PropTypes.elementType:
+                    case PropTypes.instanceOf:
+                    case PropTypes.node:
+                    case PropTypes.object:
+                    case PropTypes.objectOf:
+                    case PropTypes.shape:
+                    case PropTypes.exact:
+                    case PropTypes.symbol:
+                    case 'any':
+                        if (value) {
+                            const representation:string =
+                                Tools.represent(value)
+                            if (representation) {
+                                this.setAttribute(name, representation)
+                                break
+                            }
+                        }
+                        this.removeAttribute(name)
+                        break
+                    case PropTypes.bool:
+                    case 'boolean':
+                        value ?
+                            this.setAttribute(name, '') :
+                            this.removeAttribute(name)
+                        break
+                    case PropTypes.number:
+                    case 'number':
+                        (typeof value === 'number' && !isNaN(value)) ?
+                            this.setAttribute(name, `${value}`) :
+                            this.removeAttribute(name)
+                        break
+                    case PropTypes.func:
+                    case 'output':
+                        break
+                    case PropTypes.string:
+                    case 'string':
+                        value ?
+                            this.setAttribute(name, value) :
+                            this.removeAttribute(name)
+                        break
+                }
+        }
         this.render()
     }
     /**
@@ -232,10 +289,20 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      */
     evaluateStringAndSetAsProperty(name:string, value:string):void {
         name = Tools.stringDelimitedToCamelCase(name)
-        if (Object.prototype.hasOwnProperty.call(
-            this._attributeEvaluationTypes, name
-        ))
-            switch (this._attributeEvaluationTypes[name]) {
+        if (Object.prototype.hasOwnProperty.call(this._propertyTypes, name))
+            switch (this._propertyTypes[name]) {
+                case PropTypes.any:
+                case PropTypes.array:
+                case PropTypes.arrayOf:
+                case PropTypes.element:
+                case PropTypes.elementType:
+                case PropTypes.instanceOf:
+                case PropTypes.node:
+                case PropTypes.object:
+                case PropTypes.objectOf:
+                case PropTypes.shape:
+                case PropTypes.exact:
+                case PropTypes.symbol:
                 case 'any':
                     if (value) {
                         let get:Function
@@ -264,9 +331,11 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                     } else
                         this.properties[name] = null
                     break
+                case PropTypes.bool:
                 case 'boolean':
                     this.properties[name] = value !== 'false'
                     break
+                case PropTypes.number:
                 case 'number':
                     const number:number = parseFloat(value)
                     if (isNaN(number))
@@ -274,6 +343,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                     else
                         this.properties[name] = number
                     break
+                case PropTypes.func:
                 case 'output':
                     let callback:Function
                     try {
@@ -286,11 +356,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                         )
                     }
                     properties[name] = (...parameter:Array<any>):void => {
-                        this.reflectProperties(
-                            this._attributeEvaluationTypes.output[name](
-                                ...parameter
-                            )
-                        )
+                        this.reflectProperties(this.output[name](...parameter))
                         if (callback)
                             try {
                                 callback(parameter)
@@ -305,6 +371,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                             }
                     }
                     break
+                case PropTypes.string:
                 case 'string':
                     this.properties[name] = value
                     break

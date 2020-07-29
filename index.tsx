@@ -21,7 +21,7 @@ import Tools from 'clientnode'
 import {Component} from 'react'
 
 import ReactWeb from './web/ReactWeb'
-import {WebComponentAPI, WebComponentAttributeEvaluationTypes} from './types'
+import {PropertyTypes, WebComponentAPI} from './types'
 // endregion
 export const components:Mapping<WebComponentAPI> = {}
 /*
@@ -29,13 +29,18 @@ export const components:Mapping<WebComponentAPI> = {}
     class wrapper with corresponding web component register method. A derived
     default web component name is provided.
 */
-const modules = require.context('./components/', true, /[a-zA-Z0-9]\.tsx$/)
+const modules:Function =
+    require.context('./components/', true, /[a-zA-Z0-9]\.tsx$/)
 for (const key of modules.keys()) {
     const component:typeof Component = modules(key).default
     // Determine class / function name.
     const name:string =
         component._name ||
         component.name ||
+        /*
+            NOTE: There exists babel plugins which reflects component name and
+            member variables under this property. Try to respect these.
+        */
         component.___types &&
         component.___types.name &&
         component.___types.name.name ||
@@ -52,11 +57,13 @@ for (const key of modules.keys()) {
                     Tools.stringCamelCaseToDelimited(name)
                 )
 
+            readonly output:Output = component.output || {}
             readonly self:typeof ReactWeb = components[name].component
 
-            _attributeEvaluationTypes:PropertyTypes =
-                attributeEvaluationTypes
-            _content:typeof Component = modules(key).default
+            _content:typeof Component = component
+            _propertiesToReflectAsAttributes:Mapping<boolean> =
+                component.propertiesToReflectAsAttributes || {}
+            _propertyTypes:PropertyTypes = propertyTypes
         },
         register: (
             tagName:string = Tools.stringCamelCaseToDelimited(name)

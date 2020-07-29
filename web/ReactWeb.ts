@@ -25,13 +25,11 @@ import Web from './Web'
 // endregion
 /**
  * Adapter for exposing a react component as web-component.
- * @property instance - Holds the current component instance.
  * @property self - Back-reference to this class.
  *
  * @property _content - React component to wrap.
  */
 export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
-    instance:Component|null = null
     readonly self:typeof ReactWeb = ReactWeb
 
     _content:typeof Component = 'div'
@@ -41,27 +39,13 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
      * @returns Nothing.
      */
     render():void {
-        for (const [name, mapping] of Object.entries(
-            this._attributeEvaluationTypes.output
-        ))
+        for (const [name, mapping] of Object.entries(this.output))
             if (!Object.prototype.hasOwnProperty.call(this.properties, name))
                 this.properties[name] = (...parameter:Array<any>):void =>
-                    this.reflectProperties(
-                        this._attributeEvaluationTypes.output[name](
-                            ...parameter
-                        )
-                    )
-        // TODO how to initially reflect?
-        this.instance = ReactDOM.render(
-            React.createElement(this._content, this.properties),
-            this.root,
-            ():void => {
-                if (this.instance)
-                    return
-                    // this.reflectProperties({})
-            }
+                    this.reflectProperties(this.output[name](...parameter))
+        ReactDOM.render(
+            React.createElement(this._content, this.properties), this.root
         )
-        // this.reflectProperties({})
     }
 }
 export default ReactWeb
