@@ -55,6 +55,7 @@ export type Model<Type = any> = BaseModel<Type> & {
 }
 export type Output = Mapping<(...parameter:Array<any>) => Mapping<any>>
 export type Properties<Type = any> = BaseModel<Type> & ModelState & {
+    align:'end'|'start';
     disabled?:boolean;
     fullWidth:boolean;
     icon:string;
@@ -74,6 +75,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     placeholder:string;
     required?:boolean;
     requiredText:string;
+    ripple:boolean;
     rows:number;
     selectableEditor:boolean;
     showDeclaration:boolean;

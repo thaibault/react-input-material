@@ -316,7 +316,6 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                             )
                             break
                         }
-                        let value:any
                         try {
                             value = get()
                         } catch (error) {

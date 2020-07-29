@@ -64,6 +64,7 @@ export type Props<Type = any> = {
     valid?:boolean;
 
     // Properties
+    align?:'end'|'start';
     disabled?:boolean;
     fullWidth?:boolean;
     icon?:string;
@@ -78,6 +79,8 @@ export type Props<Type = any> = {
     model:any;
     onChangeValue?:(value:Type) => void;
     onChangeState?:(state:ModelState) => void;
+    onClick?:(event:Event) => void;
+    onFocus?:(event:Event) => void;
     onInitialize?:(properties:Properties<Type>) => void;
     onTouch?:(event:Event) => void;
     outlined?:boolean;
@@ -85,6 +88,7 @@ export type Props<Type = any> = {
     placeholder?:string;
     required?:boolean;
     requiredText?:string;
+    ripple?:boolean;
     rows?:number;
     selectableEditor?:boolean;
     showDeclaration?:boolean;
@@ -163,13 +167,13 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
     }
     static readonly propertiesToReflectAsAttributes:Mapping<boolean> = new Map(
         [
-            [dirty, true],
-            [invalid, true],
-            [name, true],
-            [pristine, true],
-            [touched, true],
-            [untouched, true],
-            [valid, true]
+            ['name', true],
+            ['dirty', true],
+            ['invalid', true],
+            ['pristine', true],
+            ['touched', true],
+            ['untouched', true],
+            ['valid', true]
         ]
     )
     // endregion
@@ -197,14 +201,20 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
      * @returns Nothing.
     */
     consolidateProperties():void {
-        this.properties = Tools.copy(this.props)
-        if (this.props.disabled) {
+        /*
+            NOTE: Default props seems not to respect nested layers to merge so
+            we have to manage this for nested model structure.
+        */
+        this.properties = Tools.extend(
+            true, {}, {model: this.self.defaultProps.model}, this.props
+        )
+        if (this.properties.disabled) {
             delete this.properties.disabled
-            this.properties.mutable = !this.props.disabled
+            this.properties.model.mutable = false
         }
-        if (this.props.required) {
+        if (this.properties.required) {
             delete this.properties.required
-            this.properties.nullable = !this.props.required
+            this.properties.model.nullable = false
         }
         for (const [name, value] of Object.entries(this.properties.model))
             if (Object.prototype.hasOwnProperty.call(this.properties, name))
@@ -223,7 +233,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         // else -> Controlled component via models's "value" property.
     }
     /**
-     * Calculate external properties.
+     * Calculate external properties (a set of all configurable properties).
      * @returns External properties object.
      */
     getExternalProperties():Properties<Type> {
@@ -274,15 +284,15 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         return (
             //<React.StrictMode>
             <TextField
+                align={properties.align}
                 disabled={!properties.model.mutable}
                 fullwidth={properties.fullWidth}
                 helpText={properties.model.declaration}
                 icon={properties.icon}
+                invalid={properties.model.state.invalid}
                 label={properties.model.description || properties.model.name}
                 maxLength={properties.model.maximumLength}
                 minLength={properties.model.minimumLength}
-                onFocus={this.onTouch.bind(this)}
-                onClick={this.onTouch.bind(this)}
                 onChange={(event:Event):void => {
                     let value:any = event.target.value
                     if (properties.model.trim && typeof value === 'string')
@@ -303,10 +313,21 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
                             properties.onChangeState(state)
                     }
                 }}
+                onClick={(event:Event):void => {
+                    if (properties.onClick)
+                        properties.onClick(event)
+                    this.onTouch(event)
+                }}
+                onFocus={(event:Event):void => {
+                    if (properties.onFocus)
+                        properties.onFocus(event)
+                    this.onTouch(event)
+                }}
                 outlined={properties.outlined}
                 pattern={properties.model.regularExpressionPattern}
                 placeholder={properties.placeholder}
                 required={!properties.model.nullable}
+                ripple={properties.ripple}
                 rows={properties.rows}
                 textarea={
                     properties.model.type === 'string' &&
