@@ -351,34 +351,35 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
     render():Component {
         this.consolidateProperties()
         const properties:Properties<Type> = this.properties
+        const model:Model<Type> = properties.model
         return (
             //<React.StrictMode>
             <TextField
                 align={properties.align}
-                disabled={!properties.model.mutable}
+                disabled={!model.mutable}
                 fullwidth={properties.fullWidth}
-                helpText={properties.model.declaration}
+                helpText={{
+                    persistent: Boolean(model.declaration),
+                    children: model.valid && model.declaration || null
+                }}
                 icon={properties.icon}
-                invalid={properties.model.state.invalid}
-                label={properties.model.description || properties.model.name}
-                maxLength={properties.model.maximumLength}
-                minLength={properties.model.minimumLength}
+                invalid={model.state.invalid}
+                label={model.description || model.name}
+                maxLength={model.maximumLength}
+                minLength={model.minimumLength}
                 onBlur={this.onBlur}
                 onChange={this.onChange}
                 onClick={this.onClick}
                 onFocus={this.onFocus}
                 outlined={properties.outlined}
-                pattern={properties.model.regularExpressionPattern}
+                pattern={model.regularExpressionPattern}
                 placeholder={properties.placeholder}
-                required={!properties.model.nullable}
+                required={!model.nullable}
                 ripple={properties.ripple}
                 rows={properties.rows}
-                textarea={
-                    properties.model.type === 'string' &&
-                    properties.model.editor === 'text'
-                }
+                textarea={model.type === 'string' && model.editor === 'text'}
                 trailingIcon={properties.trailingIcon}
-                value={properties.model.value || ''}
+                value={model.value || ''}
             />
             //</React.StrictMode>
         )

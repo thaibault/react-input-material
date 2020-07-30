@@ -60,9 +60,14 @@
 
         <hr/>
 
-        <generic-input disabled name="input3" value="'value3'"></generic-input>
         <generic-input
-            model="{mutable: false, name: 'input3Model', value: 'value3Model'}"
+            declaration="Disabled"
+            disabled
+            name="input3"
+            value="'value3'"
+        ></generic-input>
+        <generic-input
+            model="{declaration: 'Disabled', mutable: false, name: 'input3Model', value: 'value3Model'}"
         ></generic-input>
 
         <hr/>
