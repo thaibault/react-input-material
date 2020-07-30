@@ -18,6 +18,7 @@
 // region imports
 import {Mapping, ValueOf} from 'clientnode/type'
 import PropTypes from 'prop-types'
+import {FocusEvent, MouseEvent, SyntheticEvent} from 'react'
 
 import {ReactWeb} from '../web/ReactWeb'
 // endregion
@@ -68,13 +69,14 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     minimumText:string;
     model:Model<Type>;
     onBlur:(event:SyntheticEvent) => void;
-    onChangeValue:(value:Type) => void;
-    onChangeState:(state:ModelState) => void;
+    onChangeValue:(value:Type, event:SyntheticEvent) => void;
+    onChangeState:(state:ModelState, event:SyntheticEvent) => void;
     onClick:(event:MouseEvent) => void;
     onFocus:(event:FocusEvent) => void;
     onInitialize:(properties:Properties<Type>) => void;
     onTouch:(event:Event) => void;
     outlined:boolean;
+    pattern:string;
     patternText:string;
     placeholder:string;
     required?:boolean;

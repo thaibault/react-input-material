@@ -80,13 +80,14 @@ export type Props<Type = any> = {
     // model?:Model<Type>;
     model:any;
     onBlur?:(event:SyntheticEvent) => void;
-    onChangeValue?:(value:Type) => void;
-    onChangeState?:(state:ModelState) => void;
+    onChangeValue?:(value:Type, event:SyntheticEvent) => void;
+    onChangeState?:(state:ModelState, event:SyntheticEvent) => void;
     onClick?:(event:MouseEvent) => void;
     onFocus?:(event:FocusEvent) => void;
     onInitialize?:(properties:Properties<Type>) => void;
     onTouch?:(event:FocusEvent|MouseEvent) => void;
     outlined?:boolean;
+    pattern?:string;
     patternText?:string;
     placeholder?:string;
     required?:boolean;
@@ -203,10 +204,9 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         if (this.properties.model.state.focused) {
             const state:ModelState =
                 {...this.properties.model.state, focused: false}
-            console.log(state)
             this.setState({model: state})
             if (this.properties.onChangeState)
-                this.properties.onChangeState(state)
+                this.properties.onChangeState(state, event)
         }
         if (this.properties.onBlur)
             this.properties.onBlur(event)
@@ -220,7 +220,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
 
         this.setState({value})
         if (this.properties.onChangeValue)
-            this.properties.onChangeValue(value)
+            this.properties.onChangeValue(value, event)
 
         const state:ModelState = {...this.properties.model.state}
         if (state.pristine) {
@@ -228,7 +228,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             state.dirty = true
             this.setState({model: state})
             if (this.properties.onChangeState)
-                this.properties.onChangeState(state)
+                this.properties.onChangeState(state, event)
         }
     }
     onClick = (event:MouseEvent):void => {
@@ -282,14 +282,22 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         this.properties = Tools.extend(
             true, {}, {model: this.self.defaultProps.model}, this.props
         )
+        // region handle aliases
         if (this.properties.disabled) {
             delete this.properties.disabled
             this.properties.model.mutable = false
+        }
+        if (this.properties.pattern) {
+            this.properties.model.regularExpressionPattern =
+                this.properties.pattern
+            delete this.properties.pattern
         }
         if (this.properties.required) {
             delete this.properties.required
             this.properties.model.nullable = false
         }
+        // endregion
+        // region handle model configuration
         for (const [name, value] of Object.entries(this.properties.model))
             if (Object.prototype.hasOwnProperty.call(this.properties, name))
                 this.properties.model[name] = this.properties[name]
@@ -305,6 +313,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         )
             this.properties.model.value = this.state.value
         // else -> Controlled component via models's "value" property.
+        // endregion
     }
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -328,6 +337,9 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         result.required = !result.nullable
         delete result.nullable
 
+        result.pattern = result.regularExpressionPattern
+        delete result.regularExpressionPattern
+
         return result
     }
     // endregion
@@ -337,7 +349,6 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
      * @returns Current component's representation.
      */
     render():Component {
-        console.log('do render', this.props.name, this.props.disabled, this.props.mutable, this.props.writable)
         this.consolidateProperties()
         const properties:Properties<Type> = this.properties
         return (

@@ -57,11 +57,13 @@ const Function:typeof Function = (
  * queue has been finished.
  * @property batchedAttributeUpdateRunning - A boolean indicator to identify
  * if an attribute update is currently batched.
+ * @property batchedPropertyUpdateRunning - A boolean indicator to identify
+ * if an property update is currently batched.
+ * @property batchedUpdateRunning - Indicates whether a batched render update
+ * is currently running.
  * @property batchPropertyUpdates - Indicates whether to directly update dom
  * after each property mutation or to wait and batch mutations after current
  * queue has been finished.
- * @property batchedPropertyUpdateRunning - A boolean indicator to identify
- * if an property update is currently batched.
  * @property properties - Holds currently evaluated properties.
  * @property root - Hosting dom node.
  * @property self - Back-reference to this class.
@@ -78,9 +80,11 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     static useShadowDOM:boolean = false
 
     batchAttributeUpdates:boolean = true
-    batchedAttributeUpdateRunning:boolean = true
     batchPropertyUpdates:boolean = true
+    batchUpdates:boolean = true
+    batchedAttributeUpdateRunning:boolean = true
     batchedPropertyUpdateRunning:boolean = true
+    batchedUpdateRunning:boolean = true
     output:Output = {}
     properties:object = {}
     root:TElement
@@ -104,10 +108,17 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                     this
             ).attachShadow({mode: 'open'}) :
             this
-        // Trigger an initial render.
+        /*
+            NOTE: Trigger an initial render after finished initializing.
+            Usually inherited classes set their properties after this
+            constructor has been called so their configuration has to be taken
+            into account after initializing.
+        */
         Tools.timeout(():void => {
+            this.attachEventHandler()
             this.batchedAttributeUpdateRunning = false
             this.batchedPropertyUpdateRunning = false
+            this.batchedUpdateRunning = false
             this.render()
         })
     }
@@ -124,10 +135,14 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     ):void {
         this.evaluateStringAndSetAsProperty(name, newValue)
         if (this.batchAttributeUpdates) {
-            if (!this.batchedAttributeUpdateRunning) {
+            if (!(
+                this.batchedAttributeUpdateRunning || this.batchedUpdateRunning
+            )) {
                 this.batchedAttributeUpdateRunning = true
+                this.batchedUpdateRunning = true
                 Tools.timeout(():void => {
                     this.batchedAttributeUpdateRunning = false
+                    this.batchedUpdateRunning = false
                     this.render()
                 })
             }
@@ -171,10 +186,14 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     setPropertyValue(name:string, value:any):void {
         this.properties[name] = value
         if (this.batchPropertyUpdates) {
-            if (!this.batchedPropertyUpdateRunning) {
+            if (!(
+                this.batchedPropertyUpdateRunning || this.batchedUpdateRunning
+            )) {
                 this.batchedPropertyUpdateRunning = true
+                this.batchedUpdateRunning = true
                 Tools.timeout(():void => {
                     this.batchedPropertyUpdateRunning = false
+                    this.batchedUpdateRunning = false
                     this.render()
                 })
             }
@@ -219,12 +238,48 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     // endregion
     // region helper
     /**
-     * Reflects reacts component state back to web-component's attributes and
+     * Attaches event handler to keep in sync with nested components properties
+     * states.
+     * @returns Nothing.
+     */
+    attachEventHandler():void {
+        this.attachExplicitDefinedOutputEventHandler()
+        this.attachImplicitDefinedOutputEventHandler()
+    }
+    /**
+     * Attach explicitly defined event handler to synchronize internal and
+     * external property states.
+     * @returns Nothing.
+     */
+    attachExplicitDefinedOutputEventHandler():void {
+        // Grab all existing output to property specifications
+        for (const [name, mapping] of Object.entries(this.output))
+            if (!Object.prototype.hasOwnProperty.call(this.properties, name))
+                this.properties[name] = (...parameter:Array<any>):void =>
+                    this.reflectEventToProperties(name, parameter)
+    }
+    /**
+     * Attach implicitly defined event handler to synchronize internal and
+     * external property states.
+     * @returns Nothing.
+     */
+    attachImplicitDefinedOutputEventHandler():void {
+        // Determine all event handler to inject
+        for (const [name, type] of Object.entries(this._propertyTypes))
+            if (
+                !Object.prototype.hasOwnProperty.call(this.properties, name) &&
+                ['output', PropTypes.func].includes(this._propertyTypes[name])
+            )
+                this.properties[name] = (...parameter:Array<any>):void =>
+                    this.reflectEventToProperties(name, parameter)
+    }
+    /**
+     * Reflects wrapped component state back to web-component's attributes and
      * properties.
+     * @param properties - Properties to update in reflected property state.
      * @returns Nothing.
      */
     reflectProperties(properties:Mapping<any>):void {
-        console.log('reflect', properties.name, properties.disabled, properties.mutable, properties.writable)
         for (const [name, value] of Object.entries(properties)) {
             this.properties[name] = value
             if (this._propertiesToReflectAsAttributes.has(name))
@@ -275,7 +330,16 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                         break
                 }
         }
-        this.render()
+        if (this.batchUpdates) {
+            if (!this.batchedUpdateRunning) {
+                this.batchedUpdateRunning = true
+                Tools.timeout(():void => {
+                    this.batchedUpdateRunning = false
+                    this.render()
+                })
+            }
+        } else
+            this.render()
     }
     /**
      * Triggers a re-evaluation of all attributes.
