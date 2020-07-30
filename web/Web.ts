@@ -17,8 +17,8 @@
     endregion
 */
 // region imports
-import PropTypes from 'prop-types'
 import Tools, {globalContext, PlainObject} from 'clientnode'
+import PropTypes from 'prop-types'
 
 import {Output, PropertyTypes} from '../types'
 // endregion
@@ -82,7 +82,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     batchPropertyUpdates:boolean = true
     batchedPropertyUpdateRunning:boolean = true
     output:Output = {}
-    properties:PlainObject = {}
+    properties:object = {}
     root:TElement
     readonly self:typeof Web = Web
 
@@ -104,6 +104,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                     this
             ).attachShadow({mode: 'open'}) :
             this
+        // Trigger an initial render.
         Tools.timeout(():void => {
             this.batchedAttributeUpdateRunning = false
             this.batchedPropertyUpdateRunning = false
@@ -286,6 +287,27 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                 const value:any = this.getAttribute(name)
                 this.attributeChangedCallback(name, value, value)
             }
+    }
+    /**
+     * Reflect given event handler call with given parameter back to current
+     * properties state.
+     * @param name - Event handler name.
+     * @param parameter - List of parameter to given event handler call.
+     * @returns Nothing.
+     */
+    reflectEventToProperties(name:string, parameter:Array<any>):void {
+        if (Object.prototype.hasOwnProperty.call(this.output, name))
+            this.reflectProperties(this.output[name](...parameter))
+        else if (
+            parameter.length > 0 &&
+            parameter[0] !== null &&
+            typeof parameter[0] === 'object' &&
+            !(
+                'persist' in parameter[0] &&
+                Tools.isFunction(parameter[0].persist)
+            )
+        )
+            this.reflectProperties(parameter[0])
     }
     /**
      * Evaluates given property value depending on its type specification and

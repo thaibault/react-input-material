@@ -16,8 +16,9 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports 
+// region imports
 import Tools from 'clientnode'
+import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 
@@ -39,11 +40,19 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
      * @returns Nothing.
      */
     render():void {
+        // Grab all existing output to property specifications
         for (const [name, mapping] of Object.entries(this.output))
             if (!Object.prototype.hasOwnProperty.call(this.properties, name))
                 this.properties[name] = (...parameter:Array<any>):void =>
-                    this.reflectProperties(this.output[name](...parameter))
-        console.log('Delegate render', this.properties.name, this.properties.disabled, this.properties.mutable, this.properties.writable)
+                    this.reflectEventToProperties(name, parameter)
+        // Determine all event handler to inject
+        for (const [name, type] of Object.entries(this._propertyTypes))
+            if (
+                !Object.prototype.hasOwnProperty.call(this.properties, name) &&
+                ['output', PropTypes.func].includes(this._propertyTypes[name])
+            )
+                this.properties[name] = (...parameter:Array<any>):void =>
+                    this.reflectEventToProperties(name, parameter)
         ReactDOM.render(
             React.createElement(this._content, this.properties), this.root
         )

@@ -24,6 +24,7 @@ import {ReactWeb} from '../web/ReactWeb'
 // region exports
 export type ModelState = {
     dirty:boolean;
+    focused:boolean;
     invalid:boolean;
     pristine:boolean;
     touched:boolean;
@@ -66,8 +67,11 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     minimumLengthText:string;
     minimumText:string;
     model:Model<Type>;
+    onBlur:(event:SyntheticEvent) => void;
     onChangeValue:(value:Type) => void;
     onChangeState:(state:ModelState) => void;
+    onClick:(event:MouseEvent) => void;
+    onFocus:(event:FocusEvent) => void;
     onInitialize:(properties:Properties<Type>) => void;
     onTouch:(event:Event) => void;
     outlined:boolean;

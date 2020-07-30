@@ -19,12 +19,13 @@
 // region imports
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
 import {Mapping} from 'clientnode/type'
-import React, {Component} from 'react'
+import React, {Component, FocusEvent, MouseEvent, SyntheticEvent} from 'react'
 import {TextField} from '@rmwc/textfield'
 import '@rmwc/textfield/styles'
 
 import {Model, ModelState, Output, Properties} from '../type'
 // endregion
+// region prop-types
 /*
     NOTE: Using an imported "Props" type (which consists of a "Partial"
     modifier) is not yet working with "babel-plugin-typescript-to-proptypes".
@@ -57,6 +58,7 @@ export type Props<Type = any> = {
 
     // ModelState
     dirty?:boolean;
+    focused?:boolean;
     invalid?:boolean;
     pristine?:boolean;
     touched?:boolean;
@@ -77,12 +79,13 @@ export type Props<Type = any> = {
     // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
     // model?:Model<Type>;
     model:any;
+    onBlur?:(event:SyntheticEvent) => void;
     onChangeValue?:(value:Type) => void;
     onChangeState?:(state:ModelState) => void;
-    onClick?:(event:Event) => void;
-    onFocus?:(event:Event) => void;
+    onClick?:(event:MouseEvent) => void;
+    onFocus?:(event:FocusEvent) => void;
     onInitialize?:(properties:Properties<Type>) => void;
-    onTouch?:(event:Event) => void;
+    onTouch?:(event:FocusEvent|MouseEvent) => void;
     outlined?:boolean;
     patternText?:string;
     placeholder?:string;
@@ -96,6 +99,7 @@ export type Props<Type = any> = {
     showValidationState?:boolean;
     trailingIcon?:string;
 }
+// endregion
 /**
  * Generic input wrapper component which automatically determines a useful
  * input field depending on given model specification.
@@ -112,6 +116,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
     // region static properties
     static readonly defaultModelState:ModelState = {
         dirty: false,
+        focused: false,
         invalid: false,
         pristine: true,
         touched: false,
@@ -160,16 +165,14 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         showValidationState: false
     }
     static readonly output:Output = {
-        onChangeState: (state:ModelState):ModelState => state,
-        onChangeValue: (value:Type):{value:Type} => ({value}),
-        onInitialize: (properties:Properties<Type>):Properties<Type> =>
-            properties
+        onChangeValue: (value:Type):{value:Type} => ({value})
     }
     static readonly propertiesToReflectAsAttributes:Mapping<boolean> = new Map(
         [
-            ['name', true],
             ['dirty', true],
+            ['focused', true],
             ['invalid', true],
+            ['name', true],
             ['pristine', true],
             ['touched', true],
             ['untouched', true],
@@ -188,11 +191,82 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         value: null
     }
     // endregion
+    // region live-cycle methods
     constructor(props:Props<Type>) {
         super(props)
         if (props.onInitialize)
             props.onInitialize(this.getExternalProperties())
     }
+    // endregion
+    // region event handler
+    onBlur = (event:SyntheticEvent):void => {
+        if (this.properties.model.state.focused) {
+            const state:ModelState =
+                {...this.properties.model.state, focused: false}
+            console.log(state)
+            this.setState({model: state})
+            if (this.properties.onChangeState)
+                this.properties.onChangeState(state)
+        }
+        if (this.properties.onBlur)
+            this.properties.onBlur(event)
+    }
+    onChange = (event:SyntheticEvent):void => {
+        let value:any = event.target.value
+        if (this.properties.model.trim && typeof value === 'string')
+            value = value.trim()
+
+        // TODO validate
+
+        this.setState({value})
+        if (this.properties.onChangeValue)
+            this.properties.onChangeValue(value)
+
+        const state:ModelState = {...this.properties.model.state}
+        if (state.pristine) {
+            state.pristine = false
+            state.dirty = true
+            this.setState({model: state})
+            if (this.properties.onChangeState)
+                this.properties.onChangeState(state)
+        }
+    }
+    onClick = (event:MouseEvent):void => {
+        if (this.properties.onClick)
+            this.properties.onClick(event)
+        this.onTouch(event)
+    }
+    onFocus = (event:FocusEvent):void => {
+        if (this.properties.onFocus)
+            this.properties.onFocus(event)
+        this.onTouch(event)
+    }
+    /**
+     * Triggers on start interacting with the input.
+     * @param event - Event which triggers interaction.
+     * @returns Nothing.
+     */
+    onTouch(event:FocusEvent|MouseEvent):void {
+        const state:ModelState = {...this.properties.model.state}
+        let changeState:boolean = false
+        if (!state.focused) {
+            changeState = true
+            state.focused = true
+        }
+        if (state.untouched) {
+            changeState = true
+            state.touched = true
+            state.untouched = false
+        }
+        if (changeState) {
+            this.setState({model: state})
+            if (this.properties.onChangeState)
+                this.properties.onChangeState(state)
+        }
+        if (this.properties.onTouch)
+            this.properties.onTouch(event)
+    }
+    // endregion
     // region helper
     /**
      * Synchronizes property, state and model configuration:
@@ -256,24 +330,8 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
 
         return result
     }
-    /**
-     * Triggers on start interacting with the input.
-     * @param event - Event which triggers interaction.
-     * @returns Nothing.
-     */
-    onTouch(event:Event):void {
-        const state:ModelState = {...this.properties.model.state}
-        if (state.untouched) {
-            state.touched = true
-            state.untouched = false
-            this.setState({model: state})
-            if (this.properties.onChangeState)
-                this.properties.onChangeState(state)
-        }
-        if (this.properties.onTouch)
-            this.properties.onTouch(event)
-    }
     // endregion
+    // region render
     /**
      * Renders current's component state.
      * @returns Current component's representation.
@@ -294,36 +352,10 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
                 label={properties.model.description || properties.model.name}
                 maxLength={properties.model.maximumLength}
                 minLength={properties.model.minimumLength}
-                onChange={(event:Event):void => {
-                    let value:any = event.target.value
-                    if (properties.model.trim && typeof value === 'string')
-                        value = value.trim()
-
-                    // TODO validate
-
-                    this.setState({value})
-                    if (properties.onChangeValue)
-                        properties.onChangeValue(value)
-
-                    const state:ModelState = {...properties.model.state}
-                    if (state.pristine) {
-                        state.pristine = false
-                        state.dirty = true
-                        this.setState({model: state})
-                        if (properties.onChangeState)
-                            properties.onChangeState(state)
-                    }
-                }}
-                onClick={(event:Event):void => {
-                    if (properties.onClick)
-                        properties.onClick(event)
-                    this.onTouch(event)
-                }}
-                onFocus={(event:Event):void => {
-                    if (properties.onFocus)
-                        properties.onFocus(event)
-                    this.onTouch(event)
-                }}
+                onBlur={this.onBlur}
+                onChange={this.onChange}
+                onClick={this.onClick}
+                onFocus={this.onFocus}
                 outlined={properties.outlined}
                 pattern={properties.model.regularExpressionPattern}
                 placeholder={properties.placeholder}
@@ -340,6 +372,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             //</React.StrictMode>
         )
     }
+    // endregion
 }
 export default GenericInput
 // region vim modline
