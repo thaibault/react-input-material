@@ -43,7 +43,7 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
             if (!Object.prototype.hasOwnProperty.call(this.properties, name))
                 this.properties[name] = (...parameter:Array<any>):void =>
                     this.reflectProperties(this.output[name](...parameter))
-        console.log('Render', this.properties.name, this.properties.disabled)
+        console.log('Delegate render', this.properties.name, this.properties.disabled, this.properties.mutable, this.properties.writable)
         ReactDOM.render(
             React.createElement(this._content, this.properties), this.root
         )

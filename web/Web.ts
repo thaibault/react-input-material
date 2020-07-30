@@ -78,9 +78,9 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     static useShadowDOM:boolean = false
 
     batchAttributeUpdates:boolean = true
-    batchedAttributeUpdateRunning:boolean = false
+    batchedAttributeUpdateRunning:boolean = true
     batchPropertyUpdates:boolean = true
-    batchedPropertyUpdateRunning:boolean = false
+    batchedPropertyUpdateRunning:boolean = true
     output:Output = {}
     properties:PlainObject = {}
     root:TElement
@@ -104,6 +104,11 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                     this
             ).attachShadow({mode: 'open'}) :
             this
+        Tools.timeout(():void => {
+            this.batchedAttributeUpdateRunning = false
+            this.batchedPropertyUpdateRunning = false
+            this.render()
+        })
     }
     /**
      * Triggered when ever a given attribute has changed and triggers to update
@@ -117,14 +122,14 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         name:string, oldValue:string, newValue:string
     ):void {
         this.evaluateStringAndSetAsProperty(name, newValue)
-        if (
-            this.batchAttributeUpdates && !this.batchedAttributeUpdateRunning
-        ) {
-            this.batchedAttributeUpdateRunning = true
-            Tools.timeout(():void => {
-                this.batchedAttributeUpdateRunning = false
-                this.render()
-            })
+        if (this.batchAttributeUpdates) {
+            if (!this.batchedAttributeUpdateRunning) {
+                this.batchedAttributeUpdateRunning = true
+                Tools.timeout(():void => {
+                    this.batchedAttributeUpdateRunning = false
+                    this.render()
+                })
+            }
         } else
             this.render()
     }
@@ -164,12 +169,14 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      */
     setPropertyValue(name:string, value:any):void {
         this.properties[name] = value
-        if (this.batchPropertyUpdates && !this.batchedPropertyUpdateRunning) {
-            this.batchedPropertyUpdateRunning = true
-            Tools.timeout(():void => {
-                this.batchedPropertyUpdateRunning = false
-                this.render()
-            })
+        if (this.batchPropertyUpdates) {
+            if (!this.batchedPropertyUpdateRunning) {
+                this.batchedPropertyUpdateRunning = true
+                Tools.timeout(():void => {
+                    this.batchedPropertyUpdateRunning = false
+                    this.render()
+                })
+            }
         } else
             this.render()
     }
@@ -215,8 +222,8 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * properties.
      * @returns Nothing.
      */
-    // TODO check of properties has to be sorted?
     reflectProperties(properties:Mapping<any>):void {
+        console.log('reflect', properties.name, properties.disabled, properties.mutable, properties.writable)
         for (const [name, value] of Object.entries(properties)) {
             this.properties[name] = value
             if (this._propertiesToReflectAsAttributes.has(name))

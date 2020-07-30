@@ -279,6 +279,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
      * @returns Current component's representation.
      */
     render():Component {
+        console.log('do render', this.props.name, this.props.disabled, this.props.mutable, this.props.writable)
         this.consolidateProperties()
         const properties:Properties<Type> = this.properties
         return (
