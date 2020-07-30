@@ -20,7 +20,10 @@
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import React, {Component, FocusEvent, MouseEvent, SyntheticEvent} from 'react'
+import {Select} from '@rmwc/select'
 import {TextField} from '@rmwc/textfield'
+
+import '@rmwc/select/styles'
 import '@rmwc/textfield/styles'
 
 import {Model, ModelState, Output, Properties} from '../type'
@@ -350,38 +353,56 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
      */
     render():Component {
         this.consolidateProperties()
+
         const properties:Properties<Type> = this.properties
         const model:Model<Type> = properties.model
+
+        const materialProperties = {
+            disabled: !model.mutable,
+            helpText: {
+                persistent: Boolean(
+                    properties.showDeclaration && model.declaration
+                ),
+                children:
+                    model.state.valid &&
+                    properties.showDeclaration &&
+                    model.declaration
+            },
+            icon: properties.icon,
+            invalid: model.state.invalid,
+            label: model.description || model.name,
+            onBlur: this.onBlur,
+            onChange: this.onChange,
+            onClick: this.onClick,
+            onFocus: this.onFocus,
+            outlined: properties.outlined,
+            placeholder: properties.placeholder,
+            required: !model.nullable,
+            value: model.value || ''
+        }
         return (
-            //<React.StrictMode>
-            <TextField
-                align={properties.align}
-                disabled={!model.mutable}
-                fullwidth={properties.fullWidth}
-                helpText={{
-                    persistent: Boolean(model.declaration),
-                    children: model.valid && model.declaration || null
-                }}
-                icon={properties.icon}
-                invalid={model.state.invalid}
-                label={model.description || model.name}
-                maxLength={model.maximumLength}
-                minLength={model.minimumLength}
-                onBlur={this.onBlur}
-                onChange={this.onChange}
-                onClick={this.onClick}
-                onFocus={this.onFocus}
-                outlined={properties.outlined}
-                pattern={model.regularExpressionPattern}
-                placeholder={properties.placeholder}
-                required={!model.nullable}
-                ripple={properties.ripple}
-                rows={properties.rows}
-                textarea={model.type === 'string' && model.editor === 'text'}
-                trailingIcon={properties.trailingIcon}
-                value={model.value || ''}
-            />
-            //</React.StrictMode>
+            //<React.StrictMode>{
+                model.selection ?
+                    <Select
+                        enhanced
+                        options={model.selection}
+                        {...materialProperties}
+                    /> :
+                    <TextField
+                        align={properties.align}
+                        fullwidth={properties.fullWidth}
+                        maxLength={model.maximumLength}
+                        minLength={model.minimumLength}
+                        pattern={model.regularExpressionPattern}
+                        ripple={properties.ripple}
+                        rows={properties.rows}
+                        textarea={
+                            model.type === 'string' && model.editor === 'text'
+                        }
+                        trailingIcon={properties.trailingIcon}
+                        {...materialProperties}
+                    />
+            //}</React.StrictMode>
         )
     }
     // endregion
