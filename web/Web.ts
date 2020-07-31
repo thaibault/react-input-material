@@ -108,19 +108,6 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                     this
             ).attachShadow({mode: 'open'}) :
             this
-        /*
-            NOTE: Trigger an initial render after finished initializing.
-            Usually inherited classes set their properties after this
-            constructor has been called so their configuration has to be taken
-            into account after initializing.
-        */
-        Tools.timeout(():void => {
-            this.attachEventHandler()
-            this.batchedAttributeUpdateRunning = false
-            this.batchedPropertyUpdateRunning = false
-            this.batchedUpdateRunning = false
-            this.render()
-        })
     }
     /**
      * Triggered when ever a given attribute has changed and triggers to update
@@ -148,6 +135,13 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
             }
         } else
             this.render()
+    }
+    connectedCallback():void {
+        this.attachEventHandler()
+        this.batchedAttributeUpdateRunning = false
+        this.batchedPropertyUpdateRunning = false
+        this.batchedUpdateRunning = false
+        this.render()
     }
     // endregion
     // region getter/setter
@@ -255,7 +249,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         // Grab all existing output to property specifications
         for (const [name, mapping] of Object.entries(this.output))
             if (!Object.prototype.hasOwnProperty.call(this.properties, name))
-                this.properties[name] = (...parameter:Array<any>):void =>
+                this.properties[name] = (...parameter:Array<any>):void => 
                     this.reflectEventToProperties(name, parameter)
     }
     /**
@@ -360,6 +354,9 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @returns Nothing.
      */
     reflectEventToProperties(name:string, parameter:Array<any>):void {
+        this.dispatchEvent(
+            new CustomEvent(name, {detail: {target: this, parameter}})
+        )
         if (Object.prototype.hasOwnProperty.call(this.output, name))
             this.reflectProperties(this.output[name](...parameter))
         else if (
