@@ -401,6 +401,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
                     model.declaration
             },
             icon: properties.icon,
+            inputRef: ,
             invalid: model.state.invalid,
             label: model.description || model.name,
             onBlur: this.onBlur,
