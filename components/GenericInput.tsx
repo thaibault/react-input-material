@@ -388,6 +388,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
 
         result.pattern = result.regularExpressionPattern
         delete result.regularExpressionPattern
+
         return result
     }
     /**
@@ -464,6 +465,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             this.properties.model.state.valid =
                 !this.properties.model.state.invalid
         }
+
         return changed
     }
     /**
