@@ -55,7 +55,7 @@ export type Model<Type = any> = BaseModel<Type> & {
     state:ModelState;
     writable:boolean;
 }
-export type Output = Mapping<(...parameter:Array<any>) => Mapping<any>>
+export type Output = Mapping<true|((...parameter:Array<any>) => Mapping<any>)>
 export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     align:'end'|'start';
     disabled?:boolean;
@@ -69,6 +69,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     minimumText:string;
     model:Model<Type>;
     onBlur:(event:SyntheticEvent) => void;
+    onChange:(properties:Properties<Type>, event?:SyntheticEvent) => void;
     onChangeValue:(value:Type, event:SyntheticEvent) => void;
     onChangeState:(state:ModelState, event:SyntheticEvent) => void;
     onClick:(event:MouseEvent) => void;

@@ -237,35 +237,64 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @returns Nothing.
      */
     attachEventHandler():void {
-        this.attachExplicitDefinedOutputEventHandler()
-        this.attachImplicitDefinedOutputEventHandler()
+        /*
+            NOTE: We only reflect properties by implicit determined events if
+            their where no explicitly defined.
+        */
+        this.attachImplicitDefinedOutputEventHandler(
+            !this.attachExplicitDefinedOutputEventHandler()
+        )
     }
     /**
      * Attach explicitly defined event handler to synchronize internal and
      * external property states.
-     * @returns Nothing.
+     * @returns Returns "true" if there are some defined and "false" otherwise.
      */
-    attachExplicitDefinedOutputEventHandler():void {
+    attachExplicitDefinedOutputEventHandler():boolean {
         // Grab all existing output to property specifications
+        let result:boolean = false
         for (const [name, mapping] of Object.entries(this.output))
-            if (!Object.prototype.hasOwnProperty.call(this.properties, name))
-                this.properties[name] = (...parameter:Array<any>):void => 
+            if (!Object.prototype.hasOwnProperty.call(this.properties, name)) {
+                result = true
+                this.properties[name] = (...parameter:Array<any>):void => {
+                    this.forwardEvent(name, parameter)
                     this.reflectEventToProperties(name, parameter)
+                }
+            }
+        return result
     }
     /**
      * Attach implicitly defined event handler to synchronize internal and
      * external property states.
+     * @param reflectProperties - Indicates whether implicitly determined
+     * properties should be reflected.
      * @returns Nothing.
      */
-    attachImplicitDefinedOutputEventHandler():void {
+    attachImplicitDefinedOutputEventHandler(
+        reflectProperties:boolean = true
+    ):void {
         // Determine all event handler to inject
         for (const [name, type] of Object.entries(this._propertyTypes))
             if (
                 !Object.prototype.hasOwnProperty.call(this.properties, name) &&
                 ['output', PropTypes.func].includes(this._propertyTypes[name])
             )
-                this.properties[name] = (...parameter:Array<any>):void =>
-                    this.reflectEventToProperties(name, parameter)
+                this.properties[name] = (...parameter:Array<any>):void => {
+                    this.forwardEvent(name, parameter)
+                    if (reflectProperties)
+                        this.reflectEventToProperties(name, parameter)
+                }
+    }
+    /**
+     * Forwards given event as native web event.
+     * @param name - Event name.
+     * @param parameter - Event parameter.
+     * @returns Nothing.
+     */
+    forwardEvent(name:string, parameter:Array<any>):void {
+        this.dispatchEvent(
+            new CustomEvent(name, {detail: {target: this, parameter}})
+        )
     }
     /**
      * Reflects wrapped component state back to web-component's attributes and
@@ -354,10 +383,10 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @returns Nothing.
      */
     reflectEventToProperties(name:string, parameter:Array<any>):void {
-        this.dispatchEvent(
-            new CustomEvent(name, {detail: {target: this, parameter}})
+        if (
+            Object.prototype.hasOwnProperty.call(this.output, name) &&
+            Tools.isFunction(this.output[name])
         )
-        if (Object.prototype.hasOwnProperty.call(this.output, name))
             this.reflectProperties(this.output[name](...parameter))
         else if (
             parameter.length > 0 &&

@@ -32,16 +32,17 @@
                 .map((component) => component.register())
 
             for (const domNode of document.querySelectorAll('[name]'))
-                for (const name of ['onChangeState', 'onChangeValue'])
-                    domNode.addEventListener(name, ({detail}) =>
-                        setTimeout(() => {
-                            document.querySelector('pre').innerHTML =
-                                `${detail.target.name}: ` +
-                                JSON.stringify(
-                                    detail.target.properties, null, 4
-                                )
-                        })
-                    )
+                domNode.addEventListener('onChange', ({detail}) =>
+                    setTimeout(() => {
+                        document.querySelector('pre').innerHTML =
+                            `${detail.target.name}: ` +
+                            JSON.stringify(
+                                detail.target.properties,
+                                Object.keys(detail.target.properties).sort(),
+                                4
+                            )
+                    })
+                )
         }
     </script>
     <body class="no-javascript">

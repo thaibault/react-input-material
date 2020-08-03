@@ -83,6 +83,7 @@ export type Props<Type = any> = {
     // model?:Model<Type>;
     model:any;
     onBlur?:(event:SyntheticEvent) => void;
+    onChange?:(value:Properties<Type>, event?:SyntheticEvent) => void;
     onChangeValue?:(value:Type, event:SyntheticEvent) => void;
     onChangeState?:(state:ModelState, event:SyntheticEvent) => void;
     onClick?:(event:MouseEvent) => void;
@@ -168,9 +169,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         showInputText: 'Show password.',
         showValidationState: false
     }
-    static readonly output:Output = {
-        onChangeValue: (value:Type):{value:Type} => ({value})
-    }
+    static readonly output:Output = {onChange: true}
     static readonly propertiesToReflectAsAttributes:Mapping<boolean> = new Map(
         [
             ['dirty', true],
@@ -198,41 +197,61 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
     // region live-cycle methods
     constructor(props:Props<Type>) {
         super(props)
-        if (props.onInitialize)
-            props.onInitialize(this.getExternalProperties())
+        this.onInitialize()
     }
     // endregion
     // region event handler
     onBlur = (event:SyntheticEvent):void => {
         if (this.properties.model.state.focused) {
-            const state:ModelState =
-                {...this.properties.model.state, focused: false}
-            this.setState({model: state})
-            if (this.properties.onChangeState)
-                this.properties.onChangeState(state, event)
+            this.properties.focused =
+            this.properties.model.state.focused =
+                false
+            this.onChangeState(this.properties.model.state, event)
         }
         if (this.properties.onBlur)
             this.properties.onBlur(event)
+        this.onChange(event)
     }
-    onChange = (event:SyntheticEvent):void => {
-        let value:any = event.target.value
-        if (this.properties.model.trim && typeof value === 'string')
-            value = value.trim()
+    onChange(event?:SyntheticEvent):void {
+        if (this.properties.onChange)
+            this.properties.onChange(
+                this.getExternalPropertiesRepresentation(), event
+            )
+    }
+    onChangeState(state:ModelState, event:SyntheticEvent):void {
+        this.setState({model: state})
+        if (this.properties.onChangeState)
+            this.properties.onChangeState(state, event)
+    }
+    onChangeValue = (event:SyntheticEvent):void => {
+        this.properties.value = event.target.value
+        if (
+            this.properties.model.trim &&
+            typeof this.properties.value === 'string'
+        )
+            this.properties.value = this.properties.value.trim()
+        if (
+            this.properties.model.emptyEqualsNull &&
+            this.properties.value === ''
+        )
+            this.properties.value = null
 
         // TODO validate
 
-        this.setState({value})
+        this.setState({value: this.properties.value})
         if (this.properties.onChangeValue)
-            this.properties.onChangeValue(value, event)
+            this.properties.onChangeValue(this.properties.value, event)
 
-        const state:ModelState = {...this.properties.model.state}
-        if (state.pristine) {
-            state.pristine = false
-            state.dirty = true
-            this.setState({model: state})
-            if (this.properties.onChangeState)
-                this.properties.onChangeState(state, event)
+        if (this.properties.model.state.pristine) {
+            this.properties.dirty =
+            this.properties.model.state.dirty =
+                true
+            this.properties.pristine =
+            this.properties.model.state.pristine =
+                false
+            this.onChangeState(this.properties.model.state, event)
         }
+        this.onChange(event)
     }
     onClick = (event:MouseEvent):void => {
         if (this.properties.onClick)
@@ -244,30 +263,41 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             this.properties.onFocus(event)
         this.onTouch(event)
     }
+    onInitialize():void {
+        this.properties = this.props
+        if (this.properties.onInitialize)
+            this.properties.onInitialize(
+                this.getExternalPropertiesRepresentation()
+            )
+        this.onChange()
+    }
     /**
      * Triggers on start interacting with the input.
      * @param event - Event which triggers interaction.
      * @returns Nothing.
      */
     onTouch(event:FocusEvent|MouseEvent):void {
-        const state:ModelState = {...this.properties.model.state}
         let changeState:boolean = false
-        if (!state.focused) {
-            changeState = true
-            state.focused = true
+        if (!this.properties.model.state.focused) {
+            changeState =
+            this.properties.focused =
+            this.properties.model.state.focused =
+                true
         }
-        if (state.untouched) {
-            changeState = true
-            state.touched = true
-            state.untouched = false
+        if (this.properties.model.state.untouched) {
+            changeState =
+            this.properties.touched =
+            this.properties.model.state.touched =
+                true
+            this.properties.untouched =
+            this.properties.model.state.untouched =
+                false
         }
-        if (changeState) {
-            this.setState({model: state})
-            if (this.properties.onChangeState)
-                this.properties.onChangeState(state)
-        }
+        if (changeState)
+            this.onChangeState(this.properties.model.state, event)
         if (this.properties.onTouch)
             this.properties.onTouch(event)
+        this.onChange(event)
     }
     // endregion
     // region helper
@@ -283,7 +313,10 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             we have to manage this for nested model structure.
         */
         this.properties = Tools.extend(
-            true, {}, {model: this.self.defaultProps.model}, this.props
+            true,
+            {},
+            {model: this.self.defaultProps.model},
+            this.properties || this.props
         )
         // region handle aliases
         if (this.properties.disabled) {
@@ -322,7 +355,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
      * Calculate external properties (a set of all configurable properties).
      * @returns External properties object.
      */
-    getExternalProperties():Properties<Type> {
+    getExternalPropertiesRepresentation():Properties<Type> {
         this.consolidateProperties()
         const result:Properties<Type> = Tools.extend(
             {},
@@ -342,11 +375,10 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
 
         result.pattern = result.regularExpressionPattern
         delete result.regularExpressionPattern
-
         return result
     }
     // endregion
-    // region render
+    // region  render
     /**
      * Renders current's component state.
      * @returns Current component's representation.
@@ -372,7 +404,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             invalid: model.state.invalid,
             label: model.description || model.name,
             onBlur: this.onBlur,
-            onChange: this.onChange,
+            onChange: this.onChangeValue,
             onClick: this.onClick,
             onFocus: this.onFocus,
             outlined: properties.outlined,
