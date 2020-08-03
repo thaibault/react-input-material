@@ -33,15 +33,13 @@
 
             for (const domNode of document.querySelectorAll('[name]'))
                 domNode.addEventListener('onChange', ({detail}) =>
-                    setTimeout(() => {
-                        document.querySelector('pre').innerHTML =
-                            `${detail.target.name}: ` +
-                            JSON.stringify(
-                                detail.target.properties,
-                                Object.keys(detail.target.properties).sort(),
-                                4
-                            )
-                    })
+                    document.querySelector('pre').innerHTML =
+                        `${detail.target.name}: ` +
+                        JSON.stringify(
+                            detail.parameter[0],
+                            Object.keys(detail.target.properties).sort(),
+                            4
+                        )
                 )
         }
     </script>
@@ -99,6 +97,7 @@
             <generic-input
                 declaration="pattern"
                 description="input5Description"
+                icon="search"
                 name="input5"
                 pattern="a+"
                 placeholder="input5Placeholder"
@@ -116,7 +115,7 @@
                 declaration="selection"
                 description="input6Description"
                 name="input6"
-                placeholder="input5Placeholder"
+                placeholder="input6Placeholder"
                 selection="['A', 'B', 'C']"
                 required
                 value="'A'"
@@ -126,9 +125,25 @@
                 placeholder="input6ModelPlaceholder"
             ></generic-input>
 
+            <generic-input
+                declaration="selection"
+                description="input7Description"
+                name="input6"
+                selection="{a: 'A', b: 'B', c: 'C'}"
+                required
+                value="'a'"
+            ></generic-input>
+            <generic-input
+                model="{declaration: 'selection', description: 'input7ModelDescription', name: 'input6Model', nullable: false, selection: {a: 'A', b: 'B', c: 'C'}, value: 'a'}"
+            ></generic-input>
+
         </div>
 
         <pre style="float: right"></pre>
+
+        <style>
+            <%- require('material-design-icons/iconfont/material-icons.css') %>
+        </style>
     </body>
 <html>
 <%_ /*

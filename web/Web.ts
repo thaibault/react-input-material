@@ -257,8 +257,8 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
             if (!Object.prototype.hasOwnProperty.call(this.properties, name)) {
                 result = true
                 this.properties[name] = (...parameter:Array<any>):void => {
-                    this.forwardEvent(name, parameter)
                     this.reflectEventToProperties(name, parameter)
+                    this.forwardEvent(name, parameter)
                 }
             }
         return result
@@ -280,9 +280,9 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                 ['output', PropTypes.func].includes(this._propertyTypes[name])
             )
                 this.properties[name] = (...parameter:Array<any>):void => {
-                    this.forwardEvent(name, parameter)
                     if (reflectProperties)
                         this.reflectEventToProperties(name, parameter)
+                    this.forwardEvent(name, parameter)
                 }
     }
     /**
