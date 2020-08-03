@@ -63,6 +63,12 @@ export type Props<Type = any> = {
     dirty?:boolean;
     focused?:boolean;
     invalid?:boolean;
+    invalidMaximum?:boolean;
+    invalidMaximumLength?:boolean;
+    invalidMinimum?:boolean;
+    invalidMinimumLength?:boolean;
+    invalidPattern?:boolean;
+    invalidRequired?:boolean;
     pristine?:boolean;
     touched?:boolean;
     untouched?:boolean;
@@ -123,6 +129,12 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         dirty: false,
         focused: false,
         invalid: false,
+        invalidMaximum: false,
+        invalidMaximumLength: false,
+        invalidMinimum: false,
+        invalidMinimumLength: false,
+        invalidPattern: false,
+        invalidRequired: false,
         pristine: true,
         touched: false,
         untouched: true,
@@ -175,6 +187,12 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             ['dirty', true],
             ['focused', true],
             ['invalid', true],
+            ['invalidMaximum', true],
+            ['invalidMaximumLength', true],
+            ['invalidMinimum', true],
+            ['invalidMinimumLength', true],
+            ['invalidPattern', true],
+            ['invalidRequired', true],
             ['name', true],
             ['pristine', true],
             ['touched', true],
@@ -224,19 +242,9 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             this.properties.onChangeState(state, event)
     }
     onChangeValue = (event:SyntheticEvent):void => {
-        this.properties.value = event.target.value
-        if (
-            this.properties.model.trim &&
-            typeof this.properties.value === 'string'
-        )
-            this.properties.value = this.properties.value.trim()
-        if (
-            this.properties.model.emptyEqualsNull &&
-            this.properties.value === ''
-        )
-            this.properties.value = null
-
-        // TODO validate
+        this.properties.value = this.transformValue(event.target.value)
+        let stateChanged:boolean =
+            this.determineValidationState(this.properties.value)
 
         this.setState({value: this.properties.value})
         if (this.properties.onChangeValue)
@@ -249,8 +257,10 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             this.properties.pristine =
             this.properties.model.state.pristine =
                 false
-            this.onChangeState(this.properties.model.state, event)
+            stateChanged = true
         }
+        if (stateChanged)
+            this.onChangeState(this.properties.model.state, event)
         this.onChange(event)
     }
     onClick = (event:MouseEvent):void => {
@@ -350,6 +360,9 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             this.properties.model.value = this.state.value
         // else -> Controlled component via models's "value" property.
         // endregion
+        this.properties.model.value =
+            this.transformValue(this.properties.model.value)
+        this.determineValidationState(this.properties.model.value)
     }
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -377,8 +390,96 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         delete result.regularExpressionPattern
         return result
     }
+    /**
+     * Derives current validation state from given value.
+     * @param value - Value to validate against current configuration.
+     * @returns A boolean indicating if validation state has changed.
+     */
+    determineValidationState(value:any):boolean {
+        let changed:boolean = false
+        let oldValue:boolean = false
+
+        oldValue = this.properties.model.state.invalidMaximum
+        this.properties.model.state.invalidMaximum =
+            typeof this.properties.model.maximum === 'number' &&
+            typeof value === 'number' &&
+            !isNaN(value) &&
+            this.properties.model.maximum < value
+        changed =
+            changed || oldValue !== this.properties.model.state.invalidMaximum
+
+        oldValue = this.properties.model.state.invalidMaximumLength
+        this.properties.model.state.invalidMaximumLength =
+            typeof this.properties.model.maximumLength === 'number' &&
+            typeof value === 'string' &&
+            this.properties.model.maximumLength < value.length
+        changed =
+            changed ||
+            oldValue !== this.properties.model.state.invalidMaximumLength
+
+        oldValue = this.properties.model.state.invalidMinimum
+        this.properties.model.state.invalidMinimum =
+            typeof this.properties.model.minimum === 'number' &&
+            typeof value === 'number' &&
+            !isNaN(value) &&
+            value < this.properties.model.minimum
+        changed =
+            changed || oldValue !== this.properties.model.state.invalidMinimum
+
+        oldValue = this.properties.model.state.invalidMinimumLength
+        this.properties.model.state.invalidMinimumLength =
+            typeof this.properties.model.minimumLength === 'number' &&
+            typeof value === 'string' &&
+            value.length < this.properties.model.minimumLength
+        changed =
+            changed ||
+            oldValue !== this.properties.model.state.invalidMinimumLength
+
+        oldValue = this.properties.model.state.invalidPattern
+        this.properties.model.state.invalidPattern =
+            typeof this.properties.model.regularExpressionPattern ===
+                'string' &&
+            !(new RegExp(this.properties.model.regularExpressionPattern))
+                .test(value) ||
+            typeof this.properties.model.regularExpressionPattern ===
+                'object' &&
+            !typeof this.properties.model.regularExpressionPattern.test(value)
+        changed =
+            changed || oldValue !== this.properties.model.state.invalidPattern
+
+        oldValue = this.properties.model.state.invalidRequired
+        this.properties.model.state.invalidRequired =
+            this.properties.model.nullable === false && value === null
+        changed =
+            changed || oldValue !== this.properties.model.state.invalidRequired
+
+        if (changed) {
+            this.properties.model.state.invalid =
+                this.properties.model.state.invalidMaximum ||
+                this.properties.model.state.invalidMaximumLength ||
+                this.properties.model.state.invalidMinimum ||
+                this.properties.model.state.invalidMinimumLength ||
+                this.properties.model.state.invalidPattern ||
+                this.properties.model.state.invalidRequired
+            this.properties.model.state.valid =
+                !this.properties.model.state.invalid
+        }
+        return changed
+    }
+    /**
+     * Applies configured value transformations.
+     * @param value - Value to transform.
+     * @returns Transformed value.
+     */
+    transformValue(value:any):any {
+        if (this.properties.model.trim && typeof value === 'string')
+            value = value.trim()
+        if (this.properties.model.emptyEqualsNull && value === '')
+            return null
+        return value
+    }
     // endregion
-    // region  render
+    // region render
     /**
      * Renders current's component state.
      * @returns Current component's representation.
@@ -401,7 +502,6 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
                     model.declaration
             },
             icon: properties.icon,
-            inputRef: ,
             invalid: model.state.invalid,
             label: model.description || model.name,
             onBlur: this.onBlur,

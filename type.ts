@@ -27,6 +27,12 @@ export type ModelState = {
     dirty:boolean;
     focused:boolean;
     invalid:boolean;
+    invalidMaximum:boolean;
+    invalidMaximumLength:boolean;
+    invalidMinimum:boolean;
+    invalidMinimumLength:boolean;
+    invalidPattern:boolean;
+    invalidRequired:boolean;
     pristine:boolean;
     touched:boolean;
     untouched:boolean;
