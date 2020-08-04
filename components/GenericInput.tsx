@@ -94,7 +94,6 @@ export type Props<Type = any> = {
     onChangeState?:(state:ModelState, event:SyntheticEvent) => void;
     onClick?:(event:MouseEvent) => void;
     onFocus?:(event:FocusEvent) => void;
-    onInitialize?:(properties:Properties<Type>) => void;
     onTouch?:(event:FocusEvent|MouseEvent) => void;
     outlined?:boolean;
     pattern?:string;
@@ -220,15 +219,9 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         value: null
     }
     // endregion
-    // region live-cycle methods
-    constructor(props:Props<Type>) {
-        super(props)
-        this.onInitialize()
-    }
-    // endregion
     // region event handler
     onBlur = (event:SyntheticEvent):void => {
-        if (this.properties.model.state.focused) {
+        if (this.properties.focused) {
             this.properties.focused =
             this.properties.model.state.focused =
                 false
@@ -241,7 +234,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
     onChange(event?:SyntheticEvent):void {
         if (this.properties.onChange)
             this.properties.onChange(
-                this.getExternalPropertiesRepresentation(), event
+                this.getConsolidatedProperties(this.properties), event
             )
     }
     onChangeState(state:ModelState, event:SyntheticEvent):void {
@@ -250,15 +243,18 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             this.properties.onChangeState(state, event)
     }
     onChangeValue = (event:SyntheticEvent):void => {
-        this.properties.value = this.transformValue(event.target.value)
-        let stateChanged:boolean =
-            this.determineValidationState(this.properties.value)
+        this.properties.value = this.transformValue(
+            this.properties, event.target.value
+        )
+        let stateChanged:boolean = this.determineValidationState(
+            this.properties, this.properties.value
+        )
 
         this.setState({value: this.properties.value})
         if (this.properties.onChangeValue)
             this.properties.onChangeValue(this.properties.value, event)
 
-        if (this.properties.model.state.pristine) {
+        if (this.properties.pristine) {
             this.properties.dirty =
             this.properties.model.state.dirty =
                 true
@@ -281,14 +277,6 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             this.properties.onFocus(event)
         this.onTouch(event)
     }
-    onInitialize():void {
-        this.properties = this.props
-        if (this.properties.onInitialize)
-            this.properties.onInitialize(
-                this.getExternalPropertiesRepresentation()
-            )
-        this.onChange()
-    }
     /**
      * Triggers on start interacting with the input.
      * @param event - Event which triggers interaction.
@@ -296,13 +284,13 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
      */
     onTouch(event:FocusEvent|MouseEvent):void {
         let changeState:boolean = false
-        if (!this.properties.model.state.focused) {
+        if (!this.properties.focused) {
             changeState =
             this.properties.focused =
             this.properties.model.state.focused =
                 true
         }
-        if (this.properties.model.state.untouched) {
+        if (this.properties.untouched) {
             changeState =
             this.properties.touched =
             this.properties.model.state.touched =
@@ -325,64 +313,57 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
      * properties.
      * @returns Nothing.
     */
-    consolidateProperties():void {
+    mapPropertiesToModel(
+        properties:Partial<Properties<Type>>
+    ):Properties<Type> {
         /*
             NOTE: Default props seems not to respect nested layers to merge so
             we have to manage this for nested model structure.
         */
-        this.properties = Tools.extend(
-            true,
-            {},
-            {model: this.self.defaultProps.model},
-            this.properties || this.props
+        const result:Properties<Type> = Tools.extend(
+            true, {}, {model: this.self.defaultProps.model}, properties
         )
         // region handle aliases
-        if (this.properties.disabled) {
-            delete this.properties.disabled
-            this.properties.model.mutable = false
+        if (result.disabled) {
+            delete result.disabled
+            result.model.mutable = false
         }
-        if (this.properties.pattern) {
-            this.properties.model.regularExpressionPattern =
-                this.properties.pattern
-            delete this.properties.pattern
+        if (result.pattern) {
+            result.model.regularExpressionPattern = result.pattern
+            delete result.pattern
         }
-        if (this.properties.required) {
-            delete this.properties.required
-            this.properties.model.nullable = false
+        if (result.required) {
+            delete result.required
+            result.model.nullable = false
         }
         // endregion
         // region handle model configuration
-        for (const [name, value] of Object.entries(this.properties.model))
-            if (Object.prototype.hasOwnProperty.call(this.properties, name))
-                this.properties.model[name] = this.properties[name]
-        this.properties.model.state = this.state.model
-        if (Object.prototype.hasOwnProperty.call(this.properties, 'value'))
-            // Controlled component via "value" property.
-            this.properties.model.value = this.properties.value
-        else if (
-            !Object.prototype.hasOwnProperty.call(
-                this.properties.model, 'value'
-            ) ||
-            this.properties.model.value === undefined
+        for (const [name, value] of Object.entries(result.model))
+            if (Object.prototype.hasOwnProperty.call(result, name))
+                result.model[name] = result[name]
+        result.model.state = this.state.model
+        if (
+            !Object.prototype.hasOwnProperty.call(result.model, 'value') ||
+            result.model.value === undefined
         )
-            this.properties.model.value = this.state.value
-        // else -> Controlled component via models's "value" property.
+            result.model.value = this.state.value
+        // else -> Controlled component via model's "value" property.
         // endregion
-        this.properties.model.value =
-            this.transformValue(this.properties.model.value)
-        this.determineValidationState(this.properties.model.value)
+        result.model.value = this.transformValue(result, result.model.value)
+        this.determineValidationState(result, result.model.value)
+
+        return result
     }
     /**
      * Calculate external properties (a set of all configurable properties).
      * @returns External properties object.
      */
-    getExternalPropertiesRepresentation():Properties<Type> {
-        this.consolidateProperties()
+    getConsolidatedProperties(
+        properties:Partial<Properties<Type>>
+    ):Properties<Type> {
+        properties = this.mapPropertiesToModel(properties)
         const result:Properties<Type> = Tools.extend(
-            {},
-            this.properties,
-            this.properties.model,
-            this.properties.model.state
+            {}, properties, properties.model, properties.model.state
         )
 
         delete result.state
@@ -401,90 +382,92 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
     }
     /**
      * Derives current validation state from given value.
-     * @param value - Value to validate against current configuration.
+     * @param configuration - Input configuration.
+     * @param value - Value to validate against given configuration.
      * @returns A boolean indicating if validation state has changed.
      */
-    determineValidationState(value:any):boolean {
+    determineValidationState(
+        configuration:Properties<Type>, value:any
+    ):boolean {
         let changed:boolean = false
         let oldValue:boolean = false
 
-        oldValue = this.properties.model.state.invalidMaximum
-        this.properties.model.state.invalidMaximum =
-            typeof this.properties.model.maximum === 'number' &&
+        oldValue = configuration.model.state.invalidMaximum
+        configuration.model.state.invalidMaximum =
+            typeof configuration.model.maximum === 'number' &&
             typeof value === 'number' &&
             !isNaN(value) &&
-            this.properties.model.maximum < value
+            configuration.model.maximum < value
         changed =
-            changed || oldValue !== this.properties.model.state.invalidMaximum
+            changed || oldValue !== configuration.model.state.invalidMaximum
 
-        oldValue = this.properties.model.state.invalidMaximumLength
-        this.properties.model.state.invalidMaximumLength =
-            typeof this.properties.model.maximumLength === 'number' &&
+        oldValue = configuration.model.state.invalidMaximumLength
+        configuration.model.state.invalidMaximumLength =
+            typeof configuration.model.maximumLength === 'number' &&
             typeof value === 'string' &&
-            this.properties.model.maximumLength < value.length
+            configuration.model.maximumLength < value.length
         changed =
             changed ||
-            oldValue !== this.properties.model.state.invalidMaximumLength
+            oldValue !== configuration.model.state.invalidMaximumLength
 
-        oldValue = this.properties.model.state.invalidMinimum
-        this.properties.model.state.invalidMinimum =
-            typeof this.properties.model.minimum === 'number' &&
+        oldValue = configuration.model.state.invalidMinimum
+        configuration.model.state.invalidMinimum =
+            typeof configuration.model.minimum === 'number' &&
             typeof value === 'number' &&
             !isNaN(value) &&
-            value < this.properties.model.minimum
+            value < configuration.model.minimum
         changed =
-            changed || oldValue !== this.properties.model.state.invalidMinimum
+            changed || oldValue !== configuration.model.state.invalidMinimum
 
-        oldValue = this.properties.model.state.invalidMinimumLength
-        this.properties.model.state.invalidMinimumLength =
-            typeof this.properties.model.minimumLength === 'number' &&
+        oldValue = configuration.model.state.invalidMinimumLength
+        configuration.model.state.invalidMinimumLength =
+            typeof configuration.model.minimumLength === 'number' &&
             typeof value === 'string' &&
-            value.length < this.properties.model.minimumLength
+            value.length < configuration.model.minimumLength
         changed =
             changed ||
-            oldValue !== this.properties.model.state.invalidMinimumLength
+            oldValue !== configuration.model.state.invalidMinimumLength
 
-        oldValue = this.properties.model.state.invalidPattern
-        this.properties.model.state.invalidPattern =
-            typeof this.properties.model.regularExpressionPattern ===
-                'string' &&
-            !(new RegExp(this.properties.model.regularExpressionPattern))
+        oldValue = configuration.model.state.invalidPattern
+        configuration.model.state.invalidPattern =
+            typeof configuration.model.regularExpressionPattern === 'string' &&
+            !(new RegExp(configuration.model.regularExpressionPattern))
                 .test(value) ||
-            typeof this.properties.model.regularExpressionPattern ===
-                'object' &&
-            !typeof this.properties.model.regularExpressionPattern.test(value)
+            typeof configuration.model.regularExpressionPattern === 'object' &&
+            !typeof configuration.model.regularExpressionPattern.test(value)
         changed =
-            changed || oldValue !== this.properties.model.state.invalidPattern
+            changed || oldValue !== configuration.model.state.invalidPattern
 
-        oldValue = this.properties.model.state.invalidRequired
-        this.properties.model.state.invalidRequired =
-            this.properties.model.nullable === false && value === null
+        oldValue = configuration.model.state.invalidRequired
+        configuration.model.state.invalidRequired =
+            configuration.model.nullable === false && value === null
         changed =
-            changed || oldValue !== this.properties.model.state.invalidRequired
+            changed || oldValue !== configuration.model.state.invalidRequired
 
         if (changed) {
-            this.properties.model.state.invalid =
-                this.properties.model.state.invalidMaximum ||
-                this.properties.model.state.invalidMaximumLength ||
-                this.properties.model.state.invalidMinimum ||
-                this.properties.model.state.invalidMinimumLength ||
-                this.properties.model.state.invalidPattern ||
-                this.properties.model.state.invalidRequired
-            this.properties.model.state.valid =
-                !this.properties.model.state.invalid
+            configuration.model.state.invalid =
+                configuration.model.state.invalidMaximum ||
+                configuration.model.state.invalidMaximumLength ||
+                configuration.model.state.invalidMinimum ||
+                configuration.model.state.invalidMinimumLength ||
+                configuration.model.state.invalidPattern ||
+                configuration.model.state.invalidRequired
+            configuration.model.state.valid =
+                !configuration.model.state.invalid
         }
 
         return changed
     }
     /**
      * Applies configured value transformations.
+     * @param configuration - Input configuration.
      * @param value - Value to transform.
      * @returns Transformed value.
      */
-    transformValue(value:any):any {
-        if (this.properties.model.trim && typeof value === 'string')
+    transformValue(configuration:Properties<Type>, value:any):any {
+        if (configuration.model.trim && typeof value === 'string')
             value = value.trim()
-        if (this.properties.model.emptyEqualsNull && value === '')
+        if (configuration.model.emptyEqualsNull && value === '')
             return null
         return value
     }
@@ -495,52 +478,52 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
      * @returns Current component's representation.
      */
     render():Component {
-        this.consolidateProperties()
-
-        const properties:Properties<Type> = this.properties
-        const model:Model<Type> = properties.model
+        const properties:Properties<Type> =
+        this.properties =
+            this.getConsolidatedProperties(this.props)
 
         const materialProperties = {
-            disabled: !model.mutable,
+            disabled: properties.disabled,
             helpText: {
                 persistent: Boolean(
-                    properties.showDeclaration && model.declaration
+                    properties.showDeclaration && properties.declaration
                 ),
                 children:
-                    model.state.valid &&
+                    properties.valid &&
                     properties.showDeclaration &&
-                    model.declaration
+                    properties.declaration
             },
             icon: properties.icon,
-            invalid: model.state.invalid,
-            label: model.description || model.name,
+            invalid: properties.invalid,
+            label: properties.description || properties.name,
             onBlur: this.onBlur,
             onChange: this.onChangeValue,
             onClick: this.onClick,
             onFocus: this.onFocus,
             outlined: properties.outlined,
             placeholder: properties.placeholder,
-            required: !model.nullable,
-            value: model.value || ''
+            required: properties.required,
+            value: properties.value || ''
         }
         return (
             //<React.StrictMode>{
-                model.selection ?
+                properties.selection ?
                     <Select
                         enhanced
-                        options={model.selection}
+                        options={properties.selection}
                         {...materialProperties}
                     /> :
                     <TextField
                         align={properties.align}
                         fullwidth={properties.fullWidth}
-                        maxLength={model.maximumLength}
-                        minLength={model.minimumLength}
-                        pattern={model.regularExpressionPattern}
+                        maxLength={properties.maximumLength}
+                        minLength={properties.minimumLength}
+                        pattern={properties.regularExpressionPattern}
                         ripple={properties.ripple}
                         rows={properties.rows}
                         textarea={
-                            model.type === 'string' && model.editor === 'text'
+                            properties.type === 'string' &&
+                            properties.editor === 'text'
                         }
                         trailingIcon={properties.trailingIcon}
                         {...materialProperties}

@@ -86,12 +86,11 @@
                 placeholder="input4"
                 required
             ></generic-input>
-            <!-- TODO provide scope-->
             <generic-input
                 icon="backup"
                 model="{declaration: 'placeholder', name: 'input4Model', nullable: false, value: 'value4Model'}"
                 placholder="input4Model"
-                trailing-icon="{icon: 'clear', onClick: function() { console.log('JAU', this)}}"
+                trailing-icon="{icon: 'clear', onClick: (event) => {event.preventDefault(); this.value = ''}}"
             ></generic-input>
 
             <hr/>

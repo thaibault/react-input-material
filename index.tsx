@@ -41,9 +41,7 @@ for (const key of modules.keys()) {
             NOTE: There exists babel plugins which reflects component name and
             member variables under this property. Try to respect these.
         */
-        component.___types &&
-        component.___types.name &&
-        component.___types.name.name ||
+        component.___types?.name?.name ||
         key.replace(/^(.*\/+)?([^\/]+)\.tsx$/, '$2')
     let propertyTypes:PropertyTypes = {}
     if (component.propTypes) {

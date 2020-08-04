@@ -79,8 +79,8 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     onChangeValue:(value:Type, event:SyntheticEvent) => void;
     onChangeState:(state:ModelState, event:SyntheticEvent) => void;
     onClick:(event:MouseEvent) => void;
+    onConfigure:(properties:Properties<Type>) => void;
     onFocus:(event:FocusEvent) => void;
-    onInitialize:(properties:Properties<Type>) => void;
     onTouch:(event:Event) => void;
     outlined:boolean;
     pattern:string;

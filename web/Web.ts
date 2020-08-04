@@ -85,6 +85,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     batchedAttributeUpdateRunning:boolean = true
     batchedPropertyUpdateRunning:boolean = true
     batchedUpdateRunning:boolean = true
+    instance:null|object = null
     output:Output = {}
     properties:object = {}
     root:TElement
@@ -168,6 +169,8 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @returns Retrieved property value.
      */
     getPropertyValue(name:string):any {
+        if (this.instance?.properties)
+            return this.instance.properties[name]
         return this.properties[name]
     }
     /**
@@ -438,7 +441,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                         this.reflectProperties(this.output[name](...parameter))
                         if (callback)
                             try {
-                                callback(parameter)
+                                callback.call(this, parameter)
                             } catch (error) {
                                 console.warn(
                                     `'Failed to evaluate event handler "` +
@@ -482,16 +485,17 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                             )
                             break
                         }
-                        try {
-                            value = get()
-                        } catch (error) {
-                            console.warn(
-                                `Error occured durring interpreting given "` +
-                                `${name}" attribute object "${value}": "` +
-                                `${Tools.represent(error)}".`
-                            )
-                            break
-                        }
+                        if (get)
+                            try {
+                                value = get.call(this)
+                            } catch (error) {
+                                console.warn(
+                                    `Error occured durring interpreting ` +
+                                    `given "${name}" attribute object "` +
+                                    `${value}": "${Tools.represent(error)}".`
+                                )
+                                break
+                            }
                         this.properties[name] = value
                     } else
                         this.properties[name] = null
@@ -504,9 +508,31 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @returns Nothing.
      */
     render():void {
-        this.root.innerHTML = (new Function(
-            ...Object.keys(this), `return \`${this._content}\``
-        ))(...Object.values(this))
+        let renderer:Function
+        const scopeNames:Array<string> = Object.keys(this)
+        try {
+            renderer = new Function(
+                ...scopeNames, `return \`${this._content}\``
+            )
+        } catch (error) {
+            console.warn(
+                `Faild to compile template "${this._content}" with scope ` +
+                `variables "${scopeNames.join('", "')}": "` +
+                `${Tools.represent(error)}".`
+            )
+        }
+        if (renderer)
+            try {
+                this.root.innerHTML = renderer.call(
+                    this, ...Object.values(this)
+                )
+            } catch (error) {
+                console.warn(
+                    'Faild to evaluate render function with template "' +
+                    `${this._content}" with scope variables "` +
+                    `${scopeNames.join('", "')}": "${Tools.represent(error)}".`
+                )
+            }
     }
     // endregion
 }

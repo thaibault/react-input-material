@@ -48,7 +48,6 @@
   "devDependencies": {
     "airbnb-prop-types": "*",
     "@babel/plugin-transform-proto-to-assign": "*",
-    "@babel/preset-env": "*",
     "@babel/preset-react": "*",
     "@rmwc/card": "*",
     "@rmwc/formfield": "*",
