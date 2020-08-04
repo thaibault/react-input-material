@@ -108,7 +108,15 @@ export type Props<Type = any> = {
     showDeclaration?:boolean;
     showInputText?:string;
     showValidationState?:boolean;
-    trailingIcon?:string;
+    /*
+        NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
+        trailingIcon?:string|{
+            icon:string;
+            onClick:(event:MouseEvent) => void
+            tabIndex:number;
+        };
+    */
+    trailingIcon?:any;
 }
 // endregion
 /**

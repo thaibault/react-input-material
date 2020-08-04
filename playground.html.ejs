@@ -85,11 +85,13 @@
                 name="input4"
                 placeholder="input4"
                 required
-            >
-            </generic-input>
+            ></generic-input>
+            <!-- TODO provide scope-->
             <generic-input
+                icon="backup"
                 model="{declaration: 'placeholder', name: 'input4Model', nullable: false, value: 'value4Model'}"
                 placholder="input4Model"
+                trailing-icon="{icon: 'clear', onClick: function() { console.log('JAU', this)}}"
             ></generic-input>
 
             <hr/>
@@ -107,6 +109,7 @@
                 model="{declaration: 'pattern', description: 'input5ModelDescription', regularExpressionPattern: 'a+', value: 'only a`s allowed'}"
                 name="input5Model"
                 placeholder="input5ModelPlaceholder"
+                trailing-icon="'search'"
             ></generic-input>
 
             <hr/>
@@ -142,7 +145,13 @@
         <pre style="float: right"></pre>
 
         <style>
-            <%- require('material-design-icons/iconfont/material-icons.css') %>
+            <%-
+                require('material-design-icons/iconfont/material-icons.css')
+                    .replace(
+                        /(url\()(MaterialIcons-Regular\.[^.]+\))/g,
+                        '$1./node_modules/material-design-icons/iconfont/$2'
+                    )
+             %>
         </style>
     </body>
 <html>

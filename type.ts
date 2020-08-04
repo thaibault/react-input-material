@@ -94,7 +94,11 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     showDeclaration:boolean;
     showInputText:string;
     showValidationState:boolean;
-    trailingIcon:string;
+    trailingIcon:string|{
+        icon:string;
+        onClick:(event:MouseEvent) => void
+        tabIndex:number;
+    };
 }
 export type PropertyTypes = Mapping<ValueOf<PropTypes>|string>
 export type Props<Type = any> = Partial<Properties<Type>>

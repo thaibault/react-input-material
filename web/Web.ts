@@ -410,45 +410,6 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         name = Tools.stringDelimitedToCamelCase(name)
         if (Object.prototype.hasOwnProperty.call(this._propertyTypes, name))
             switch (this._propertyTypes[name]) {
-                case PropTypes.any:
-                case PropTypes.array:
-                case PropTypes.arrayOf:
-                case PropTypes.element:
-                case PropTypes.elementType:
-                case PropTypes.instanceOf:
-                case PropTypes.node:
-                case PropTypes.object:
-                case PropTypes.objectOf:
-                case PropTypes.shape:
-                case PropTypes.exact:
-                case PropTypes.symbol:
-                case 'any':
-                    if (value) {
-                        let get:Function
-                        try {
-                            get = new Function(`return ${value}`)
-                        } catch (error) {
-                            console.warn(
-                                `Error occured during compiling given "` +
-                                `${name}" attribute configuration "${value}"` +
-                                `: "${Tools.represent(error)}".`
-                            )
-                            break
-                        }
-                        try {
-                            value = get()
-                        } catch (error) {
-                            console.warn(
-                                `Error occured durring interpreting given "` +
-                                `${name}" attribute object "${value}": "` +
-                                `${Tools.represent(error)}".`
-                            )
-                            break
-                        }
-                        this.properties[name] = value
-                    } else
-                        this.properties[name] = null
-                    break
                 case PropTypes.bool:
                 case 'boolean':
                     this.properties[name] = value !== 'false'
@@ -492,6 +453,48 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                 case PropTypes.string:
                 case 'string':
                     this.properties[name] = value
+                    break
+                case PropTypes.any:
+                case PropTypes.array:
+                case PropTypes.arrayOf:
+                case PropTypes.element:
+                case PropTypes.elementType:
+                case PropTypes.instanceOf:
+                case PropTypes.node:
+                case PropTypes.object:
+                case PropTypes.objectOf:
+                case PropTypes.oneOf:
+                case PropTypes.oneOfType:
+                case PropTypes.shape:
+                case PropTypes.exact:
+                case PropTypes.symbol:
+                case 'any':
+                default:
+                    if (value) {
+                        let get:Function
+                        try {
+                            get = new Function(`return ${value}`)
+                        } catch (error) {
+                            console.warn(
+                                `Error occured during compiling given "` +
+                                `${name}" attribute configuration "${value}"` +
+                                `: "${Tools.represent(error)}".`
+                            )
+                            break
+                        }
+                        try {
+                            value = get()
+                        } catch (error) {
+                            console.warn(
+                                `Error occured durring interpreting given "` +
+                                `${name}" attribute object "${value}": "` +
+                                `${Tools.represent(error)}".`
+                            )
+                            break
+                        }
+                        this.properties[name] = value
+                    } else
+                        this.properties[name] = null
                     break
             }
     }
