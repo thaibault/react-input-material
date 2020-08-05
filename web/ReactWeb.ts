@@ -42,7 +42,7 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
             React.createElement(this._content, this.properties), this.root
         )
         if (this.instance?.properties)
-            this.reflectProperties(this.instance.properties)
+            this.reflectProperties(this.instance.properties, false)
     }
 }
 export default ReactWeb

@@ -116,11 +116,18 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @param name - Attribute name which was updates.
      * @param oldValue - Old attribute value.
      * @param newValue - New updated value.
+     * @param forceReEvaluation - Indicates if a re-evaluation should be
+     * performed if given old and new value are the same.
      * @returns Nothing.
      */
     attributeChangedCallback(
-        name:string, oldValue:string, newValue:string
+        name:string,
+        oldValue:string,
+        newValue:string,
+        forceReEvaluation:boolean = false
     ):void {
+        if (!forceReEvaluation && oldValue === newValue)
+            return
         this.evaluateStringAndSetAsProperty(name, newValue)
         if (this.batchAttributeUpdates) {
             if (!(
@@ -303,9 +310,11 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * Reflects wrapped component state back to web-component's attributes and
      * properties.
      * @param properties - Properties to update in reflected property state.
+     * @param render - Indicates whether an additional re-render should be
+     * triggered.
      * @returns Nothing.
      */
-    reflectProperties(properties:Mapping<any>):void {
+    reflectProperties(properties:Mapping<any>, render:boolean = true):void {
         for (const [name, value] of Object.entries(properties)) {
             this.properties[name] = value
             if (this._propertiesToReflectAsAttributes.has(name))
@@ -326,23 +335,32 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                         if (value) {
                             const representation:string =
                                 Tools.represent(value)
-                            if (representation) {
+                            if (
+                                representation &&
+                                this.getAttribute(name) !== representation
+                            ) {
                                 this.setAttribute(name, representation)
                                 break
                             }
                         }
-                        this.removeAttribute(name)
+                        if (this.hasAttribute(name))
+                            this.removeAttribute(name)
                         break
                     case PropTypes.bool:
                     case 'boolean':
-                        value ?
-                            this.setAttribute(name, '') :
+                        if (value) {
+                            if (this.getAttribute(name) !== '')
+                                this.setAttribute(name, '')
+                        } else if (this.hasAttribute(name))
                             this.removeAttribute(name)
                         break
                     case PropTypes.number:
                     case 'number':
-                        (typeof value === 'number' && !isNaN(value)) ?
-                            this.setAttribute(name, `${value}`) :
+                        if (typeof value === 'number' && !isNaN(value)) {
+                            value = `${value}`
+                            if (this.getAttribute(name) !== value)
+                                this.setAttribute(name, value)
+                        } else if (this.hasAttribute(name))
                             this.removeAttribute(name)
                         break
                     case PropTypes.func:
@@ -350,22 +368,25 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                         break
                     case PropTypes.string:
                     case 'string':
-                        value ?
-                            this.setAttribute(name, value) :
+                        if (value) {
+                            if (this.getAttribute(name) !== value)
+                                this.setAttribute(name, value)
+                        } else if (this.hasAttribute(name))
                             this.removeAttribute(name)
                         break
                 }
         }
-        if (this.batchUpdates) {
-            if (!this.batchedUpdateRunning) {
-                this.batchedUpdateRunning = true
-                Tools.timeout(():void => {
-                    this.batchedUpdateRunning = false
-                    this.render()
-                })
-            }
-        } else
-            this.render()
+        if (render)
+            if (this.batchUpdates) {
+                if (!this.batchedUpdateRunning) {
+                    this.batchedUpdateRunning = true
+                    Tools.timeout(():void => {
+                        this.batchedUpdateRunning = false
+                        this.render()
+                    })
+                }
+            } else
+                this.render()
     }
     /**
      * Triggers a re-evaluation of all attributes.
@@ -375,7 +396,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         for (const name of this.self.observedAttributes)
             if (this.hasAttribute(name)) {
                 const value:any = this.getAttribute(name)
-                this.attributeChangedCallback(name, value, value)
+                this.attributeChangedCallback(name, value, value, true)
             }
     }
     /**

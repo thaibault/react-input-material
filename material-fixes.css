@@ -9,16 +9,22 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
-generic-input .mdc-icon-button {
-    font-size: 1em;
-    height: 34px;
-    width: 34px;
-    vertical-align: middle;
+generic-input {
+    & .mdc-icon-button {
+        font-size: 1.3em;
+        height: 32px;
+        padding: 8px;
+        width: 32px;
+        vertical-align: middle;
+    }
+
+    & .mdc-text-field + .mdc-text-field-helper-line {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 .mdc-select-helper-text {
     color: rgba(0, 0, 0, 0.6);
-    padding-left: 16px;
-    padding-right: 16px;
 }
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:

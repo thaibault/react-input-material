@@ -23,10 +23,12 @@ import React, {Component, FocusEvent, MouseEvent, SyntheticEvent} from 'react'
 import {IconButton} from '@rmwc/icon-button'
 import {Select} from '@rmwc/select'
 import {TextField} from '@rmwc/textfield'
+import {Theme} from '@rmwc/theme'
 
 import '@rmwc/icon-button/styles'
 import '@rmwc/select/styles'
 import '@rmwc/textfield/styles'
+import '@rmwc/theme/styles'
 
 import '../material-fixes'
 import {Model, ModelState, Output, Properties} from '../type'
@@ -96,6 +98,7 @@ export type Props<Type = any> = {
     onBlur?:(event:SyntheticEvent) => void;
     onChange?:(value:Properties<Type>, event?:SyntheticEvent) => void;
     onChangeValue?:(value:Type, event:SyntheticEvent) => void;
+    onChangeShowDeclaration?:(show:boolean, event?:MouseEvent) => void;
     onChangeState?:(state:ModelState, event:SyntheticEvent) => void;
     onClick?:(event:MouseEvent) => void;
     onFocus?:(event:FocusEvent) => void;
@@ -110,8 +113,8 @@ export type Props<Type = any> = {
     rows?:number;
     selectableEditor?:boolean;
     showDeclaration?:boolean;
+    showInitialValidationState?:boolean;
     showInputText?:string;
-    showValidationState?:boolean;
     /*
         NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
         trailingIcon?:string|{
@@ -190,8 +193,8 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         rows: 4,
         selectableEditor: false,
         showDeclaration: false,
-        showInputText: 'Show password.',
-        showValidationState: false
+        showInitialValidationState: false,
+        showInputText: 'Show password.'
     }
     static readonly output:Output = {onChange: true}
     static readonly propertiesToReflectAsAttributes:Mapping<boolean> = new Map(
@@ -218,9 +221,11 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
     self:typeof GenericInput = GenericInput
     state:{
         model:ModelState;
+        showDeclaration:boolean;
         value:Type;
     } = {
         model: GenericInput.defaultModelState,
+        showDeclaration: false,
         value: null
     }
     // endregion
@@ -241,6 +246,15 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             this.properties.onChange(
                 this.getConsolidatedProperties(this.properties), event
             )
+    }
+    onChangeShowDeclaration = (event?:MouseEvent):void => {
+        this.setState(({showDeclaration}):void => !showDeclaration)
+        this.properties.showDeclaration = !this.properties.showDeclaration
+        if (this.properties.onChangeShowDeclaration)
+            this.properties.onChangeShowDeclaration(
+                this.properties.showDeclaration, event
+            )
+        this.onChange(event)
     }
     onChangeState(state:ModelState, event:SyntheticEvent):void {
         this.setState({model: state})
@@ -352,6 +366,8 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             result.model.value === undefined
         )
             result.model.value = this.state.value
+        if (!Object.prototype.hasOwnProperty.call(result, 'showDeclaration'))
+            result.showDeclaration = this.state.showDeclaration
         // else -> Controlled component via model's "value" property.
         // endregion
         result.model.value = this.transformValue(result, result.model.value)
@@ -459,6 +475,11 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
                 configuration.model.state.invalidRequired
             configuration.model.state.valid =
                 !configuration.model.state.invalid
+            if (
+                configuration.model.state.invalid &&
+                configuration.showDeclaration
+            )
+                this.onChangeShowDeclaration()
         }
 
         return changed
@@ -490,29 +511,48 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         const materialProperties = {
             disabled: properties.disabled,
             helpText: {
-                persistent: Boolean(
-                    properties.showDeclaration && properties.declaration
-                ),
-                children: (
-                    properties.valid &&
-                    properties.showDeclaration &&
-                    properties.declaration
-                ) ?
-                    // TODO
-                    <>
+                persistent: Boolean(properties.declaration),
+                children: <>
+                    {
+                        properties.declaration &&
                         <IconButton
                             icon={{
-                                icon: 'info_outline',
-                                onClick: () =>
-                                    console.log('A', properties.showDeclaration)
+                                icon: 'more_horiz',
+                                onClick: this.onChangeShowDeclaration
                             }}
                         />
-                        {properties.declaration}
-                    </> :
-                    null
+                    }
+                    {
+                        properties.showDeclaration ?
+                            properties.declaration :
+                            properties.invalid &&
+                            (
+                                properties.showInitialValidationState ||
+                                // TODO need something like "visited"
+                                properties.touched
+                            ) &&
+                            <Theme use="error">
+                                {
+                                    properties.invalidMaximum &&
+                                    properties.maximumText ||
+                                    properties.invalidMaximumLength &&
+                                    properties.maximumLengthText ||
+                                    properties.invalidMinimum &&
+                                    properties.minimumText ||
+                                    properties.invalidMinimumLength &&
+                                    properties.minimumLengthText ||
+                                    properties.invalidPattern &&
+                                    properties.patternText ||
+                                    properties.invalidRequired &&
+                                    properties.requiredText
+                                }
+                            </Theme>
+                    }
+                </>
             },
             icon: properties.icon,
-            invalid: properties.showValidationState && properties.invalid,
+            invalid:
+                properties.showInitialValidationState && properties.invalid,
             label: properties.description || properties.name,
             onBlur: this.onBlur,
             onChange: this.onChangeValue,

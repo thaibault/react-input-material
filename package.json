@@ -54,6 +54,7 @@
     "@rmwc/icon-button": "*",
     "@rmwc/select": "*",
     "@rmwc/textfield": "*",
+    "@rmwc/theme": "*",
     "@rmwc/tooltip": "*",
     "@types/ejs": "*",
     "@types/html-minifier": "*",

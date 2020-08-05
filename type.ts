@@ -77,6 +77,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     onBlur:(event:SyntheticEvent) => void;
     onChange:(properties:Properties<Type>, event?:SyntheticEvent) => void;
     onChangeValue:(value:Type, event:SyntheticEvent) => void;
+    onChangeShowDeclaration:(show:boolean, event:SyntheticEvent) => void;
     onChangeState:(state:ModelState, event:SyntheticEvent) => void;
     onClick:(event:MouseEvent) => void;
     onConfigure:(properties:Properties<Type>) => void;
@@ -92,8 +93,8 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     rows:number;
     selectableEditor:boolean;
     showDeclaration:boolean;
+    showInitialValidationState:boolean;
     showInputText:string;
-    showValidationState:boolean;
     trailingIcon:string|{
         icon:string;
         onClick:(event:MouseEvent) => void
