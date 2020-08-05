@@ -20,12 +20,15 @@
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import React, {Component, FocusEvent, MouseEvent, SyntheticEvent} from 'react'
+import {IconButton} from '@rmwc/icon-button'
 import {Select} from '@rmwc/select'
 import {TextField} from '@rmwc/textfield'
 
+import '@rmwc/icon-button/styles'
 import '@rmwc/select/styles'
 import '@rmwc/textfield/styles'
 
+import '../material-fixes'
 import {Model, ModelState, Output, Properties} from '../type'
 // endregion
 // region prop-types
@@ -40,7 +43,9 @@ export type Props<Type = any> = {
     // default?:Type;
     default?:any;
     description?:string;
-    editor?:'code'|'code(css)'|'code(script)'|'plain'|'text'|'text(simple)'|'text(advanced)';
+    // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
+    // editor?:'code'|'code(css)'|'code(script)'|'plain'|'text'|'text(simple)'|'text(advanced)';
+    editor?:string;
     emptyEqualsNull?:boolean;
     maximum?:number;
     maximumLength?:number;
@@ -182,7 +187,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             'Your string have to match the regular expression: "' +
             '${regularExpressionPattern}".',
         requiredText: 'Please fill this field.',
-        rows: 8,
+        rows: 4,
         selectableEditor: false,
         showDeclaration: false,
         showInputText: 'Show password.',
@@ -488,13 +493,26 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
                 persistent: Boolean(
                     properties.showDeclaration && properties.declaration
                 ),
-                children:
+                children: (
                     properties.valid &&
                     properties.showDeclaration &&
                     properties.declaration
+                ) ?
+                    // TODO
+                    <>
+                        <IconButton
+                            icon={{
+                                icon: 'info_outline',
+                                onClick: () =>
+                                    console.log('A', properties.showDeclaration)
+                            }}
+                        />
+                        {properties.declaration}
+                    </> :
+                    null
             },
             icon: properties.icon,
-            invalid: properties.invalid,
+            invalid: properties.showValidationState && properties.invalid,
             label: properties.description || properties.name,
             onBlur: this.onBlur,
             onChange: this.onChangeValue,
