@@ -27,12 +27,18 @@
         </script>
     </head>
     <style>
+        .inputs {
+            float: left;
+            width: 480px;
+        }
         generic-input {
             display: block;
             margin-bottom: 20px;
         }
-        pre {
+        .outputs {
+            height: -webkit-fill-available;
             margin-left: 500px;
+            overflow: auto;
             position: fixed;
         }
     </style>
@@ -61,8 +67,8 @@
                 );
         </script>
 
-        <div style="float: left">
-
+        <div class="inputs">
+<!--
             <generic-input></generic-input>
 
             <hr/>
@@ -163,9 +169,53 @@
                 rows="2"
             ></generic-input>
 
+            <generic-input
+                declaration="code"
+                description="input9Description"
+                disabled
+                editor="code"
+                name="input9"
+                rows="2"
+                value="'const value = 2'"
+            ></generic-input>
+            <generic-input
+                model="{declaration: 'code', description: 'input9ModelDescription', editor: 'code', name: 'input9Model', nullable: false, value: 'const value = 2'}"
+                rows="6"
+            ></generic-input>
+
+            <generic-input
+                declaration="code"
+                description="input10Description"
+                editor="code"
+                maximum-length="10"
+                name="input10"
+                required
+                rows="2"
+            ></generic-input>
+            <generic-input
+                model="{declaration: 'code', description: 'input10ModelDescription', editor: 'code', name: 'input10Model', nullable: false}"
+                rows="6"
+            ></generic-input>
+-->
+            <generic-input
+                declaration="text(raw)"
+                description="input11Description"
+                disabled
+                editor="text(raw)"
+                name="input11"
+                rows="2"
+                value="'Hello Mr. Smith,<br><br>how are you?'"
+            ></generic-input>
+<!--
+            <generic-input
+                model="{declaration: 'text(simple)', description: 'input11ModelDescription', editor: 'text(simple)', name: 'input11Model', nullable: false, value: 'const value = 2'}"
+                rows="6"
+            ></generic-input>
+-->
+
         </div>
 
-        <pre></pre>
+        <pre class="outputs"></pre>
 
         <style>
             <%-
@@ -176,6 +226,7 @@
                     )
              %>
         </style>
+
     </body>
 <html>
 <%_ /*

@@ -55,7 +55,7 @@
     "@rmwc/select": "*",
     "@rmwc/textfield": "*",
     "@rmwc/theme": "*",
-    "@rmwc/tooltip": "*",
+    "@tinymce/tinymce-react": "*",
     "@types/ejs": "*",
     "@types/html-minifier": "*",
     "@types/jest": "*",
@@ -86,16 +86,19 @@
     "postcss-url": "*",
     "prop-types": "*",
     "react": "*",
+    "react-ace": "*",
     "react-dom": "*",
     "style-loader": "*",
     "stylelint": "*",
     "stylelint-config-standard": "*",
+    "tinymce": "^5.0.0",
     "weboptimizer": "*",
     "webpack": "*",
     "webpack-cli": "*",
     "webpack-dev-server": "*"
   },
   "peerDependencies": {
+    "ace-builds": "*",
     "@babel/runtime": "*",
     "@rmwc/card": "*",
     "@rmwc/formfield": "*",
@@ -103,10 +106,13 @@
     "@rmwc/select": "*",
     "@rmwc/textfield": "*",
     "@rmwc/tooltip": "*",
+    "@tinymce/tinymce-react": "*",
     "clientnode": "*",
     "material-design-icons": "*",
     "react": "*",
-    "react-dom": "*"
+    "react-ace": "*",
+    "react-dom": "*",
+    "tinymce": "^5.0.0"
   },
   "sideEffects": false,
   "webOptimizer": {

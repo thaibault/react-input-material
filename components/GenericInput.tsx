@@ -17,9 +17,13 @@
     endregion
 */
 // region imports
+import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
+import {config as aceConfig} from 'ace-builds'
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import React, {Component, FocusEvent, MouseEvent, SyntheticEvent} from 'react'
+import CodeEditor from 'react-ace'
+
 import {IconButton} from '@rmwc/icon-button'
 import {Select} from '@rmwc/select'
 import {TextField} from '@rmwc/textfield'
@@ -33,6 +37,46 @@ import '@rmwc/theme/styles'
 import '../material-fixes'
 import {Model, ModelState, Output, Properties} from '../type'
 // endregion
+aceConfig.set('basePath', '/node_modules/ace-builds/src-noconflict/')
+
+const tinymce = require('tinymce')
+const tinymceBasePath:string = '/node_modules/tinymce/'
+tinymce.baseURL = tinymceBasePath
+export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
+    /* eslint-disable camelcase */
+    // region paths
+    baseURL: tinymceBasePath,
+    scriptPath: `${tinymceBasePath}tinymce.min.js`,
+    skin_url: `${tinymceBasePath}skins/ui/oxide`,
+    theme_url: `${tinymceBasePath}themes/silver/theme.min.js`,
+    // endregion
+    allow_conditional_comments: false,
+    allow_script_urls: false,
+    cache_suffix: `?version=${UTC_BUILD_TIMESTAMP}`,
+    convert_fonts_to_spans: true,
+    document_base_url: '/',
+    element_format: 'xhtml',
+    entity_encoding: 'raw',
+    fix_list_elements: true,
+    hidden_input: false,
+    invalid_elements: 'em',
+    invalid_styles: 'color font-size line-height',
+    keep_styles: false,
+    menubar: false,
+    /* eslint-disable max-len */
+    plugins: 'fullscreen link code hr nonbreaking searchreplace visualblocks',
+    /* eslint-enable max-len */
+    relative_urls: false,
+    remove_script_host: false,
+    remove_trailing_brs: true,
+    schema: 'html5',
+    /* eslint-disable max-len */
+    toolbar1: 'cut copy paste | undo redo removeformat | styleselect formatselect fontselect fontsizeselect | searchreplace visualblocks fullscreen code',
+    toolbar2: 'alignleft aligncenter alignright alignjustify outdent indent | link hr nonbreaking bullist numlist bold italic underline strikethrough',
+    /* eslint-enable max-len */
+    trim: true
+    /* eslint-enable camelcase */
+}
 // region prop-types
 /*
     NOTE: Using an imported "Props" type (which consists of a "Partial"
@@ -46,7 +90,7 @@ export type Props<Type = any> = {
     default?:any;
     description?:string;
     // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
-    // editor?:'code'|'code(css)'|'code(script)'|'plain'|'text'|'text(simple)'|'text(advanced)';
+    // editor?:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext('normal')'|'richtext(advanced)';
     editor?:string;
     emptyEqualsNull?:boolean;
     maximum?:number;
@@ -231,15 +275,25 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
     // endregion
     // region event handler
     onBlur = (event:SyntheticEvent):void => {
+        let changed:boolean = false
         if (this.properties.focused) {
             this.properties.focused =
             this.properties.model.state.focused =
                 false
             this.onChangeState(this.properties.model.state, event)
+            changed = true
         }
+
+        const oldValue:string = this.properties.value
+        this.onChangeValue(
+            this.transformFinalValue(this.properties, this.properties.value)
+        )
+        changed = changed || oldValue !== this.properties.value
+
         if (this.properties.onBlur)
             this.properties.onBlur(event)
-        this.onChange(event)
+        if (changed)
+            this.onChange(event)
     }
     onChange(event?:SyntheticEvent):void {
         if (this.properties.onChange)
@@ -248,7 +302,10 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             )
     }
     onChangeShowDeclaration = (event?:MouseEvent):void => {
-        this.setState(({showDeclaration}):void => !showDeclaration)
+        if (!Object.prototype.hasOwnProperty.call(
+            this.props, 'showDeclaration'
+        ))
+            this.setState(({showDeclaration}):void => !showDeclaration)
         this.properties.showDeclaration = !this.properties.showDeclaration
         if (this.properties.onChangeShowDeclaration)
             this.properties.onChangeShowDeclaration(
@@ -257,34 +314,56 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         this.onChange(event)
     }
     onChangeState(state:ModelState, event:SyntheticEvent):void {
-        this.setState({model: state})
+        for (const key of Object.keys(state))
+            if (!Object.prototype.hasOwnProperty.call(this.props, key)) {
+                this.setState({model: state})
+                break
+            }
         if (this.properties.onChangeState)
             this.properties.onChangeState(state, event)
     }
-    onChangeValue = (event:SyntheticEvent):void => {
-        this.properties.value = this.transformValue(
-            this.properties, event.target.value
-        )
-        let stateChanged:boolean = this.determineValidationState(
-            this.properties, this.properties.value
-        )
+    onChangeValue = (eventOrValue:string|SyntheticEvent):void => {
+        if (!(this.properties.model.mutable && this.properties.model.writable))
+            return
 
-        this.setState({value: this.properties.value})
-        if (this.properties.onChangeValue)
-            this.properties.onChangeValue(this.properties.value, event)
+        let event:SyntheticEvent
+        let value:string
+        if (
+            eventOrValue !== null &&
+            typeof eventOrValue === 'object' &&
+            eventOrValue.target
+        ) {
+            event = eventOrValue
+            value = event.target.value
+        } else
+            value = eventOrValue
 
-        if (this.properties.pristine) {
-            this.properties.dirty =
-            this.properties.model.state.dirty =
-                true
-            this.properties.pristine =
-            this.properties.model.state.pristine =
-                false
-            stateChanged = true
+        const oldValue:string = this.properties.value
+        this.properties.value = this.transformValue(this.properties, value)
+
+        if (oldValue !== this.properties.value) {
+            let stateChanged:boolean = this.determineValidationState(
+                this.properties, this.properties.value
+            )
+            if (this.properties.onChangeValue)
+                this.properties.onChangeValue(this.properties.value, event)
+
+            if (this.properties.pristine) {
+                this.properties.dirty =
+                this.properties.model.state.dirty =
+                    true
+                this.properties.pristine =
+                this.properties.model.state.pristine =
+                    false
+                stateChanged = true
+            }
+            if (stateChanged)
+                this.onChangeState(this.properties.model.state, event)
+
+            if (!Object.prototype.hasOwnProperty.call(this.props, 'value'))
+                this.setState({value: this.properties.value})
+            this.onChange(event)
         }
-        if (stateChanged)
-            this.onChangeState(this.properties.model.state, event)
-        this.onChange(event)
     }
     onClick = (event:MouseEvent):void => {
         if (this.properties.onClick)
@@ -318,11 +397,12 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             this.properties.model.state.untouched =
                 false
         }
-        if (changeState)
+        if (changeState) {
             this.onChangeState(this.properties.model.state, event)
+            this.onChange(event)
+        }
         if (this.properties.onTouch)
             this.properties.onTouch(event)
-        this.onChange(event)
     }
     // endregion
     // region helper
@@ -491,11 +571,14 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
      * @returns Transformed value.
      */
     transformValue(configuration:Properties<Type>, value:any):any {
-        if (configuration.model.trim && typeof value === 'string')
-            value = value.trim()
         if (configuration.model.emptyEqualsNull && value === '')
             return null
         return value
+    }
+    transformFinalValue(configuration:Properties<Type>, value:any):any {
+        if (configuration.model.trim && typeof value === 'string')
+            value = value.trim().replace(/ +\n/g, '\n')
+        return this.transformValue(configuration, value)
     }
     // endregion
     // region render
@@ -508,6 +591,16 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         this.properties =
             this.getConsolidatedProperties(this.props)
 
+        // TODO determine type
+        const genericProperties = {
+            name: properties.name,
+            onBlur: this.onBlur,
+            onChange: this.onChangeValue,
+            onClick: this.onClick,
+            onFocus: this.onFocus,
+            placeholder: properties.placeholder,
+            value: properties.value || ''
+        }
         const materialProperties = {
             disabled: properties.disabled,
             helpText: {
@@ -554,23 +647,63 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             invalid:
                 properties.showInitialValidationState && properties.invalid,
             label: properties.description || properties.name,
-            onBlur: this.onBlur,
-            onChange: this.onChangeValue,
-            onClick: this.onClick,
-            onFocus: this.onFocus,
             outlined: properties.outlined,
-            placeholder: properties.placeholder,
-            required: properties.required,
-            value: properties.value || ''
+            required: properties.required
         }
+
+        const tinyMCEOptions = {}
+        if (properties.editor.endsWith('raw)')) {
+            tinyMCEOptions.toolbar1 =
+                'cut copy paste | undo redo removeformat | code | fullscreen'
+            tinyMCEOptions.toolbar2 = false
+        } else if (properties.editor.endsWith('simple)')) {
+            tinyMCEOptions.toolbar1 =
+                'cut copy paste | undo redo removeformat | bold italic ' +
+                'underline strikethrough subscript superscript | fullscreen'
+            tinyMCEOptions.toolbar2 = false
+        } else if (properties.editor.endsWith('normal)'))
+            tinyMCEOptions.toolbar1 =
+                'cut copy paste | undo redo removeformat | styleselect ' +
+                'formatselect | searchreplace visualblocks fullscreen code'
+
         return (
             //<React.StrictMode>{
                 properties.selection ?
                     <Select
                         enhanced
                         options={properties.selection}
+                        {...genericProperties}
                         {...materialProperties}
-                    /> :
+                    />
+                : (
+                    properties.type === 'string' &&
+                    properties.editor.startsWith('code')
+                ) ?
+                    <CodeEditor
+                        mode="javascript"
+                        theme="github"
+                        setOptions={{
+                            maxLines: properties.rows,
+                            minLines: properties.rows,
+                            readOnly: properties.disabled,
+                            tabSize: 4,
+                            useWorker: false
+                        }}
+                        {...genericProperties}
+                    />
+                : (
+                    properties.type === 'string' &&
+                    properties.editor.startsWith('text(')
+                ) ?
+                    <RichTextEditor
+                        init={{
+                            ...TINYMCE_DEFAULT_OPTIONS,
+                            ...tinyMCEOptions
+                        }}
+                        initialValue={properties.value}
+                        onEditorChange={this.onChangeValue}
+                    />
+                :
                     <TextField
                         align={properties.align}
                         fullwidth={properties.fullWidth}
@@ -584,6 +717,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
                             properties.editor === 'text'
                         }
                         trailingIcon={properties.trailingIcon}
+                        {...genericProperties}
                         {...materialProperties}
                     />
             //}</React.StrictMode>

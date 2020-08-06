@@ -42,7 +42,7 @@ export type BaseModel<Type = any> = {
     declaration:string;
     default:Type;
     description:string;
-    editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'text(simple)'|'text(advanced)';
+    editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)';
     emtyEqualsNull:boolean;
     maximum:number;
     maximumLength:number;
