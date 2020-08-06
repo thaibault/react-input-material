@@ -47,16 +47,24 @@
             Object.values(reactInputMaterial.index.default)
                 .map((component) => component.register())
 
+            let currentEventData = null
             for (const domNode of document.querySelectorAll('[name]'))
-                domNode.addEventListener('onChange', ({detail}) =>
-                    document.querySelector('pre').innerHTML =
-                        `${detail.target.name}: ` +
-                        JSON.stringify(
-                            detail.parameter[0],
-                            Object.keys(detail.target.properties).sort(),
-                            4
-                        )
-                )
+                domNode.addEventListener('onChange', ({detail}) => {
+                    if (!currentEventData || detail.parameter[0].focused) {
+                        if (!currentEventData)
+                            setTimeout(() => {
+                                document.querySelector('pre').innerHTML =
+                                    `${currentEventData.name}: ` +
+                                    JSON.stringify(
+                                        currentEventData,
+                                        Object.keys(currentEventData).sort(),
+                                        4
+                                    )
+                                currentEventData = null
+                            })
+                        currentEventData = detail.parameter[0]
+                    }
+                })
         }
     </script>
     <body class="no-javascript">
@@ -68,7 +76,7 @@
         </script>
 
         <div class="inputs">
-<!--
+
             <generic-input></generic-input>
 
             <hr/>
@@ -151,7 +159,7 @@
                 required
                 value="'a'"
             ></generic-input>
-            <generic-input
+            <generic-input2asd
                 model="{declaration: 'selection', description: 'input7ModelDescription', name: 'input7Model', nullable: false, selection: {a: 'A', b: 'B', c: 'C'}, value: 'a'}"
             ></generic-input>
 
@@ -196,22 +204,20 @@
                 model="{declaration: 'code', description: 'input10ModelDescription', editor: 'code', name: 'input10Model', nullable: false}"
                 rows="6"
             ></generic-input>
--->
+
             <generic-input
                 declaration="text(raw)"
                 description="input11Description"
-                disabled
                 editor="text(raw)"
                 name="input11"
+                required
                 rows="2"
                 value="'Hello Mr. Smith,<br><br>how are you?'"
             ></generic-input>
-<!--
             <generic-input
-                model="{declaration: 'text(simple)', description: 'input11ModelDescription', editor: 'text(simple)', name: 'input11Model', nullable: false, value: 'const value = 2'}"
+                model="{declaration: 'text(simple)', description: 'input11ModelDescription', editor: 'text(simple)', mutable: false, name: 'input11Model', nullable: false, value: 'Hello Mr. Smith,<br><br>how are you?'}"
                 rows="6"
             ></generic-input>
--->
 
         </div>
 

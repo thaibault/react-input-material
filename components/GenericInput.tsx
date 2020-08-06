@@ -326,6 +326,8 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         if (!(this.properties.model.mutable && this.properties.model.writable))
             return
 
+        console.log('Aa', eventOrValue)
+
         let event:SyntheticEvent
         let value:string
         if (
@@ -577,7 +579,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
     }
     transformFinalValue(configuration:Properties<Type>, value:any):any {
         if (configuration.model.trim && typeof value === 'string')
-            value = value.trim().replace(/ +\n/g, '\n')
+            value = value.trim().replace(/ +\n/g, '\\n')
         return this.transformValue(configuration, value)
     }
     // endregion
@@ -595,7 +597,6 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         const genericProperties = {
             name: properties.name,
             onBlur: this.onBlur,
-            onChange: this.onChangeValue,
             onClick: this.onClick,
             onFocus: this.onFocus,
             placeholder: properties.placeholder,
@@ -681,6 +682,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
                 ) ?
                     <CodeEditor
                         mode="javascript"
+                        onChange={this.onChangeValue}
                         theme="github"
                         setOptions={{
                             maxLines: properties.rows,
@@ -696,12 +698,14 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
                     properties.editor.startsWith('text(')
                 ) ?
                     <RichTextEditor
+                        disabled={properties.disabled}
                         init={{
                             ...TINYMCE_DEFAULT_OPTIONS,
                             ...tinyMCEOptions
                         }}
-                        initialValue={properties.value}
                         onEditorChange={this.onChangeValue}
+                        textareaName={this.properties.name}
+                        {...genericProperties}
                     />
                 :
                     <TextField
@@ -709,6 +713,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
                         fullwidth={properties.fullWidth}
                         maxLength={properties.maximumLength}
                         minLength={properties.minimumLength}
+                        onChange={this.onChangeValue}
                         pattern={properties.regularExpressionPattern}
                         ripple={properties.ripple}
                         rows={properties.rows}
