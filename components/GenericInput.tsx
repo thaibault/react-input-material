@@ -21,7 +21,9 @@ import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
 import {config as aceConfig} from 'ace-builds'
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
 import {Mapping} from 'clientnode/type'
-import React, {Component, FocusEvent, MouseEvent, SyntheticEvent} from 'react'
+import React, {
+    PureComponent, FocusEvent, MouseEvent, SyntheticEvent
+} from 'react'
 import CodeEditor from 'react-ace'
 
 import {IconButton} from '@rmwc/icon-button'
@@ -182,7 +184,7 @@ export type Props<Type = any> = {
  * @property properties - Current properties.
  * @property state - Current state.
  */
-export class GenericInput<Type = any> extends Component<Props<Type>> {
+export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     // region static properties
     static readonly defaultModelState:ModelState = {
         dirty: false,
@@ -295,7 +297,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
         if (changed)
             this.onChange(event)
     }
-    onChange(event?:SyntheticEvent):void {
+    onChange = (event?:SyntheticEvent):void => {
         if (this.properties.onChange)
             this.properties.onChange(
                 this.getConsolidatedProperties(this.properties), event
@@ -313,7 +315,7 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             )
         this.onChange(event)
     }
-    onChangeState(state:ModelState, event:SyntheticEvent):void {
+    onChangeState = (state:ModelState, event:SyntheticEvent):void => {
         for (const key of Object.keys(state))
             if (!Object.prototype.hasOwnProperty.call(this.props, key)) {
                 this.setState({model: state})
@@ -325,8 +327,6 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
     onChangeValue = (eventOrValue:string|SyntheticEvent):void => {
         if (!(this.properties.model.mutable && this.properties.model.writable))
             return
-
-        console.log('Aa', eventOrValue)
 
         let event:SyntheticEvent
         let value:string
@@ -382,8 +382,10 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
      * @param event - Event which triggers interaction.
      * @returns Nothing.
      */
-    onTouch(event:FocusEvent|MouseEvent):void {
+    onTouch = (event:FocusEvent|MouseEvent):void => {
         let changeState:boolean = false
+        // TODO
+        console.log('T', this.properties.name, this.properties.focused, this.properties.model.state.focused)
         if (!this.properties.focused) {
             changeState =
             this.properties.focused =
@@ -558,8 +560,8 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
             configuration.model.state.valid =
                 !configuration.model.state.invalid
             if (
-                configuration.model.state.invalid &&
-                configuration.showDeclaration
+                configuration.showDeclaration &&
+                configuration.model.state.invalid
             )
                 this.onChangeShowDeclaration()
         }
@@ -667,6 +669,10 @@ export class GenericInput<Type = any> extends Component<Props<Type>> {
                 'cut copy paste | undo redo removeformat | styleselect ' +
                 'formatselect | searchreplace visualblocks fullscreen code'
 
+        // TODO
+        console.log(
+            'R', this.properties.name, this.properties.focused, this.properties.model.state.focused
+        )
         return (
             //<React.StrictMode>{
                 properties.selection ?

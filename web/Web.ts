@@ -315,6 +315,9 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @returns Nothing.
      */
     reflectProperties(properties:Mapping<any>, render:boolean = true):void {
+        // TODO
+        if (this.properties.name === 'NO_NAME_DEFINED')
+            console.log('reflect', this.properties.name, properties.focused)
         for (const [name, value] of Object.entries(properties)) {
             this.properties[name] = value
             if (this._propertiesToReflectAsAttributes.has(name))
@@ -458,8 +461,8 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                             `${Tools.represent(error)}".`
                         )
                     }
-                    properties[name] = (...parameter:Array<any>):void => {
-                        this.reflectProperties(this.output[name](...parameter))
+                    this.properties[name] = (...parameter:Array<any>):void => {
+                        this.reflectEventToProperties(name, parameter)
                         if (callback)
                             try {
                                 callback.call(this, parameter)

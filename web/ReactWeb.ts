@@ -39,7 +39,7 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
      */
     render():void {
         this.instance = ReactDOM.render(
-            React.createElement(this._content, this.properties), this.root
+            React.createElement(this._content, {...this.properties}), this.root
         )
         if (this.instance?.properties)
             this.reflectProperties(this.instance.properties, false)
