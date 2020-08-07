@@ -273,7 +273,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     } = {
         model: GenericInput.defaultModelState,
         showDeclaration: false,
-        value: null
+        value: undefined
     }
     // endregion
     // region event handler
@@ -459,7 +459,9 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             !Object.prototype.hasOwnProperty.call(result.model, 'value') ||
             result.model.value === undefined
         )
-            result.model.value = this.state.value
+            result.model.value = (this.state.value === undefined) ?
+                result.model.default :
+                this.state.value
         if (!Object.prototype.hasOwnProperty.call(result, 'showDeclaration'))
             result.showDeclaration = this.state.showDeclaration
         // else -> Controlled component via model's "value" property.
@@ -608,7 +610,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         // TODO
         return <input
             onChange={this.onChangeValue}
-            value={this.props.value}
+            value={this.properties.value || ''}
         />
 
         // TODO determine type
