@@ -607,11 +607,12 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         this.properties =
             this.getConsolidatedProperties(this.props)
 
-        // TODO
+        /* TODO
         return <input
             onChange={this.onChangeValue}
             value={this.properties.value || ''}
         />
+        */
 
         // TODO determine type
         const genericProperties = {
