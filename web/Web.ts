@@ -64,6 +64,9 @@ const Function:typeof Function = (
  * @property batchPropertyUpdates - Indicates whether to directly update dom
  * after each property mutation or to wait and batch mutations after current
  * queue has been finished.
+ * @property batchUpdates - TODO.
+ * @property ignoreAttributeUpdates - Indicates whether attribute updates
+ * should be considered (usually only needed internally).
  * @property properties - Holds currently evaluated properties.
  * @property root - Hosting dom node.
  * @property self - Back-reference to this class.
@@ -80,12 +83,13 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     static useShadowDOM:boolean = false
 
     batchAttributeUpdates:boolean = true
-    batchPropertyUpdates:boolean = true
-    batchUpdates:boolean = true
     batchedAttributeUpdateRunning:boolean = true
     batchedPropertyUpdateRunning:boolean = true
     batchedUpdateRunning:boolean = true
-    instance:null|object = null
+    batchPropertyUpdates:boolean = true
+    batchUpdates:boolean = true
+    ignoreAttributeUpdates:boolean = false
+    instance:null|{current?:object} = null
     output:Output = {}
     properties:object = {}
     root:TElement
@@ -126,9 +130,12 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         newValue:string,
         forceReEvaluation:boolean = false
     ):void {
-        if (!forceReEvaluation && oldValue === newValue)
+        if (
+            !forceReEvaluation &&
+            (this.ignoreAttributeUpdates || oldValue === newValue)
+        )
             return
-        this.evaluateStringAndSetAsProperty(name, newValue)
+        this.evaluateStringOrNullAndSetAsProperty(name, newValue)
         if (this.batchAttributeUpdates) {
             if (!(
                 this.batchedAttributeUpdateRunning || this.batchedUpdateRunning
@@ -144,6 +151,11 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         } else
             this.render()
     }
+    /**
+     * Triggered when this component is mounted into the document. Event
+     * handlers will be attached and final render proceed.
+     * @returns Nothing.
+     */
     connectedCallback():void {
         this.attachEventHandler()
         this.batchedAttributeUpdateRunning = false
@@ -176,8 +188,8 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @returns Retrieved property value.
      */
     getPropertyValue(name:string):any {
-        if (this.instance?.properties)
-            return this.instance.properties[name]
+        if (this.instance?.current?.properties)
+            return this.instance.current.properties[name]
         return this.properties[name]
     }
     /**
@@ -315,9 +327,11 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @returns Nothing.
      */
     reflectProperties(properties:Mapping<any>, render:boolean = true):void {
-        // TODO
-        if (this.properties.name === 'NO_NAME_DEFINED')
-            console.log('reflect', this.properties.name, properties.focused)
+        /*
+            NOTE: We can avoid an additional attribute parsing for this
+            reflections.
+        */
+        this.ignoreAttributeUpdates = true
         for (const [name, value] of Object.entries(properties)) {
             this.properties[name] = value
             if (this._propertiesToReflectAsAttributes.has(name))
@@ -379,6 +393,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                         break
                 }
         }
+        this.ignoreAttributeUpdates = false
         if (render)
             if (this.batchUpdates) {
                 if (!this.batchedUpdateRunning) {
@@ -433,13 +448,22 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @param value - Value to evaluate.
      * @returns Nothing.
      */
-    evaluateStringAndSetAsProperty(name:string, value:string):void {
+    evaluateStringOrNullAndSetAsProperty(name:string, value:string):void {
         name = Tools.stringDelimitedToCamelCase(name)
-        if (Object.prototype.hasOwnProperty.call(this._propertyTypes, name))
+        if (Object.prototype.hasOwnProperty.call(this._propertyTypes, name)) {
+            if (
+                value === null &&
+                ![PropTypes.bool, 'boolean'].includes(
+                    this._propertyTypes[name]
+                )
+            ) {
+                delete this.properties[name]
+                return
+            }
             switch (this._propertyTypes[name]) {
                 case PropTypes.bool:
                 case 'boolean':
-                    this.properties[name] = value !== 'false'
+                    this.properties[name] = ![null, 'false'].includes(value)
                     break
                 case PropTypes.number:
                 case 'number':
@@ -525,6 +549,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                         this.properties[name] = null
                     break
             }
+        }
     }
     /**
      * Method which does the rendering job. Should be called when ever state

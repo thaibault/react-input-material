@@ -292,10 +292,10 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         )
         changed = changed || oldValue !== this.properties.value
 
-        if (this.properties.onBlur)
-            this.properties.onBlur(event)
         if (changed)
             this.onChange(event)
+        if (this.properties.onBlur)
+            this.properties.onBlur(event)
     }
     onChange = (event?:SyntheticEvent):void => {
         if (this.properties.onChange)
@@ -347,8 +347,6 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             let stateChanged:boolean = this.determineValidationState(
                 this.properties, this.properties.value
             )
-            if (this.properties.onChangeValue)
-                this.properties.onChangeValue(this.properties.value, event)
 
             if (this.properties.pristine) {
                 this.properties.dirty =
@@ -365,6 +363,9 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             if (!Object.prototype.hasOwnProperty.call(this.props, 'value'))
                 this.setState({value: this.properties.value})
             this.onChange(event)
+
+            if (this.properties.onChangeValue)
+                this.properties.onChangeValue(this.properties.value, event)
         }
     }
     onClick = (event:MouseEvent):void => {
@@ -384,8 +385,6 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
      */
     onTouch = (event:FocusEvent|MouseEvent):void => {
         let changeState:boolean = false
-        // TODO
-        console.log('T', this.properties.name, this.properties.focused, this.properties.model.state.focused)
         if (!this.properties.focused) {
             changeState =
             this.properties.focused =
@@ -424,7 +423,10 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             we have to manage this for nested model structure.
         */
         const result:Properties<Type> = Tools.extend(
-            true, {}, {model: this.self.defaultProps.model}, properties
+            true,
+            {},
+            {model: Tools.copy(this.self.defaultProps.model)},
+            properties
         )
         // region handle aliases
         if (result.disabled) {
@@ -444,7 +446,14 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         for (const [name, value] of Object.entries(result.model))
             if (Object.prototype.hasOwnProperty.call(result, name))
                 result.model[name] = result[name]
-        result.model.state = this.state.model
+        for (const [name, value] of Object.entries(result.model.state))
+            if (Object.prototype.hasOwnProperty.call(result, name))
+                result.model.state[name] = result[name]
+         for (const key of Object.keys(result.model.state))
+            if (!Object.prototype.hasOwnProperty.call(this.props, key)) {
+                result.model.state = this.state.model
+                break
+            }
         if (
             !Object.prototype.hasOwnProperty.call(result.model, 'value') ||
             result.model.value === undefined
@@ -669,11 +678,8 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                 'cut copy paste | undo redo removeformat | styleselect ' +
                 'formatselect | searchreplace visualblocks fullscreen code'
 
-        // TODO
-        console.log(
-            'R', this.properties.name, this.properties.focused, this.properties.model.state.focused
-        )
         return (
+            /*
             //<React.StrictMode>{
                 properties.selection ?
                     <Select
@@ -713,7 +719,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                         textareaName={this.properties.name}
                         {...genericProperties}
                     />
-                :
+                :*/
                     <TextField
                         align={properties.align}
                         fullwidth={properties.fullWidth}
@@ -730,8 +736,9 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                         trailingIcon={properties.trailingIcon}
                         {...genericProperties}
                         {...materialProperties}
-                    />
+                    />/*
             //}</React.StrictMode>
+*/
         )
     }
     // endregion

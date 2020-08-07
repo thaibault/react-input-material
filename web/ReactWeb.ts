@@ -22,6 +22,15 @@ import ReactDOM from 'react-dom'
 
 import Web from './Web'
 // endregion
+/*
+    1. Render react component with properties (defined in web-component) and
+       start listing to "onChange" events.
+    2. Reflect components properties to web-components properties and
+       attributes (with prevented re-rendering caused by new properties).
+    3. Component triggers an "onChange" event (caused by some event) which
+       delivers updated properties to the web-component.
+    -> Starting with first point.
+*/
 /**
  * Adapter for exposing a react component as web-component.
  * @property self - Back-reference to this class.
@@ -38,11 +47,12 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
      * @returns Nothing.
      */
     render():void {
-        this.instance = ReactDOM.render(
+        this.instance = this.properties.ref = React.createRef()
+        ReactDOM.render(
             React.createElement(this._content, {...this.properties}), this.root
         )
-        if (this.instance?.properties)
-            this.reflectProperties(this.instance.properties, false)
+        if (this.instance?.current?.properties)
+            this.reflectProperties(this.instance.current.properties, false)
     }
 }
 export default ReactWeb
