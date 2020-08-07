@@ -25,12 +25,13 @@ import React, {
     PureComponent, FocusEvent, MouseEvent, SyntheticEvent
 } from 'react'
 import CodeEditor from 'react-ace'
-
+import {FormField} from '@rmwc/formfield'
 import {IconButton} from '@rmwc/icon-button'
 import {Select} from '@rmwc/select'
 import {TextField} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
 
+import '@rmwc/formfield/styles'
 import '@rmwc/icon-button/styles'
 import '@rmwc/select/styles'
 import '@rmwc/textfield/styles'
@@ -604,6 +605,12 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         this.properties =
             this.getConsolidatedProperties(this.props)
 
+        // TODO
+        return <input
+            onChange={this.onChangeValue}
+            value={this.props.value}
+        />
+
         // TODO determine type
         const genericProperties = {
             name: properties.name,
@@ -679,47 +686,59 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                 'formatselect | searchreplace visualblocks fullscreen code'
 
         return (
-            /*
             //<React.StrictMode>{
                 properties.selection ?
                     <Select
                         enhanced
+                        onChange={this.onChangeValue}
                         options={properties.selection}
                         {...genericProperties}
                         {...materialProperties}
                     />
                 : (
                     properties.type === 'string' &&
-                    properties.editor.startsWith('code')
+                    (
+                        properties.editor.startsWith('code') ||
+                        properties.editor.startsWith('richtext(')
+                    )
                 ) ?
-                    <CodeEditor
-                        mode="javascript"
-                        onChange={this.onChangeValue}
-                        theme="github"
-                        setOptions={{
-                            maxLines: properties.rows,
-                            minLines: properties.rows,
-                            readOnly: properties.disabled,
-                            tabSize: 4,
-                            useWorker: false
-                        }}
-                        {...genericProperties}
-                    />
-                : (
-                    properties.type === 'string' &&
-                    properties.editor.startsWith('text(')
-                ) ?
-                    <RichTextEditor
-                        disabled={properties.disabled}
-                        init={{
-                            ...TINYMCE_DEFAULT_OPTIONS,
-                            ...tinyMCEOptions
-                        }}
-                        onEditorChange={this.onChangeValue}
-                        textareaName={this.properties.name}
-                        {...genericProperties}
-                    />
-                :*/
+                    <>
+                        <FormField>
+                            <label>
+                                {properties.name}
+
+                                {
+                                    properties.editor.startsWith('code') ?
+                                        <CodeEditor
+                                            mode="javascript"
+                                            onChange={this.onChangeValue}
+                                            theme="github"
+                                            setOptions={{
+                                                maxLines: properties.rows,
+                                                minLines: properties.rows,
+                                                readOnly: properties.disabled,
+                                                tabSize: 4,
+                                                useWorker: false
+                                            }}
+                                            {...genericProperties}
+                                        />
+                                    :
+                                        <RichTextEditor
+                                            disabled={properties.disabled}
+                                            init={{
+                                                ...TINYMCE_DEFAULT_OPTIONS,
+                                                ...tinyMCEOptions
+                                            }}
+                                            onEditorChange={this.onChangeValue}
+                                            textareaName={this.properties.name}
+                                            {...genericProperties}
+                                        />
+                                }
+                            </label>
+                        </FormField>
+                        {materialProperties.helpText.children}
+                    </>
+                :
                     <TextField
                         align={properties.align}
                         fullwidth={properties.fullWidth}
@@ -736,9 +755,8 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                         trailingIcon={properties.trailingIcon}
                         {...genericProperties}
                         {...materialProperties}
-                    />/*
+                    />
             //}</React.StrictMode>
-*/
         )
     }
     // endregion
