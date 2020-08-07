@@ -603,16 +603,11 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
      * @returns Current component's representation.
      */
     render():Component {
+        // TODO
+        console.log('Render', this.props.value)
         const properties:Properties<Type> =
         this.properties =
             this.getConsolidatedProperties(this.props)
-
-        /* TODO
-        return <input
-            onChange={this.onChangeValue}
-            value={this.properties.value || ''}
-        />
-        */
 
         // TODO determine type
         const genericProperties = {
