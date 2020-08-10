@@ -63,6 +63,7 @@
     "@types/jsdom": "*",
     "@types/loader-utils": "*",
     "@types/node": "*",
+    "@types/tinymce": "*",
     "@typescript-eslint/eslint-plugin": "*",
     "@typescript-eslint/parser": "*",
     "babel-eslint": "*",

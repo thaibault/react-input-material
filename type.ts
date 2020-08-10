@@ -18,7 +18,7 @@
 // region imports
 import {Mapping, ValueOf} from 'clientnode/type'
 import PropTypes from 'prop-types'
-import {FocusEvent, MouseEvent, SyntheticEvent} from 'react'
+import {FocusEvent, KeyUpEvent, MouseEvent, SyntheticEvent} from 'react'
 
 import {ReactWeb} from '../web/ReactWeb'
 // endregion
@@ -82,6 +82,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     onClick:(event:MouseEvent) => void;
     onConfigure:(properties:Properties<Type>) => void;
     onFocus:(event:FocusEvent) => void;
+    onKeyUp:(event:KeyUpEvent) => void;
     onTouch:(event:Event) => void;
     outlined:boolean;
     pattern:string;
@@ -103,6 +104,15 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
 }
 export type PropertyTypes = Mapping<ValueOf<PropTypes>|string>
 export type Props<Type = any> = Partial<Properties<Type>>
+export type State<Type = any> = {
+    model:ModelState;
+    selection:{
+        end:number;
+        start:number;
+    };
+    showDeclaration:boolean;
+    value:Type;
+}
 export type WebComponentAPI = {
     component:ReactWeb;
     register:(tagName:string) => void;

@@ -17,16 +17,24 @@
     endregion
 */
 // region imports
+import {Settings as TinyMCEOptions} from 'tinymce'
 import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
 import {config as aceConfig} from 'ace-builds'
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
-import {Mapping} from 'clientnode/type'
+import {DomNode, Mapping} from 'clientnode/type'
 import React, {
-    PureComponent, FocusEvent, MouseEvent, SyntheticEvent
+    createRef,
+    FocusEvent,
+    KeyUpEvent,
+    MouseEvent,
+    PureComponent,
+    RefObject,
+    SyntheticEvent
 } from 'react'
 import CodeEditor from 'react-ace'
 import {FormField} from '@rmwc/formfield'
 import {IconButton} from '@rmwc/icon-button'
+import {TODO} from '@rmwc/types'
 import {Select} from '@rmwc/select'
 import {TextField} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
@@ -38,7 +46,7 @@ import '@rmwc/textfield/styles'
 import '@rmwc/theme/styles'
 
 import '../material-fixes'
-import {Model, ModelState, Output, Properties} from '../type'
+import {Model, ModelState, Output, Properties, State} from '../type'
 // endregion
 aceConfig.set('basePath', '/node_modules/ace-builds/src-noconflict/')
 
@@ -149,6 +157,7 @@ export type Props<Type = any> = {
     onChangeState?:(state:ModelState, event:SyntheticEvent) => void;
     onClick?:(event:MouseEvent) => void;
     onFocus?:(event:FocusEvent) => void;
+    onKeyUp?:(event:KeyUpEvent) => void;
     onTouch?:(event:FocusEvent|MouseEvent) => void;
     outlined?:boolean;
     pattern?:string;
@@ -176,6 +185,7 @@ export type Props<Type = any> = {
 /**
  * Generic input wrapper component which automatically determines a useful
  * input field depending on given model specification.
+ *
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProps - Initial property configuration.
  * @property static:output - Describes external event handler interface.
@@ -264,14 +274,15 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     )
     // endregion
     // region properties
+    inputReference:RefObject<HTMLInputElement> = createRef<HTMLInputElement>()
     properties:Properties<Type>
     self:typeof GenericInput = GenericInput
-    state:{
-        model:ModelState;
-        showDeclaration:boolean;
-        value:Type;
-    } = {
+    state:State<Type> = {
         model: GenericInput.defaultModelState,
+        selection: {
+            end: 0,
+            start: 0
+        },
         showDeclaration: false,
         value: undefined
     }
@@ -361,8 +372,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             if (stateChanged)
                 this.onChangeState(this.properties.model.state, event)
 
-            if (!Object.prototype.hasOwnProperty.call(this.props, 'value'))
-                this.setState({value: this.properties.value})
+            this.setState({value: this.properties.value})
             this.onChange(event)
 
             if (this.properties.onChangeValue)
@@ -370,14 +380,21 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         }
     }
     onClick = (event:MouseEvent):void => {
+        this.saveSelectionState()
         if (this.properties.onClick)
             this.properties.onClick(event)
         this.onTouch(event)
     }
     onFocus = (event:FocusEvent):void => {
+        this.saveSelectionState()
         if (this.properties.onFocus)
             this.properties.onFocus(event)
         this.onTouch(event)
+    }
+    onKeyUp = (event:KeyUpEvent):void => {
+        this.saveSelectionState()
+        if (this.properties.onKeyUp)
+            this.properties.onKeyUp(event)
     }
     /**
      * Triggers on start interacting with the input.
@@ -410,93 +427,6 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     }
     // endregion
     // region helper
-    /**
-     * Synchronizes property, state and model configuration:
-     * Properties overwrites default properties which overwrites default model
-     * properties.
-     * @returns Nothing.
-    */
-    mapPropertiesToModel(
-        properties:Partial<Properties<Type>>
-    ):Properties<Type> {
-        /*
-            NOTE: Default props seems not to respect nested layers to merge so
-            we have to manage this for nested model structure.
-        */
-        const result:Properties<Type> = Tools.extend(
-            true,
-            {},
-            {model: Tools.copy(this.self.defaultProps.model)},
-            properties
-        )
-        // region handle aliases
-        if (result.disabled) {
-            delete result.disabled
-            result.model.mutable = false
-        }
-        if (result.pattern) {
-            result.model.regularExpressionPattern = result.pattern
-            delete result.pattern
-        }
-        if (result.required) {
-            delete result.required
-            result.model.nullable = false
-        }
-        // endregion
-        // region handle model configuration
-        for (const [name, value] of Object.entries(result.model))
-            if (Object.prototype.hasOwnProperty.call(result, name))
-                result.model[name] = result[name]
-        for (const [name, value] of Object.entries(result.model.state))
-            if (Object.prototype.hasOwnProperty.call(result, name))
-                result.model.state[name] = result[name]
-         for (const key of Object.keys(result.model.state))
-            if (!Object.prototype.hasOwnProperty.call(this.props, key)) {
-                result.model.state = this.state.model
-                break
-            }
-        if (
-            !Object.prototype.hasOwnProperty.call(result.model, 'value') ||
-            result.model.value === undefined
-        )
-            result.model.value = (this.state.value === undefined) ?
-                result.model.default :
-                this.state.value
-        if (!Object.prototype.hasOwnProperty.call(result, 'showDeclaration'))
-            result.showDeclaration = this.state.showDeclaration
-        // else -> Controlled component via model's "value" property.
-        // endregion
-        result.model.value = this.transformValue(result, result.model.value)
-        this.determineValidationState(result, result.model.value)
-
-        return result
-    }
-    /**
-     * Calculate external properties (a set of all configurable properties).
-     * @returns External properties object.
-     */
-    getConsolidatedProperties(
-        properties:Partial<Properties<Type>>
-    ):Properties<Type> {
-        properties = this.mapPropertiesToModel(properties)
-        const result:Properties<Type> = Tools.extend(
-            {}, properties, properties.model, properties.model.state
-        )
-
-        delete result.state
-        delete result.writable
-
-        result.disabled = !result.mutable
-        delete result.mutable
-
-        result.required = !result.nullable
-        delete result.nullable
-
-        result.pattern = result.regularExpressionPattern
-        delete result.regularExpressionPattern
-
-        return result
-    }
     /**
      * Derives current validation state from given value.
      * @param configuration - Input configuration.
@@ -581,17 +511,127 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         return changed
     }
     /**
+     * Calculate external properties (a set of all configurable properties).
+     * @returns External properties object.
+     */
+    getConsolidatedProperties(
+        properties:Partial<Properties<Type>>
+    ):Properties<Type> {
+        properties = this.mapPropertiesToModel(properties)
+        const result:Properties<Type> = Tools.extend(
+            {}, properties, properties.model, properties.model.state
+        )
+
+        delete result.state
+        delete result.writable
+
+        result.disabled = !result.mutable
+        delete result.mutable
+
+        result.required = !result.nullable
+        delete result.nullable
+
+        result.pattern = result.regularExpressionPattern
+        delete result.regularExpressionPattern
+
+        return result
+    }
+    /**
+     * Synchronizes property, state and model configuration:
+     * Properties overwrites default properties which overwrites default model
+     * properties.
+     * @returns Nothing.
+    */
+    mapPropertiesToModel(
+        properties:Partial<Properties<Type>>
+    ):Properties<Type> {
+        /*
+            NOTE: Default props seems not to respect nested layers to merge so
+            we have to manage this for nested model structure.
+        */
+        const result:Properties<Type> = Tools.extend(
+            true,
+            {},
+            {model: Tools.copy(this.self.defaultProps.model)},
+            properties
+        )
+        // region handle aliases
+        if (result.disabled) {
+            delete result.disabled
+            result.model.mutable = false
+        }
+        if (result.pattern) {
+            result.model.regularExpressionPattern = result.pattern
+            delete result.pattern
+        }
+        if (result.required) {
+            delete result.required
+            result.model.nullable = false
+        }
+        // endregion
+        // region handle model configuration
+        for (const [name, value] of Object.entries(result.model))
+            if (Object.prototype.hasOwnProperty.call(result, name))
+                result.model[name] = result[name]
+        for (const [name, value] of Object.entries(result.model.state))
+            if (Object.prototype.hasOwnProperty.call(result, name))
+                result.model.state[name] = result[name]
+         for (const key of Object.keys(result.model.state))
+            if (!Object.prototype.hasOwnProperty.call(this.props, key)) {
+                result.model.state = this.state.model
+                break
+            }
+        if (
+            !Object.prototype.hasOwnProperty.call(result.model, 'value') ||
+            result.model.value === undefined
+        )
+            result.model.value = (this.state.value === undefined) ?
+                result.model.default :
+                this.state.value
+        if (!Object.prototype.hasOwnProperty.call(result, 'showDeclaration'))
+            result.showDeclaration = this.state.showDeclaration
+        // else -> Controlled component via model's "value" property.
+        // endregion
+        result.model.value = this.transformValue(result, result.model.value)
+        this.determineValidationState(result, result.model.value)
+
+        return result
+    }
+    /**
+     * Saves current selection state in components state.
+     * @returns Nothing.
+     */
+    saveSelectionState():void {
+        if (
+            typeof this.inputReference.current?.selectionEnd === 'number' &&
+            typeof this.inputReference.current?.selectionStart === 'number'
+        )
+            this.setState({
+                selection: {
+                    end: this.inputReference.current?.selectionEnd,
+                    start: this.inputReference.current?.selectionStart
+                }
+            })
+    }
+    /**
      * Applies configured value transformations.
      * @param configuration - Input configuration.
      * @param value - Value to transform.
      * @returns Transformed value.
      */
-    transformValue(configuration:Properties<Type>, value:any):any {
+    transformValue(configuration:Properties<Type>, value:any):Type {
         if (configuration.model.emptyEqualsNull && value === '')
             return null
         return value
     }
-    transformFinalValue(configuration:Properties<Type>, value:any):any {
+    /**
+     * Applies configured value transformation when editing the input has been
+     * ended (element is not focused anymore).
+     * @param configuration - Current configuration.
+     * @param value - Current value to transform.
+     * @returns Transformed value.
+     */
+    transformFinalValue(configuration:Properties<Type>, value:any):Type {
         if (configuration.model.trim && typeof value === 'string')
             value = value.trim().replace(/ +\n/g, '\\n')
         return this.transformValue(configuration, value)
@@ -603,8 +643,6 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
      * @returns Current component's representation.
      */
     render():Component {
-        // TODO
-        console.log('Render', this.props.value)
         const properties:Properties<Type> =
         this.properties =
             this.getConsolidatedProperties(this.props)
@@ -615,8 +653,9 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             onBlur: this.onBlur,
             onClick: this.onClick,
             onFocus: this.onFocus,
+            onKeyUp: this.onKeyUp,
             placeholder: properties.placeholder,
-            value: properties.value || ''
+            value: this.state.value || properties.value || ''
         }
         const materialProperties = {
             disabled: properties.disabled,
@@ -668,7 +707,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             required: properties.required
         }
 
-        const tinyMCEOptions = {}
+        const tinyMCEOptions:TinyMCEOptions = {}
         if (properties.editor.endsWith('raw)')) {
             tinyMCEOptions.toolbar1 =
                 'cut copy paste | undo redo removeformat | code | fullscreen'
@@ -740,11 +779,13 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                     <TextField
                         align={properties.align}
                         fullwidth={properties.fullWidth}
+                        inputRef={this.inputReference}
                         maxLength={properties.maximumLength}
                         minLength={properties.minimumLength}
                         onChange={this.onChangeValue}
                         pattern={properties.regularExpressionPattern}
                         ripple={properties.ripple}
+                        rootProps={{onKeyUp: this.onKeyUp}}
                         rows={properties.rows}
                         textarea={
                             properties.type === 'string' &&

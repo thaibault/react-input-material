@@ -47,23 +47,10 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
      * @returns Nothing.
      */
     render():void {
-        if (this.instance?.current?.forceUpdate) {
-            // TODO
-            Object.defineProperty(
-                this.instance.current.props, 'value', {
-                    value: this.properties.value
-                }
-            )
-
-            console.log(this.properties.value, this.instance.current.props.value)
-            this.instance.current.forceUpdate()
-            console.log(this.properties.value, this.instance.current.props.value)
-        } else {
-            this.instance = this.properties.ref = React.createRef()
-            ReactDOM.render(
-                React.createElement(this._content, this.properties), this.root
-            )
-        }
+        this.instance = this.properties.ref = React.createRef()
+        ReactDOM.render(
+            React.createElement(this._content, this.properties), this.root
+        )
         if (this.instance?.current?.properties)
             this.reflectProperties(this.instance.current.properties, false)
     }
