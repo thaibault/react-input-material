@@ -245,8 +245,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             writable: true
         },
         patternText:
-            'Your string have to match the regular expression: "' +
-            '${regularExpressionPattern}".',
+            'Your string have to match the regular expression: "${pattern}".',
         requiredText: 'Please fill this field.',
         rows: 4,
         selectableEditor: false,
@@ -623,25 +622,27 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
      */
     renderMessage(template?:any):string {
         if (typeof template === 'string') {
+            const scopeNames:Array<string> = Object.keys(this.properties)
+                .filter((name:string):boolean => name !== 'default')
             let render:Function
             try {
-                render = new Function(
-                    ...Object.keys(this.properties), `return \`${template}\``
-                )
+                render = new Function(...scopeNames, `return \`${template}\``)
             } catch (error) {
                 console.warn(
                     `Given message template "${template}" could not be ` +
                     `parsed: "${Tools.represent(error)}".`
                 )
+                return ''
             }
             try {
-                return render(...Object.values(this.properties))
+                return render(...scopeNames.map((name:string):any =>
+                    this.properties[name])
+                )
             } catch (error) {
                 console.warn(
                     `Given message template "${template}" failed to evaluate` +
                     ' with given scope variables: "' +
-                    `${Object.keys(this.properties).join('", "')}": "` +
-                    `${Tools.represent(error)}".`
+                    `${scopeNames.join('", "')}": "${Tools.represent(error)}".`
                 )
             }
         }
