@@ -393,6 +393,24 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                         break
                 }
         }
+        /*
+            NOTE: Do not reflect properties which are hold in state. These
+            values are only set once when they are explicitly set (see
+            "setPropertyValue").
+        */
+        if (
+            this.instance?.current?.state !== null &&
+            typeof this.instance.current.state === 'object'
+        )
+            for (const name of Object.keys(this.instance.current.state))
+                if (
+                    Object.prototype.hasOwnProperty.call(this.properties, name)
+                )
+                    /*
+                        We want to avoid to fully delete this property to know
+                        which properties exists on the underlying instance.
+                    */
+                    this.properties[name] = undefined
         this.ignoreAttributeUpdates = false
         if (render)
             if (this.batchUpdates) {

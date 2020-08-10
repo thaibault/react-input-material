@@ -64,6 +64,10 @@ export type Model<Type = any> = BaseModel<Type> & {
 export type Output = Mapping<true|((...parameter:Array<any>) => Mapping<any>)>
 export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     align:'end'|'start';
+    cursor:{
+        end:number;
+        start:number;
+    };
     disabled?:boolean;
     fullWidth:boolean;
     icon:string;

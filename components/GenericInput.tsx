@@ -34,9 +34,8 @@ import React, {
 import CodeEditor from 'react-ace'
 import {FormField} from '@rmwc/formfield'
 import {IconButton} from '@rmwc/icon-button'
-import {TODO} from '@rmwc/types'
-import {Select} from '@rmwc/select'
-import {TextField} from '@rmwc/textfield'
+import {Select, SelectProps} from '@rmwc/select'
+import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
 
 import '@rmwc/formfield/styles'
@@ -138,6 +137,8 @@ export type Props<Type = any> = {
 
     // Properties
     align?:'end'|'start';
+    // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
+    cursor?:any;
     disabled?:boolean;
     fullWidth?:boolean;
     icon?:string;
@@ -278,13 +279,30 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     properties:Properties<Type>
     self:typeof GenericInput = GenericInput
     state:State<Type> = {
-        model: GenericInput.defaultModelState,
-        selection: {
+        cursor: {
             end: 0,
             start: 0
         },
+        model: GenericInput.defaultModelState,
         showDeclaration: false,
         value: undefined
+    }
+    // endregion
+    // region live-cycle
+    /**
+     * Updates state depending on given properties.
+     * @param properties - Properties to derive into state.
+     * @param state - Current state to update with respect to given properties.
+     * @returns Updated state.
+     */
+    static getDerivedStateFromProps(
+        properties:Partial<Properties<Type>>, state:State<Type>
+    ):State<Type> {
+        if (properties.value !== undefined)
+            state.value = properties.value
+        else if (properties.model?.value !== undefined)
+            state.value = properties.model.value
+        return state
     }
     // endregion
     // region event handler
@@ -598,7 +616,39 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         return result
     }
     /**
-     * Saves current selection state in components state.
+     * Renders given template string against all properties in current
+     * instance.
+     * @param template - Template to render.
+     * @returns Evaluated template or an empty string if something goes wrong.
+     */
+    renderMessage(template?:any):string {
+        if (typeof template === 'string') {
+            let render:Function
+            try {
+                render = new Function(
+                    ...Object.keys(this.properties), `return \`${template}\``
+                )
+            } catch (error) {
+                console.warn(
+                    `Given message template "${template}" could not be ` +
+                    `parsed: "${Tools.represent(error)}".`
+                )
+            }
+            try {
+                return render(...Object.values(this.properties))
+            } catch (error) {
+                console.warn(
+                    `Given message template "${template}" failed to evaluate` +
+                    ' with given scope variables: "' +
+                    `${Object.keys(this.properties).join('", "')}": "` +
+                    `${Tools.represent(error)}".`
+                )
+            }
+        }
+        return ''
+    }
+    /**
+     * Saves current selection/cursor state in components state.
      * @returns Nothing.
      */
     saveSelectionState():void {
@@ -607,7 +657,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             typeof this.inputReference.current?.selectionStart === 'number'
         )
             this.setState({
-                selection: {
+                cursor: {
                     end: this.inputReference.current?.selectionEnd,
                     start: this.inputReference.current?.selectionStart
                 }
@@ -647,17 +697,16 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         this.properties =
             this.getConsolidatedProperties(this.props)
 
-        // TODO determine type
-        const genericProperties = {
+        const genericProperties:Partial<HTMLInputElement> = {
             name: properties.name,
             onBlur: this.onBlur,
             onClick: this.onClick,
             onFocus: this.onFocus,
             onKeyUp: this.onKeyUp,
             placeholder: properties.placeholder,
-            value: this.state.value || properties.value || ''
+            value: properties.value || ''
         }
-        const materialProperties = {
+        const materialProperties:SelectProps|TextFieldProps = {
             disabled: properties.disabled,
             helpText: {
                 persistent: Boolean(properties.declaration),
@@ -681,7 +730,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                                 properties.touched
                             ) &&
                             <Theme use="error">
-                                {
+                                {this.renderMessage(
                                     properties.invalidMaximum &&
                                     properties.maximumText ||
                                     properties.invalidMaximumLength &&
@@ -694,7 +743,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                                     properties.patternText ||
                                     properties.invalidRequired &&
                                     properties.requiredText
-                                }
+                                )}
                             </Theme>
                     }
                 </>

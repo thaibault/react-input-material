@@ -52,7 +52,7 @@
                     document.querySelector('pre').innerHTML =
                         `${detail.target.properties.name}: ` +
                         JSON.stringify(
-                            detail.target.properties,
+                            detail.target,
                             Object.keys(detail.target.properties).sort(),
                             4
                         )
@@ -69,7 +69,6 @@
 
         <div class="inputs">
 
-<!--
             <generic-input></generic-input>
 
             <hr/>
@@ -78,9 +77,8 @@
             <generic-input model="{name: 'input1Model'}"></generic-input>
 
             <hr/>
--->
+
             <generic-input name="input2" value="'value2'"></generic-input>
-<!--
             <generic-input model="{name: 'input2Model', value: 'value2Model'}">
             </generic-input>
 
@@ -212,7 +210,6 @@
                 model="{declaration: 'richtext(simple)', description: 'input11ModelDescription', editor: 'richtext(simple)', mutable: false, name: 'input11Model', nullable: false, value: 'Hello Mr. Smith,<br><br>how are you?'}"
                 rows="6"
             ></generic-input>
--->
 
         </div>
 
