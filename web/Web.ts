@@ -64,9 +64,14 @@ const Function:typeof Function = (
  * @property batchPropertyUpdates - Indicates whether to directly update dom
  * after each property mutation or to wait and batch mutations after current
  * queue has been finished.
- * @property batchUpdates - TODO.
+ * @property batchUpdates - Indicates whether to directly perform a
+ * re-rendering after changes on properties have been made.
  * @property ignoreAttributeUpdates - Indicates whether attribute updates
  * should be considered (usually only needed internally).
+ * @property instance - Wrapped component instance.
+ * @property output - Explicitly defined output events (a mapping of event
+ * names to a potential parameter to properties transformer).
+ * @property outputEventNames - List of determined output event names.
  * @property properties - Holds currently evaluated properties.
  * @property root - Hosting dom node.
  * @property self - Back-reference to this class.
@@ -91,6 +96,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     ignoreAttributeUpdates:boolean = false
     instance:null|{current?:object} = null
     output:Output = {}
+    outputEventNames:Array<string> = []
     properties:object = {}
     root:TElement
     readonly self:typeof Web = Web
@@ -194,7 +200,8 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     }
     /**
      * Generic property setter. Forwards field writes into "properties" field
-     * and triggers re-rendering (optionally batched).
+     * and triggers re-rendering (optionally batched). After rendering all
+     * known output events are triggered.
      * @param name - Property name to write.
      * @param value - New value to write.
      * @returns Nothing.
@@ -211,10 +218,13 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                     this.batchedPropertyUpdateRunning = false
                     this.batchedUpdateRunning = false
                     this.render()
+                    this.triggerOuputEvents()
                 })
             }
-        } else
+        } else {
             this.render()
+            this.triggerOuputEvents()
+        }
     }
     /**
      * Just forwards internal property types.
@@ -263,6 +273,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
             NOTE: We only reflect properties by implicit determined events if
             their where no explicitly defined.
         */
+        this.outputEventNames = []
         this.attachImplicitDefinedOutputEventHandler(
             !this.attachExplicitDefinedOutputEventHandler()
         )
@@ -275,9 +286,10 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     attachExplicitDefinedOutputEventHandler():boolean {
         // Grab all existing output to property specifications
         let result:boolean = false
-        for (const [name, mapping] of Object.entries(this.output))
+        for (const name of Object.keys(this.output))
             if (!Object.prototype.hasOwnProperty.call(this.properties, name)) {
                 result = true
+                this.outputEventNames.push(name)
                 this.properties[name] = (...parameter:Array<any>):void => {
                     this.reflectEventToProperties(name, parameter)
                     this.forwardEvent(name, parameter)
@@ -300,12 +312,23 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
             if (
                 !Object.prototype.hasOwnProperty.call(this.properties, name) &&
                 ['output', PropTypes.func].includes(this._propertyTypes[name])
-            )
+            ) {
+                this.outputEventNames.push(name)
                 this.properties[name] = (...parameter:Array<any>):void => {
                     if (reflectProperties)
                         this.reflectEventToProperties(name, parameter)
                     this.forwardEvent(name, parameter)
                 }
+            }
+    }
+    /**
+     * Triggers all identified events to communicate internal property / state
+     * changes.
+     * @returns Nothing.
+     */
+    triggerOuputEvents():void {
+        for (const name of this.outputEventNames)
+            this.forwardEvent(name, [this.properties])
     }
     /**
      * Forwards given event as native web event.

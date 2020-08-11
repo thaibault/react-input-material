@@ -71,7 +71,6 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     fullWidth:boolean;
     icon:string;
     hidden:boolean;
-    hideInputText:string;
     maximumLengthText:string;
     maximumText:string;
     minimumLengthText:string;
@@ -98,7 +97,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     selectableEditor:boolean;
     showDeclaration:boolean;
     showInitialValidationState:boolean;
-    showInputText:string;
+    tooltip:string;
     trailingIcon:string|{
         icon:string;
         onClick:(event:MouseEvent) => void

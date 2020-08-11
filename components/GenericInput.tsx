@@ -37,12 +37,14 @@ import {IconButton} from '@rmwc/icon-button'
 import {Select, SelectProps} from '@rmwc/select'
 import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
+import {Tooltip} from '@rmwc/tooltip'
 
 import '@rmwc/formfield/styles'
 import '@rmwc/icon-button/styles'
 import '@rmwc/select/styles'
 import '@rmwc/textfield/styles'
 import '@rmwc/theme/styles'
+import '@rmwc/tooltip/styles'
 
 import '../material-fixes'
 import {Model, ModelState, Output, Properties, State} from '../type'
@@ -143,7 +145,6 @@ export type Props<Type = any> = {
     fullWidth?:boolean;
     icon?:string;
     hidden?:boolean;
-    hideInputText?:string;
     maximumLengthText?:string;
     maximumText?:string;
     minimumLengthText?:string;
@@ -171,7 +172,7 @@ export type Props<Type = any> = {
     selectableEditor?:boolean;
     showDeclaration?:boolean;
     showInitialValidationState?:boolean;
-    showInputText?:string;
+    tooltip?:string;
     /*
         NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
         trailingIcon?:string|{
@@ -214,7 +215,6 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         valid: true
     }
     static readonly defaultProps:Partial<Properties<string>> = {
-        hideInputText: 'Hide password.',
         maximumLengthText:
             'Please type less or equal than ${maximumLength} symbols.',
         maximumText: 'Please give a number less or equal than ${maximum}.',
@@ -249,8 +249,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         rows: 4,
         selectableEditor: false,
         showDeclaration: undefined,
-        showInitialValidationState: false,
-        showInputText: 'Show password.'
+        showInitialValidationState: false
     }
     static readonly output:Output = {onChange: true}
     static readonly propertiesToReflectAsAttributes:Mapping<boolean> = new Map(
@@ -271,6 +270,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             ['valid', true]
         ]
     )
+    static readonly strict:boolean = false
     // endregion
     // region properties
     inputReference:RefObject<HTMLInputElement> = createRef<HTMLInputElement>()
@@ -577,8 +577,12 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         */
         const result:Properties<Type> = Tools.extend(
             true,
-            {},
-            {model: Tools.copy(this.self.defaultProps.model)},
+            {
+                model: {
+                    ...this.self.defaultProps.model,
+                    state: {...this.self.defaultProps.model.state}
+                }
+            },
             properties
         )
         // region handle aliases
@@ -783,82 +787,85 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                 'cut copy paste | undo redo removeformat | styleselect ' +
                 'formatselect | searchreplace visualblocks fullscreen code'
 
-        return (
-            //<React.StrictMode>{
-                properties.selection ?
-                    <Select
-                        enhanced
-                        onChange={this.onChangeValue}
-                        options={properties.selection}
-                        {...genericProperties}
-                        {...materialProperties}
-                    />
-                : (
-                    properties.type === 'string' &&
-                    (
-                        properties.editor.startsWith('code') ||
-                        properties.editor.startsWith('richtext(')
-                    )
-                ) ?
-                    <>
-                        <FormField>
-                            <label>
-                                {properties.name}
-
-                                {
-                                    properties.editor.startsWith('code') ?
-                                        <CodeEditor
-                                            mode="javascript"
-                                            onChange={this.onChangeValue}
-                                            theme="github"
-                                            setOptions={{
-                                                maxLines: properties.rows,
-                                                minLines: properties.rows,
-                                                readOnly: properties.disabled,
-                                                tabSize: 4,
-                                                useWorker: false
-                                            }}
-                                            {...genericProperties}
-                                        />
-                                    :
-                                        <RichTextEditor
-                                            disabled={properties.disabled}
-                                            init={{
-                                                ...TINYMCE_DEFAULT_OPTIONS,
-                                                ...tinyMCEOptions
-                                            }}
-                                            onEditorChange={this.onChangeValue}
-                                            textareaName={this.properties.name}
-                                            {...genericProperties}
-                                        />
-                                }
-                            </label>
-                        </FormField>
-                        {materialProperties.helpText.children}
-                    </>
-                :
-                    <TextField
-                        align={properties.align}
-                        fullwidth={properties.fullWidth}
-                        inputRef={this.inputReference}
-                        maxLength={properties.maximumLength}
-                        minLength={properties.minimumLength}
-                        onChange={this.onChangeValue}
-                        pattern={properties.regularExpressionPattern}
-                        ripple={properties.ripple}
-                        rootProps={{onKeyUp: this.onKeyUp}}
-                        rows={properties.rows}
-                        textarea={
-                            properties.type === 'string' &&
-                            properties.editor === 'text'
-                        }
-                        trailingIcon={properties.trailingIcon}
-                        type={(properties.type === 'string' && properties.hidden) ? 'password' : 'text'}
-                        {...genericProperties}
-                        {...materialProperties}
-                    />
-            //}</React.StrictMode>
+        let result:Component = (
+            properties.selection ?
+                <Select
+                    enhanced
+                    onChange={this.onChangeValue}
+                    options={properties.selection}
+                    {...genericProperties}
+                    {...materialProperties}
+                />
+            : (
+                properties.type === 'string' &&
+                (
+                    properties.editor.startsWith('code') ||
+                    properties.editor.startsWith('richtext(')
+                )
+            ) ?
+                <>
+                    <FormField>
+                        <label>
+                            {properties.name}
+                            {
+                                properties.editor.startsWith('code') ?
+                                    <CodeEditor
+                                        mode="javascript"
+                                        onChange={this.onChangeValue}
+                                        theme="github"
+                                        setOptions={{
+                                            maxLines: properties.rows,
+                                            minLines: properties.rows,
+                                            readOnly: properties.disabled,
+                                            tabSize: 4,
+                                            useWorker: false
+                                        }}
+                                        {...genericProperties}
+                                    />
+                                :
+                                    <RichTextEditor
+                                        disabled={properties.disabled}
+                                        init={{
+                                            ...TINYMCE_DEFAULT_OPTIONS,
+                                            ...tinyMCEOptions
+                                        }}
+                                        onEditorChange={this.onChangeValue}
+                                        textareaName={this.properties.name}
+                                        {...genericProperties}
+                                    />
+                            }
+                        </label>
+                    </FormField>
+                    {materialProperties.helpText.children}
+                </>
+            :
+                <TextField
+                    align={properties.align}
+                    fullwidth={properties.fullWidth}
+                    inputRef={this.inputReference}
+                    maxLength={properties.maximumLength}
+                    minLength={properties.minimumLength}
+                    onChange={this.onChangeValue}
+                    pattern={properties.regularExpressionPattern}
+                    ripple={properties.ripple}
+                    rootProps={{onKeyUp: this.onKeyUp}}
+                    rows={properties.rows}
+                    textarea={
+                        properties.type === 'string' &&
+                        properties.editor === 'text'
+                    }
+                    trailingIcon={properties.trailingIcon}
+                    type={(properties.type === 'string' && properties.hidden) ? 'password' : 'text'}
+                    {...genericProperties}
+                    {...materialProperties}
+                />
         )
+        result = properties.tooltip ?
+            <Tooltip content={properties.tooltip}>{result}</Tooltip> :
+            <>{result}</>
+        return this.self.strict ?
+            <React.StrictMode>{result}</React.StrictMode> :
+            <>{result}</>
     }
     // endregion
 }

@@ -55,6 +55,7 @@
     "@rmwc/select": "*",
     "@rmwc/textfield": "*",
     "@rmwc/theme": "*",
+    "@rmwc/tooltip": "*",
     "@tinymce/tinymce-react": "*",
     "@types/ejs": "*",
     "@types/html-minifier": "*",
