@@ -215,7 +215,6 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     }
     static readonly defaultProps:Partial<Properties<string>> = {
         hideInputText: 'Hide password.',
-        hidden: undefined,
         maximumLengthText:
             'Please type less or equal than ${maximumLength} symbols.',
         maximumText: 'Please give a number less or equal than ${maximum}.',
@@ -282,7 +281,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             end: 0,
             start: 0
         },
-        hidden: false,
+        hidden: undefined,
         model: GenericInput.defaultModelState,
         showDeclaration: false,
         value: null
@@ -299,13 +298,18 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         properties:Partial<Properties<Type>>, state:State<Type>
     ):State<Type> {
 
+        if (properties.hidden !== undefined)
+            state.hidden = properties.hidden
+        if (state.hidden === undefined)
+            state.hidden = properties.name?.startsWith('password')
+
+        if (properties.showDeclaration !== undefined)
+            state.showDeclaration = properties.showDeclaration
+
         if (properties.value !== undefined)
             state.value = properties.value
         else if (properties.model?.value !== undefined)
             state.value = properties.model.value
-
-        if (properties.showDeclaration !== undefined)
-            state.showDeclaration = properties.showDeclaration
 
         return state
     }
@@ -339,9 +343,9 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             )
     }
     onChangeShowDeclaration = (event?:MouseEvent):void => {
-        this.setState(({showDeclaration}):Partial<State<Type>> =>
+        this.setState(({showDeclaration}):Partial<State<Type>> => (
             {showDeclaration: !showDeclaration}
-        )
+        ))
 
         if (this.properties.onChangeShowDeclaration)
             this.properties.onChangeShowDeclaration(
@@ -604,6 +608,12 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                 break
             }
 
+        if (result.hidden === undefined)
+            result.hidden = this.state.hidden
+
+        if (result.showDeclaration === undefined)
+            result.showDeclaration = this.state.showDeclaration
+
         if (result.model.value === undefined)
             result.model.value = (this.state.value === undefined) ?
                 result.model.default :
@@ -612,9 +622,6 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         // endregion
         result.model.value = this.transformValue(result, result.model.value)
         this.determineValidationState(result, result.model.value)
-
-        if (result.showDeclaration === undefined)
-            result.showDeclaration = this.state.showDeclaration
 
         return result
     }
@@ -698,8 +705,6 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
      * @returns Current component's representation.
      */
     render():Component {
-        console.log('A', this.props.showDeclaration, this.state.showDeclaration)
-
         const properties:Properties<Type> =
         this.properties =
             this.getConsolidatedProperties(this.props)
@@ -848,6 +853,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                             properties.editor === 'text'
                         }
                         trailingIcon={properties.trailingIcon}
+                        type={(properties.type === 'string' && properties.hidden) ? 'password' : 'text'}
                         {...genericProperties}
                         {...materialProperties}
                     />
