@@ -42,6 +42,14 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
 
     _content:typeof Component = 'div'
     /**
+     * Triggered when this component is unmounted into the document. Event
+     * handlers and state will be removed.
+     * @returns Nothing.
+     */
+    disconnectedCallback():void {
+        ReactDOM.unmountComponentAtNode(this.root)
+    }
+    /**
      * Method which does the rendering job. Should be called when ever state
      * changes should be projected to the hosts dom content.
      * @returns Nothing.

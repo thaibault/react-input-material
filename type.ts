@@ -36,7 +36,6 @@ export type ModelState = {
     pristine:boolean;
     touched:boolean;
     untouched:boolean;
-    value:boolean;
 }
 export type BaseModel<Type = any> = {
     declaration:string;
@@ -80,7 +79,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     model:Model<Type>;
     onBlur:(event:SyntheticEvent) => void;
     onChange:(properties:Properties<Type>, event?:SyntheticEvent) => void;
-    onChangeValue:(value:Type, event:SyntheticEvent) => void;
+    onChangeValue:(value:null|Type, event:SyntheticEvent) => void;
     onChangeShowDeclaration:(show:boolean, event:SyntheticEvent) => void;
     onChangeState:(state:ModelState, event:SyntheticEvent) => void;
     onClick:(event:MouseEvent) => void;
@@ -109,13 +108,14 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
 export type PropertyTypes = Mapping<ValueOf<PropTypes>|string>
 export type Props<Type = any> = Partial<Properties<Type>>
 export type State<Type = any> = {
-    model:ModelState;
-    selection:{
+    cursor:{
         end:number;
         start:number;
     };
+    hidden:boolean;
+    model:ModelState;
     showDeclaration:boolean;
-    value:Type;
+    value:null|Type;
 }
 export type WebComponentAPI = {
     component:ReactWeb;

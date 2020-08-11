@@ -215,7 +215,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     }
     static readonly defaultProps:Partial<Properties<string>> = {
         hideInputText: 'Hide password.',
-        hidden: false,
+        hidden: undefined,
         maximumLengthText:
             'Please type less or equal than ${maximumLength} symbols.',
         maximumText: 'Please give a number less or equal than ${maximum}.',
@@ -249,7 +249,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         requiredText: 'Please fill this field.',
         rows: 4,
         selectableEditor: false,
-        showDeclaration: false,
+        showDeclaration: undefined,
         showInitialValidationState: false,
         showInputText: 'Show password.'
     }
@@ -282,9 +282,10 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             end: 0,
             start: 0
         },
+        hidden: false,
         model: GenericInput.defaultModelState,
         showDeclaration: false,
-        value: undefined
+        value: null
     }
     // endregion
     // region live-cycle
@@ -297,10 +298,15 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     static getDerivedStateFromProps(
         properties:Partial<Properties<Type>>, state:State<Type>
     ):State<Type> {
+
         if (properties.value !== undefined)
             state.value = properties.value
         else if (properties.model?.value !== undefined)
             state.value = properties.model.value
+
+        if (properties.showDeclaration !== undefined)
+            state.showDeclaration = properties.showDeclaration
+
         return state
     }
     // endregion
@@ -333,11 +339,10 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             )
     }
     onChangeShowDeclaration = (event?:MouseEvent):void => {
-        if (!Object.prototype.hasOwnProperty.call(
-            this.props, 'showDeclaration'
-        ))
-            this.setState(({showDeclaration}):void => !showDeclaration)
-        this.properties.showDeclaration = !this.properties.showDeclaration
+        this.setState(({showDeclaration}):Partial<State<Type>> =>
+            {showDeclaration: !showDeclaration}
+        )
+
         if (this.properties.onChangeShowDeclaration)
             this.properties.onChangeShowDeclaration(
                 this.properties.showDeclaration, event
@@ -598,19 +603,18 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                 result.model.state = this.state.model
                 break
             }
-        if (
-            !Object.prototype.hasOwnProperty.call(result.model, 'value') ||
-            result.model.value === undefined
-        )
+
+        if (result.model.value === undefined)
             result.model.value = (this.state.value === undefined) ?
                 result.model.default :
                 this.state.value
-        if (!Object.prototype.hasOwnProperty.call(result, 'showDeclaration'))
-            result.showDeclaration = this.state.showDeclaration
         // else -> Controlled component via model's "value" property.
         // endregion
         result.model.value = this.transformValue(result, result.model.value)
         this.determineValidationState(result, result.model.value)
+
+        if (result.showDeclaration === undefined)
+            result.showDeclaration = this.state.showDeclaration
 
         return result
     }
@@ -694,6 +698,8 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
      * @returns Current component's representation.
      */
     render():Component {
+        console.log('A', this.props.showDeclaration, this.state.showDeclaration)
+
         const properties:Properties<Type> =
         this.properties =
             this.getConsolidatedProperties(this.props)
