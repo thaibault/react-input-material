@@ -55,10 +55,15 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
      * @returns Nothing.
      */
     render():void {
-        this.instance = this.properties.ref = React.createRef()
+        this.properties.ref = React.createRef()
+        if (!this.instance)
+            this.instance = this.properties.ref
         ReactDOM.render(
             React.createElement(this._content, this.properties), this.root
         )
+        // NOTE: Only update current instance if we have a newly created one.
+        if (this.properties.ref.current)
+            this.instance = this.properties.ref
         if (this.instance?.current?.properties)
             this.reflectProperties(this.instance.current.properties, false)
     }

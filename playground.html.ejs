@@ -50,10 +50,14 @@
             for (const domNode of document.querySelectorAll('[name]'))
                 domNode.addEventListener('onChange', ({detail}) =>
                     document.querySelector('pre').innerHTML =
-                        `${detail.target.properties.name}: ` +
+                        `${detail.parameter[0].name}: ` +
                         JSON.stringify(
+                            /*
+                                NOTE: We want to call the corresponding getter
+                                on the dom node for each property.
+                            */
                             detail.target,
-                            Object.keys(detail.target.properties).sort(),
+                            Object.keys(detail.parameter[0]).sort(),
                             4
                         )
                 )
@@ -172,7 +176,7 @@
                 required
                 value="'a'"
             ></generic-input>
-            <generic-input2asd
+            <generic-input
                 model="{declaration: 'selection', description: 'input8ModelDescription', name: 'input8Model', nullable: false, selection: {a: 'A', b: 'B', c: 'C'}, value: 'a'}"
             ></generic-input>
 

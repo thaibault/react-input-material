@@ -10,6 +10,14 @@ This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
 generic-input {
+    & label, & .mdc-form-field {
+        width: 100%;
+
+        &.mdc-text-field--textarea {
+            width: 100%;
+        }
+    }
+
     & .mdc-icon-button {
         font-size: 1.3em;
         height: 32px;

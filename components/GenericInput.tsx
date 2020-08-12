@@ -860,7 +860,12 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                         properties.declaration &&
                         <IconButton
                             icon={{
-                                icon: 'more_horiz',
+                                icon:
+                                    'more_' +
+                                    (properties.showDeclaration ?
+                                        'vert' :
+                                        'horiz'
+                                    ),
                                 onClick: this.onChangeShowDeclaration
                             }}
                         />
