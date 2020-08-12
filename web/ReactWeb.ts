@@ -17,6 +17,7 @@
     endregion
 */
 // region imports
+import Tools from 'clientnode'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 
@@ -41,6 +42,21 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
     readonly self:typeof ReactWeb = ReactWeb
 
     _content:typeof Component = 'div'
+    // region helper
+    /**
+     * Updates current component instance and reflects newly determined
+     * properties.
+     * @returns Nothing.
+     */
+    reflectInstanceProperties():void {
+        if (this.properties.ref.current) {
+            this.instance = this.properties.ref
+            if (this.instance.current.properties)
+                this.reflectProperties(this.instance.current.properties, false)
+        }
+    }
+    // endregion
+    // region live-cycle
     /**
      * Triggered when this component is unmounted into the document. Event
      * handlers and state will be removed.
@@ -61,12 +77,17 @@ export class ReactWeb<TElement = HTMLElement> extends Web<TElement> {
         ReactDOM.render(
             React.createElement(this._content, this.properties), this.root
         )
-        // NOTE: Only update current instance if we have a newly created one.
+        /*
+            NOTE: Update current instance if we have a newly created one
+            otherwise check after current queue has been finished.
+        */
         if (this.properties.ref.current)
-            this.instance = this.properties.ref
-        if (this.instance?.current?.properties)
-            this.reflectProperties(this.instance.current.properties, false)
+            this.reflectInstanceProperties()
+        else
+            Tools.timeout(this.reflectInstanceProperties.bind(this))
+
     }
+    // endregion
 }
 export default ReactWeb
 // region vim modline

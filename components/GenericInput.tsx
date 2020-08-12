@@ -139,6 +139,7 @@ export type Props<Type = any> = {
     touched?:boolean;
     untouched?:boolean;
     valid?:boolean;
+    visited?:boolean;
 
     // Properties
     align?:'end'|'start';
@@ -222,7 +223,8 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         pristine: true,
         touched: false,
         untouched: true,
-        valid: true
+        valid: true,
+        visited: false
     }
     static readonly defaultProps:Partial<Properties<string>> = {
         maximumLengthText:
@@ -276,7 +278,8 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             ['pristine', true],
             ['touched', true],
             ['untouched', true],
-            ['valid', true]
+            ['valid', true],
+            ['visited', true]
         ]
     )
     static readonly strict:boolean = false
@@ -307,6 +310,9 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         properties:Partial<Properties<Type>>, state:State<Type>
     ):State<Type> {
 
+        if (properties.cursor !== undefined)
+            state.cursor = properties.cursor
+
         if (properties.hidden !== undefined)
             state.hidden = properties.hidden
         if (state.hidden === undefined)
@@ -319,6 +325,14 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             state.value = properties.value
         else if (properties.model?.value !== undefined)
             state.value = properties.model.value
+
+        for (const name of Object.keys(state.model))
+            if (properties[name] !== undefined)
+                state.model[name] = properties[name]
+            else if (![null, undefined].includes(
+                properties.model?.state && properties.model.state[name]
+            ))
+                state.model[name] = properties.model.state[name]
 
         return state
     }
@@ -627,6 +641,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     getConsolidatedProperties(
         properties:Partial<Properties<Type>>
     ):Properties<Type> {
+        // TODO check if we correctly retrieve model states and cursor state.
         properties = this.mapPropertiesToModel(properties)
         const result:Properties<Type> = Tools.extend(
             {}, properties, properties.model, properties.model.state
@@ -876,8 +891,12 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                             properties.invalid &&
                             (
                                 properties.showInitialValidationState ||
-                                // TODO need something like "visited"
-                                properties.touched
+                                /*
+                                    Material inputs show their validation state
+                                    at least after a blur event so we
+                                    synchronize error message appearances.
+                                */
+                                properties.visited
                             ) &&
                             <Theme use="error">
                                 {this.renderMessage(

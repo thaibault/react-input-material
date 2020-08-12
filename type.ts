@@ -36,6 +36,8 @@ export type ModelState = {
     pristine:boolean;
     touched:boolean;
     untouched:boolean;
+    valid:boolean;
+    visited:boolean;
 }
 export type BaseModel<Type = any> = {
     declaration:string;
