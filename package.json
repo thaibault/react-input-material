@@ -51,6 +51,7 @@
     "@babel/preset-react": "*",
     "@rmwc/card": "*",
     "@rmwc/formfield": "*",
+    "@rmwc/icon": "*",
     "@rmwc/icon-button": "*",
     "@rmwc/select": "*",
     "@rmwc/textfield": "*",

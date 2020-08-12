@@ -101,12 +101,13 @@
                 name="input4"
                 placeholder="input4"
                 required
+                trailing-icon="'clear_preset'"
             ></generic-input>
             <generic-input
-                icon="backup"
+                icon="'backup'"
                 model="{declaration: 'placeholder', name: 'input4Model', nullable: false, value: 'value4Model'}"
                 placholder="input4Model"
-                trailing-icon="{icon: 'clear', onClick: (event) => {event.preventDefault(); this.value = ''}}"
+                trailing-icon="'clear_preset'"
             ></generic-input>
 
             <hr/>
@@ -114,7 +115,7 @@
             <generic-input
                 declaration="pattern"
                 description="input5Description"
-                icon="search"
+                icon="'search'"
                 name="input5"
                 pattern="a+"
                 placeholder="input5Placeholder"
@@ -132,18 +133,19 @@
             <generic-input
                 declaration="password"
                 description="input6Description"
-                icon="search"
+                icon="'search'"
                 name="passwordInput6"
                 pattern="a+"
                 placeholder="input6Placeholder"
-                tooltip="Please type in your password."
+                tooltip="'Please type in your password.'"
+                trailing-icon="'password_preset'"
                 value="'hans'"
             ></generic-input>
             <generic-input
                 model="{declaration: 'password', description: 'input6ModelDescription', regularExpressionPattern: 'a+', value: 'hans'}"
                 name="passwordInput6Model"
                 placeholder="input6ModelPlaceholder"
-                trailing-icon="{icon: 'lock_open', onClick: (event) => {event.preventDefault(); this.trailingIcon.icon = this.hidden ? 'lock' : 'lock_open'; this.hidden = !this.hidden}}"
+                trailing-icon="'password_preset'"
             ></generic-input>
 
             <hr/>

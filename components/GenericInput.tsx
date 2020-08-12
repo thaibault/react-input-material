@@ -23,6 +23,7 @@ import {config as aceConfig} from 'ace-builds'
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
 import {DomNode, Mapping} from 'clientnode/type'
 import React, {
+    Component,
     createRef,
     FocusEvent,
     KeyUpEvent,
@@ -33,11 +34,13 @@ import React, {
 } from 'react'
 import CodeEditor from 'react-ace'
 import {FormField} from '@rmwc/formfield'
+import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
 import {Select, SelectProps} from '@rmwc/select'
 import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
-import {Tooltip} from '@rmwc/tooltip'
+import {Tooltip, TooltipProps} from '@rmwc/tooltip'
+import {IconOptions} from '@rmwc/types'
 
 import '@rmwc/formfield/styles'
 import '@rmwc/icon-button/styles'
@@ -139,11 +142,21 @@ export type Props<Type = any> = {
 
     // Properties
     align?:'end'|'start';
-    // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
+    /*
+        NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
+        cursor?:{
+            end:number;
+            start:number;
+        };
+    */
     cursor?:any;
     disabled?:boolean;
     fullWidth?:boolean;
-    icon?:string;
+    /*
+        NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
+        icon?:string|(IconOptions & {tooltip?:string|TooltipProps});
+    */
+    icon?:any;
     hidden?:boolean;
     maximumLengthText?:string;
     maximumText?:string;
@@ -172,15 +185,12 @@ export type Props<Type = any> = {
     selectableEditor?:boolean;
     showDeclaration?:boolean;
     showInitialValidationState?:boolean;
-    tooltip?:string;
     /*
         NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
-        trailingIcon?:string|{
-            icon:string;
-            onClick:(event:MouseEvent) => void
-            tabIndex:number;
-        };
+        tooltip?:string|TooltipProps;
+        trailingIcon?:string|(IconOptions & {tooltip?:string|TooltipProps});
     */
+    tooltip?:any;
     trailingIcon?:any;
 }
 // endregion
@@ -240,7 +250,6 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             state: GenericInput.defaultModelState,
             trim: true,
             type: 'string',
-            value: undefined,
             writable: true
         },
         patternText:
@@ -315,6 +324,11 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     }
     // endregion
     // region event handler
+    /**
+     * Triggered on blur events.
+     * @param event - Event object.
+     * @returns Nothing.
+     */
     onBlur = (event:SyntheticEvent):void => {
         let changed:boolean = false
         if (this.properties.focused) {
@@ -336,12 +350,22 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         if (this.properties.onBlur)
             this.properties.onBlur(event)
     }
+    /**
+     * Triggered on any change events.
+     * @param event - Potential event object.
+     * @returns Nothing.
+     */
     onChange = (event?:SyntheticEvent):void => {
         if (this.properties.onChange)
             this.properties.onChange(
                 this.getConsolidatedProperties(this.properties), event
             )
     }
+    /**
+     * Triggered when show declaration indicator should be changed.
+     * @param event - Potential event object.
+     * @returns Nothing.
+     */
     onChangeShowDeclaration = (event?:MouseEvent):void => {
         this.setState(({showDeclaration}):Partial<State<Type>> => (
             {showDeclaration: !showDeclaration}
@@ -353,6 +377,12 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             )
         this.onChange(event)
     }
+    /**
+     * Triggered when a value state changes like validation or focusing.
+     * @param state - Current value state.
+     * @param event - Triggering event object.
+     * @returns Nothing.
+     */
     onChangeState = (state:ModelState, event:SyntheticEvent):void => {
         for (const key of Object.keys(state))
             if (!Object.prototype.hasOwnProperty.call(this.props, key)) {
@@ -362,6 +392,11 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         if (this.properties.onChangeState)
             this.properties.onChangeState(state, event)
     }
+    /**
+     * Triggered when ever the value changes.
+     * @param eventOrValue - Event object or new value.
+     * @returns Nothing.
+     */
     onChangeValue = (eventOrValue:string|SyntheticEvent):void => {
         if (!(this.properties.model.mutable && this.properties.model.writable))
             return
@@ -379,7 +414,9 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             value = eventOrValue
 
         const oldValue:string = this.properties.value
-        this.properties.value = this.transformValue(this.properties, value)
+        this.properties.value =
+        this.properties.model.value =
+            this.transformValue(this.properties, value)
 
         if (oldValue !== this.properties.value) {
             let stateChanged:boolean = this.determineValidationState(
@@ -405,18 +442,33 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                 this.properties.onChangeValue(this.properties.value, event)
         }
     }
+    /**
+     * Triggered on click events.
+     * @param event - Mouse event object.
+     * @returns Nothing.
+     */
     onClick = (event:MouseEvent):void => {
         this.saveSelectionState()
         if (this.properties.onClick)
             this.properties.onClick(event)
         this.onTouch(event)
     }
+    /**
+     * Triggered on focus events.
+     * @param event - Focus event object.
+     * @returns Nothing.
+     */
     onFocus = (event:FocusEvent):void => {
         this.saveSelectionState()
         if (this.properties.onFocus)
             this.properties.onFocus(event)
         this.onTouch(event)
     }
+    /**
+     * Triggered on key up events.
+     * @param event - Key up event object.
+     * @returns Nothing.
+     */
     onKeyUp = (event:KeyUpEvent):void => {
         this.saveSelectionState()
         if (this.properties.onKeyUp)
@@ -424,7 +476,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     }
     /**
      * Triggers on start interacting with the input.
-     * @param event - Event which triggers interaction.
+     * @param event - Event object which triggered interaction.
      * @returns Nothing.
      */
     onTouch = (event:FocusEvent|MouseEvent):void => {
@@ -453,6 +505,38 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     }
     // endregion
     // region helper
+    /**
+     * Applies icon preset configurations.
+     * @param options - Icon options to extend of known preset identified.
+     * @return Given potential extended icon configuration.
+     */
+    applyIconPreset(options?:Properties['icon']):Properties['icon']|void {
+        if (options === 'clear_preset')
+            return {
+                icon: 'clear',
+                onClick: (event:MouseEvent):void => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    this.onChangeValue(this.transformFinalValue(
+                        this.properties, this.properties.default
+                    ))
+                },
+                tooltip: 'Clear input'
+            }
+        if (options === 'password_preset')
+            return {
+                icon: 'lock' + (this.properties.hidden ? '_open' : ''),
+                onClick: (event:MouseEvent):void => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    this.setState(({hidden}):void => ({hidden: !hidden}))
+                    this.onChange(event)
+                },
+                tooltip:
+                    (this.properties.hidden ? 'Show' : 'Hide') + ' password'
+            }
+        return options
+    }
     /**
      * Derives current validation state from given value.
      * @param configuration - Input configuration.
@@ -702,6 +786,51 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             value = value.trim().replace(/ +\n/g, '\\n')
         return this.transformValue(configuration, value)
     }
+    /**
+     * Wraps given component with react strict mode component.
+     * @param component - Component or string to wrap.
+     * @returns Wrapped component.
+     */
+    wrapStrict(content:Component|string):Component {
+        return this.self.strict ?
+            <React.StrictMode>{content}</React.StrictMode> :
+            <>{content}</>
+    }
+    /**
+     * Wraps given component with a tooltip component with given tooltip
+     * configuration.
+     * @param options - Tooltip options.
+     * @param content - Component or string to wrap.
+     * @returns Wrapped given content.
+     */
+    wrapTooltip(
+        options?:Properties['tooltip'], content:Component|string
+    ):Component {
+        if (typeof options === 'string')
+            return <Tooltip content={options}>{content}</Tooltip>
+        else if (options !== null && typeof options === 'object')
+            return <Tooltip {...options}>{content}</Tooltip>
+        return <>{content}</>
+    }
+    /**
+     * If given icon options has an additional tooltip configuration integrate
+     * a wrapping tooltip component into given configuration and remove initial
+     * tooltip configuration.
+     * @param options - Icon configuration potential extended a tooltip
+     * configuration.
+     * @returns Resolved icon configuration.
+     */
+    wrapIconWithTooltip(options?:Properties['icon']):IconOptions|void {
+        if (options?.tooltip) {
+            const tooltip:Properties['tooltip'] = options.tooltip
+            options = {...options}
+            delete options.tooltip
+            const nestedOptions:IconOptions = {...options}
+            options.strategy = 'component'
+            options.icon = this.wrapTooltip(tooltip, <Icon icon={nestedOptions} />)
+        }
+        return options
+    }
     // endregion
     // region render
     /**
@@ -764,7 +893,9 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                     }
                 </>
             },
-            icon: properties.icon,
+            icon: this.wrapIconWithTooltip(
+                this.applyIconPreset(properties.icon)
+            ),
             invalid:
                 properties.showInitialValidationState && properties.invalid,
             label: properties.description || properties.name,
@@ -787,86 +918,92 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                 'cut copy paste | undo redo removeformat | styleselect ' +
                 'formatselect | searchreplace visualblocks fullscreen code'
 
-        let result:Component = (
-            properties.selection ?
-                <Select
-                    enhanced
-                    onChange={this.onChangeValue}
-                    options={properties.selection}
-                    {...genericProperties}
-                    {...materialProperties}
-                />
-            : (
-                properties.type === 'string' &&
-                (
-                    properties.editor.startsWith('code') ||
-                    properties.editor.startsWith('richtext(')
-                )
-            ) ?
-                <>
-                    <FormField>
-                        <label>
-                            {properties.name}
-                            {
-                                properties.editor.startsWith('code') ?
-                                    <CodeEditor
-                                        mode="javascript"
-                                        onChange={this.onChangeValue}
-                                        theme="github"
-                                        setOptions={{
-                                            maxLines: properties.rows,
-                                            minLines: properties.rows,
-                                            readOnly: properties.disabled,
-                                            tabSize: 4,
-                                            useWorker: false
-                                        }}
-                                        {...genericProperties}
-                                    />
-                                :
-                                    <RichTextEditor
-                                        disabled={properties.disabled}
-                                        init={{
-                                            ...TINYMCE_DEFAULT_OPTIONS,
-                                            ...tinyMCEOptions
-                                        }}
-                                        onEditorChange={this.onChangeValue}
-                                        textareaName={this.properties.name}
-                                        {...genericProperties}
-                                    />
-                            }
-                        </label>
-                    </FormField>
-                    {materialProperties.helpText.children}
-                </>
-            :
-                <TextField
-                    align={properties.align}
-                    fullwidth={properties.fullWidth}
-                    inputRef={this.inputReference}
-                    maxLength={properties.maximumLength}
-                    minLength={properties.minimumLength}
-                    onChange={this.onChangeValue}
-                    pattern={properties.regularExpressionPattern}
-                    ripple={properties.ripple}
-                    rootProps={{onKeyUp: this.onKeyUp}}
-                    rows={properties.rows}
-                    textarea={
-                        properties.type === 'string' &&
-                        properties.editor === 'text'
-                    }
-                    trailingIcon={properties.trailingIcon}
-                    type={(properties.type === 'string' && properties.hidden) ? 'password' : 'text'}
-                    {...genericProperties}
-                    {...materialProperties}
-                />
-        )
-        result = properties.tooltip ?
-            <Tooltip content={properties.tooltip}>{result}</Tooltip> :
-            <>{result}</>
-        return this.self.strict ?
-            <React.StrictMode>{result}</React.StrictMode> :
-            <>{result}</>
+        return this.wrapStrict(this.wrapTooltip(
+            properties.tooltip,
+            (
+                properties.selection ?
+                    <Select
+                        enhanced
+                        onChange={this.onChangeValue}
+                        options={properties.selection}
+                        {...genericProperties}
+                        {...materialProperties}
+                    />
+                : (
+                    properties.type === 'string' &&
+                    (
+                        properties.editor.startsWith('code') ||
+                        properties.editor.startsWith('richtext(')
+                    )
+                ) ?
+                    <>
+                        <FormField>
+                            <label>
+                                {properties.name}
+                                {
+                                    properties.editor.startsWith('code') ?
+                                        <CodeEditor
+                                            mode="javascript"
+                                            onChange={this.onChangeValue}
+                                            setOptions={{
+                                                maxLines: properties.rows,
+                                                minLines: properties.rows,
+                                                readOnly: properties.disabled,
+                                                tabSize: 4,
+                                                useWorker: false
+                                            }}
+                                            theme="github"
+                                            {...genericProperties}
+                                        />
+                                    :
+                                        <RichTextEditor
+                                            disabled={properties.disabled}
+                                            init={{
+                                                ...TINYMCE_DEFAULT_OPTIONS,
+                                                ...tinyMCEOptions
+                                            }}
+                                            onEditorChange={this.onChangeValue}
+                                            textareaName={this.properties.name}
+                                            {...genericProperties}
+                                        />
+                                }
+                            </label>
+                        </FormField>
+                        {materialProperties.helpText.children}
+                    </>
+                :
+                    <TextField
+                        align={properties.align}
+                        fullwidth={properties.fullWidth}
+                        inputRef={this.inputReference}
+                        maxLength={properties.maximumLength}
+                        minLength={properties.minimumLength}
+                        onChange={this.onChangeValue}
+                        pattern={properties.regularExpressionPattern}
+                        ripple={properties.ripple}
+                        rootProps={{onKeyUp: this.onKeyUp}}
+                        rows={properties.rows}
+                        textarea={
+                            properties.type === 'string' &&
+                            properties.editor === 'text'
+                        }
+                        trailingIcon={this.wrapIconWithTooltip(
+                            this.applyIconPreset(properties.trailingIcon)
+                        )}
+                        type={(
+                            properties.type === 'string' &&
+                            properties.hidden
+                        ) ?
+                            'password' :
+                            'text'
+                        }
+                        {...genericProperties}
+                        {...materialProperties}
+                    />
+            )
+        ))
     }
+    /**/
     // endregion
 }
 export default GenericInput

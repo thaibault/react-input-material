@@ -466,6 +466,16 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
      * @returns Nothing.
      */
     reflectEventToProperties(name:string, parameter:Array<any>):void {
+        /*
+            NOTE: We enforce to update components state imidiatly after an event
+            occurs since batching usually does not make sense here. An event
+            is ran an its own context.
+            On the other hand it can be necessary to immediately reflect a
+            property change to the components internal state to avoid
+            contradicting internal render cycles.
+        */
+        const oldBatchUpdatesConfiguration:boolean = this.batchUpdates
+        this.batchUpdates = false
         if (
             Object.prototype.hasOwnProperty.call(this.output, name) &&
             Tools.isFunction(this.output[name])
@@ -481,6 +491,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
             )
         )
             this.reflectProperties(parameter[0])
+        this.batchUpdates = oldBatchUpdatesConfiguration
     }
     /**
      * Evaluates given property value depending on its type specification and

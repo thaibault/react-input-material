@@ -69,7 +69,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     };
     disabled?:boolean;
     fullWidth:boolean;
-    icon:string;
+    icon:string|(IconOptions & {tooltip?:string|TooltipProps});
     hidden:boolean;
     maximumLengthText:string;
     maximumText:string;
@@ -97,12 +97,8 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     selectableEditor:boolean;
     showDeclaration:boolean;
     showInitialValidationState:boolean;
-    tooltip:string;
-    trailingIcon:string|{
-        icon:string;
-        onClick:(event:MouseEvent) => void
-        tabIndex:number;
-    };
+    tooltip:string|TooltipProps;
+    trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps});
 }
 export type PropertyTypes = Mapping<ValueOf<PropTypes>|string>
 export type Props<Type = any> = Partial<Properties<Type>>
