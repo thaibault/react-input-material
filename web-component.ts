@@ -36,7 +36,7 @@ for (const key of modules.keys()) {
     // Determine class / function name.
     const name:string =
         component._name ||
-        component.name ||
+        // NOTE: Not minifyable save: "component.name ||"
         /*
             NOTE: There exists babel plugins which reflects component name and
             member variables under this property. Try to respect these.

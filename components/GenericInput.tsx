@@ -18,8 +18,6 @@
 */
 // region imports
 import {Settings as TinyMCEOptions} from 'tinymce'
-import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
-import {config as aceConfig} from 'ace-builds'
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
 import {DomNode, Mapping} from 'clientnode/type'
 import React, {
@@ -27,12 +25,13 @@ import React, {
     createRef,
     FocusEvent,
     KeyUpEvent,
+    lazy,
     MouseEvent,
     PureComponent,
     RefObject,
+    Suspense,
     SyntheticEvent
 } from 'react'
-import CodeEditor from 'react-ace'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
@@ -41,6 +40,7 @@ import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
 import {Tooltip, TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
+import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
 
 import '@rmwc/formfield/styles'
 import '@rmwc/icon-button/styles'
@@ -52,11 +52,16 @@ import '@rmwc/tooltip/styles'
 import '../material-fixes'
 import {Model, ModelState, Output, Properties, State} from '../type'
 // endregion
-aceConfig.set('basePath', '/node_modules/ace-builds/src-noconflict/')
-
-const tinymce = require('tinymce')
+// region code-editor
+const CodeEditor = lazy(async ():Promise<'TODO'> => {
+    const {config} = await import('ace-builds')
+    config.set('basePath', '/node_modules/ace-builds/src-noconflict/')
+    return await import('react-ace')
+})
+// endregion
+// region rich-text-editor
 const tinymceBasePath:string = '/node_modules/tinymce/'
-tinymce.baseURL = tinymceBasePath
+const tinymceScriptPath:string = `${tinymceBasePath}tinymce.min.js`
 export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
     /* eslint-disable camelcase */
     // region paths
@@ -92,6 +97,7 @@ export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
     trim: true
     /* eslint-enable camelcase */
 }
+// endregion
 // region prop-types
 /*
     NOTE: Using an imported "Props" type (which consists of a "Partial"
@@ -202,10 +208,16 @@ export type Props<Type = any> = {
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProps - Initial property configuration.
  * @property static:output - Describes external event handler interface.
- * @property static:self - Back-reference to this class.
+ * @property static:propertiesToReflectAsAttributes - List of properties to
+ * potentially reflect as attributes (e.g. in a wrapped web-component).
+ * @property static:strict - Indicates whether we should wrap render output in
+ * reacts strict component.
  *
- * @property model - Current model configuration.
+ * @property static:_name - Non minifyable component name.
+ *
+ * @property inputReference - Current wrapped input reference node.
  * @property properties - Current properties.
+ * @property self - Back-reference to this class.
  * @property state - Current state.
  */
 export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
@@ -283,6 +295,8 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         ]
     )
     static readonly strict:boolean = false
+
+    static readonly _name:string = 'GenericInput'
     // endregion
     // region properties
     inputReference:RefObject<HTMLInputElement> = createRef<HTMLInputElement>()
@@ -861,6 +875,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
      * @returns Current component's representation.
      */
     render():Component {
+        // region consolidate properties
         const properties:Properties<Type> =
         this.properties =
             this.getConsolidatedProperties(this.props)
@@ -949,6 +964,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             tinyMCEOptions.toolbar1 =
                 'cut copy paste | undo redo removeformat | styleselect ' +
                 'formatselect | searchreplace visualblocks fullscreen code'
+        // endregion
 
         return this.wrapStrict(this.wrapTooltip(
             properties.tooltip,
@@ -986,19 +1002,21 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                                 </span>
                                 {
                                     properties.editor.startsWith('code') ?
-                                        <CodeEditor
-                                            mode="javascript"
-                                            onChange={this.onChangeValue}
-                                            setOptions={{
-                                                maxLines: properties.rows,
-                                                minLines: properties.rows,
-                                                readOnly: properties.disabled,
-                                                tabSize: 4,
-                                                useWorker: false
-                                            }}
-                                            theme="github"
-                                            {...genericProperties}
-                                        />
+                                        <Suspense fallback="loading...">
+                                            <CodeEditor
+                                                mode="javascript"
+                                                onChange={this.onChangeValue}
+                                                setOptions={{
+                                                    maxLines: properties.rows,
+                                                    minLines: properties.rows,
+                                                    readOnly: properties.disabled,
+                                                    tabSize: 4,
+                                                    useWorker: false
+                                                }}
+                                                theme="github"
+                                                {...genericProperties}
+                                            />
+                                        </Suspense>
                                     :
                                         <RichTextEditor
                                             disabled={properties.disabled}
@@ -1008,6 +1026,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                                             }}
                                             onEditorChange={this.onChangeValue}
                                             textareaName={this.properties.name}
+                                            tinymceScriptSrc={tinymceScriptPath}
                                             {...genericProperties}
                                         />
                                 }
