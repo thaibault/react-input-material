@@ -326,14 +326,6 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         else if (properties.model?.value !== undefined)
             state.value = properties.model.value
 
-        for (const name of Object.keys(state.model))
-            if (properties[name] !== undefined)
-                state.model[name] = properties[name]
-            else if (![null, undefined].includes(
-                properties.model?.state && properties.model.state[name]
-            ))
-                state.model[name] = properties.model.state[name]
-
         return state
     }
     // endregion
@@ -350,6 +342,13 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             this.properties.model.state.focused =
                 false
             this.onChangeState(this.properties.model.state, event)
+            changed = true
+        }
+
+        if (!this.properties.visited) {
+            this.properties.visited =
+            this.properties.model.state.visited =
+                true
             changed = true
         }
 
@@ -625,6 +624,8 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                 configuration.model.state.invalidRequired
             configuration.model.state.valid =
                 !configuration.model.state.invalid
+
+            // Hide declaration to show invalidation state.
             if (
                 configuration.showDeclaration &&
                 configuration.model.state.invalid
@@ -641,8 +642,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     getConsolidatedProperties(
         properties:Partial<Properties<Type>>
     ):Properties<Type> {
-        // TODO check if we correctly retrieve model states and cursor state.
-        properties = this.mapPropertiesToModel(properties)
+        properties = this.mapPropertiesAndStateToModel(properties)
         const result:Properties<Type> = Tools.extend(
             {}, properties, properties.model, properties.model.state
         )
@@ -667,7 +667,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
      * properties.
      * @returns Nothing.
     */
-    mapPropertiesToModel(
+    mapPropertiesAndStateToModel(
         properties:Partial<Properties<Type>>
     ):Properties<Type> {
         /*
@@ -711,8 +711,16 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                 break
             }
 
+        if (result.cursor === undefined)
+            result.cursor = this.state.cursor
+
         if (result.hidden === undefined)
             result.hidden = this.state.hidden
+
+        /*
+            NOTE: Model states are not retrieved from state but derived from
+            specification and current value.
+        */
 
         if (result.showDeclaration === undefined)
             result.showDeclaration = this.state.showDeclaration
@@ -961,9 +969,21 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                     )
                 ) ?
                     <>
-                        <FormField>
+                        <FormField className="mdc-text-field mdc-text-field--textarea">
                             <label>
-                                {properties.name}
+                                <span
+                                    className="generic-input__editor__label mdc-floating-label mdc-floating-label--float-above"
+                                >
+                                    <Theme use={
+                                        properties.invalid &&
+                                        (
+                                            properties.showInitialValidationState ||
+                                            properties.visited
+                                        ) ? 'error' : null
+                                    }>
+                                        {properties.name}{properties.required ? '*' : ''}
+                                    </Theme>
+                                </span>
                                 {
                                     properties.editor.startsWith('code') ?
                                         <CodeEditor
@@ -993,7 +1013,13 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                                 }
                             </label>
                         </FormField>
-                        {materialProperties.helpText.children}
+                        <div className="mdc-text-field-helper-line">
+                            <p
+                                className="mdc-text-field-helper-text mdc-text-field-helper-text--persistent"
+                            >
+                                {materialProperties.helpText.children}
+                            </p>
+                        </div>
                     </>
                 :
                     <TextField
