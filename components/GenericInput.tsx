@@ -62,7 +62,7 @@ import PropertyTypes, {
     shape,
     string
 } from '../property-types'
-import styles from '../material-fixes'
+import styles from '../material-fixes.module'
 import {
     Model, ModelState, Output, Properties, ReactWebComponent, State
 } from '../type'
