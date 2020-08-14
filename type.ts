@@ -44,6 +44,7 @@ export type BaseModel<Type = any> = {
     default:Type;
     description:string;
     editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)';
+    editorIsActive:boolean;
     emtyEqualsNull:boolean;
     maximum:number;
     maximumLength:number;
@@ -80,6 +81,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     model:Model<Type>;
     onBlur:(event:SyntheticEvent) => void;
     onChange:(properties:Properties<Type>, event?:SyntheticEvent) => void;
+    onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void;
     onChangeValue:(value:null|Type, event:SyntheticEvent) => void;
     onChangeShowDeclaration:(show:boolean, event:SyntheticEvent) => void;
     onChangeState:(state:ModelState, event:SyntheticEvent) => void;
@@ -109,6 +111,7 @@ export type State<Type = any> = {
         end:number;
         start:number;
     };
+    editorIsActive:boolean;
     hidden:boolean;
     model:ModelState;
     showDeclaration:boolean;

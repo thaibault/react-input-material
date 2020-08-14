@@ -17,6 +17,7 @@
     endregion
 */
 // region imports
+import {ReactAce as CodeEditorType} from 'react-ace'
 import {Settings as TinyMCEOptions} from 'tinymce'
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
 import {DomNode, Mapping} from 'clientnode/type'
@@ -53,7 +54,7 @@ import '../material-fixes'
 import {Model, ModelState, Output, Properties, State} from '../type'
 // endregion
 // region code-editor
-const CodeEditor = lazy(async ():Promise<'TODO'> => {
+const CodeEditor = lazy(async ():Promise<CodeEditorType> => {
     const {config} = await import('ace-builds')
     config.set('basePath', '/node_modules/ace-builds/src-noconflict/')
     return await import('react-ace')
@@ -113,6 +114,7 @@ export type Props<Type = any> = {
     // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
     // editor?:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext('normal')'|'richtext(advanced)';
     editor?:string;
+    editorIsActive?:boolean;
     emptyEqualsNull?:boolean;
     maximum?:number;
     maximumLength?:number;
@@ -174,6 +176,7 @@ export type Props<Type = any> = {
     model:any;
     onBlur?:(event:SyntheticEvent) => void;
     onChange?:(value:Properties<Type>, event?:SyntheticEvent) => void;
+    onChangeEditorIsActive?:(isActive:boolean, event?:MouseEvent) => void;
     onChangeValue?:(value:Type, event:SyntheticEvent) => void;
     onChangeShowDeclaration?:(show:boolean, event?:MouseEvent) => void;
     onChangeState?:(state:ModelState, event:SyntheticEvent) => void;
@@ -307,6 +310,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             end: 0,
             start: 0
         },
+        editorIsActive: false,
         hidden: undefined,
         model: GenericInput.defaultModelState,
         showDeclaration: false,
@@ -326,6 +330,9 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
 
         if (properties.cursor !== undefined)
             state.cursor = properties.cursor
+
+        if (properties.editorIsActive !== undefined)
+            state.editorIsActive = properties.editorIsActive
 
         if (properties.hidden !== undefined)
             state.hidden = properties.hidden
@@ -389,11 +396,29 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             )
     }
     /**
+     * Triggered when editor is active indicator should be changed.
+     * @param event - Mouse event object.
+     * @returns Nothing.
+     */
+    onChangeEditorIsActive = (event?:MouseEvent):void => {
+        this.properties.editorIsActive = !this.properties.editorIsActive
+        this.setState(({editorIsActive}):Partial<State<Type>> => (
+            {editorIsActive: !editorIsActive}
+        ))
+
+        if (this.properties.onChangeEditorIsActive)
+            this.properties.onChangeEditorIsActive(
+                this.properties.editorIsActive, event
+            )
+        this.onChange(event)
+    }
+    /**
      * Triggered when show declaration indicator should be changed.
      * @param event - Potential event object.
      * @returns Nothing.
      */
     onChangeShowDeclaration = (event?:MouseEvent):void => {
+        this.properties.showDeclaration = !this.properties.showDeclaration
         this.setState(({showDeclaration}):Partial<State<Type>> => (
             {showDeclaration: !showDeclaration}
         ))
@@ -673,6 +698,10 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
         result.pattern = result.regularExpressionPattern
         delete result.regularExpressionPattern
 
+        // NOTE: If an editor is specified it should be possible to display.
+        if (!(result.editor === 'plain' || result.selectableEditor))
+            result.editorIsActive = true
+
         return result
     }
     /**
@@ -725,25 +754,29 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                 break
             }
 
-        if (result.cursor === undefined)
-            result.cursor = this.state.cursor
-
-        if (result.hidden === undefined)
-            result.hidden = this.state.hidden
-
         /*
             NOTE: Model states are not retrieved from state but derived from
             specification and current value.
         */
-
-        if (result.showDeclaration === undefined)
-            result.showDeclaration = this.state.showDeclaration
 
         if (result.model.value === undefined)
             result.model.value = (this.state.value === undefined) ?
                 result.model.default :
                 this.state.value
         // else -> Controlled component via model's "value" property.
+        // endregion
+        // region handle state configuration
+        if (result.cursor === undefined)
+            result.cursor = this.state.cursor
+
+        if (result.editorIsActive === undefined)
+            result.editorIsActive = this.state.editorIsActive
+
+        if (result.hidden === undefined)
+            result.hidden = this.state.hidden
+
+        if (result.showDeclaration === undefined)
+            result.showDeclaration = this.state.showDeclaration
         // endregion
         result.model.value = this.transformValue(result, result.model.value)
         this.determineValidationState(result, result.model.value)
@@ -895,6 +928,21 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                 persistent: Boolean(properties.declaration),
                 children: <>
                     {
+                        this.properties.selectableEditor &&
+                        this.properties.type === 'string' &&
+                        this.properties.editor !== 'plain' &&
+                        <IconButton
+                            icon={{
+                                icon: this.properties.editorIsActive ?
+                                    'subject' :
+                                    this.properties.editor.startsWith('code') ?
+                                        'code' :
+                                        'text_format',
+                                onClick: this.onChangeEditorIsActive
+                            }}
+                        />
+                    }
+                    {
                         properties.declaration &&
                         <IconButton
                             icon={{
@@ -910,7 +958,8 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                     }
                     {
                         properties.showDeclaration ?
-                            properties.declaration :
+                            properties.declaration
+                        :
                             properties.invalid &&
                             (
                                 properties.showInitialValidationState ||
@@ -979,6 +1028,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                     />
                 : (
                     properties.type === 'string' &&
+                    properties.editorIsActive &&
                     (
                         properties.editor.startsWith('code') ||
                         properties.editor.startsWith('richtext(')
@@ -997,7 +1047,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                                             properties.visited
                                         ) ? 'error' : null
                                     }>
-                                        {properties.name}{properties.required ? '*' : ''}
+                                        {properties.description || properties.name}{properties.required ? '*' : ''}
                                     </Theme>
                                 </span>
                                 {
@@ -1054,7 +1104,7 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
                         rows={properties.rows}
                         textarea={
                             properties.type === 'string' &&
-                            properties.editor === 'text'
+                            properties.editor !== 'plain'
                         }
                         trailingIcon={this.wrapIconWithTooltip(
                             this.applyIconPreset(properties.trailingIcon)
