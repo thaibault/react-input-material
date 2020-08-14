@@ -1055,6 +1055,7 @@ export class GenericInput<Type = any> extends
                 'formatselect | searchreplace visualblocks fullscreen code'
         // endregion
 
+        console.log('TODO', styles)
         return this.wrapStrict(this.wrapTooltip(
             properties.tooltip,
             (
