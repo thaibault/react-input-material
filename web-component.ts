@@ -43,10 +43,7 @@ for (const key of modules.keys()) {
         */
         component.___types?.name?.name ||
         key.replace(/^(.*\/+)?([^\/]+)\.tsx$/, '$2')
-    let propertyTypes:PropertyTypes = {}
-    if (component.propTypes) {
-        propertyTypes = component.propTypes
-    }
+    const propertyTypes:PropertyTypes = component.propTypes || {}
     const allPropertyNames:Array<string> = Object.keys(propertyTypes)
     components[name] = {
         component: class extends ReactWeb {

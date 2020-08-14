@@ -20,7 +20,8 @@
     "form-field"
   ],
   "files": [
-    "index.tsx"
+    "index.tsx",
+    "type.ts"
   ],
   "main": "index.js",
   "repository": {
@@ -46,7 +47,6 @@
     "watch": "weboptimizer build --watch"
   },
   "devDependencies": {
-    "airbnb-prop-types": "*",
     "@babel/plugin-transform-proto-to-assign": "*",
     "@babel/preset-react": "*",
     "@rmwc/card": "*",
@@ -69,7 +69,6 @@
     "@typescript-eslint/eslint-plugin": "*",
     "@typescript-eslint/parser": "*",
     "babel-eslint": "*",
-    "babel-plugin-typescript-to-proptypes": "*",
     "clientnode": "*",
     "css-loader": "*",
     "cssnano": "*",
@@ -134,18 +133,20 @@
       "cascadingStyleSheet": {
         "exclude": "false"
       },
+
+      "optimizer": {
+        "babelMinify": {
+          "#": "To provide a logging output we need to exclude this feature.",
+          "__evaluate__": "self.debug ? {bundle: null, module: null} : {bundle: {transform: {removeConsole: false}}, module: {removeConsole: false}}"
+        }
+      },
+
       "preprocessor": {
         "javaScript": {
           "options": {
             "presets": {
               "#": "NOTE: We have to disable module export/import transformation to allow tree shaking by the final (minimizer).",
               "__evaluate__": "['@babel/preset-react', ['@babel/preset-env', {loose: true, modules: false, targets: self.targetTechnology === 'node' ? {node: 'current'} : {browsers: self.generic.supportedBrowsers, node: 'current'}}], '@babel/typescript'].concat((self.debug || !self.module.optimizer.babelMinify.module || 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'document') ? [] : [['minify', self.module.optimizer.babelMinify.module]])"
-            },
-            "plugins": {
-              "__prepend__": [[
-                "babel-plugin-typescript-to-proptypes",
-                {"forbidExtraProps": true, "maxSize": 0, "typeCheck": true}
-              ]]
             }
           }
         }

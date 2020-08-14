@@ -17,10 +17,12 @@
 */
 // region imports
 import {Mapping, ValueOf} from 'clientnode/type'
-import PropTypes from 'prop-types'
-import {FocusEvent, KeyUpEvent, MouseEvent, SyntheticEvent} from 'react'
+import {
+    Component, FocusEvent, KeyUpEvent, MouseEvent, SyntheticEvent
+} from 'react'
 
-import {ReactWeb} from '../web/ReactWeb'
+import PropertyTypes from './property-types'
+import {ReactWeb} from './web/ReactWeb'
 // endregion
 // region exports
 export type ModelState = {
@@ -44,22 +46,21 @@ export type BaseModel<Type = any> = {
     default:Type;
     description:string;
     editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)';
-    editorIsActive:boolean;
     emtyEqualsNull:boolean;
     maximum:number;
     maximumLength:number;
     minimum:number;
     minimumLength:number;
-    mutable:boolean;
     name:string;
-    nullable:boolean;
     regularExpressionPattern:string;
-    selection:Array<number|string>|Mapping<any>;
+    selection:Array<number|string>|Mapping<number|string>;
     trim:boolean;
     type:'date'|'datetime-local'|'month'|'number'|'range'|'string'|'time'|'week';
     value?:null|Type;
 }
 export type Model<Type = any> = BaseModel<Type> & {
+    mutable:boolean;
+    nullable:boolean;
     state:ModelState;
     writable:boolean;
 }
@@ -71,6 +72,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
         start:number;
     };
     disabled?:boolean;
+    editorIsActive:boolean;
     fullWidth:boolean;
     icon:string|(IconOptions & {tooltip?:string|TooltipProps});
     hidden:boolean;
@@ -104,7 +106,6 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     tooltip:string|TooltipProps;
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps});
 }
-export type PropertyTypes = Mapping<ValueOf<PropTypes>|string>
 export type Props<Type = any> = Partial<Properties<Type>>
 export type State<Type = any> = {
     cursor:{
@@ -120,6 +121,12 @@ export type State<Type = any> = {
 export type WebComponentAPI = {
     component:ReactWeb;
     register:(tagName:string) => void;
+}
+export interface ReactWebComponent extends Component {
+    static readonly output?:Output;
+    static readonly propertiesToReflectAsAttributes?:Mapping<boolean>;
+    static readonly propertyTypes?:Mapping<ValueOf<PropertyTypes>>;
+    static readonly propTypes?:Mapping<ValueOf<PropertyTypes>>;
 }
 // endregion
 // region vim modline

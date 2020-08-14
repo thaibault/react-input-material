@@ -22,8 +22,12 @@ generic-input {
         font-size: 1rem;
         height: 30px;
         padding: 6px;
-        width: 30px;
         vertical-align: middle;
+        width: 30px;
+    }
+
+    & .mdc-select-helper-text {
+        color: rgba(0, 0, 0, 0.6);
     }
 
     & .mdc-text-field {
@@ -36,9 +40,6 @@ generic-input {
             top: 9px;
         }
     }
-}
-.mdc-select-helper-text {
-    color: rgba(0, 0, 0, 0.6);
 }
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:

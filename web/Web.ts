@@ -18,8 +18,28 @@
 */
 // region imports
 import Tools, {globalContext, PlainObject} from 'clientnode'
-import PropTypes from 'prop-types'
+import {ValueOf} from 'clientnode/type'
 
+import {
+    any,
+    array,
+    arrayOf,
+    boolean,
+    element,
+    elementType,
+    instanceOf,
+    func,
+    node,
+    number,
+    object,
+    objectOf,
+    oneOf,
+    oneOfType,
+    exact,
+    shape,
+    string,
+    symbol
+} from '../property-types'
 import {Output, PropertyTypes} from '../types'
 // endregion
 // region polyfills
@@ -311,7 +331,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
         for (const [name, type] of Object.entries(this._propertyTypes))
             if (
                 !Object.prototype.hasOwnProperty.call(this.properties, name) &&
-                ['output', PropTypes.func].includes(this._propertyTypes[name])
+                ['output', func].includes(this._propertyTypes[name])
             ) {
                 this.outputEventNames.push(name)
                 this.properties[name] = (...parameter:Array<any>):void => {
@@ -359,19 +379,18 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
             this.properties[name] = value
             if (this._propertiesToReflectAsAttributes.has(name))
                 switch (this._propertyTypes[name]) {
-                    case PropTypes.any:
-                    case PropTypes.array:
-                    case PropTypes.arrayOf:
-                    case PropTypes.element:
-                    case PropTypes.elementType:
-                    case PropTypes.instanceOf:
-                    case PropTypes.node:
-                    case PropTypes.object:
-                    case PropTypes.objectOf:
-                    case PropTypes.shape:
-                    case PropTypes.exact:
-                    case PropTypes.symbol:
-                    case 'any':
+                    case any:
+                    case array:
+                    case arrayOf:
+                    case element:
+                    case elementType:
+                    case instanceOf:
+                    case node:
+                    case object:
+                    case objectOf:
+                    case shape:
+                    case exact:
+                    case symbol:
                         if (value) {
                             const representation:string =
                                 Tools.represent(value)
@@ -386,16 +405,14 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                         if (this.hasAttribute(name))
                             this.removeAttribute(name)
                         break
-                    case PropTypes.bool:
-                    case 'boolean':
+                    case boolean:
                         if (value) {
                             if (this.getAttribute(name) !== '')
                                 this.setAttribute(name, '')
                         } else if (this.hasAttribute(name))
                             this.removeAttribute(name)
                         break
-                    case PropTypes.number:
-                    case 'number':
+                    case number:
                         if (typeof value === 'number' && !isNaN(value)) {
                             value = `${value}`
                             if (this.getAttribute(name) !== value)
@@ -403,11 +420,9 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                         } else if (this.hasAttribute(name))
                             this.removeAttribute(name)
                         break
-                    case PropTypes.func:
-                    case 'output':
+                    case func:
                         break
-                    case PropTypes.string:
-                    case 'string':
+                    case string:
                         if (value) {
                             if (this.getAttribute(name) !== value)
                                 this.setAttribute(name, value)
@@ -503,30 +518,28 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
     evaluateStringOrNullAndSetAsProperty(name:string, value:string):void {
         name = Tools.stringDelimitedToCamelCase(name)
         if (Object.prototype.hasOwnProperty.call(this._propertyTypes, name)) {
-            if (
-                value === null &&
-                ![PropTypes.bool, 'boolean'].includes(
-                    this._propertyTypes[name]
-                )
-            ) {
+            const type:ValueOf<PropertyTypes> = this._propertyTypes[name]
+            if (value === null && ![boolean, 'boolean'].includes(type)) {
                 delete this.properties[name]
                 return
             }
-            switch (this._propertyTypes[name]) {
-                case PropTypes.bool:
-                case 'boolean':
+            switch (type) {
+                case boolean:
                     this.properties[name] = ![null, 'false'].includes(value)
                     break
-                case PropTypes.number:
-                case 'number':
-                    const number:number = parseFloat(value)
-                    if (isNaN(number))
+                case number:
+                    /*
+                        NOTE: You should not name this variable "number" since
+                        babel gets confused caused by existing module wide
+                        property type variable "number".
+                    */
+                    const numberValue:number = parseFloat(value)
+                    if (isNaN(numberValue))
                         this.properties[name] = undefined
                     else
-                        this.properties[name] = number
+                        this.properties[name] = numberValue
                     break
-                case PropTypes.func:
-                case 'output':
+                case func:
                     let callback:Function
                     try {
                         callback = new Function('parameter', `return ${value}`)
@@ -553,25 +566,23 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                             }
                     }
                     break
-                case PropTypes.string:
-                case 'string':
+                case string:
                     this.properties[name] = value
                     break
-                case PropTypes.any:
-                case PropTypes.array:
-                case PropTypes.arrayOf:
-                case PropTypes.element:
-                case PropTypes.elementType:
-                case PropTypes.instanceOf:
-                case PropTypes.node:
-                case PropTypes.object:
-                case PropTypes.objectOf:
-                case PropTypes.oneOf:
-                case PropTypes.oneOfType:
-                case PropTypes.shape:
-                case PropTypes.exact:
-                case PropTypes.symbol:
-                case 'any':
+                case any:
+                case array:
+                case arrayOf:
+                case element:
+                case elementType:
+                case instanceOf:
+                case node:
+                case object:
+                case objectOf:
+                case oneOf:
+                case oneOfType:
+                case shape:
+                case exact:
+                case symbol:
                 default:
                     if (value) {
                         let get:Function
@@ -591,7 +602,7 @@ export class Web<TElement = HTMLElement> extends HTMLElement {
                             } catch (error) {
                                 console.warn(
                                     `Error occured durring interpreting ` +
-                                    `given "${name}" attribute object "` +
+                                    `given "${name}" attribute value "` +
                                     `${value}": "${Tools.represent(error)}".`
                                 )
                                 break

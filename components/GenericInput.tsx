@@ -17,10 +17,8 @@
     endregion
 */
 // region imports
-import {ReactAce as CodeEditorType} from 'react-ace'
-import {Settings as TinyMCEOptions} from 'tinymce'
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
-import {DomNode, Mapping} from 'clientnode/type'
+import {DomNode, Mapping, ValueOf} from 'clientnode/type'
 import React, {
     Component,
     createRef,
@@ -33,6 +31,8 @@ import React, {
     Suspense,
     SyntheticEvent
 } from 'react'
+import {ReactAce as CodeEditorType} from 'react-ace'
+import {Settings as TinyMCEOptions} from 'tinymce'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
@@ -50,17 +50,31 @@ import '@rmwc/textfield/styles'
 import '@rmwc/theme/styles'
 import '@rmwc/tooltip/styles'
 
-import '../material-fixes'
-import {Model, ModelState, Output, Properties, State} from '../type'
+import PropertyTypes, {
+    any,
+    arrayOf,
+    boolean,
+    func,
+    number,
+    object,
+    objectOf,
+    oneOfType,
+    shape,
+    string
+} from '../property-types'
+import styles from '../material-fixes'
+import {
+    Model, ModelState, Output, Properties, ReactWebComponent, State
+} from '../type'
 // endregion
-// region code-editor
+// region code-editor configuration
 const CodeEditor = lazy(async ():Promise<CodeEditorType> => {
     const {config} = await import('ace-builds')
     config.set('basePath', '/node_modules/ace-builds/src-noconflict/')
     return await import('react-ace')
 })
 // endregion
-// region rich-text-editor
+// region rich-text-editor configuration
 const tinymceBasePath:string = '/node_modules/tinymce/'
 const tinymceScriptPath:string = `${tinymceBasePath}tinymce.min.js`
 export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
@@ -99,109 +113,69 @@ export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
     /* eslint-enable camelcase */
 }
 // endregion
-// region prop-types
-/*
-    NOTE: Using an imported "Props" type (which consists of a "Partial"
-    modifier) is not yet working with "babel-plugin-typescript-to-proptypes".
-*/
-export type Props<Type = any> = {
-    // BaseModel
-    declaration?:string;
-    // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
-    // default?:Type;
-    default?:any;
-    description?:string;
-    // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
-    // editor?:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext('normal')'|'richtext(advanced)';
-    editor?:string;
-    editorIsActive?:boolean;
-    emptyEqualsNull?:boolean;
-    maximum?:number;
-    maximumLength?:number;
-    minimum?:number;
-    minimumLength?:number;
-    mutable?:boolean;
-    name?:string;
-    nullable?:boolean;
-    regularExpressionPattern?:string;
-    // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
-    // selection?:Array<number|string>|Mapping<any>;
-    selection?:any;
-    trim?:boolean;
-    type?:'date'|'datetime-local'|'month'|'number'|'range'|'string'|'time'|'week';
-    // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
-    // value?:null|Type;
-    value?:any;
-
-    // ModelState
-    dirty?:boolean;
-    focused?:boolean;
-    invalid?:boolean;
-    invalidMaximum?:boolean;
-    invalidMaximumLength?:boolean;
-    invalidMinimum?:boolean;
-    invalidMinimumLength?:boolean;
-    invalidPattern?:boolean;
-    invalidRequired?:boolean;
-    pristine?:boolean;
-    touched?:boolean;
-    untouched?:boolean;
-    valid?:boolean;
-    visited?:boolean;
-
-    // Properties
-    align?:'end'|'start';
+// region property type helper
+const modelStatePropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
+    dirty: boolean,
+    focused: boolean,
+    invalid: boolean,
+    invalidMaximum: boolean,
+    invalidMaximumLength: boolean,
+    invalidMinimum: boolean,
+    invalidMinimumLength: boolean,
+    invalidPattern: boolean,
+    invalidRequired: boolean,
+    pristine: boolean,
+    touched: boolean,
+    untouched: boolean,
+    valid: boolean,
+    visited: boolean
+}
+const baseModelPropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
+    declaration: string,
+    default: any,
+    description: string,
     /*
-        NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
-        cursor?:{
-            end:number;
-            start:number;
-        };
+        NOTE: Not yet working:
+        editor: oneOf([
+            'code',
+            'code(css)',
+            'code(script)',
+            'plain',
+            'text',
+            'richtext(raw)',
+            'richtext(simple)',
+            'richtext(normal)',
+            'richtext(advanced)'
+        ]),
     */
-    cursor?:any;
-    disabled?:boolean;
-    fullWidth?:boolean;
+    editor: string,
+    emtyEqualsNull: boolean,
+    maximum: number,
+    maximumLength: number,
+    minimum: number,
+    minimumLength: number,
+    name: string,
+    regularExpressionPattern: string,
+    selection: oneOfType([
+        arrayOf(oneOfType([number, string])),
+        objectOf(oneOfType([number, string]))
+    ]),
+    trim: boolean,
     /*
-        NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
-        icon?:string|(IconOptions & {tooltip?:string|TooltipProps});
+        NOTE: Not yet working:
+        type: oneOf([
+            'date',
+            'datetime-local',
+            'month',
+            'number',
+            'range',
+            'string',
+            'time',
+            'week'
+        ])
     */
-    icon?:any;
-    hidden?:boolean;
-    maximumLengthText?:string;
-    maximumText?:string;
-    minimumLengthText?:string;
-    minimumText?:string;
-    // NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
-    // model?:Model<Type>;
-    model:any;
-    onBlur?:(event:SyntheticEvent) => void;
-    onChange?:(value:Properties<Type>, event?:SyntheticEvent) => void;
-    onChangeEditorIsActive?:(isActive:boolean, event?:MouseEvent) => void;
-    onChangeValue?:(value:Type, event:SyntheticEvent) => void;
-    onChangeShowDeclaration?:(show:boolean, event?:MouseEvent) => void;
-    onChangeState?:(state:ModelState, event:SyntheticEvent) => void;
-    onClick?:(event:MouseEvent) => void;
-    onFocus?:(event:FocusEvent) => void;
-    onKeyUp?:(event:KeyUpEvent) => void;
-    onTouch?:(event:FocusEvent|MouseEvent) => void;
-    outlined?:boolean;
-    pattern?:string;
-    patternText?:string;
-    placeholder?:string;
-    required?:boolean;
-    requiredText?:string;
-    ripple?:boolean;
-    rows?:number;
-    selectableEditor?:boolean;
-    showDeclaration?:boolean;
-    showInitialValidationState?:boolean;
-    /*
-        NOTE: Not yet working with "babel-plugin-typescript-to-proptypes".
-        tooltip?:string|TooltipProps;
-        trailingIcon?:string|(IconOptions & {tooltip?:string|TooltipProps});
-    */
-    tooltip?:any;
-    trailingIcon?:any;
+    type: string,
+    value: any
 }
 // endregion
 /**
@@ -211,19 +185,21 @@ export type Props<Type = any> = {
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProps - Initial property configuration.
  * @property static:output - Describes external event handler interface.
+ * @property static:propTypes - Triggers reacts runtime property value checks
+ * in development mode and enables property / attribute reflection for
+ * web-component wrapper instances.
  * @property static:propertiesToReflectAsAttributes - List of properties to
  * potentially reflect as attributes (e.g. in a wrapped web-component).
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
- *
- * @property static:_name - Non minifyable component name.
  *
  * @property inputReference - Current wrapped input reference node.
  * @property properties - Current properties.
  * @property self - Back-reference to this class.
  * @property state - Current state.
  */
-export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
+export class GenericInput<Type = any> extends
+    PureComponent<Partial<Properties<Type>>> implements ReactWebComponent {
     // region static properties
     static readonly defaultModelState:ModelState = {
         dirty: false,
@@ -297,9 +273,67 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
             ['visited', true]
         ]
     )
+    static readonly propTypes:Mapping<ValueOf<PropertyTypes>> = {
+        /*
+            NOTE: Not yet working:
+            align: oneOf(['end', 'start']),
+        */
+        align: string,
+        cursor: shape({
+            end: number.isRequired,
+            start: number.isRequired
+        }),
+        disabled: boolean,
+        editorIsActive: boolean,
+        fullWidth: boolean,
+        /*
+            NOTE: Not yet working:
+            icon?:string|(IconOptions & {tooltip?:string|TooltipProps});
+        */
+        icon: oneOfType([string, object]),
+        hidden: boolean,
+        maximumLengthText: string,
+        maximumText: string,
+        minimumLengthText: string,
+        minimumText: string,
+        model: shape({
+            mutable: boolean,
+            state: shape(modelStatePropertyTypes),
+            writable: boolean,
+            ...baseModelPropertyTypes
+        }),
+        onBlur: func,
+        onChange: func,
+        onChangeEditorIsActive: func,
+        onChangeValue: func,
+        onChangeShowDeclaration: func,
+        onChangeState: func,
+        onClick: func,
+        onFocus: func,
+        onKeyUp: func,
+        onTouch: func,
+        outlined: boolean,
+        pattern: string,
+        patternText: string,
+        placeholder: string,
+        required: boolean,
+        requiredText: string,
+        ripple: boolean,
+        rows: number,
+        selectableEditor: boolean,
+        showDeclaration: boolean,
+        showInitialValidationState: boolean,
+        /*
+            NOTE: Not yet working:
+            tooltip?:string|TooltipProps;
+            trailingIcon?:string|(IconOptions & {tooltip?:string|TooltipProps});
+        */
+        tooltip: any,
+        trailingIcon: any,
+        ...modelStatePropertyTypes,
+        ...baseModelPropertyTypes
+    }
     static readonly strict:boolean = false
-
-    static readonly _name:string = 'GenericInput'
     // endregion
     // region properties
     inputReference:RefObject<HTMLInputElement> = createRef<HTMLInputElement>()
@@ -681,6 +715,12 @@ export class GenericInput<Type = any> extends PureComponent<Props<Type>> {
     getConsolidatedProperties(
         properties:Partial<Properties<Type>>
     ):Properties<Type> {
+        /*
+        if (typeof properties.focused === 'function')
+            for (const [a, b] of Object.entries(properties))
+                properties[a] = b()
+        */
+
         properties = this.mapPropertiesAndStateToModel(properties)
         const result:Properties<Type> = Tools.extend(
             {}, properties, properties.model, properties.model.state
