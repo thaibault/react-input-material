@@ -1078,9 +1078,10 @@ export class GenericInput<Type = any> extends
                     <>
                         <FormField className="mdc-text-field mdc-text-field--textarea">
                             <label>
-                                <span
-                                    className="generic-input__editor__label mdc-floating-label mdc-floating-label--float-above"
-                                >
+                                <span className={
+                                    styles['generic-input__editor__label'] +
+                                    ' mdc-floating-label mdc-floating-label--float-above'
+                                }>
                                     <Theme use={
                                         properties.invalid &&
                                         (
