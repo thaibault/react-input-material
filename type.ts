@@ -16,13 +16,10 @@
     endregion
 */
 // region imports
-import PropertyTypes from 'clientnode/property-types'
-import {Mapping, ValueOf} from 'clientnode/type'
+import {Mapping} from 'clientnode/type'
 import {
     Component, FocusEvent, KeyUpEvent, MouseEvent, SyntheticEvent
 } from 'react'
-
-import {ReactWeb} from './web/ReactWeb'
 // endregion
 // region exports
 export type ModelState = {
@@ -117,16 +114,6 @@ export type State<Type = any> = {
     model:ModelState;
     showDeclaration:boolean;
     value:null|Type;
-}
-export type WebComponentAPI = {
-    component:ReactWeb;
-    register:(tagName:string) => void;
-}
-export interface ReactWebComponent extends Component {
-    static readonly output?:Output;
-    static readonly propertiesToReflectAsAttributes?:Mapping<boolean>;
-    static readonly propertyTypes?:Mapping<ValueOf<PropertyTypes>>;
-    static readonly propTypes?:Mapping<ValueOf<PropertyTypes>>;
 }
 // endregion
 // region vim modline

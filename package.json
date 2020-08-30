@@ -94,6 +94,7 @@
     "stylelint": "*",
     "stylelint-config-standard": "*",
     "tinymce": "^5.0.0",
+    "web-component-wrapper": "*",
     "weboptimizer": "*",
     "webpack": "*",
     "webpack-cli": "*",

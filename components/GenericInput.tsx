@@ -45,6 +45,7 @@ import React, {
 } from 'react'
 import {ReactAce as CodeEditorType} from 'react-ace'
 import {Settings as TinyMCEOptions} from 'tinymce'
+import {Output, ReactWebComponent} from 'web-component-wrapper/type'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
@@ -63,9 +64,7 @@ import '@rmwc/theme/styles'
 import '@rmwc/tooltip/styles'
 
 import '../material-fixes'
-import {
-    Model, ModelState, Output, Properties, ReactWebComponent, State
-} from '../type'
+import {Model, ModelState, Properties, State} from '../type'
 import styles from './GenericInput.module'
 // endregion
 // region code-editor configuration
