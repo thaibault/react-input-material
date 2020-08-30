@@ -50,6 +50,7 @@ import '@rmwc/textfield/styles'
 import '@rmwc/theme/styles'
 import '@rmwc/tooltip/styles'
 
+import '../material-fixes'
 import PropertyTypes, {
     any,
     arrayOf,
@@ -62,10 +63,10 @@ import PropertyTypes, {
     shape,
     string
 } from '../property-types'
-import styles from '../material-fixes.module'
 import {
     Model, ModelState, Output, Properties, ReactWebComponent, State
 } from '../type'
+import styles from './GenericInput.module'
 // endregion
 // region code-editor configuration
 const CodeEditor = lazy(async ():Promise<CodeEditorType> => {
@@ -1055,7 +1056,6 @@ export class GenericInput<Type = any> extends
                 'formatselect | searchreplace visualblocks fullscreen code'
         // endregion
 
-        console.log('TODO', styles)
         return this.wrapStrict(this.wrapTooltip(
             properties.tooltip,
             (
@@ -1076,11 +1076,14 @@ export class GenericInput<Type = any> extends
                     )
                 ) ?
                     <>
-                        <FormField className="mdc-text-field mdc-text-field--textarea">
+                        <FormField
+                            className="mdc-text-field mdc-text-field--textarea"
+                        >
                             <label>
                                 <span className={
                                     styles['generic-input__editor__label'] +
-                                    ' mdc-floating-label mdc-floating-label--float-above'
+                                    ' mdc-floating-label' +
+                                    ' mdc-floating-label--float-above'
                                 }>
                                     <Theme use={
                                         properties.invalid &&
@@ -1089,7 +1092,10 @@ export class GenericInput<Type = any> extends
                                             properties.visited
                                         ) ? 'error' : null
                                     }>
-                                        {properties.description || properties.name}{properties.required ? '*' : ''}
+                                        {
+                                            properties.description ||
+                                            properties.name
+                                        }{properties.required ? '*' : ''}
                                     </Theme>
                                 </span>
                                 {

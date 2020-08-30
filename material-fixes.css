@@ -35,10 +35,6 @@ generic-input {
             padding-left: 0;
             padding-right: 0;
         }
-
-        & .generic-input__editor__label {
-            top: 9px;
-        }
     }
 }
 /* region vim modline
