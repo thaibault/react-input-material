@@ -18,6 +18,18 @@
 */
 // region imports
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
+import PropertyTypes, {
+    any,
+    arrayOf,
+    boolean,
+    func,
+    number,
+    object,
+    objectOf,
+    oneOfType,
+    shape,
+    string
+} from 'clientnode/property-types'
 import {DomNode, Mapping, ValueOf} from 'clientnode/type'
 import React, {
     Component,
@@ -51,18 +63,6 @@ import '@rmwc/theme/styles'
 import '@rmwc/tooltip/styles'
 
 import '../material-fixes'
-import PropertyTypes, {
-    any,
-    arrayOf,
-    boolean,
-    func,
-    number,
-    object,
-    objectOf,
-    oneOfType,
-    shape,
-    string
-} from '../property-types'
 import {
     Model, ModelState, Output, Properties, ReactWebComponent, State
 } from '../type'

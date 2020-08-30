@@ -16,12 +16,12 @@
     endregion
 */
 // region imports
+import PropertyTypes from 'clientnode/property-types'
 import {Mapping, ValueOf} from 'clientnode/type'
 import {
     Component, FocusEvent, KeyUpEvent, MouseEvent, SyntheticEvent
 } from 'react'
 
-import PropertyTypes from './property-types'
 import {ReactWeb} from './web/ReactWeb'
 // endregion
 // region exports
