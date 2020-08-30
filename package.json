@@ -20,7 +20,10 @@
     "form-field"
   ],
   "files": [
+    "components",
+    "index.compiled.css",
     "index.tsx",
+    "material-fixes.css",
     "type.ts"
   ],
   "main": "index.js",
