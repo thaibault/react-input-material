@@ -2,7 +2,7 @@
   "name": "react-input-material",
   "version": "0.0.5",
   "license": "CC-BY-3.0",
-  "description": "Reusable material design based input field with spport for (richt-)text, code, selections, numbers, dates and so on.",
+  "description": "Reusable material design based input field with support for (richt-)text, code, selections, numbers, dates and so on.",
   "homepage": "https://torben.website/react-input-material",
   "documentationWebsite": {
     "languages": [
@@ -133,12 +133,14 @@
       "cascadingStyleSheet": {
         "exclude": "false"
       },
+
       "optimizer": {
         "babelMinify": {
           "#": "To provide a logging output we need to exclude this feature.",
           "__evaluate__": "self.debug ? {bundle: null, module: null} : {bundle: {transform: {removeConsole: false}}, module: {removeConsole: false}}"
         }
       },
+
       "preprocessor": {
         "javaScript": {
           "options": {
