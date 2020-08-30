@@ -12748,6 +12748,11 @@ wbuf@^1.1.0, wbuf@^1.7.3:
   dependencies:
     minimalistic-assert "^1.0.0"
 
+web-component-wrapper@*:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.3.tgz#7155192cf5d124c26c56f2821971b5b19d50093d"
+  integrity sha512-cRHkrZaVi1sPXJ8iF6LOSV4t9RU/Zt3v/6NRKiqiX1kFJhyTxahPP9IupYkuZttBU0VnPLIbbSq4bkMY9S48xA==
+
 webidl-conversions@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-5.0.0.tgz#ae59c8a00b121543a2acc65c0434f57b0fc11aff"
