@@ -15,7 +15,7 @@
 */
 // region imports
 // endregion
-describe('react-material-input', () => {
+describe('react-input-material', () => {
     // region mockup
     // endregion
     // region tests

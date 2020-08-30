@@ -1,0 +1,43 @@
+/* !/usr/bin/env css
+-*- coding: utf-8 -*- */
+/* region header
+Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
+
+License
+-------
+
+This library written by Torben Sickert stand under a creative commons naming
+3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
+endregion */
+generic-input {
+    & label, & .mdc-form-field {
+        width: 100%;
+
+        &.mdc-text-field--textarea {
+            width: 100%;
+        }
+    }
+
+    & .mdc-icon-button {
+        font-size: 1rem;
+        height: 30px;
+        padding: 6px;
+        vertical-align: middle;
+        width: 30px;
+    }
+
+    & .mdc-select-helper-text {
+        color: rgba(0, 0, 0, 0.6);
+    }
+
+    & .mdc-text-field {
+        &+ .mdc-text-field-helper-line {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+}
+/* region vim modline
+vim: set tabstop=4 shiftwidth=4 expandtab:
+vim: foldmethod=marker foldmarker=region,endregion:
+endregion */
