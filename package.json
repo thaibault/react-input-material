@@ -135,7 +135,12 @@
     },
     "module": {
       "cascadingStyleSheet": {
-        "exclude": "false"
+        "exclude": "false",
+        "options": {
+          "modules": {
+            "localIdentName": "[local]"
+          }
+        }
       },
       "optimizer": {
         "babelMinify": {

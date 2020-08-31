@@ -1055,7 +1055,10 @@ export class GenericInput<Type = any> extends
                 'formatselect | searchreplace visualblocks fullscreen code'
         // endregion
 
-        return this.wrapStrict(this.wrapTooltip(
+        // TODO check if mdc-classes can be retrieved
+        return <div
+            className={styles['generic-input']}
+        >{this.wrapStrict(this.wrapTooltip(
             properties.tooltip,
             (
                 properties.selection ?
@@ -1167,7 +1170,7 @@ export class GenericInput<Type = any> extends
                         {...materialProperties}
                     />
             )
-        ))
+        ))}</div>
     }
     /**/
     // endregion
