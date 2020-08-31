@@ -67,14 +67,14 @@ import '../material-fixes'
 import {Model, ModelState, Properties, State} from '../type'
 import styles from './GenericInput.module'
 // endregion
-// region code-editor configuration
+// region code editor configuration
 const CodeEditor = lazy(async ():Promise<CodeEditorType> => {
     const {config} = await import('ace-builds')
     config.set('basePath', '/node_modules/ace-builds/src-noconflict/')
     return await import('react-ace')
 })
 // endregion
-// region rich-text-editor configuration
+// region rich text editor configuration
 const tinymceBasePath:string = '/node_modules/tinymce/'
 const tinymceScriptPath:string = `${tinymceBasePath}tinymce.min.js`
 export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
@@ -87,13 +87,17 @@ export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
     // endregion
     allow_conditional_comments: false,
     allow_script_urls: false,
+    body_class: 'mdc-text-field__input',
+    branding: false,
     cache_suffix: `?version=${UTC_BUILD_TIMESTAMP}`,
+    contextmenu: false,
     convert_fonts_to_spans: true,
     document_base_url: '/',
     element_format: 'xhtml',
     entity_encoding: 'raw',
     fix_list_elements: true,
     hidden_input: false,
+    icon: 'material',
     invalid_elements: 'em',
     invalid_styles: 'color font-size line-height',
     keep_styles: false,
@@ -1039,7 +1043,11 @@ export class GenericInput<Type = any> extends
             required: properties.required
         }
 
-        const tinyMCEOptions:TinyMCEOptions = {}
+        const tinyMCEOptions:TinyMCEOptions = {
+            placeholder: properties.placeholder,
+            readonly: properties.disabled,
+            content_style: properties.disabled ? 'body {opacity: .38}' : ''
+        }
         if (properties.editor.endsWith('raw)')) {
             tinyMCEOptions.toolbar1 =
                 'cut copy paste | undo redo removeformat | code | fullscreen'
@@ -1079,7 +1087,14 @@ export class GenericInput<Type = any> extends
                 ) ?
                     <>
                         <FormField
-                            className="mdc-text-field mdc-text-field--textarea"
+                            className={
+                                'mdc-text-field' +
+                                (properties.disabled ?
+                                    ' mdc-text-field--disabled' :
+                                    ''
+                                ) +
+                                ' mdc-text-field--textarea'
+                            }
                         >
                             <label>
                                 <span className={
@@ -1104,6 +1119,7 @@ export class GenericInput<Type = any> extends
                                     properties.editor.startsWith('code') ?
                                         <Suspense fallback="loading...">
                                             <CodeEditor
+                                                className="mdc-text-field__input"
                                                 mode="javascript"
                                                 onChange={this.onChangeValue}
                                                 setOptions={{
@@ -1143,6 +1159,7 @@ export class GenericInput<Type = any> extends
                 :
                     <TextField
                         align={properties.align}
+                        characterCount
                         fullwidth={properties.fullWidth}
                         inputRef={this.inputReference}
                         maxLength={properties.maximumLength}

@@ -31,10 +31,15 @@ endregion */
     }
 
     & .mdc-text-field {
+        & .ace_editor.mdc-text-field__input {
+            font-family: monospace;
+        }
+
         &+ .mdc-text-field-helper-line {
             padding-left: 0;
             padding-right: 0;
         }
+
     }
 }
 /* region vim modline

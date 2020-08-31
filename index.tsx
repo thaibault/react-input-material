@@ -62,13 +62,12 @@ const Application:FunctionComponent<{}> = () => {
 
             <hr/>
 
-{/*
             <GenericInput
                 declaration="placeholder"
                 name="input4"
                 placeholder="input4"
                 required
-                trailing-icon="clear_preset"
+                trailingIcon="clear_preset"
             />
             <GenericInput
                 icon="backup"
@@ -79,7 +78,7 @@ const Application:FunctionComponent<{}> = () => {
                     value: 'value4Model'
                 }}
                 placholder="input4Model"
-                trailing-icon="clear_preset"
+                trailingIcon="clear_preset"
             />
 
             <hr/>
@@ -102,7 +101,7 @@ const Application:FunctionComponent<{}> = () => {
                 }}
                 name="input5Model"
                 placeholder="input5ModelPlaceholder"
-                trailing-icon="search"
+                trailingIcon="search"
             />
 
             <hr/>
@@ -115,7 +114,7 @@ const Application:FunctionComponent<{}> = () => {
                 pattern="a+"
                 placeholder="input6Placeholder"
                 tooltip="Please type in your password."
-                trailing-icon="password_preset"
+                trailingIcon="password_preset"
                 value="hans"
             />
             <GenericInput
@@ -127,7 +126,7 @@ const Application:FunctionComponent<{}> = () => {
                 }}
                 name="passwordInput6Model"
                 placeholder="input6ModelPlaceholder"
-                trailing-icon="password_preset"
+                trailingIcon="password_preset"
             />
 
             <hr/>
@@ -146,6 +145,7 @@ const Application:FunctionComponent<{}> = () => {
                     declaration: 'selection',
                     description: 'input7ModelDescription',
                     name: 'input7Model',
+                    mutable: false,
                     nullable: false,
                     selection: ['A', 'B', 'C'],
                     value: 'A'
@@ -178,7 +178,7 @@ const Application:FunctionComponent<{}> = () => {
                 editor="text"
                 name="input9"
                 required
-                rows="3"
+                rows={3}
                 value="a"
             />
 
@@ -191,7 +191,7 @@ const Application:FunctionComponent<{}> = () => {
                     nullable: false,
                     value: 'a'
                 }}
-                rows="2"
+                rows={2}
             />
 
             <GenericInput
@@ -200,8 +200,8 @@ const Application:FunctionComponent<{}> = () => {
                 disabled
                 editor="code"
                 name="input10"
-                rows="2"
-                selectable-editor
+                rows={2}
+                selectableEditor
                 value="const value = 2"
             />
             <GenericInput
@@ -213,19 +213,19 @@ const Application:FunctionComponent<{}> = () => {
                     nullable: false,
                     value: 'const value = 2'
                 }}
-                rows="6"
-                selectable-editor
+                rows={6}
+                selectableEditor
             />
 
             <GenericInput
                 declaration="code"
                 description="input11Description"
                 editor="code"
-                maximum-length="10"
+                maximumLength={10}
                 name="input11"
                 required
-                rows="2"
-                selectable-editor
+                rows={2}
+                selectableEditor
             />
             <GenericInput
                 model={{
@@ -235,7 +235,7 @@ const Application:FunctionComponent<{}> = () => {
                     name: 'input11Model',
                     nullable: false
                 }}
-                rows="6"
+                rows={6}
                 selectable-editor
             />
 
@@ -244,10 +244,10 @@ const Application:FunctionComponent<{}> = () => {
                 description="input12Description"
                 editor="richtext(raw)"
                 name="input12"
+                placeholder="Hello Mr. Smith,<br><br>this is a Placeholder."
                 required
-                rows="2"
-                selectable-editor
-                value="Hello Mr. Smith,<br><br>how are you?"
+                rows={2}
+                selectableEditor
             />
             <GenericInput
                 model={{
@@ -259,10 +259,10 @@ const Application:FunctionComponent<{}> = () => {
                     nullable: false,
                     value: 'Hello Mr. Smith,<br><br>how are you?'
                 }}
-                rows="6"
-                selectable-editor
+                rows={6}
+                selectableEditor
             />
-*/}
+
         </div>
 
         <pre className="outputs"></pre>
