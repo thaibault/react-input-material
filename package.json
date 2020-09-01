@@ -22,9 +22,9 @@
   "files": [
     "components",
     "GenericInput.js",
-    "index.compiled.css",
     "index.ts",
     "material-fixes.css",
+    "styles.compiled.css",
     "type.ts"
   ],
   "main": "index.js",
@@ -128,6 +128,13 @@
           "jsdom",
           "node"
         ]
+      }
+    },
+    "files": {
+      "compose": {
+        "cascadingStyleSheet": {
+          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['test:browser', 'serve'].includes(self.givenCommandLineArguments[2]) ? null : `${path.resolve(self.path.target.asset.cascadingStyleSheet, 'styles.compiled.css')}?${self.hashAlgorithm}=[hash]`"
+        }
       }
     },
     "injection": {
