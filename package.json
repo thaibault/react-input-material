@@ -21,8 +21,9 @@
   ],
   "files": [
     "components",
+    "GenericInput.js",
     "index.compiled.css",
-    "index.tsx",
+    "index.ts",
     "material-fixes.css",
     "type.ts"
   ],
@@ -132,7 +133,7 @@
     },
     "injection": {
       "entry": {
-        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? './playground' : './index'"
+        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? './playground' : {index: './index', GenericInput: './components/GenericInput'}"
       }
     },
     "module": {
