@@ -113,7 +113,6 @@
     "@rmwc/textfield": "*",
     "@rmwc/tooltip": "*",
     "@tinymce/tinymce-react": "*",
-    "ace-builds": "*",
     "clientnode": "*",
     "material-design-icons": "*",
     "react": "*",
