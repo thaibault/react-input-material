@@ -9,7 +9,7 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
-generic-input {
+.generic-input {
     & label, & .mdc-form-field {
         width: 100%;
 
@@ -31,10 +31,15 @@ generic-input {
     }
 
     & .mdc-text-field {
+        & .ace_editor.mdc-text-field__input {
+            font-family: monospace;
+        }
+
         &+ .mdc-text-field-helper-line {
             padding-left: 0;
             padding-right: 0;
         }
+
     }
 }
 /* region vim modline
