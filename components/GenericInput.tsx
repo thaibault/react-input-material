@@ -1063,6 +1063,7 @@ export class GenericInput<Type = any> extends
                 'formatselect | searchreplace visualblocks fullscreen code'
         // endregion
 
+        console.log('TODO', properties.cursor)
         // TODO check if mdc-classes can be retrieved
         return <div
             className={styles['generic-input']}
