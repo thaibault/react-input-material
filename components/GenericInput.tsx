@@ -866,6 +866,7 @@ export class GenericInput<Type = any> extends
      * @returns Nothing.
      */
     saveSelectionState():void {
+        console.log('get selection', this.inputReference.current)
         if (
             typeof this.inputReference.current?.selectionEnd === 'number' &&
             typeof this.inputReference.current?.selectionStart === 'number'
@@ -1142,6 +1143,7 @@ export class GenericInput<Type = any> extends
                                                 ...tinyMCEOptions
                                             }}
                                             onEditorChange={this.onChangeValue}
+                                            ref={this.inputReference}
                                             textareaName={this.properties.name}
                                             tinymceScriptSrc={tinymceScriptPath}
                                             {...genericProperties}
