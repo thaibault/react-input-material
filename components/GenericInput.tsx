@@ -197,8 +197,10 @@ const baseModelPropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
  *
+ * @property codeEditorReference - Current code editor component reference.
  * @property inputReference - Current wrapped input reference node.
  * @property properties - Current properties.
+ * @property richTextEditorReference - Current rich text component reference.
  * @property self - Back-reference to this class.
  * @property state - Current state.
  */
@@ -340,8 +342,10 @@ export class GenericInput<Type = any> extends
     static readonly strict:boolean = false
     // endregion
     // region properties
+    codeEditorReference?:CodeEditor
     inputReference:RefObject<HTMLInputElement> = createRef<HTMLInputElement>()
     properties:Properties<Type>
+    richTextEditorReference?:RichTextEditor
     self:typeof GenericInput = GenericInput
     state:State<Type> = {
         cursor: {
@@ -440,6 +444,41 @@ export class GenericInput<Type = any> extends
      */
     onChangeEditorIsActive = (event?:MouseEvent):void => {
         this.properties.editorIsActive = !this.properties.editorIsActive
+
+        const selection = {
+            end: this.properties.cursor.end,
+            start: this.properties.cursor.start
+        }
+        // TODO may should be in an effect or live-cycle hook.
+        // TODO nested editor may not loaded yet.
+        setTimeout(():void => {
+            if (this.properties.editorIsActive) {
+                if (this.codeEditorReference?.editor?.selection) {
+                    this.codeEditorReference.editor.textInput.focus()
+                    // TODO
+                } else if (this.richTextEditorReference?.editor?.selection) {
+                    this.richTextEditorReference.editor.focus()
+                    /*
+                        const range = this.richTextEditorReference.editor.selection.getRng()
+                        range.setEnd(this.inputReference.current, selection.end)
+                        range.setStart(this.inputReference.current, selection.start)
+                        this.richTextEditorReference.editor.selection.setRng(range)
+                    */
+                }
+            } else if (this.inputReference.current) {
+                this.inputReference.current.focus()
+                // TODO code should not calculate offset from tags!
+                this.inputReference.current.setSelectionRange(
+                    this.determineSymbolOffset(
+                        selection.start, this.properties.editorIsActive
+                    ),
+                    this.determineSymbolOffset(
+                        selection.end, this.properties.editorIsActive
+                    )
+                )
+            }
+        })
+
         this.setState(({editorIsActive}):Partial<State<Type>> => (
             {editorIsActive: !editorIsActive}
         ))
@@ -626,6 +665,27 @@ export class GenericInput<Type = any> extends
                     (this.properties.hidden ? 'Show' : 'Hide') + ' password'
             }
         return options
+    }
+    /**
+     * Determines cursor offset depending on prior hidden html tags.
+     * @param offset - Last known position.
+     * @param removeTags - Indicates whether tag content should be subtracted.
+     * @returns New determine offset.
+     */
+    determineSymbolOffset(offset:number, removeTags:boolean = true):number {
+        let beeingInTag:boolean = false
+        for (let index:number = 0; index < offset; index += 1) {
+            if (this.properties.value.charAt(index) === '<')
+                beeingInTag = true
+            if (beeingInTag)
+                if (removeTags)
+                    offset -= 1
+                else
+                    offset += 1
+            if (this.properties.value.charAt(index) === '>')
+                beeingInTag = false
+        }
+        return offset
     }
     /**
      * Derives current validation state from given value.
@@ -866,8 +926,36 @@ export class GenericInput<Type = any> extends
      * @returns Nothing.
      */
     saveSelectionState():void {
-        console.log('get selection', this.inputReference.current)
+        /*
+            NOTE: Known issues is that we do not get the absolute positions but
+            the one in current selected node.
+        */
+        console.log(this.codeEditorReference?.editor?.selection?.cursor.column)
         if (
+            this.codeEditorReference?.editor?.selection?.cursor &&
+            typeof this.codeEditorReference.editor.selection.cursor.column === 'number'
+            // TODO handle selection end
+        )
+            this.setState({
+                cursor: {
+                    end: this.codeEditorReference.editor.selection.cursor.column,
+                    start: this.codeEditorReference.editor.selection.cursor.column
+                }
+            })
+        else if (
+            this.richTextEditorReference?.editor?.selection &&
+            typeof this.richTextEditorReference.editor.selection.getRng().endOffset === 'number' &&
+            typeof this.richTextEditorReference.editor.selection.getRng().startOffset === 'number'
+        )
+            this.setState({
+                cursor: {
+                    end: this.richTextEditorReference.editor.selection.getRng()
+                        .endOffset,
+                    start: this.richTextEditorReference.editor.selection
+                        .getRng().startOffset
+                }
+            })
+        else if (
             typeof this.inputReference.current?.selectionEnd === 'number' &&
             typeof this.inputReference.current?.selectionStart === 'number'
         )
@@ -877,6 +965,28 @@ export class GenericInput<Type = any> extends
                     start: this.inputReference.current?.selectionStart
                 }
             })
+    }
+    /**
+     * Set code editor references.
+     * @param instance - Code editor instance.
+     * @returns Nothing.
+     */
+    setCodeEditorReference = (instance?:CodeEditor):void => {
+        if (instance?.editor?.container?.querySelector('textarea'))
+            this.inputReference = {
+                current: instance.editor.container.querySelector('textarea')
+            }
+        this.codeEditorReference = instance
+    }
+    /**
+     * Set rich text editor references.
+     * @param instance - Editor instance.
+     * @returns Nothing.
+     */
+    setRichTextEditorReference = (instance?:RichTextEditor):void => {
+        if (instance?.elementRef)
+            this.inputReference = instance.elementRef
+        this.richTextEditorReference = instance
     }
     /**
      * Applies configured value transformations.
@@ -1064,7 +1174,6 @@ export class GenericInput<Type = any> extends
                 'formatselect | searchreplace visualblocks fullscreen code'
         // endregion
 
-        console.log('TODO', properties.cursor)
         // TODO check if mdc-classes can be retrieved
         return <div
             className={styles['generic-input']}
@@ -1124,6 +1233,7 @@ export class GenericInput<Type = any> extends
                                                 className="mdc-text-field__input"
                                                 mode="javascript"
                                                 onChange={this.onChangeValue}
+                                                ref={this.setCodeEditorReference}
                                                 setOptions={{
                                                     maxLines: properties.rows,
                                                     minLines: properties.rows,
@@ -1143,7 +1253,7 @@ export class GenericInput<Type = any> extends
                                                 ...tinyMCEOptions
                                             }}
                                             onEditorChange={this.onChangeValue}
-                                            ref={this.inputReference}
+                                            ref={this.setRichTextEditorReference}
                                             textareaName={this.properties.name}
                                             tinymceScriptSrc={tinymceScriptPath}
                                             {...genericProperties}
