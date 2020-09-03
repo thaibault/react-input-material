@@ -317,6 +317,7 @@ export class GenericInput<Type = any> extends
         onClick: func,
         onFocus: func,
         onKeyUp: func,
+        onSelectionChange: func,
         onTouch: func,
         outlined: boolean,
         pattern: string,
@@ -355,11 +356,49 @@ export class GenericInput<Type = any> extends
         editorIsActive: false,
         hidden: undefined,
         model: GenericInput.defaultModelState,
+        selectionIsUnstable: false,
         showDeclaration: false,
         value: null
     }
     // endregion
     // region live-cycle
+    /**
+     * Is triggered immediate after a re-rendering. Re-stores cursor selection
+     * state if editor has been switched.
+     * @returns Nothing.
+     */
+    componentDidUpdate():void {
+        if (this.state.selectionIsUnstable) {
+            if (this.state.editorIsActive) {
+                if (this.codeEditorReference?.editor?.selection) {
+                    this.codeEditorReference.editor.textInput.focus()
+                    const range =
+                        this.codeEditorReference.editor.selection.getRange()
+                    const endPosition =
+                        this.determineTablePosition(this.state.cursor.end)
+                    range.setEnd(endPosition.row, endPosition.column)
+                    const startPosition =
+                        this.determineTablePosition(this.state.cursor.start)
+                    range.setStart(startPosition.row, startPosition.column)
+                    this.codeEditorReference.editor.selection.setRange(range)
+                } else if (this.richTextEditorReference?.editor?.selection) {
+                    this.richTextEditorReference.editor.focus()
+                    /*
+                        const range = this.richTextEditorReference.editor.selection.getRng()
+                        range.setEnd(this.inputReference.current, this.state.cursor.end)
+                        range.setStart(this.inputReference.current, this.state.cursor.start)
+                        this.richTextEditorReference.editor.selection.setRng(range)
+                    */
+                }
+            } else if (this.inputReference.current) {
+                this.inputReference.current.focus()
+                this.inputReference.current.setSelectionRange(
+                    this.state.cursor.start, this.state.cursor.end
+                )
+            }
+            this.setState({selectionIsUnstable: false})
+        }
+    }
     /**
      * Updates state depending on given properties.
      * @param properties - Properties to derive into state.
@@ -444,43 +483,8 @@ export class GenericInput<Type = any> extends
      */
     onChangeEditorIsActive = (event?:MouseEvent):void => {
         this.properties.editorIsActive = !this.properties.editorIsActive
-
-        const selection = {
-            end: this.properties.cursor.end,
-            start: this.properties.cursor.start
-        }
-        // TODO may should be in an effect or live-cycle hook.
-        // TODO nested editor may not loaded yet.
-        setTimeout(():void => {
-            if (this.properties.editorIsActive) {
-                if (this.codeEditorReference?.editor?.selection) {
-                    this.codeEditorReference.editor.textInput.focus()
-                    // TODO
-                } else if (this.richTextEditorReference?.editor?.selection) {
-                    this.richTextEditorReference.editor.focus()
-                    /*
-                        const range = this.richTextEditorReference.editor.selection.getRng()
-                        range.setEnd(this.inputReference.current, selection.end)
-                        range.setStart(this.inputReference.current, selection.start)
-                        this.richTextEditorReference.editor.selection.setRng(range)
-                    */
-                }
-            } else if (this.inputReference.current) {
-                this.inputReference.current.focus()
-                // TODO code should not calculate offset from tags!
-                this.inputReference.current.setSelectionRange(
-                    this.determineSymbolOffset(
-                        selection.start, this.properties.editorIsActive
-                    ),
-                    this.determineSymbolOffset(
-                        selection.end, this.properties.editorIsActive
-                    )
-                )
-            }
-        })
-
         this.setState(({editorIsActive}):Partial<State<Type>> => (
-            {editorIsActive: !editorIsActive}
+            {editorIsActive: !editorIsActive, selectionIsUnstable: true}
         ))
 
         if (this.properties.onChangeEditorIsActive)
@@ -577,7 +581,7 @@ export class GenericInput<Type = any> extends
      * @returns Nothing.
      */
     onClick = (event:MouseEvent):void => {
-        this.saveSelectionState()
+        this.onSelectionChange()
         if (this.properties.onClick)
             this.properties.onClick(event)
         this.onTouch(event)
@@ -588,7 +592,6 @@ export class GenericInput<Type = any> extends
      * @returns Nothing.
      */
     onFocus = (event:FocusEvent):void => {
-        this.saveSelectionState()
         if (this.properties.onFocus)
             this.properties.onFocus(event)
         this.onTouch(event)
@@ -599,9 +602,19 @@ export class GenericInput<Type = any> extends
      * @returns Nothing.
      */
     onKeyUp = (event:KeyUpEvent):void => {
-        this.saveSelectionState()
+        this.onSelectionChange()
         if (this.properties.onKeyUp)
             this.properties.onKeyUp(event)
+    }
+    /**
+     * Triggered on selection change events.
+     * @param event - Event which triggered selection change.
+     * @returns Nothing.
+     */
+    onSelectionChange = (event:SyntheticEvent):void => {
+        this.saveSelectionState()
+        if (this.properties.onSelectionChange)
+            this.properties.onSelectionChange(event)
     }
     /**
      * Triggers on start interacting with the input.
@@ -667,22 +680,65 @@ export class GenericInput<Type = any> extends
         return options
     }
     /**
+     * Converts absolute range into table oriented position.
+     * @param offset - Absolute position.
+     * @returns Position.
+     */
+    determineTablePosition(offset:number):{column:number;row:number} {
+        const result = {column: 0, row: 0}
+        if (this.state.value)
+            for (const line of this.state.value.split('\n')) {
+                if (line.length < offset)
+                    offset -= 1 + line.length
+                else {
+                    result.column = offset
+                    break
+                }
+                result.row += 1
+            }
+        return result
+    }
+    /**
+     * Determines absolute range from table oriented position.
+     * @param column - Symbol offset in given row.
+     * @param row - Offset row.
+     * @returns Determined offset.
+     */
+    determineAbsoluteSymbolOffsetFromTable(
+        column:number, row:number
+    ):number {
+        if (!this.state.value)
+            return 0
+        if (row > 0)
+            return column + this.state.value
+                .split('\n')
+                .slice(0, row)
+                .map((line:string):number => 1 + line.length)
+                .reduce((sum:number, value:number):number => sum + value)
+        return column
+    }
+    /**
      * Determines cursor offset depending on prior hidden html tags.
      * @param offset - Last known position.
-     * @param removeTags - Indicates whether tag content should be subtracted.
+     * @param skipTags - Indicates whether tag content should be subtracted.
      * @returns New determine offset.
      */
-    determineSymbolOffset(offset:number, removeTags:boolean = true):number {
+    determineAbsoluteSymbolOffsetFromHTML(
+        offset:number, skipTags:boolean = false
+    ):number {
+        if (!this.state.value)
+            return 0
+        // TODO Consider html around better
         let beeingInTag:boolean = false
         for (let index:number = 0; index < offset; index += 1) {
-            if (this.properties.value.charAt(index) === '<')
+            if (this.state.value.charAt(index) === '<')
                 beeingInTag = true
             if (beeingInTag)
-                if (removeTags)
+                if (skipTags)
                     offset -= 1
                 else
                     offset += 1
-            if (this.properties.value.charAt(index) === '>')
+            if (this.state.value.charAt(index) === '>')
                 beeingInTag = false
         }
         return offset
@@ -930,40 +986,48 @@ export class GenericInput<Type = any> extends
             NOTE: Known issues is that we do not get the absolute positions but
             the one in current selected node.
         */
-        console.log(this.codeEditorReference?.editor?.selection?.cursor.column)
-        if (
-            this.codeEditorReference?.editor?.selection?.cursor &&
-            typeof this.codeEditorReference.editor.selection.cursor.column === 'number'
-            // TODO handle selection end
-        )
+        const codeEditorRange =
+            this.codeEditorReference?.editor?.selection?.getRange()
+        const richTextEditorRange =
+            this.richTextEditorReference?.editor?.selection?.getRng()
+        const selectionEnd = this.inputReference.current?.selectionEnd
+        const selectionStart = this.inputReference.current?.selectionStart
+        if (codeEditorRange)
             this.setState({
                 cursor: {
-                    end: this.codeEditorReference.editor.selection.cursor.column,
-                    start: this.codeEditorReference.editor.selection.cursor.column
+                    end: this.determineAbsoluteSymbolOffsetFromTable(
+                        codeEditorRange.end.column,
+                        typeof codeEditorRange.end.row === 'number' ?
+                            codeEditorRange.end.row :
+                            (this.properties.value?.split('\n').length - 1) ||
+                                0
+                    ),
+                    start: this.determineAbsoluteSymbolOffsetFromTable(
+                        codeEditorRange.start.column,
+                        typeof codeEditorRange.start.row === 'number' ?
+                            codeEditorRange.start.row :
+                            (this.properties.value?.split('\n').length - 1) ||
+                                0
+                    )
+                }
+            })
+        else if (richTextEditorRange)
+            this.setState({
+                cursor: {
+                    end: this.determineAbsoluteSymbolOffsetFromHTML(
+                        richTextEditorRange.endOffset
+                    ),
+                    start: this.determineAbsoluteSymbolOffsetFromHTML(
+                        richTextEditorRange.startOffset
+                    )
                 }
             })
         else if (
-            this.richTextEditorReference?.editor?.selection &&
-            typeof this.richTextEditorReference.editor.selection.getRng().endOffset === 'number' &&
-            typeof this.richTextEditorReference.editor.selection.getRng().startOffset === 'number'
+            typeof selectionEnd === 'number' &&
+            typeof selectionStart === 'number'
         )
             this.setState({
-                cursor: {
-                    end: this.richTextEditorReference.editor.selection.getRng()
-                        .endOffset,
-                    start: this.richTextEditorReference.editor.selection
-                        .getRng().startOffset
-                }
-            })
-        else if (
-            typeof this.inputReference.current?.selectionEnd === 'number' &&
-            typeof this.inputReference.current?.selectionStart === 'number'
-        )
-            this.setState({
-                cursor: {
-                    end: this.inputReference.current?.selectionEnd,
-                    start: this.inputReference.current?.selectionStart
-                }
+                cursor: {end: selectionEnd, start: selectionStart}
             })
     }
     /**
@@ -1071,9 +1135,7 @@ export class GenericInput<Type = any> extends
         const genericProperties:Partial<HTMLInputElement> = {
             name: properties.name,
             onBlur: this.onBlur,
-            onClick: this.onClick,
             onFocus: this.onFocus,
-            onKeyUp: this.onKeyUp,
             placeholder: properties.placeholder,
             value: properties.value || ''
         }
@@ -1150,6 +1212,8 @@ export class GenericInput<Type = any> extends
             invalid:
                 properties.showInitialValidationState && properties.invalid,
             label: properties.description || properties.name,
+            onClick: this.onClick,
+            onKeyUp: this.onKeyUp,
             outlined: properties.outlined,
             required: properties.required
         }
@@ -1233,6 +1297,8 @@ export class GenericInput<Type = any> extends
                                                 className="mdc-text-field__input"
                                                 mode="javascript"
                                                 onChange={this.onChangeValue}
+                                                onCursorChange={this.onSelectionChange}
+                                                onSelectionChange={this.onSelectionChange}
                                                 ref={this.setCodeEditorReference}
                                                 setOptions={{
                                                     maxLines: properties.rows,
@@ -1252,7 +1318,9 @@ export class GenericInput<Type = any> extends
                                                 ...TINYMCE_DEFAULT_OPTIONS,
                                                 ...tinyMCEOptions
                                             }}
+                                            onClick={this.onClick}
                                             onEditorChange={this.onChangeValue}
+                                            onKeyUp={this.onKeyUp}
                                             ref={this.setRichTextEditorReference}
                                             textareaName={this.properties.name}
                                             tinymceScriptSrc={tinymceScriptPath}
