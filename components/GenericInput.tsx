@@ -1011,7 +1011,21 @@ export class GenericInput<Type = any> extends
                     )
                 }
             })
-        else if (richTextEditorRange)
+        else if (richTextEditorRange) {
+
+const ed = this.richTextEditorReference.editor
+ed.execCommand('mceInsertContent', false,'<span class="marker">TEST</span>')
+var rng = ed.selection.getRng(1)
+var rng2 = rng.cloneRange()
+rng2.setStartBefore(ed.getBody().querySelector('p'))
+rng2.setEndBefore(ed.getBody().querySelector('span.marker'))
+ed.selection.setRng(rng2)
+var content = ed.selection.getContent({format: 'text'})
+ed.getBody().querySelector('span.marker').remove()
+ed.selection.setRng(rng)
+
+            console.log(richTextEditorRange.startOffset, content.length, content)
+
             this.setState({
                 cursor: {
                     end: this.determineAbsoluteSymbolOffsetFromHTML(
@@ -1022,7 +1036,7 @@ export class GenericInput<Type = any> extends
                     )
                 }
             })
-        else if (
+        } else if (
             typeof selectionEnd === 'number' &&
             typeof selectionStart === 'number'
         )
