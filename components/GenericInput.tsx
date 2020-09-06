@@ -381,15 +381,14 @@ export class GenericInput<Type = any> extends
                         this.determineTablePosition(this.state.cursor.start)
                     range.setStart(startPosition.row, startPosition.column)
                     this.codeEditorReference.editor.selection.setRange(range)
-                } else if (this.richTextEditorReference?.editor?.selection) {
-                    this.richTextEditorReference.editor.focus()
-                    /*
-                        const range = this.richTextEditorReference.editor.selection.getRng()
-                        range.setEnd(this.inputReference.current, this.state.cursor.end)
-                        range.setStart(this.inputReference.current, this.state.cursor.start)
-                        this.richTextEditorReference.editor.selection.setRng(range)
-                    */
                 }
+                /*
+                    else if (this.richTextEditorReference?.editor?.selection)
+
+                    NOTE: Could not be set here since we have to wait for
+                    tinymce to be finally loaded ("init" event) to set
+                    focus and selections.
+                */
             } else if (this.inputReference.current) {
                 this.inputReference.current.focus()
                 this.inputReference.current.setSelectionRange(
@@ -709,6 +708,7 @@ export class GenericInput<Type = any> extends
     ):number {
         if (!this.state.value)
             return 0
+
         if (row > 0)
             return column + this.state.value
                 .split('\n')
@@ -718,30 +718,39 @@ export class GenericInput<Type = any> extends
         return column
     }
     /**
-     * Determines cursor offset depending on prior hidden html tags.
-     * @param offset - Last known position.
-     * @param skipTags - Indicates whether tag content should be subtracted.
-     * @returns New determine offset.
+     * Determines absolute offset in given markup.
+     * @param contentDomNode - Wrapping dom node where all content is
+     * contained.
+     * @param domNode - Dom node which contains given position.
+     * @param offset - Relative position within given node.
+     * @returns Determine absolute offset.
      */
     determineAbsoluteSymbolOffsetFromHTML(
-        offset:number, skipTags:boolean = false
+        contentDomNode:Element, domNode:Element, offset:number
     ):number {
         if (!this.state.value)
             return 0
-        // TODO Consider html around better
-        let beeingInTag:boolean = false
-        for (let index:number = 0; index < offset; index += 1) {
-            if (this.state.value.charAt(index) === '<')
-                beeingInTag = true
-            if (beeingInTag)
-                if (skipTags)
-                    offset -= 1
-                else
-                    offset += 1
-            if (this.state.value.charAt(index) === '>')
-                beeingInTag = false
-        }
-        return offset
+
+        const indicatorKey:string = 'generic-input-selection-indicator'
+        const indicatorValue:string = '###'
+        const indicator:string = ` ${indicatorKey}="${indicatorValue}"`
+
+        domNode.setAttribute(indicatorKey, indicatorValue)
+        // NOTE: TinyMCE seems to add a newline after each paragraph.
+        const content:string = contentDomNode.innerHTML.replace(
+            /(<\/p>)/gi, '$1\n'
+        )
+        domNode.removeAttribute(indicatorKey)
+
+        const domNodeOffset:number = content.indexOf(indicator)
+        const startIndex:number = domNodeOffset + indicator.length
+
+        return (
+            offset +
+            content.indexOf('>', startIndex) +
+            1 -
+            indicator.length
+        )
     }
     /**
      * Derives current validation state from given value.
@@ -1011,32 +1020,23 @@ export class GenericInput<Type = any> extends
                     )
                 }
             })
-        else if (richTextEditorRange) {
-
-const ed = this.richTextEditorReference.editor
-ed.execCommand('mceInsertContent', false,'<span class="marker">TEST</span>')
-var rng = ed.selection.getRng(1)
-var rng2 = rng.cloneRange()
-rng2.setStartBefore(ed.getBody().querySelector('p'))
-rng2.setEndBefore(ed.getBody().querySelector('span.marker'))
-ed.selection.setRng(rng2)
-var content = ed.selection.getContent({format: 'text'})
-ed.getBody().querySelector('span.marker').remove()
-ed.selection.setRng(rng)
-
-            console.log(richTextEditorRange.startOffset, content.length, content)
-
+        else if (richTextEditorRange)
             this.setState({
                 cursor: {
                     end: this.determineAbsoluteSymbolOffsetFromHTML(
+                        this.richTextEditorReference.editor.getBody(),
+                        this.richTextEditorReference.editor.selection.getEnd(),
                         richTextEditorRange.endOffset
                     ),
                     start: this.determineAbsoluteSymbolOffsetFromHTML(
+                        this.richTextEditorReference.editor.getBody(),
+                        this.richTextEditorReference.editor.selection
+                            .getStart(),
                         richTextEditorRange.startOffset
                     )
                 }
             })
-        } else if (
+        else if (
             typeof selectionEnd === 'number' &&
             typeof selectionStart === 'number'
         )
@@ -1233,9 +1233,47 @@ ed.selection.setRng(rng)
         }
 
         const tinyMCEOptions:TinyMCEOptions = {
+            content_style: properties.disabled ? 'body {opacity: .38}' : '',
             placeholder: properties.placeholder,
             readonly: properties.disabled,
-            content_style: properties.disabled ? 'body {opacity: .38}' : ''
+            setup: (editor:RichTextEditor):void => editor.on('init', ():void => {
+                // TODO not stable!
+                editor.focus()
+                const value:string = genericProperties.value
+
+                const relativeEnd:number = (
+                    properties.cursor.end -
+                    value.lastIndexOf('>', properties.cursor.end) -
+                    1
+                )
+                const relativeStart:number = (
+                    properties.cursor.start -
+                    value.lastIndexOf('>', properties.cursor.start) -
+                    1
+                )
+
+                const indicator:string = '<span generic-input-selection-indicator="###"></span>'
+                editor.getBody().innerHTML = (
+                    value.substring(0, properties.cursor.start) +
+                    indicator +
+                    value.substring(properties.cursor.start)
+                )
+                const domNode:HTMLSpanElement = editor.getBody().querySelector(
+                    'span[generic-input-selection-indicator="###"]'
+                )
+                const parentDomNode = domNode.parentNode
+                domNode.remove()
+
+                for (const node of parentDomNode.childNodes)
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const range = editor.dom.createRng()
+                        console.log(parentDomNode.childNodes)
+                        range.setEnd(node, relativeEnd)
+                        range.setStart(node, relativeStart)
+                        editor.selection.setRng(range)
+                        break
+                    }
+            })
         }
         if (properties.editor.endsWith('raw)')) {
             tinyMCEOptions.toolbar1 =
