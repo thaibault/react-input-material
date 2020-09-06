@@ -1236,44 +1236,61 @@ export class GenericInput<Type = any> extends
             content_style: properties.disabled ? 'body {opacity: .38}' : '',
             placeholder: properties.placeholder,
             readonly: properties.disabled,
-            setup: (editor:RichTextEditor):void => editor.on('init', ():void => {
-                // TODO not stable!
-                editor.focus()
-                const value:string = genericProperties.value
+            setup: (editor:RichTextEditor):void => editor.on(
+                'init',
+                ():void => {
+                    editor.focus()
 
-                const relativeEnd:number = (
-                    properties.cursor.end -
-                    value.lastIndexOf('>', properties.cursor.end) -
-                    1
-                )
-                const relativeStart:number = (
-                    properties.cursor.start -
-                    value.lastIndexOf('>', properties.cursor.start) -
-                    1
-                )
-
-                const indicator:string = '<span generic-input-selection-indicator="###"></span>'
-                editor.getBody().innerHTML = (
-                    value.substring(0, properties.cursor.start) +
-                    indicator +
-                    value.substring(properties.cursor.start)
-                )
-                const domNode:HTMLSpanElement = editor.getBody().querySelector(
-                    'span[generic-input-selection-indicator="###"]'
-                )
-                const parentDomNode = domNode.parentNode
-                domNode.remove()
-
-                for (const node of parentDomNode.childNodes)
-                    if (node.nodeType === Node.TEXT_NODE) {
-                        const range = editor.dom.createRng()
-                        console.log(parentDomNode.childNodes)
-                        range.setEnd(node, relativeEnd)
-                        range.setStart(node, relativeStart)
-                        editor.selection.setRng(range)
-                        break
+                    const indicator:{end:string;start:string} = {
+                        end: '###generic-input-selection-indicator-end###',
+                        start: '###generic-input-selection-indicator-start###'
                     }
-            })
+                    const cursor:{end:number;start:number} = {
+                        end: properties.cursor.end + indicator.start.length,
+                        start: properties.cursor.start
+                    }
+                    const keysSorted:Array<keyof indicator> = ['start', 'end']
+
+                    let value:string = genericProperties.value
+                    for (const type of keysSorted)
+                        value = (
+                            value.substring(0, cursor[type]) +
+                            indicator[type] +
+                            value.substring(cursor[type])
+                        )
+                    editor.getBody().innerHTML = value
+
+                    const walker = document.createTreeWalker(
+                        editor.getBody(),
+                        NodeFilter.SHOW_TEXT,
+                        null,
+                        false
+                    )
+
+                    const range = editor.dom.createRng()
+                    const result:{end?:[Node, number];start?:[Node, number]} =
+                        {}
+                    let node
+                    while (node = walker.nextNode())
+                        for (const type of keysSorted) {
+                            const index:number =
+                                node.nodeValue.indexOf(indicator[type])
+                            if (index > -1) {
+                                node.nodeValue =
+                                    node.nodeValue.replace(indicator[type], '')
+                                result[type] = [node, index]
+                            }
+                        }
+
+                    for (const type of keysSorted)
+                        if (result[type])
+                            range[`set${Tools.stringCapitalize(type)}`](
+                                ...result[type]
+                            )
+                    if (result.end && result.start)
+                        editor.selection.setRng(range)
+                }
+            )
         }
         if (properties.editor.endsWith('raw)')) {
             tinyMCEOptions.toolbar1 =

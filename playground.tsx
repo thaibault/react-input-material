@@ -236,7 +236,7 @@ const Application:FunctionComponent<{}> = () => {
                     nullable: false
                 }}
                 rows={6}
-                selectable-editor
+                selectableEditor
             />
 
             <GenericInput
