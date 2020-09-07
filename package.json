@@ -94,6 +94,7 @@
     "react": "*",
     "react-ace": "*",
     "react-dom": "*",
+    "react-transition-group": "*",
     "style-loader": "*",
     "stylelint": "*",
     "stylelint-config-standard": "*",
@@ -118,6 +119,7 @@
     "react": "*",
     "react-ace": "*",
     "react-dom": "*",
+    "react-transition-group": "*",
     "tinymce": "^5.0.0"
   },
   "sideEffects": true,

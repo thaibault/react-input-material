@@ -9,8 +9,28 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
-.generic-input .generic-input__editor__label {
-    top: 9px !important;
+.generic-input {
+    & .generic-input__animation--enter {
+        opacity: 0.01;
+    }
+
+    & .generic-input__animation--enter.generic-input__animation--enter-active {
+        opacity: 1;
+        transition: opacity 500ms ease-in;
+    }
+
+    & .generic-input__animation--leave {
+        opacity: 1;
+    }
+
+    & .generic-input__animation--leave.generic-input__animation--leave-active {
+        opacity: 0.01;
+        transition: opacity 300ms ease-in;
+    }
+
+    & .generic-input__editor__label {
+        top: 9px !important;
+    }
 }
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:

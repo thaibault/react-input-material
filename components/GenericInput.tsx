@@ -44,6 +44,7 @@ import React, {
     SyntheticEvent
 } from 'react'
 import {ReactAce as CodeEditorType} from 'react-ace'
+import ReactCSSTransitionGroup from 'react-transition-group'
 import {Settings as TinyMCEOptions} from 'tinymce'
 import {Output, ReactWebComponent} from 'web-component-wrapper/type'
 import {FormField} from '@rmwc/formfield'
@@ -1189,7 +1190,14 @@ export class GenericInput<Type = any> extends
                     }
                     {
                         properties.showDeclaration ?
-                            properties.declaration
+                            // TODO
+                            (<ReactCSSTransitionGroup
+                                transitionName="generic-input__animation"
+                                transitionEnterTimeout={500}
+                                transitionLeaveTimeout={300}
+                            >
+                                <span key="test">{properties.declaration}</span>
+                            </ReactCSSTransitionGroup>)
                         :
                             properties.invalid &&
                             (
