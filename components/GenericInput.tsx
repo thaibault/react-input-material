@@ -1442,7 +1442,7 @@ export class GenericInput<Type = any> extends
                         </div>
                     ],
                     isAdvancedEditor,
-                    richTextEditorLoaded
+                    richTextEditorLoaded || properties.editor.startsWith('code')
                 )}
                 {this.wrapAnimationConditionally(
                     <TextField
@@ -1475,7 +1475,7 @@ export class GenericInput<Type = any> extends
                         {...materialProperties}
                     />,
                     !(isAdvancedEditor || properties.selection),
-                    richTextEditorLoaded
+                    richTextEditorLoaded || properties.editor.startsWith('code')
                 )}
             </>
         ))}</div>
