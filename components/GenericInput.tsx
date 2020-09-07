@@ -40,11 +40,11 @@ import React, {
     MouseEvent,
     PureComponent,
     RefObject,
+    StrictMode,
     Suspense,
     SyntheticEvent
 } from 'react'
 import {ReactAce as CodeEditorType} from 'react-ace'
-import ReactCSSTransitionGroup from 'react-transition-group'
 import {Settings as TinyMCEOptions} from 'tinymce'
 import {Output, ReactWebComponent} from 'web-component-wrapper/type'
 import {FormField} from '@rmwc/formfield'
@@ -64,6 +64,7 @@ import '@rmwc/textfield/styles'
 import '@rmwc/theme/styles'
 import '@rmwc/tooltip/styles'
 
+import {Animate} from './Animate'
 import '../material-fixes'
 import {Model, ModelState, Properties, State} from '../type'
 import styles from './GenericInput.module'
@@ -76,6 +77,7 @@ const CodeEditor = lazy(async ():Promise<CodeEditorType> => {
 })
 // endregion
 // region rich text editor configuration
+let richTextEditorLoaded:boolean = false
 const tinymceBasePath:string = '/node_modules/tinymce/'
 const tinymceScriptPath:string = `${tinymceBasePath}tinymce.min.js`
 export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
@@ -1091,13 +1093,33 @@ export class GenericInput<Type = any> extends
         return this.transformValue(configuration, value)
     }
     /**
+     * Wraps given component with animation component if given condition holds.
+     * @param content - Component or string to wrap.
+     * @param propertiesOrInCondition - Animation properties or in condition
+     * only.
+     * @returns Wrapped component.
+     */
+    wrapAnimationConditionally(
+        content:Component|string,
+        propertiesOrInCondition:boolean = {},
+        condition:boolean = true
+    ):Component {
+        if (typeof propertiesOrInCondition === 'boolean')
+            return condition ?
+                <Animate in={propertiesOrInCondition}>{content}</Animate> :
+                propertiesOrInCondition ? content : ''
+        return condition ?
+            <Animate {...propertiesOrInCondition}>{content}</Animate> :
+            propertiesOrInCondition.in ? content : ''
+    }
+    /**
      * Wraps given component with react strict mode component.
-     * @param component - Component or string to wrap.
+     * @param content - Component or string to wrap.
      * @returns Wrapped component.
      */
     wrapStrict(content:Component|string):Component {
         return this.self.strict ?
-            <React.StrictMode>{content}</React.StrictMode> :
+            <StrictMode>{content}</StrictMode> :
             <>{content}</>
     }
     /**
@@ -1159,10 +1181,11 @@ export class GenericInput<Type = any> extends
             helpText: {
                 persistent: Boolean(properties.declaration),
                 children: <>
-                    {
-                        this.properties.selectableEditor &&
-                        this.properties.type === 'string' &&
-                        this.properties.editor !== 'plain' &&
+                   <Animate in={
+                        properties.selectableEditor &&
+                        properties.type === 'string' &&
+                        properties.editor !== 'plain'
+                    }>
                         <IconButton
                             icon={{
                                 icon: this.properties.editorIsActive ?
@@ -1173,9 +1196,8 @@ export class GenericInput<Type = any> extends
                                 onClick: this.onChangeEditorIsActive
                             }}
                         />
-                    }
-                    {
-                        properties.declaration &&
+                    </Animate>
+                    <Animate in={Boolean(properties.declaration)}>
                         <IconButton
                             icon={{
                                 icon:
@@ -1187,45 +1209,40 @@ export class GenericInput<Type = any> extends
                                 onClick: this.onChangeShowDeclaration
                             }}
                         />
-                    }
-                    {
-                        properties.showDeclaration ?
-                            // TODO
-                            (<ReactCSSTransitionGroup
-                                transitionName="generic-input__animation"
-                                transitionEnterTimeout={500}
-                                transitionLeaveTimeout={300}
-                            >
-                                <span key="test">{properties.declaration}</span>
-                            </ReactCSSTransitionGroup>)
-                        :
-                            properties.invalid &&
-                            (
-                                properties.showInitialValidationState ||
-                                /*
-                                    Material inputs show their validation state
-                                    at least after a blur event so we
-                                    synchronize error message appearances.
-                                */
-                                properties.visited
-                            ) &&
-                            <Theme use="error">
-                                {this.renderMessage(
-                                    properties.invalidMaximum &&
-                                    properties.maximumText ||
-                                    properties.invalidMaximumLength &&
-                                    properties.maximumLengthText ||
-                                    properties.invalidMinimum &&
-                                    properties.minimumText ||
-                                    properties.invalidMinimumLength &&
-                                    properties.minimumLengthText ||
-                                    properties.invalidPattern &&
-                                    properties.patternText ||
-                                    properties.invalidRequired &&
-                                    properties.requiredText
-                                )}
-                            </Theme>
-                    }
+                    </Animate>
+                    <Animate in={properties.showDeclaration}>
+                        {properties.declaration}
+                    </Animate>
+                    <Animate in={
+                        !properties.showDeclaration &&
+                        properties.invalid &&
+                        (
+                            properties.showInitialValidationState ||
+                            /*
+                                Material inputs show their validation state
+                                at least after a blur event so we
+                                synchronize error message appearances.
+                            */
+                            properties.visited
+                        )
+                    }>
+                        <Theme use="error">
+                            {this.renderMessage(
+                                properties.invalidMaximum &&
+                                properties.maximumText ||
+                                properties.invalidMaximumLength &&
+                                properties.maximumLengthText ||
+                                properties.invalidMinimum &&
+                                properties.minimumText ||
+                                properties.invalidMinimumLength &&
+                                properties.minimumLengthText ||
+                                properties.invalidPattern &&
+                                properties.patternText ||
+                                properties.invalidRequired &&
+                                properties.requiredText
+                            )}
+                        </Theme>
+                    </Animate>
                 </>
             },
             icon: this.wrapIconWithTooltip(
@@ -1247,6 +1264,7 @@ export class GenericInput<Type = any> extends
             setup: (editor:RichTextEditor):void => editor.on(
                 'init',
                 ():void => {
+                    richTextEditorLoaded = true
                     editor.focus()
 
                     const indicator:{end:string;start:string} = {
@@ -1313,15 +1331,26 @@ export class GenericInput<Type = any> extends
             tinyMCEOptions.toolbar1 =
                 'cut copy paste | undo redo removeformat | styleselect ' +
                 'formatselect | searchreplace visualblocks fullscreen code'
-        // endregion
+
+        const isAdvancedEditor:boolean = (
+            !properties.selection &&
+            properties.type === 'string' &&
+            properties.editorIsActive &&
+            (
+                properties.editor.startsWith('code') ||
+                properties.editor.startsWith('richtext(')
+            )
+        )
+        // endregion 
 
         // TODO check if mdc-classes can be retrieved
-        return <div
-            className={styles['generic-input']}
-        >{this.wrapStrict(this.wrapTooltip(
+        return <div className={
+            styles['generic-input'] +
+            (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
+        }>{this.wrapStrict(this.wrapTooltip(
             properties.tooltip,
-            (
-                properties.selection ?
+            <>
+                <Animate in={Boolean(properties.selection)}>
                     <Select
                         enhanced
                         onChange={this.onChangeValue}
@@ -1329,15 +1358,9 @@ export class GenericInput<Type = any> extends
                         {...genericProperties}
                         {...materialProperties}
                     />
-                : (
-                    properties.type === 'string' &&
-                    properties.editorIsActive &&
-                    (
-                        properties.editor.startsWith('code') ||
-                        properties.editor.startsWith('richtext(')
-                    )
-                ) ?
-                    <>
+                </Animate>
+                {this.wrapAnimationConditionally(
+                    [
                         <FormField
                             className={
                                 'mdc-text-field' +
@@ -1347,6 +1370,7 @@ export class GenericInput<Type = any> extends
                                 ) +
                                 ' mdc-text-field--textarea'
                             }
+                            key="advanced-editor-form-field"
                         >
                             <label>
                                 <span className={
@@ -1405,16 +1429,22 @@ export class GenericInput<Type = any> extends
                                         />
                                 }
                             </label>
-                        </FormField>
-                        <div className="mdc-text-field-helper-line">
+                        </FormField>,
+                        <div
+                            className="mdc-text-field-helper-line"
+                            key="advanced-editor-helper-line"
+                        >
                             <p
                                 className="mdc-text-field-helper-text mdc-text-field-helper-text--persistent"
                             >
                                 {materialProperties.helpText.children}
                             </p>
                         </div>
-                    </>
-                :
+                    ],
+                    isAdvancedEditor,
+                    richTextEditorLoaded
+                )}
+                {this.wrapAnimationConditionally(
                     <TextField
                         align={properties.align}
                         characterCount
@@ -1443,8 +1473,11 @@ export class GenericInput<Type = any> extends
                         }
                         {...genericProperties}
                         {...materialProperties}
-                    />
-            )
+                    />,
+                    !(isAdvancedEditor || properties.selection),
+                    richTextEditorLoaded
+                )}
+            </>
         ))}</div>
     }
     /**/

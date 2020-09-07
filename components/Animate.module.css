@@ -9,17 +9,34 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
-.generic-input {
-    display: block;
+.generic-animate {}
+
+.generic-animate-appear,
+.generic-animate-enter {
+    opacity: 0;
 }
 
-.generic-input--custom {
-    padding-top: 9px;
+.generic-animate-appear-active,
+.generic-animate-enter-active {
+    opacity: 1;
+    position: absolute;
+    transition: opacity 200ms ease-in;
 }
 
-.generic-input__editor__label {
-    top: 9px !important;
+.generic-animate-exit {
+    opacity: 1;
 }
+
+.generic-animate-exit-active {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+}
+
+.generic-animate-exit-done {
+    display: none;
+}
+
+.generic-animate__list-wrapper {}
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:
 vim: foldmethod=marker foldmarker=region,endregion:
