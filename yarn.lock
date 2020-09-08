@@ -1690,6 +1690,16 @@
   resolved "https://registry.yarnpkg.com/@rmwc/types/-/types-6.0.5.tgz#2b388d9a1512f06b43d78a1c364299c663e01061"
   integrity sha512-G4NZxakwsTMFxxpEWX90MOlZtVNzCwooLUg7FH7Oh5OJCnKWGmXK8ZMF59vvIEn7zCiEpVroKhOxNpMw9TIUTw==
 
+"@rmwc/typography@*":
+  version "6.1.3"
+  resolved "https://registry.yarnpkg.com/@rmwc/typography/-/typography-6.1.3.tgz#80ec70f7e12eefb501d1e94a027915d32af82678"
+  integrity sha512-g6K3izVMARRP948YixNsiQcVTqTi9+HrX/6nmJFzJRxe9L7k5huqWKi/ZJ03txJbghRH4XVSUmhYbWU9cdZPWg==
+  dependencies:
+    "@material/typography" "^5.1.0"
+    "@rmwc/base" "^6.0.14"
+    "@rmwc/provider" "^6.1.3"
+    "@rmwc/types" "^6.0.5"
+
 "@sinonjs/commons@^1.7.0":
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/@sinonjs/commons/-/commons-1.8.1.tgz#e7df00f98a203324f6dc7cc606cad9d4a8ab2217"

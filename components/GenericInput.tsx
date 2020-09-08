@@ -55,6 +55,7 @@ import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
 import {Tooltip, TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
+import {Typography} from '@rmwc/typography'
 import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
 
 import '@rmwc/formfield/styles'
@@ -63,6 +64,7 @@ import '@rmwc/select/styles'
 import '@rmwc/textfield/styles'
 import '@rmwc/theme/styles'
 import '@rmwc/tooltip/styles'
+import '@rmwc/typography/styles'
 
 import {Animate} from './Animate'
 import '../material-fixes'
@@ -1122,9 +1124,13 @@ export class GenericInput<Type = any> extends
         options?:Properties['tooltip'], content:Component|string
     ):Component {
         if (typeof options === 'string')
-            return <Tooltip content={options}>{content}</Tooltip>
+            return <Tooltip
+                content=<Typography use="caption">{options}</Typography>
+            >{content}</Tooltip>
         else if (options !== null && typeof options === 'object')
-            return <Tooltip {...options}>{content}</Tooltip>
+            return <Tooltip {...options}>
+                <Typography use="caption">{content}</Typography>
+            </Tooltip>
         return <>{content}</>
     }
     /**
@@ -1142,7 +1148,8 @@ export class GenericInput<Type = any> extends
             delete options.tooltip
             const nestedOptions:IconOptions = {...options}
             options.strategy = 'component'
-            options.icon = this.wrapTooltip(tooltip, <Icon icon={nestedOptions} />)
+            options.icon =
+                this.wrapTooltip(tooltip, <Icon icon={nestedOptions} />)
         }
         return options
     }
@@ -1330,7 +1337,7 @@ export class GenericInput<Type = any> extends
                 properties.editor.startsWith('richtext(')
             )
         )
-        // endregion 
+        // endregion
 
         // TODO check if mdc-classes can be retrieved
         return <div className={
@@ -1338,7 +1345,7 @@ export class GenericInput<Type = any> extends
             (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
         }>{this.wrapStrict(this.wrapTooltip(
             properties.tooltip,
-            <>
+            <div>
                 <Animate in={Boolean(properties.selection)}>
                     <Select
                         enhanced
@@ -1466,7 +1473,7 @@ export class GenericInput<Type = any> extends
                     !(isAdvancedEditor || properties.selection),
                     richTextEditorLoaded || properties.editor.startsWith('code')
                 )}
-            </>
+            </div>
         ))}</div>
     }
     /**/

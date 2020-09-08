@@ -20,11 +20,13 @@
     "form-field"
   ],
   "files": [
+    "Animate.js",
+    "Animate.styles.compiled.css",
     "components",
     "GenericInput.js",
+    "GenericInput.styles.compiled.css",
     "index.ts",
     "material-fixes.css",
-    "styles.compiled.css",
     "type.ts"
   ],
   "main": "index.js",
@@ -61,6 +63,7 @@
     "@rmwc/textfield": "*",
     "@rmwc/theme": "*",
     "@rmwc/tooltip": "*",
+    "@rmwc/typography": "*",
     "@tinymce/tinymce-react": "*",
     "@types/ejs": "*",
     "@types/html-minifier": "*",
@@ -114,6 +117,7 @@
     "@rmwc/select": "*",
     "@rmwc/textfield": "*",
     "@rmwc/tooltip": "*",
+    "@rmwc/typography": "*",
     "@tinymce/tinymce-react": "*",
     "clientnode": "*",
     "material-design-icons": "*",
@@ -136,13 +140,13 @@
     "files": {
       "compose": {
         "cascadingStyleSheet": {
-          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['test:browser', 'serve'].includes(self.givenCommandLineArguments[2]) ? null : `${path.resolve(self.path.target.asset.cascadingStyleSheet, 'styles.compiled.css')}?${self.hashAlgorithm}=[hash]`"
+          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['test:browser', 'serve'].includes(self.givenCommandLineArguments[2]) ? null : `${path.resolve(self.path.target.asset.cascadingStyleSheet, '[name].styles.compiled.css')}?${self.hashAlgorithm}=[hash]`"
         }
       }
     },
     "injection": {
       "entry": {
-        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? './playground' : {index: './index', GenericInput: './components/GenericInput'}"
+        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? './playground' : {Animate: './components/Animate', GenericInput: './components/GenericInput', index: './index'}"
       }
     },
     "module": {
