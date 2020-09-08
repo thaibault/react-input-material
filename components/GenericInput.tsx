@@ -40,6 +40,7 @@ import React, {
     MouseEvent,
     PureComponent,
     RefObject,
+    StrictMode,
     Suspense,
     SyntheticEvent
 } from 'react'
@@ -54,6 +55,7 @@ import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
 import {Tooltip, TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
+import {Typography} from '@rmwc/typography'
 import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
 
 import '@rmwc/formfield/styles'
@@ -62,7 +64,9 @@ import '@rmwc/select/styles'
 import '@rmwc/textfield/styles'
 import '@rmwc/theme/styles'
 import '@rmwc/tooltip/styles'
+import '@rmwc/typography/styles'
 
+import {Animate} from './Animate'
 import '../material-fixes'
 import {Model, ModelState, Properties, State} from '../type'
 import styles from './GenericInput.module'
@@ -71,10 +75,12 @@ import styles from './GenericInput.module'
 const CodeEditor = lazy(async ():Promise<CodeEditorType> => {
     const {config} = await import('ace-builds')
     config.set('basePath', '/node_modules/ace-builds/src-noconflict/')
+    config.set('useWorker', false)
     return await import('react-ace')
 })
 // endregion
 // region rich text editor configuration
+let richTextEditorLoaded:boolean = false
 const tinymceBasePath:string = '/node_modules/tinymce/'
 const tinymceScriptPath:string = `${tinymceBasePath}tinymce.min.js`
 export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
@@ -197,8 +203,10 @@ const baseModelPropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
  *
+ * @property codeEditorReference - Current code editor component reference.
  * @property inputReference - Current wrapped input reference node.
  * @property properties - Current properties.
+ * @property richTextEditorReference - Current rich text component reference.
  * @property self - Back-reference to this class.
  * @property state - Current state.
  */
@@ -315,6 +323,7 @@ export class GenericInput<Type = any> extends
         onClick: func,
         onFocus: func,
         onKeyUp: func,
+        onSelectionChange: func,
         onTouch: func,
         outlined: boolean,
         pattern: string,
@@ -340,8 +349,10 @@ export class GenericInput<Type = any> extends
     static readonly strict:boolean = false
     // endregion
     // region properties
+    codeEditorReference?:CodeEditor
     inputReference:RefObject<HTMLInputElement> = createRef<HTMLInputElement>()
     properties:Properties<Type>
+    richTextEditorReference?:RichTextEditor
     self:typeof GenericInput = GenericInput
     state:State<Type> = {
         cursor: {
@@ -351,11 +362,48 @@ export class GenericInput<Type = any> extends
         editorIsActive: false,
         hidden: undefined,
         model: GenericInput.defaultModelState,
+        selectionIsUnstable: false,
         showDeclaration: false,
         value: null
     }
     // endregion
     // region live-cycle
+    /**
+     * Is triggered immediate after a re-rendering. Re-stores cursor selection
+     * state if editor has been switched.
+     * @returns Nothing.
+     */
+    componentDidUpdate():void {
+        if (this.state.selectionIsUnstable) {
+            if (this.state.editorIsActive) {
+                if (this.codeEditorReference?.editor?.selection) {
+                    this.codeEditorReference.editor.textInput.focus()
+                    const range =
+                        this.codeEditorReference.editor.selection.getRange()
+                    const endPosition =
+                        this.determineTablePosition(this.state.cursor.end)
+                    range.setEnd(endPosition.row, endPosition.column)
+                    const startPosition =
+                        this.determineTablePosition(this.state.cursor.start)
+                    range.setStart(startPosition.row, startPosition.column)
+                    this.codeEditorReference.editor.selection.setRange(range)
+                }
+                /*
+                    else if (this.richTextEditorReference?.editor?.selection)
+
+                    NOTE: Could not be set here since we have to wait for
+                    tinymce to be finally loaded ("init" event) to set
+                    focus and selections.
+                */
+            } else if (this.inputReference.current) {
+                this.inputReference.current.focus()
+                this.inputReference.current.setSelectionRange(
+                    this.state.cursor.start, this.state.cursor.end
+                )
+            }
+            this.setState({selectionIsUnstable: false})
+        }
+    }
     /**
      * Updates state depending on given properties.
      * @param properties - Properties to derive into state.
@@ -441,7 +489,7 @@ export class GenericInput<Type = any> extends
     onChangeEditorIsActive = (event?:MouseEvent):void => {
         this.properties.editorIsActive = !this.properties.editorIsActive
         this.setState(({editorIsActive}):Partial<State<Type>> => (
-            {editorIsActive: !editorIsActive}
+            {editorIsActive: !editorIsActive, selectionIsUnstable: true}
         ))
 
         if (this.properties.onChangeEditorIsActive)
@@ -455,18 +503,13 @@ export class GenericInput<Type = any> extends
      * @param event - Potential event object.
      * @returns Nothing.
      */
-    onChangeShowDeclaration = (event?:MouseEvent):void => {
-        this.properties.showDeclaration = !this.properties.showDeclaration
-        this.setState(({showDeclaration}):Partial<State<Type>> => (
-            {showDeclaration: !showDeclaration}
-        ))
-
-        if (this.properties.onChangeShowDeclaration)
-            this.properties.onChangeShowDeclaration(
-                this.properties.showDeclaration, event
-            )
-        this.onChange(event)
-    }
+    onChangeShowDeclaration = (event?:MouseEvent):void =>
+        this.setState(({showDeclaration}):Partial<State<Type>> => {
+            if (this.properties.onChangeShowDeclaration)
+                this.properties.onChangeShowDeclaration(showDeclaration, event)
+            this.onChange(event)
+            return {showDeclaration: !showDeclaration}
+        })
     /**
      * Triggered when a value state changes like validation or focusing.
      * @param state - Current value state.
@@ -538,7 +581,7 @@ export class GenericInput<Type = any> extends
      * @returns Nothing.
      */
     onClick = (event:MouseEvent):void => {
-        this.saveSelectionState()
+        this.onSelectionChange()
         if (this.properties.onClick)
             this.properties.onClick(event)
         this.onTouch(event)
@@ -549,7 +592,6 @@ export class GenericInput<Type = any> extends
      * @returns Nothing.
      */
     onFocus = (event:FocusEvent):void => {
-        this.saveSelectionState()
         if (this.properties.onFocus)
             this.properties.onFocus(event)
         this.onTouch(event)
@@ -560,9 +602,19 @@ export class GenericInput<Type = any> extends
      * @returns Nothing.
      */
     onKeyUp = (event:KeyUpEvent):void => {
-        this.saveSelectionState()
+        this.onSelectionChange()
         if (this.properties.onKeyUp)
             this.properties.onKeyUp(event)
+    }
+    /**
+     * Triggered on selection change events.
+     * @param event - Event which triggered selection change.
+     * @returns Nothing.
+     */
+    onSelectionChange = (event:SyntheticEvent):void => {
+        this.saveSelectionState()
+        if (this.properties.onSelectionChange)
+            this.properties.onSelectionChange(event)
     }
     /**
      * Triggers on start interacting with the input.
@@ -626,6 +678,80 @@ export class GenericInput<Type = any> extends
                     (this.properties.hidden ? 'Show' : 'Hide') + ' password'
             }
         return options
+    }
+    /**
+     * Converts absolute range into table oriented position.
+     * @param offset - Absolute position.
+     * @returns Position.
+     */
+    determineTablePosition(offset:number):{column:number;row:number} {
+        const result = {column: 0, row: 0}
+        if (this.state.value)
+            for (const line of this.state.value.split('\n')) {
+                if (line.length < offset)
+                    offset -= 1 + line.length
+                else {
+                    result.column = offset
+                    break
+                }
+                result.row += 1
+            }
+        return result
+    }
+    /**
+     * Determines absolute range from table oriented position.
+     * @param column - Symbol offset in given row.
+     * @param row - Offset row.
+     * @returns Determined offset.
+     */
+    determineAbsoluteSymbolOffsetFromTable(
+        column:number, row:number
+    ):number {
+        if (!this.state.value)
+            return 0
+
+        if (row > 0)
+            return column + this.state.value
+                .split('\n')
+                .slice(0, row)
+                .map((line:string):number => 1 + line.length)
+                .reduce((sum:number, value:number):number => sum + value)
+        return column
+    }
+    /**
+     * Determines absolute offset in given markup.
+     * @param contentDomNode - Wrapping dom node where all content is
+     * contained.
+     * @param domNode - Dom node which contains given position.
+     * @param offset - Relative position within given node.
+     * @returns Determine absolute offset.
+     */
+    determineAbsoluteSymbolOffsetFromHTML(
+        contentDomNode:Element, domNode:Element, offset:number
+    ):number {
+        if (!this.state.value)
+            return 0
+
+        const indicatorKey:string = 'generic-input-selection-indicator'
+        const indicatorValue:string = '###'
+        const indicator:string = ` ${indicatorKey}="${indicatorValue}"`
+
+        domNode.setAttribute(indicatorKey, indicatorValue)
+        // NOTE: TinyMCE seems to add a newline after each paragraph.
+        const content:string = contentDomNode.innerHTML.replace(
+            /(<\/p>)/gi, '$1\n'
+        )
+        domNode.removeAttribute(indicatorKey)
+
+        const domNodeOffset:number = content.indexOf(indicator)
+        const startIndex:number = domNodeOffset + indicator.length
+
+        return (
+            offset +
+            content.indexOf('>', startIndex) +
+            1 -
+            indicator.length
+        )
     }
     /**
      * Derives current validation state from given value.
@@ -701,13 +827,6 @@ export class GenericInput<Type = any> extends
                 configuration.model.state.invalidRequired
             configuration.model.state.valid =
                 !configuration.model.state.invalid
-
-            // Hide declaration to show invalidation state.
-            if (
-                configuration.showDeclaration &&
-                configuration.model.state.invalid
-            )
-                this.onChangeShowDeclaration()
         }
 
         return changed
@@ -866,16 +985,80 @@ export class GenericInput<Type = any> extends
      * @returns Nothing.
      */
     saveSelectionState():void {
-        if (
-            typeof this.inputReference.current?.selectionEnd === 'number' &&
-            typeof this.inputReference.current?.selectionStart === 'number'
-        )
+        /*
+            NOTE: Known issues is that we do not get the absolute positions but
+            the one in current selected node.
+        */
+        const codeEditorRange =
+            this.codeEditorReference?.editor?.selection?.getRange()
+        const richTextEditorRange =
+            this.richTextEditorReference?.editor?.selection?.getRng()
+        const selectionEnd = this.inputReference.current?.selectionEnd
+        const selectionStart = this.inputReference.current?.selectionStart
+        if (codeEditorRange)
             this.setState({
                 cursor: {
-                    end: this.inputReference.current?.selectionEnd,
-                    start: this.inputReference.current?.selectionStart
+                    end: this.determineAbsoluteSymbolOffsetFromTable(
+                        codeEditorRange.end.column,
+                        typeof codeEditorRange.end.row === 'number' ?
+                            codeEditorRange.end.row :
+                            (this.properties.value?.split('\n').length - 1) ||
+                                0
+                    ),
+                    start: this.determineAbsoluteSymbolOffsetFromTable(
+                        codeEditorRange.start.column,
+                        typeof codeEditorRange.start.row === 'number' ?
+                            codeEditorRange.start.row :
+                            (this.properties.value?.split('\n').length - 1) ||
+                                0
+                    )
                 }
             })
+        else if (richTextEditorRange)
+            this.setState({
+                cursor: {
+                    end: this.determineAbsoluteSymbolOffsetFromHTML(
+                        this.richTextEditorReference.editor.getBody(),
+                        this.richTextEditorReference.editor.selection.getEnd(),
+                        richTextEditorRange.endOffset
+                    ),
+                    start: this.determineAbsoluteSymbolOffsetFromHTML(
+                        this.richTextEditorReference.editor.getBody(),
+                        this.richTextEditorReference.editor.selection
+                            .getStart(),
+                        richTextEditorRange.startOffset
+                    )
+                }
+            })
+        else if (
+            typeof selectionEnd === 'number' &&
+            typeof selectionStart === 'number'
+        )
+            this.setState({
+                cursor: {end: selectionEnd, start: selectionStart}
+            })
+    }
+    /**
+     * Set code editor references.
+     * @param instance - Code editor instance.
+     * @returns Nothing.
+     */
+    setCodeEditorReference = (instance?:CodeEditor):void => {
+        if (instance?.editor?.container?.querySelector('textarea'))
+            this.inputReference = {
+                current: instance.editor.container.querySelector('textarea')
+            }
+        this.codeEditorReference = instance
+    }
+    /**
+     * Set rich text editor references.
+     * @param instance - Editor instance.
+     * @returns Nothing.
+     */
+    setRichTextEditorReference = (instance?:RichTextEditor):void => {
+        if (instance?.elementRef)
+            this.inputReference = instance.elementRef
+        this.richTextEditorReference = instance
     }
     /**
      * Applies configured value transformations.
@@ -901,13 +1084,33 @@ export class GenericInput<Type = any> extends
         return this.transformValue(configuration, value)
     }
     /**
+     * Wraps given component with animation component if given condition holds.
+     * @param content - Component or string to wrap.
+     * @param propertiesOrInCondition - Animation properties or in condition
+     * only.
+     * @returns Wrapped component.
+     */
+    wrapAnimationConditionally(
+        content:Component|string,
+        propertiesOrInCondition:boolean = {},
+        condition:boolean = true
+    ):Component {
+        if (typeof propertiesOrInCondition === 'boolean')
+            return condition ?
+                <Animate in={propertiesOrInCondition}>{content}</Animate> :
+                propertiesOrInCondition ? content : ''
+        return condition ?
+            <Animate {...propertiesOrInCondition}>{content}</Animate> :
+            propertiesOrInCondition.in ? content : ''
+    }
+    /**
      * Wraps given component with react strict mode component.
-     * @param component - Component or string to wrap.
+     * @param content - Component or string to wrap.
      * @returns Wrapped component.
      */
     wrapStrict(content:Component|string):Component {
         return this.self.strict ?
-            <React.StrictMode>{content}</React.StrictMode> :
+            <StrictMode>{content}</StrictMode> :
             <>{content}</>
     }
     /**
@@ -921,9 +1124,13 @@ export class GenericInput<Type = any> extends
         options?:Properties['tooltip'], content:Component|string
     ):Component {
         if (typeof options === 'string')
-            return <Tooltip content={options}>{content}</Tooltip>
+            return <Tooltip
+                content=<Typography use="caption">{options}</Typography>
+            >{content}</Tooltip>
         else if (options !== null && typeof options === 'object')
-            return <Tooltip {...options}>{content}</Tooltip>
+            return <Tooltip {...options}>
+                <Typography use="caption">{content}</Typography>
+            </Tooltip>
         return <>{content}</>
     }
     /**
@@ -941,7 +1148,8 @@ export class GenericInput<Type = any> extends
             delete options.tooltip
             const nestedOptions:IconOptions = {...options}
             options.strategy = 'component'
-            options.icon = this.wrapTooltip(tooltip, <Icon icon={nestedOptions} />)
+            options.icon =
+                this.wrapTooltip(tooltip, <Icon icon={nestedOptions} />)
         }
         return options
     }
@@ -960,9 +1168,7 @@ export class GenericInput<Type = any> extends
         const genericProperties:Partial<HTMLInputElement> = {
             name: properties.name,
             onBlur: this.onBlur,
-            onClick: this.onClick,
             onFocus: this.onFocus,
-            onKeyUp: this.onKeyUp,
             placeholder: properties.placeholder,
             value: properties.value || ''
         }
@@ -971,10 +1177,11 @@ export class GenericInput<Type = any> extends
             helpText: {
                 persistent: Boolean(properties.declaration),
                 children: <>
-                    {
-                        this.properties.selectableEditor &&
-                        this.properties.type === 'string' &&
-                        this.properties.editor !== 'plain' &&
+                   <Animate in={
+                        properties.selectableEditor &&
+                        properties.type === 'string' &&
+                        properties.editor !== 'plain'
+                    }>
                         <IconButton
                             icon={{
                                 icon: this.properties.editorIsActive ?
@@ -985,9 +1192,8 @@ export class GenericInput<Type = any> extends
                                 onClick: this.onChangeEditorIsActive
                             }}
                         />
-                    }
-                    {
-                        properties.declaration &&
+                    </Animate>
+                    <Animate in={Boolean(properties.declaration)}>
                         <IconButton
                             icon={{
                                 icon:
@@ -999,38 +1205,40 @@ export class GenericInput<Type = any> extends
                                 onClick: this.onChangeShowDeclaration
                             }}
                         />
-                    }
-                    {
-                        properties.showDeclaration ?
-                            properties.declaration
-                        :
-                            properties.invalid &&
-                            (
-                                properties.showInitialValidationState ||
-                                /*
-                                    Material inputs show their validation state
-                                    at least after a blur event so we
-                                    synchronize error message appearances.
-                                */
-                                properties.visited
-                            ) &&
-                            <Theme use="error">
-                                {this.renderMessage(
-                                    properties.invalidMaximum &&
-                                    properties.maximumText ||
-                                    properties.invalidMaximumLength &&
-                                    properties.maximumLengthText ||
-                                    properties.invalidMinimum &&
-                                    properties.minimumText ||
-                                    properties.invalidMinimumLength &&
-                                    properties.minimumLengthText ||
-                                    properties.invalidPattern &&
-                                    properties.patternText ||
-                                    properties.invalidRequired &&
-                                    properties.requiredText
-                                )}
-                            </Theme>
-                    }
+                    </Animate>
+                    <Animate in={properties.showDeclaration}>
+                        {properties.declaration}
+                    </Animate>
+                    <Animate in={
+                        !properties.showDeclaration &&
+                        properties.invalid &&
+                        (
+                            properties.showInitialValidationState ||
+                            /*
+                                Material inputs show their validation state
+                                at least after a blur event so we
+                                synchronize error message appearances.
+                            */
+                            properties.visited
+                        )
+                    }>
+                        <Theme use="error">
+                            {this.renderMessage(
+                                properties.invalidMaximum &&
+                                properties.maximumText ||
+                                properties.invalidMaximumLength &&
+                                properties.maximumLengthText ||
+                                properties.invalidMinimum &&
+                                properties.minimumText ||
+                                properties.invalidMinimumLength &&
+                                properties.minimumLengthText ||
+                                properties.invalidPattern &&
+                                properties.patternText ||
+                                properties.invalidRequired &&
+                                properties.requiredText
+                            )}
+                        </Theme>
+                    </Animate>
                 </>
             },
             icon: this.wrapIconWithTooltip(
@@ -1039,14 +1247,72 @@ export class GenericInput<Type = any> extends
             invalid:
                 properties.showInitialValidationState && properties.invalid,
             label: properties.description || properties.name,
+            onClick: this.onClick,
+            onKeyUp: this.onKeyUp,
             outlined: properties.outlined,
             required: properties.required
         }
 
         const tinyMCEOptions:TinyMCEOptions = {
+            content_style: properties.disabled ? 'body {opacity: .38}' : '',
             placeholder: properties.placeholder,
             readonly: properties.disabled,
-            content_style: properties.disabled ? 'body {opacity: .38}' : ''
+            setup: (editor:RichTextEditor):void => editor.on(
+                'init',
+                ():void => {
+                    richTextEditorLoaded = true
+                    editor.focus()
+
+                    const indicator:{end:string;start:string} = {
+                        end: '###generic-input-selection-indicator-end###',
+                        start: '###generic-input-selection-indicator-start###'
+                    }
+                    const cursor:{end:number;start:number} = {
+                        end: properties.cursor.end + indicator.start.length,
+                        start: properties.cursor.start
+                    }
+                    const keysSorted:Array<keyof indicator> = ['start', 'end']
+
+                    let value:string = genericProperties.value
+                    for (const type of keysSorted)
+                        value = (
+                            value.substring(0, cursor[type]) +
+                            indicator[type] +
+                            value.substring(cursor[type])
+                        )
+                    editor.getBody().innerHTML = value
+
+                    const walker = document.createTreeWalker(
+                        editor.getBody(),
+                        NodeFilter.SHOW_TEXT,
+                        null,
+                        false
+                    )
+
+                    const range = editor.dom.createRng()
+                    const result:{end?:[Node, number];start?:[Node, number]} =
+                        {}
+                    let node
+                    while (node = walker.nextNode())
+                        for (const type of keysSorted) {
+                            const index:number =
+                                node.nodeValue.indexOf(indicator[type])
+                            if (index > -1) {
+                                node.nodeValue =
+                                    node.nodeValue.replace(indicator[type], '')
+                                result[type] = [node, index]
+                            }
+                        }
+
+                    for (const type of keysSorted)
+                        if (result[type])
+                            range[`set${Tools.stringCapitalize(type)}`](
+                                ...result[type]
+                            )
+                    if (result.end && result.start)
+                        editor.selection.setRng(range)
+                }
+            )
         }
         if (properties.editor.endsWith('raw)')) {
             tinyMCEOptions.toolbar1 =
@@ -1061,15 +1327,26 @@ export class GenericInput<Type = any> extends
             tinyMCEOptions.toolbar1 =
                 'cut copy paste | undo redo removeformat | styleselect ' +
                 'formatselect | searchreplace visualblocks fullscreen code'
+
+        const isAdvancedEditor:boolean = (
+            !properties.selection &&
+            properties.type === 'string' &&
+            properties.editorIsActive &&
+            (
+                properties.editor.startsWith('code') ||
+                properties.editor.startsWith('richtext(')
+            )
+        )
         // endregion
 
         // TODO check if mdc-classes can be retrieved
-        return <div
-            className={styles['generic-input']}
-        >{this.wrapStrict(this.wrapTooltip(
+        return <div className={
+            styles['generic-input'] +
+            (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
+        }>{this.wrapStrict(this.wrapTooltip(
             properties.tooltip,
-            (
-                properties.selection ?
+            <div>
+                <Animate in={Boolean(properties.selection)}>
                     <Select
                         enhanced
                         onChange={this.onChangeValue}
@@ -1077,15 +1354,9 @@ export class GenericInput<Type = any> extends
                         {...genericProperties}
                         {...materialProperties}
                     />
-                : (
-                    properties.type === 'string' &&
-                    properties.editorIsActive &&
-                    (
-                        properties.editor.startsWith('code') ||
-                        properties.editor.startsWith('richtext(')
-                    )
-                ) ?
-                    <>
+                </Animate>
+                {this.wrapAnimationConditionally(
+                    [
                         <FormField
                             className={
                                 'mdc-text-field' +
@@ -1095,6 +1366,7 @@ export class GenericInput<Type = any> extends
                                 ) +
                                 ' mdc-text-field--textarea'
                             }
+                            key="advanced-editor-form-field"
                         >
                             <label>
                                 <span className={
@@ -1122,6 +1394,9 @@ export class GenericInput<Type = any> extends
                                                 className="mdc-text-field__input"
                                                 mode="javascript"
                                                 onChange={this.onChangeValue}
+                                                onCursorChange={this.onSelectionChange}
+                                                onSelectionChange={this.onSelectionChange}
+                                                ref={this.setCodeEditorReference}
                                                 setOptions={{
                                                     maxLines: properties.rows,
                                                     minLines: properties.rows,
@@ -1140,23 +1415,32 @@ export class GenericInput<Type = any> extends
                                                 ...TINYMCE_DEFAULT_OPTIONS,
                                                 ...tinyMCEOptions
                                             }}
+                                            onClick={this.onClick}
                                             onEditorChange={this.onChangeValue}
+                                            onKeyUp={this.onKeyUp}
+                                            ref={this.setRichTextEditorReference}
                                             textareaName={this.properties.name}
                                             tinymceScriptSrc={tinymceScriptPath}
                                             {...genericProperties}
                                         />
                                 }
                             </label>
-                        </FormField>
-                        <div className="mdc-text-field-helper-line">
+                        </FormField>,
+                        <div
+                            className="mdc-text-field-helper-line"
+                            key="advanced-editor-helper-line"
+                        >
                             <p
                                 className="mdc-text-field-helper-text mdc-text-field-helper-text--persistent"
                             >
                                 {materialProperties.helpText.children}
                             </p>
                         </div>
-                    </>
-                :
+                    ],
+                    isAdvancedEditor,
+                    richTextEditorLoaded || properties.editor.startsWith('code')
+                )}
+                {this.wrapAnimationConditionally(
                     <TextField
                         align={properties.align}
                         characterCount
@@ -1185,8 +1469,11 @@ export class GenericInput<Type = any> extends
                         }
                         {...genericProperties}
                         {...materialProperties}
-                    />
-            )
+                    />,
+                    !(isAdvancedEditor || properties.selection),
+                    richTextEditorLoaded || properties.editor.startsWith('code')
+                )}
+            </div>
         ))}</div>
     }
     /**/

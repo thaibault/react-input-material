@@ -88,6 +88,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     onConfigure:(properties:Properties<Type>) => void;
     onFocus:(event:FocusEvent) => void;
     onKeyUp:(event:KeyUpEvent) => void;
+    onSelectionChange:(event:SynthethicEvent) => void;
     onTouch:(event:Event) => void;
     outlined:boolean;
     pattern:string;
@@ -112,6 +113,7 @@ export type State<Type = any> = {
     editorIsActive:boolean;
     hidden:boolean;
     model:ModelState;
+    selectionIsUnstable:boolean;
     showDeclaration:boolean;
     value:null|Type;
 }
