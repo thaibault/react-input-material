@@ -73,6 +73,7 @@ import styles from './GenericInput.module'
 const CodeEditor = lazy(async ():Promise<CodeEditorType> => {
     const {config} = await import('ace-builds')
     config.set('basePath', '/node_modules/ace-builds/src-noconflict/')
+    config.set('useWorker', false)
     return await import('react-ace')
 })
 // endregion
