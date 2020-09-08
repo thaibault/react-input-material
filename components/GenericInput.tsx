@@ -500,18 +500,13 @@ export class GenericInput<Type = any> extends
      * @param event - Potential event object.
      * @returns Nothing.
      */
-    onChangeShowDeclaration = (event?:MouseEvent):void => {
-        this.properties.showDeclaration = !this.properties.showDeclaration
-        this.setState(({showDeclaration}):Partial<State<Type>> => (
-            {showDeclaration: !showDeclaration}
-        ))
-
-        if (this.properties.onChangeShowDeclaration)
-            this.properties.onChangeShowDeclaration(
-                this.properties.showDeclaration, event
-            )
-        this.onChange(event)
-    }
+    onChangeShowDeclaration = (event?:MouseEvent):void =>
+        this.setState(({showDeclaration}):Partial<State<Type>> => {
+            if (this.properties.onChangeShowDeclaration)
+                this.properties.onChangeShowDeclaration(showDeclaration, event)
+            this.onChange(event)
+            return {showDeclaration: !showDeclaration}
+        })
     /**
      * Triggered when a value state changes like validation or focusing.
      * @param state - Current value state.
@@ -829,13 +824,6 @@ export class GenericInput<Type = any> extends
                 configuration.model.state.invalidRequired
             configuration.model.state.valid =
                 !configuration.model.state.invalid
-
-            // Hide declaration to show invalidation state.
-            if (
-                configuration.showDeclaration &&
-                configuration.model.state.invalid
-            )
-                this.onChangeShowDeclaration()
         }
 
         return changed

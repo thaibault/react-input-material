@@ -30,9 +30,9 @@ export const Animate:FunctionComponent<TransitionProps<Type>> = (
 ) =>
     <CSSTransition
         appear
+        classNames={styles['generic-animate']}
         in
         timeout={200}
-        classNames={styles['generic-animate']}
         unmountOnExit
         {...properties}
     >{

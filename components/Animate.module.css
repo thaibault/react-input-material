@@ -19,7 +19,6 @@ endregion */
 .generic-animate-appear-active,
 .generic-animate-enter-active {
     opacity: 1;
-    position: absolute;
     transition: opacity 200ms ease-in;
 }
 
