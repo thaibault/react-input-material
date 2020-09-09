@@ -8190,6 +8190,11 @@ loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
 
+lottie-web@^5.5.7:
+  version "5.7.3"
+  resolved "https://registry.yarnpkg.com/lottie-web/-/lottie-web-5.7.3.tgz#dbe542270665be5dd5b32deae19e27de6e77728c"
+  integrity sha512-ftN4AdiNmtoVpCfN1doiUIUbhOrDSMikH1Yl64/xO5lzQ31AO0+G82bqrCNHIW5Ec2zE/g7y4iz7zBR1YJwDaA==
+
 lower-case@^1.1.1:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/lower-case/-/lower-case-1.1.4.tgz#9a2cabd1b9e8e0ae993a4bf7d5875c39c42e8eac"
@@ -10553,6 +10558,13 @@ react-transition-group@*:
     dom-helpers "^5.0.1"
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
+
+react-useanimations@*:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/react-useanimations/-/react-useanimations-2.0.5.tgz#11fa3e8db5768ea17c39bc5bcaa3058b45d3b051"
+  integrity sha512-CpUfCqnbl5CCrtXSerItVoTN0vX7gquuR+FKQRb0aHzpT/P7EdaXVVA9C7+NcyPoHV869ium8egXf2SBLGbxCA==
+  dependencies:
+    lottie-web "^5.5.7"
 
 react@*:
   version "16.13.1"
