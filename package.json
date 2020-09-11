@@ -117,6 +117,7 @@
     "@rmwc/icon-button": "*",
     "@rmwc/select": "*",
     "@rmwc/textfield": "*",
+    "@rmwc/theme": "*",
     "@rmwc/tooltip": "*",
     "@rmwc/typography": "*",
     "@tinymce/tinymce-react": "*",

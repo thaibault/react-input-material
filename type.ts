@@ -20,6 +20,9 @@ import {Mapping} from 'clientnode/type'
 import {
     Component, FocusEvent, KeyUpEvent, MouseEvent, SyntheticEvent
 } from 'react'
+import {IconOptions} from '@rmwc/types'
+import {ThemeProviderProps} from '@rmwc/theme'
+import {TooltipProps} from '@rmwc/tooltip'
 // endregion
 // region exports
 export type ModelState = {
@@ -101,6 +104,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     selectableEditor:boolean;
     showDeclaration:boolean;
     showInitialValidationState:boolean;
+    theme:ThemeProviderProps['options'];
     tooltip:string|TooltipProps;
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps});
 }

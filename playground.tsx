@@ -199,9 +199,12 @@ const Application:FunctionComponent<{}> = () => {
                 onChange={onChange}
                 required
                 rows={3}
+                theme={{
+                    primary: 'yellow',
+                    secondary: 'blue'
+                }}
                 value="a"
             />
-
             <GenericInput
                 model={{
                     declaration: 'text',
