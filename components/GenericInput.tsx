@@ -52,11 +52,14 @@ import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
 import {Select, SelectProps} from '@rmwc/select'
 import {TextField, TextFieldProps} from '@rmwc/textfield'
-import {Theme} from '@rmwc/theme'
+import {Theme, ThemeProvider} from '@rmwc/theme'
 import {Tooltip, TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
 import {Typography} from '@rmwc/typography'
 import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
+import UseAnimations from 'react-useanimations'
+import loading from 'react-useanimations/lib/loading'
+import lock from 'react-useanimations/lib/lock'
 
 import '@rmwc/formfield/styles'
 import '@rmwc/icon-button/styles'
@@ -336,6 +339,7 @@ export class GenericInput<Type = any> extends
         selectableEditor: boolean,
         showDeclaration: boolean,
         showInitialValidationState: boolean,
+        theme: object,
         /*
             NOTE: Not yet working:
             tooltip?:string|TooltipProps;
@@ -361,7 +365,7 @@ export class GenericInput<Type = any> extends
         },
         editorIsActive: false,
         hidden: undefined,
-        model: GenericInput.defaultModelState,
+        model: {...GenericInput.defaultModelState},
         selectionIsUnstable: false,
         showDeclaration: false,
         value: null
@@ -667,7 +671,11 @@ export class GenericInput<Type = any> extends
             }
         if (options === 'password_preset')
             return {
-                icon: 'lock' + (this.properties.hidden ? '_open' : ''),
+                strategy: 'component',
+                icon: <UseAnimations
+                    animation={lock}
+                    reverse={!this.properties.hidden}
+                />,
                 onClick: (event:MouseEvent):void => {
                     event.preventDefault()
                     event.stopPropagation()
@@ -1260,6 +1268,8 @@ export class GenericInput<Type = any> extends
             setup: (editor:RichTextEditor):void => editor.on(
                 'init',
                 ():void => {
+                    if (!editor)
+                        return
                     richTextEditorLoaded = true
                     editor.focus()
 
@@ -1340,7 +1350,9 @@ export class GenericInput<Type = any> extends
         // endregion
 
         // TODO check if mdc-classes can be retrieved
-        return <div className={
+        return <ThemeProvider options={
+            properties.theme || {}
+        } wrap><div className={
             styles['generic-input'] +
             (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
         }>{this.wrapStrict(this.wrapTooltip(
@@ -1389,7 +1401,9 @@ export class GenericInput<Type = any> extends
                                 </span>
                                 {
                                     properties.editor.startsWith('code') ?
-                                        <Suspense fallback="loading...">
+                                        <Suspense fallback={<UseAnimations
+                                            animation={loading} size={96}
+                                        />}>
                                             <CodeEditor
                                                 className="mdc-text-field__input"
                                                 mode="javascript"
@@ -1474,7 +1488,7 @@ export class GenericInput<Type = any> extends
                     richTextEditorLoaded || properties.editor.startsWith('code')
                 )}
             </div>
-        ))}</div>
+        ))}</div></ThemeProvider>
     }
     /**/
     // endregion

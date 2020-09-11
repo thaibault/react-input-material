@@ -99,6 +99,7 @@
     "react-ace": "*",
     "react-dom": "*",
     "react-transition-group": "*",
+    "react-useanimations": "*",
     "style-loader": "*",
     "stylelint": "*",
     "stylelint-config-standard": "*",
@@ -116,6 +117,7 @@
     "@rmwc/icon-button": "*",
     "@rmwc/select": "*",
     "@rmwc/textfield": "*",
+    "@rmwc/theme": "*",
     "@rmwc/tooltip": "*",
     "@rmwc/typography": "*",
     "@tinymce/tinymce-react": "*",
@@ -125,6 +127,7 @@
     "react-ace": "*",
     "react-dom": "*",
     "react-transition-group": "*",
+    "react-useanimations": "*",
     "tinymce": "^5.0.0"
   },
   "sideEffects": true,
