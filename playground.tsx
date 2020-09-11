@@ -17,6 +17,7 @@
     endregion
 */
 // region imports
+import Tools from 'clientnode'
 import React, {FunctionComponent, useState} from 'react'
 import ReactDOM from 'react-dom'
 
@@ -296,13 +297,7 @@ const Application:FunctionComponent<{}> = () => {
         </div>
 
         <pre className="outputs">{
-            selectedState ?
-                JSON.stringify(
-                    selectedState,
-                    Object.keys(selectedState).sort(),
-                    4
-                ) :
-                ''
+            selectedState ? Tools.represent(selectedState) : ''
         }</pre>
     </>)
 }
