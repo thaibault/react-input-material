@@ -169,6 +169,7 @@
       },
       "preprocessor": {
         "javaScript": {
+          "#": "Pre-process environment specific module.",
           "exclude": "!filePath.includes('clientnode/property-types') && isFilePathInDependencies(filePath)",
           "options": {
             "presets": {
