@@ -291,7 +291,18 @@ const Application:FunctionComponent<{}> = () => {
         </div>
 
         <pre className="outputs">{
-            selectedState ? Tools.represent(selectedState) : ''
+            selectedState ?
+                Tools.represent(
+                    Object.keys(selectedState)
+                        .filter(key => !/^on[A-Z]/.test(key))
+                        .reduce(
+                            (result, key) => (
+                                result[key] = selectedState[key], result
+                            ),
+                            {}
+                        )
+                ) :
+                ''
         }</pre>
     </>)
 }
