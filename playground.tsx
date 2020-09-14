@@ -27,8 +27,6 @@ const Application:FunctionComponent<{}> = () => {
     const [selectedState, setSelectedState] = useState()
     const onChange = (state) => setSelectedState(state)
 
-    const [value2, setValue2] = useState('')
-
     return (<>
         <div className="inputs">
 
@@ -41,14 +39,10 @@ const Application:FunctionComponent<{}> = () => {
 
             <hr/>
 
+            <GenericInput name="input2" onChange={onChange}/>
             <GenericInput
-                name="input2"
-                onChange={onChange}
-                onChangeValue={(value) => setValue2(value)}
-                value={value2}
-            />
-            <GenericInput
-                model={{name: 'input2Model', value: 'value2Model'}}
+                initialValue="value2Model"
+                model={{name: 'input2Model'}}
                 onChange={onChange}
             />
             <hr/>
@@ -56,16 +50,16 @@ const Application:FunctionComponent<{}> = () => {
             <GenericInput
                 declaration="Disabled"
                 disabled
+                initialValue="value3"
                 name="input3"
                 onChange={onChange}
-                value="value3"
             />
             <GenericInput
+                initialValue="value3Model"
                 model={{
                     declaration: 'Disabled',
                     mutable: false,
-                    name: 'input3Model',
-                    value: 'value3Model'
+                    name: 'input3Model'
                 }}
                 onChange={onChange}
             />
@@ -82,11 +76,11 @@ const Application:FunctionComponent<{}> = () => {
             />
             <GenericInput
                 icon="backup"
+                initialValue="value4Model"
                 model={{
                     declaration: 'placeholder',
                     name: 'input4Model',
-                    nullable: false,
-                    value: 'value4Model'
+                    nullable: false
                 }}
                 onChange={onChange}
                 placholder="input4Model"
@@ -99,18 +93,18 @@ const Application:FunctionComponent<{}> = () => {
                 declaration="pattern"
                 description="input5Description"
                 icon="search"
+                initialValue="only a`s allowed"
                 name="input5"
                 onChange={onChange}
                 pattern="a+"
                 placeholder="input5Placeholder"
-                value="only a`s allowed"
             />
             <GenericInput
+                initialValue="only a`s allowed"
                 model={{
                     declaration: 'pattern',
                     description: 'input5ModelDescription',
-                    regularExpressionPattern: 'a+',
-                    value: 'only a`s allowed'
+                    regularExpressionPattern: 'a+'
                 }}
                 name="input5Model"
                 onChange={onChange}
@@ -124,20 +118,20 @@ const Application:FunctionComponent<{}> = () => {
                 declaration="password"
                 description="input6Description"
                 icon="search"
+                initialValue="hans"
                 name="passwordInput6"
                 onChange={onChange}
                 pattern="a+"
                 placeholder="input6Placeholder"
                 tooltip="Please type in your password."
                 trailingIcon="password_preset"
-                value="hans"
             />
             <GenericInput
+                initialValue="hans"
                 model={{
                     declaration: 'password',
                     description: 'input6ModelDescription',
                     regularExpressionPattern: 'a+',
-                    value: 'hans'
                 }}
                 name="passwordInput6Model"
                 onChange={onChange}
@@ -150,14 +144,15 @@ const Application:FunctionComponent<{}> = () => {
             <GenericInput
                 declaration="selection"
                 description="input7Description"
+                initialValue="A"
                 name="input7"
                 onChange={onChange}
                 placeholder="input7Placeholder"
                 selection={['A', 'B', 'C']}
                 required
-                value="A"
             />
             <GenericInput
+                initialValue="A"
                 model={{
                     declaration: 'selection',
                     description: 'input7ModelDescription',
@@ -165,7 +160,6 @@ const Application:FunctionComponent<{}> = () => {
                     mutable: false,
                     nullable: false,
                     selection: ['A', 'B', 'C'],
-                    value: 'A'
                 }}
                 onChange={onChange}
                 placeholder="input7ModelPlaceholder"
@@ -174,20 +168,20 @@ const Application:FunctionComponent<{}> = () => {
             <GenericInput
                 declaration="selection"
                 description="input8Description"
+                initialValue="a"
                 name="input8"
                 onChange={onChange}
                 selection={{a: 'A', b: 'B', c: 'C'}}
                 required
-                value="a"
             />
             <GenericInput
+                initialValue="a"
                 model={{
                     declaration: 'selection',
                     description: 'input8ModelDescription',
                     name: 'input8Model',
                     nullable: false,
                     selection: {a: 'A', b: 'B', c: 'C'},
-                    value: 'a'
                 }}
                 onChange={onChange}
             />
@@ -196,6 +190,7 @@ const Application:FunctionComponent<{}> = () => {
                 declaration="text"
                 description="input9Description"
                 editor="text"
+                initialValue="a"
                 name="input9"
                 onChange={onChange}
                 required
@@ -204,16 +199,15 @@ const Application:FunctionComponent<{}> = () => {
                     primary: 'yellow',
                     secondary: 'blue'
                 }}
-                value="a"
             />
             <GenericInput
+                initialValue="a"
                 model={{
                     declaration: 'text',
                     description: 'input9ModelDescription',
                     editor: 'text',
                     name: 'input9Model',
                     nullable: false,
-                    value: 'a'
                 }}
                 onChange={onChange}
                 rows={2}
@@ -224,20 +218,20 @@ const Application:FunctionComponent<{}> = () => {
                 description="input10Description"
                 disabled
                 editor="code"
+                initialValue="const value = 2"
                 name="input10"
                 onChange={onChange}
                 rows={2}
                 selectableEditor
-                value="const value = 2"
             />
             <GenericInput
+                initialValue="const value = 2"
                 model={{
                     declaration: 'code',
                     description: 'input10ModelDescription',
                     editor: 'code',
                     name: 'input10Model',
                     nullable: false,
-                    value: 'const value = 2'
                 }}
                 onChange={onChange}
                 rows={6}
@@ -280,6 +274,7 @@ const Application:FunctionComponent<{}> = () => {
                 selectableEditor
             />
             <GenericInput
+                initialValue="Hello Mr. Smith,<br><br>how are you?"
                 model={{
                     declaration: 'richtext(simple)',
                     description: 'input12ModelDescription',
@@ -287,7 +282,6 @@ const Application:FunctionComponent<{}> = () => {
                     mutable: false,
                     name: 'input12Model',
                     nullable: false,
-                    value: 'Hello Mr. Smith,<br><br>how are you?'
                 }}
                 onChange={onChange}
                 rows={6}

@@ -306,6 +306,7 @@ export class GenericInput<Type = any> extends
             icon?:string|(IconOptions & {tooltip?:string|TooltipProps});
         */
         icon: oneOfType([string, object]),
+        initialValue: any,
         hidden: boolean,
         maximumLengthText: string,
         maximumText: string,
