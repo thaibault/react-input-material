@@ -75,6 +75,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     editorIsActive:boolean;
     fullWidth:boolean;
     icon:string|(IconOptions & {tooltip?:string|TooltipProps});
+    initialValue:null|Type;
     hidden:boolean;
     maximumLengthText:string;
     maximumText:string;

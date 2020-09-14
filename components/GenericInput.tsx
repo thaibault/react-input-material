@@ -306,6 +306,7 @@ export class GenericInput<Type = any> extends
             icon?:string|(IconOptions & {tooltip?:string|TooltipProps});
         */
         icon: oneOfType([string, object]),
+        initialValue: any,
         hidden: boolean,
         maximumLengthText: string,
         maximumText: string,
@@ -846,6 +847,7 @@ export class GenericInput<Type = any> extends
     getConsolidatedProperties(
         properties:Partial<Properties<Type>>
     ):Properties<Type> {
+        // TODO cursor and theme seems to be not present in result
         /*
         if (typeof properties.focused === 'function')
             for (const [a, b] of Object.entries(properties))
