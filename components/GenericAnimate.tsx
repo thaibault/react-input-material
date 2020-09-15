@@ -20,12 +20,12 @@
 import React, {FunctionComponent} from 'react'
 import {CSSTransition, TransitionProps} from 'react-transition-group'
 
-import styles from './Animate.module'
+import styles from './GenericAnimate.module'
 // endregion
 /**
  * Generic animation wrapper component.
  */
-export const Animate:FunctionComponent<TransitionProps<Type>> = (
+export const GenericAnimate:FunctionComponent<TransitionProps<Type>> = (
     properties:TransitionProps<Type>
 ) =>
     <CSSTransition
@@ -45,7 +45,7 @@ export const Animate:FunctionComponent<TransitionProps<Type>> = (
         :
             properties.children
     }</CSSTransition>
-export default Animate
+export default GenericAnimate
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
