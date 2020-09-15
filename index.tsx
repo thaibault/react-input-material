@@ -16,6 +16,7 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
+export {Animate} from './components/Animate'
 export {GenericInput} from './components/GenericInput'
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
