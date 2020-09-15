@@ -18,33 +18,35 @@
 */
 // region imports
 import React, {FunctionComponent} from 'react'
-import {CSSTransition, TransitionProps} from 'react-transition-group'
+import {CSSTransition} from 'react-transition-group'
+import {TransitionProps} from 'react-transition-group/Transition'
 
 import styles from './GenericAnimate.module'
 // endregion
 /**
  * Generic animation wrapper component.
  */
-export const GenericAnimate:FunctionComponent<TransitionProps<Type>> = (
-    properties:TransitionProps<Type>
-) =>
-    <CSSTransition
-        appear
-        classNames={styles['generic-animate']}
-        in
-        timeout={200}
-        unmountOnExit
-        {...properties}
-    >{
-        typeof properties.children === 'string' ?
-            <span>{properties.children}</span> :
-        Array.isArray(properties.children) ?
-            <div className={styles['generic-animate__list-wrapper']}>
-                {properties.children}
-            </div>
-        :
-            properties.children
-    }</CSSTransition>
+export const GenericAnimate:FunctionComponent<TransitionProps<HTMLElement|undefined>> =
+    <Type extends HTMLElement|undefined = undefined>(
+        properties:TransitionProps<Type>
+    ) =>
+        <CSSTransition
+            appear
+            classNames={styles['generic-animate']}
+            in
+            timeout={200}
+            unmountOnExit
+            {...properties}
+        >{
+            typeof properties.children === 'string' ?
+                <span>{properties.children}</span> :
+            Array.isArray(properties.children) ?
+                <div className={styles['generic-animate__list-wrapper']}>
+                    {properties.children}
+                </div>
+            :
+                properties.children
+        }</CSSTransition>
 export default GenericAnimate
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

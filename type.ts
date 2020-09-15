@@ -18,7 +18,7 @@
 // region imports
 import {Mapping} from 'clientnode/type'
 import {
-    Component, FocusEvent, KeyUpEvent, MouseEvent, SyntheticEvent
+    Component, FocusEvent, KeyboardEvent, MouseEvent, SyntheticEvent
 } from 'react'
 import {IconOptions} from '@rmwc/types'
 import {ThemeProviderProps} from '@rmwc/theme'
@@ -43,7 +43,7 @@ export type ModelState = {
 }
 export type BaseModel<Type = any> = {
     declaration:string;
-    default:Type;
+    default?:null|Type;
     description:string;
     editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)';
     emtyEqualsNull:boolean;
@@ -91,8 +91,8 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     onClick:(event:MouseEvent) => void;
     onConfigure:(properties:Properties<Type>) => void;
     onFocus:(event:FocusEvent) => void;
-    onKeyUp:(event:KeyUpEvent) => void;
-    onSelectionChange:(event:SynthethicEvent) => void;
+    onKeyUp:(event:KeyboardEvent) => void;
+    onSelectionChange:(event:SyntheticEvent) => void;
     onTouch:(event:Event) => void;
     outlined:boolean;
     pattern:string;

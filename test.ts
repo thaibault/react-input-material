@@ -1,5 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
+/** @module test */
 'use strict'
 /* !
     region header
@@ -14,8 +15,10 @@
     endregion
 */
 // region imports
+import GenericInput from './components/GenericInput'
 // endregion
 describe('react-input-material', () => {
+    console.log(GenericInput)
     // region mockup
     // endregion
     // region tests

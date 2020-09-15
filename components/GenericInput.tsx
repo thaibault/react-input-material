@@ -30,12 +30,13 @@ import PropertyTypes, {
     shape,
     string
 } from 'clientnode/property-types'
-import {DomNode, Mapping, ValueOf} from 'clientnode/type'
+import {Mapping, PlainObject, ValueOf} from 'clientnode/type'
 import React, {
     Component,
+    ComponentType,
     createRef,
     FocusEvent,
-    KeyUpEvent,
+    KeyboardEvent,
     lazy,
     MouseEvent,
     PureComponent,
@@ -44,7 +45,6 @@ import React, {
     Suspense,
     SyntheticEvent
 } from 'react'
-import {ReactAce as CodeEditorType} from 'react-ace'
 import {Settings as TinyMCEOptions} from 'tinymce'
 import {Output, ReactWebComponent} from 'web-component-wrapper/type'
 import {FormField} from '@rmwc/formfield'
@@ -60,6 +60,7 @@ import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
 import UseAnimations from 'react-useanimations'
 import loading from 'react-useanimations/lib/loading'
 import lock from 'react-useanimations/lib/lock'
+import plusToX from 'react-useanimations/lib/plusToX'
 
 import '@rmwc/formfield/styles'
 import '@rmwc/icon-button/styles'
@@ -75,7 +76,7 @@ import {Model, ModelState, Properties, State} from '../type'
 import styles from './GenericInput.module'
 // endregion
 // region code editor configuration
-const CodeEditor = lazy(async ():Promise<CodeEditorType> => {
+const CodeEditor = lazy(async ():Promise<{default:ComponentType<any>}> => {
     const {config} = await import('ace-builds')
     config.set('basePath', '/node_modules/ace-builds/src-noconflict/')
     config.set('useWorker', false)
@@ -83,6 +84,12 @@ const CodeEditor = lazy(async ():Promise<CodeEditorType> => {
 })
 // endregion
 // region rich text editor configuration
+declare var UTC_BUILD_TIMESTAMP:number
+// NOTE: Could be set via module bundler environment variables.
+if (typeof UTC_BUILD_TIMESTAMP === 'undefined')
+    /* eslint-disable no-var */
+    var UTC_BUILD_TIMESTAMP:number = 1
+    /* eslint-enable no-var */
 let richTextEditorLoaded:boolean = false
 const tinymceBasePath:string = '/node_modules/tinymce/'
 const tinymceScriptPath:string = `${tinymceBasePath}tinymce.min.js`
@@ -127,7 +134,7 @@ export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
 }
 // endregion
 // region property type helper
-const modelStatePropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
+const modelStatePropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     dirty: boolean,
     focused: boolean,
     invalid: boolean,
@@ -143,7 +150,7 @@ const modelStatePropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
     valid: boolean,
     visited: boolean
 }
-const baseModelPropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
+const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     declaration: string,
     default: any,
     description: string,
@@ -169,9 +176,9 @@ const baseModelPropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
     minimumLength: number,
     name: string,
     regularExpressionPattern: string,
-    selection: oneOfType([
-        arrayOf(oneOfType([number, string])),
-        objectOf(oneOfType([number, string]))
+    selection: (oneOfType as Function)([
+        (arrayOf as Function)((oneOfType as Function)([number, string])),
+        (objectOf as Function)((oneOfType as Function)([number, string]))
     ]),
     trim: boolean,
     /*
@@ -241,7 +248,7 @@ export class GenericInput<Type = any> extends
         minimumText: 'Please give a number at least or equal to ${minimum}.',
         model: {
             declaration: '',
-            default: '',
+            default: null,
             description: '',
             editor: 'plain',
             emptyEqualsNull: true,
@@ -660,7 +667,11 @@ export class GenericInput<Type = any> extends
     applyIconPreset(options?:Properties['icon']):Properties['icon']|void {
         if (options === 'clear_preset')
             return {
-                icon: 'clear',
+                icon: <GenericAnimate
+                    in={this.properties.value !== this.properties.default}
+                >
+                    <UseAnimations animation={plusToX} reverse={true}/>
+                </GenericAnimate>,
                 onClick: (event:MouseEvent):void => {
                     event.preventDefault()
                     event.stopPropagation()
@@ -668,11 +679,11 @@ export class GenericInput<Type = any> extends
                         this.properties, this.properties.default
                     ))
                 },
+                strategy: 'component',
                 tooltip: 'Clear input'
             }
         if (options === 'password_preset')
             return {
-                strategy: 'component',
                 icon: <UseAnimations
                     animation={lock}
                     reverse={!this.properties.hidden}
@@ -683,6 +694,7 @@ export class GenericInput<Type = any> extends
                     this.setState(({hidden}):void => ({hidden: !hidden}))
                     this.onChange(event)
                 },
+                strategy: 'component',
                 tooltip:
                     (this.properties.hidden ? 'Show' : 'Hide') + ' password'
             }
@@ -1139,7 +1151,7 @@ export class GenericInput<Type = any> extends
     ):Component {
         if (typeof options === 'string')
             return <Tooltip
-                content=<Typography use="caption">{options}</Typography>
+                content={<Typography use="caption">{options}</Typography>}
             >{content}</Tooltip>
         else if (options !== null && typeof options === 'object')
             return <Tooltip {...options}>
