@@ -69,7 +69,7 @@ import '@rmwc/theme/styles'
 import '@rmwc/tooltip/styles'
 import '@rmwc/typography/styles'
 
-import {Animate} from './Animate'
+import {GenericAnimate} from './GenericAnimate'
 import '../material-fixes'
 import {Model, ModelState, Properties, State} from '../type'
 import styles from './GenericInput.module'
@@ -1107,10 +1107,14 @@ export class GenericInput<Type = any> extends
     ):Component {
         if (typeof propertiesOrInCondition === 'boolean')
             return condition ?
-                <Animate in={propertiesOrInCondition}>{content}</Animate> :
+                <GenericAnimate in={propertiesOrInCondition}>
+                    {content}
+                </GenericAnimate> :
                 propertiesOrInCondition ? content : ''
         return condition ?
-            <Animate {...propertiesOrInCondition}>{content}</Animate> :
+            <GenericAnimate {...propertiesOrInCondition}>
+                {content}
+            </GenericAnimate> :
             propertiesOrInCondition.in ? content : ''
     }
     /**
@@ -1187,7 +1191,7 @@ export class GenericInput<Type = any> extends
             helpText: {
                 persistent: Boolean(properties.declaration),
                 children: <>
-                   <Animate in={
+                   <GenericAnimate in={
                         properties.selectableEditor &&
                         properties.type === 'string' &&
                         properties.editor !== 'plain'
@@ -1202,8 +1206,8 @@ export class GenericInput<Type = any> extends
                                 onClick: this.onChangeEditorIsActive
                             }}
                         />
-                    </Animate>
-                    <Animate in={Boolean(properties.declaration)}>
+                    </GenericAnimate>
+                    <GenericAnimate in={Boolean(properties.declaration)}>
                         <IconButton
                             icon={{
                                 icon:
@@ -1215,11 +1219,11 @@ export class GenericInput<Type = any> extends
                                 onClick: this.onChangeShowDeclaration
                             }}
                         />
-                    </Animate>
-                    <Animate in={properties.showDeclaration}>
+                    </GenericAnimate>
+                    <GenericAnimate in={properties.showDeclaration}>
                         {properties.declaration}
-                    </Animate>
-                    <Animate in={
+                    </GenericAnimate>
+                    <GenericAnimate in={
                         !properties.showDeclaration &&
                         properties.invalid &&
                         (
@@ -1248,7 +1252,7 @@ export class GenericInput<Type = any> extends
                                 properties.requiredText
                             )}
                         </Theme>
-                    </Animate>
+                    </GenericAnimate>
                 </>
             },
             icon: this.wrapIconWithTooltip(
@@ -1360,7 +1364,7 @@ export class GenericInput<Type = any> extends
         }>{this.wrapStrict(this.wrapTooltip(
             properties.tooltip,
             <div>
-                <Animate in={Boolean(properties.selection)}>
+                <GenericAnimate in={Boolean(properties.selection)}>
                     <Select
                         enhanced
                         onChange={this.onChangeValue}
@@ -1368,7 +1372,7 @@ export class GenericInput<Type = any> extends
                         {...genericProperties}
                         {...materialProperties}
                     />
-                </Animate>
+                </GenericAnimate>
                 {this.wrapAnimationConditionally(
                     [
                         <FormField

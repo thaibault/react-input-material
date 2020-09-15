@@ -20,9 +20,9 @@
     "form-field"
   ],
   "files": [
-    "Animate.js",
-    "Animate.styles.compiled.css",
     "components",
+    "GenericAnimate.js",
+    "GenericAnimate.styles.compiled.css",
     "GenericInput.js",
     "GenericInput.styles.compiled.css",
     "index.ts",
@@ -149,7 +149,7 @@
     },
     "injection": {
       "entry": {
-        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? './playground' : {Animate: './components/Animate', GenericInput: './components/GenericInput', index: './index'}"
+        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? './playground' : {GenericAnimate: './components/GenericAnimate', GenericInput: './components/GenericInput', index: './index'}"
       }
     },
     "module": {
