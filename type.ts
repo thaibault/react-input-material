@@ -46,14 +46,14 @@ export type BaseModel<Type = any> = {
     default?:null|Type;
     description:string;
     editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)';
-    emtyEqualsNull:boolean;
+    emptyEqualsNull:boolean;
     maximum:number;
     maximumLength:number;
     minimum:number;
     minimumLength:number;
     name:string;
     regularExpressionPattern:string;
-    selection:Array<number|string>|Mapping<number|string>;
+    selection?:Array<number|string>|Mapping<number|string>;
     trim:boolean;
     type:'date'|'datetime-local'|'month'|'number'|'range'|'string'|'time'|'week';
     value?:null|Type;

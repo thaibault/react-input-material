@@ -176,9 +176,9 @@ const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     minimumLength: number,
     name: string,
     regularExpressionPattern: string,
-    selection: (oneOfType as Function)([
-        (arrayOf as Function)((oneOfType as Function)([number, string])),
-        (objectOf as Function)((oneOfType as Function)([number, string]))
+    selection: oneOfType([
+        arrayOf(oneOfType([number, string])),
+        objectOf(oneOfType([number, string]))
     ]),
     trim: boolean,
     /*
@@ -259,9 +259,7 @@ export class GenericInput<Type = any> extends
             mutable: true,
             name: 'NO_NAME_DEFINED',
             nullable: true,
-            placeholder: '',
             regularExpressionPattern: '.*',
-            selection: null,
             state: GenericInput.defaultModelState,
             trim: true,
             type: 'string',
@@ -276,8 +274,8 @@ export class GenericInput<Type = any> extends
         showInitialValidationState: false
     }
     static readonly output:Output = {onChange: true}
-    static readonly propertiesToReflectAsAttributes:Mapping<boolean> = new Map(
-        [
+    static readonly propertiesToReflectAsAttributes:Map<string, boolean> =
+        new Map([
             ['dirty', true],
             ['focused', true],
             ['invalid', true],
@@ -293,9 +291,8 @@ export class GenericInput<Type = any> extends
             ['untouched', true],
             ['valid', true],
             ['visited', true]
-        ]
-    )
-    static readonly propTypes:Mapping<ValueOf<PropertyTypes>> = {
+        ])
+    static readonly propTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
         /*
             NOTE: Not yet working:
             align: oneOf(['end', 'start']),
