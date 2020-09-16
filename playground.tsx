@@ -19,13 +19,17 @@
 // region imports
 import Tools from 'clientnode'
 import React, {FunctionComponent, useState} from 'react'
+import {ReactElement} from 'react'
 import ReactDOM from 'react-dom'
 
 import GenericInput from './components/GenericInput'
+import {Properties} from './type'
 // endregion
-const Application:FunctionComponent<{}> = () => {
-    const [selectedState, setSelectedState] = useState()
-    const onChange = (state) => setSelectedState(state)
+const Application:FunctionComponent<{}> = ():ReactElement => {
+    const [selectedState, setSelectedState] = useState<Properties>()
+    function onChange<Type = string>(state:Properties<Type>):void {
+        setSelectedState(state)
+    }
 
     return (<>
         <div className="inputs">
@@ -83,7 +87,7 @@ const Application:FunctionComponent<{}> = () => {
                     nullable: false
                 }}
                 onChange={onChange}
-                placholder="input4Model"
+                placeholder="input4Model"
                 trailingIcon="clear_preset"
             />
 
@@ -290,23 +294,26 @@ const Application:FunctionComponent<{}> = () => {
 
         </div>
 
-        <pre className="outputs">{
-            selectedState ?
-                Tools.represent(
-                    Object.keys(selectedState)
-                        .filter(key => !/^on[A-Z]/.test(key))
-                        .reduce(
-                            (result, key) => (
-                                result[key] = selectedState[key], result
-                            ),
-                            {}
-                        )
-                ) :
-                ''
+        <pre className="outputs">{selectedState ?
+            Tools.represent(
+                Object.keys(selectedState)
+                    .filter((key:string):boolean => !/^on[A-Z]/.test(key))
+                    .reduce(
+                        (
+                            result:Partial<Properties>, key:string
+                        ):Partial<Properties> => {
+                            result[key as keyof Properties] =
+                                selectedState[key as keyof Properties]
+                            return result
+                        },
+                        {}
+                    )
+            ) :
+            ''
         }</pre>
     </>)
 }
-window.onload = ():Application =>
+window.onload = ():void =>
     ReactDOM.render(<Application />, document.querySelector('.app'))
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

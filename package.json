@@ -73,6 +73,7 @@
     "@types/jsdom": "*",
     "@types/loader-utils": "*",
     "@types/node": "*",
+    "@types/react-dom": "*",
     "@types/react-transition-group": "*",
     "@types/tinymce": "*",
     "@typescript-eslint/eslint-plugin": "*",

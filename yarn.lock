@@ -1870,9 +1870,9 @@
     "@types/istanbul-lib-report" "*"
 
 "@types/jest@*":
-  version "26.0.13"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-26.0.13.tgz#5a7b9d5312f5dd521a38329c38ee9d3802a0b85e"
-  integrity sha512-sCzjKow4z9LILc6DhBvn5AkIfmQzDZkgtVVKmGwVrs5tuid38ws281D4l+7x1kP487+FlKDh5kfMZ8WSPAdmdA==
+  version "26.0.14"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-26.0.14.tgz#078695f8f65cb55c5a98450d65083b2b73e5a3f3"
+  integrity sha512-Hz5q8Vu0D288x3iWXePSn53W7hAjP0H7EQ6QvDO9c7t46mR0lNOLlfuwQ+JkVxuhygHzlzPX+0jKdA3ZgSh+Vg==
   dependencies:
     jest-diff "^25.2.1"
     pretty-format "^25.2.1"
@@ -1950,6 +1950,13 @@
   version "1.5.4"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.4.tgz#15925414e0ad2cd765bfef58842f7e26a7accb24"
   integrity sha512-1HcDas8SEj4z1Wc696tH56G8OlRaH/sqZOynNNB+HF0WOeXPaxTtbYzJY2oEfiUxjSKjhCKr+MvR7dCHcEelug==
+
+"@types/react-dom@*":
+  version "16.9.8"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.9.8.tgz#fe4c1e11dfc67155733dfa6aa65108b4971cb423"
+  integrity sha512-ykkPQ+5nFknnlU6lDd947WbQ6TE3NNzbQAkInC2EKY1qeYdTKp7onFusmYZb+ityzx2YviqT6BXSu+LyWWJwcA==
+  dependencies:
+    "@types/react" "*"
 
 "@types/react-transition-group@*":
   version "4.4.0"
@@ -4046,9 +4053,9 @@ cli-table3@^0.5.0:
     colors "^1.1.2"
 
 clientnode@*:
-  version "3.0.522"
-  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.522.tgz#fb1cef4831734b399ee4af3aeae810eb33bd30f2"
-  integrity sha512-E8J6LOY10aomlXJ9jtP4sbvnlXyLg4FDGe5JsAWlKvJu1SU4KzQJehyR30DS7SJLgEH2yPvt4/ouaJbX5Wb5dA==
+  version "3.0.524"
+  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.524.tgz#eba4ee5b340f641e4913a3b7df32a9ed20012d26"
+  integrity sha512-ZTSVoibTR2GRXyoiPQkpP7cPL8mgpv92jj1h4xAzJA53xdT5AilhyFHtH1lE2RJSbx/yFtqzgdjAdHZOETiXBQ==
 
 cliui@^4.0.0:
   version "4.1.0"
@@ -13065,9 +13072,9 @@ wbuf@^1.1.0, wbuf@^1.7.3:
     minimalistic-assert "^1.0.0"
 
 web-component-wrapper@*:
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.15.tgz#21118a46d7ba3ff7723859b808ced04072e85d4d"
-  integrity sha512-CQHw/psyNMBF1TEoWJ7QzhqC1XFIffKRyahcYjGVU4ggJM83oTQhEy8QrsGoxVN3lgi/cbIMi5M900ACzO5y8g==
+  version "0.0.18"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.18.tgz#8582ed37b5d9ee9464d21f5efac244cdc5688c85"
+  integrity sha512-ulJkNCSoxLfPfV2gNi+gY7/+fU6ncHbaidvebnJu0cQJqEreaxsHA79uYtEe0El0bghYD3dZhXEYbqih0AJRBw==
 
 webidl-conversions@^5.0.0:
   version "5.0.0"

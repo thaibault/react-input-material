@@ -16,7 +16,8 @@
     endregion
 */
 // region imports
-import {Mapping} from 'clientnode/type'
+import GenericPropertyTypes from 'clientnode/property-types'
+import {Mapping, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
     Component, FocusEvent, KeyboardEvent, MouseEvent, SyntheticEvent
 } from 'react'
@@ -52,7 +53,7 @@ export type BaseModel<Type = any> = {
     minimum:number;
     minimumLength:number;
     name:string;
-    regularExpressionPattern:string;
+    regularExpressionPattern:RegExp|string;
     selection?:Array<number|string>|Mapping<number|string>;
     trim:boolean;
     type:'date'|'datetime-local'|'month'|'number'|'range'|'string'|'time'|'week';
@@ -85,17 +86,16 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     onBlur:(event:SyntheticEvent) => void;
     onChange:(properties:Properties<Type>, event?:SyntheticEvent) => void;
     onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void;
-    onChangeValue:(value:null|Type, event:SyntheticEvent) => void;
-    onChangeShowDeclaration:(show:boolean, event:SyntheticEvent) => void;
-    onChangeState:(state:ModelState, event:SyntheticEvent) => void;
+    onChangeValue:(value:null|Type, event?:SyntheticEvent) => void;
+    onChangeShowDeclaration:(show:boolean, event?:SyntheticEvent) => void;
+    onChangeState:(state:ModelState, event?:SyntheticEvent) => void;
     onClick:(event:MouseEvent) => void;
-    onConfigure:(properties:Properties<Type>) => void;
     onFocus:(event:FocusEvent) => void;
     onKeyUp:(event:KeyboardEvent) => void;
     onSelectionChange:(event:SyntheticEvent) => void;
-    onTouch:(event:Event) => void;
+    onTouch:(event:SyntheticEvent) => void;
     outlined:boolean;
-    pattern:string;
+    pattern:RegExp|string;
     patternText:string;
     placeholder:string;
     required?:boolean;
@@ -109,7 +109,10 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     tooltip:string|TooltipProps;
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps});
 }
-export type Props<Type = any> = Partial<Properties<Type>>
+export type PropertyTypes<Type = any> = {
+    [key in keyof Properties<Type>]:ValueOf<typeof GenericPropertyTypes>
+}
+export type Props<Type = any> = RecursivePartial<Properties<Type>>
 export type State<Type = any> = {
     cursor:{
         end:number;
