@@ -116,7 +116,7 @@ export type State<Type = any> = {
         start:number;
     };
     editorIsActive:boolean;
-    hidden:boolean;
+    hidden?:boolean;
     model:ModelState;
     selectionIsUnstable:boolean;
     showDeclaration:boolean;

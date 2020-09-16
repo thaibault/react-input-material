@@ -358,7 +358,7 @@ export class GenericInput<Type = any> extends
     static readonly strict:boolean = false
     // endregion
     // region properties
-    codeEditorReference?:CodeEditor
+    codeEditorReference?:typeof CodeEditor
     inputReference:RefObject<HTMLInputElement> = createRef<HTMLInputElement>()
     properties:Properties<Type>
     richTextEditorReference?:RichTextEditor
@@ -369,7 +369,6 @@ export class GenericInput<Type = any> extends
             start: 0
         },
         editorIsActive: false,
-        hidden: undefined,
         model: {...GenericInput.defaultModelState},
         selectionIsUnstable: false,
         showDeclaration: false,
