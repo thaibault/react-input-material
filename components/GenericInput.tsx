@@ -399,6 +399,11 @@ export class GenericInput<Type = any> extends
      */
     constructor(properties:Props<Type>) {
         super(properties)
+        if (
+            Object.prototype.hasOwnProperty.call(this.props, 'initialValue') &&
+            typeof this.props.initialValue !== 'undefined'
+        )
+            this.state.value = this.props.initialValue as null|Type
         this.properties = this.getConsolidatedProperties(properties)
     }
     /**
@@ -466,9 +471,9 @@ export class GenericInput<Type = any> extends
             state.showDeclaration = properties.showDeclaration
 
         if (properties.value !== undefined)
-            state.value = properties.value
+            state.value = properties.value as null|Type
         else if (properties.model?.value !== undefined)
-            state.value = properties.model.value
+            state.value = properties.model.value as null|Type
 
         return state
     }
@@ -515,7 +520,14 @@ export class GenericInput<Type = any> extends
     onChange = (event?:SyntheticEvent):void => {
         if (this.properties.onChange)
             this.properties.onChange(
-                this.getConsolidatedProperties(this.properties), event
+                this.getConsolidatedProperties(
+                    /*
+                        Workaround since "Something" isn't identified as subset
+                        of "RecursivePartial<Type>"
+                    */
+                    this.properties as unknown as Props<Type>
+                ),
+                event
             )
     }
     /**
@@ -888,13 +900,6 @@ export class GenericInput<Type = any> extends
      * @returns External properties object.
      */
     getConsolidatedProperties(properties:Props<Type>):Properties<Type> {
-        // TODO cursor and theme seems to be not present in result
-        /*
-        if (typeof properties.focused === 'function')
-            for (const [a, b] of Object.entries(properties))
-                properties[a] = b()
-        */
-
         properties = this.mapPropertiesAndStateToModel(properties)
         const result:Properties<Type> & {
             state?:null;
@@ -933,7 +938,7 @@ export class GenericInput<Type = any> extends
      * properties.
      * @returns Nothing.
     */
-    mapPropertiesAndStateToModel(properties:Props<Type>):Properties<Type> {
+    mapPropertiesAndStateToModel(properties:Props<Type>):Props<Type> {
         /*
             NOTE: Default props seems not to respect nested layers to merge so
             we have to manage this for nested model structure.
