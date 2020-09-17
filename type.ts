@@ -16,9 +16,10 @@
     endregion
 */
 // region imports
-import {Mapping} from 'clientnode/type'
+import GenericPropertyTypes from 'clientnode/property-types'
+import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
-    Component, FocusEvent, KeyUpEvent, MouseEvent, SyntheticEvent
+    Component, FocusEvent, KeyboardEvent, MouseEvent, SyntheticEvent
 } from 'react'
 import {IconOptions} from '@rmwc/types'
 import {ThemeProviderProps} from '@rmwc/theme'
@@ -43,17 +44,17 @@ export type ModelState = {
 }
 export type BaseModel<Type = any> = {
     declaration:string;
-    default:Type;
+    default?:null|Type;
     description:string;
     editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)';
-    emtyEqualsNull:boolean;
+    emptyEqualsNull:boolean;
     maximum:number;
     maximumLength:number;
     minimum:number;
     minimumLength:number;
     name:string;
-    regularExpressionPattern:string;
-    selection:Array<number|string>|Mapping<number|string>;
+    regularExpressionPattern:RegExp|string;
+    selection?:Array<number|string>|Mapping<number|string>;
     trim:boolean;
     type:'date'|'datetime-local'|'month'|'number'|'range'|'string'|'time'|'week';
     value?:null|Type;
@@ -85,17 +86,16 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     onBlur:(event:SyntheticEvent) => void;
     onChange:(properties:Properties<Type>, event?:SyntheticEvent) => void;
     onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void;
-    onChangeValue:(value:null|Type, event:SyntheticEvent) => void;
-    onChangeShowDeclaration:(show:boolean, event:SyntheticEvent) => void;
-    onChangeState:(state:ModelState, event:SyntheticEvent) => void;
+    onChangeValue:(value:null|Type, event?:SyntheticEvent) => void;
+    onChangeShowDeclaration:(show:boolean, event?:SyntheticEvent) => void;
+    onChangeState:(state:ModelState, event?:SyntheticEvent) => void;
     onClick:(event:MouseEvent) => void;
-    onConfigure:(properties:Properties<Type>) => void;
     onFocus:(event:FocusEvent) => void;
-    onKeyUp:(event:KeyUpEvent) => void;
-    onSelectionChange:(event:SynthethicEvent) => void;
-    onTouch:(event:Event) => void;
+    onKeyUp:(event:KeyboardEvent) => void;
+    onSelectionChange:(event:SyntheticEvent) => void;
+    onTouch:(event:SyntheticEvent) => void;
     outlined:boolean;
-    pattern:string;
+    pattern:RegExp|string;
     patternText:string;
     placeholder:string;
     required?:boolean;
@@ -109,18 +109,27 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     tooltip:string|TooltipProps;
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps});
 }
-export type Props<Type = any> = Partial<Properties<Type>>
+export type PropertyTypes<Type = any> = {
+    [key in keyof Properties<Type>]:ValueOf<typeof GenericPropertyTypes>
+}
+export type Props<Type = any> = RecursivePartial<Properties<Type>>
 export type State<Type = any> = {
     cursor:{
         end:number;
         start:number;
     };
     editorIsActive:boolean;
-    hidden:boolean;
+    hidden?:boolean;
     model:ModelState;
     selectionIsUnstable:boolean;
     showDeclaration:boolean;
     value:null|Type;
+}
+export type TransformSpecification<Type = any> = {
+    format?:(value:null|Type) => string;
+    options:PlainObject;
+    parse?:(value:string) => null|Type;
+    type?:string;
 }
 // endregion
 // region vim modline

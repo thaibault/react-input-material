@@ -30,21 +30,25 @@ import PropertyTypes, {
     shape,
     string
 } from 'clientnode/property-types'
-import {DomNode, Mapping, ValueOf} from 'clientnode/type'
+import {Mapping, PlainObject, ValueOf} from 'clientnode/type'
+import {ValidationMap} from 'prop-types'
 import React, {
     Component,
+    ComponentType,
     createRef,
     FocusEvent,
-    KeyUpEvent,
+    KeyboardEvent,
     lazy,
     MouseEvent,
     PureComponent,
+    ReactElement,
     RefObject,
     StrictMode,
     Suspense,
     SyntheticEvent
 } from 'react'
-import {ReactAce as CodeEditorType} from 'react-ace'
+import CodeEditorType from 'react-ace'
+import {TransitionProps} from 'react-transition-group/Transition'
 import {Settings as TinyMCEOptions} from 'tinymce'
 import {Output, ReactWebComponent} from 'web-component-wrapper/type'
 import {FormField} from '@rmwc/formfield'
@@ -60,6 +64,7 @@ import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
 import UseAnimations from 'react-useanimations'
 import loading from 'react-useanimations/lib/loading'
 import lock from 'react-useanimations/lib/lock'
+import plusToX from 'react-useanimations/lib/plusToX'
 
 import '@rmwc/formfield/styles'
 import '@rmwc/icon-button/styles'
@@ -71,11 +76,20 @@ import '@rmwc/typography/styles'
 
 import {GenericAnimate} from './GenericAnimate'
 import '../material-fixes'
-import {Model, ModelState, Properties, State} from '../type'
+import {
+    BaseModel,
+    Model,
+    ModelState,
+    Properties,
+    PropertyTypes as InputPropertyTypes,
+    Props,
+    State,
+    TransformSpecification
+} from '../type'
 import styles from './GenericInput.module'
 // endregion
 // region code editor configuration
-const CodeEditor = lazy(async ():Promise<CodeEditorType> => {
+const CodeEditor = lazy(async ():Promise<{default:ComponentType<any>}> => {
     const {config} = await import('ace-builds')
     config.set('basePath', '/node_modules/ace-builds/src-noconflict/')
     config.set('useWorker', false)
@@ -83,6 +97,12 @@ const CodeEditor = lazy(async ():Promise<CodeEditorType> => {
 })
 // endregion
 // region rich text editor configuration
+declare var UTC_BUILD_TIMESTAMP:number
+// NOTE: Could be set via module bundler environment variables.
+if (typeof UTC_BUILD_TIMESTAMP === 'undefined')
+    /* eslint-disable no-var */
+    var UTC_BUILD_TIMESTAMP:number = 1
+    /* eslint-enable no-var */
 let richTextEditorLoaded:boolean = false
 const tinymceBasePath:string = '/node_modules/tinymce/'
 const tinymceScriptPath:string = `${tinymceBasePath}tinymce.min.js`
@@ -127,7 +147,7 @@ export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
 }
 // endregion
 // region property type helper
-const modelStatePropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
+const modelStatePropertyTypes:{[key in keyof ModelState]:typeof boolean} = {
     dirty: boolean,
     focused: boolean,
     invalid: boolean,
@@ -142,8 +162,10 @@ const modelStatePropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
     untouched: boolean,
     valid: boolean,
     visited: boolean
-}
-const baseModelPropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
+} as const
+const baseModelPropertyTypes:{
+    [key in keyof BaseModel]:ValueOf<typeof PropertyTypes>
+} = {
     declaration: string,
     default: any,
     description: string,
@@ -162,13 +184,13 @@ const baseModelPropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
         ]),
     */
     editor: string,
-    emtyEqualsNull: boolean,
+    emptyEqualsNull: boolean,
     maximum: number,
     maximumLength: number,
     minimum: number,
     minimumLength: number,
     name: string,
-    regularExpressionPattern: string,
+    regularExpressionPattern: oneOfType([object, string]),
     selection: oneOfType([
         arrayOf(oneOfType([number, string])),
         objectOf(oneOfType([number, string]))
@@ -189,7 +211,7 @@ const baseModelPropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
     */
     type: string,
     value: any
-}
+} as const
 // endregion
 /**
  * Generic input wrapper component which automatically determines a useful
@@ -214,7 +236,8 @@ const baseModelPropertyTypes:Mapping<ValueOf<PropertyTypes>> = {
  * @property state - Current state.
  */
 export class GenericInput<Type = any> extends
-    PureComponent<Partial<Properties<Type>>> implements ReactWebComponent {
+    PureComponent<Props<Type>, State<Type>> implements
+    ReactWebComponent {
     // region static properties
     static readonly defaultModelState:ModelState = {
         dirty: false,
@@ -232,7 +255,7 @@ export class GenericInput<Type = any> extends
         valid: true,
         visited: false
     }
-    static readonly defaultProps:Partial<Properties<string>> = {
+    static readonly defaultProps:Props & Pick<Properties, 'model'> = {
         maximumLengthText:
             'Please type less or equal than ${maximumLength} symbols.',
         maximumText: 'Please give a number less or equal than ${maximum}.',
@@ -241,7 +264,7 @@ export class GenericInput<Type = any> extends
         minimumText: 'Please give a number at least or equal to ${minimum}.',
         model: {
             declaration: '',
-            default: '',
+            default: null,
             description: '',
             editor: 'plain',
             emptyEqualsNull: true,
@@ -252,9 +275,7 @@ export class GenericInput<Type = any> extends
             mutable: true,
             name: 'NO_NAME_DEFINED',
             nullable: true,
-            placeholder: '',
             regularExpressionPattern: '.*',
-            selection: null,
             state: GenericInput.defaultModelState,
             trim: true,
             type: 'string',
@@ -268,9 +289,10 @@ export class GenericInput<Type = any> extends
         showDeclaration: undefined,
         showInitialValidationState: false
     }
+    static readonly local:string = 'en-US'
     static readonly output:Output = {onChange: true}
-    static readonly propertiesToReflectAsAttributes:Mapping<boolean> = new Map(
-        [
+    static readonly propertiesToReflectAsAttributes:Map<keyof Properties, boolean> =
+        new Map([
             ['dirty', true],
             ['focused', true],
             ['invalid', true],
@@ -286,9 +308,10 @@ export class GenericInput<Type = any> extends
             ['untouched', true],
             ['valid', true],
             ['visited', true]
-        ]
-    )
-    static readonly propTypes:Mapping<ValueOf<PropertyTypes>> = {
+        ])
+    static readonly propTypes:{
+        [key in keyof Properties]:ValueOf<typeof PropertyTypes>
+    } = {
         /*
             NOTE: Not yet working:
             align: oneOf(['end', 'start']),
@@ -314,7 +337,9 @@ export class GenericInput<Type = any> extends
         minimumText: string,
         model: shape({
             mutable: boolean,
-            state: shape(modelStatePropertyTypes),
+            state: shape(
+                modelStatePropertyTypes as ValidationMap<typeof PropertyTypes>
+            ),
             writable: boolean,
             ...baseModelPropertyTypes
         }),
@@ -330,7 +355,7 @@ export class GenericInput<Type = any> extends
         onSelectionChange: func,
         onTouch: func,
         outlined: boolean,
-        pattern: string,
+        pattern: oneOfType([object, string]),
         patternText: string,
         placeholder: string,
         required: boolean,
@@ -352,9 +377,55 @@ export class GenericInput<Type = any> extends
         ...baseModelPropertyTypes
     }
     static readonly strict:boolean = false
+    static readonly transformer:Mapping<TransformSpecification> = {
+        currency: {
+            format: (value:any):string => (new Intl.NumberFormat(
+                GenericInput.local,
+                {
+                    currency: 'USD',
+                    style: 'currency',
+                    ...(GenericInput.transformer.currency.options || {})
+                }
+            )).format(value),
+            parse: (value:string):any =>
+                GenericInput.transformer.float.parse(value),
+            type: 'text'
+        },
+        float: {
+            format: (value:any):string => (new Intl.NumberFormat(
+                GenericInput.local,
+                {
+                    style: 'decimal',
+                    ...(GenericInput.transformer.float.options || {})
+                }
+            )).format(value),
+            parse: (value:string):any => parseFloat(
+                typeof value === 'string' && GenericInput.local === 'de-DE' ?
+                    value.replace(/\./g, '').replace(/\,/g, '.') :
+                    value
+            ),
+            type: 'text'
+        },
+        integer: {
+            format: (value:any):string => (new Intl.NumberFormat(
+                GenericInput.local,
+                {
+                    maximumFractionDigits: 0,
+                    ...(GenericInput.transformer.integer.options || {})
+                }
+            )).format(value),
+            parse: (value:string):any => parseInt(
+                typeof value === 'string' && GenericInput.local === 'de-DE' ?
+                    value.replace(/[,.]/g, '') :
+                    value
+            ),
+            type: 'text'
+        },
+        number: {parse: parseInt}
+    }
     // endregion
     // region properties
-    codeEditorReference?:CodeEditor
+    codeEditorReference?:CodeEditorType
     inputReference:RefObject<HTMLInputElement> = createRef<HTMLInputElement>()
     properties:Properties<Type>
     richTextEditorReference?:RichTextEditor
@@ -365,7 +436,6 @@ export class GenericInput<Type = any> extends
             start: 0
         },
         editorIsActive: false,
-        hidden: undefined,
         model: {...GenericInput.defaultModelState},
         selectionIsUnstable: false,
         showDeclaration: false,
@@ -373,6 +443,18 @@ export class GenericInput<Type = any> extends
     }
     // endregion
     // region live-cycle
+    /**
+     * Creates a new instance consolidates given properties.
+     * @returns Nothing.
+     */
+    constructor(properties:Props<Type>) {
+        super(properties)
+        if (
+            Object.prototype.hasOwnProperty.call(this.props, 'initialValue') &&
+            typeof this.props.initialValue !== 'undefined'
+        )
+            this.state.value = this.props.initialValue as null|Type
+    }
     /**
      * Is triggered immediate after a re-rendering. Re-stores cursor selection
      * state if editor has been switched.
@@ -415,12 +497,16 @@ export class GenericInput<Type = any> extends
      * @param state - Current state to update with respect to given properties.
      * @returns Updated state.
      */
-    static getDerivedStateFromProps(
-        properties:Partial<Properties<Type>>, state:State<Type>
+    static getDerivedStateFromProps<Type = any>(
+        properties:Props<Type>, state:State<Type>
     ):State<Type> {
 
-        if (properties.cursor !== undefined)
-            state.cursor = properties.cursor
+        if (properties.cursor) {
+            if (properties.cursor.end !== undefined)
+                state.cursor.end = properties.cursor.end
+            if (properties.cursor.start !== undefined)
+                state.cursor.start = properties.cursor.start
+        }
 
         if (properties.editorIsActive !== undefined)
             state.editorIsActive = properties.editorIsActive
@@ -434,9 +520,9 @@ export class GenericInput<Type = any> extends
             state.showDeclaration = properties.showDeclaration
 
         if (properties.value !== undefined)
-            state.value = properties.value
+            state.value = properties.value as null|Type
         else if (properties.model?.value !== undefined)
-            state.value = properties.model.value
+            state.value = properties.model.value as null|Type
 
         return state
     }
@@ -464,7 +550,7 @@ export class GenericInput<Type = any> extends
             changed = true
         }
 
-        const oldValue:string = this.properties.value
+        const oldValue:null|Type = this.properties.value as null|Type
         this.onChangeValue(
             this.transformFinalValue(this.properties, this.properties.value)
         )
@@ -483,7 +569,14 @@ export class GenericInput<Type = any> extends
     onChange = (event?:SyntheticEvent):void => {
         if (this.properties.onChange)
             this.properties.onChange(
-                this.getConsolidatedProperties(this.properties), event
+                this.getConsolidatedProperties(
+                    /*
+                        Workaround since "Something" isn't identified as subset
+                        of "RecursivePartial<Type>"
+                    */
+                    this.properties as unknown as Props<Type>
+                ),
+                event
             )
     }
     /**
@@ -493,7 +586,7 @@ export class GenericInput<Type = any> extends
      */
     onChangeEditorIsActive = (event?:MouseEvent):void => {
         this.properties.editorIsActive = !this.properties.editorIsActive
-        this.setState(({editorIsActive}):Partial<State<Type>> => (
+        this.setState(({editorIsActive}):Pick<State<Type>, 'editorIsActive'|'selectionIsUnstable'> => (
             {editorIsActive: !editorIsActive, selectionIsUnstable: true}
         ))
 
@@ -509,7 +602,7 @@ export class GenericInput<Type = any> extends
      * @returns Nothing.
      */
     onChangeShowDeclaration = (event?:MouseEvent):void =>
-        this.setState(({showDeclaration}):Partial<State<Type>> => {
+        this.setState(({showDeclaration}):Pick<State<Type>, 'showDeclaration'> => {
             if (this.properties.onChangeShowDeclaration)
                 this.properties.onChangeShowDeclaration(showDeclaration, event)
             this.onChange(event)
@@ -521,7 +614,7 @@ export class GenericInput<Type = any> extends
      * @param event - Triggering event object.
      * @returns Nothing.
      */
-    onChangeState = (state:ModelState, event:SyntheticEvent):void => {
+    onChangeState = (state:ModelState, event?:SyntheticEvent):void => {
         for (const key of Object.keys(state))
             if (!Object.prototype.hasOwnProperty.call(this.props, key)) {
                 this.setState({model: state})
@@ -535,26 +628,30 @@ export class GenericInput<Type = any> extends
      * @param eventOrValue - Event object or new value.
      * @returns Nothing.
      */
-    onChangeValue = (eventOrValue:string|SyntheticEvent):void => {
+    onChangeValue = (eventOrValue:null|SyntheticEvent|Type):void => {
         if (!(this.properties.model.mutable && this.properties.model.writable))
             return
 
-        let event:SyntheticEvent
-        let value:string
+        let event:SyntheticEvent|undefined
+        let value:null|Type
         if (
             eventOrValue !== null &&
             typeof eventOrValue === 'object' &&
-            eventOrValue.target
+            (eventOrValue as SyntheticEvent).target
         ) {
-            event = eventOrValue
-            value = event.target.value
+            event = eventOrValue as SyntheticEvent
+            value =
+                typeof (event.target as {value?:null|Type}).value ===
+                    'undefined' ?
+                        null :
+                        (event.target as unknown as {value:null|Type}).value
         } else
-            value = eventOrValue
+            value = eventOrValue as null|Type
 
-        const oldValue:string = this.properties.value
+        const oldValue:null|Type = this.properties.value as null|Type
         this.properties.value =
         this.properties.model.value =
-            this.transformValue(this.properties, value)
+            this.parseValue(this.properties, value)
 
         if (oldValue !== this.properties.value) {
             let stateChanged:boolean = this.determineValidationState(
@@ -586,7 +683,7 @@ export class GenericInput<Type = any> extends
      * @returns Nothing.
      */
     onClick = (event:MouseEvent):void => {
-        this.onSelectionChange()
+        this.onSelectionChange(event)
         if (this.properties.onClick)
             this.properties.onClick(event)
         this.onTouch(event)
@@ -606,8 +703,8 @@ export class GenericInput<Type = any> extends
      * @param event - Key up event object.
      * @returns Nothing.
      */
-    onKeyUp = (event:KeyUpEvent):void => {
-        this.onSelectionChange()
+    onKeyUp = (event:KeyboardEvent):void => {
+        this.onSelectionChange(event)
         if (this.properties.onKeyUp)
             this.properties.onKeyUp(event)
     }
@@ -660,7 +757,11 @@ export class GenericInput<Type = any> extends
     applyIconPreset(options?:Properties['icon']):Properties['icon']|void {
         if (options === 'clear_preset')
             return {
-                icon: 'clear',
+                icon: <GenericAnimate
+                    in={this.properties.value !== this.properties.default}
+                >
+                    <UseAnimations animation={plusToX} reverse={true}/>
+                </GenericAnimate>,
                 onClick: (event:MouseEvent):void => {
                     event.preventDefault()
                     event.stopPropagation()
@@ -668,11 +769,11 @@ export class GenericInput<Type = any> extends
                         this.properties, this.properties.default
                     ))
                 },
+                strategy: 'component',
                 tooltip: 'Clear input'
             }
         if (options === 'password_preset')
             return {
-                strategy: 'component',
                 icon: <UseAnimations
                     animation={lock}
                     reverse={!this.properties.hidden}
@@ -680,11 +781,14 @@ export class GenericInput<Type = any> extends
                 onClick: (event:MouseEvent):void => {
                     event.preventDefault()
                     event.stopPropagation()
-                    this.setState(({hidden}):void => ({hidden: !hidden}))
+                    this.setState(({hidden}):Pick<State<Type>, 'hidden'> =>
+                        ({hidden: !hidden})
+                    )
                     this.onChange(event)
                 },
+                strategy: 'component',
                 tooltip:
-                    (this.properties.hidden ? 'Show' : 'Hide') + ' password'
+                    `${(this.properties.hidden ? 'Show' : 'Hide')} password`
             }
         return options
     }
@@ -695,7 +799,7 @@ export class GenericInput<Type = any> extends
      */
     determineTablePosition(offset:number):{column:number;row:number} {
         const result = {column: 0, row: 0}
-        if (this.state.value)
+        if (typeof this.state.value === 'string')
             for (const line of this.state.value.split('\n')) {
                 if (line.length < offset)
                     offset -= 1 + line.length
@@ -716,11 +820,11 @@ export class GenericInput<Type = any> extends
     determineAbsoluteSymbolOffsetFromTable(
         column:number, row:number
     ):number {
-        if (!this.state.value)
+        if (typeof this.state.value !== 'string' && !this.state.value)
             return 0
 
         if (row > 0)
-            return column + this.state.value
+            return column + (this.state.value as unknown as string)
                 .split('\n')
                 .slice(0, row)
                 .map((line:string):number => 1 + line.length)
@@ -844,34 +948,36 @@ export class GenericInput<Type = any> extends
      * Calculate external properties (a set of all configurable properties).
      * @returns External properties object.
      */
-    getConsolidatedProperties(
-        properties:Partial<Properties<Type>>
-    ):Properties<Type> {
-        // TODO cursor and theme seems to be not present in result
-        /*
-        if (typeof properties.focused === 'function')
-            for (const [a, b] of Object.entries(properties))
-                properties[a] = b()
-        */
-
+    getConsolidatedProperties(properties:Props<Type>):Properties<Type> {
         properties = this.mapPropertiesAndStateToModel(properties)
-        const result:Properties<Type> = Tools.extend(
-            {}, properties, properties.model, properties.model.state
+        const result:Properties<Type> & {
+            mutable?:boolean;
+            nullable?:boolean;
+            regularExpressionPattern?:RegExp|string;
+            state?:null;
+            writable?:boolean;
+        } = Tools.extend(
+            {},
+            properties,
+            properties.model || {},
+            (properties.model || {}).state || {}
         )
-
-        delete result.state
-        delete result.writable
 
         result.disabled = !result.mutable
         delete result.mutable
+
+        delete result.state
+        delete result.writable
 
         result.required = !result.nullable
         delete result.nullable
 
         result.pattern = result.regularExpressionPattern
-        delete result.regularExpressionPattern
+        // NOTE: Workaround since options configuration above is ignored.
+        delete (result as {regularExpressionPattern?:RegExp|string})
+            .regularExpressionPattern
 
-        // NOTE: If an editor is specified it should be possible to display.
+        // NOTE: If only an editor is specified it should be displayed.
         if (!(result.editor === 'plain' || result.selectableEditor))
             result.editorIsActive = true
 
@@ -883,14 +989,12 @@ export class GenericInput<Type = any> extends
      * properties.
      * @returns Nothing.
     */
-    mapPropertiesAndStateToModel(
-        properties:Partial<Properties<Type>>
-    ):Properties<Type> {
+    mapPropertiesAndStateToModel(properties:Props<Type>):Props<Type> {
         /*
             NOTE: Default props seems not to respect nested layers to merge so
             we have to manage this for nested model structure.
         */
-        const result:Properties<Type> = Tools.extend(
+        const result:Props<Type> & {model:Model} = Tools.extend(
             true,
             {
                 model: {
@@ -917,11 +1021,15 @@ export class GenericInput<Type = any> extends
         // region handle model configuration
         for (const [name, value] of Object.entries(result.model))
             if (Object.prototype.hasOwnProperty.call(result, name))
-                result.model[name] = result[name]
+                (
+                    result.model[name as keyof Model<Type>] as
+                        ValueOf<Model<Type>>
+                ) = result[name as keyof Props<Type>] as ValueOf<Model<Type>>
         for (const [name, value] of Object.entries(result.model.state))
             if (Object.prototype.hasOwnProperty.call(result, name))
-                result.model.state[name] = result[name]
-         for (const key of Object.keys(result.model.state))
+                result.model.state[name as keyof ModelState] =
+                    result[name as keyof Props<Type>] as ValueOf<ModelState>
+        for (const key of Object.keys(result.model.state))
             if (!Object.prototype.hasOwnProperty.call(this.props, key)) {
                 result.model.state = this.state.model
                 break
@@ -951,8 +1059,12 @@ export class GenericInput<Type = any> extends
         if (result.showDeclaration === undefined)
             result.showDeclaration = this.state.showDeclaration
         // endregion
-        result.model.value = this.transformValue(result, result.model.value)
-        this.determineValidationState(result, result.model.value)
+        result.model.value = this.parseValue(
+            result as unknown as Properties<Type>, result.model.value
+        )
+        this.determineValidationState(
+            result as unknown as Properties<Type>, result.model.value
+        )
 
         return result
     }
@@ -964,8 +1076,10 @@ export class GenericInput<Type = any> extends
      */
     renderMessage(template?:any):string {
         if (typeof template === 'string') {
-            const scopeNames:Array<string> = Object.keys(this.properties)
-                .filter((name:string):boolean => name !== 'default')
+            const scopeNames:Array<keyof Properties<Type>> = Object
+                .keys(this.properties)
+                .filter((name:string):boolean => name !== 'default') as
+                    Array<keyof Properties<Type>>
             let render:Function
             try {
                 render = new Function(...scopeNames, `return \`${template}\``)
@@ -977,9 +1091,9 @@ export class GenericInput<Type = any> extends
                 return ''
             }
             try {
-                return render(...scopeNames.map((name:string):any =>
-                    this.properties[name])
-                )
+                return render(
+                    ...scopeNames.map((name:keyof Properties<Type>
+                ):any => this.properties[name]))
             } catch (error) {
                 console.warn(
                     `Given message template "${template}" failed to evaluate` +
@@ -1012,14 +1126,16 @@ export class GenericInput<Type = any> extends
                         codeEditorRange.end.column,
                         typeof codeEditorRange.end.row === 'number' ?
                             codeEditorRange.end.row :
-                            (this.properties.value?.split('\n').length - 1) ||
+                            typeof this.properties.value === 'string' ?
+                                this.properties.value.split('\n').length - 1 :
                                 0
                     ),
                     start: this.determineAbsoluteSymbolOffsetFromTable(
                         codeEditorRange.start.column,
                         typeof codeEditorRange.start.row === 'number' ?
                             codeEditorRange.start.row :
-                            (this.properties.value?.split('\n').length - 1) ||
+                            typeof this.properties.value === 'string' ?
+                                this.properties.value.split('\n').length - 1 :
                                 0
                     )
                 }
@@ -1053,7 +1169,7 @@ export class GenericInput<Type = any> extends
      * @param instance - Code editor instance.
      * @returns Nothing.
      */
-    setCodeEditorReference = (instance?:CodeEditor):void => {
+    setCodeEditorReference = (instance?:CodeEditorType):void => {
         if (instance?.editor?.container?.querySelector('textarea'))
             this.inputReference = {
                 current: instance.editor.container.querySelector('textarea')
@@ -1071,13 +1187,49 @@ export class GenericInput<Type = any> extends
         this.richTextEditorReference = instance
     }
     /**
+     * Represents configured value transformations.
+     * @param configuration - Input configuration.
+     * @returns Transformed value.
+     */
+    formatValue(configuration:Properties<Type>):string {
+        const value:null|Type = configuration.value
+        if (value === null || typeof value === 'number' && isNaN(value))
+            return ''
+        if (
+            Object.prototype.hasOwnProperty.call(
+                this.self.transformer, configuration.type
+            ) &&
+            this.self.transformer[configuration.type].format
+        ) {
+            // TODO
+            console.log('Format', value, this.self.transformer[configuration.type].format(value))
+            return this.self.transformer[configuration.type].format(value)
+        }
+        if (configuration.type === 'number')
+            return `${value}`
+        return value
+    }
+    /**
      * Applies configured value transformations.
      * @param configuration - Input configuration.
      * @param value - Value to transform.
      * @returns Transformed value.
      */
-    transformValue(configuration:Properties<Type>, value:any):Type {
-        if (configuration.model.emptyEqualsNull && value === '')
+    parseValue(configuration:Properties<Type>, value:any):null|Type {
+        if (configuration.emptyEqualsNull && value === '')
+            return null
+        if (
+            ![null, undefined].includes(value) &&
+            Object.prototype.hasOwnProperty.call(
+                this.self.transformer, configuration.type
+            ) &&
+            this.self.transformer[configuration.type].parse
+        ) {
+            // TODO
+            console.log('Parse', value, this.self.transformer[configuration.type].parse(value))
+            return this.self.transformer[configuration.type].parse(value)
+        }
+        if (typeof value === 'number' && isNaN(value))
             return null
         return value
     }
@@ -1088,10 +1240,10 @@ export class GenericInput<Type = any> extends
      * @param value - Current value to transform.
      * @returns Transformed value.
      */
-    transformFinalValue(configuration:Properties<Type>, value:any):Type {
+    transformFinalValue(configuration:Properties<Type>, value:any):null|Type {
         if (configuration.model.trim && typeof value === 'string')
             value = value.trim().replace(/ +\n/g, '\\n')
-        return this.transformValue(configuration, value)
+        return this.parseValue(configuration, value)
     }
     /**
      * Wraps given component with animation component if given condition holds.
@@ -1101,10 +1253,10 @@ export class GenericInput<Type = any> extends
      * @returns Wrapped component.
      */
     wrapAnimationConditionally(
-        content:Component|string,
-        propertiesOrInCondition:boolean = {},
+        content:ReactElement|string,
+        propertiesOrInCondition:boolean|Partial<TransitionProps<HTMLElement|undefined>> = {},
         condition:boolean = true
-    ):Component {
+    ):ReactElement|string {
         if (typeof propertiesOrInCondition === 'boolean')
             return condition ?
                 <GenericAnimate in={propertiesOrInCondition}>
@@ -1122,7 +1274,7 @@ export class GenericInput<Type = any> extends
      * @param content - Component or string to wrap.
      * @returns Wrapped component.
      */
-    wrapStrict(content:Component|string):Component {
+    wrapStrict(content:Component|string):ReactElement {
         return this.self.strict ?
             <StrictMode>{content}</StrictMode> :
             <>{content}</>
@@ -1130,16 +1282,16 @@ export class GenericInput<Type = any> extends
     /**
      * Wraps given component with a tooltip component with given tooltip
      * configuration.
-     * @param options - Tooltip options.
      * @param content - Component or string to wrap.
+     * @param options - Tooltip options.
      * @returns Wrapped given content.
      */
     wrapTooltip(
-        options?:Properties['tooltip'], content:Component|string
-    ):Component {
+        content:ReactElement|string, options?:Properties['tooltip']
+    ):ReactElement {
         if (typeof options === 'string')
             return <Tooltip
-                content=<Typography use="caption">{options}</Typography>
+                content={<Typography use="caption">{options}</Typography>}
             >{content}</Tooltip>
         else if (options !== null && typeof options === 'object')
             return <Tooltip {...options}>
@@ -1163,7 +1315,7 @@ export class GenericInput<Type = any> extends
             const nestedOptions:IconOptions = {...options}
             options.strategy = 'component'
             options.icon =
-                this.wrapTooltip(tooltip, <Icon icon={nestedOptions} />)
+                this.wrapTooltip(<Icon icon={nestedOptions} />, tooltip)
         }
         return options
     }
@@ -1173,7 +1325,7 @@ export class GenericInput<Type = any> extends
      * Renders current's component state.
      * @returns Current component's representation.
      */
-    render():Component {
+    render():ReactElement {
         // region consolidate properties
         const properties:Properties<Type> =
         this.properties =
@@ -1184,7 +1336,7 @@ export class GenericInput<Type = any> extends
             onBlur: this.onBlur,
             onFocus: this.onFocus,
             placeholder: properties.placeholder,
-            value: properties.value || ''
+            value: this.formatValue(properties)
         }
         const materialProperties:SelectProps|TextFieldProps = {
             disabled: properties.disabled,
@@ -1271,7 +1423,7 @@ export class GenericInput<Type = any> extends
             content_style: properties.disabled ? 'body {opacity: .38}' : '',
             placeholder: properties.placeholder,
             readonly: properties.disabled,
-            setup: (editor:RichTextEditor):void => editor.on(
+            setup: (editor:typeof RichTextEditor):void => editor.on(
                 'init',
                 ():void => {
                     if (!editor)
@@ -1362,7 +1514,6 @@ export class GenericInput<Type = any> extends
             styles['generic-input'] +
             (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
         }>{this.wrapStrict(this.wrapTooltip(
-            properties.tooltip,
             <div>
                 <GenericAnimate in={Boolean(properties.selection)}>
                     <Select
@@ -1466,10 +1617,11 @@ export class GenericInput<Type = any> extends
                         characterCount
                         fullwidth={properties.fullWidth}
                         inputRef={this.inputReference}
+                        maximum={properties.maximum}
                         maxLength={properties.maximumLength}
+                        minimum={properties.minimum}
                         minLength={properties.minimumLength}
                         onChange={this.onChangeValue}
-                        pattern={properties.regularExpressionPattern}
                         ripple={properties.ripple}
                         rootProps={{onKeyUp: this.onKeyUp}}
                         rows={properties.rows}
@@ -1480,12 +1632,22 @@ export class GenericInput<Type = any> extends
                         trailingIcon={this.wrapIconWithTooltip(
                             this.applyIconPreset(properties.trailingIcon)
                         )}
-                        type={(
-                            properties.type === 'string' &&
-                            properties.hidden
-                        ) ?
-                            'password' :
-                            'text'
+                        type={
+                            properties.type === 'string' ?
+                                properties.hidden ?
+                                    'password' :
+                                    'text' :
+                                    (
+                                        Object.prototype.hasOwnProperty.call(
+                                            this.self.transformer,
+                                            properties.type
+                                        ) &&
+                                        this.self.transformer[properties.type]
+                                            .type
+                                    ) ?
+                                        this.self.transformer[properties.type]
+                                            .type :
+                                        properties.type
                         }
                         {...genericProperties}
                         {...materialProperties}
@@ -1493,7 +1655,8 @@ export class GenericInput<Type = any> extends
                     !(isAdvancedEditor || properties.selection),
                     richTextEditorLoaded || properties.editor.startsWith('code')
                 )}
-            </div>
+            </div>,
+            properties.tooltip
         ))}</div></ThemeProvider>
     }
     /**/
