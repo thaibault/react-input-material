@@ -17,7 +17,7 @@
 */
 // region imports
 import GenericPropertyTypes from 'clientnode/property-types'
-import {Mapping, RecursivePartial, ValueOf} from 'clientnode/type'
+import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
     Component, FocusEvent, KeyboardEvent, MouseEvent, SyntheticEvent
 } from 'react'
@@ -124,6 +124,12 @@ export type State<Type = any> = {
     selectionIsUnstable:boolean;
     showDeclaration:boolean;
     value:null|Type;
+}
+export type TransformSpecification<Type = any> = {
+    format?:(value:null|Type) => string;
+    options:PlainObject;
+    parse?:(value:string) => null|Type;
+    type?:string;
 }
 // endregion
 // region vim modline

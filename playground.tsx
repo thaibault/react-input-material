@@ -25,6 +25,9 @@ import ReactDOM from 'react-dom'
 import GenericInput from './components/GenericInput'
 import {Properties} from './type'
 // endregion
+GenericInput.local = 'de-DE'
+GenericInput.transformer.currency.options = {currency: 'EUR'}
+
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<Properties>()
     function onChange<Type = string>(state:Properties<Type>):void {
@@ -33,7 +36,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
     return (<>
         <div className="inputs">
-
+{/*
             <GenericInput onChange={onChange}/>
 
             <hr/>
@@ -74,7 +77,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 declaration="placeholder"
                 name="input4"
                 onChange={onChange}
-                placeholder="input4"
+                placeholder="100.000,00"
                 required
                 trailingIcon="clear_preset"
             />
@@ -169,6 +172,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 placeholder="input7ModelPlaceholder"
             />
 
+            <hr/>
+
             <GenericInput
                 declaration="selection"
                 description="input8Description"
@@ -189,6 +194,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 }}
                 onChange={onChange}
             />
+
+            <hr/>
 
             <GenericInput
                 declaration="text"
@@ -217,6 +224,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 rows={2}
             />
 
+            <hr/>
+
             <GenericInput
                 declaration="code"
                 description="input10Description"
@@ -242,6 +251,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 selectableEditor
             />
 
+            <hr/>
+
             <GenericInput
                 declaration="code"
                 description="input11Description"
@@ -266,6 +277,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 selectableEditor
             />
 
+            <hr/>
+
             <GenericInput
                 declaration="richtext(raw)"
                 description="input12Description"
@@ -285,11 +298,92 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     editor: 'richtext(simple)',
                     mutable: false,
                     name: 'input12Model',
-                    nullable: false,
+                    nullable: false
                 }}
                 onChange={onChange}
                 rows={6}
                 selectableEditor
+            />
+
+            <hr/>
+
+            <GenericInput
+                declaration="Number"
+                description="input13Description"
+                maximum={200000}
+                minimum={10}
+                name="input13"
+                onChange={onChange}
+                placeholder="100000"
+                required
+                type="number"
+            />
+            <GenericInput
+                initialValue={{100.000,00}}
+                model={{
+                    declaration: 'Number',
+                    description: 'input13ModelDescription',
+                    maximum: 200000,
+                    minimum: 10,
+                    name: 'input13Model',
+                    nullable: false,
+                    type: 'number'
+                }}
+                onChange={onChange}
+            />
+
+            <hr/>
+
+            <GenericInput
+                declaration="Number"
+                description="input14Description"
+                maximum={200000}
+                minimum={10}
+                name="input14"
+                onChange={onChange}
+                placeholder="100.000"
+                required
+                type="integer"
+            />
+            <GenericInput
+                initialValue={{100.000,00}}
+                model={{
+                    declaration: 'Number',
+                    description: 'input14ModelDescription',
+                    maximum: 200000,
+                    minimum: 10,
+                    name: 'input14Model',
+                    nullable: false,
+                    type: 'float'
+                }}
+                onChange={onChange}
+            />
+
+            <hr/>
+
+            <GenericInput
+                declaration="Number"
+                description="input15Description"
+                maximum={200000}
+                minimum={10}
+                name="input15"
+                onChange={onChange}
+                placeholder="100.000"
+                required
+                type="currency"
+            />*/}
+            <GenericInput
+                initialValue={100000.01}
+                model={{
+                    declaration: 'Number',
+                    description: 'input15ModelDescription',
+                    maximum: 200000,
+                    minimum: 10,
+                    name: 'input15Model',
+                    nullable: false,
+                    type: 'currency'
+                }}
+                onChange={onChange}
             />
 
         </div>

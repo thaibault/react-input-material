@@ -83,7 +83,8 @@ import {
     Properties,
     PropertyTypes as InputPropertyTypes,
     Props,
-    State
+    State,
+    TransformSpecification
 } from '../type'
 import styles from './GenericInput.module'
 // endregion
@@ -288,6 +289,7 @@ export class GenericInput<Type = any> extends
         showDeclaration: undefined,
         showInitialValidationState: false
     }
+    static readonly local:string = 'en-US'
     static readonly output:Output = {onChange: true}
     static readonly propertiesToReflectAsAttributes:Map<keyof Properties, boolean> =
         new Map([
@@ -375,6 +377,52 @@ export class GenericInput<Type = any> extends
         ...baseModelPropertyTypes
     }
     static readonly strict:boolean = false
+    static readonly transformer:Mapping<TransformSpecification> = {
+        currency: {
+            format: (value:any):string => (new Intl.NumberFormat(
+                GenericInput.local,
+                {
+                    currency: 'USD',
+                    style: 'currency',
+                    ...(GenericInput.transformer.currency.options || {})
+                }
+            )).format(value),
+            parse: (value:string):any =>
+                GenericInput.transformer.float.parse(value),
+            type: 'text'
+        },
+        float: {
+            format: (value:any):string => (new Intl.NumberFormat(
+                GenericInput.local,
+                {
+                    style: 'decimal',
+                    ...(GenericInput.transformer.float.options || {})
+                }
+            )).format(value),
+            parse: (value:string):any => parseFloat(
+                typeof value === 'string' && GenericInput.local === 'de-DE' ?
+                    value.replace(/\./g, '').replace(/\,/g, '.') :
+                    value
+            ),
+            type: 'text'
+        },
+        integer: {
+            format: (value:any):string => (new Intl.NumberFormat(
+                GenericInput.local,
+                {
+                    maximumFractionDigits: 0,
+                    ...(GenericInput.transformer.integer.options || {})
+                }
+            )).format(value),
+            parse: (value:string):any => parseInt(
+                typeof value === 'string' && GenericInput.local === 'de-DE' ?
+                    value.replace(/[,.]/g, '') :
+                    value
+            ),
+            type: 'text'
+        },
+        number: {parse: parseInt}
+    }
     // endregion
     // region properties
     codeEditorReference?:CodeEditorType
@@ -406,7 +454,6 @@ export class GenericInput<Type = any> extends
             typeof this.props.initialValue !== 'undefined'
         )
             this.state.value = this.props.initialValue as null|Type
-        this.properties = this.getConsolidatedProperties(properties)
     }
     /**
      * Is triggered immediate after a re-rendering. Re-stores cursor selection
@@ -604,7 +651,7 @@ export class GenericInput<Type = any> extends
         const oldValue:null|Type = this.properties.value as null|Type
         this.properties.value =
         this.properties.model.value =
-            this.transformValue(this.properties, value)
+            this.parseValue(this.properties, value)
 
         if (oldValue !== this.properties.value) {
             let stateChanged:boolean = this.determineValidationState(
@@ -982,7 +1029,7 @@ export class GenericInput<Type = any> extends
             if (Object.prototype.hasOwnProperty.call(result, name))
                 result.model.state[name as keyof ModelState] =
                     result[name as keyof Props<Type>] as ValueOf<ModelState>
-         for (const key of Object.keys(result.model.state))
+        for (const key of Object.keys(result.model.state))
             if (!Object.prototype.hasOwnProperty.call(this.props, key)) {
                 result.model.state = this.state.model
                 break
@@ -1012,7 +1059,7 @@ export class GenericInput<Type = any> extends
         if (result.showDeclaration === undefined)
             result.showDeclaration = this.state.showDeclaration
         // endregion
-        result.model.value = this.transformValue(
+        result.model.value = this.parseValue(
             result as unknown as Properties<Type>, result.model.value
         )
         this.determineValidationState(
@@ -1140,13 +1187,49 @@ export class GenericInput<Type = any> extends
         this.richTextEditorReference = instance
     }
     /**
+     * Represents configured value transformations.
+     * @param configuration - Input configuration.
+     * @returns Transformed value.
+     */
+    formatValue(configuration:Properties<Type>):string {
+        const value:null|Type = configuration.value
+        if (value === null || typeof value === 'number' && isNaN(value))
+            return ''
+        if (
+            Object.prototype.hasOwnProperty.call(
+                this.self.transformer, configuration.type
+            ) &&
+            this.self.transformer[configuration.type].format
+        ) {
+            // TODO
+            console.log('Format', value, this.self.transformer[configuration.type].format(value))
+            return this.self.transformer[configuration.type].format(value)
+        }
+        if (configuration.type === 'number')
+            return `${value}`
+        return value
+    }
+    /**
      * Applies configured value transformations.
      * @param configuration - Input configuration.
      * @param value - Value to transform.
      * @returns Transformed value.
      */
-    transformValue(configuration:Properties<Type>, value:any):null|Type {
-        if (configuration.model.emptyEqualsNull && value === '')
+    parseValue(configuration:Properties<Type>, value:any):null|Type {
+        if (configuration.emptyEqualsNull && value === '')
+            return null
+        if (
+            ![null, undefined].includes(value) &&
+            Object.prototype.hasOwnProperty.call(
+                this.self.transformer, configuration.type
+            ) &&
+            this.self.transformer[configuration.type].parse
+        ) {
+            // TODO
+            console.log('Parse', value, this.self.transformer[configuration.type].parse(value))
+            return this.self.transformer[configuration.type].parse(value)
+        }
+        if (typeof value === 'number' && isNaN(value))
             return null
         return value
     }
@@ -1160,7 +1243,7 @@ export class GenericInput<Type = any> extends
     transformFinalValue(configuration:Properties<Type>, value:any):null|Type {
         if (configuration.model.trim && typeof value === 'string')
             value = value.trim().replace(/ +\n/g, '\\n')
-        return this.transformValue(configuration, value)
+        return this.parseValue(configuration, value)
     }
     /**
      * Wraps given component with animation component if given condition holds.
@@ -1253,7 +1336,7 @@ export class GenericInput<Type = any> extends
             onBlur: this.onBlur,
             onFocus: this.onFocus,
             placeholder: properties.placeholder,
-            value: properties.value || ''
+            value: this.formatValue(properties)
         }
         const materialProperties:SelectProps|TextFieldProps = {
             disabled: properties.disabled,
@@ -1534,7 +1617,9 @@ export class GenericInput<Type = any> extends
                         characterCount
                         fullwidth={properties.fullWidth}
                         inputRef={this.inputReference}
+                        maximum={properties.maximum}
                         maxLength={properties.maximumLength}
+                        minimum={properties.minimum}
                         minLength={properties.minimumLength}
                         onChange={this.onChangeValue}
                         ripple={properties.ripple}
@@ -1547,12 +1632,22 @@ export class GenericInput<Type = any> extends
                         trailingIcon={this.wrapIconWithTooltip(
                             this.applyIconPreset(properties.trailingIcon)
                         )}
-                        type={(
-                            properties.type === 'string' &&
-                            properties.hidden
-                        ) ?
-                            'password' :
-                            'text'
+                        type={
+                            properties.type === 'string' ?
+                                properties.hidden ?
+                                    'password' :
+                                    'text' :
+                                    (
+                                        Object.prototype.hasOwnProperty.call(
+                                            this.self.transformer,
+                                            properties.type
+                                        ) &&
+                                        this.self.transformer[properties.type]
+                                            .type
+                                    ) ?
+                                        this.self.transformer[properties.type]
+                                            .type :
+                                        properties.type
                         }
                         {...genericProperties}
                         {...materialProperties}
