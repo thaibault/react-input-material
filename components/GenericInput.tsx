@@ -49,7 +49,7 @@ import React, {
 } from 'react'
 import CodeEditorType from 'react-ace'
 import {TransitionProps} from 'react-transition-group/Transition'
-import {Settings as TinyMCEOptions} from 'tinymce'
+import {Editor as RichTextEditor, Settings as TinyMCEOptions} from 'tinymce'
 import {Output, ReactWebComponent} from 'web-component-wrapper/type'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
@@ -60,7 +60,7 @@ import {Theme, ThemeProvider} from '@rmwc/theme'
 import {Tooltip, TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
 import {Typography} from '@rmwc/typography'
-import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
+import {Editor as RichTextEditorComponent} from '@tinymce/tinymce-react'
 import UseAnimations from 'react-useanimations'
 import loading from 'react-useanimations/lib/loading'
 import lock from 'react-useanimations/lib/lock'
@@ -231,6 +231,7 @@ const baseModelPropertyTypes:{
  * @property codeEditorReference - Current code editor component reference.
  * @property inputReference - Current wrapped input reference node.
  * @property properties - Current properties.
+ * @property richTextEditorInstance - Current rich text instance.
  * @property richTextEditorReference - Current rich text component reference.
  * @property self - Back-reference to this class.
  * @property state - Current state.
@@ -387,17 +388,22 @@ export class GenericInput<Type = any> extends
                         {
                             currency: 'USD',
                             style: 'currency',
-                            ...(GenericInput.transformer.currency.format.final.options || {})
+                            ...(
+                                GenericInput.transformer.currency.format!
+                                    .final!.options ||
+                                {}
+                            )
                         }
                     )).format(value)
                 },
                 intermediate: {
                     transform: (value:string):any =>
-                        GenericInput.transformer.float.format.intermediate.transform(value)
+                        GenericInput.transformer.float.format!.intermediate!
+                            .transform!(value)
                 }
             },
             parse: (value:string):any =>
-                GenericInput.transformer.float.parse(value),
+                GenericInput.transformer.float.parse!(value),
             type: 'text'
         },
         float: {
@@ -407,7 +413,11 @@ export class GenericInput<Type = any> extends
                         GenericInput.local,
                         {
                             style: 'decimal',
-                            ...(GenericInput.transformer.float.format.final.options || {})
+                            ...(
+                                GenericInput.transformer.float.format!.final!
+                                    .options ||
+                                {}
+                            )
                         }
                     )).format(value)
                 },
@@ -429,7 +439,11 @@ export class GenericInput<Type = any> extends
                         GenericInput.local,
                         {
                             maximumFractionDigits: 0,
-                            ...(GenericInput.transformer.integer.format.final.options || {})
+                            ...(
+                                GenericInput.transformer.integer.format!.final!
+                                    .options ||
+                                {}
+                            )
                         }
                     )).format(value)
                 }
@@ -446,9 +460,11 @@ export class GenericInput<Type = any> extends
     // endregion
     // region properties
     codeEditorReference?:CodeEditorType
-    inputReference:RefObject<HTMLInputElement> = createRef<HTMLInputElement>()
+    inputReference:RefObject<HTMLInputElement|HTMLTextAreaElement> =
+        createRef<HTMLInputElement|HTMLTextAreaElement>()
     properties:Properties<Type>
-    richTextEditorReference?:RichTextEditor
+    richTextEditorInstance?:RichTextEditor
+    richTextEditorReference?:RichTextEditorComponent
     self:typeof GenericInput = GenericInput
     state:State<Type> = {
         cursor: {
@@ -469,24 +485,27 @@ export class GenericInput<Type = any> extends
      */
     constructor(properties:Props<Type>) {
         super(properties)
+        this.properties = this.getConsolidatedProperties(this.props)
 
         if (
-            Object.prototype.hasOwnProperty.call(this.props, 'initialValue') &&
-            typeof this.props.initialValue !== 'undefined'
+            Object.prototype.hasOwnProperty.call(
+                this.properties, 'initialValue'
+            ) &&
+            typeof this.properties.initialValue !== 'undefined'
         )
-            this.state.value = this.props.initialValue as null|Type
-        if (this.props.value !== undefined)
-            this.state.value = this.props.value as null|Type
-        else if (this.props.model?.value !== undefined)
-            this.state.value = this.props.model.value as null|Type
+            this.state.value = this.properties.initialValue as null|Type
+        if (this.properties.value !== undefined)
+            this.state.value = this.properties.value as null|Type
+        else if (this.properties.model?.value !== undefined)
+            this.state.value = this.properties.model.value as null|Type
 
-        if (typeof this.props.representation === 'string')
-            this.state.representation = this.props.representation
+        if (typeof this.properties.representation === 'string')
+            this.state.representation = this.properties.representation
         else if (this.state.value !== null)
             this.state.representation = this.formatValue(
                 this.state.value,
-                this.props.type ||
-                this.props.model?.type ||
+                this.properties.type ||
+                this.properties.model?.type ||
                 this.self.defaultProps.model.type
             )
         else
@@ -513,7 +532,7 @@ export class GenericInput<Type = any> extends
                     this.codeEditorReference.editor.selection.setRange(range)
                 }
                 /*
-                    else if (this.richTextEditorReference?.editor?.selection)
+                    else if (this.richTextEditorInstance?.selection)
 
                     NOTE: Could not be set here since we have to wait for
                     tinymce to be finally loaded ("init" event) to set
@@ -1175,7 +1194,7 @@ export class GenericInput<Type = any> extends
         const codeEditorRange =
             this.codeEditorReference?.editor?.selection?.getRange()
         const richTextEditorRange =
-            this.richTextEditorReference?.editor?.selection?.getRng()
+            this.richTextEditorInstance?.selection?.getRng(true)
         const selectionEnd = this.inputReference.current?.selectionEnd
         const selectionStart = this.inputReference.current?.selectionStart
         if (codeEditorRange)
@@ -1203,14 +1222,13 @@ export class GenericInput<Type = any> extends
             this.setState({
                 cursor: {
                     end: this.determineAbsoluteSymbolOffsetFromHTML(
-                        this.richTextEditorReference.editor.getBody(),
-                        this.richTextEditorReference.editor.selection.getEnd(),
+                        this.richTextEditorInstance!.getBody(),
+                        this.richTextEditorInstance!.selection.getEnd(),
                         richTextEditorRange.endOffset
                     ),
                     start: this.determineAbsoluteSymbolOffsetFromHTML(
-                        this.richTextEditorReference.editor.getBody(),
-                        this.richTextEditorReference.editor.selection
-                            .getStart(),
+                        this.richTextEditorInstance!.getBody(),
+                        this.richTextEditorInstance!.selection.getStart(),
                         richTextEditorRange.startOffset
                     )
                 }
@@ -1240,7 +1258,7 @@ export class GenericInput<Type = any> extends
      * @param instance - Editor instance.
      * @returns Nothing.
      */
-    setRichTextEditorReference = (instance?:RichTextEditor):void => {
+    setRichTextEditorReference = (instance?:RichTextEditorComponent):void => {
         if (instance?.elementRef)
             this.inputReference = instance.elementRef
         this.richTextEditorReference = instance
@@ -1264,9 +1282,9 @@ export class GenericInput<Type = any> extends
             Object.prototype.hasOwnProperty.call(
                 this.self.transformer[type].format, methodName
             ) &&
-            this.self.transformer[type].format[methodName].transform
+            this.self.transformer[type].format![methodName]!.transform
         )
-            return this.self.transformer[type].format[methodName].transform(value)
+            return this.self.transformer[type].format![methodName]!.transform(value)
         return `${value}`
     }
     /**
@@ -1285,7 +1303,7 @@ export class GenericInput<Type = any> extends
             ) &&
             this.self.transformer[configuration.type].parse
         )
-            return this.self.transformer[configuration.type].parse(value)
+            return this.self.transformer[configuration.type].parse!(value)
         if (typeof value === 'number' && isNaN(value))
             return null
         return value
@@ -1365,7 +1383,7 @@ export class GenericInput<Type = any> extends
      * @returns Resolved icon configuration.
      */
     wrapIconWithTooltip(options?:Properties['icon']):IconOptions|void {
-        if (options?.tooltip) {
+        if (typeof options === 'object' && options?.tooltip) {
             const tooltip:Properties['tooltip'] = options.tooltip
             options = {...options}
             delete options.tooltip
@@ -1480,13 +1498,14 @@ export class GenericInput<Type = any> extends
             content_style: properties.disabled ? 'body {opacity: .38}' : '',
             placeholder: properties.placeholder,
             readonly: properties.disabled,
-            setup: (editor:typeof RichTextEditor):void => editor.on(
-                'init',
-                ():void => {
-                    if (!editor)
+            setup: (instance:RichTextEditor):void => {
+                this.richTextEditorInstance = instance
+                this.richTextEditorInstance.on('init', ():void => {
+                    if (!this.richTextEditorInstance)
                         return
+
                     richTextEditorLoaded = true
-                    editor.focus()
+                    this.richTextEditorInstance.focus()
 
                     const indicator:{end:string;start:string} = {
                         end: '###generic-input-selection-indicator-end###',
@@ -1505,16 +1524,16 @@ export class GenericInput<Type = any> extends
                             indicator[type] +
                             value.substring(cursor[type])
                         )
-                    editor.getBody().innerHTML = value
+                    this.richTextEditorInstance.getBody().innerHTML = value
 
                     const walker = document.createTreeWalker(
-                        editor.getBody(),
+                        this.richTextEditorInstance.getBody(),
                         NodeFilter.SHOW_TEXT,
                         null,
                         false
                     )
 
-                    const range = editor.dom.createRng()
+                    const range = this.richTextEditorInstance.dom.createRng()
                     const result:{end?:[Node, number];start?:[Node, number]} =
                         {}
                     let node
@@ -1535,9 +1554,9 @@ export class GenericInput<Type = any> extends
                                 ...result[type]
                             )
                     if (result.end && result.start)
-                        editor.selection.setRng(range)
-                }
-            )
+                        this.richTextEditorInstance.selection.setRng(range)
+                })
+            }
         }
         if (properties.editor.endsWith('raw)')) {
             tinyMCEOptions.toolbar1 =
@@ -1637,7 +1656,7 @@ export class GenericInput<Type = any> extends
                                             />
                                         </Suspense>
                                     :
-                                        <RichTextEditor
+                                        <RichTextEditorComponent
                                             disabled={properties.disabled}
                                             init={{
                                                 ...TINYMCE_DEFAULT_OPTIONS,
