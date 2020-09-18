@@ -26,7 +26,7 @@ import GenericInput from './components/GenericInput'
 import {Properties} from './type'
 // endregion
 GenericInput.local = 'de-DE'
-GenericInput.transformer.currency.options = {currency: 'EUR'}
+GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<Properties>()
@@ -36,7 +36,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
     return (<>
         <div className="inputs">
-{/*
+
             <GenericInput onChange={onChange}/>
 
             <hr/>
@@ -319,7 +319,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 type="number"
             />
             <GenericInput
-                initialValue={{100.000,00}}
+                initialValue={100000}
                 model={{
                     declaration: 'Number',
                     description: 'input13ModelDescription',
@@ -346,7 +346,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 type="integer"
             />
             <GenericInput
-                initialValue={{100.000,00}}
+                initialValue={100000.01}
                 model={{
                     declaration: 'Number',
                     description: 'input14ModelDescription',
@@ -371,7 +371,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 placeholder="100.000"
                 required
                 type="currency"
-            />*/}
+            />
             <GenericInput
                 initialValue={100000.01}
                 model={{

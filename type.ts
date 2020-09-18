@@ -98,6 +98,7 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     pattern:RegExp|string;
     patternText:string;
     placeholder:string;
+    representation:string;
     required?:boolean;
     requiredText:string;
     ripple:boolean;
@@ -121,6 +122,7 @@ export type State<Type = any> = {
     editorIsActive:boolean;
     hidden?:boolean;
     model:ModelState;
+    representation?:string;
     selectionIsUnstable:boolean;
     showDeclaration:boolean;
     value:null|Type;
@@ -129,7 +131,7 @@ export type FormatSpecification<Type = any> = {
     options?:PlainObject;
     transform?:(value:null|Type) => string;
 }
-export type TransformSpecification<Type = any> = {
+export type DataTransformSpecification<Type = any> = {
     format?:{
         final?:FormatSpecification;
         intermediate?:FormatSpecification;
