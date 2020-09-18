@@ -379,7 +379,7 @@ export class GenericInput<Type = any> extends
     static readonly strict:boolean = false
     static readonly transformer:Mapping<TransformSpecification> = {
         currency: {
-            format: (value:any):string => (new Intl.NumberFormat(
+            formatFinal: (value:any):string => (new Intl.NumberFormat(
                 GenericInput.local,
                 {
                     currency: 'USD',
@@ -392,7 +392,7 @@ export class GenericInput<Type = any> extends
             type: 'text'
         },
         float: {
-            format: (value:any):string => (new Intl.NumberFormat(
+            formatFinal: (value:any):string => (new Intl.NumberFormat(
                 GenericInput.local,
                 {
                     style: 'decimal',
@@ -407,7 +407,7 @@ export class GenericInput<Type = any> extends
             type: 'text'
         },
         integer: {
-            format: (value:any):string => (new Intl.NumberFormat(
+            formatFinal: (value:any):string => (new Intl.NumberFormat(
                 GenericInput.local,
                 {
                     maximumFractionDigits: 0,
@@ -1187,27 +1187,26 @@ export class GenericInput<Type = any> extends
         this.richTextEditorReference = instance
     }
     /**
-     * Represents configured value transformations.
+     * Represents configured value.
      * @param configuration - Input configuration.
+     * @param final - Specifies whether it is a final representation.
      * @returns Transformed value.
      */
-    formatValue(configuration:Properties<Type>):string {
+    formatValue(configuration:Properties<Type>, final:boolean = true):string {
         const value:null|Type = configuration.value
+        const methodName:string = final ? 'formatFinal' : 'final'
         if (value === null || typeof value === 'number' && isNaN(value))
             return ''
         if (
             Object.prototype.hasOwnProperty.call(
                 this.self.transformer, configuration.type
             ) &&
-            this.self.transformer[configuration.type].format
-        ) {
-            // TODO
-            console.log('Format', value, this.self.transformer[configuration.type].format(value))
-            return this.self.transformer[configuration.type].format(value)
-        }
-        if (configuration.type === 'number')
-            return `${value}`
-        return value
+            Object.prototype.hasOwnProperty.call(
+                this.self.transformer[configuration.type], methodName
+            )
+        )
+            return this.self.transformer[configuration.type][methodName](value)
+        return `${value}`
     }
     /**
      * Applies configured value transformations.
@@ -1336,7 +1335,7 @@ export class GenericInput<Type = any> extends
             onBlur: this.onBlur,
             onFocus: this.onFocus,
             placeholder: properties.placeholder,
-            value: this.formatValue(properties)
+            value: this.formatValue(properties, !properties.focused)
         }
         const materialProperties:SelectProps|TextFieldProps = {
             disabled: properties.disabled,
