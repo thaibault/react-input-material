@@ -78,13 +78,13 @@ import {GenericAnimate} from './GenericAnimate'
 import '../material-fixes'
 import {
     BaseModel,
+    DataTransformSpecification,
     Model,
     ModelState,
     Properties,
     PropertyTypes as InputPropertyTypes,
     Props,
-    State,
-    TransformSpecification
+    State
 } from '../type'
 import styles from './GenericInput.module'
 // endregion
@@ -358,6 +358,7 @@ export class GenericInput<Type = any> extends
         pattern: oneOfType([object, string]),
         patternText: string,
         placeholder: string,
+        representation: string,
         required: boolean,
         requiredText: string,
         ripple: boolean,
@@ -377,28 +378,43 @@ export class GenericInput<Type = any> extends
         ...baseModelPropertyTypes
     }
     static readonly strict:boolean = false
-    static readonly transformer:Mapping<TransformSpecification> = {
+    static readonly transformer:Mapping<DataTransformSpecification> = {
         currency: {
-            formatFinal: (value:any):string => (new Intl.NumberFormat(
-                GenericInput.local,
-                {
-                    currency: 'USD',
-                    style: 'currency',
-                    ...(GenericInput.transformer.currency.options || {})
+            format: {
+                final: {
+                    transform: (value:number):string => (new Intl.NumberFormat(
+                        GenericInput.local,
+                        {
+                            currency: 'USD',
+                            style: 'currency',
+                            ...(GenericInput.transformer.currency.format.final.options || {})
+                        }
+                    )).format(value)
+                },
+                intermediate: {
+                    transform: (value:string):any =>
+                        GenericInput.transformer.float.format.intermediate.transform(value)
                 }
-            )).format(value),
+            },
             parse: (value:string):any =>
                 GenericInput.transformer.float.parse(value),
             type: 'text'
         },
         float: {
-            formatFinal: (value:any):string => (new Intl.NumberFormat(
-                GenericInput.local,
-                {
-                    style: 'decimal',
-                    ...(GenericInput.transformer.float.options || {})
+            format: {
+                final: {
+                    transform: (value:number):string => (new Intl.NumberFormat(
+                        GenericInput.local,
+                        {
+                            style: 'decimal',
+                            ...(GenericInput.transformer.float.format.final.options || {})
+                        }
+                    )).format(value)
+                },
+                intermediate: {
+                    transform: (value:number):string => `${value}`
                 }
-            )).format(value),
+            },
             parse: (value:string):any => parseFloat(
                 typeof value === 'string' && GenericInput.local === 'de-DE' ?
                     value.replace(/\./g, '').replace(/\,/g, '.') :
@@ -407,13 +423,17 @@ export class GenericInput<Type = any> extends
             type: 'text'
         },
         integer: {
-            formatFinal: (value:any):string => (new Intl.NumberFormat(
-                GenericInput.local,
-                {
-                    maximumFractionDigits: 0,
-                    ...(GenericInput.transformer.integer.options || {})
+            format: {
+                final: {
+                    transform: (value:number):string => (new Intl.NumberFormat(
+                        GenericInput.local,
+                        {
+                            maximumFractionDigits: 0,
+                            ...(GenericInput.transformer.integer.format.final.options || {})
+                        }
+                    )).format(value)
                 }
-            )).format(value),
+            },
             parse: (value:string):any => parseInt(
                 typeof value === 'string' && GenericInput.local === 'de-DE' ?
                     value.replace(/[,.]/g, '') :
@@ -449,11 +469,28 @@ export class GenericInput<Type = any> extends
      */
     constructor(properties:Props<Type>) {
         super(properties)
+
         if (
             Object.prototype.hasOwnProperty.call(this.props, 'initialValue') &&
             typeof this.props.initialValue !== 'undefined'
         )
             this.state.value = this.props.initialValue as null|Type
+        if (this.props.value !== undefined)
+            this.state.value = this.props.value as null|Type
+        else if (this.props.model?.value !== undefined)
+            this.state.value = this.props.model.value as null|Type
+
+        if (typeof this.props.representation === 'string')
+            this.state.representation = this.props.representation
+        else if (this.state.value !== null)
+            this.state.representation = this.formatValue(
+                this.state.value,
+                this.props.type ||
+                this.props.model?.type ||
+                this.self.defaultProps.model.type
+            )
+        else
+            this.state.representation = ''
     }
     /**
      * Is triggered immediate after a re-rendering. Re-stores cursor selection
@@ -523,6 +560,9 @@ export class GenericInput<Type = any> extends
             state.value = properties.value as null|Type
         else if (properties.model?.value !== undefined)
             state.value = properties.model.value as null|Type
+
+        if (properties.representation !== undefined)
+            state.representation = properties.representation
 
         return state
     }
@@ -649,6 +689,10 @@ export class GenericInput<Type = any> extends
             value = eventOrValue as null|Type
 
         const oldValue:null|Type = this.properties.value as null|Type
+
+        this.properties.representation = typeof value === 'string' ?
+            value :
+            this.formatValue(value, this.properties.type)
         this.properties.value =
         this.properties.model.value =
             this.parseValue(this.properties, value)
@@ -670,12 +714,16 @@ export class GenericInput<Type = any> extends
             if (stateChanged)
                 this.onChangeState(this.properties.model.state, event)
 
-            this.setState({value: this.properties.value})
+            this.setState({
+                representation: this.properties.representation,
+                value: this.properties.value
+            })
             this.onChange(event)
 
             if (this.properties.onChangeValue)
                 this.properties.onChangeValue(this.properties.value, event)
-        }
+        } else
+            this.setState({representation: this.properties.representation})
     }
     /**
      * Triggered on click events.
@@ -981,6 +1029,11 @@ export class GenericInput<Type = any> extends
         if (!(result.editor === 'plain' || result.selectableEditor))
             result.editorIsActive = true
 
+        if (typeof result.representation !== 'string' && result.value)
+            result.representation = this.formatValue(
+                result.value, result.type, !result.focused
+            )
+
         return result
     }
     /**
@@ -1055,6 +1108,12 @@ export class GenericInput<Type = any> extends
 
         if (result.hidden === undefined)
             result.hidden = this.state.hidden
+
+        if (
+            result.representation === undefined &&
+            typeof this.state.representation === 'string'
+        )
+            result.representation = this.state.representation
 
         if (result.showDeclaration === undefined)
             result.showDeclaration = this.state.showDeclaration
@@ -1188,24 +1247,26 @@ export class GenericInput<Type = any> extends
     }
     /**
      * Represents configured value.
-     * @param configuration - Input configuration.
+     * @param value - To represent.
+     * @param type - Input type.
      * @param final - Specifies whether it is a final representation.
      * @returns Transformed value.
      */
-    formatValue(configuration:Properties<Type>, final:boolean = true):string {
-        const value:null|Type = configuration.value
-        const methodName:string = final ? 'formatFinal' : 'final'
+    formatValue(value:null|Type, type:string, final:boolean = true):string {
+        const methodName:string = final ? 'final' : 'intermediate'
         if (value === null || typeof value === 'number' && isNaN(value))
             return ''
         if (
             Object.prototype.hasOwnProperty.call(
-                this.self.transformer, configuration.type
+                this.self.transformer, type
             ) &&
+            this.self.transformer[type].format &&
             Object.prototype.hasOwnProperty.call(
-                this.self.transformer[configuration.type], methodName
-            )
+                this.self.transformer[type].format, methodName
+            ) &&
+            this.self.transformer[type].format[methodName].transform
         )
-            return this.self.transformer[configuration.type][methodName](value)
+            return this.self.transformer[type].format[methodName].transform(value)
         return `${value}`
     }
     /**
@@ -1223,11 +1284,8 @@ export class GenericInput<Type = any> extends
                 this.self.transformer, configuration.type
             ) &&
             this.self.transformer[configuration.type].parse
-        ) {
-            // TODO
-            console.log('Parse', value, this.self.transformer[configuration.type].parse(value))
+        )
             return this.self.transformer[configuration.type].parse(value)
-        }
         if (typeof value === 'number' && isNaN(value))
             return null
         return value
@@ -1335,7 +1393,7 @@ export class GenericInput<Type = any> extends
             onBlur: this.onBlur,
             onFocus: this.onFocus,
             placeholder: properties.placeholder,
-            value: this.formatValue(properties, !properties.focused)
+            value: properties.representation
         }
         const materialProperties:SelectProps|TextFieldProps = {
             disabled: properties.disabled,
