@@ -125,9 +125,15 @@ export type State<Type = any> = {
     showDeclaration:boolean;
     value:null|Type;
 }
+export type FormatSpecification<Type = any> = {
+    options?:PlainObject;
+    transform?:(value:null|Type) => string;
+}
 export type TransformSpecification<Type = any> = {
-    format?:(value:null|Type) => string;
-    options:PlainObject;
+    format?:{
+        final?:FormatSpecification;
+        intermediate?:FormatSpecification;
+    };
     parse?:(value:string) => null|Type;
     type?:string;
 }
