@@ -37,11 +37,12 @@ import React, {
     ComponentType,
     createRef,
     FocusEvent,
-    KeyboardEvent,
+    KeyboardEvent as ReactKeyboardEvent,
     lazy,
-    MouseEvent,
+    MouseEvent as ReactMouseEvent,
     PureComponent,
     ReactElement,
+    RefCallback,
     RefObject,
     StrictMode,
     Suspense,
@@ -63,6 +64,9 @@ import {Typography} from '@rmwc/typography'
 import {
     Editor as RichTextEditorComponent, IAllProps as RichTextEditorProps
 } from '@tinymce/tinymce-react'
+import {
+    EventHandler as RichTextEventHandler
+} from '@tinymce/tinymce-react/lib/cjs/main/ts/Events'
 import UseAnimations from 'react-useanimations'
 import loading from 'react-useanimations/lib/loading'
 import lock from 'react-useanimations/lib/lock'
@@ -175,9 +179,7 @@ const modelStatePropertyTypes:{[key in keyof ModelState]:typeof boolean} = {
     valid: boolean,
     visited: boolean
 } as const
-const baseModelPropertyTypes:{
-    [key in keyof BaseModel]:ValueOf<typeof PropertyTypes>
-} = {
+const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     declaration: string,
     default: any,
     description: string,
@@ -325,9 +327,9 @@ export class GenericInput<Type = any> extends
             ['valid', true],
             ['visited', true]
         ])
-    static readonly propTypes:{
-        [key in keyof Properties]:ValueOf<typeof PropertyTypes>
-    } = {
+    static readonly propTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+        ...baseModelPropertyTypes,
+        ...modelStatePropertyTypes,
         /*
             NOTE: Not yet working:
             align: oneOf(['end', 'start']),
@@ -351,13 +353,11 @@ export class GenericInput<Type = any> extends
         maximumText: string,
         minimumLengthText: string,
         minimumText: string,
-        model: shape({
+        model: shape<any>({
+            ...baseModelPropertyTypes,
             mutable: boolean,
-            state: shape(
-                modelStatePropertyTypes as ValidationMap<typeof PropertyTypes>
-            ),
-            writable: boolean,
-            ...baseModelPropertyTypes
+            state: shape(modelStatePropertyTypes),
+            writable: boolean
         }),
         onBlur: func,
         onChange: func,
@@ -389,9 +389,7 @@ export class GenericInput<Type = any> extends
             trailingIcon?:string|(IconOptions & {tooltip?:string|TooltipProps});
         */
         tooltip: any,
-        trailingIcon: any,
-        ...modelStatePropertyTypes,
-        ...baseModelPropertyTypes
+        trailingIcon: any
     }
     static readonly strict:boolean = false
     static readonly transformer:GenericInputDataTransformation = {
@@ -661,7 +659,7 @@ export class GenericInput<Type = any> extends
      * @param event - Mouse event object.
      * @returns Nothing.
      */
-    onChangeEditorIsActive = (event?:MouseEvent):void => {
+    onChangeEditorIsActive = (event?:ReactMouseEvent):void => {
         this.properties.editorIsActive = !this.properties.editorIsActive
         this.setState(({editorIsActive}):Pick<State<Type>, 'editorIsActive'|'selectionIsUnstable'> => (
             {editorIsActive: !editorIsActive, selectionIsUnstable: true}
@@ -678,7 +676,7 @@ export class GenericInput<Type = any> extends
      * @param event - Potential event object.
      * @returns Nothing.
      */
-    onChangeShowDeclaration = (event?:MouseEvent):void =>
+    onChangeShowDeclaration = (event?:ReactMouseEvent):void =>
         this.setState(({showDeclaration}):Pick<State<Type>, 'showDeclaration'> => {
             if (this.properties.onChangeShowDeclaration)
                 this.properties.onChangeShowDeclaration(showDeclaration, event)
@@ -767,7 +765,7 @@ export class GenericInput<Type = any> extends
      * @param event - Mouse event object.
      * @returns Nothing.
      */
-    onClick = (event:MouseEvent):void => {
+    onClick = (event:ReactMouseEvent):void => {
         this.onSelectionChange(event)
         if (this.properties.onClick)
             this.properties.onClick(event)
@@ -788,7 +786,7 @@ export class GenericInput<Type = any> extends
      * @param event - Key up event object.
      * @returns Nothing.
      */
-    onKeyUp = (event:KeyboardEvent):void => {
+    onKeyUp = (event:ReactKeyboardEvent):void => {
         this.onSelectionChange(event)
         if (this.properties.onKeyUp)
             this.properties.onKeyUp(event)
@@ -808,7 +806,7 @@ export class GenericInput<Type = any> extends
      * @param event - Event object which triggered interaction.
      * @returns Nothing.
      */
-    onTouch = (event:FocusEvent|MouseEvent):void => {
+    onTouch = (event:FocusEvent|ReactMouseEvent):void => {
         let changeState:boolean = false
         if (!this.properties.focused) {
             changeState =
@@ -847,7 +845,7 @@ export class GenericInput<Type = any> extends
                 >
                     <UseAnimations animation={plusToX} reverse={true}/>
                 </GenericAnimate>,
-                onClick: (event:MouseEvent):void => {
+                onClick: (event:ReactMouseEvent):void => {
                     event.preventDefault()
                     event.stopPropagation()
                     this.onChangeValue(this.transformFinalValue(
@@ -863,7 +861,7 @@ export class GenericInput<Type = any> extends
                     animation={lock}
                     reverse={!this.properties.hidden}
                 />,
-                onClick: (event:MouseEvent):void => {
+                onClick: (event:ReactMouseEvent):void => {
                     event.preventDefault()
                     event.stopPropagation()
                     this.setState(({hidden}):Pick<State<Type>, 'hidden'> =>
@@ -1624,16 +1622,16 @@ export class GenericInput<Type = any> extends
             <div>
                 <GenericAnimate in={Boolean(properties.selection)}>
                     <Select
+                        {...genericProperties as SelectProps}
+                        {...materialProperties as SelectProps}
                         enhanced
-                        inputRef={this.inputReference as RefObject<HTMLSelectElement>}
+                        inputRef={this.inputReference as unknown as undefined}
                         rootProps={{
                             name: properties.name,
                             onClick: this.onClick
                         }}
                         onChange={this.onChangeValue}
                         options={properties.selection}
-                        {...genericProperties}
-                        {...materialProperties}
                     />
                 </GenericAnimate>
                 {this.wrapAnimationConditionally(
@@ -1660,7 +1658,7 @@ export class GenericInput<Type = any> extends
                                         (
                                             properties.showInitialValidationState ||
                                             properties.visited
-                                        ) ? 'error' : null
+                                        ) ? 'error' : undefined
                                     }>
                                         {
                                             properties.description ||
@@ -1674,6 +1672,9 @@ export class GenericInput<Type = any> extends
                                             animation={loading} size={96}
                                         />}>
                                             <CodeEditor
+                                                {...genericProperties as
+                                                    CodeEditorProps
+                                                }
                                                 className="mdc-text-field__input"
                                                 mode="javascript"
                                                 name={this.properties.name}
@@ -1689,20 +1690,27 @@ export class GenericInput<Type = any> extends
                                                     useWorker: false
                                                 }}
                                                 theme="github"
-                                                {...genericProperties}
                                             />
                                         </Suspense>
                                     :
                                         <RichTextEditorComponent
+                                            {...genericProperties as
+                                                RichTextEditorProps
+                                            }
                                             disabled={properties.disabled}
                                             init={tinyMCEOptions}
-                                            onClick={this.onClick}
+                                            onClick={this.onClick as unknown as
+                                                RichTextEventHandler<MouseEvent>
+                                            }
                                             onEditorChange={this.onChangeValue}
-                                            onKeyUp={this.onKeyUp}
-                                            ref={this.setRichTextEditorReference}
+                                            onKeyUp={this.onKeyUp as unknown as
+                                                RichTextEventHandler<KeyboardEvent>
+                                            }
+                                            ref={this.setRichTextEditorReference as
+                                                RefCallback<RichTextEditorComponent>
+                                            }
                                             textareaName={this.properties.name}
                                             tinymceScriptSrc={tinymceScriptPath}
-                                            {...genericProperties}
                                         />
                                 }
                             </label>
@@ -1713,9 +1721,10 @@ export class GenericInput<Type = any> extends
                         >
                             <p
                                 className="mdc-text-field-helper-text mdc-text-field-helper-text--persistent"
-                            >
-                                {materialProperties.helpText.children}
-                            </p>
+                            >{(
+                                materialProperties.helpText as
+                                    {children:ReactElement}
+                            ).children}</p>
                         </div>
                     ],
                     isAdvancedEditor,
@@ -1723,15 +1732,18 @@ export class GenericInput<Type = any> extends
                 )}
                 {this.wrapAnimationConditionally(
                     <TextField
+                        {...genericProperties as TextFieldProps}
+                        {...materialProperties as TextFieldProps}
                         align={properties.align}
                         characterCount
                         fullwidth={properties.fullWidth}
                         inputRef={
-                            this.inputReference as unknown as RefObject<HTMLInputElement|HTMLTextAreaElement>
+                            this.inputReference as unknown as
+                                RefCallback<HTMLInputElement|HTMLTextAreaElement>
                         }
-                        maximum={properties.maximum}
+                        max={properties.maximum}
                         maxLength={properties.maximumLength}
-                        minimum={properties.minimum}
+                        min={properties.minimum}
                         minLength={properties.minimumLength}
                         onChange={this.onChangeValue}
                         ripple={properties.ripple}
@@ -1765,8 +1777,6 @@ export class GenericInput<Type = any> extends
                                             .type :
                                         properties.type
                         }
-                        {...genericProperties}
-                        {...materialProperties}
                     />,
                     !(isAdvancedEditor || properties.selection),
                     richTextEditorLoaded || properties.editor.startsWith('code')

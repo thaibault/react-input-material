@@ -16,6 +16,7 @@
     endregion
 */
 // region imports
+import {SelectProps} from '@rmwc/select'
 import GenericPropertyTypes from 'clientnode/property-types'
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
@@ -61,7 +62,7 @@ export type BaseModel<Type = any> = {
     minimumLength:number;
     name:string;
     regularExpressionPattern:RegExp|string;
-    selection?:Array<number|string>|Mapping<number|string>;
+    selection?:SelectProps['options'];
     trim:boolean;
     type:GenericInputType;
     value?:null|Type;
@@ -120,7 +121,9 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
 export type PropertyTypes<Type = any> = {
     [key in keyof Properties<Type>]:ValueOf<typeof GenericPropertyTypes>
 }
-export type Props<Type = any> = RecursivePartial<Properties<Type>>
+export type Props<Type = any> = Partial<Omit<Properties<Type>, 'model'>> & {
+    model?:Partial<Model<Type>>
+}
 export type State<Type = any> = {
     cursor:{
         end:number;
