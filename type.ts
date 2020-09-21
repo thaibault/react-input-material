@@ -19,7 +19,12 @@
 import GenericPropertyTypes from 'clientnode/property-types'
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
-    Component, FocusEvent, KeyboardEvent, MouseEvent, SyntheticEvent
+    Component,
+    FocusEvent,
+    KeyboardEvent,
+    MouseEvent,
+    ReactElement,
+    SyntheticEvent
 } from 'react'
 import {IconOptions} from '@rmwc/types'
 import {ThemeProviderProps} from '@rmwc/theme'
@@ -42,6 +47,8 @@ export type ModelState = {
     valid:boolean;
     visited:boolean;
 }
+export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
+export type GenericInputType = 'currency'|'float'|'integer'|'string'|NativeInputType
 export type BaseModel<Type = any> = {
     declaration:string;
     default?:null|Type;
@@ -56,7 +63,7 @@ export type BaseModel<Type = any> = {
     regularExpressionPattern:RegExp|string;
     selection?:Array<number|string>|Mapping<number|string>;
     trim:boolean;
-    type:'date'|'datetime-local'|'month'|'number'|'range'|'string'|'time'|'week';
+    type:GenericInputType;
     value?:null|Type;
 }
 export type Model<Type = any> = BaseModel<Type> & {
@@ -129,16 +136,36 @@ export type State<Type = any> = {
 }
 export type FormatSpecification<Type = any> = {
     options?:PlainObject;
-    transform?:(value:null|Type) => string;
+    transform:(value:null|Type) => string;
 }
 export type DataTransformSpecification<Type = any> = {
-    format?:{
-        final?:FormatSpecification;
-        intermediate?:FormatSpecification;
+    format:{
+        final:FormatSpecification;
+        intermediate:FormatSpecification;
     };
-    parse?:(value:string) => null|Type;
-    type?:string;
+    parse:(value:string) => null|Type;
+    type:NativeInputType;
 }
+export type GenericInputDataTransformation<Type = any> =
+    Mapping<RecursivePartial<DataTransformSpecification<Type>>> &
+    {
+        currency: DataTransformSpecification<Type>;
+        float: DataTransformSpecification<Type>;
+        integer: {
+            format:{
+                final:FormatSpecification<Type>
+                intermediate?:DataTransformSpecification<Type>['format']['intermediate'];
+            };
+            parse:DataTransformSpecification<Type>['parse'];
+            type:NativeInputType;
+        };
+        number: {
+            format?:DataTransformSpecification<Type>['format'];
+            parse:DataTransformSpecification<Type>['parse'];
+            type?:DataTransformSpecification<Type>['type'];
+        };
+    }
+export type Renderable = Array<ReactElement|string>|ReactElement|string
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
