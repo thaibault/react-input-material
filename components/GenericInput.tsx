@@ -396,7 +396,7 @@ export function determineValidationState<Type = any>(
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput = function<Type = any>(
+export const GenericInputInner = function<Type = any>(
     props:Props<Type>, reference?:RefObject<ReactWebComponent>
 ):ReactElement {
     // region live-cycle
@@ -1599,14 +1599,46 @@ export const GenericInput = function<Type = any>(
     // endregion
 // TODO check if contextTypes makes sense here
 } as VoidFunctionComponent<Props> & {
-    defaultModelState:ModelState;
-    defaultProps:Props & Pick<Properties, 'model'>;
     displayName:string;
-    local:string;
-    strict:boolean;
-    transformer:GenericInputDataTransformation;
 }
-// region stati cproperties
+GenericInputInner.displayName = 'GenericInput'
+/**
+ * Wrapping web component compatible react component.
+ * @property static:output - Describes external event handler interface.
+ * @property static:propertiesToReflectAsAttributes - List of properties to
+ * potentially reflect as attributes (e.g. in a wrapped web-component).
+ * @property static:wrapped - Wrapped component.
+ *
+ * @param props - Given components properties.
+ * @param reference - Reference object to forward internal state.
+ * @returns React elements.
+ */
+// TODO extend ReactStaticWebComponent?
+export const GenericInput:ReactStaticWebComponent =
+    forwardRef<typeof GenericInputInner, Props>(GenericInputInner) as
+        ReactStaticWebComponent
+// region static properties
+// / region web-component hints
+GenericInput.output = {onChange: true} as Output
+GenericInput.propertiesToReflectAsAttributes = new Map([
+    ['dirty', true],
+    ['focused', true],
+    ['invalid', true],
+    ['invalidMaximum', true],
+    ['invalidMaximumLength', true],
+    ['invalidMinimum', true],
+    ['invalidMinimumLength', true],
+    ['invalidPattern', true],
+    ['invalidRequired', true],
+    ['name', true],
+    ['pristine', true],
+    ['touched', true],
+    ['untouched', true],
+    ['valid', true],
+    ['visited', true]
+]) as Map<keyof Properties, boolean> 
+GenericInput.wrapped = GenericInput
+// / endregion
 GenericInput.defaultModelState = {
     dirty: false,
     focused: false,
@@ -1657,7 +1689,6 @@ GenericInput.defaultProps = {
     showDeclaration: undefined,
     showInitialValidationState: false
 } as Props & Pick<Properties, 'model'>
-GenericInput.displayName = 'GenericInput'
 GenericInput.local = 'en-US'
 GenericInput.propTypes = {
     ...baseModelPropertyTypes,
@@ -1802,42 +1833,6 @@ GenericInput.transformer = {
     },
     number: {parse: parseInt}
 } as GenericInputDataTransformation
-// endregion
-// region web-component adapter
-/**
- * Wrapping web component compatible react component.
- * @property static:output - Describes external event handler interface.
- * @property static:propertiesToReflectAsAttributes - List of properties to
- * potentially reflect as attributes (e.g. in a wrapped web-component).
- * @property static:wrapped - Wrapped component.
- *
- * @param props - Given components properties.
- * @param reference - Reference object to forward internal state.
- * @returns React elements.
- */
-export const GenericInputWeb:ReactStaticWebComponent =
-    forwardRef<GenericInput>(GenericInput) as ReactStaticWebComponent
-// / region static properties
-GenericInputWeb.output = {onChange: true} as Output
-GenericInputWeb.propertiesToReflectAsAttributes = new Map([
-    ['dirty', true],
-    ['focused', true],
-    ['invalid', true],
-    ['invalidMaximum', true],
-    ['invalidMaximumLength', true],
-    ['invalidMinimum', true],
-    ['invalidMinimumLength', true],
-    ['invalidPattern', true],
-    ['invalidRequired', true],
-    ['name', true],
-    ['pristine', true],
-    ['touched', true],
-    ['untouched', true],
-    ['valid', true],
-    ['visited', true]
-]) as Map<keyof Properties, boolean> 
-GenericInputWeb.wrapped = GenericInput
-// / endregion
 // endregion
 export default GenericInputWeb
 // region vim modline
