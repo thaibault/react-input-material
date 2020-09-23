@@ -111,7 +111,7 @@ if (typeof UTC_BUILD_TIMESTAMP === 'undefined')
     /* eslint-disable no-var */
     var UTC_BUILD_TIMESTAMP:number = 1
     /* eslint-enable no-var */
-let richTextEditorLoaded:boolean = false
+let richTextEditorLoadedOnce:boolean = false
 const tinymceBasePath:string = '/node_modules/tinymce/'
 const tinymceScriptPath:string = `${tinymceBasePath}tinymce.min.js`
 // NOTE: Some options are available but not specified yet.
@@ -375,63 +375,8 @@ export function determineValidationState<Type = any>(
  * reacts strict component.
  * @property static:transformer - Generic input data transformation
  * specifications.
- *
- * @property codeEditorReference - Current code editor component reference.
- * @property inputReference - Current wrapped input reference node.
- * @property properties - Current properties.
- * @property richTextEditorInstance - Current rich text instance.
- * @property richTextEditorReference - Current rich text component reference.
- * @property self - Back-reference to this class.
- * @property state - Current state.
  */
 export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
-    // region properties
-    let codeEditorReference:CodeEditorType|undefined
-    let inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement> =
-        createRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>()
-    let richTextEditorInstance:RichTextEditor|undefined
-    let richTextEditorReference:RichTextEditorComponent|undefined
-    const [cursor, setCursor] =
-        useState<{end:number;start:number}>({end: 0, start: 0})
-    let [editorIsActive, setEditorIsActive] = useState<boolean>(false)
-    let [hidden, setHidden] = useState<boolean|undefined>()
-    const [model, setModel] =
-        useState<ModelState>({...GenericInput.defaultModelState})
-    const [selectionIsUnstable, setSelectionIsUnstable] =
-        useState<boolean>(false)
-    let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
-    let [value, setValue] = useState<null|Type>(determineInitialValue(props))
-    let [representation, setRepresentation] =
-        useState<string>(determineInitialRepresentation(props, value))
-    const properties:Properties<Type> = getConsolidatedProperties(props)
-    // endregion
-    // region derive state variables from given properties
-    if (properties.cursor) {
-        if (properties.cursor.end !== undefined)
-            cursor.end = properties.cursor.end
-        if (properties.cursor.start !== undefined)
-            cursor.start = properties.cursor.start
-    }
-
-    if (properties.editorIsActive !== undefined)
-        editorIsActive = properties.editorIsActive
-
-    if (properties.hidden !== undefined)
-        hidden = properties.hidden
-    if (hidden === undefined)
-        hidden = properties.name?.startsWith('password')
-
-    if (properties.showDeclaration !== undefined)
-        showDeclaration = properties.showDeclaration
-
-    if (properties.value !== undefined)
-        value = properties.value as null|Type
-    else if (properties.model?.value !== undefined)
-        value = properties.model.value as null|Type
-
-    if (properties.representation !== undefined)
-        representation = properties.representation
-    // endregion
     // region live-cycle
     /**
      * Is triggered immediate after a re-rendering. Re-stores cursor selection
@@ -439,35 +384,657 @@ export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
      * @returns Nothing.
      */
     useEffect(():void => {
-        if (selectionIsUnstable) {
+        if (selectionIsUnstable)
             if (editorIsActive) {
+                /*
+                    NOTE: If the corresponding editor are not loaded yet they
+                    will set the selection state on initialisation as long as
+                    "selectionIsUnstable" is set to "true".
+                */
                 if (codeEditorReference?.editor?.selection) {
                     codeEditorReference.editor.textInput.focus()
-                    const range =
-                        codeEditorReference.editor.selection.getRange()
-                    const endPosition = determineTablePosition(cursor.end)
-                    range.setEnd(endPosition.row, endPosition.column)
-                    const startPosition = determineTablePosition(cursor.start)
-                    range.setStart(startPosition.row, startPosition.column)
-                    codeEditorReference.editor.selection.setRange(range)
+                    setCodeEditorSelectionState()
+                    setSelectionIsUnstable(false)
+                } else if (richTextEditorInstance?.selection) {
+                    richTextEditorInstance.focus(false)
+                    setRichTextEditorSelectionState()
+                    setSelectionIsUnstable(false)
                 }
-                /*
-                    else if (richTextEditorInstance?.selection)
-
-                    NOTE: Could not be set here since we have to wait for
-                    tinymce to be finally loaded ("init" event) to set focus
-                    and selections.
-                */
             } else if (inputReference.current) {
                 inputReference.current.focus();
                 (
                     inputReference.current as
                         HTMLInputElement|HTMLTextAreaElement
                 ).setSelectionRange(cursor.start, cursor.end)
+                setSelectionIsUnstable(false)
             }
+    })
+    // endregion
+    // region context helper
+    // / region render helper
+    /**
+     * Applies icon preset configurations.
+     * @param options - Icon options to extend of known preset identified.
+     * @return Given potential extended icon configuration.
+     */
+    const applyIconPreset = (options?:Properties['icon']):IconOptions|string|undefined => {
+        if (options === 'clear_preset')
+            return {
+                icon: <GenericAnimate
+                    in={properties.value !== properties.default}
+                >
+                    <UseAnimations animation={plusToX} reverse={true}/>
+                </GenericAnimate>,
+                onClick: (event:ReactMouseEvent):void => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    onChangeValue(transformFinalValue(
+                        properties, properties.default
+                    ))
+                },
+                strategy: 'component',
+                tooltip: 'Clear input'
+            }
+        if (options === 'password_preset')
+            return {
+                icon: <UseAnimations
+                    animation={lock} reverse={!properties.hidden}
+                />,
+                onClick: (event:ReactMouseEvent):void => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    setHidden((value:boolean|undefined):boolean => !value)
+                    onChange(event)
+                },
+                strategy: 'component',
+                tooltip: `${(properties.hidden ? 'Show' : 'Hide')} password`
+            }
+        return options
+    }
+    /**
+     * TODO
+     */
+    const renderHelpText = ():ReactElement => <>
+       <GenericAnimate in={
+            properties.selectableEditor &&
+            properties.type === 'string' &&
+            properties.editor !== 'plain'
+        }>
+            <IconButton
+                icon={{
+                    icon: properties.editorIsActive ?
+                        'subject' :
+                        properties.editor.startsWith('code') ?
+                            'code' :
+                            'text_format',
+                    onClick: onChangeEditorIsActive
+                }}
+            />
+        </GenericAnimate>
+        <GenericAnimate in={Boolean(properties.declaration)}>
+            <IconButton
+                icon={{
+                    icon:
+                        'more_' +
+                        (properties.showDeclaration ? 'vert' : 'horiz'),
+                    onClick: onChangeShowDeclaration
+                }}
+            />
+        </GenericAnimate>
+        <GenericAnimate in={properties.showDeclaration}>
+            {properties.declaration}
+        </GenericAnimate>
+        <GenericAnimate in={
+            !properties.showDeclaration &&
+            properties.invalid &&
+            (
+                properties.showInitialValidationState ||
+                /*
+                    Material inputs show their validation state at
+                    least after a blur event so we synchronize error
+                    message appearances.
+                */
+                properties.visited
+            )
+        }>
+            <Theme use="error">{renderMessage(
+                properties.invalidMaximum &&
+                properties.maximumText ||
+                properties.invalidMaximumLength &&
+                properties.maximumLengthText ||
+                properties.invalidMinimum &&
+                properties.minimumText ||
+                properties.invalidMinimumLength &&
+                properties.minimumLengthText ||
+                properties.invalidPattern &&
+                properties.patternText ||
+                properties.invalidRequired &&
+                properties.requiredText
+            )}</Theme>
+        </GenericAnimate>
+    </>
+    /**
+     * Renders given template string against all properties in current
+     * instance.
+     * @param template - Template to render.
+     * @returns Evaluated template or an empty string if something goes wrong.
+     */
+    const renderMessage = (template?:any):string => {
+        if (typeof template === 'string') {
+            const scopeNames:Array<keyof Properties<Type>> = Object
+                .keys(properties)
+                .filter((name:string):boolean => name !== 'default') as
+                    Array<keyof Properties<Type>>
+            let render:Function
+            try {
+                render = new Function(...scopeNames, `return \`${template}\``)
+            } catch (error) {
+                console.warn(
+                    `Given message template "${template}" could not be ` +
+                    `parsed: "${Tools.represent(error)}".`
+                )
+                return ''
+            }
+            try {
+                return render(
+                    ...scopeNames.map((name:keyof Properties<Type>
+                ):any => properties[name]))
+            } catch (error) {
+                console.warn(
+                    `Given message template "${template}" failed to evaluate` +
+                    ' with given scope variables: "' +
+                    `${scopeNames.join('", "')}": "${Tools.represent(error)}".`
+                )
+            }
+        }
+        return ''
+    }
+    /**
+     * Wraps given component with animation component if given condition holds.
+     * @param content - Component or string to wrap.
+     * @param propertiesOrInCondition - Animation properties or in condition
+     * only.
+     * @returns Wrapped component.
+     */
+    const wrapAnimationConditionally = (
+        content:Renderable,
+        propertiesOrInCondition:boolean|Partial<TransitionProps<HTMLElement|undefined>> = {},
+        condition:boolean = true
+    ):Renderable => {
+        if (typeof propertiesOrInCondition === 'boolean')
+            return condition ?
+                <GenericAnimate in={propertiesOrInCondition}>
+                    {content}
+                </GenericAnimate> :
+                propertiesOrInCondition ? content : ''
+        return condition ?
+            <GenericAnimate {...propertiesOrInCondition}>
+                {content}
+            </GenericAnimate> :
+            propertiesOrInCondition.in ? content : ''
+    }
+    /**
+     * Wraps given component with react strict mode component.
+     * @param content - Component or string to wrap.
+     * @returns Wrapped component.
+     */
+    const wrapStrict = (content:Renderable):ReactElement => {
+        return GenericInput.strict ?
+            <StrictMode>{content}</StrictMode> :
+            <>{content}</>
+    }
+    /**
+     * Wraps given component with a tooltip component with given tooltip
+     * configuration.
+     * @param content - Component or string to wrap.
+     * @param options - Tooltip options.
+     * @returns Wrapped given content.
+     */
+    const wrapTooltip = (
+        content:ReactElement, options?:Properties['tooltip']
+    ):ReactElement => {
+        if (typeof options === 'string')
+            return <Tooltip
+                content={<Typography use="caption">{options}</Typography>}
+            >{content}</Tooltip>
+        if (options !== null && typeof options === 'object')
+            return <Tooltip {...options}>
+                <Typography use="caption">{content}</Typography>
+            </Tooltip>
+        return <>{content}</>
+    }
+    /**
+     * If given icon options has an additional tooltip configuration integrate
+     * a wrapping tooltip component into given configuration and remove initial
+     * tooltip configuration.
+     * @param options - Icon configuration potential extended a tooltip
+     * configuration.
+     * @returns Resolved icon configuration.
+     */
+    const wrapIconWithTooltip = (options?:Properties['icon']):IconOptions|undefined => {
+        if (typeof options === 'object' && options?.tooltip) {
+            const tooltip:Properties['tooltip'] = options.tooltip
+            options = {...options}
+            delete options.tooltip
+            const nestedOptions:IconOptions = {...options}
+            options.strategy = 'component'
+            options.icon = wrapTooltip(<Icon icon={nestedOptions} />, tooltip)
+        }
+        return options as IconOptions|undefined
+    }
+    // / endregion
+    // / region handle cursor selection state
+    // // region rich-text editor
+    /**
+     * Determines absolute offset in given markup.
+     * @param contentDomNode - Wrapping dom node where all content is
+     * contained.
+     * @param domNode - Dom node which contains given position.
+     * @param offset - Relative position within given node.
+     * @returns Determine absolute offset.
+     */
+    const determineAbsoluteSymbolOffsetFromHTML = (
+        contentDomNode:Element, domNode:Element, offset:number
+    ):number => {
+        if (!value)
+            return 0
+
+        const indicatorKey:string = 'generic-input-selection-indicator'
+        const indicatorValue:string = '###'
+        const indicator:string = ` ${indicatorKey}="${indicatorValue}"`
+
+        domNode.setAttribute(indicatorKey, indicatorValue)
+        // NOTE: TinyMCE seems to add a newline after each paragraph.
+        const content:string = contentDomNode.innerHTML.replace(
+            /(<\/p>)/gi, '$1\n'
+        )
+        domNode.removeAttribute(indicatorKey)
+
+        const domNodeOffset:number = content.indexOf(indicator)
+        const startIndex:number = domNodeOffset + indicator.length
+
+        return (
+            offset +
+            content.indexOf('>', startIndex) +
+            1 -
+            indicator.length
+        )
+    }
+    // // endregion
+    // // region code editor
+    /**
+     * Determines absolute range from table oriented position.
+     * @param column - Symbol offset in given row.
+     * @param row - Offset row.
+     * @returns Determined offset.
+     */
+    const determineAbsoluteSymbolOffsetFromTable = (
+        column:number, row:number
+    ):number => {
+        if (typeof value !== 'string' && !value)
+            return 0
+
+        if (row > 0)
+            return column + (value as unknown as string)
+                .split('\n')
+                .slice(0, row)
+                .map((line:string):number => 1 + line.length)
+                .reduce((sum:number, value:number):number => sum + value)
+        return column
+    }
+    /**
+     * Converts absolute range into table oriented position.
+     * @param offset - Absolute position.
+     * @returns Position.
+     */
+    const determineTablePosition = (offset:number):{column:number;row:number} => {
+        const result = {column: 0, row: 0}
+        if (typeof value === 'string')
+            for (const line of value.split('\n')) {
+                if (line.length < offset)
+                    offset -= 1 + line.length
+                else {
+                    result.column = offset
+                    break
+                }
+                result.row += 1
+            }
+        return result
+    }
+    /**
+     * TODO
+     */
+    const setCodeEditorSelectionState = ():void => {
+        const range = codeEditorReference.editor.selection.getRange()
+        const endPosition = determineTablePosition(cursor.end)
+        range.setEnd(endPosition.row, endPosition.column)
+        const startPosition = determineTablePosition(cursor.start)
+        range.setStart(startPosition.row, startPosition.column)
+        codeEditorReference.editor.selection.setRange(range)
+    }
+    /**
+     * TODO
+     */
+    const setRichTextEditorSelectionState = ():void => {
+        const indicator:{end:string;start:string} = {
+            end: '###generic-input-selection-indicator-end###',
+            start: '###generic-input-selection-indicator-start###'
+        }
+        const cursor:{end:number;start:number} = {
+            end: properties.cursor.end + indicator.start.length,
+            start: properties.cursor.start
+        }
+        const keysSorted:Array<keyof typeof indicator> =
+            ['start', 'end']
+
+        let value:string = properties.representation || ''
+        for (const type of keysSorted)
+            value = (
+                value.substring(0, cursor[type as keyof typeof indicator]) +
+                indicator[type] +
+                value.substring(cursor[type as keyof typeof indicator])
+            )
+        richTextEditorInstance.getBody().innerHTML = value
+
+        const walker = document.createTreeWalker(
+            richTextEditorInstance.getBody(),
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        )
+
+        const range = richTextEditorInstance.dom.createRng()
+        const result:{end?:[Node, number];start?:[Node, number]} = {}
+        let node
+        while (node = walker.nextNode())
+            for (const type of keysSorted) {
+                if (node.nodeValue) {
+                    const index:number =
+                        node.nodeValue.indexOf(indicator[type])
+                    if (index > -1) {
+                        node.nodeValue = node.nodeValue.replace(
+                            indicator[type], ''
+                        )
+                        result[type] = [node, index]
+                    }
+                }
+            }
+
+        for (const type of keysSorted)
+            if (result[type])
+                range[
+                    `set${Tools.stringCapitalize(type)}` as 'setEnd'|'setStart'
+                ](...(result[type] as [Node, number]))
+        if (result.end && result.start)
+            richTextEditorInstance.selection.setRng(range)
+    }
+    // // endregion
+    /**
+     * Saves current selection/cursor state in components state.
+     * @returns Nothing.
+     */
+    const saveSelectionState = ():void => {
+        /*
+            NOTE: Known issues is that we do not get the absolute positions but
+            the one in current selected node.
+        */
+        const codeEditorRange =
+            codeEditorReference?.editor?.selection?.getRange()
+        const richTextEditorRange =
+            richTextEditorInstance?.selection?.getRng(true)
+        const selectionEnd:null|number = (
+            inputReference.current as HTMLInputElement|HTMLTextAreaElement
+        )?.selectionEnd
+        const selectionStart:null|number = (
+            inputReference.current as HTMLInputElement|HTMLTextAreaElement
+        )?.selectionStart
+        if (codeEditorRange)
+            setCursor({
+                end: determineAbsoluteSymbolOffsetFromTable(
+                    codeEditorRange.end.column,
+                    typeof codeEditorRange.end.row === 'number' ?
+                        codeEditorRange.end.row :
+                        typeof properties.value === 'string' ?
+                            properties.value.split('\n').length - 1 :
+                            0
+                ),
+                start: determineAbsoluteSymbolOffsetFromTable(
+                    codeEditorRange.start.column,
+                    typeof codeEditorRange.start.row === 'number' ?
+                        codeEditorRange.start.row :
+                        typeof properties.value === 'string' ?
+                            properties.value.split('\n').length - 1 :
+                            0
+                )
+            })
+        else if (richTextEditorRange)
+            setCursor({
+                end: determineAbsoluteSymbolOffsetFromHTML(
+                    richTextEditorInstance!.getBody(),
+                    richTextEditorInstance!.selection.getEnd(),
+                    richTextEditorRange.endOffset
+                ),
+                start: determineAbsoluteSymbolOffsetFromHTML(
+                    richTextEditorInstance!.getBody(),
+                    richTextEditorInstance!.selection.getStart(),
+                    richTextEditorRange.startOffset
+                )
+            })
+        else if (
+            typeof selectionEnd === 'number' &&
+            typeof selectionStart === 'number'
+        )
+            setCursor({end: selectionEnd, start: selectionStart})
+    }
+    // / endregion
+    // / region property aggregation
+    /**
+     * Synchronizes property, state and model configuration:
+     * Properties overwrites default properties which overwrites default model
+     * properties.
+     * @returns Nothing.
+    */
+    const mapPropertiesAndStateToModel = (properties:Props<Type>):Props<Type> => {
+        /*
+            NOTE: Default props seems not to respect nested layers to merge so
+            we have to manage this for nested model structure.
+        */
+        const result:Props<Type> & {model:Model} = Tools.extend(
+            true,
+            {
+                model: {
+                    ...GenericInput.defaultProps.model,
+                    state: {...GenericInput.defaultProps.model.state}
+                }
+            },
+            properties
+        )
+        // region handle aliases
+        if (result.disabled) {
+            delete result.disabled
+            result.model.mutable = false
+        }
+        if (result.pattern) {
+            result.model.regularExpressionPattern = result.pattern
+            delete result.pattern
+        }
+        if (result.required) {
+            delete result.required
+            result.model.nullable = false
+        }
+        if (result.type === 'text')
+            result.type = 'string'
+        // endregion
+        // region handle model configuration
+        for (const [name, value] of Object.entries(result.model))
+            if (Object.prototype.hasOwnProperty.call(result, name))
+                (
+                    result.model[name as keyof Model<Type>] as
+                        ValueOf<Model<Type>>
+                ) = result[name as keyof Props<Type>] as ValueOf<Model<Type>>
+        for (const [name, value] of Object.entries(result.model.state))
+            if (Object.prototype.hasOwnProperty.call(result, name))
+                result.model.state[name as keyof ModelState] =
+                    result[name as keyof Props<Type>] as ValueOf<ModelState>
+        for (const key of Object.keys(result.model.state))
+            if (!Object.prototype.hasOwnProperty.call(props, key)) {
+                result.model.state = model
+                break
+            }
+
+        /*
+            NOTE: Model states are not retrieved from state but derived from
+            specification and current value.
+        */
+
+        if (result.model.value === undefined)
+            result.model.value = (value === undefined) ?
+                result.model.default :
+                value
+        // else -> Controlled component via model's "value" property.
+        // endregion
+        // region handle state configuration
+        if (result.cursor === undefined)
+            result.cursor = cursor
+
+        if (result.editorIsActive === undefined)
+            result.editorIsActive = editorIsActive
+
+        if (result.hidden === undefined)
+            result.hidden = hidden
+
+        if (
+            result.representation === undefined &&
+            typeof representation === 'string'
+        )
+            result.representation = representation
+
+        if (result.showDeclaration === undefined)
+            result.showDeclaration = showDeclaration
+        // endregion
+        result.model.value = parseValue(
+            result as unknown as Properties<Type>, result.model.value
+        )
+        determineValidationState(
+            result as unknown as Properties<Type>, result.model.value
+        )
+
+        return result
+    }
+    /**
+     * Calculate external properties (a set of all configurable properties).
+     * @returns External properties object.
+     */
+    const getConsolidatedProperties = (properties:Props<Type>):Properties<Type> => {
+        properties = mapPropertiesAndStateToModel(properties)
+        const result:Properties<Type> & {
+            mutable?:boolean;
+            nullable?:boolean;
+            regularExpressionPattern?:RegExp|string;
+            state?:null;
+            writable?:boolean;
+        } = Tools.extend(
+            {},
+            properties,
+            properties.model || {},
+            (properties.model || {}).state || {}
+        )
+
+        result.disabled = !result.mutable
+        delete result.mutable
+
+        delete result.state
+        delete result.writable
+
+        result.required = !result.nullable
+        delete result.nullable
+
+        result.pattern = result.regularExpressionPattern
+        // NOTE: Workaround since options configuration above is ignored.
+        delete (result as {regularExpressionPattern?:RegExp|string})
+            .regularExpressionPattern
+
+        // NOTE: If only an editor is specified it should be displayed.
+        if (!(result.editor === 'plain' || result.selectableEditor))
+            result.editorIsActive = true
+
+        if (typeof result.representation !== 'string' && result.value)
+            result.representation = formatValue(
+                result.value, result.type, !result.focused
+            )
+
+        return result
+    }
+    // / endregion
+    // / region reference setter
+    /**
+     * Set code editor references.
+     * @param instance - Code editor instance.
+     * @returns Nothing.
+     */
+    const setCodeEditorReference = (instance?:CodeEditorType):void => {
+        codeEditorReference = instance
+
+        if (codeEditorReference?.editor?.container?.querySelector('textarea'))
+            codeEditorInputReference = {
+                current: codeEditorReference.editor.container.querySelector(
+                    'textarea'
+                )
+            }
+
+        if (codeEditorReference && editorIsActive && selectionIsUnstable) {
+            codeEditorReference.editor.textInput.focus()
+            setCodeEditorSelectionState()
             setSelectionIsUnstable(false)
         }
-    })
+    }
+    /**
+     * Set rich text editor references.
+     * @param instance - Editor instance.
+     * @returns Nothing.
+     */
+    const setRichTextEditorReference = (instance?:RichTextEditorComponent):void => {
+        richTextEditorReference = instance
+
+        if (richTextEditorReference?.elementRef)
+            richTextEditorInputReference = richTextEditorReference.elementRef
+    }
+    // / endregion
+    // / region value transformer
+    /**
+     * Applies configured value transformations.
+     * @param configuration - Input configuration.
+     * @param value - Value to transform.
+     * @returns Transformed value.
+     */
+    const parseValue = (configuration:Properties<Type>, value:any):null|Type => {
+        if (configuration.emptyEqualsNull && value === '')
+            return null
+        if (
+            ![null, undefined].includes(value) &&
+            Object.prototype.hasOwnProperty.call(
+                GenericInput.transformer, configuration.type
+            ) &&
+            GenericInput.transformer[configuration.type].parse
+        )
+            return GenericInput.transformer[configuration.type].parse!(value)
+        if (typeof value === 'number' && isNaN(value))
+            return null
+        return value
+    }
+    /**
+     * Applies configured value transformation when editing the input has been
+     * ended (element is not focused anymore).
+     * @param configuration - Current configuration.
+     * @param value - Current value to transform.
+     * @returns Transformed value.
+     */
+    const transformFinalValue = (configuration:Properties<Type>, value:any):null|Type => {
+        if (configuration.model.trim && typeof value === 'string')
+            value = value.trim().replace(/ +\n/g, '\\n')
+        return parseValue(configuration, value)
+    }
+    // / endregion
     // endregion
     // region event handler
     /**
@@ -691,480 +1258,59 @@ export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
             properties.onTouch(event)
     }
     // endregion
-    // region context helper
-    /**
-     * Applies icon preset configurations.
-     * @param options - Icon options to extend of known preset identified.
-     * @return Given potential extended icon configuration.
-     */
-    const applyIconPreset = (options?:Properties['icon']):IconOptions|string|undefined => {
-        if (options === 'clear_preset')
-            return {
-                icon: <GenericAnimate
-                    in={properties.value !== properties.default}
-                >
-                    <UseAnimations animation={plusToX} reverse={true}/>
-                </GenericAnimate>,
-                onClick: (event:ReactMouseEvent):void => {
-                    event.preventDefault()
-                    event.stopPropagation()
-                    onChangeValue(transformFinalValue(
-                        properties, properties.default
-                    ))
-                },
-                strategy: 'component',
-                tooltip: 'Clear input'
-            }
-        if (options === 'password_preset')
-            return {
-                icon: <UseAnimations
-                    animation={lock} reverse={!properties.hidden}
-                />,
-                onClick: (event:ReactMouseEvent):void => {
-                    event.preventDefault()
-                    event.stopPropagation()
-                    setHidden((value:boolean|undefined):boolean => !value)
-                    onChange(event)
-                },
-                strategy: 'component',
-                tooltip: `${(properties.hidden ? 'Show' : 'Hide')} password`
-            }
-        return options
+    // region properties
+    let codeEditorReference:CodeEditorType|undefined
+    let codeEditorInputReference:RefObject<HTMLTextAreaElement> =
+        createRef<HTMLTextAreaElement>()
+    const inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement> =
+        createRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>()
+    let richTextEditorInputReference:RefObject<HTMLTextAreaElement> =
+        createRef<HTMLTextAreaElement>()
+    let richTextEditorInstance:RichTextEditor|undefined
+    let richTextEditorReference:RichTextEditorComponent|undefined
+    const [cursor, setCursor] =
+        useState<{end:number;start:number}>({end: 0, start: 0})
+    let [editorIsActive, setEditorIsActive] = useState<boolean>(false)
+    let [hidden, setHidden] = useState<boolean|undefined>()
+    const [model, setModel] =
+        useState<ModelState>({...GenericInput.defaultModelState})
+    const [selectionIsUnstable, setSelectionIsUnstable] =
+        useState<boolean>(false)
+    let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
+    let [value, setValue] = useState<null|Type>(determineInitialValue(props))
+    let [representation, setRepresentation] =
+        useState<string>(determineInitialRepresentation(props, value))
+    const properties:Properties<Type> = getConsolidatedProperties(props)
+    // endregion
+    // region derive state variables from given properties
+    if (properties.cursor) {
+        if (properties.cursor.end !== undefined)
+            cursor.end = properties.cursor.end
+        if (properties.cursor.start !== undefined)
+            cursor.start = properties.cursor.start
     }
-    /**
-     * Converts absolute range into table oriented position.
-     * @param offset - Absolute position.
-     * @returns Position.
-     */
-    const determineTablePosition = (offset:number):{column:number;row:number} => {
-        const result = {column: 0, row: 0}
-        if (typeof value === 'string')
-            for (const line of value.split('\n')) {
-                if (line.length < offset)
-                    offset -= 1 + line.length
-                else {
-                    result.column = offset
-                    break
-                }
-                result.row += 1
-            }
-        return result
-    }
-    /**
-     * Determines absolute range from table oriented position.
-     * @param column - Symbol offset in given row.
-     * @param row - Offset row.
-     * @returns Determined offset.
-     */
-    const determineAbsoluteSymbolOffsetFromTable = (
-        column:number, row:number
-    ):number => {
-        if (typeof value !== 'string' && !value)
-            return 0
 
-        if (row > 0)
-            return column + (value as unknown as string)
-                .split('\n')
-                .slice(0, row)
-                .map((line:string):number => 1 + line.length)
-                .reduce((sum:number, value:number):number => sum + value)
-        return column
-    }
-    /**
-     * Determines absolute offset in given markup.
-     * @param contentDomNode - Wrapping dom node where all content is
-     * contained.
-     * @param domNode - Dom node which contains given position.
-     * @param offset - Relative position within given node.
-     * @returns Determine absolute offset.
-     */
-    const determineAbsoluteSymbolOffsetFromHTML = (
-        contentDomNode:Element, domNode:Element, offset:number
-    ):number => {
-        if (!value)
-            return 0
+    if (properties.editorIsActive !== undefined)
+        editorIsActive = properties.editorIsActive
 
-        const indicatorKey:string = 'generic-input-selection-indicator'
-        const indicatorValue:string = '###'
-        const indicator:string = ` ${indicatorKey}="${indicatorValue}"`
+    if (properties.hidden !== undefined)
+        hidden = properties.hidden
+    if (hidden === undefined)
+        hidden = properties.name?.startsWith('password')
 
-        domNode.setAttribute(indicatorKey, indicatorValue)
-        // NOTE: TinyMCE seems to add a newline after each paragraph.
-        const content:string = contentDomNode.innerHTML.replace(
-            /(<\/p>)/gi, '$1\n'
-        )
-        domNode.removeAttribute(indicatorKey)
+    if (properties.showDeclaration !== undefined)
+        showDeclaration = properties.showDeclaration
 
-        const domNodeOffset:number = content.indexOf(indicator)
-        const startIndex:number = domNodeOffset + indicator.length
+    if (properties.value !== undefined)
+        value = properties.value as null|Type
+    else if (properties.model?.value !== undefined)
+        value = properties.model.value as null|Type
 
-        return (
-            offset +
-            content.indexOf('>', startIndex) +
-            1 -
-            indicator.length
-        )
-    }
-    /**
-     * Calculate external properties (a set of all configurable properties).
-     * @returns External properties object.
-     */
-    const getConsolidatedProperties = (properties:Props<Type>):Properties<Type> => {
-        properties = mapPropertiesAndStateToModel(properties)
-        const result:Properties<Type> & {
-            mutable?:boolean;
-            nullable?:boolean;
-            regularExpressionPattern?:RegExp|string;
-            state?:null;
-            writable?:boolean;
-        } = Tools.extend(
-            {},
-            properties,
-            properties.model || {},
-            (properties.model || {}).state || {}
-        )
-
-        result.disabled = !result.mutable
-        delete result.mutable
-
-        delete result.state
-        delete result.writable
-
-        result.required = !result.nullable
-        delete result.nullable
-
-        result.pattern = result.regularExpressionPattern
-        // NOTE: Workaround since options configuration above is ignored.
-        delete (result as {regularExpressionPattern?:RegExp|string})
-            .regularExpressionPattern
-
-        // NOTE: If only an editor is specified it should be displayed.
-        if (!(result.editor === 'plain' || result.selectableEditor))
-            result.editorIsActive = true
-
-        if (typeof result.representation !== 'string' && result.value)
-            result.representation = formatValue(
-                result.value, result.type, !result.focused
-            )
-
-        return result
-    }
-    /**
-     * Synchronizes property, state and model configuration:
-     * Properties overwrites default properties which overwrites default model
-     * properties.
-     * @returns Nothing.
-    */
-    const mapPropertiesAndStateToModel = (properties:Props<Type>):Props<Type> => {
-        /*
-            NOTE: Default props seems not to respect nested layers to merge so
-            we have to manage this for nested model structure.
-        */
-        const result:Props<Type> & {model:Model} = Tools.extend(
-            true,
-            {
-                model: {
-                    ...GenericInput.defaultProps.model,
-                    state: {...GenericInput.defaultProps.model.state}
-                }
-            },
-            properties
-        )
-        // region handle aliases
-        if (result.disabled) {
-            delete result.disabled
-            result.model.mutable = false
-        }
-        if (result.pattern) {
-            result.model.regularExpressionPattern = result.pattern
-            delete result.pattern
-        }
-        if (result.required) {
-            delete result.required
-            result.model.nullable = false
-        }
-        if (result.type === 'text')
-            result.type = 'string'
-        // endregion
-        // region handle model configuration
-        for (const [name, value] of Object.entries(result.model))
-            if (Object.prototype.hasOwnProperty.call(result, name))
-                (
-                    result.model[name as keyof Model<Type>] as
-                        ValueOf<Model<Type>>
-                ) = result[name as keyof Props<Type>] as ValueOf<Model<Type>>
-        for (const [name, value] of Object.entries(result.model.state))
-            if (Object.prototype.hasOwnProperty.call(result, name))
-                result.model.state[name as keyof ModelState] =
-                    result[name as keyof Props<Type>] as ValueOf<ModelState>
-        for (const key of Object.keys(result.model.state))
-            if (!Object.prototype.hasOwnProperty.call(props, key)) {
-                result.model.state = model
-                break
-            }
-
-        /*
-            NOTE: Model states are not retrieved from state but derived from
-            specification and current value.
-        */
-
-        if (result.model.value === undefined)
-            result.model.value = (value === undefined) ?
-                result.model.default :
-                value
-        // else -> Controlled component via model's "value" property.
-        // endregion
-        // region handle state configuration
-        if (result.cursor === undefined)
-            result.cursor = cursor
-
-        if (result.editorIsActive === undefined)
-            result.editorIsActive = editorIsActive
-
-        if (result.hidden === undefined)
-            result.hidden = hidden
-
-        if (
-            result.representation === undefined &&
-            typeof representation === 'string'
-        )
-            result.representation = representation
-
-        if (result.showDeclaration === undefined)
-            result.showDeclaration = showDeclaration
-        // endregion
-        result.model.value = parseValue(
-            result as unknown as Properties<Type>, result.model.value
-        )
-        determineValidationState(
-            result as unknown as Properties<Type>, result.model.value
-        )
-
-        return result
-    }
-    /**
-     * Renders given template string against all properties in current
-     * instance.
-     * @param template - Template to render.
-     * @returns Evaluated template or an empty string if something goes wrong.
-     */
-    const renderMessage = (template?:any):string => {
-        if (typeof template === 'string') {
-            const scopeNames:Array<keyof Properties<Type>> = Object
-                .keys(properties)
-                .filter((name:string):boolean => name !== 'default') as
-                    Array<keyof Properties<Type>>
-            let render:Function
-            try {
-                render = new Function(...scopeNames, `return \`${template}\``)
-            } catch (error) {
-                console.warn(
-                    `Given message template "${template}" could not be ` +
-                    `parsed: "${Tools.represent(error)}".`
-                )
-                return ''
-            }
-            try {
-                return render(
-                    ...scopeNames.map((name:keyof Properties<Type>
-                ):any => properties[name]))
-            } catch (error) {
-                console.warn(
-                    `Given message template "${template}" failed to evaluate` +
-                    ' with given scope variables: "' +
-                    `${scopeNames.join('", "')}": "${Tools.represent(error)}".`
-                )
-            }
-        }
-        return ''
-    }
-    /**
-     * Saves current selection/cursor state in components state.
-     * @returns Nothing.
-     */
-    const saveSelectionState = ():void => {
-        /*
-            NOTE: Known issues is that we do not get the absolute positions but
-            the one in current selected node.
-        */
-        const codeEditorRange =
-            codeEditorReference?.editor?.selection?.getRange()
-        const richTextEditorRange =
-            richTextEditorInstance?.selection?.getRng(true)
-        const selectionEnd:null|number = (
-            inputReference.current as HTMLInputElement|HTMLTextAreaElement
-        )?.selectionEnd
-        const selectionStart:null|number = (
-            inputReference.current as HTMLInputElement|HTMLTextAreaElement
-        )?.selectionStart
-        if (codeEditorRange)
-            setCursor({
-                end: determineAbsoluteSymbolOffsetFromTable(
-                    codeEditorRange.end.column,
-                    typeof codeEditorRange.end.row === 'number' ?
-                        codeEditorRange.end.row :
-                        typeof properties.value === 'string' ?
-                            properties.value.split('\n').length - 1 :
-                            0
-                ),
-                start: determineAbsoluteSymbolOffsetFromTable(
-                    codeEditorRange.start.column,
-                    typeof codeEditorRange.start.row === 'number' ?
-                        codeEditorRange.start.row :
-                        typeof properties.value === 'string' ?
-                            properties.value.split('\n').length - 1 :
-                            0
-                )
-            })
-        else if (richTextEditorRange)
-            setCursor({
-                end: determineAbsoluteSymbolOffsetFromHTML(
-                    richTextEditorInstance!.getBody(),
-                    richTextEditorInstance!.selection.getEnd(),
-                    richTextEditorRange.endOffset
-                ),
-                start: determineAbsoluteSymbolOffsetFromHTML(
-                    richTextEditorInstance!.getBody(),
-                    richTextEditorInstance!.selection.getStart(),
-                    richTextEditorRange.startOffset
-                )
-            })
-        else if (
-            typeof selectionEnd === 'number' &&
-            typeof selectionStart === 'number'
-        )
-            setCursor({end: selectionEnd, start: selectionStart})
-    }
-    /**
-     * Set code editor references.
-     * @param instance - Code editor instance.
-     * @returns Nothing.
-     */
-    const setCodeEditorReference = (instance?:CodeEditorType):void => {
-        if (instance?.editor?.container?.querySelector('textarea'))
-            inputReference = {
-                current: instance.editor.container.querySelector('textarea')
-            }
-        codeEditorReference = instance
-    }
-    /**
-     * Set rich text editor references.
-     * @param instance - Editor instance.
-     * @returns Nothing.
-     */
-    const setRichTextEditorReference = (instance?:RichTextEditorComponent):void => {
-        if (instance?.elementRef)
-            inputReference = instance.elementRef
-        richTextEditorReference = instance
-    }
-    /**
-     * Applies configured value transformations.
-     * @param configuration - Input configuration.
-     * @param value - Value to transform.
-     * @returns Transformed value.
-     */
-    const parseValue = (configuration:Properties<Type>, value:any):null|Type => {
-        if (configuration.emptyEqualsNull && value === '')
-            return null
-        if (
-            ![null, undefined].includes(value) &&
-            Object.prototype.hasOwnProperty.call(
-                GenericInput.transformer, configuration.type
-            ) &&
-            GenericInput.transformer[configuration.type].parse
-        )
-            return GenericInput.transformer[configuration.type].parse!(value)
-        if (typeof value === 'number' && isNaN(value))
-            return null
-        return value
-    }
-    /**
-     * Applies configured value transformation when editing the input has been
-     * ended (element is not focused anymore).
-     * @param configuration - Current configuration.
-     * @param value - Current value to transform.
-     * @returns Transformed value.
-     */
-    const transformFinalValue = (configuration:Properties<Type>, value:any):null|Type => {
-        if (configuration.model.trim && typeof value === 'string')
-            value = value.trim().replace(/ +\n/g, '\\n')
-        return parseValue(configuration, value)
-    }
-    /**
-     * Wraps given component with animation component if given condition holds.
-     * @param content - Component or string to wrap.
-     * @param propertiesOrInCondition - Animation properties or in condition
-     * only.
-     * @returns Wrapped component.
-     */
-    const wrapAnimationConditionally = (
-        content:Renderable,
-        propertiesOrInCondition:boolean|Partial<TransitionProps<HTMLElement|undefined>> = {},
-        condition:boolean = true
-    ):Renderable => {
-        if (typeof propertiesOrInCondition === 'boolean')
-            return condition ?
-                <GenericAnimate in={propertiesOrInCondition}>
-                    {content}
-                </GenericAnimate> :
-                propertiesOrInCondition ? content : ''
-        return condition ?
-            <GenericAnimate {...propertiesOrInCondition}>
-                {content}
-            </GenericAnimate> :
-            propertiesOrInCondition.in ? content : ''
-    }
-    /**
-     * Wraps given component with react strict mode component.
-     * @param content - Component or string to wrap.
-     * @returns Wrapped component.
-     */
-    const wrapStrict = (content:Renderable):ReactElement => {
-        return GenericInput.strict ?
-            <StrictMode>{content}</StrictMode> :
-            <>{content}</>
-    }
-    /**
-     * Wraps given component with a tooltip component with given tooltip
-     * configuration.
-     * @param content - Component or string to wrap.
-     * @param options - Tooltip options.
-     * @returns Wrapped given content.
-     */
-    const wrapTooltip = (
-        content:ReactElement, options?:Properties['tooltip']
-    ):ReactElement => {
-        if (typeof options === 'string')
-            return <Tooltip
-                content={<Typography use="caption">{options}</Typography>}
-            >{content}</Tooltip>
-        if (options !== null && typeof options === 'object')
-            return <Tooltip {...options}>
-                <Typography use="caption">{content}</Typography>
-            </Tooltip>
-        return <>{content}</>
-    }
-    /**
-     * If given icon options has an additional tooltip configuration integrate
-     * a wrapping tooltip component into given configuration and remove initial
-     * tooltip configuration.
-     * @param options - Icon configuration potential extended a tooltip
-     * configuration.
-     * @returns Resolved icon configuration.
-     */
-    const wrapIconWithTooltip = (options?:Properties['icon']):IconOptions|undefined => {
-        if (typeof options === 'object' && options?.tooltip) {
-            const tooltip:Properties['tooltip'] = options.tooltip
-            options = {...options}
-            delete options.tooltip
-            const nestedOptions:IconOptions = {...options}
-            options.strategy = 'component'
-            options.icon = wrapTooltip(<Icon icon={nestedOptions} />, tooltip)
-        }
-        return options as IconOptions|undefined
-    }
+    if (properties.representation !== undefined)
+        representation = properties.representation
     // endregion
     // region render
+    // / region intermediate render properties
     const genericProperties:Partial<CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps> = {
         onBlur: onBlur,
         onFocus: onFocus,
@@ -1174,69 +1320,8 @@ export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
     const materialProperties:SelectProps|TextFieldProps = {
         disabled: properties.disabled,
         helpText: {
-            persistent: Boolean(properties.declaration),
-            children: <>
-               <GenericAnimate in={
-                    properties.selectableEditor &&
-                    properties.type === 'string' &&
-                    properties.editor !== 'plain'
-                }>
-                    <IconButton
-                        icon={{
-                            icon: properties.editorIsActive ?
-                                'subject' :
-                                properties.editor.startsWith('code') ?
-                                    'code' :
-                                    'text_format',
-                            onClick: onChangeEditorIsActive
-                        }}
-                    />
-                </GenericAnimate>
-                <GenericAnimate in={Boolean(properties.declaration)}>
-                    <IconButton
-                        icon={{
-                            icon:
-                                'more_' +
-                                (properties.showDeclaration ?
-                                    'vert' :
-                                    'horiz'
-                                ),
-                            onClick: onChangeShowDeclaration
-                        }}
-                    />
-                </GenericAnimate>
-                <GenericAnimate in={properties.showDeclaration}>
-                    {properties.declaration}
-                </GenericAnimate>
-                <GenericAnimate in={
-                    !properties.showDeclaration &&
-                    properties.invalid &&
-                    (
-                        properties.showInitialValidationState ||
-                        /*
-                            Material inputs show their validation state at
-                            least after a blur event so we synchronize error
-                            message appearances.
-                        */
-                        properties.visited
-                    )
-                }>
-                    <Theme use="error">{renderMessage(
-                        properties.invalidMaximum &&
-                        properties.maximumText ||
-                        properties.invalidMaximumLength &&
-                        properties.maximumLengthText ||
-                        properties.invalidMinimum &&
-                        properties.minimumText ||
-                        properties.invalidMinimumLength &&
-                        properties.minimumLengthText ||
-                        properties.invalidPattern &&
-                        properties.patternText ||
-                        properties.invalidRequired &&
-                        properties.requiredText
-                    )}</Theme>
-                </GenericAnimate>
-            </>
+            children: renderHelpText(),
+            persistent: Boolean(properties.declaration)
         },
         invalid: properties.showInitialValidationState && properties.invalid,
         label: properties.description || properties.name,
@@ -1248,7 +1333,6 @@ export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
             applyIconPreset(properties.icon) as IconOptions
         ) as IconOptions
 
-    // TODO stick to class to save effort during generation.
     const tinyMCEOptions:CustomTinyMCEOptions = {
         ...TINYMCE_DEFAULT_OPTIONS,
         content_style: properties.disabled ? 'body {opacity: .38}' : '',
@@ -1260,61 +1344,13 @@ export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
                 if (!richTextEditorInstance)
                     return
 
-                richTextEditorLoaded = true
-                richTextEditorInstance.focus(false)
+                richTextEditorLoadedOnce = true
 
-                const indicator:{end:string;start:string} = {
-                    end: '###generic-input-selection-indicator-end###',
-                    start: '###generic-input-selection-indicator-start###'
+                if (editorIsActive && selectionIsUnstable) {
+                    richTextEditorInstance.focus(false)
+                    setRichTextEditorSelectionState()
+                    setSelectionIsUnstable(false)
                 }
-                const cursor:{end:number;start:number} = {
-                    end: properties.cursor.end + indicator.start.length,
-                    start: properties.cursor.start
-                }
-                const keysSorted:Array<keyof typeof indicator> =
-                    ['start', 'end']
-
-                let value:string = properties.representation || ''
-                for (const type of keysSorted)
-                    value = (
-                        value.substring(0, cursor[type as keyof typeof indicator]) +
-                        indicator[type] +
-                        value.substring(cursor[type as keyof typeof indicator])
-                    )
-                richTextEditorInstance.getBody().innerHTML = value
-
-                const walker = document.createTreeWalker(
-                    richTextEditorInstance.getBody(),
-                    NodeFilter.SHOW_TEXT,
-                    null,
-                    false
-                )
-
-                const range = richTextEditorInstance.dom.createRng()
-                const result:{end?:[Node, number];start?:[Node, number]} =
-                    {}
-                let node
-                while (node = walker.nextNode())
-                    for (const type of keysSorted) {
-                        if (node.nodeValue) {
-                            const index:number =
-                                node.nodeValue.indexOf(indicator[type])
-                            if (index > -1) {
-                                node.nodeValue = node.nodeValue.replace(
-                                    indicator[type], ''
-                                )
-                                result[type] = [node, index]
-                            }
-                        }
-                    }
-
-                for (const type of keysSorted)
-                    if (result[type])
-                        range[`set${Tools.stringCapitalize(type)}` as 'setEnd'|'setStart'](
-                            ...(result[type] as [Node, number])
-                        )
-                if (result.end && result.start)
-                    richTextEditorInstance.selection.setRng(range)
             })
         }
     }
@@ -1341,8 +1377,8 @@ export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
             properties.editor.startsWith('richtext(')
         )
     )
-    // endregion
-
+    // / endregion
+    // / region main markup
     // TODO check if mdc-classes can be retrieved
     return <ThemeProvider options={
         properties.theme || {}
@@ -1456,7 +1492,7 @@ export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
                     </div>
                 ],
                 isAdvancedEditor,
-                richTextEditorLoaded || properties.editor.startsWith('code')
+                richTextEditorLoadedOnce || properties.editor.startsWith('code')
             )}
             {wrapAnimationConditionally(
                 <TextField
@@ -1506,11 +1542,12 @@ export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
                     }
                 />,
                 !(isAdvancedEditor || properties.selection),
-                richTextEditorLoaded || properties.editor.startsWith('code')
+                richTextEditorLoadedOnce || properties.editor.startsWith('code')
             )}
         </div>,
         properties.tooltip
     ))}</div></ThemeProvider>
+    // / endregion
     // endregion
 }// TODO as FunctionComponent<Props<Type>, State<Type>>
 // region static properties
