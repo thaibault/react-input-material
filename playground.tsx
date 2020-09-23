@@ -22,7 +22,7 @@ import React, {FunctionComponent, useState} from 'react'
 import {ReactElement} from 'react'
 import ReactDOM from 'react-dom'
 
-import GenericInput from './components/GenericInput'
+import {GenericInput} from './components/GenericInput'
 import {Properties} from './type'
 // endregion
 GenericInput.local = 'de-DE'
