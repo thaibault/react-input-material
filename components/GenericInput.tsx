@@ -415,11 +415,11 @@ export const GenericInput = function<Type = any>(
                 */
                 if (codeEditorReference?.editor?.selection) {
                     codeEditorReference.editor.textInput.focus()
-                    setCodeEditorSelectionState()
+                    setCodeEditorSelectionState(codeEditorReference)
                     setSelectionIsUnstable(false)
                 } else if (richTextEditorInstance?.selection) {
                     richTextEditorInstance.focus(false)
-                    setRichTextEditorSelectionState()
+                    setRichTextEditorSelectionState(richTextEditorInstance)
                     setSelectionIsUnstable(false)
                 }
             } else if (inputReference.current) {
@@ -737,18 +737,18 @@ export const GenericInput = function<Type = any>(
     /**
      * TODO
      */
-    const setCodeEditorSelectionState = ():void => {
-        const range = codeEditorReference.editor.selection.getRange()
+    const setCodeEditorSelectionState = (instance:CodeEditorType):void => {
+        const range = instance.editor.selection.getRange()
         const endPosition = determineTablePosition(cursor.end)
         range.setEnd(endPosition.row, endPosition.column)
         const startPosition = determineTablePosition(cursor.start)
         range.setStart(startPosition.row, startPosition.column)
-        codeEditorReference.editor.selection.setRange(range)
+        instance.editor.selection.setRange(range)
     }
     /**
      * TODO
      */
-    const setRichTextEditorSelectionState = ():void => {
+    const setRichTextEditorSelectionState = (instance:RichTextEditor):void => {
         const indicator:{end:string;start:string} = {
             end: '###generic-input-selection-indicator-end###',
             start: '###generic-input-selection-indicator-start###'
@@ -767,16 +767,16 @@ export const GenericInput = function<Type = any>(
                 indicator[type] +
                 value.substring(cursor[type as keyof typeof indicator])
             )
-        richTextEditorInstance.getBody().innerHTML = value
+        instance.getBody().innerHTML = value
 
         const walker = document.createTreeWalker(
-            richTextEditorInstance.getBody(),
+            instance.getBody(),
             NodeFilter.SHOW_TEXT,
             null,
             false
         )
 
-        const range = richTextEditorInstance.dom.createRng()
+        const range = instance.dom.createRng()
         const result:{end?:[Node, number];start?:[Node, number]} = {}
         let node
         while (node = walker.nextNode())
@@ -799,7 +799,7 @@ export const GenericInput = function<Type = any>(
                     `set${Tools.stringCapitalize(type)}` as 'setEnd'|'setStart'
                 ](...(result[type] as [Node, number]))
         if (result.end && result.start)
-            richTextEditorInstance.selection.setRng(range)
+            instance.selection.setRng(range)
     }
     // // endregion
     /**
@@ -1017,7 +1017,7 @@ export const GenericInput = function<Type = any>(
 
         if (codeEditorReference && editorIsActive && selectionIsUnstable) {
             codeEditorReference.editor.textInput.focus()
-            setCodeEditorSelectionState()
+            setCodeEditorSelectionState(codeEditorReference)
             setSelectionIsUnstable(false)
         }
     }
@@ -1315,7 +1315,19 @@ export const GenericInput = function<Type = any>(
     let [representation, setRepresentation] =
         useState<string>(determineInitialRepresentation(props, value))
     const properties:Properties<Type> = getConsolidatedProperties(props)
-    reference = {current: {properties}}
+    reference = {current: {
+        properties,
+        state: {
+            cursor,
+            editorIsActive,
+            hidden,
+            model,
+            representation,
+            selectionIsUnstable,
+            showDeclaration,
+            value
+        }
+    }}
     // endregion
     // region derive state variables from given properties
     if (properties.cursor) {
@@ -1383,7 +1395,7 @@ export const GenericInput = function<Type = any>(
 
                 if (editorIsActive && selectionIsUnstable) {
                     richTextEditorInstance.focus(false)
-                    setRichTextEditorSelectionState()
+                    setRichTextEditorSelectionState(richTextEditorInstance)
                     setSelectionIsUnstable(false)
                 }
             })
