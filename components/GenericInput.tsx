@@ -36,6 +36,7 @@ import React, {
     ComponentType,
     createRef,
     FocusEvent,
+    forwardRef,
     FunctionComponent,
     KeyboardEvent as ReactKeyboardEvent,
     lazy,
@@ -58,7 +59,7 @@ import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
 import {Select, SelectProps} from '@rmwc/select'
 import {TextField, TextFieldProps} from '@rmwc/textfield'
-import {Theme, ThemeProvider} from '@rmwc/theme'
+import {Theme, ThemeProvider, ThemeProviderProps} from '@rmwc/theme'
 import {Tooltip, TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
 import {Typography} from '@rmwc/typography'
@@ -583,6 +584,17 @@ export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
             <StrictMode>{content}</StrictMode> :
             <>{content}</>
     }
+    /**
+     * TODO
+     */
+    const wrapThemeProvider = (
+        configuration?:ThemeProviderProps['options'], element:ReactElement
+    ):ReactElement =>
+        configuration ?
+            <ThemeProvider options={configuration} wrap>
+                {element}
+            </ThemeProvider> :
+            element
     /**
      * Wraps given component with a tooltip component with given tooltip
      * configuration.
@@ -1380,9 +1392,7 @@ export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
     // / endregion
     // / region main markup
     // TODO check if mdc-classes can be retrieved
-    return <ThemeProvider options={
-        properties.theme || {}
-    } wrap><div className={
+    return wrapThemeProvider(properties.theme, <div className={
         styles['generic-input'] +
         (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
     }>{wrapStrict(wrapTooltip(
@@ -1546,7 +1556,7 @@ export function GenericInput<Type = any>(props:Props<Type>):ReactElement {
             )}
         </div>,
         properties.tooltip
-    ))}</div></ThemeProvider>
+    ))}</div>)
     // / endregion
     // endregion
 }// TODO as FunctionComponent<Props<Type>, State<Type>>
