@@ -94,7 +94,7 @@ import {
     PropertyTypes as InputPropertyTypes,
     Props,
     Renderable,
-    StaticWebComponent
+    StaticWebInputFunctionComponent
 } from '../type'
 import styles from './GenericInput.module'
 // endregion
@@ -1617,8 +1617,9 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput:StaticWebComponent = forwardRef(GenericInputInner) as
-    unknown as StaticWebComponent
+export const GenericInput:StaticWebInputFunctionComponent<typeof GenericInputInner> =
+    forwardRef(GenericInputInner) as
+        unknown as StaticWebInputFunctionComponent<typeof GenericInputInner>
 // region static properties
 // / region web-component hints
 GenericInput.output = {onChange: true} as Output
