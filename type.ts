@@ -20,7 +20,7 @@ import {SelectProps} from '@rmwc/select'
 import GenericPropertyTypes from 'clientnode/property-types'
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
-    Component,
+    ComponentClass,
     FocusEvent,
     KeyboardEvent,
     MouseEvent,
@@ -30,6 +30,7 @@ import {
 import {IconOptions} from '@rmwc/types'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
+import {ReactStaticWebComponent} from 'web-component-wrapper/type'
 // endregion
 // region exports
 export type ModelState = {
@@ -169,6 +170,14 @@ export type GenericInputDataTransformation<Type = any> =
         };
     }
 export type Renderable = Array<ReactElement|string>|ReactElement|string
+export interface StaticWebComponent extends ComponentClass, ReactStaticWebComponent {
+    defaultModelState:ModelState
+    defaultProps:Mapping<ValueOf<Properties>>
+    local:string
+    propTypes:ReactStaticWebComponent['propTypes'];
+    strict:boolean
+    transformer:GenericInputDataTransformation
+}
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

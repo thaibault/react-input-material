@@ -37,6 +37,7 @@ import React, {
     createRef,
     FocusEvent,
     forwardRef,
+    ForwardRefRenderFunction,
     KeyboardEvent as ReactKeyboardEvent,
     lazy,
     MouseEvent as ReactMouseEvent,
@@ -53,9 +54,7 @@ import React, {
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 import {TransitionProps} from 'react-transition-group/Transition'
 import {Editor as RichTextEditor, Settings as TinyMCEOptions} from 'tinymce'
-import {
-    Output, ReactStaticWebComponent, ReactWebComponent
-} from 'web-component-wrapper/type'
+import {Output, ReactWebComponent} from 'web-component-wrapper/type'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
@@ -94,7 +93,8 @@ import {
     Properties,
     PropertyTypes as InputPropertyTypes,
     Props,
-    Renderable
+    Renderable,
+    StaticWebComponent
 } from '../type'
 import styles from './GenericInput.module'
 // endregion
@@ -379,18 +379,8 @@ export function determineValidationState<Type = any>(
  * Generic input wrapper component which automatically determines a useful
  * input field depending on given model specification.
  *
- * @property static:defaultModelState - Initial model state.
- * @property static:defaultProps - Initial property configuration.
  * @property static:displayName - Descriptive name for component to show in web
  * developer tools.
- * @property static:local - Defines localization.
- * @property static:propTypes - Triggers reacts runtime property value checks
- * in development mode and enables property / attribute reflection for
- * web-component wrapper instances.
- * @property static:strict - Indicates whether we should wrap render output in
- * reacts strict component.
- * @property static:transformer - Generic input data transformation
- * specifications.
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
@@ -1029,8 +1019,13 @@ export const GenericInputInner = function<Type = any>(
     const setRichTextEditorReference = (instance?:RichTextEditorComponent):void => {
         richTextEditorReference = instance
 
-        if (richTextEditorReference?.elementRef)
-            richTextEditorInputReference = richTextEditorReference.elementRef
+        /*
+            Refer inner element here is possible but marked as private.
+
+            if (richTextEditorReference?.elementRef)
+                richTextEditorInputReference =
+                    richTextEditorReference.elementRef
+        */
     }
     // / endregion
     // / region value transformer
@@ -1598,25 +1593,32 @@ export const GenericInputInner = function<Type = any>(
     // / endregion
     // endregion
 // TODO check if contextTypes makes sense here
-} as VoidFunctionComponent<Props> & {
-    displayName:string;
-}
+} as ForwardRefRenderFunction<VoidFunctionComponent<Props> & {displayName:string}, Props>
+// NOTE: This is useful in react dev tools.
 GenericInputInner.displayName = 'GenericInput'
 /**
  * Wrapping web component compatible react component.
+ * @property static:defaultModelState - Initial model state.
+ * @property static:defaultProps - Initial property configuration.
+ * @property static:local - Defines localization.
  * @property static:output - Describes external event handler interface.
  * @property static:propertiesToReflectAsAttributes - List of properties to
  * potentially reflect as attributes (e.g. in a wrapped web-component).
+ * @property static:propTypes - Triggers reacts runtime property value checks
+ * in development mode and enables property / attribute reflection for
+ * web-component wrapper instances.
+ * @property static:strict - Indicates whether we should wrap render output in
+ * reacts strict component.
+ * @property static:transformer - Generic input data transformation
+ * specifications.
  * @property static:wrapped - Wrapped component.
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-// TODO extend ReactStaticWebComponent?
-export const GenericInput:ReactStaticWebComponent =
-    forwardRef<typeof GenericInputInner, Props>(GenericInputInner) as
-        ReactStaticWebComponent
+export const GenericInput:StaticWebComponent = forwardRef(GenericInputInner) as
+    unknown as StaticWebComponent
 // region static properties
 // / region web-component hints
 GenericInput.output = {onChange: true} as Output
@@ -1637,7 +1639,7 @@ GenericInput.propertiesToReflectAsAttributes = new Map([
     ['valid', true],
     ['visited', true]
 ]) as Map<keyof Properties, boolean> 
-GenericInput.wrapped = GenericInput
+GenericInput.wrapped = GenericInputInner
 // / endregion
 GenericInput.defaultModelState = {
     dirty: false,
@@ -1834,7 +1836,7 @@ GenericInput.transformer = {
     number: {parse: parseInt}
 } as GenericInputDataTransformation
 // endregion
-export default GenericInputWeb
+export default GenericInput
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
