@@ -26,7 +26,9 @@ import GenericInput from './components/GenericInput'
 import {Properties} from './type'
 // endregion
 GenericInput.local = 'de-DE'
-GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
+GenericInput.transformer.currency.format.final.options = {
+    currency: 'EUR'
+}
 
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<Properties>()

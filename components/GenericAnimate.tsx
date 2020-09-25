@@ -26,9 +26,9 @@ import styles from './GenericAnimate.module'
 /**
  * Generic animation wrapper component.
  */
-export const GenericAnimate:FunctionComponent<TransitionProps<HTMLElement|undefined>> =
+export const GenericAnimate:FunctionComponent<Partial<TransitionProps<HTMLElement|undefined>>> =
     <Type extends HTMLElement|undefined = undefined>(
-        properties:TransitionProps<Type>
+        properties:Partial<TransitionProps<Type>>
     ) =>
         <CSSTransition
             appear

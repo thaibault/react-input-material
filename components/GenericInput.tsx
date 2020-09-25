@@ -33,34 +33,43 @@ import PropertyTypes, {
 import {Mapping, PlainObject, ValueOf} from 'clientnode/type'
 import {ValidationMap} from 'prop-types'
 import React, {
-    Component,
     ComponentType,
     createRef,
     FocusEvent,
-    KeyboardEvent,
+    forwardRef,
+    ForwardRefRenderFunction,
+    KeyboardEvent as ReactKeyboardEvent,
     lazy,
-    MouseEvent,
-    PureComponent,
+    MouseEvent as ReactMouseEvent,
     ReactElement,
+    RefCallback,
     RefObject,
     StrictMode,
     Suspense,
-    SyntheticEvent
+    SyntheticEvent,
+    useEffect,
+    useState,
+    VoidFunctionComponent
 } from 'react'
-import CodeEditorType from 'react-ace'
+import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 import {TransitionProps} from 'react-transition-group/Transition'
-import {Settings as TinyMCEOptions} from 'tinymce'
+import {Editor as RichTextEditor, Settings as TinyMCEOptions} from 'tinymce'
 import {Output, ReactWebComponent} from 'web-component-wrapper/type'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
 import {Select, SelectProps} from '@rmwc/select'
 import {TextField, TextFieldProps} from '@rmwc/textfield'
-import {Theme, ThemeProvider} from '@rmwc/theme'
+import {Theme, ThemeProvider, ThemeProviderProps} from '@rmwc/theme'
 import {Tooltip, TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
 import {Typography} from '@rmwc/typography'
-import {Editor as RichTextEditor} from '@tinymce/tinymce-react'
+import {
+    Editor as RichTextEditorComponent, IAllProps as RichTextEditorProps
+} from '@tinymce/tinymce-react'
+import {
+    EventHandler as RichTextEventHandler
+} from '@tinymce/tinymce-react/lib/cjs/main/ts/Events'
 import UseAnimations from 'react-useanimations'
 import loading from 'react-useanimations/lib/loading'
 import lock from 'react-useanimations/lib/lock'
@@ -78,13 +87,14 @@ import {GenericAnimate} from './GenericAnimate'
 import '../material-fixes'
 import {
     BaseModel,
-    DataTransformSpecification,
+    GenericInputDataTransformation,
     Model,
     ModelState,
     Properties,
     PropertyTypes as InputPropertyTypes,
     Props,
-    State
+    Renderable,
+    StaticWebComponent
 } from '../type'
 import styles from './GenericInput.module'
 // endregion
@@ -103,14 +113,23 @@ if (typeof UTC_BUILD_TIMESTAMP === 'undefined')
     /* eslint-disable no-var */
     var UTC_BUILD_TIMESTAMP:number = 1
     /* eslint-enable no-var */
-let richTextEditorLoaded:boolean = false
+let richTextEditorLoadedOnce:boolean = false
 const tinymceBasePath:string = '/node_modules/tinymce/'
 const tinymceScriptPath:string = `${tinymceBasePath}tinymce.min.js`
-export const TINYMCE_DEFAULT_OPTIONS:PlainObject = {
+// NOTE: Some options are available but not specified yet.
+type CustomTinyMCEOptions = TinyMCEOptions & {
+    contextmenu:boolean;
+    icon:string;
+    placeholder?:string;
+    readonly?:boolean;
+    toolbar1:false|string;
+    toolbar2:false|string;
+    trim:boolean;
+}
+export const TINYMCE_DEFAULT_OPTIONS:CustomTinyMCEOptions = {
     /* eslint-disable camelcase */
     // region paths
-    baseURL: tinymceBasePath,
-    scriptPath: `${tinymceBasePath}tinymce.min.js`,
+    base_url: tinymceBasePath,
     skin_url: `${tinymceBasePath}skins/ui/oxide`,
     theme_url: `${tinymceBasePath}themes/silver/theme.min.js`,
     // endregion
@@ -163,9 +182,7 @@ const modelStatePropertyTypes:{[key in keyof ModelState]:typeof boolean} = {
     valid: boolean,
     visited: boolean
 } as const
-const baseModelPropertyTypes:{
-    [key in keyof BaseModel]:ValueOf<typeof PropertyTypes>
-} = {
+const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     declaration: string,
     default: any,
     description: string,
@@ -213,608 +230,218 @@ const baseModelPropertyTypes:{
     value: any
 } as const
 // endregion
+// region static helper
+/**
+ * Determines initial value depending on given properties.
+ * @param properties - Components properties.
+ * @returns Determined value.
+ */
+export function determineInitialValue<Type = any>(
+    properties:Props<Type>
+):null|Type {
+    if (properties.value !== undefined)
+        return properties.value as null|Type
+    if (properties.model?.value !== undefined)
+        return properties.model.value as null|Type
+    if (
+        Object.prototype.hasOwnProperty.call(
+            properties, 'initialValue'
+        ) &&
+        typeof properties.initialValue !== 'undefined'
+    )
+        return properties.initialValue as null|Type
+    return null
+}
+/**
+ * Represents configured value as string.
+ * @param value - To represent.
+ * @param type - Input type.
+ * @param final - Specifies whether it is a final representation.
+ * @returns Transformed value.
+ */
+export function formatValue<Type = any>(
+    value:null|Type, type:string, final:boolean = true
+):string {
+    const methodName:'final'|'intermediate' = final ? 'final' : 'intermediate'
+    if (value === null || typeof value === 'number' && isNaN(value))
+        return ''
+    if (
+        Object.prototype.hasOwnProperty.call(GenericInput.transformer, type) &&
+        GenericInput.transformer[type].format &&
+        Object.prototype.hasOwnProperty.call(
+            GenericInput.transformer[type].format, methodName
+        ) &&
+        GenericInput.transformer[type].format![methodName]!.transform
+    )
+        return GenericInput.transformer[type].format![methodName]!.transform!(
+            value
+        )
+    return `${value}`
+}
+/**
+ * Determines initial value representation as string.
+ * @param properties - Components properties.
+ * @param value - Current value to represent.
+ * @returns Determined initial representation.
+ */
+export function determineInitialRepresentation<Type = any>(properties:Props, value:null|Type):string {
+    if (typeof properties.representation === 'string')
+        return properties.representation
+    if (value !== null)
+        return formatValue<Type>(
+            value,
+            properties.type ||
+            properties.model?.type ||
+            GenericInput.defaultProps.model.type
+        )
+    return ''
+}
+/**
+ * Derives current validation state from given value.
+ * @param configuration - Input configuration.
+ * @param value - Value to validate against given configuration.
+ * @returns A boolean indicating if validation state has changed.
+ */
+export function determineValidationState<Type = any>(
+    configuration:Properties<Type>, value:any
+):boolean {
+    let changed:boolean = false
+    let oldValue:boolean = false
+
+    oldValue = configuration.model.state.invalidMaximum
+    configuration.model.state.invalidMaximum =
+        typeof configuration.model.maximum === 'number' &&
+        typeof value === 'number' &&
+        !isNaN(value) &&
+        configuration.model.maximum < value
+    changed =
+        changed || oldValue !== configuration.model.state.invalidMaximum
+
+    oldValue = configuration.model.state.invalidMaximumLength
+    configuration.model.state.invalidMaximumLength =
+        typeof configuration.model.maximumLength === 'number' &&
+        typeof value === 'string' &&
+        configuration.model.maximumLength < value.length
+    changed =
+        changed ||
+        oldValue !== configuration.model.state.invalidMaximumLength
+
+    oldValue = configuration.model.state.invalidMinimum
+    configuration.model.state.invalidMinimum =
+        typeof configuration.model.minimum === 'number' &&
+        typeof value === 'number' &&
+        !isNaN(value) &&
+        value < configuration.model.minimum
+    changed =
+        changed || oldValue !== configuration.model.state.invalidMinimum
+
+    oldValue = configuration.model.state.invalidMinimumLength
+    configuration.model.state.invalidMinimumLength =
+        typeof configuration.model.minimumLength === 'number' &&
+        typeof value === 'string' &&
+        value.length < configuration.model.minimumLength
+    changed =
+        changed ||
+        oldValue !== configuration.model.state.invalidMinimumLength
+
+    oldValue = configuration.model.state.invalidPattern
+    configuration.model.state.invalidPattern =
+        typeof configuration.model.regularExpressionPattern === 'string' &&
+        !(new RegExp(configuration.model.regularExpressionPattern))
+            .test(value) ||
+        typeof configuration.model.regularExpressionPattern === 'object' &&
+        !typeof configuration.model.regularExpressionPattern.test(value)
+    changed =
+        changed || oldValue !== configuration.model.state.invalidPattern
+
+    oldValue = configuration.model.state.invalidRequired
+    configuration.model.state.invalidRequired =
+        configuration.model.nullable === false && value === null
+    changed =
+        changed || oldValue !== configuration.model.state.invalidRequired
+
+    if (changed) {
+        configuration.model.state.invalid =
+            configuration.model.state.invalidMaximum ||
+            configuration.model.state.invalidMaximumLength ||
+            configuration.model.state.invalidMinimum ||
+            configuration.model.state.invalidMinimumLength ||
+            configuration.model.state.invalidPattern ||
+            configuration.model.state.invalidRequired
+        configuration.model.state.valid =
+            !configuration.model.state.invalid
+    }
+
+    return changed
+}
+// endregion
 /**
  * Generic input wrapper component which automatically determines a useful
  * input field depending on given model specification.
  *
- * @property static:defaultModelState - Initial model state.
- * @property static:defaultProps - Initial property configuration.
- * @property static:output - Describes external event handler interface.
- * @property static:propTypes - Triggers reacts runtime property value checks
- * in development mode and enables property / attribute reflection for
- * web-component wrapper instances.
- * @property static:propertiesToReflectAsAttributes - List of properties to
- * potentially reflect as attributes (e.g. in a wrapped web-component).
- * @property static:strict - Indicates whether we should wrap render output in
- * reacts strict component.
+ * @property static:displayName - Descriptive name for component to show in web
+ * developer tools.
  *
- * @property codeEditorReference - Current code editor component reference.
- * @property inputReference - Current wrapped input reference node.
- * @property properties - Current properties.
- * @property richTextEditorReference - Current rich text component reference.
- * @property self - Back-reference to this class.
- * @property state - Current state.
+ * @param props - Given components properties.
+ * @param reference - Reference object to forward internal state.
+ * @returns React elements.
  */
-export class GenericInput<Type = any> extends
-    PureComponent<Props<Type>, State<Type>> implements
-    ReactWebComponent {
-    // region static properties
-    static readonly defaultModelState:ModelState = {
-        dirty: false,
-        focused: false,
-        invalid: false,
-        invalidMaximum: false,
-        invalidMaximumLength: false,
-        invalidMinimum: false,
-        invalidMinimumLength: false,
-        invalidPattern: false,
-        invalidRequired: false,
-        pristine: true,
-        touched: false,
-        untouched: true,
-        valid: true,
-        visited: false
-    }
-    static readonly defaultProps:Props & Pick<Properties, 'model'> = {
-        maximumLengthText:
-            'Please type less or equal than ${maximumLength} symbols.',
-        maximumText: 'Please give a number less or equal than ${maximum}.',
-        minimumLengthText:
-            'Please type at least or equal ${minimumLength} symbols.',
-        minimumText: 'Please give a number at least or equal to ${minimum}.',
-        model: {
-            declaration: '',
-            default: null,
-            description: '',
-            editor: 'plain',
-            emptyEqualsNull: true,
-            maximum: Infinity,
-            maximumLength: Infinity,
-            minimum: 0,
-            minimumLength: 0,
-            mutable: true,
-            name: 'NO_NAME_DEFINED',
-            nullable: true,
-            regularExpressionPattern: '.*',
-            state: GenericInput.defaultModelState,
-            trim: true,
-            type: 'string',
-            writable: true
-        },
-        patternText:
-            'Your string have to match the regular expression: "${pattern}".',
-        requiredText: 'Please fill this field.',
-        rows: 4,
-        selectableEditor: false,
-        showDeclaration: undefined,
-        showInitialValidationState: false
-    }
-    static readonly local:string = 'en-US'
-    static readonly output:Output = {onChange: true}
-    static readonly propertiesToReflectAsAttributes:Map<keyof Properties, boolean> =
-        new Map([
-            ['dirty', true],
-            ['focused', true],
-            ['invalid', true],
-            ['invalidMaximum', true],
-            ['invalidMaximumLength', true],
-            ['invalidMinimum', true],
-            ['invalidMinimumLength', true],
-            ['invalidPattern', true],
-            ['invalidRequired', true],
-            ['name', true],
-            ['pristine', true],
-            ['touched', true],
-            ['untouched', true],
-            ['valid', true],
-            ['visited', true]
-        ])
-    static readonly propTypes:{
-        [key in keyof Properties]:ValueOf<typeof PropertyTypes>
-    } = {
-        /*
-            NOTE: Not yet working:
-            align: oneOf(['end', 'start']),
-        */
-        align: string,
-        cursor: shape({
-            end: number.isRequired,
-            start: number.isRequired
-        }),
-        disabled: boolean,
-        editorIsActive: boolean,
-        fullWidth: boolean,
-        /*
-            NOTE: Not yet working:
-            icon?:string|(IconOptions & {tooltip?:string|TooltipProps});
-        */
-        icon: oneOfType([string, object]),
-        initialValue: any,
-        hidden: boolean,
-        maximumLengthText: string,
-        maximumText: string,
-        minimumLengthText: string,
-        minimumText: string,
-        model: shape({
-            mutable: boolean,
-            state: shape(
-                modelStatePropertyTypes as ValidationMap<typeof PropertyTypes>
-            ),
-            writable: boolean,
-            ...baseModelPropertyTypes
-        }),
-        onBlur: func,
-        onChange: func,
-        onChangeEditorIsActive: func,
-        onChangeValue: func,
-        onChangeShowDeclaration: func,
-        onChangeState: func,
-        onClick: func,
-        onFocus: func,
-        onKeyUp: func,
-        onSelectionChange: func,
-        onTouch: func,
-        outlined: boolean,
-        pattern: oneOfType([object, string]),
-        patternText: string,
-        placeholder: string,
-        representation: string,
-        required: boolean,
-        requiredText: string,
-        ripple: boolean,
-        rows: number,
-        selectableEditor: boolean,
-        showDeclaration: boolean,
-        showInitialValidationState: boolean,
-        theme: object,
-        /*
-            NOTE: Not yet working:
-            tooltip?:string|TooltipProps;
-            trailingIcon?:string|(IconOptions & {tooltip?:string|TooltipProps});
-        */
-        tooltip: any,
-        trailingIcon: any,
-        ...modelStatePropertyTypes,
-        ...baseModelPropertyTypes
-    }
-    static readonly strict:boolean = false
-    static readonly transformer:Mapping<DataTransformSpecification> = {
-        currency: {
-            format: {
-                final: {
-                    transform: (value:number):string => (new Intl.NumberFormat(
-                        GenericInput.local,
-                        {
-                            currency: 'USD',
-                            style: 'currency',
-                            ...(GenericInput.transformer.currency.format.final.options || {})
-                        }
-                    )).format(value)
-                },
-                intermediate: {
-                    transform: (value:string):any =>
-                        GenericInput.transformer.float.format.intermediate.transform(value)
-                }
-            },
-            parse: (value:string):any =>
-                GenericInput.transformer.float.parse(value),
-            type: 'text'
-        },
-        float: {
-            format: {
-                final: {
-                    transform: (value:number):string => (new Intl.NumberFormat(
-                        GenericInput.local,
-                        {
-                            style: 'decimal',
-                            ...(GenericInput.transformer.float.format.final.options || {})
-                        }
-                    )).format(value)
-                },
-                intermediate: {
-                    transform: (value:number):string => `${value}`
-                }
-            },
-            parse: (value:string):any => parseFloat(
-                typeof value === 'string' && GenericInput.local === 'de-DE' ?
-                    value.replace(/\./g, '').replace(/\,/g, '.') :
-                    value
-            ),
-            type: 'text'
-        },
-        integer: {
-            format: {
-                final: {
-                    transform: (value:number):string => (new Intl.NumberFormat(
-                        GenericInput.local,
-                        {
-                            maximumFractionDigits: 0,
-                            ...(GenericInput.transformer.integer.format.final.options || {})
-                        }
-                    )).format(value)
-                }
-            },
-            parse: (value:string):any => parseInt(
-                typeof value === 'string' && GenericInput.local === 'de-DE' ?
-                    value.replace(/[,.]/g, '') :
-                    value
-            ),
-            type: 'text'
-        },
-        number: {parse: parseInt}
-    }
-    // endregion
-    // region properties
-    codeEditorReference?:CodeEditorType
-    inputReference:RefObject<HTMLInputElement> = createRef<HTMLInputElement>()
-    properties:Properties<Type>
-    richTextEditorReference?:RichTextEditor
-    self:typeof GenericInput = GenericInput
-    state:State<Type> = {
-        cursor: {
-            end: 0,
-            start: 0
-        },
-        editorIsActive: false,
-        model: {...GenericInput.defaultModelState},
-        selectionIsUnstable: false,
-        showDeclaration: false,
-        value: null
-    }
-    // endregion
+export const GenericInputInner = function<Type = any>(
+    props:Props<Type>, reference?:RefObject<ReactWebComponent>
+):ReactElement {
     // region live-cycle
-    /**
-     * Creates a new instance consolidates given properties.
-     * @returns Nothing.
-     */
-    constructor(properties:Props<Type>) {
-        super(properties)
-
-        if (
-            Object.prototype.hasOwnProperty.call(this.props, 'initialValue') &&
-            typeof this.props.initialValue !== 'undefined'
-        )
-            this.state.value = this.props.initialValue as null|Type
-        if (this.props.value !== undefined)
-            this.state.value = this.props.value as null|Type
-        else if (this.props.model?.value !== undefined)
-            this.state.value = this.props.model.value as null|Type
-
-        if (typeof this.props.representation === 'string')
-            this.state.representation = this.props.representation
-        else if (this.state.value !== null)
-            this.state.representation = this.formatValue(
-                this.state.value,
-                this.props.type ||
-                this.props.model?.type ||
-                this.self.defaultProps.model.type
-            )
-        else
-            this.state.representation = ''
-    }
     /**
      * Is triggered immediate after a re-rendering. Re-stores cursor selection
      * state if editor has been switched.
      * @returns Nothing.
      */
-    componentDidUpdate():void {
-        if (this.state.selectionIsUnstable) {
-            if (this.state.editorIsActive) {
-                if (this.codeEditorReference?.editor?.selection) {
-                    this.codeEditorReference.editor.textInput.focus()
-                    const range =
-                        this.codeEditorReference.editor.selection.getRange()
-                    const endPosition =
-                        this.determineTablePosition(this.state.cursor.end)
-                    range.setEnd(endPosition.row, endPosition.column)
-                    const startPosition =
-                        this.determineTablePosition(this.state.cursor.start)
-                    range.setStart(startPosition.row, startPosition.column)
-                    this.codeEditorReference.editor.selection.setRange(range)
-                }
+    useEffect(():void => {
+        if (selectionIsUnstable)
+            if (editorIsActive) {
                 /*
-                    else if (this.richTextEditorReference?.editor?.selection)
-
-                    NOTE: Could not be set here since we have to wait for
-                    tinymce to be finally loaded ("init" event) to set
-                    focus and selections.
+                    NOTE: If the corresponding editor are not loaded yet they
+                    will set the selection state on initialisation as long as
+                    "selectionIsUnstable" is set to "true".
                 */
-            } else if (this.inputReference.current) {
-                this.inputReference.current.focus()
-                this.inputReference.current.setSelectionRange(
-                    this.state.cursor.start, this.state.cursor.end
-                )
+                if (codeEditorReference?.editor?.selection) {
+                    codeEditorReference.editor.textInput.focus()
+                    setCodeEditorSelectionState(codeEditorReference)
+                    setSelectionIsUnstable(false)
+                } else if (richTextEditorInstance?.selection) {
+                    richTextEditorInstance.focus(false)
+                    setRichTextEditorSelectionState(richTextEditorInstance)
+                    setSelectionIsUnstable(false)
+                }
+            } else if (inputReference.current) {
+                inputReference.current.focus();
+                (
+                    inputReference.current as
+                        HTMLInputElement|HTMLTextAreaElement
+                ).setSelectionRange(cursor.start, cursor.end)
+                setSelectionIsUnstable(false)
             }
-            this.setState({selectionIsUnstable: false})
-        }
-    }
-    /**
-     * Updates state depending on given properties.
-     * @param properties - Properties to derive into state.
-     * @param state - Current state to update with respect to given properties.
-     * @returns Updated state.
-     */
-    static getDerivedStateFromProps<Type = any>(
-        properties:Props<Type>, state:State<Type>
-    ):State<Type> {
-
-        if (properties.cursor) {
-            if (properties.cursor.end !== undefined)
-                state.cursor.end = properties.cursor.end
-            if (properties.cursor.start !== undefined)
-                state.cursor.start = properties.cursor.start
-        }
-
-        if (properties.editorIsActive !== undefined)
-            state.editorIsActive = properties.editorIsActive
-
-        if (properties.hidden !== undefined)
-            state.hidden = properties.hidden
-        if (state.hidden === undefined)
-            state.hidden = properties.name?.startsWith('password')
-
-        if (properties.showDeclaration !== undefined)
-            state.showDeclaration = properties.showDeclaration
-
-        if (properties.value !== undefined)
-            state.value = properties.value as null|Type
-        else if (properties.model?.value !== undefined)
-            state.value = properties.model.value as null|Type
-
-        if (properties.representation !== undefined)
-            state.representation = properties.representation
-
-        return state
-    }
+    })
     // endregion
-    // region event handler
-    /**
-     * Triggered on blur events.
-     * @param event - Event object.
-     * @returns Nothing.
-     */
-    onBlur = (event:SyntheticEvent):void => {
-        let changed:boolean = false
-        if (this.properties.focused) {
-            this.properties.focused =
-            this.properties.model.state.focused =
-                false
-            this.onChangeState(this.properties.model.state, event)
-            changed = true
-        }
-
-        if (!this.properties.visited) {
-            this.properties.visited =
-            this.properties.model.state.visited =
-                true
-            changed = true
-        }
-
-        const oldValue:null|Type = this.properties.value as null|Type
-        this.onChangeValue(
-            this.transformFinalValue(this.properties, this.properties.value)
-        )
-        changed = changed || oldValue !== this.properties.value
-
-        if (changed)
-            this.onChange(event)
-        if (this.properties.onBlur)
-            this.properties.onBlur(event)
-    }
-    /**
-     * Triggered on any change events.
-     * @param event - Potential event object.
-     * @returns Nothing.
-     */
-    onChange = (event?:SyntheticEvent):void => {
-        if (this.properties.onChange)
-            this.properties.onChange(
-                this.getConsolidatedProperties(
-                    /*
-                        Workaround since "Something" isn't identified as subset
-                        of "RecursivePartial<Type>"
-                    */
-                    this.properties as unknown as Props<Type>
-                ),
-                event
-            )
-    }
-    /**
-     * Triggered when editor is active indicator should be changed.
-     * @param event - Mouse event object.
-     * @returns Nothing.
-     */
-    onChangeEditorIsActive = (event?:MouseEvent):void => {
-        this.properties.editorIsActive = !this.properties.editorIsActive
-        this.setState(({editorIsActive}):Pick<State<Type>, 'editorIsActive'|'selectionIsUnstable'> => (
-            {editorIsActive: !editorIsActive, selectionIsUnstable: true}
-        ))
-
-        if (this.properties.onChangeEditorIsActive)
-            this.properties.onChangeEditorIsActive(
-                this.properties.editorIsActive, event
-            )
-        this.onChange(event)
-    }
-    /**
-     * Triggered when show declaration indicator should be changed.
-     * @param event - Potential event object.
-     * @returns Nothing.
-     */
-    onChangeShowDeclaration = (event?:MouseEvent):void =>
-        this.setState(({showDeclaration}):Pick<State<Type>, 'showDeclaration'> => {
-            if (this.properties.onChangeShowDeclaration)
-                this.properties.onChangeShowDeclaration(showDeclaration, event)
-            this.onChange(event)
-            return {showDeclaration: !showDeclaration}
-        })
-    /**
-     * Triggered when a value state changes like validation or focusing.
-     * @param state - Current value state.
-     * @param event - Triggering event object.
-     * @returns Nothing.
-     */
-    onChangeState = (state:ModelState, event?:SyntheticEvent):void => {
-        for (const key of Object.keys(state))
-            if (!Object.prototype.hasOwnProperty.call(this.props, key)) {
-                this.setState({model: state})
-                break
-            }
-        if (this.properties.onChangeState)
-            this.properties.onChangeState(state, event)
-    }
-    /**
-     * Triggered when ever the value changes.
-     * @param eventOrValue - Event object or new value.
-     * @returns Nothing.
-     */
-    onChangeValue = (eventOrValue:null|SyntheticEvent|Type):void => {
-        if (!(this.properties.model.mutable && this.properties.model.writable))
-            return
-
-        let event:SyntheticEvent|undefined
-        let value:null|Type
-        if (
-            eventOrValue !== null &&
-            typeof eventOrValue === 'object' &&
-            (eventOrValue as SyntheticEvent).target
-        ) {
-            event = eventOrValue as SyntheticEvent
-            value =
-                typeof (event.target as {value?:null|Type}).value ===
-                    'undefined' ?
-                        null :
-                        (event.target as unknown as {value:null|Type}).value
-        } else
-            value = eventOrValue as null|Type
-
-        const oldValue:null|Type = this.properties.value as null|Type
-
-        this.properties.representation = typeof value === 'string' ?
-            value :
-            this.formatValue(value, this.properties.type)
-        this.properties.value =
-        this.properties.model.value =
-            this.parseValue(this.properties, value)
-
-        if (oldValue !== this.properties.value) {
-            let stateChanged:boolean = this.determineValidationState(
-                this.properties, this.properties.value
-            )
-
-            if (this.properties.pristine) {
-                this.properties.dirty =
-                this.properties.model.state.dirty =
-                    true
-                this.properties.pristine =
-                this.properties.model.state.pristine =
-                    false
-                stateChanged = true
-            }
-            if (stateChanged)
-                this.onChangeState(this.properties.model.state, event)
-
-            this.setState({
-                representation: this.properties.representation,
-                value: this.properties.value
-            })
-            this.onChange(event)
-
-            if (this.properties.onChangeValue)
-                this.properties.onChangeValue(this.properties.value, event)
-        } else
-            this.setState({representation: this.properties.representation})
-    }
-    /**
-     * Triggered on click events.
-     * @param event - Mouse event object.
-     * @returns Nothing.
-     */
-    onClick = (event:MouseEvent):void => {
-        this.onSelectionChange(event)
-        if (this.properties.onClick)
-            this.properties.onClick(event)
-        this.onTouch(event)
-    }
-    /**
-     * Triggered on focus events.
-     * @param event - Focus event object.
-     * @returns Nothing.
-     */
-    onFocus = (event:FocusEvent):void => {
-        if (this.properties.onFocus)
-            this.properties.onFocus(event)
-        this.onTouch(event)
-    }
-    /**
-     * Triggered on key up events.
-     * @param event - Key up event object.
-     * @returns Nothing.
-     */
-    onKeyUp = (event:KeyboardEvent):void => {
-        this.onSelectionChange(event)
-        if (this.properties.onKeyUp)
-            this.properties.onKeyUp(event)
-    }
-    /**
-     * Triggered on selection change events.
-     * @param event - Event which triggered selection change.
-     * @returns Nothing.
-     */
-    onSelectionChange = (event:SyntheticEvent):void => {
-        this.saveSelectionState()
-        if (this.properties.onSelectionChange)
-            this.properties.onSelectionChange(event)
-    }
-    /**
-     * Triggers on start interacting with the input.
-     * @param event - Event object which triggered interaction.
-     * @returns Nothing.
-     */
-    onTouch = (event:FocusEvent|MouseEvent):void => {
-        let changeState:boolean = false
-        if (!this.properties.focused) {
-            changeState =
-            this.properties.focused =
-            this.properties.model.state.focused =
-                true
-        }
-        if (this.properties.untouched) {
-            changeState =
-            this.properties.touched =
-            this.properties.model.state.touched =
-                true
-            this.properties.untouched =
-            this.properties.model.state.untouched =
-                false
-        }
-        if (changeState) {
-            this.onChangeState(this.properties.model.state, event)
-            this.onChange(event)
-        }
-        if (this.properties.onTouch)
-            this.properties.onTouch(event)
-    }
-    // endregion
-    // region helper
+    // region context helper
+    // / region render helper
     /**
      * Applies icon preset configurations.
      * @param options - Icon options to extend of known preset identified.
      * @return Given potential extended icon configuration.
      */
-    applyIconPreset(options?:Properties['icon']):Properties['icon']|void {
+    const applyIconPreset = (options?:Properties['icon']):IconOptions|string|undefined => {
         if (options === 'clear_preset')
             return {
                 icon: <GenericAnimate
-                    in={this.properties.value !== this.properties.default}
+                    in={properties.value !== properties.default}
                 >
                     <UseAnimations animation={plusToX} reverse={true}/>
                 </GenericAnimate>,
-                onClick: (event:MouseEvent):void => {
+                onClick: (event:ReactMouseEvent):void => {
                     event.preventDefault()
                     event.stopPropagation()
-                    this.onChangeValue(this.transformFinalValue(
-                        this.properties, this.properties.default
+                    onChangeValue(transformFinalValue(
+                        properties, properties.default
                     ))
                 },
                 strategy: 'component',
@@ -823,62 +450,204 @@ export class GenericInput<Type = any> extends
         if (options === 'password_preset')
             return {
                 icon: <UseAnimations
-                    animation={lock}
-                    reverse={!this.properties.hidden}
+                    animation={lock} reverse={!properties.hidden}
                 />,
-                onClick: (event:MouseEvent):void => {
+                onClick: (event:ReactMouseEvent):void => {
                     event.preventDefault()
                     event.stopPropagation()
-                    this.setState(({hidden}):Pick<State<Type>, 'hidden'> =>
-                        ({hidden: !hidden})
-                    )
-                    this.onChange(event)
+                    setHidden((value:boolean|undefined):boolean => !value)
+                    onChange(event)
                 },
                 strategy: 'component',
-                tooltip:
-                    `${(this.properties.hidden ? 'Show' : 'Hide')} password`
+                tooltip: `${(properties.hidden ? 'Show' : 'Hide')} password`
             }
         return options
     }
     /**
-     * Converts absolute range into table oriented position.
-     * @param offset - Absolute position.
-     * @returns Position.
+     * TODO
      */
-    determineTablePosition(offset:number):{column:number;row:number} {
-        const result = {column: 0, row: 0}
-        if (typeof this.state.value === 'string')
-            for (const line of this.state.value.split('\n')) {
-                if (line.length < offset)
-                    offset -= 1 + line.length
-                else {
-                    result.column = offset
-                    break
-                }
-                result.row += 1
+    const renderHelpText = ():ReactElement => <>
+       <GenericAnimate in={
+            properties.selectableEditor &&
+            properties.type === 'string' &&
+            properties.editor !== 'plain'
+        }>
+            <IconButton
+                icon={{
+                    icon: properties.editorIsActive ?
+                        'subject' :
+                        properties.editor.startsWith('code') ?
+                            'code' :
+                            'text_format',
+                    onClick: onChangeEditorIsActive
+                }}
+            />
+        </GenericAnimate>
+        <GenericAnimate in={Boolean(properties.declaration)}>
+            <IconButton
+                icon={{
+                    icon:
+                        'more_' +
+                        (properties.showDeclaration ? 'vert' : 'horiz'),
+                    onClick: onChangeShowDeclaration
+                }}
+            />
+        </GenericAnimate>
+        <GenericAnimate in={properties.showDeclaration}>
+            {properties.declaration}
+        </GenericAnimate>
+        <GenericAnimate in={
+            !properties.showDeclaration &&
+            properties.invalid &&
+            (
+                properties.showInitialValidationState ||
+                /*
+                    Material inputs show their validation state at
+                    least after a blur event so we synchronize error
+                    message appearances.
+                */
+                properties.visited
+            )
+        }>
+            <Theme use="error">{renderMessage(
+                properties.invalidMaximum &&
+                properties.maximumText ||
+                properties.invalidMaximumLength &&
+                properties.maximumLengthText ||
+                properties.invalidMinimum &&
+                properties.minimumText ||
+                properties.invalidMinimumLength &&
+                properties.minimumLengthText ||
+                properties.invalidPattern &&
+                properties.patternText ||
+                properties.invalidRequired &&
+                properties.requiredText
+            )}</Theme>
+        </GenericAnimate>
+    </>
+    /**
+     * Renders given template string against all properties in current
+     * instance.
+     * @param template - Template to render.
+     * @returns Evaluated template or an empty string if something goes wrong.
+     */
+    const renderMessage = (template?:any):string => {
+        if (typeof template === 'string') {
+            const scopeNames:Array<keyof Properties<Type>> = Object
+                .keys(properties)
+                .filter((name:string):boolean => name !== 'default') as
+                    Array<keyof Properties<Type>>
+            let render:Function
+            try {
+                render = new Function(...scopeNames, `return \`${template}\``)
+            } catch (error) {
+                console.warn(
+                    `Given message template "${template}" could not be ` +
+                    `parsed: "${Tools.represent(error)}".`
+                )
+                return ''
             }
-        return result
+            try {
+                return render(
+                    ...scopeNames.map((name:keyof Properties<Type>
+                ):any => properties[name]))
+            } catch (error) {
+                console.warn(
+                    `Given message template "${template}" failed to evaluate` +
+                    ' with given scope variables: "' +
+                    `${scopeNames.join('", "')}": "${Tools.represent(error)}".`
+                )
+            }
+        }
+        return ''
     }
     /**
-     * Determines absolute range from table oriented position.
-     * @param column - Symbol offset in given row.
-     * @param row - Offset row.
-     * @returns Determined offset.
+     * Wraps given component with animation component if given condition holds.
+     * @param content - Component or string to wrap.
+     * @param propertiesOrInCondition - Animation properties or in condition
+     * only.
+     * @returns Wrapped component.
      */
-    determineAbsoluteSymbolOffsetFromTable(
-        column:number, row:number
-    ):number {
-        if (typeof this.state.value !== 'string' && !this.state.value)
-            return 0
-
-        if (row > 0)
-            return column + (this.state.value as unknown as string)
-                .split('\n')
-                .slice(0, row)
-                .map((line:string):number => 1 + line.length)
-                .reduce((sum:number, value:number):number => sum + value)
-        return column
+    const wrapAnimationConditionally = (
+        content:Renderable,
+        propertiesOrInCondition:boolean|Partial<TransitionProps<HTMLElement|undefined>> = {},
+        condition:boolean = true
+    ):Renderable => {
+        if (typeof propertiesOrInCondition === 'boolean')
+            return condition ?
+                <GenericAnimate in={propertiesOrInCondition}>
+                    {content}
+                </GenericAnimate> :
+                propertiesOrInCondition ? content : ''
+        return condition ?
+            <GenericAnimate {...propertiesOrInCondition}>
+                {content}
+            </GenericAnimate> :
+            propertiesOrInCondition.in ? content : ''
     }
+    /**
+     * Wraps given component with react strict mode component.
+     * @param content - Component or string to wrap.
+     * @returns Wrapped component.
+     */
+    const wrapStrict = (content:Renderable):ReactElement => {
+        return GenericInput.strict ?
+            <StrictMode>{content}</StrictMode> :
+            <>{content}</>
+    }
+    /**
+     * TODO
+     */
+    const wrapThemeProvider = (
+        element:ReactElement, configuration?:ThemeProviderProps['options']
+    ):ReactElement =>
+        configuration ?
+            <ThemeProvider options={configuration} wrap>
+                {element}
+            </ThemeProvider> :
+            element
+    /**
+     * Wraps given component with a tooltip component with given tooltip
+     * configuration.
+     * @param content - Component or string to wrap.
+     * @param options - Tooltip options.
+     * @returns Wrapped given content.
+     */
+    const wrapTooltip = (
+        content:ReactElement, options?:Properties['tooltip']
+    ):ReactElement => {
+        if (typeof options === 'string')
+            return <Tooltip
+                content={<Typography use="caption">{options}</Typography>}
+            >{content}</Tooltip>
+        if (options !== null && typeof options === 'object')
+            return <Tooltip {...options}>
+                <Typography use="caption">{content}</Typography>
+            </Tooltip>
+        return <>{content}</>
+    }
+    /**
+     * If given icon options has an additional tooltip configuration integrate
+     * a wrapping tooltip component into given configuration and remove initial
+     * tooltip configuration.
+     * @param options - Icon configuration potential extended a tooltip
+     * configuration.
+     * @returns Resolved icon configuration.
+     */
+    const wrapIconWithTooltip = (options?:Properties['icon']):IconOptions|undefined => {
+        if (typeof options === 'object' && options?.tooltip) {
+            const tooltip:Properties['tooltip'] = options.tooltip
+            options = {...options}
+            delete options.tooltip
+            const nestedOptions:IconOptions = {...options}
+            options.strategy = 'component'
+            options.icon = wrapTooltip(<Icon icon={nestedOptions} />, tooltip)
+        }
+        return options as IconOptions|undefined
+    }
+    // / endregion
+    // / region handle cursor selection state
+    // // region rich-text editor
     /**
      * Determines absolute offset in given markup.
      * @param contentDomNode - Wrapping dom node where all content is
@@ -887,10 +656,10 @@ export class GenericInput<Type = any> extends
      * @param offset - Relative position within given node.
      * @returns Determine absolute offset.
      */
-    determineAbsoluteSymbolOffsetFromHTML(
+    const determineAbsoluteSymbolOffsetFromHTML = (
         contentDomNode:Element, domNode:Element, offset:number
-    ):number {
-        if (!this.state.value)
+    ):number => {
+        if (!value)
             return 0
 
         const indicatorKey:string = 'generic-input-selection-indicator'
@@ -914,90 +683,273 @@ export class GenericInput<Type = any> extends
             indicator.length
         )
     }
+    // // endregion
+    // // region code editor
     /**
-     * Derives current validation state from given value.
-     * @param configuration - Input configuration.
-     * @param value - Value to validate against given configuration.
-     * @returns A boolean indicating if validation state has changed.
+     * Determines absolute range from table oriented position.
+     * @param column - Symbol offset in given row.
+     * @param row - Offset row.
+     * @returns Determined offset.
      */
-    determineValidationState(
-        configuration:Properties<Type>, value:any
-    ):boolean {
-        let changed:boolean = false
-        let oldValue:boolean = false
+    const determineAbsoluteSymbolOffsetFromTable = (
+        column:number, row:number
+    ):number => {
+        if (typeof value !== 'string' && !value)
+            return 0
 
-        oldValue = configuration.model.state.invalidMaximum
-        configuration.model.state.invalidMaximum =
-            typeof configuration.model.maximum === 'number' &&
-            typeof value === 'number' &&
-            !isNaN(value) &&
-            configuration.model.maximum < value
-        changed =
-            changed || oldValue !== configuration.model.state.invalidMaximum
-
-        oldValue = configuration.model.state.invalidMaximumLength
-        configuration.model.state.invalidMaximumLength =
-            typeof configuration.model.maximumLength === 'number' &&
-            typeof value === 'string' &&
-            configuration.model.maximumLength < value.length
-        changed =
-            changed ||
-            oldValue !== configuration.model.state.invalidMaximumLength
-
-        oldValue = configuration.model.state.invalidMinimum
-        configuration.model.state.invalidMinimum =
-            typeof configuration.model.minimum === 'number' &&
-            typeof value === 'number' &&
-            !isNaN(value) &&
-            value < configuration.model.minimum
-        changed =
-            changed || oldValue !== configuration.model.state.invalidMinimum
-
-        oldValue = configuration.model.state.invalidMinimumLength
-        configuration.model.state.invalidMinimumLength =
-            typeof configuration.model.minimumLength === 'number' &&
-            typeof value === 'string' &&
-            value.length < configuration.model.minimumLength
-        changed =
-            changed ||
-            oldValue !== configuration.model.state.invalidMinimumLength
-
-        oldValue = configuration.model.state.invalidPattern
-        configuration.model.state.invalidPattern =
-            typeof configuration.model.regularExpressionPattern === 'string' &&
-            !(new RegExp(configuration.model.regularExpressionPattern))
-                .test(value) ||
-            typeof configuration.model.regularExpressionPattern === 'object' &&
-            !typeof configuration.model.regularExpressionPattern.test(value)
-        changed =
-            changed || oldValue !== configuration.model.state.invalidPattern
-
-        oldValue = configuration.model.state.invalidRequired
-        configuration.model.state.invalidRequired =
-            configuration.model.nullable === false && value === null
-        changed =
-            changed || oldValue !== configuration.model.state.invalidRequired
-
-        if (changed) {
-            configuration.model.state.invalid =
-                configuration.model.state.invalidMaximum ||
-                configuration.model.state.invalidMaximumLength ||
-                configuration.model.state.invalidMinimum ||
-                configuration.model.state.invalidMinimumLength ||
-                configuration.model.state.invalidPattern ||
-                configuration.model.state.invalidRequired
-            configuration.model.state.valid =
-                !configuration.model.state.invalid
+        if (row > 0)
+            return column + (value as unknown as string)
+                .split('\n')
+                .slice(0, row)
+                .map((line:string):number => 1 + line.length)
+                .reduce((sum:number, value:number):number => sum + value)
+        return column
+    }
+    /**
+     * Converts absolute range into table oriented position.
+     * @param offset - Absolute position.
+     * @returns Position.
+     */
+    const determineTablePosition = (offset:number):{column:number;row:number} => {
+        const result = {column: 0, row: 0}
+        if (typeof value === 'string')
+            for (const line of value.split('\n')) {
+                if (line.length < offset)
+                    offset -= 1 + line.length
+                else {
+                    result.column = offset
+                    break
+                }
+                result.row += 1
+            }
+        return result
+    }
+    /**
+     * TODO
+     */
+    const setCodeEditorSelectionState = (instance:CodeEditorType):void => {
+        const range = instance.editor.selection.getRange()
+        const endPosition = determineTablePosition(cursor.end)
+        range.setEnd(endPosition.row, endPosition.column)
+        const startPosition = determineTablePosition(cursor.start)
+        range.setStart(startPosition.row, startPosition.column)
+        instance.editor.selection.setRange(range)
+    }
+    /**
+     * TODO
+     */
+    const setRichTextEditorSelectionState = (instance:RichTextEditor):void => {
+        const indicator:{end:string;start:string} = {
+            end: '###generic-input-selection-indicator-end###',
+            start: '###generic-input-selection-indicator-start###'
         }
+        const cursor:{end:number;start:number} = {
+            end: properties.cursor.end + indicator.start.length,
+            start: properties.cursor.start
+        }
+        const keysSorted:Array<keyof typeof indicator> =
+            ['start', 'end']
 
-        return changed
+        let value:string = properties.representation || ''
+        for (const type of keysSorted)
+            value = (
+                value.substring(0, cursor[type as keyof typeof indicator]) +
+                indicator[type] +
+                value.substring(cursor[type as keyof typeof indicator])
+            )
+        instance.getBody().innerHTML = value
+
+        const walker = document.createTreeWalker(
+            instance.getBody(),
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        )
+
+        const range = instance.dom.createRng()
+        const result:{end?:[Node, number];start?:[Node, number]} = {}
+        let node
+        while (node = walker.nextNode())
+            for (const type of keysSorted) {
+                if (node.nodeValue) {
+                    const index:number =
+                        node.nodeValue.indexOf(indicator[type])
+                    if (index > -1) {
+                        node.nodeValue = node.nodeValue.replace(
+                            indicator[type], ''
+                        )
+                        result[type] = [node, index]
+                    }
+                }
+            }
+
+        for (const type of keysSorted)
+            if (result[type])
+                range[
+                    `set${Tools.stringCapitalize(type)}` as 'setEnd'|'setStart'
+                ](...(result[type] as [Node, number]))
+        if (result.end && result.start)
+            instance.selection.setRng(range)
+    }
+    // // endregion
+    /**
+     * Saves current selection/cursor state in components state.
+     * @returns Nothing.
+     */
+    const saveSelectionState = ():void => {
+        /*
+            NOTE: Known issues is that we do not get the absolute positions but
+            the one in current selected node.
+        */
+        const codeEditorRange =
+            codeEditorReference?.editor?.selection?.getRange()
+        const richTextEditorRange =
+            richTextEditorInstance?.selection?.getRng(true)
+        const selectionEnd:null|number = (
+            inputReference.current as HTMLInputElement|HTMLTextAreaElement
+        )?.selectionEnd
+        const selectionStart:null|number = (
+            inputReference.current as HTMLInputElement|HTMLTextAreaElement
+        )?.selectionStart
+        if (codeEditorRange)
+            setCursor({
+                end: determineAbsoluteSymbolOffsetFromTable(
+                    codeEditorRange.end.column,
+                    typeof codeEditorRange.end.row === 'number' ?
+                        codeEditorRange.end.row :
+                        typeof properties.value === 'string' ?
+                            properties.value.split('\n').length - 1 :
+                            0
+                ),
+                start: determineAbsoluteSymbolOffsetFromTable(
+                    codeEditorRange.start.column,
+                    typeof codeEditorRange.start.row === 'number' ?
+                        codeEditorRange.start.row :
+                        typeof properties.value === 'string' ?
+                            properties.value.split('\n').length - 1 :
+                            0
+                )
+            })
+        else if (richTextEditorRange)
+            setCursor({
+                end: determineAbsoluteSymbolOffsetFromHTML(
+                    richTextEditorInstance!.getBody(),
+                    richTextEditorInstance!.selection.getEnd(),
+                    richTextEditorRange.endOffset
+                ),
+                start: determineAbsoluteSymbolOffsetFromHTML(
+                    richTextEditorInstance!.getBody(),
+                    richTextEditorInstance!.selection.getStart(),
+                    richTextEditorRange.startOffset
+                )
+            })
+        else if (
+            typeof selectionEnd === 'number' &&
+            typeof selectionStart === 'number'
+        )
+            setCursor({end: selectionEnd, start: selectionStart})
+    }
+    // / endregion
+    // / region property aggregation
+    /**
+     * Synchronizes property, state and model configuration:
+     * Properties overwrites default properties which overwrites default model
+     * properties.
+     * @returns Nothing.
+    */
+    const mapPropertiesAndStateToModel = (properties:Props<Type>):Props<Type> => {
+        /*
+            NOTE: Default props seems not to respect nested layers to merge so
+            we have to manage this for nested model structure.
+        */
+        const result:Props<Type> & {model:Model} = Tools.extend(
+            true,
+            {
+                model: {
+                    ...GenericInput.defaultProps.model,
+                    state: {...GenericInput.defaultProps.model.state}
+                }
+            },
+            properties
+        )
+        // region handle aliases
+        if (result.disabled) {
+            delete result.disabled
+            result.model.mutable = false
+        }
+        if (result.pattern) {
+            result.model.regularExpressionPattern = result.pattern
+            delete result.pattern
+        }
+        if (result.required) {
+            delete result.required
+            result.model.nullable = false
+        }
+        if (result.type === 'text')
+            result.type = 'string'
+        // endregion
+        // region handle model configuration
+        for (const [name, value] of Object.entries(result.model))
+            if (Object.prototype.hasOwnProperty.call(result, name))
+                (
+                    result.model[name as keyof Model<Type>] as
+                        ValueOf<Model<Type>>
+                ) = result[name as keyof Props<Type>] as ValueOf<Model<Type>>
+        for (const [name, value] of Object.entries(result.model.state))
+            if (Object.prototype.hasOwnProperty.call(result, name))
+                result.model.state[name as keyof ModelState] =
+                    result[name as keyof Props<Type>] as ValueOf<ModelState>
+        for (const key of Object.keys(result.model.state))
+            if (!Object.prototype.hasOwnProperty.call(props, key)) {
+                result.model.state = model
+                break
+            }
+
+        /*
+            NOTE: Model states are not retrieved from state but derived from
+            specification and current value.
+        */
+
+        if (result.model.value === undefined)
+            result.model.value = (value === undefined) ?
+                result.model.default :
+                value
+        // else -> Controlled component via model's "value" property.
+        // endregion
+        // region handle state configuration
+        if (result.cursor === undefined)
+            result.cursor = cursor
+
+        if (result.editorIsActive === undefined)
+            result.editorIsActive = editorIsActive
+
+        if (result.hidden === undefined)
+            result.hidden = hidden
+
+        if (
+            result.representation === undefined &&
+            typeof representation === 'string'
+        )
+            result.representation = representation
+
+        if (result.showDeclaration === undefined)
+            result.showDeclaration = showDeclaration
+        // endregion
+        result.model.value = parseValue(
+            result as unknown as Properties<Type>, result.model.value
+        )
+        determineValidationState(
+            result as unknown as Properties<Type>, result.model.value
+        )
+
+        return result
     }
     /**
      * Calculate external properties (a set of all configurable properties).
      * @returns External properties object.
      */
-    getConsolidatedProperties(properties:Props<Type>):Properties<Type> {
-        properties = this.mapPropertiesAndStateToModel(properties)
+    const getConsolidatedProperties = (properties:Props<Type>):Properties<Type> => {
+        properties = mapPropertiesAndStateToModel(properties)
         const result:Properties<Type> & {
             mutable?:boolean;
             nullable?:boolean;
@@ -1030,262 +982,70 @@ export class GenericInput<Type = any> extends
             result.editorIsActive = true
 
         if (typeof result.representation !== 'string' && result.value)
-            result.representation = this.formatValue(
+            result.representation = formatValue<Type>(
                 result.value, result.type, !result.focused
             )
 
         return result
     }
-    /**
-     * Synchronizes property, state and model configuration:
-     * Properties overwrites default properties which overwrites default model
-     * properties.
-     * @returns Nothing.
-    */
-    mapPropertiesAndStateToModel(properties:Props<Type>):Props<Type> {
-        /*
-            NOTE: Default props seems not to respect nested layers to merge so
-            we have to manage this for nested model structure.
-        */
-        const result:Props<Type> & {model:Model} = Tools.extend(
-            true,
-            {
-                model: {
-                    ...this.self.defaultProps.model,
-                    state: {...this.self.defaultProps.model.state}
-                }
-            },
-            properties
-        )
-        // region handle aliases
-        if (result.disabled) {
-            delete result.disabled
-            result.model.mutable = false
-        }
-        if (result.pattern) {
-            result.model.regularExpressionPattern = result.pattern
-            delete result.pattern
-        }
-        if (result.required) {
-            delete result.required
-            result.model.nullable = false
-        }
-        // endregion
-        // region handle model configuration
-        for (const [name, value] of Object.entries(result.model))
-            if (Object.prototype.hasOwnProperty.call(result, name))
-                (
-                    result.model[name as keyof Model<Type>] as
-                        ValueOf<Model<Type>>
-                ) = result[name as keyof Props<Type>] as ValueOf<Model<Type>>
-        for (const [name, value] of Object.entries(result.model.state))
-            if (Object.prototype.hasOwnProperty.call(result, name))
-                result.model.state[name as keyof ModelState] =
-                    result[name as keyof Props<Type>] as ValueOf<ModelState>
-        for (const key of Object.keys(result.model.state))
-            if (!Object.prototype.hasOwnProperty.call(this.props, key)) {
-                result.model.state = this.state.model
-                break
-            }
-
-        /*
-            NOTE: Model states are not retrieved from state but derived from
-            specification and current value.
-        */
-
-        if (result.model.value === undefined)
-            result.model.value = (this.state.value === undefined) ?
-                result.model.default :
-                this.state.value
-        // else -> Controlled component via model's "value" property.
-        // endregion
-        // region handle state configuration
-        if (result.cursor === undefined)
-            result.cursor = this.state.cursor
-
-        if (result.editorIsActive === undefined)
-            result.editorIsActive = this.state.editorIsActive
-
-        if (result.hidden === undefined)
-            result.hidden = this.state.hidden
-
-        if (
-            result.representation === undefined &&
-            typeof this.state.representation === 'string'
-        )
-            result.representation = this.state.representation
-
-        if (result.showDeclaration === undefined)
-            result.showDeclaration = this.state.showDeclaration
-        // endregion
-        result.model.value = this.parseValue(
-            result as unknown as Properties<Type>, result.model.value
-        )
-        this.determineValidationState(
-            result as unknown as Properties<Type>, result.model.value
-        )
-
-        return result
-    }
-    /**
-     * Renders given template string against all properties in current
-     * instance.
-     * @param template - Template to render.
-     * @returns Evaluated template or an empty string if something goes wrong.
-     */
-    renderMessage(template?:any):string {
-        if (typeof template === 'string') {
-            const scopeNames:Array<keyof Properties<Type>> = Object
-                .keys(this.properties)
-                .filter((name:string):boolean => name !== 'default') as
-                    Array<keyof Properties<Type>>
-            let render:Function
-            try {
-                render = new Function(...scopeNames, `return \`${template}\``)
-            } catch (error) {
-                console.warn(
-                    `Given message template "${template}" could not be ` +
-                    `parsed: "${Tools.represent(error)}".`
-                )
-                return ''
-            }
-            try {
-                return render(
-                    ...scopeNames.map((name:keyof Properties<Type>
-                ):any => this.properties[name]))
-            } catch (error) {
-                console.warn(
-                    `Given message template "${template}" failed to evaluate` +
-                    ' with given scope variables: "' +
-                    `${scopeNames.join('", "')}": "${Tools.represent(error)}".`
-                )
-            }
-        }
-        return ''
-    }
-    /**
-     * Saves current selection/cursor state in components state.
-     * @returns Nothing.
-     */
-    saveSelectionState():void {
-        /*
-            NOTE: Known issues is that we do not get the absolute positions but
-            the one in current selected node.
-        */
-        const codeEditorRange =
-            this.codeEditorReference?.editor?.selection?.getRange()
-        const richTextEditorRange =
-            this.richTextEditorReference?.editor?.selection?.getRng()
-        const selectionEnd = this.inputReference.current?.selectionEnd
-        const selectionStart = this.inputReference.current?.selectionStart
-        if (codeEditorRange)
-            this.setState({
-                cursor: {
-                    end: this.determineAbsoluteSymbolOffsetFromTable(
-                        codeEditorRange.end.column,
-                        typeof codeEditorRange.end.row === 'number' ?
-                            codeEditorRange.end.row :
-                            typeof this.properties.value === 'string' ?
-                                this.properties.value.split('\n').length - 1 :
-                                0
-                    ),
-                    start: this.determineAbsoluteSymbolOffsetFromTable(
-                        codeEditorRange.start.column,
-                        typeof codeEditorRange.start.row === 'number' ?
-                            codeEditorRange.start.row :
-                            typeof this.properties.value === 'string' ?
-                                this.properties.value.split('\n').length - 1 :
-                                0
-                    )
-                }
-            })
-        else if (richTextEditorRange)
-            this.setState({
-                cursor: {
-                    end: this.determineAbsoluteSymbolOffsetFromHTML(
-                        this.richTextEditorReference.editor.getBody(),
-                        this.richTextEditorReference.editor.selection.getEnd(),
-                        richTextEditorRange.endOffset
-                    ),
-                    start: this.determineAbsoluteSymbolOffsetFromHTML(
-                        this.richTextEditorReference.editor.getBody(),
-                        this.richTextEditorReference.editor.selection
-                            .getStart(),
-                        richTextEditorRange.startOffset
-                    )
-                }
-            })
-        else if (
-            typeof selectionEnd === 'number' &&
-            typeof selectionStart === 'number'
-        )
-            this.setState({
-                cursor: {end: selectionEnd, start: selectionStart}
-            })
-    }
+    // / endregion
+    // / region reference setter
     /**
      * Set code editor references.
      * @param instance - Code editor instance.
      * @returns Nothing.
      */
-    setCodeEditorReference = (instance?:CodeEditorType):void => {
-        if (instance?.editor?.container?.querySelector('textarea'))
-            this.inputReference = {
-                current: instance.editor.container.querySelector('textarea')
+    const setCodeEditorReference = (instance?:CodeEditorType):void => {
+        codeEditorReference = instance
+
+        if (codeEditorReference?.editor?.container?.querySelector('textarea'))
+            codeEditorInputReference = {
+                current: codeEditorReference.editor.container.querySelector(
+                    'textarea'
+                )
             }
-        this.codeEditorReference = instance
+
+        if (codeEditorReference && editorIsActive && selectionIsUnstable) {
+            codeEditorReference.editor.textInput.focus()
+            setCodeEditorSelectionState(codeEditorReference)
+            setSelectionIsUnstable(false)
+        }
     }
     /**
      * Set rich text editor references.
      * @param instance - Editor instance.
      * @returns Nothing.
      */
-    setRichTextEditorReference = (instance?:RichTextEditor):void => {
-        if (instance?.elementRef)
-            this.inputReference = instance.elementRef
-        this.richTextEditorReference = instance
+    const setRichTextEditorReference = (instance?:RichTextEditorComponent):void => {
+        richTextEditorReference = instance
+
+        /*
+            Refer inner element here is possible but marked as private.
+
+            if (richTextEditorReference?.elementRef)
+                richTextEditorInputReference =
+                    richTextEditorReference.elementRef
+        */
     }
-    /**
-     * Represents configured value.
-     * @param value - To represent.
-     * @param type - Input type.
-     * @param final - Specifies whether it is a final representation.
-     * @returns Transformed value.
-     */
-    formatValue(value:null|Type, type:string, final:boolean = true):string {
-        const methodName:string = final ? 'final' : 'intermediate'
-        if (value === null || typeof value === 'number' && isNaN(value))
-            return ''
-        if (
-            Object.prototype.hasOwnProperty.call(
-                this.self.transformer, type
-            ) &&
-            this.self.transformer[type].format &&
-            Object.prototype.hasOwnProperty.call(
-                this.self.transformer[type].format, methodName
-            ) &&
-            this.self.transformer[type].format[methodName].transform
-        )
-            return this.self.transformer[type].format[methodName].transform(value)
-        return `${value}`
-    }
+    // / endregion
+    // / region value transformer
     /**
      * Applies configured value transformations.
      * @param configuration - Input configuration.
      * @param value - Value to transform.
      * @returns Transformed value.
      */
-    parseValue(configuration:Properties<Type>, value:any):null|Type {
+    const parseValue = (configuration:Properties<Type>, value:any):null|Type => {
         if (configuration.emptyEqualsNull && value === '')
             return null
         if (
             ![null, undefined].includes(value) &&
             Object.prototype.hasOwnProperty.call(
-                this.self.transformer, configuration.type
+                GenericInput.transformer, configuration.type
             ) &&
-            this.self.transformer[configuration.type].parse
+            GenericInput.transformer[configuration.type].parse
         )
-            return this.self.transformer[configuration.type].parse(value)
+            return GenericInput.transformer[configuration.type].parse!(value)
         if (typeof value === 'number' && isNaN(value))
             return null
         return value
@@ -1297,291 +1057,389 @@ export class GenericInput<Type = any> extends
      * @param value - Current value to transform.
      * @returns Transformed value.
      */
-    transformFinalValue(configuration:Properties<Type>, value:any):null|Type {
+    const transformFinalValue = (configuration:Properties<Type>, value:any):null|Type => {
         if (configuration.model.trim && typeof value === 'string')
             value = value.trim().replace(/ +\n/g, '\\n')
-        return this.parseValue(configuration, value)
+        return parseValue(configuration, value)
     }
+    // / endregion
+    // endregion
+    // region event handler
     /**
-     * Wraps given component with animation component if given condition holds.
-     * @param content - Component or string to wrap.
-     * @param propertiesOrInCondition - Animation properties or in condition
-     * only.
-     * @returns Wrapped component.
+     * Triggered on blur events.
+     * @param event - Event object.
+     * @returns Nothing.
      */
-    wrapAnimationConditionally(
-        content:ReactElement|string,
-        propertiesOrInCondition:boolean|Partial<TransitionProps<HTMLElement|undefined>> = {},
-        condition:boolean = true
-    ):ReactElement|string {
-        if (typeof propertiesOrInCondition === 'boolean')
-            return condition ?
-                <GenericAnimate in={propertiesOrInCondition}>
-                    {content}
-                </GenericAnimate> :
-                propertiesOrInCondition ? content : ''
-        return condition ?
-            <GenericAnimate {...propertiesOrInCondition}>
-                {content}
-            </GenericAnimate> :
-            propertiesOrInCondition.in ? content : ''
-    }
-    /**
-     * Wraps given component with react strict mode component.
-     * @param content - Component or string to wrap.
-     * @returns Wrapped component.
-     */
-    wrapStrict(content:Component|string):ReactElement {
-        return this.self.strict ?
-            <StrictMode>{content}</StrictMode> :
-            <>{content}</>
-    }
-    /**
-     * Wraps given component with a tooltip component with given tooltip
-     * configuration.
-     * @param content - Component or string to wrap.
-     * @param options - Tooltip options.
-     * @returns Wrapped given content.
-     */
-    wrapTooltip(
-        content:ReactElement|string, options?:Properties['tooltip']
-    ):ReactElement {
-        if (typeof options === 'string')
-            return <Tooltip
-                content={<Typography use="caption">{options}</Typography>}
-            >{content}</Tooltip>
-        else if (options !== null && typeof options === 'object')
-            return <Tooltip {...options}>
-                <Typography use="caption">{content}</Typography>
-            </Tooltip>
-        return <>{content}</>
-    }
-    /**
-     * If given icon options has an additional tooltip configuration integrate
-     * a wrapping tooltip component into given configuration and remove initial
-     * tooltip configuration.
-     * @param options - Icon configuration potential extended a tooltip
-     * configuration.
-     * @returns Resolved icon configuration.
-     */
-    wrapIconWithTooltip(options?:Properties['icon']):IconOptions|void {
-        if (options?.tooltip) {
-            const tooltip:Properties['tooltip'] = options.tooltip
-            options = {...options}
-            delete options.tooltip
-            const nestedOptions:IconOptions = {...options}
-            options.strategy = 'component'
-            options.icon =
-                this.wrapTooltip(<Icon icon={nestedOptions} />, tooltip)
+    const onBlur = (event:SyntheticEvent):void => {
+        let changed:boolean = false
+        if (properties.focused) {
+            properties.focused =
+            properties.model.state.focused =
+                false
+            onChangeState(properties.model.state, event)
+            changed = true
         }
-        return options
+
+        if (!properties.visited) {
+            properties.visited =
+            properties.model.state.visited =
+                true
+            changed = true
+        }
+
+        const oldValue:null|Type = properties.value as null|Type
+        onChangeValue(transformFinalValue(properties, properties.value))
+        changed = changed || oldValue !== properties.value
+
+        if (changed)
+            onChange(event)
+        if (properties.onBlur)
+            properties.onBlur(event)
+    }
+    /**
+     * Triggered on any change events.
+     * @param event - Potential event object.
+     * @returns Nothing.
+     */
+    const onChange = (event?:SyntheticEvent):void => {
+        if (properties.onChange)
+            properties.onChange(
+                getConsolidatedProperties(
+                    /*
+                        Workaround since "Something" isn't identified as subset
+                        of "RecursivePartial<Type>"
+                    */
+                    properties as unknown as Props<Type>
+                ),
+                event
+            )
+    }
+    /**
+     * Triggered when editor is active indicator should be changed.
+     * @param event - Mouse event object.
+     * @returns Nothing.
+     */
+    const onChangeEditorIsActive = (event?:ReactMouseEvent):void => {
+        properties.editorIsActive = !properties.editorIsActive
+        setEditorIsActive((value:boolean):boolean => !value)
+        setSelectionIsUnstable(true)
+
+        if (properties.onChangeEditorIsActive)
+            properties.onChangeEditorIsActive(properties.editorIsActive, event)
+        onChange(event)
+    }
+    /**
+     * Triggered when show declaration indicator should be changed.
+     * @param event - Potential event object.
+     * @returns Nothing.
+     */
+    const onChangeShowDeclaration = (event?:ReactMouseEvent):void =>
+        setShowDeclaration((value:boolean):boolean => {
+            if (properties.onChangeShowDeclaration)
+                properties.onChangeShowDeclaration(value, event)
+            onChange(event)
+            return !value
+        })
+    /**
+     * Triggered when a value state changes like validation or focusing.
+     * @param state - Current value state.
+     * @param event - Triggering event object.
+     * @returns Nothing.
+     */
+    const onChangeState = (state:ModelState, event?:SyntheticEvent):void => {
+        for (const key of Object.keys(state))
+            if (!Object.prototype.hasOwnProperty.call(props, key)) {
+                setModel(state)
+                break
+            }
+        if (properties.onChangeState)
+            properties.onChangeState(state, event)
+    }
+    /**
+     * Triggered when ever the value changes.
+     * @param eventOrValue - Event object or new value.
+     * @returns Nothing.
+     */
+    const onChangeValue = (eventOrValue:null|SyntheticEvent|Type):void => {
+        if (!(properties.model.mutable && properties.model.writable))
+            return
+
+        let event:SyntheticEvent|undefined
+        let value:null|Type
+        if (
+            eventOrValue !== null &&
+            typeof eventOrValue === 'object' &&
+            (eventOrValue as SyntheticEvent).target
+        ) {
+            event = eventOrValue as SyntheticEvent
+            value =
+                typeof (event.target as {value?:null|Type}).value ===
+                    'undefined' ?
+                        null :
+                        (event.target as unknown as {value:null|Type}).value
+        } else
+            value = eventOrValue as null|Type
+
+        const oldValue:null|Type = properties.value as null|Type
+
+        properties.representation = typeof value === 'string' ?
+            value :
+            formatValue<Type>(value, properties.type)
+        properties.value =
+        properties.model.value =
+            parseValue(properties, value)
+
+        if (oldValue !== properties.value) {
+            let stateChanged:boolean = determineValidationState(
+                properties, properties.value
+            )
+
+            if (properties.pristine) {
+                properties.dirty =
+                properties.model.state.dirty =
+                    true
+                properties.pristine =
+                properties.model.state.pristine =
+                    false
+                stateChanged = true
+            }
+            if (stateChanged)
+                onChangeState(properties.model.state, event)
+
+            setRepresentation(properties.representation)
+            setValue(properties.value)
+            onChange(event)
+
+            if (properties.onChangeValue)
+                properties.onChangeValue(properties.value, event)
+        } else
+            setRepresentation(properties.representation)
+    }
+    /**
+     * Triggered on click events.
+     * @param event - Mouse event object.
+     * @returns Nothing.
+     */
+    const onClick = (event:ReactMouseEvent):void => {
+        onSelectionChange(event)
+        if (properties.onClick)
+            properties.onClick(event)
+        onTouch(event)
+    }
+    /**
+     * Triggered on focus events.
+     * @param event - Focus event object.
+     * @returns Nothing.
+     */
+    const onFocus = (event:FocusEvent):void => {
+        if (properties.onFocus)
+            properties.onFocus(event)
+        onTouch(event)
+    }
+    /**
+     * Triggered on key up events.
+     * @param event - Key up event object.
+     * @returns Nothing.
+     */
+    const onKeyUp = (event:ReactKeyboardEvent):void => {
+        onSelectionChange(event)
+        if (properties.onKeyUp)
+            properties.onKeyUp(event)
+    }
+    /**
+     * Triggered on selection change events.
+     * @param event - Event which triggered selection change.
+     * @returns Nothing.
+     */
+    const onSelectionChange = (event:SyntheticEvent):void => {
+        saveSelectionState()
+        if (properties.onSelectionChange)
+            properties.onSelectionChange(event)
+    }
+    /**
+     * Triggers on start interacting with the input.
+     * @param event - Event object which triggered interaction.
+     * @returns Nothing.
+     */
+    const onTouch = (event:FocusEvent|ReactMouseEvent):void => {
+        let changeState:boolean = false
+        if (!properties.focused) {
+            changeState =
+            properties.focused =
+            properties.model.state.focused =
+                true
+        }
+        if (properties.untouched) {
+            changeState =
+            properties.touched =
+            properties.model.state.touched =
+                true
+            properties.untouched =
+            properties.model.state.untouched =
+                false
+        }
+        if (changeState) {
+            onChangeState(properties.model.state, event)
+            onChange(event)
+        }
+        if (properties.onTouch)
+            properties.onTouch(event)
     }
     // endregion
+    // region properties
+    let codeEditorReference:CodeEditorType|undefined
+    let codeEditorInputReference:RefObject<HTMLTextAreaElement> =
+        createRef<HTMLTextAreaElement>()
+    const inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement> =
+        createRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>()
+    let richTextEditorInputReference:RefObject<HTMLTextAreaElement> =
+        createRef<HTMLTextAreaElement>()
+    let richTextEditorInstance:RichTextEditor|undefined
+    let richTextEditorReference:RichTextEditorComponent|undefined
+    const [cursor, setCursor] =
+        useState<{end:number;start:number}>({end: 0, start: 0})
+    let [editorIsActive, setEditorIsActive] = useState<boolean>(false)
+    let [hidden, setHidden] = useState<boolean|undefined>()
+    const [model, setModel] =
+        useState<ModelState>({...GenericInput.defaultModelState})
+    const [selectionIsUnstable, setSelectionIsUnstable] =
+        useState<boolean>(false)
+    let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
+    let [value, setValue] =
+        useState<null|Type>(determineInitialValue<Type>(props))
+    let [representation, setRepresentation] =
+        useState<string>(determineInitialRepresentation(props, value))
+    const properties:Properties<Type> = getConsolidatedProperties(props)
+    reference = {current: {
+        properties,
+        state: {
+            cursor,
+            editorIsActive,
+            hidden,
+            model,
+            representation,
+            selectionIsUnstable,
+            showDeclaration,
+            value
+        }
+    }}
+    // endregion
+    // region derive state variables from given properties
+    if (properties.cursor) {
+        if (properties.cursor.end !== undefined)
+            cursor.end = properties.cursor.end
+        if (properties.cursor.start !== undefined)
+            cursor.start = properties.cursor.start
+    }
+
+    if (properties.editorIsActive !== undefined)
+        editorIsActive = properties.editorIsActive
+
+    if (properties.hidden !== undefined)
+        hidden = properties.hidden
+    if (hidden === undefined)
+        hidden = properties.name?.startsWith('password')
+
+    if (properties.showDeclaration !== undefined)
+        showDeclaration = properties.showDeclaration
+
+    if (properties.value !== undefined)
+        value = properties.value as null|Type
+    else if (properties.model?.value !== undefined)
+        value = properties.model.value as null|Type
+
+    if (properties.representation !== undefined)
+        representation = properties.representation
+    // endregion
     // region render
-    /**
-     * Renders current's component state.
-     * @returns Current component's representation.
-     */
-    render():ReactElement {
-        // region consolidate properties
-        const properties:Properties<Type> =
-        this.properties =
-            this.getConsolidatedProperties(this.props)
+    // / region intermediate render properties
+    const genericProperties:Partial<CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps> = {
+        onBlur: onBlur,
+        onFocus: onFocus,
+        placeholder: properties.placeholder,
+        value: properties.representation
+    }
+    const materialProperties:SelectProps|TextFieldProps = {
+        disabled: properties.disabled,
+        helpText: {
+            children: renderHelpText(),
+            persistent: Boolean(properties.declaration)
+        },
+        invalid: properties.showInitialValidationState && properties.invalid,
+        label: properties.description || properties.name,
+        outlined: properties.outlined,
+        required: properties.required
+    }
+    if (properties.icon)
+        materialProperties.icon = wrapIconWithTooltip(
+            applyIconPreset(properties.icon) as IconOptions
+        ) as IconOptions
 
-        const genericProperties:Partial<HTMLInputElement> = {
-            name: properties.name,
-            onBlur: this.onBlur,
-            onFocus: this.onFocus,
-            placeholder: properties.placeholder,
-            value: properties.representation
-        }
-        const materialProperties:SelectProps|TextFieldProps = {
-            disabled: properties.disabled,
-            helpText: {
-                persistent: Boolean(properties.declaration),
-                children: <>
-                   <GenericAnimate in={
-                        properties.selectableEditor &&
-                        properties.type === 'string' &&
-                        properties.editor !== 'plain'
-                    }>
-                        <IconButton
-                            icon={{
-                                icon: this.properties.editorIsActive ?
-                                    'subject' :
-                                    this.properties.editor.startsWith('code') ?
-                                        'code' :
-                                        'text_format',
-                                onClick: this.onChangeEditorIsActive
-                            }}
-                        />
-                    </GenericAnimate>
-                    <GenericAnimate in={Boolean(properties.declaration)}>
-                        <IconButton
-                            icon={{
-                                icon:
-                                    'more_' +
-                                    (properties.showDeclaration ?
-                                        'vert' :
-                                        'horiz'
-                                    ),
-                                onClick: this.onChangeShowDeclaration
-                            }}
-                        />
-                    </GenericAnimate>
-                    <GenericAnimate in={properties.showDeclaration}>
-                        {properties.declaration}
-                    </GenericAnimate>
-                    <GenericAnimate in={
-                        !properties.showDeclaration &&
-                        properties.invalid &&
-                        (
-                            properties.showInitialValidationState ||
-                            /*
-                                Material inputs show their validation state
-                                at least after a blur event so we
-                                synchronize error message appearances.
-                            */
-                            properties.visited
-                        )
-                    }>
-                        <Theme use="error">
-                            {this.renderMessage(
-                                properties.invalidMaximum &&
-                                properties.maximumText ||
-                                properties.invalidMaximumLength &&
-                                properties.maximumLengthText ||
-                                properties.invalidMinimum &&
-                                properties.minimumText ||
-                                properties.invalidMinimumLength &&
-                                properties.minimumLengthText ||
-                                properties.invalidPattern &&
-                                properties.patternText ||
-                                properties.invalidRequired &&
-                                properties.requiredText
-                            )}
-                        </Theme>
-                    </GenericAnimate>
-                </>
-            },
-            icon: this.wrapIconWithTooltip(
-                this.applyIconPreset(properties.icon)
-            ),
-            invalid:
-                properties.showInitialValidationState && properties.invalid,
-            label: properties.description || properties.name,
-            onClick: this.onClick,
-            onKeyUp: this.onKeyUp,
-            outlined: properties.outlined,
-            required: properties.required
-        }
+    const tinyMCEOptions:CustomTinyMCEOptions = {
+        ...TINYMCE_DEFAULT_OPTIONS,
+        content_style: properties.disabled ? 'body {opacity: .38}' : '',
+        placeholder: properties.placeholder,
+        readonly: Boolean(properties.disabled),
+        setup: (instance:RichTextEditor):void => {
+            richTextEditorInstance = instance
+            richTextEditorInstance.on('init', ():void => {
+                if (!richTextEditorInstance)
+                    return
 
-        const tinyMCEOptions:TinyMCEOptions = {
-            content_style: properties.disabled ? 'body {opacity: .38}' : '',
-            placeholder: properties.placeholder,
-            readonly: properties.disabled,
-            setup: (editor:typeof RichTextEditor):void => editor.on(
-                'init',
-                ():void => {
-                    if (!editor)
-                        return
-                    richTextEditorLoaded = true
-                    editor.focus()
+                richTextEditorLoadedOnce = true
 
-                    const indicator:{end:string;start:string} = {
-                        end: '###generic-input-selection-indicator-end###',
-                        start: '###generic-input-selection-indicator-start###'
-                    }
-                    const cursor:{end:number;start:number} = {
-                        end: properties.cursor.end + indicator.start.length,
-                        start: properties.cursor.start
-                    }
-                    const keysSorted:Array<keyof indicator> = ['start', 'end']
-
-                    let value:string = genericProperties.value
-                    for (const type of keysSorted)
-                        value = (
-                            value.substring(0, cursor[type]) +
-                            indicator[type] +
-                            value.substring(cursor[type])
-                        )
-                    editor.getBody().innerHTML = value
-
-                    const walker = document.createTreeWalker(
-                        editor.getBody(),
-                        NodeFilter.SHOW_TEXT,
-                        null,
-                        false
-                    )
-
-                    const range = editor.dom.createRng()
-                    const result:{end?:[Node, number];start?:[Node, number]} =
-                        {}
-                    let node
-                    while (node = walker.nextNode())
-                        for (const type of keysSorted) {
-                            const index:number =
-                                node.nodeValue.indexOf(indicator[type])
-                            if (index > -1) {
-                                node.nodeValue =
-                                    node.nodeValue.replace(indicator[type], '')
-                                result[type] = [node, index]
-                            }
-                        }
-
-                    for (const type of keysSorted)
-                        if (result[type])
-                            range[`set${Tools.stringCapitalize(type)}`](
-                                ...result[type]
-                            )
-                    if (result.end && result.start)
-                        editor.selection.setRng(range)
+                if (editorIsActive && selectionIsUnstable) {
+                    richTextEditorInstance.focus(false)
+                    setRichTextEditorSelectionState(richTextEditorInstance)
+                    setSelectionIsUnstable(false)
                 }
-            )
+            })
         }
-        if (properties.editor.endsWith('raw)')) {
-            tinyMCEOptions.toolbar1 =
-                'cut copy paste | undo redo removeformat | code | fullscreen'
-            tinyMCEOptions.toolbar2 = false
-        } else if (properties.editor.endsWith('simple)')) {
-            tinyMCEOptions.toolbar1 =
-                'cut copy paste | undo redo removeformat | bold italic ' +
-                'underline strikethrough subscript superscript | fullscreen'
-            tinyMCEOptions.toolbar2 = false
-        } else if (properties.editor.endsWith('normal)'))
-            tinyMCEOptions.toolbar1 =
-                'cut copy paste | undo redo removeformat | styleselect ' +
-                'formatselect | searchreplace visualblocks fullscreen code'
+    }
+    if (properties.editor.endsWith('raw)')) {
+        tinyMCEOptions.toolbar1 =
+            'cut copy paste | undo redo removeformat | code | fullscreen'
+        tinyMCEOptions.toolbar2 = false
+    } else if (properties.editor.endsWith('simple)')) {
+        tinyMCEOptions.toolbar1 =
+            'cut copy paste | undo redo removeformat | bold italic ' +
+            'underline strikethrough subscript superscript | fullscreen'
+        tinyMCEOptions.toolbar2 = false
+    } else if (properties.editor.endsWith('normal)'))
+        tinyMCEOptions.toolbar1 =
+            'cut copy paste | undo redo removeformat | styleselect ' +
+            'formatselect | searchreplace visualblocks fullscreen code'
 
-        const isAdvancedEditor:boolean = (
-            !properties.selection &&
-            properties.type === 'string' &&
-            properties.editorIsActive &&
-            (
-                properties.editor.startsWith('code') ||
-                properties.editor.startsWith('richtext(')
-            )
+    const isAdvancedEditor:boolean = (
+        !properties.selection &&
+        properties.type === 'string' &&
+        properties.editorIsActive &&
+        (
+            properties.editor.startsWith('code') ||
+            properties.editor.startsWith('richtext(')
         )
-        // endregion
-
-        // TODO check if mdc-classes can be retrieved
-        return <ThemeProvider options={
-            properties.theme || {}
-        } wrap><div className={
+    )
+    // / endregion
+    // / region main markup
+    // TODO check if mdc-classes can be retrieved
+    return wrapThemeProvider(
+        <div className={
             styles['generic-input'] +
             (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
-        }>{this.wrapStrict(this.wrapTooltip(
+        }>{wrapStrict(wrapTooltip(
             <div>
                 <GenericAnimate in={Boolean(properties.selection)}>
                     <Select
+                        {...genericProperties as SelectProps}
+                        {...materialProperties as SelectProps}
                         enhanced
-                        onChange={this.onChangeValue}
+                        inputRef={inputReference as unknown as undefined}
+                        rootProps={{name: properties.name, onClick: onClick}}
+                        onChange={onChangeValue}
                         options={properties.selection}
-                        {...genericProperties}
-                        {...materialProperties}
                     />
                 </GenericAnimate>
-                {this.wrapAnimationConditionally(
+                {wrapAnimationConditionally(
                     [
                         <FormField
                             className={
@@ -1605,7 +1463,7 @@ export class GenericInput<Type = any> extends
                                         (
                                             properties.showInitialValidationState ||
                                             properties.visited
-                                        ) ? 'error' : null
+                                        ) ? 'error' : undefined
                                     }>
                                         {
                                             properties.description ||
@@ -1619,12 +1477,16 @@ export class GenericInput<Type = any> extends
                                             animation={loading} size={96}
                                         />}>
                                             <CodeEditor
+                                                {...genericProperties as
+                                                    CodeEditorProps
+                                                }
                                                 className="mdc-text-field__input"
                                                 mode="javascript"
-                                                onChange={this.onChangeValue}
-                                                onCursorChange={this.onSelectionChange}
-                                                onSelectionChange={this.onSelectionChange}
-                                                ref={this.setCodeEditorReference}
+                                                name={properties.name}
+                                                onChange={onChangeValue}
+                                                onCursorChange={onSelectionChange}
+                                                onSelectionChange={onSelectionChange}
+                                                ref={setCodeEditorReference}
                                                 setOptions={{
                                                     maxLines: properties.rows,
                                                     minLines: properties.rows,
@@ -1633,23 +1495,27 @@ export class GenericInput<Type = any> extends
                                                     useWorker: false
                                                 }}
                                                 theme="github"
-                                                {...genericProperties}
                                             />
                                         </Suspense>
                                     :
-                                        <RichTextEditor
+                                        <RichTextEditorComponent
+                                            {...genericProperties as
+                                                RichTextEditorProps
+                                            }
                                             disabled={properties.disabled}
-                                            init={{
-                                                ...TINYMCE_DEFAULT_OPTIONS,
-                                                ...tinyMCEOptions
-                                            }}
-                                            onClick={this.onClick}
-                                            onEditorChange={this.onChangeValue}
-                                            onKeyUp={this.onKeyUp}
-                                            ref={this.setRichTextEditorReference}
-                                            textareaName={this.properties.name}
+                                            init={tinyMCEOptions}
+                                            onClick={onClick as unknown as
+                                                RichTextEventHandler<MouseEvent>
+                                            }
+                                            onEditorChange={onChangeValue}
+                                            onKeyUp={onKeyUp as unknown as
+                                                RichTextEventHandler<KeyboardEvent>
+                                            }
+                                            ref={setRichTextEditorReference as
+                                                RefCallback<RichTextEditorComponent>
+                                            }
+                                            textareaName={properties.name}
                                             tinymceScriptSrc={tinymceScriptPath}
-                                            {...genericProperties}
                                         />
                                 }
                             </label>
@@ -1660,34 +1526,43 @@ export class GenericInput<Type = any> extends
                         >
                             <p
                                 className="mdc-text-field-helper-text mdc-text-field-helper-text--persistent"
-                            >
-                                {materialProperties.helpText.children}
-                            </p>
+                            >{(
+                                materialProperties.helpText as
+                                    {children:ReactElement}
+                            ).children}</p>
                         </div>
                     ],
                     isAdvancedEditor,
-                    richTextEditorLoaded || properties.editor.startsWith('code')
+                    richTextEditorLoadedOnce || properties.editor.startsWith('code')
                 )}
-                {this.wrapAnimationConditionally(
+                {wrapAnimationConditionally(
                     <TextField
+                        {...genericProperties as TextFieldProps}
+                        {...materialProperties as TextFieldProps}
                         align={properties.align}
                         characterCount
                         fullwidth={properties.fullWidth}
-                        inputRef={this.inputReference}
-                        maximum={properties.maximum}
+                        inputRef={inputReference as unknown as
+                            RefCallback<HTMLInputElement|HTMLTextAreaElement>
+                        }
+                        max={properties.maximum}
                         maxLength={properties.maximumLength}
-                        minimum={properties.minimum}
+                        min={properties.minimum}
                         minLength={properties.minimumLength}
-                        onChange={this.onChangeValue}
+                        onChange={onChangeValue}
                         ripple={properties.ripple}
-                        rootProps={{onKeyUp: this.onKeyUp}}
+                        rootProps={{
+                            name: properties.name,
+                            onClick: onClick,
+                            onKeyUp: onKeyUp
+                        }}
                         rows={properties.rows}
                         textarea={
                             properties.type === 'string' &&
                             properties.editor !== 'plain'
                         }
-                        trailingIcon={this.wrapIconWithTooltip(
-                            this.applyIconPreset(properties.trailingIcon)
+                        trailingIcon={wrapIconWithTooltip(
+                            applyIconPreset(properties.trailingIcon)
                         )}
                         type={
                             properties.type === 'string' ?
@@ -1696,29 +1571,271 @@ export class GenericInput<Type = any> extends
                                     'text' :
                                     (
                                         Object.prototype.hasOwnProperty.call(
-                                            this.self.transformer,
+                                            GenericInput.transformer,
                                             properties.type
                                         ) &&
-                                        this.self.transformer[properties.type]
+                                        GenericInput.transformer[properties.type]
                                             .type
                                     ) ?
-                                        this.self.transformer[properties.type]
+                                        GenericInput.transformer[properties.type]
                                             .type :
                                         properties.type
                         }
-                        {...genericProperties}
-                        {...materialProperties}
                     />,
                     !(isAdvancedEditor || properties.selection),
-                    richTextEditorLoaded || properties.editor.startsWith('code')
+                    richTextEditorLoadedOnce || properties.editor.startsWith('code')
                 )}
             </div>,
             properties.tooltip
-        ))}</div></ThemeProvider>
-    }
-    /**/
+        ))}</div>,
+        properties.theme
+    )
+    // / endregion
     // endregion
-}
+// TODO check if contextTypes makes sense here
+} as ForwardRefRenderFunction<VoidFunctionComponent<Props> & {displayName:string}, Props>
+// NOTE: This is useful in react dev tools.
+GenericInputInner.displayName = 'GenericInput'
+/**
+ * Wrapping web component compatible react component.
+ * @property static:defaultModelState - Initial model state.
+ * @property static:defaultProps - Initial property configuration.
+ * @property static:local - Defines localization.
+ * @property static:output - Describes external event handler interface.
+ * @property static:propertiesToReflectAsAttributes - List of properties to
+ * potentially reflect as attributes (e.g. in a wrapped web-component).
+ * @property static:propTypes - Triggers reacts runtime property value checks
+ * in development mode and enables property / attribute reflection for
+ * web-component wrapper instances.
+ * @property static:strict - Indicates whether we should wrap render output in
+ * reacts strict component.
+ * @property static:transformer - Generic input data transformation
+ * specifications.
+ * @property static:wrapped - Wrapped component.
+ *
+ * @param props - Given components properties.
+ * @param reference - Reference object to forward internal state.
+ * @returns React elements.
+ */
+export const GenericInput:StaticWebComponent = forwardRef(GenericInputInner) as
+    unknown as StaticWebComponent
+// region static properties
+// / region web-component hints
+GenericInput.output = {onChange: true} as Output
+GenericInput.propertiesToReflectAsAttributes = new Map([
+    ['dirty', true],
+    ['focused', true],
+    ['invalid', true],
+    ['invalidMaximum', true],
+    ['invalidMaximumLength', true],
+    ['invalidMinimum', true],
+    ['invalidMinimumLength', true],
+    ['invalidPattern', true],
+    ['invalidRequired', true],
+    ['name', true],
+    ['pristine', true],
+    ['touched', true],
+    ['untouched', true],
+    ['valid', true],
+    ['visited', true]
+]) as Map<keyof Properties, boolean> 
+GenericInput.wrapped = GenericInputInner
+// / endregion
+GenericInput.defaultModelState = {
+    dirty: false,
+    focused: false,
+    invalid: false,
+    invalidMaximum: false,
+    invalidMaximumLength: false,
+    invalidMinimum: false,
+    invalidMinimumLength: false,
+    invalidPattern: false,
+    invalidRequired: false,
+    pristine: true,
+    touched: false,
+    untouched: true,
+    valid: true,
+    visited: false
+} as ModelState
+GenericInput.defaultProps = {
+    maximumLengthText:
+        'Please type less or equal than ${maximumLength} symbols.',
+    maximumText: 'Please give a number less or equal than ${maximum}.',
+    minimumLengthText:
+        'Please type at least or equal ${minimumLength} symbols.',
+    minimumText: 'Please give a number at least or equal to ${minimum}.',
+    model: {
+        declaration: '',
+        default: null,
+        description: '',
+        editor: 'plain',
+        emptyEqualsNull: true,
+        maximum: Infinity,
+        maximumLength: Infinity,
+        minimum: 0,
+        minimumLength: 0,
+        mutable: true,
+        name: 'NO_NAME_DEFINED',
+        nullable: true,
+        regularExpressionPattern: '.*',
+        state: GenericInput.defaultModelState,
+        trim: true,
+        type: 'string',
+        writable: true
+    },
+    patternText:
+        'Your string have to match the regular expression: "${pattern}".',
+    requiredText: 'Please fill this field.',
+    rows: 4,
+    selectableEditor: false,
+    showDeclaration: undefined,
+    showInitialValidationState: false
+} as Props & Pick<Properties, 'model'>
+GenericInput.local = 'en-US'
+GenericInput.propTypes = {
+    ...baseModelPropertyTypes,
+    ...modelStatePropertyTypes,
+    /*
+        NOTE: Not yet working:
+        align: oneOf(['end', 'start']),
+    */
+    align: string,
+    cursor: shape({
+        end: number.isRequired,
+        start: number.isRequired
+    }),
+    disabled: boolean,
+    editorIsActive: boolean,
+    fullWidth: boolean,
+    /*
+        NOTE: Not yet working:
+        icon?:string|(IconOptions & {tooltip?:string|TooltipProps});
+    */
+    icon: oneOfType([string, object]),
+    initialValue: any,
+    hidden: boolean,
+    maximumLengthText: string,
+    maximumText: string,
+    minimumLengthText: string,
+    minimumText: string,
+    model: shape<any>({
+        ...baseModelPropertyTypes,
+        mutable: boolean,
+        state: shape(modelStatePropertyTypes),
+        writable: boolean
+    }),
+    onBlur: func,
+    onChange: func,
+    onChangeEditorIsActive: func,
+    onChangeValue: func,
+    onChangeShowDeclaration: func,
+    onChangeState: func,
+    onClick: func,
+    onFocus: func,
+    onKeyUp: func,
+    onSelectionChange: func,
+    onTouch: func,
+    outlined: boolean,
+    pattern: oneOfType([object, string]),
+    patternText: string,
+    placeholder: string,
+    representation: string,
+    required: boolean,
+    requiredText: string,
+    ripple: boolean,
+    rows: number,
+    selectableEditor: boolean,
+    showDeclaration: boolean,
+    showInitialValidationState: boolean,
+    theme: object,
+    /*
+        NOTE: Not yet working:
+        tooltip?:string|TooltipProps;
+        trailingIcon?:string|(IconOptions & {tooltip?:string|TooltipProps});
+    */
+    tooltip: any,
+    trailingIcon: any
+} as Mapping<ValueOf<typeof PropertyTypes>>
+GenericInput.strict = false
+GenericInput.transformer = {
+    currency: {
+        format: {
+            final: {
+                transform: (value:number):string => (new Intl.NumberFormat(
+                    GenericInput.local,
+                    {
+                        currency: 'USD',
+                        style: 'currency',
+                        ...(
+                            GenericInput.transformer.currency.format.final
+                                .options ||
+                            {}
+                        )
+                    }
+                )).format(value)
+            },
+            intermediate: {
+                transform: (value:string):any =>
+                    GenericInput.transformer.float.format.intermediate
+                        .transform(value)
+            }
+        },
+        parse: (value:string):any =>
+            GenericInput.transformer.float.parse(value),
+        type: 'text'
+    },
+    float: {
+        format: {
+            final: {
+                transform: (value:number):string => (new Intl.NumberFormat(
+                    GenericInput.local,
+                    {
+                        style: 'decimal',
+                        ...(
+                            GenericInput.transformer.float.format.final
+                                .options ||
+                            {}
+                        )
+                    }
+                )).format(value)
+            },
+            intermediate: {
+                transform: (value:number):string => `${value}`
+            }
+        },
+        parse: (value:string):any => parseFloat(
+            typeof value === 'string' && GenericInput.local === 'de-DE' ?
+                value.replace(/\./g, '').replace(/\,/g, '.') :
+                value
+        ),
+        type: 'text'
+    },
+    integer: {
+        format: {
+            final: {
+                transform: (value:number):string => (new Intl.NumberFormat(
+                    GenericInput.local,
+                    {
+                        maximumFractionDigits: 0,
+                        ...(
+                            GenericInput.transformer.integer.format.final
+                                .options ||
+                            {}
+                        )
+                    }
+                )).format(value)
+            }
+        },
+        parse: (value:string):any => parseInt(
+            typeof value === 'string' && GenericInput.local === 'de-DE' ?
+                value.replace(/[,.]/g, '') :
+                value
+        ),
+        type: 'text'
+    },
+    number: {parse: parseInt}
+} as GenericInputDataTransformation
+// endregion
 export default GenericInput
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
