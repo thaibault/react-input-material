@@ -40,7 +40,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         <div className="inputs">
 
             <GenericInput onChange={onChange}/>
-{/*
+
             <hr/>
 
             <GenericInput name="input1" onChange={onChange}/>
@@ -387,7 +387,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 }}
                 onChange={onChange}
             />
-*/}
+
         </div>
 
         <pre className="outputs">{selectedState ?
