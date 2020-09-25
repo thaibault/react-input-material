@@ -292,7 +292,7 @@ export function determineInitialRepresentation<Type = any>(properties:Props, val
             value,
             properties.type ||
             properties.model?.type ||
-            GenericInput.defaultProps.model.type
+            GenericInput.defaultProps.model!.type as string
         )
     return ''
 }
@@ -867,7 +867,7 @@ export const GenericInputInner = function<Type = any>(
             {
                 model: {
                     ...GenericInput.defaultProps.model,
-                    state: {...GenericInput.defaultProps.model.state}
+                    state: {...GenericInput.defaultProps.model!.state}
                 }
             },
             properties
@@ -1593,7 +1593,7 @@ export const GenericInputInner = function<Type = any>(
     // / endregion
     // endregion
 // TODO check if contextTypes makes sense here
-} as ForwardRefRenderFunction<VoidFunctionComponent<Props> & {displayName:string}, Props>
+} as ForwardRefRenderFunction<ReactWebComponent, Props>
 // NOTE: This is useful in react dev tools.
 GenericInputInner.displayName = 'GenericInput'
 /**
@@ -1617,9 +1617,9 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput:StaticWebInputFunctionComponent<typeof GenericInputInner> =
+export const GenericInput:StaticWebInputFunctionComponent =
     forwardRef(GenericInputInner) as
-        unknown as StaticWebInputFunctionComponent<typeof GenericInputInner>
+        unknown as StaticWebInputFunctionComponent
 // region static properties
 // / region web-component hints
 GenericInput.output = {onChange: true} as Output

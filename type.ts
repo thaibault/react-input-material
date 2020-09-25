@@ -20,6 +20,7 @@ import {SelectProps} from '@rmwc/select'
 import GenericPropertyTypes from 'clientnode/property-types'
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
+    Component,
     ComponentClass,
     FocusEvent,
     ForwardRefExoticComponent,
@@ -173,8 +174,8 @@ export type GenericInputDataTransformation<Type = any> =
         };
     }
 export type Renderable = Array<ReactElement|string>|ReactElement|string
-export interface StaticInputComponent<Instance, Type = any> extends StaticReactWebComponent {
-    new (properties:Props<Type>):Instance;
+export interface StaticInputComponent<Type = any> extends StaticReactWebComponent {
+    new (properties:Props<Type>):Component<Props<Type>>
     defaultModelState:ModelState
     defaultProps:Props<Type>
     local:string
@@ -182,12 +183,12 @@ export interface StaticInputComponent<Instance, Type = any> extends StaticReactW
     strict:boolean
     transformer:GenericInputDataTransformation<Type>
 }
-export type StaticWebInputComponent<Instance, Type = any> =
-    Omit<ComponentClass<Properties<Type>>, 'defaultProps'> &
-    StaticInputComponent<Instance, Type>
-export type StaticWebInputFunctionComponent<Instance, Type = any> =
-    Omit<FunctionComponent<Properties<Type>>, 'defaultProps'> &
-    StaticInputComponent<Instance, Type>
+export type StaticWebInputComponent<Type = any> =
+    Omit<ComponentClass<Props<Type>>, 'defaultProps'> &
+    StaticInputComponent<Type>
+export type StaticWebInputFunctionComponent<Type = any> =
+    Omit<FunctionComponent<Props<Type>>, 'defaultProps'> &
+    StaticInputComponent<Type>
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
