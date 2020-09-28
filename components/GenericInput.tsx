@@ -48,13 +48,14 @@ import React, {
     Suspense,
     SyntheticEvent,
     useEffect,
+    useImperativeHandle,
     useState,
     VoidFunctionComponent
 } from 'react'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 import {TransitionProps} from 'react-transition-group/Transition'
 import {Editor as RichTextEditor, Settings as TinyMCEOptions} from 'tinymce'
-import {Output, ReactWebComponent} from 'web-component-wrapper/type'
+import {Output, WebComponentAdapter} from 'web-component-wrapper/type'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
@@ -94,6 +95,7 @@ import {
     PropertyTypes as InputPropertyTypes,
     Props,
     Renderable,
+    State,
     StaticWebInputFunctionComponent
 } from '../type'
 import styles from './GenericInput.module'
@@ -387,7 +389,8 @@ export function determineValidationState<Type = any>(
  * @returns React elements.
  */
 export const GenericInputInner = function<Type = any>(
-    props:Props<Type>, reference?:RefObject<ReactWebComponent>
+    props:Props<Type>,
+    reference?:RefObject<WebComponentAdapter<Properties<Type>, State<Type>>>
 ):ReactElement {
     // region live-cycle
     /**
@@ -1310,7 +1313,7 @@ export const GenericInputInner = function<Type = any>(
     let [representation, setRepresentation] =
         useState<string>(determineInitialRepresentation(props, value))
     const properties:Properties<Type> = getConsolidatedProperties(props)
-    reference = {current: {
+    useImperativeHandle(reference, ():WebComponentAdapter<Properties<Type>, State<Type>> => ({
         properties,
         state: {
             cursor,
@@ -1322,7 +1325,7 @@ export const GenericInputInner = function<Type = any>(
             showDeclaration,
             value
         }
-    }}
+    }))
     // endregion
     // region derive state variables from given properties
     if (properties.cursor) {
@@ -1593,14 +1596,13 @@ export const GenericInputInner = function<Type = any>(
     // / endregion
     // endregion
 // TODO check if contextTypes makes sense here
-} as ForwardRefRenderFunction<ReactWebComponent, Props>
+} as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>
 // NOTE: This is useful in react dev tools.
 GenericInputInner.displayName = 'GenericInput'
 /**
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProps - Initial property configuration.
- * @property static:local - Defines localization.
  * @property static:output - Describes external event handler interface.
  * @property static:propertiesToReflectAsAttributes - List of properties to
  * potentially reflect as attributes (e.g. in a wrapped web-component).
