@@ -90,6 +90,7 @@ import {GenericAnimate} from './GenericAnimate'
 import '../material-fixes'
 import {
     BaseModel,
+    DataTransformSpecification,
     GenericInputDataTransformation,
     Model,
     ModelState,
@@ -267,9 +268,10 @@ export function formatValue<Type = any>(
         ) &&
         GenericInput.transformer[type].format![methodName]!.transform
     )
-        return GenericInput.transformer[type].format![methodName]!.transform!(
-            value
-        )
+        return (
+            GenericInput.transformer[type].format as
+                DataTransformSpecification['format']
+        )[methodName].transform(value)
     return `${value}`
 }
 /**
@@ -1052,7 +1054,10 @@ export const GenericInputInner = function<Type = any>(
             ) &&
             GenericInput.transformer[configuration.type].parse
         )
-            return GenericInput.transformer[configuration.type].parse!(value)
+            return (
+                GenericInput.transformer[configuration.type].parse as
+                    DataTransformSpecification['parse']
+            )(value)
         if (typeof value === 'number' && isNaN(value))
             return null
         return value
