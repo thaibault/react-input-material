@@ -54,7 +54,9 @@ import React, {
 } from 'react'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 import {TransitionProps} from 'react-transition-group/Transition'
-import {Editor as RichTextEditor, Settings as TinyMCEOptions} from 'tinymce'
+import {
+    Editor as RichTextEditor, RawEditorSettings as TinyMCEOptions
+} from 'tinymce'
 import {Output, WebComponentAdapter} from 'web-component-wrapper/type'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
@@ -118,17 +120,7 @@ if (typeof UTC_BUILD_TIMESTAMP === 'undefined')
 let richTextEditorLoadedOnce:boolean = false
 const tinymceBasePath:string = '/node_modules/tinymce/'
 const tinymceScriptPath:string = `${tinymceBasePath}tinymce.min.js`
-// NOTE: Some options are available but not specified yet.
-type CustomTinyMCEOptions = TinyMCEOptions & {
-    contextmenu:boolean;
-    icon:string;
-    placeholder?:string;
-    readonly?:boolean;
-    toolbar1:false|string;
-    toolbar2:false|string;
-    trim:boolean;
-}
-export const TINYMCE_DEFAULT_OPTIONS:CustomTinyMCEOptions = {
+export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
     /* eslint-disable camelcase */
     // region paths
     base_url: tinymceBasePath,
@@ -713,7 +705,10 @@ export const GenericInputInner = function<Type = any>(
      * @param offset - Absolute position.
      * @returns Position.
      */
-    const determineTablePosition = (offset:number):{column:number;row:number} => {
+    const determineTablePosition = (offset:number):{
+        column:number
+        row:number
+    } => {
         const result = {column: 0, row: 0}
         if (typeof value === 'string')
             for (const line of value.split('\n')) {
@@ -742,11 +737,17 @@ export const GenericInputInner = function<Type = any>(
      * TODO
      */
     const setRichTextEditorSelectionState = (instance:RichTextEditor):void => {
-        const indicator:{end:string;start:string} = {
+        const indicator:{
+            end:string
+            start:string
+        } = {
             end: '###generic-input-selection-indicator-end###',
             start: '###generic-input-selection-indicator-start###'
         }
-        const cursor:{end:number;start:number} = {
+        const cursor:{
+            end:number
+            start:number
+        } = {
             end: properties.cursor.end + indicator.start.length,
             start: properties.cursor.start
         }
@@ -770,7 +771,10 @@ export const GenericInputInner = function<Type = any>(
         )
 
         const range = instance.dom.createRng()
-        const result:{end?:[Node, number];start?:[Node, number]} = {}
+        const result:{
+            end?:[Node, number]
+            start?:[Node, number]
+        } = {}
         let node
         while (node = walker.nextNode())
             for (const type of keysSorted) {
@@ -807,7 +811,7 @@ export const GenericInputInner = function<Type = any>(
         const codeEditorRange =
             codeEditorReference?.editor?.selection?.getRange()
         const richTextEditorRange =
-            richTextEditorInstance?.selection?.getRng(true)
+            richTextEditorInstance?.selection?.getRng()
         const selectionEnd:null|number = (
             inputReference.current as HTMLInputElement|HTMLTextAreaElement
         )?.selectionEnd
@@ -954,11 +958,11 @@ export const GenericInputInner = function<Type = any>(
     const getConsolidatedProperties = (properties:Props<Type>):Properties<Type> => {
         properties = mapPropertiesAndStateToModel(properties)
         const result:Properties<Type> & {
-            mutable?:boolean;
-            nullable?:boolean;
-            regularExpressionPattern?:RegExp|string;
-            state?:null;
-            writable?:boolean;
+            mutable?:boolean
+            nullable?:boolean
+            regularExpressionPattern?:RegExp|string
+            state?:null
+            writable?:boolean
         } = Tools.extend(
             {},
             properties,
@@ -1299,8 +1303,10 @@ export const GenericInputInner = function<Type = any>(
         createRef<HTMLTextAreaElement>()
     let richTextEditorInstance:RichTextEditor|undefined
     let richTextEditorReference:RichTextEditorComponent|undefined
-    const [cursor, setCursor] =
-        useState<{end:number;start:number}>({end: 0, start: 0})
+    const [cursor, setCursor] = useState<{
+        end:number
+        start:number
+    }>({end: 0, start: 0})
     let [editorIsActive, setEditorIsActive] = useState<boolean>(false)
     let [hidden, setHidden] = useState<boolean|undefined>()
     const [model, setModel] =
@@ -1378,7 +1384,7 @@ export const GenericInputInner = function<Type = any>(
             applyIconPreset(properties.icon) as IconOptions
         ) as IconOptions
 
-    const tinyMCEOptions:CustomTinyMCEOptions = {
+    const tinyMCEOptions:TinyMCEOptions = {
         ...TINYMCE_DEFAULT_OPTIONS,
         content_style: properties.disabled ? 'body {opacity: .38}' : '',
         placeholder: properties.placeholder,
@@ -1402,12 +1408,12 @@ export const GenericInputInner = function<Type = any>(
     if (properties.editor.endsWith('raw)')) {
         tinyMCEOptions.toolbar1 =
             'cut copy paste | undo redo removeformat | code | fullscreen'
-        tinyMCEOptions.toolbar2 = false
+        delete tinyMCEOptions.toolbar2
     } else if (properties.editor.endsWith('simple)')) {
         tinyMCEOptions.toolbar1 =
             'cut copy paste | undo redo removeformat | bold italic ' +
             'underline strikethrough subscript superscript | fullscreen'
-        tinyMCEOptions.toolbar2 = false
+        delete tinyMCEOptions.toolbar2
     } else if (properties.editor.endsWith('normal)'))
         tinyMCEOptions.toolbar1 =
             'cut copy paste | undo redo removeformat | styleselect ' +
@@ -1712,7 +1718,7 @@ GenericInput.propTypes = {
     fullWidth: boolean,
     /*
         NOTE: Not yet working:
-        icon?:string|(IconOptions & {tooltip?:string|TooltipProps});
+        icon?:string|(IconOptions & {tooltip?:string|TooltipProps})
     */
     icon: oneOfType([string, object]),
     initialValue: any,
@@ -1753,8 +1759,8 @@ GenericInput.propTypes = {
     theme: object,
     /*
         NOTE: Not yet working:
-        tooltip?:string|TooltipProps;
-        trailingIcon?:string|(IconOptions & {tooltip?:string|TooltipProps});
+        tooltip?:string|TooltipProps
+        trailingIcon?:string|(IconOptions & {tooltip?:string|TooltipProps})
     */
     tooltip: any,
     trailingIcon: any

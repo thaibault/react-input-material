@@ -75,7 +75,6 @@
     "@types/node": "*",
     "@types/react-dom": "*",
     "@types/react-transition-group": "*",
-    "@types/tinymce": "*",
     "@typescript-eslint/eslint-plugin": "*",
     "@typescript-eslint/parser": "*",
     "babel-eslint": "*",
