@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import React, {FunctionComponent} from 'react'
+import React, {FunctionComponent, ReactElement} from 'react'
 import {CSSTransition} from 'react-transition-group'
 import {TransitionProps} from 'react-transition-group/Transition'
 
@@ -29,7 +29,7 @@ import styles from './GenericAnimate.module'
 export const GenericAnimate:FunctionComponent<Partial<TransitionProps<HTMLElement|undefined>>> =
     <Type extends HTMLElement|undefined = undefined>(
         properties:Partial<TransitionProps<Type>>
-    ) =>
+    ):ReactElement =>
         <CSSTransition
             appear
             classNames={styles['generic-animate']}
