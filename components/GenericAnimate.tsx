@@ -17,40 +17,35 @@
     endregion
 */
 // region imports
-import React, {
-    forwardRef, ForwardRefRenderFunction, FunctionComponent, ReactElement
-} from 'react'
+import React, {FunctionComponent, ReactElement} from 'react'
 import {CSSTransition} from 'react-transition-group'
 import {TransitionProps} from 'react-transition-group/Transition'
-import {WebComponentAdapter} from 'web-component-wrapper/type'
 
 import styles from './GenericAnimate.module'
 // endregion
 /**
  * Generic animation wrapper component.
  */
-export const GenericAnimateInner = function<Type extends HTMLElement|undefined = undefined>(
-    properties:Partial<TransitionProps<Type>>
-):ReactElement {
-    return <CSSTransition
-        appear
-        classNames={styles['generic-animate']}
-        in
-        timeout={200}
-        unmountOnExit
-        {...properties}
-    >{
-        typeof properties.children === 'string' ?
-            <span>{properties.children}</span> :
-            Array.isArray(properties.children) ?
-                <div className={styles['generic-animate__list-wrapper']}>
-                    {properties.children}
-                </div> :
-                properties.children
-    }</CSSTransition>
-} as ForwardRefRenderFunction<WebComponentAdapter<Partial<TransitionProps<HTMLElement|undefined>>>, Partial<TransitionProps<HTMLElement|undefined>>>
-GenericAnimateInner.displayName = 'GenericAnimate'
-export const GenericAnimate = forwardRef(GenericAnimateInner)
+export const GenericAnimate:FunctionComponent<Partial<TransitionProps<HTMLElement|undefined>>> =
+    <Type extends HTMLElement|undefined = undefined>(
+        properties:Partial<TransitionProps<Type>>
+    ):ReactElement =>
+        <CSSTransition
+            appear
+            classNames={styles['generic-animate']}
+            in
+            timeout={200}
+            unmountOnExit
+            {...properties}
+        >{
+            typeof properties.children === 'string' ?
+                <span>{properties.children}</span> :
+                Array.isArray(properties.children) ?
+                    <div className={styles['generic-animate__list-wrapper']}>
+                        {properties.children}
+                    </div> :
+                    properties.children
+        }</CSSTransition>
 export default GenericAnimate
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
