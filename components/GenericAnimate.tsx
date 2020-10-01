@@ -29,8 +29,10 @@ import styles from './GenericAnimate.module'
 export const GenericAnimate:FunctionComponent<Partial<TransitionProps<HTMLElement|undefined>>> =
     <Type extends HTMLElement|undefined = undefined>(
         properties:Partial<TransitionProps<Type>>
-    ):ReactElement =>
-        <CSSTransition
+    ):ReactElement => {
+        console.log('REACTGenericAnimate', properties)
+        return <div>JAU</div>
+        return <CSSTransition
             appear
             classNames={styles['generic-animate']}
             in
@@ -46,6 +48,7 @@ export const GenericAnimate:FunctionComponent<Partial<TransitionProps<HTMLElemen
                     </div> :
                     properties.children
         }</CSSTransition>
+    }
 export default GenericAnimate
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

@@ -40,6 +40,7 @@ import React, {
     ForwardRefRenderFunction,
     KeyboardEvent as ReactKeyboardEvent,
     lazy,
+    memo as memorize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
     RefCallback,
@@ -1630,9 +1631,9 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput:StaticWebInputFunctionComponent =
-    forwardRef(GenericInputInner) as
-        unknown as StaticWebInputFunctionComponent
+export const GenericInput:StaticWebInputFunctionComponent = memorize(
+    forwardRef(GenericInputInner) as unknown as StaticWebInputFunctionComponent
+)
 // region static properties
 // / region web-component hints
 GenericInput.output = {onChange: true} as Output
