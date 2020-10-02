@@ -58,7 +58,9 @@ import {TransitionProps} from 'react-transition-group/Transition'
 import {
     Editor as RichTextEditor, RawEditorSettings as TinyMCEOptions
 } from 'tinymce'
-import {Output, WebComponentAdapter} from 'web-component-wrapper/type'
+import {
+    EventToPropertyMapping, WebComponentAdapter
+} from 'web-component-wrapper/type'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
@@ -1615,7 +1617,8 @@ GenericInputInner.displayName = 'GenericInput'
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProps - Initial property configuration.
- * @property static:output - Describes external event handler interface.
+ * @property static:eventToPropertyMapping - Describes external event handler
+ * interface.
  * @property static:propertiesToReflectAsAttributes - List of properties to
  * potentially reflect as attributes (e.g. in a wrapped web-component).
  * @property static:propTypes - Triggers reacts runtime property value checks
@@ -1632,11 +1635,12 @@ GenericInputInner.displayName = 'GenericInput'
  * @returns React elements.
  */
 export const GenericInput:StaticWebInputFunctionComponent = memorize(
-    forwardRef(GenericInputInner) as unknown as StaticWebInputFunctionComponent
-)
+    forwardRef(GenericInputInner)
+) as unknown as StaticWebInputFunctionComponent
 // region static properties
 // / region web-component hints
-GenericInput.output = {onChange: true} as Output
+GenericInput.eventToPropertyMapping = {onChange: true} as
+    EventToPropertyMapping
 GenericInput.propertiesToReflectAsAttributes = new Map([
     ['dirty', true],
     ['focused', true],
@@ -1655,6 +1659,7 @@ GenericInput.propertiesToReflectAsAttributes = new Map([
     ['visited', true]
 ]) as Map<keyof Properties, boolean> 
 GenericInput.wrapped = GenericInputInner
+GenericInput.webComponentAdapterWrapped = true
 // / endregion
 GenericInput.defaultModelState = {
     dirty: false,
