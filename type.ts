@@ -34,7 +34,7 @@ import {
 import {IconOptions} from '@rmwc/types'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
-import {StaticReactWebComponent} from 'web-component-wrapper/type'
+import {StaticWebComponent} from 'web-component-wrapper/type'
 // endregion
 // region exports
 export type ModelState = {
@@ -78,7 +78,6 @@ export type Model<Type = any> = BaseModel<Type> & {
     state:ModelState
     writable:boolean
 }
-export type Output = Mapping<true|((...parameter:Array<any>) => Mapping<any>)>
 export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     align:'end'|'start'
     cursor:{
@@ -174,12 +173,12 @@ export type GenericInputDataTransformation<Type = any> =
         }
     }
 export type Renderable = Array<ReactElement|string>|ReactElement|string
-export interface StaticInputComponent<Type = any> extends StaticReactWebComponent {
+export interface StaticInputComponent<Type = any> extends StaticWebComponent {
     new (properties:Props<Type>):Component<Props<Type>>
     defaultModelState:ModelState
     defaultProps:Props<Type>
     local:string
-    propTypes:StaticReactWebComponent['propTypes']
+    propTypes:StaticWebComponent['propTypes']
     strict:boolean
     transformer:GenericInputDataTransformation<Type>
 }
