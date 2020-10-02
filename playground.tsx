@@ -23,6 +23,7 @@ import {ReactElement} from 'react'
 import ReactDOM from 'react-dom'
 
 import GenericInput from './components/GenericInput'
+import './material-fixes'
 import {Properties} from './type'
 // endregion
 GenericInput.local = 'de-DE'

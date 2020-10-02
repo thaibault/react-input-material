@@ -61,6 +61,7 @@ import {
 import {
     EventToPropertyMapping, WebComponentAdapter
 } from 'web-component-wrapper/type'
+import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
@@ -77,10 +78,10 @@ import {
     EventHandler as RichTextEventHandler
 } from '@tinymce/tinymce-react/lib/cjs/main/ts/Events'
 import UseAnimations from 'react-useanimations'
-import loading from 'react-useanimations/lib/loading'
 import lock from 'react-useanimations/lib/lock'
 import plusToX from 'react-useanimations/lib/plusToX'
 
+import '@rmwc/circular-progress/styles'
 import '@rmwc/formfield/styles'
 import '@rmwc/icon-button/styles'
 import '@rmwc/select/styles'
@@ -1490,9 +1491,9 @@ export const GenericInputInner = function<Type = any>(
                                 </span>
                                 {
                                     properties.editor.startsWith('code') ?
-                                        <Suspense fallback={<UseAnimations
-                                            animation={loading} size={96}
-                                        />}>
+                                        <Suspense fallback={
+                                            <CircularProgress size="large" />
+                                        }>
                                             <CodeEditor
                                                 {...genericProperties as
                                                     CodeEditorProps

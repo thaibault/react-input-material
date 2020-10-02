@@ -53,6 +53,7 @@
     "@babel/plugin-transform-proto-to-assign": "*",
     "@babel/preset-react": "*",
     "@rmwc/card": "*",
+    "@rmwc/circular-progress": "*",
     "@rmwc/formfield": "*",
     "@rmwc/icon": "*",
     "@rmwc/icon-button": "*",
