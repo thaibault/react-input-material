@@ -53,6 +53,7 @@
     "@babel/plugin-transform-proto-to-assign": "*",
     "@babel/preset-react": "*",
     "@rmwc/card": "*",
+    "@rmwc/checkbox": "*",
     "@rmwc/circular-progress": "*",
     "@rmwc/formfield": "*",
     "@rmwc/icon": "*",
@@ -113,6 +114,8 @@
   "peerDependencies": {
     "@babel/runtime": "*",
     "@rmwc/card": "*",
+    "@rmwc/checkbox": "*",
+    "@rmwc/circular-progress": "*",
     "@rmwc/formfield": "*",
     "@rmwc/icon-button": "*",
     "@rmwc/select": "*",

@@ -87,6 +87,22 @@ export type DataTransformSpecification<Type = any> = {
 }
 // / endregion
 // / region checkbox
+export type CheckboxProperties = BaseModel<boolean> & BaseModelState & {
+    checked:boolean
+    disabled:boolean
+    id:string
+    indeterminate:boolean
+    label:string
+    model:Model<boolean>
+    name:string
+    onChange:(properties:CheckboxProperties<boolean>, event?:SyntheticEvent) =>
+        void
+    onChangeValue:(value:boolean, event?:SyntheticEvent) => void
+    required:boolean
+}
+export type CheckProps = Partial<Omit<CheckboxProperties<Type>, 'model'>> & {
+    model?:Partial<Model<Type>>
+}
 // / endregion
 // / region input
 export type InputModelState = BaseModelState & {

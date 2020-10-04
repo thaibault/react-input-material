@@ -58,9 +58,7 @@ import {TransitionProps} from 'react-transition-group/Transition'
 import {
     Editor as RichTextEditor, RawEditorSettings as TinyMCEOptions
 } from 'tinymce'
-import {
-    EventToPropertyMapping, WebComponentAdapter
-} from 'web-component-wrapper/type'
+import {WebComponentAdapter} from 'web-component-wrapper/type'
 import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
@@ -101,8 +99,7 @@ import {
     InputPropertyTypes,
     InputProps as Props,
     InputState as State,
-    Renderable,
-    StaticWebInputFunctionComponent
+    Renderable
 } from '../type'
 import styles from './GenericInput.module'
 // endregion
@@ -1329,6 +1326,7 @@ export const GenericInputInner = function<Type = any>(
     let [representation, setRepresentation] =
         useState<string>(determineInitialRepresentation(props, value))
     const properties:Properties<Type> = getConsolidatedProperties(props)
+    // TODO add ref to inputs?
     useImperativeHandle(reference, ():WebComponentAdapter<Properties<Type>, State<Type>> => ({
         properties,
         state: {
@@ -1611,7 +1609,6 @@ export const GenericInputInner = function<Type = any>(
     )
     // / endregion
     // endregion
-// TODO check if contextTypes makes sense here
 } as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>
 // NOTE: This is useful in react dev tools.
 GenericInputInner.displayName = 'GenericInput'
@@ -1619,13 +1616,8 @@ GenericInputInner.displayName = 'GenericInput'
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProps - Initial property configuration.
- * @property static:eventToPropertyMapping - Describes external event handler
- * interface.
- * @property static:propertiesToReflectAsAttributes - List of properties to
- * potentially reflect as attributes (e.g. in a wrapped web-component).
+ * @property static:local - Location hint to properly represent values.
  * @property static:propTypes - Triggers reacts runtime property value checks
- * in development mode and enables property / attribute reflection for
- * web-component wrapper instances.
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
  * @property static:transformer - Generic input data transformation
@@ -1636,30 +1628,9 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput:StaticWebInputFunctionComponent = memorize(
-    forwardRef(GenericInputInner)
-) as unknown as StaticWebInputFunctionComponent
+export const GenericInput = memorize(forwardRef(GenericInputInner))
 // region static properties
 // / region web-component hints
-GenericInput.eventToPropertyMapping = {onChange: true} as
-    EventToPropertyMapping
-GenericInput.propertiesToReflectAsAttributes = new Map([
-    ['dirty', true],
-    ['focused', true],
-    ['invalid', true],
-    ['invalidMaximum', true],
-    ['invalidMaximumLength', true],
-    ['invalidMinimum', true],
-    ['invalidMinimumLength', true],
-    ['invalidPattern', true],
-    ['invalidRequired', true],
-    ['name', true],
-    ['pristine', true],
-    ['touched', true],
-    ['untouched', true],
-    ['valid', true],
-    ['visited', true]
-]) as Map<keyof Properties, boolean> 
 GenericInput.wrapped = GenericInputInner
 GenericInput.webComponentAdapterWrapped = true
 // / endregion
