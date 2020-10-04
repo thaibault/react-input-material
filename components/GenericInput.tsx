@@ -1301,6 +1301,7 @@ export const GenericInputInner = function<Type = any>(
     }
     // endregion
     // region properties
+    // / region references
     let codeEditorReference:CodeEditorType|undefined
     let codeEditorInputReference:RefObject<HTMLTextAreaElement> =
         createRef<HTMLTextAreaElement>()
@@ -1310,6 +1311,7 @@ export const GenericInputInner = function<Type = any>(
         createRef<HTMLTextAreaElement>()
     let richTextEditorInstance:RichTextEditor|undefined
     let richTextEditorReference:RichTextEditorComponent|undefined
+    // / endregion
     const [cursor, setCursor] = useState<{
         end:number
         start:number
@@ -1326,20 +1328,39 @@ export const GenericInputInner = function<Type = any>(
     let [representation, setRepresentation] =
         useState<string>(determineInitialRepresentation(props, value))
     const properties:Properties<Type> = getConsolidatedProperties(props)
-    // TODO add ref to inputs?
-    useImperativeHandle(reference, ():WebComponentAdapter<Properties<Type>, State<Type>> => ({
-        properties,
-        state: {
-            cursor,
-            editorIsActive,
-            hidden,
-            model,
-            representation,
-            selectionIsUnstable,
-            showDeclaration,
-            value
-        }
-    }))
+    useImperativeHandle(
+        reference,
+        ():WebComponentAdapter<Properties<Type>, State<Type>> & {
+            references:{
+                codeEditorReference?:CodeEditorType|undefined
+                codeEditorInputReference:RefObject<HTMLTextAreaElement>
+                inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>
+                richTextEditorInputReference:RefObject<HTMLTextAreaElement>
+                richTextEditorInstance:RichTextEditor|undefined
+                richTextEditorReference:RichTextEditorComponent
+            }
+        } => ({
+            properties,
+            references: {
+                codeEditorReference,
+                codeEditorInputReference,
+                inputReference,
+                richTextEditorInputReference,
+                richTextEditorInstance,
+                richTextEditorReference
+            },
+            state: {
+                cursor,
+                editorIsActive,
+                hidden,
+                model,
+                representation,
+                selectionIsUnstable,
+                showDeclaration,
+                value
+            }
+        })
+    )
     // endregion
     // region derive state variables from given properties
     if (properties.cursor) {
