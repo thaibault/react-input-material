@@ -93,16 +93,15 @@ import '@rmwc/typography/styles'
 import {GenericAnimate} from './GenericAnimate'
 import '../material-fixes'
 import {
-    BaseModel,
     DataTransformSpecification,
-    GenericInputDataTransformation,
-    Model,
-    ModelState,
-    Properties,
-    PropertyTypes as InputPropertyTypes,
-    Props,
+    InputDataTransformation,
+    InputModel as Model,
+    InputModelState as ModelState,
+    InputProperties as Properties,
+    InputPropertyTypes,
+    InputProps as Props,
+    InputState as State,
     Renderable,
-    State,
     StaticWebInputFunctionComponent
 } from '../type'
 import styles from './GenericInput.module'
@@ -165,7 +164,9 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 }
 // endregion
 // region property type helper
-const modelStatePropertyTypes:{[key in keyof ModelState]:typeof boolean} = {
+const modelStatePropertyTypes:{
+    [key in keyof ModelState]:typeof boolean
+} = {
     dirty: boolean,
     focused: boolean,
     invalid: boolean,
@@ -1855,7 +1856,7 @@ GenericInput.transformer = {
         type: 'text'
     },
     number: {parse: parseInt}
-} as GenericInputDataTransformation
+} as InputDataTransformation
 // endregion
 export default GenericInput
 // region vim modline

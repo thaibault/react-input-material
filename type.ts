@@ -17,7 +17,7 @@
 */
 // region imports
 import {SelectProps} from '@rmwc/select'
-import GenericPropertyTypes from 'clientnode/property-types'
+import PropertyTypes from 'clientnode/property-types'
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
     Component,
@@ -37,24 +37,7 @@ import {TooltipProps} from '@rmwc/tooltip'
 import {StaticWebComponent} from 'web-component-wrapper/type'
 // endregion
 // region exports
-export type ModelState = {
-    dirty:boolean
-    focused:boolean
-    invalid:boolean
-    invalidMaximum:boolean
-    invalidMaximumLength:boolean
-    invalidMinimum:boolean
-    invalidMinimumLength:boolean
-    invalidPattern:boolean
-    invalidRequired:boolean
-    pristine:boolean
-    touched:boolean
-    untouched:boolean
-    valid:boolean
-    visited:boolean
-}
-export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
-export type GenericInputType = 'currency'|'float'|'integer'|'string'|NativeInputType
+// / region generic
 export type BaseModel<Type = any> = {
     declaration:string
     default?:null|Type
@@ -75,10 +58,48 @@ export type BaseModel<Type = any> = {
 export type Model<Type = any> = BaseModel<Type> & {
     mutable:boolean
     nullable:boolean
-    state:ModelState
+    state:InputModelState
     writable:boolean
 }
-export type Properties<Type = any> = BaseModel<Type> & ModelState & {
+export type Renderable = Array<ReactElement|string>|ReactElement|string
+export type BaseModelState = {
+    dirty:boolean
+    focused:boolean
+    invalid:boolean
+    invalidRequired:boolean
+    pristine:boolean
+    touched:boolean
+    untouched:boolean
+    valid:boolean
+    visited:boolean
+}
+export type FormatSpecification<Type = any> = {
+    options?:PlainObject
+    transform:(value:null|Type) => string
+}
+export type DataTransformSpecification<Type = any> = {
+    format:{
+        final:FormatSpecification
+        intermediate:FormatSpecification
+    }
+    parse:(value:string) => null|Type
+    type:NativeInputType
+}
+// / endregion
+// / region checkbox
+// / endregion
+// / region input
+export type InputModelState = BaseModelState & {
+    invalidMaximum:boolean
+    invalidMaximumLength:boolean
+    invalidMinimum:boolean
+    invalidMinimumLength:boolean
+    invalidPattern:boolean
+    invalidRequired:boolean
+}
+export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
+export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
+export type InputProperties<Type = any> = BaseModel<Type> & InputModelState & {
     align:'end'|'start'
     cursor:{
         end:number
@@ -96,11 +117,11 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     minimumText:string
     model:Model<Type>
     onBlur:(event:SyntheticEvent) => void
-    onChange:(properties:Properties<Type>, event?:SyntheticEvent) => void
+    onChange:(properties:InputProperties<Type>, event?:SyntheticEvent) => void
     onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void
     onChangeValue:(value:null|Type, event?:SyntheticEvent) => void
     onChangeShowDeclaration:(show:boolean, event?:SyntheticEvent) => void
-    onChangeState:(state:ModelState, event?:SyntheticEvent) => void
+    onChangeState:(state:InputModelState, event?:SyntheticEvent) => void
     onClick:(event:MouseEvent) => void
     onFocus:(event:FocusEvent) => void
     onKeyUp:(event:KeyboardEvent) => void
@@ -122,38 +143,26 @@ export type Properties<Type = any> = BaseModel<Type> & ModelState & {
     tooltip:string|TooltipProps
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
 }
-export type PropertyTypes<Type = any> = {
-    [key in keyof Properties<Type>]:ValueOf<typeof GenericPropertyTypes>
-}
-export type Props<Type = any> = Partial<Omit<Properties<Type>, 'model'>> & {
+export type InputProps<Type = any> = Partial<Omit<InputProperties<Type>, 'model'>> & {
     model?:Partial<Model<Type>>
 }
-export type State<Type = any> = {
+export type InputPropertyTypes<Type = any> = {
+    [key in keyof InputProperties<Type>]:ValueOf<typeof PropertyTypes>
+}
+export type InputState<Type = any> = {
     cursor:{
         end:number
         start:number
     }
     editorIsActive:boolean
     hidden?:boolean
-    model:ModelState
+    model:InputModelState
     representation?:string
     selectionIsUnstable:boolean
     showDeclaration:boolean
     value:null|Type
 }
-export type FormatSpecification<Type = any> = {
-    options?:PlainObject
-    transform:(value:null|Type) => string
-}
-export type DataTransformSpecification<Type = any> = {
-    format:{
-        final:FormatSpecification
-        intermediate:FormatSpecification
-    }
-    parse:(value:string) => null|Type
-    type:NativeInputType
-}
-export type GenericInputDataTransformation<Type = any> =
+export type InputDataTransformation<Type = any> =
     Mapping<RecursivePartial<DataTransformSpecification<Type>>> &
     {
         currency: DataTransformSpecification<Type>
@@ -172,15 +181,14 @@ export type GenericInputDataTransformation<Type = any> =
             type?:DataTransformSpecification<Type>['type']
         }
     }
-export type Renderable = Array<ReactElement|string>|ReactElement|string
 export interface StaticInputComponent<Type = any> extends StaticWebComponent {
     new (properties:Props<Type>):Component<Props<Type>>
-    defaultModelState:ModelState
+    defaultModelState:InputModelState
     defaultProps:Props<Type>
     local:string
     propTypes:StaticWebComponent['propTypes']
     strict:boolean
-    transformer:GenericInputDataTransformation<Type>
+    transformer:InputDataTransformation<Type>
 }
 export type StaticWebInputComponent<Type = any> =
     Omit<ComponentClass<Props<Type>>, 'defaultProps'> &
@@ -188,6 +196,7 @@ export type StaticWebInputComponent<Type = any> =
 export type StaticWebInputFunctionComponent<Type = any> =
     Omit<FunctionComponent<Props<Type>>, 'defaultProps'> &
     StaticInputComponent<Type>
+// / endregion
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

@@ -22,7 +22,9 @@ import React, {FunctionComponent, useState} from 'react'
 import {ReactElement} from 'react'
 import ReactDOM from 'react-dom'
 
+import GenericAnimate from './components/GenericAnimate'
 import GenericInput from './components/GenericInput'
+import RequireableCheckbox from './components/RequireableCheckbox'
 import './material-fixes'
 import {Properties} from './type'
 // endregion
@@ -36,6 +38,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     function onChange<Type = string>(state:Properties<Type>):void {
         setSelectedState(state)
     }
+
+    const [fadeState, setFadeState] = useState<boolean>(false)
+    setInterval(() => setFadeState((value:boolean): => !value), 1 * 1000)
 
     return (<>
         <div className="inputs">
@@ -387,6 +392,20 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     type: 'currency'
                 }}
                 onChange={onChange}
+            />
+
+            <hr/>
+
+            <div style="height: 50px">
+                <GenericAnimate in={fadeState}>Fade it!</GenericAnimate>
+                <br/>
+                <GenericAnimate children="Fade it!" in={!fadeState} />
+            </div>
+
+            <hr/>
+
+            <RequirableCheckbox
+                label="check1Label" name="check1" onChange={onChange} value
             />
 
         </div>
