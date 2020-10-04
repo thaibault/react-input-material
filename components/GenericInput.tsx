@@ -282,7 +282,9 @@ export function formatValue<Type = any>(
  * @param value - Current value to represent.
  * @returns Determined initial representation.
  */
-export function determineInitialRepresentation<Type = any>(properties:Props, value:null|Type):string {
+export function determineInitialRepresentation<Type = any>(
+    properties:Props, value:null|Type
+):string {
     if (typeof properties.representation === 'string')
         return properties.representation
     if (value !== null)
