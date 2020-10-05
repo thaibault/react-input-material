@@ -89,7 +89,7 @@ import styles from './GenericInput.module'
 import {
     determineInitialValue,
     determineValidationState as determineBaseValidationState,
-    mapPropertiesToModel
+    mapPropertiesAndStateToModel
 } from '../helper'
 import '../material-fixes'
 import {
@@ -722,9 +722,14 @@ export const GenericInputInner = function<Type = any>(
     const mergePropertiesStateAndModel = (
         properties:Props<Type>
     ):DefaultProperties<Type> => {
-        const result:DefaultProperties<Type> = mapPropertiesToModel<Type>(
-            properties, GenericInput.defaultProps.model, value
-        )
+        const result:DefaultProperties<Type> =
+            mapPropertiesAndStateToModel<Type>(
+                properties,
+                props,
+                GenericInput.defaultProps.model,
+                value,
+                model
+            )
         // region handle state configuration
         if (result.cursor === undefined)
             result.cursor = cursor

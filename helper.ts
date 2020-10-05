@@ -84,10 +84,20 @@ export const determineValidationState = <Type = any>(
  * Synchronizes property, state and model configuration:
  * Properties overwrites default properties which overwrites default model
  * properties.
+ * @param properties - Properties to merge.
+ * @param initialProperties - Initial unmodified properties to take into
+ * account.
+ * @param defaultModel - Default model to merge.
+ * @param value - Current value to merge.
+ * @param model - Current model state.
  * @returns Merged properties.
 */
-export const mapPropertiesToModel = <Type = any>(
-    properties:Props<Type>, defaultModel:Model<Type>, value:null|Type
+export const mapPropertiesAndStateToModel = <Type = any>(
+    properties:Props<Type>,
+    initialProperties:Props<Type>,
+    defaultModel:Model<Type>,
+    value:null|Type,
+    model:ModelState
 ):DefaultProperties<Type> => {
     /*
         NOTE: Default props seems not to respect nested layers to merge so
