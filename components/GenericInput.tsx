@@ -85,6 +85,11 @@ import '@rmwc/tooltip/styles'
 import '@rmwc/typography/styles'
 
 import {GenericAnimate} from './GenericAnimate'
+import styles from './GenericInput.module'
+import {
+    determineInitialValue,
+    determineValidationState as determineBaseValidationState
+} from '../helper'
 import '../material-fixes'
 import {
     DataTransformSpecification,
@@ -100,7 +105,6 @@ import {
     Renderable,
     StaticFunctionInputComponent as StaticComponent
 } from '../type'
-import styles from './GenericInput.module'
 import WrapStrict from './WrapStrict'
 import WrapThemeProvider from './WrapThemeProvider'
 import WrapTooltip from './WrapTooltip'
@@ -163,26 +167,44 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 }
 // endregion
 // region static helper
-/**
- * Determines initial value depending on given properties.
- * @param properties - Components properties.
- * @returns Determined value.
- */
-export function determineInitialValue<Type = any>(
-    properties:Props<Type>
-):null|Type {
-    if (properties.value !== undefined)
-        return properties.value as null|Type
-    if (properties.model?.value !== undefined)
-        return properties.model.value as null|Type
-    if (
-        Object.prototype.hasOwnProperty.call(
-            properties, 'initialValue'
-        ) &&
-        typeof properties.initialValue !== 'undefined'
+export function determineValidationState<Type = any>(
+    configuration:Properties<Type>, value:null|Type
+):boolean {
+    return determineBaseValidationState<Type>(
+        configuration,
+        value,
+        {
+            invalidMaximum: ():boolean => (
+                typeof configuration.model.maximum === 'number' &&
+                typeof value === 'number' &&
+                !isNaN(value) &&
+                configuration.model.maximum < value
+            ),
+            invalidMaximumLength: ():boolean => (
+                typeof configuration.model.maximumLength === 'number' &&
+                typeof value === 'string' &&
+                configuration.model.maximumLength < value.length
+            ),
+            invalidMinimum: ():boolean => (
+                typeof configuration.model.minimum === 'number' &&
+                typeof value === 'number' &&
+                !isNaN(value) &&
+                value < configuration.model.minimum
+            ),
+            invalidMinimumLength: ():boolean => (
+                typeof configuration.model.minimumLength === 'number' &&
+                typeof value === 'string' &&
+                value.length < configuration.model.minimumLength
+            ),
+            invalidPattern: ():boolean => (
+                typeof configuration.model.regularExpressionPattern === 'string' &&
+                !(new RegExp(configuration.model.regularExpressionPattern))
+                    .test(value) ||
+                typeof configuration.model.regularExpressionPattern === 'object' &&
+                !typeof configuration.model.regularExpressionPattern.test(value)
+            )
+        }
     )
-        return properties.initialValue as null|Type
-    return null
 }
 /**
  * Represents configured value as string.
@@ -230,84 +252,6 @@ export function determineInitialRepresentation<Type = any>(
             GenericInput.defaultProps.model!.type as string
         )
     return ''
-}
-/**
- * Derives current validation state from given value.
- * @param configuration - Input configuration.
- * @param value - Value to validate against given configuration.
- * @returns A boolean indicating if validation state has changed.
- */
-export function determineValidationState<Type = any>(
-    configuration:Properties<Type>, value:any
-):boolean {
-    let changed:boolean = false
-    let oldValue:boolean = false
-
-    oldValue = configuration.model.state.invalidMaximum
-    configuration.model.state.invalidMaximum =
-        typeof configuration.model.maximum === 'number' &&
-        typeof value === 'number' &&
-        !isNaN(value) &&
-        configuration.model.maximum < value
-    changed =
-        changed || oldValue !== configuration.model.state.invalidMaximum
-
-    oldValue = configuration.model.state.invalidMaximumLength
-    configuration.model.state.invalidMaximumLength =
-        typeof configuration.model.maximumLength === 'number' &&
-        typeof value === 'string' &&
-        configuration.model.maximumLength < value.length
-    changed =
-        changed ||
-        oldValue !== configuration.model.state.invalidMaximumLength
-
-    oldValue = configuration.model.state.invalidMinimum
-    configuration.model.state.invalidMinimum =
-        typeof configuration.model.minimum === 'number' &&
-        typeof value === 'number' &&
-        !isNaN(value) &&
-        value < configuration.model.minimum
-    changed =
-        changed || oldValue !== configuration.model.state.invalidMinimum
-
-    oldValue = configuration.model.state.invalidMinimumLength
-    configuration.model.state.invalidMinimumLength =
-        typeof configuration.model.minimumLength === 'number' &&
-        typeof value === 'string' &&
-        value.length < configuration.model.minimumLength
-    changed =
-        changed ||
-        oldValue !== configuration.model.state.invalidMinimumLength
-
-    oldValue = configuration.model.state.invalidPattern
-    configuration.model.state.invalidPattern =
-        typeof configuration.model.regularExpressionPattern === 'string' &&
-        !(new RegExp(configuration.model.regularExpressionPattern))
-            .test(value) ||
-        typeof configuration.model.regularExpressionPattern === 'object' &&
-        !typeof configuration.model.regularExpressionPattern.test(value)
-    changed =
-        changed || oldValue !== configuration.model.state.invalidPattern
-
-    oldValue = configuration.model.state.invalidRequired
-    configuration.model.state.invalidRequired =
-        configuration.model.nullable === false && value === null
-    changed =
-        changed || oldValue !== configuration.model.state.invalidRequired
-
-    if (changed) {
-        configuration.model.state.invalid =
-            configuration.model.state.invalidMaximum ||
-            configuration.model.state.invalidMaximumLength ||
-            configuration.model.state.invalidMinimum ||
-            configuration.model.state.invalidMinimumLength ||
-            configuration.model.state.invalidPattern ||
-            configuration.model.state.invalidRequired
-        configuration.model.state.valid =
-            !configuration.model.state.invalid
-    }
-
-    return changed
 }
 // endregion
 /**
@@ -848,7 +792,7 @@ export const GenericInputInner = function<Type = any>(
         result.model.value = parseValue(
             result as unknown as Properties<Type>, result.model.value
         )
-        determineValidationState(
+        determineValidationState<Type>(
             result as unknown as Properties<Type>, result.model.value
         )
 
@@ -1103,7 +1047,7 @@ export const GenericInputInner = function<Type = any>(
             parseValue(properties, value)
 
         if (oldValue !== properties.value) {
-            let stateChanged:boolean = determineValidationState(
+            let stateChanged:boolean = determineValidationState<Type>(
                 properties, properties.value
             )
 
