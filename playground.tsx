@@ -398,7 +398,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-            <div style="height: 50px">
+            <div style={{height: '50px'}}>
                 <GenericAnimate in={fadeState}>Fade it!</GenericAnimate>
                 <br/>
                 <GenericAnimate children="Fade it!" in={!fadeState} />
@@ -406,7 +406,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-            <RequirableCheckbox
+            <RequireableCheckbox
                 label="check1Label" name="check1" onChange={onChange} value
             />
 

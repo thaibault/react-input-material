@@ -45,7 +45,9 @@ import {
 import {IconOptions} from '@rmwc/types'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
-import {StaticWebComponent} from 'web-component-wrapper/type'
+import {
+    StaticWebComponent as StaticBaseWebComponent
+} from 'web-component-wrapper/type'
 // endregion
 // region exports
 // / region generic
@@ -130,6 +132,18 @@ export type State<Type = any> = {
     showDeclaration:boolean
     value:null|Type
 }
+export interface StaticWebComponent<P = Props> extends StaticBaseWebComponent {
+    new (properties:P):Component<P>
+    defaultModelState:ModelState
+    defaultProps:P
+    strict:boolean
+}
+export type StaticComponent<Type = any> =
+    Omit<ComponentClass<Props<Type>>, 'defaultProps'|'propTypes'> &
+    StaticWebComponent<Type>
+export type StaticFunctionComponent<Type = any> =
+    Omit<FunctionComponent<Props<Type>>, 'defaultProps'|'propTypes'> &
+    StaticComponent<Type>
 // // region constants
 export const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     declaration: string,
@@ -238,7 +252,7 @@ export const defaultModel:Model = {
     type: 'string',
     writable: true
 } as const
-export const defaultProperties:Props & Pick<Properties, 'model'> = {
+export const defaultProperties:Omit<Props, 'model'> & Pick<Properties, 'model'> = {
     model: {...defaultModel},
     showDeclaration: undefined,
     showInitialValidationState: false,
@@ -276,6 +290,9 @@ export type InputModelState =
         invalidPattern:boolean
         invalidRequired:boolean
     }
+export type InputModel<Type = any> =
+    Omit<Model<Type>, 'state'> &
+    {state:InputModelState}
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
 export type InputProperties<Type = any> =
@@ -295,6 +312,7 @@ export type InputProperties<Type = any> =
         maximumText:string
         minimumLengthText:string
         minimumText:string
+        model:InputModel<Type>
         onBlur:(event:SyntheticEvent) => void
         onChange:(properties:InputProperties<Type>, event?:SyntheticEvent) =>
             void
@@ -313,7 +331,7 @@ export type InputProperties<Type = any> =
     }
 export type InputProps<Type = any> =
     Partial<Omit<InputProperties<Type>, 'model'>> &
-    {model?:Partial<Model<Type>>}
+    {model?:Partial<InputModel<Type>>}
 export type InputPropertyTypes<Type = any> = {
     [key in keyof InputProperties<Type>]:ValueOf<typeof PropertyTypes>
 }
@@ -349,21 +367,14 @@ export type InputDataTransformation<Type = any> =
             type?:DataTransformSpecification<Type>['type']
         }
     }
-export interface StaticInputComponent<Type = any> extends StaticWebComponent {
-    new (properties:Props<Type>):Component<Props<Type>>
+export interface StaticWebInputComponent<Type = any> extends StaticWebComponent<InputProps<Type>> {
     defaultModelState:InputModelState
-    defaultProps:Props<Type>
     local:string
-    propTypes:StaticWebComponent['propTypes']
-    strict:boolean
     transformer:InputDataTransformation<Type>
 }
-export type StaticWebInputComponent<Type = any> =
-    Omit<ComponentClass<Props<Type>>, 'defaultProps'> &
-    StaticInputComponent<Type>
-export type StaticWebInputFunctionComponent<Type = any> =
-    Omit<FunctionComponent<Props<Type>>, 'defaultProps'> &
-    StaticInputComponent<Type>
+export type StaticFunctionInputComponent<Type = any> =
+    Omit<FunctionComponent<Props<Type>>, 'defaultProps'|'propTypes'> &
+    StaticWebInputComponent<Type>
 // // region constants
 export const inputModelStatePropertyTypes:{
     [key in keyof InputModelState]:typeof boolean
@@ -436,11 +447,11 @@ export const defaultInputModelState:InputModelState = {
     invalidMinimumLength: false,
     invalidPattern: false
 } as const
-export const defaultInputModel:Model = {
+export const defaultInputModel:InputModel = {
     ...defaultModel,
     state: defaultInputModelState
 } as const
-export const defaultInputProperties:InputProps & Pick<InputProperties, 'model'> = {
+export const defaultInputProperties:Omit<InputProps, 'model'> & Pick<InputProperties, 'model'> = {
     ...defaultProperties,
     maximumLengthText:
         'Please type less or equal than ${maximumLength} symbols.',

@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module generic-input */
+/** @module requireable-checkbox */
 'use strict'
 /* !
     region header
@@ -20,8 +20,10 @@
 import {Checkbox} from '@rmwc/checkbox'
 import '@rmwc/checkbox/styles'
 import React, {
+    forwardRef,
     ForwardRefRenderFunction,
     FunctionComponent,
+    memo as memorize,
     ReactElement,
     RefObject
 } from 'react'
@@ -30,10 +32,11 @@ import {WebComponentAdapter} from 'web-component-wrapper/type'
 import {
     CheckboxProperties as Properties,
     CheckboxProps as Props,
+    CheckboxState as State,
     defaultModelState,
     defaultProperties,
     propertyTypes,
-    CheckboxState as State
+    StaticFunctionComponent as StaticComponent
 } from '../type'
 // endregion
 /**
@@ -46,13 +49,13 @@ import {
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const RequireableCheckboxInner:ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props> = (
+export const RequireableCheckboxInner = function(
     properties:Props,
     reference?:RefObject<WebComponentAdapter<Properties, State>>
-):ReactElement => {
-    const materialProperties = {...properties}
+):ReactElement {
+    const materialProperties = {}
     return <Checkbox {...materialProperties} />
-}
+} as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>
 // NOTE: This is useful in react dev tools.
 RequireableCheckboxInner.displayName = 'RequireableCheckbox'
 /**
@@ -68,11 +71,13 @@ RequireableCheckboxInner.displayName = 'RequireableCheckbox'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const RequireabkeCheckbox =
-    memorize(forwardRef(RequireableCheckboxInner))
+export const RequireableCheckbox:StaticComponent =
+    memorize(forwardRef(RequireableCheckboxInner)) as
+        unknown as
+        StaticComponent
 // region static properties
 // / region web-component hints
-RequireableCheckbox.wrapped = GenericInputInner
+RequireableCheckbox.wrapped = RequireableCheckboxInner
 RequireableCheckbox.webComponentAdapterWrapped = true
 // / endregion
 RequireableCheckbox.defaultModelState = defaultModelState
