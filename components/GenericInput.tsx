@@ -197,11 +197,17 @@ export function determineValidationState<Type = any>(
                 value.length < configuration.model.minimumLength
             ),
             invalidPattern: ():boolean => (
-                typeof configuration.model.regularExpressionPattern === 'string' &&
-                !(new RegExp(configuration.model.regularExpressionPattern))
-                    .test(value) ||
-                typeof configuration.model.regularExpressionPattern === 'object' &&
-                !typeof configuration.model.regularExpressionPattern.test(value)
+                typeof value === 'string' &&
+                (
+                    typeof configuration.model.regularExpressionPattern ===
+                        'string' &&
+                    !(new RegExp(configuration.model.regularExpressionPattern))
+                        .test(value) ||
+                    typeof configuration.model.regularExpressionPattern ===
+                        'object' &&
+                    !typeof configuration.model.regularExpressionPattern
+                        .test(value)
+                )
             )
         }
     )

@@ -19,7 +19,7 @@
 // region imports
 import {Mapping} from 'clientnode/type'
 
-import {Properties, Props} from './type'
+import {ModelState, Properties, Props} from './type'
 // endregion
 /**
  * Determines initial value depending on given properties.
@@ -44,30 +44,36 @@ export function determineInitialValue<Type = any>(
  * Derives current validation state from given value.
  * @param configuration - Input configuration.
  * @param value - Value to validate against given configuration.
+ * @param validators - Mapping from validation state key to corresponding
+ * validator function.
  * @returns A boolean indicating if validation state has changed.
  */
 export function determineValidationState<Type = any>(
     configuration:Properties<Type>,
     value:null|Type,
-    validator:Mapping<() => boolean> = {}
+    validators:Mapping<() => boolean> = {}
 ):boolean {
     let changed:boolean = false
 
-    validator = {
+    validators = {
         invalidRequired: ():boolean => (
             configuration.model.nullable === false && value === null
         ),
-        ...validator
+        ...validators
     }
-    for (const [name, validator] of Object.entries(validator)) {
-        const oldValue:boolean = configuration.model.state[name]
-        configuration.model.state[name] = validator(value)
-        changed = changed || oldValue !== configuration.model.state[name]
+    for (const [name, validator] of Object.entries(validators)) {
+        const oldValue:boolean =
+            configuration.model.state[name as keyof ModelState]
+        configuration.model.state[name as keyof ModelState] = validator()
+        changed =
+            changed ||
+            oldValue !== configuration.model.state[name as keyof ModelState]
     }
 
     if (changed) {
-        configuration.model.state.invalid = Object.keys(validator)
-            .some((name:string):boolean => configuration.model.state[name])
+        configuration.model.state.invalid = Object.keys(validators).some((
+            name:string
+        ):boolean => configuration.model.state[name as keyof ModelState])
         configuration.model.state.valid = !configuration.model.state.invalid
     }
 
