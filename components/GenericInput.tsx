@@ -92,9 +92,8 @@ import '../material-fixes'
 import {
     DataTransformSpecification,
     defaultInputModelState as defaultModelState,
-    defaultInputProps as defaultProps,
+    defaultInputProperties as defaultPropies,
     InputDataTransformation,
-    InputModel as Model,
     inputModelStatePropertyTypes as modelStatePropertyTypes,
     InputModelState as ModelState,
     InputProperties as Properties,
@@ -102,6 +101,7 @@ import {
     inputPropertyTypes as propertyTypes,
     InputProps as Props,
     InputState as State,
+    Model,
     Renderable
 } from '../type'
 import styles from './GenericInput.module'
@@ -533,16 +533,19 @@ export const GenericInputInner = function<Type = any>(
             <>{content}</>
     }
     /**
-     * TODO
+     * Wraps a theme provider to given element if a configuration is provided.
+     * @param content - Component or string to wrap.
+     * @param configuration - Potential theme provider configuration.
+     * @returns Wrapped content.
      */
     const wrapThemeProvider = (
-        element:ReactElement, configuration?:ThemeProviderProps['options']
+        content:ReactElement, configuration?:ThemeProviderProps['options']
     ):ReactElement =>
         configuration ?
             <ThemeProvider options={configuration} wrap>
-                {element}
+                {content}
             </ThemeProvider> :
-            element
+            content
     /**
      * Wraps given component with a tooltip component with given tooltip
      * configuration.
@@ -1587,14 +1590,18 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput = memorize(forwardRef(GenericInputInner))
+// TODO
+export const GenericInput = memorize(forwardRef(GenericInputInner)) as
+    ? &
+    {
+    }
 // region static properties
 // / region web-component hints
 GenericInput.wrapped = GenericInputInner
 GenericInput.webComponentAdapterWrapped = true
 // / endregion
 GenericInput.defaultModelState = defaultModelState
-GenericInput.defaultProps = defaultProps
+GenericInput.defaultProps = defaultProperties
 GenericInput.local = 'en-US'
 GenericInput.propTypes = popertyTypes
 GenericInput.strict = false

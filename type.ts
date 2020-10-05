@@ -26,6 +26,7 @@ import PropertyTypes, {
     object,
     objectOf,
     oneOfType,
+    shape,
     string
 } from 'clientnode/property-types'
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
@@ -65,12 +66,6 @@ export type BaseModel<Type = any> = {
     type:GenericInputType
     value?:null|Type
 }
-export type Model<Type = any> = BaseModel<Type> & {
-    mutable:boolean
-    nullable:boolean
-    state:InputModelState
-    writable:boolean
-}
 export type Renderable = Array<ReactElement|string>|ReactElement|string
 export type ModelState = {
     dirty:boolean
@@ -83,6 +78,14 @@ export type ModelState = {
     valid:boolean
     visited:boolean
 }
+export type Model<Type = any> =
+    BaseModel<Type> &
+    {
+        mutable:boolean
+        nullable:boolean
+        state:ModelState
+        writable:boolean
+    }
 export type FormatSpecification<Type = any> = {
     options?:PlainObject
     transform:(value:null|Type) => string
@@ -95,29 +98,37 @@ export type DataTransformSpecification<Type = any> = {
     parse:(value:string) => null|Type
     type:NativeInputType
 }
-export type Properties<Type = any> = BaseModel<Type> & ModelState & {
-    disabled:boolean
-    id:string
-    initialValue:null|Type
-    label:string
-    model:Model<Type>
-    name:string
-    onChange:(properties:Properties<Type>, event?:SyntheticEvent) => void
-    onChangeShowDeclaration:(show:boolean, event?:SyntheticEvent) => void
-    onChangeState:(state:ModelState, event?:SyntheticEvent) => void
-    onChangeValue:(value:null|Type, event?:SyntheticEvent) => void
-    onClick:(event:MouseEvent) => void
-    onFocus:(event:FocusEvent) => void
-    onTouch:(event:SyntheticEvent) => void
-    required:boolean
-    requiredText:string
+export type Properties<Type = any> =
+    BaseModel<Type> &
+    ModelState &
+    {
+        disabled:boolean
+        id:string
+        initialValue:null|Type
+        label:string
+        model:Model<Type>
+        name:string
+        onChange:(properties:Properties<Type>, event?:SyntheticEvent) => void
+        onChangeShowDeclaration:(show:boolean, event?:SyntheticEvent) => void
+        onChangeState:(state:ModelState, event?:SyntheticEvent) => void
+        onChangeValue:(value:null|Type, event?:SyntheticEvent) => void
+        onClick:(event:MouseEvent) => void
+        onFocus:(event:FocusEvent) => void
+        onTouch:(event:SyntheticEvent) => void
+        required:boolean
+        requiredText:string
+        showDeclaration:boolean
+        showInitialValidationState:boolean
+        theme:ThemeProviderProps['options']
+        tooltip:string|TooltipProps
+    }
+export type Props<Type = any> =
+    Partial<Omit<Properties<Type>, 'model'>> &
+    {model?:Partial<Model<Type>>}
+export type State<Type = any> = {
+    model:ModelState
     showDeclaration:boolean
-    showInitialValidationState:boolean
-    theme:ThemeProviderProps['options']
-    tooltip:string|TooltipProps
-}
-export type Props<Type> = Partial<Omit<Properties<Type>, 'model'>> & {
-    model?:Partial<Model<Type>>
+    value:null|Type
 }
 // // region constants
 export const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
@@ -145,6 +156,19 @@ export const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     type: string,
     value: any
 } as const
+export const modelStatePropertyTypes:{
+    [key in keyof ModelState]:typeof boolean
+} = {
+    dirty: boolean,
+    focused: boolean,
+    invalid: boolean,
+    invalidRequired: boolean,
+    pristine: boolean,
+    touched: boolean,
+    untouched: boolean,
+    valid: boolean,
+    visited: boolean
+} as const
 export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...baseModelPropertyTypes,
     emptyEqualsNull: boolean,
@@ -158,19 +182,6 @@ export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     writable: boolean,
     regularExpressionPattern: oneOfType([object, string]),
     trim: boolean
-} as const
-const modelStatePropertyTypes:{
-    [key in keyof ModelState]:typeof boolean
-} = {
-    dirty: boolean,
-    focused: boolean,
-    invalid: boolean,
-    invalidRequired: boolean,
-    pristine: boolean,
-    touched: boolean,
-    untouched: boolean,
-    valid: boolean,
-    visited: boolean
 } as const
 export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...baseModelPropertyTypes,
@@ -226,8 +237,8 @@ export const defaultModel:Model = {
     trim: true,
     type: 'string',
     writable: true
-} as const,
-export const defaultProperties: = {
+} as const
+export const defaultProperties:Props & Pick<Properties, 'model'> = {
     model: {...defaultModel},
     showDeclaration: undefined,
     showInitialValidationState: false,
@@ -236,80 +247,89 @@ export const defaultProperties: = {
 // // endregion
 // / endregion
 // / region checkbox
-export type CheckboxProperties = Properties<boolean> & {
-    checked:boolean
-    indeterminate:boolean
-    onChange:(properties:CheckboxProperties, event?:SyntheticEvent) => void
-}
-export type CheckProps = Partial<Omit<CheckboxProperties<Type>, 'model'>> & {
-    model?:Partial<Model<Type>>
-}
+export type CheckboxProperties =
+    Properties<boolean> &
+    {
+        checked:boolean
+        indeterminate:boolean
+        onChange:(properties:CheckboxProperties, event?:SyntheticEvent) => void
+    }
+export type CheckboxProps =
+    Partial<Omit<CheckboxProperties, 'model'>> &
+    {model?:Partial<Model<boolean>>}
+export type CheckboxState = State<boolean>
 // // region constants
-export const defaultCheckboxProperties: = {
+export const defaultCheckboxProperties:CheckboxProps = {
     ...defaultProperties,
     requiredText: 'Please check this field.'
 } as const
 // // endregion
 // / endregion
 // / region input
-export type InputModelState = ModelState & {
-    invalidMaximum:boolean
-    invalidMaximumLength:boolean
-    invalidMinimum:boolean
-    invalidMinimumLength:boolean
-    invalidPattern:boolean
-    invalidRequired:boolean
-}
+export type InputModelState =
+    ModelState &
+    {
+        invalidMaximum:boolean
+        invalidMaximumLength:boolean
+        invalidMinimum:boolean
+        invalidMinimumLength:boolean
+        invalidPattern:boolean
+        invalidRequired:boolean
+    }
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export type InputProperties<Type = any> = Properties<Type> & InputModelState & {
-    align:'end'|'start'
-    cursor:{
-        end:number
-        start:number
+export type InputProperties<Type = any> =
+    Properties<Type> &
+    InputModelState &
+    {
+        align:'end'|'start'
+        cursor:{
+            end:number
+            start:number
+        }
+        editorIsActive:boolean
+        fullWidth:boolean
+        icon:string|(IconOptions & {tooltip?:string|TooltipProps})
+        hidden:boolean
+        maximumLengthText:string
+        maximumText:string
+        minimumLengthText:string
+        minimumText:string
+        onBlur:(event:SyntheticEvent) => void
+        onChange:(properties:InputProperties<Type>, event?:SyntheticEvent) =>
+            void
+        onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void
+        onKeyUp:(event:KeyboardEvent) => void
+        onSelectionChange:(event:SyntheticEvent) => void
+        outlined:boolean
+        pattern:RegExp|string
+        patternText:string
+        placeholder:string
+        representation:string
+        ripple:boolean
+        rows:number
+        selectableEditor:boolean
+        trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
     }
-    editorIsActive:boolean
-    fullWidth:boolean
-    icon:string|(IconOptions & {tooltip?:string|TooltipProps})
-    hidden:boolean
-    maximumLengthText:string
-    maximumText:string
-    minimumLengthText:string
-    minimumText:string
-    onBlur:(event:SyntheticEvent) => void
-    onChange:(properties:InputProperties<Type>, event?:SyntheticEvent) => void
-    onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void
-    onKeyUp:(event:KeyboardEvent) => void
-    onSelectionChange:(event:SyntheticEvent) => void
-    outlined:boolean
-    pattern:RegExp|string
-    patternText:string
-    placeholder:string
-    representation:string
-    ripple:boolean
-    rows:number
-    selectableEditor:boolean
-    trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
-}
-export type InputProps<Type = any> = Partial<Omit<InputProperties<Type>, 'model'>> & {
-    model?:Partial<Model<Type>>
-}
+export type InputProps<Type = any> =
+    Partial<Omit<InputProperties<Type>, 'model'>> &
+    {model?:Partial<Model<Type>>}
 export type InputPropertyTypes<Type = any> = {
     [key in keyof InputProperties<Type>]:ValueOf<typeof PropertyTypes>
 }
-export type InputState<Type = any> = {
-    cursor:{
-        end:number
-        start:number
+export type InputState<Type = any> =
+    State<Type> &
+    {
+        cursor:{
+            end:number
+            start:number
+        }
+        editorIsActive:boolean
+        hidden?:boolean
+        model:InputModelState
+        representation?:string
+        selectionIsUnstable:boolean
     }
-    editorIsActive:boolean
-    hidden?:boolean
-    model:InputModelState
-    representation?:string
-    selectionIsUnstable:boolean
-    showDeclaration:boolean
-    value:null|Type
-}
 export type InputDataTransformation<Type = any> =
     Mapping<RecursivePartial<DataTransformSpecification<Type>>> &
     {
@@ -345,7 +365,7 @@ export type StaticWebInputFunctionComponent<Type = any> =
     Omit<FunctionComponent<Props<Type>>, 'defaultProps'> &
     StaticInputComponent<Type>
 // // region constants
-const inputModelStatePropertyTypes:{
+export const inputModelStatePropertyTypes:{
     [key in keyof InputModelState]:typeof boolean
 } = {
     ...modelStatePropertyTypes,

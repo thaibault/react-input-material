@@ -40,7 +40,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     }
 
     const [fadeState, setFadeState] = useState<boolean>(false)
-    setInterval(() => setFadeState((value:boolean): => !value), 1 * 1000)
+    setInterval(
+        () => setFadeState((value:boolean):boolean => !value), 1 * 1000
+    )
 
     return (<>
         <div className="inputs">
