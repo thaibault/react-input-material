@@ -17,7 +17,17 @@
 */
 // region imports
 import {SelectProps} from '@rmwc/select'
-import PropertyTypes from 'clientnode/property-types'
+import PropertyTypes, {
+    any,
+    arrayOf,
+    boolean,
+    func,
+    number,
+    object,
+    objectOf,
+    oneOfType,
+    string
+} from 'clientnode/property-types'
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
     Component,
@@ -62,7 +72,7 @@ export type Model<Type = any> = BaseModel<Type> & {
     writable:boolean
 }
 export type Renderable = Array<ReactElement|string>|ReactElement|string
-export type BaseModelState = {
+export type ModelState = {
     dirty:boolean
     focused:boolean
     invalid:boolean
@@ -85,9 +95,116 @@ export type DataTransformSpecification<Type = any> = {
     parse:(value:string) => null|Type
     type:NativeInputType
 }
+// // region constants
+// TODO
+export const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+    declaration: string,
+    default: any,
+    description: string,
+    /*
+        NOTE: Not yet working:
+        editor: oneOf([
+            'code',
+            'code(css)',
+            'code(script)',
+            'plain',
+            'text',
+            'richtext(raw)',
+            'richtext(simple)',
+            'richtext(normal)',
+            'richtext(advanced)'
+        ]),
+    */
+    editor: string,
+    emptyEqualsNull: boolean,
+    maximum: number,
+    maximumLength: number,
+    minimum: number,
+    minimumLength: number,
+    name: string,
+    regularExpressionPattern: oneOfType([object, string]),
+    selection: oneOfType([
+        arrayOf(oneOfType([number, string])),
+        objectOf(oneOfType([number, string]))
+    ]),
+    trim: boolean,
+    /*
+        NOTE: Not yet working:
+        type: oneOf([
+            'date',
+            'datetime-local',
+            'month',
+            'number',
+            'range',
+            'string',
+            'time',
+            'week'
+        ])
+    */
+    type: string,
+    value: any
+} as const
+export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+    ...baseModelPropertyTypes,
+    maximum: number,
+    maximumLength: number,
+    minimum: number,
+    minimumLength: number,
+    regularExpressionPattern: oneOfType([object, string]),
+    trim: boolean
+} as const
+const modelStatePropertyTypes:{
+    [key in keyof ModelState]:typeof boolean
+} = {
+    dirty: boolean,
+    focused: boolean,
+    invalid: boolean,
+    invalidRequired: boolean,
+    pristine: boolean,
+    touched: boolean,
+    untouched: boolean,
+    valid: boolean,
+    visited: boolean
+} as const
+export const propTypes: = {
+    ...baseModelPropertyTypes,
+    ...modelStatePropertyTypes,
+    disabled: boolean,
+}
+export const defaultModelState:ModelState = {
+    dirty: false,
+    focused: false,
+    invalid: false,
+    invalidRequired: false,
+    pristine: true,
+    touched: false,
+    untouched: true,
+    valid: true,
+    visited: false
+} as const
+export const defaultModel:Model = {
+    declaration: '',
+    default: null,
+    description: '',
+    editor: 'plain',
+    emptyEqualsNull: true,
+    maximum: Infinity,
+    maximumLength: Infinity,
+    minimum: 0,
+    minimumLength: 0,
+    mutable: true,
+    name: 'NO_NAME_DEFINED',
+    nullable: true,
+    regularExpressionPattern: '.*',
+    state: defaultModelState,
+    trim: true,
+    type: 'string',
+    writable: true
+} as const
+// // endregion
 // / endregion
 // / region checkbox
-export type CheckboxProperties = BaseModel<boolean> & BaseModelState & {
+export type CheckboxProperties = BaseModel<boolean> & ModelState & {
     checked:boolean
     disabled:boolean
     id:string
@@ -105,7 +222,7 @@ export type CheckProps = Partial<Omit<CheckboxProperties<Type>, 'model'>> & {
 }
 // / endregion
 // / region input
-export type InputModelState = BaseModelState & {
+export type InputModelState = ModelState & {
     invalidMaximum:boolean
     invalidMaximumLength:boolean
     invalidMinimum:boolean
@@ -212,6 +329,46 @@ export type StaticWebInputComponent<Type = any> =
 export type StaticWebInputFunctionComponent<Type = any> =
     Omit<FunctionComponent<Props<Type>>, 'defaultProps'> &
     StaticInputComponent<Type>
+// // region constants
+const inputModelStatePropertyTypes:{
+    [key in keyof InputModelState]:typeof boolean
+} = {
+    ...modelStatePropertyTypes,
+    invalidMaximum: boolean,
+    invalidMaximumLength: boolean,
+    invalidMinimum: boolean,
+    invalidMinimumLength: boolean,
+    invalidPattern: boolean
+} as const
+export const defaultInputModelState:InputModelState = {
+    ...defaultModelState,
+    invalidMaximum: false,
+    invalidMaximumLength: false,
+    invalidMinimum: false,
+    invalidMinimumLength: false,
+    invalidPattern: false
+} as const
+export const defaultInputModel:Model = {
+    ...defaultModel,
+    state: defaultInputModelState
+} as const
+export const defaultInputProps:InputProps & Pick<InputProperties, 'model'> = {
+    maximumLengthText:
+        'Please type less or equal than ${maximumLength} symbols.',
+    maximumText: 'Please give a number less or equal than ${maximum}.',
+    minimumLengthText:
+        'Please type at least or equal ${minimumLength} symbols.',
+    minimumText: 'Please give a number at least or equal to ${minimum}.',
+    model: defaultInputModel,
+    patternText:
+        'Your string have to match the regular expression: "${pattern}".',
+    requiredText: 'Please fill this field.',
+    rows: 4,
+    selectableEditor: false,
+    showDeclaration: undefined,
+    showInitialValidationState: false
+} as const
+// // endregion
 // / endregion
 // endregion
 // region vim modline

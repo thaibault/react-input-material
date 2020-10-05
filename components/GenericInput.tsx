@@ -20,7 +20,6 @@
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
 import PropertyTypes, {
     any,
-    arrayOf,
     boolean,
     func,
     number,
@@ -92,11 +91,15 @@ import {GenericAnimate} from './GenericAnimate'
 import '../material-fixes'
 import {
     DataTransformSpecification,
+    defaultInputModelState as defaultModelState,
+    defaultInputProps as defaultProps,
     InputDataTransformation,
     InputModel as Model,
+    inputModelStatePropertyTypes as modelStatePropertyTypes,
     InputModelState as ModelState,
     InputProperties as Properties,
     InputPropertyTypes,
+    inputPropertyTypes as propertyTypes,
     InputProps as Props,
     InputState as State,
     Renderable
@@ -159,73 +162,6 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
     trim: true
     /* eslint-enable camelcase */
 }
-// endregion
-// region property type helper
-const modelStatePropertyTypes:{
-    [key in keyof ModelState]:typeof boolean
-} = {
-    dirty: boolean,
-    focused: boolean,
-    invalid: boolean,
-    invalidMaximum: boolean,
-    invalidMaximumLength: boolean,
-    invalidMinimum: boolean,
-    invalidMinimumLength: boolean,
-    invalidPattern: boolean,
-    invalidRequired: boolean,
-    pristine: boolean,
-    touched: boolean,
-    untouched: boolean,
-    valid: boolean,
-    visited: boolean
-} as const
-const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
-    declaration: string,
-    default: any,
-    description: string,
-    /*
-        NOTE: Not yet working:
-        editor: oneOf([
-            'code',
-            'code(css)',
-            'code(script)',
-            'plain',
-            'text',
-            'richtext(raw)',
-            'richtext(simple)',
-            'richtext(normal)',
-            'richtext(advanced)'
-        ]),
-    */
-    editor: string,
-    emptyEqualsNull: boolean,
-    maximum: number,
-    maximumLength: number,
-    minimum: number,
-    minimumLength: number,
-    name: string,
-    regularExpressionPattern: oneOfType([object, string]),
-    selection: oneOfType([
-        arrayOf(oneOfType([number, string])),
-        objectOf(oneOfType([number, string]))
-    ]),
-    trim: boolean,
-    /*
-        NOTE: Not yet working:
-        type: oneOf([
-            'date',
-            'datetime-local',
-            'month',
-            'number',
-            'range',
-            'string',
-            'time',
-            'week'
-        ])
-    */
-    type: string,
-    value: any
-} as const
 // endregion
 // region static helper
 /**
@@ -1657,59 +1593,12 @@ export const GenericInput = memorize(forwardRef(GenericInputInner))
 GenericInput.wrapped = GenericInputInner
 GenericInput.webComponentAdapterWrapped = true
 // / endregion
-GenericInput.defaultModelState = {
-    dirty: false,
-    focused: false,
-    invalid: false,
-    invalidMaximum: false,
-    invalidMaximumLength: false,
-    invalidMinimum: false,
-    invalidMinimumLength: false,
-    invalidPattern: false,
-    invalidRequired: false,
-    pristine: true,
-    touched: false,
-    untouched: true,
-    valid: true,
-    visited: false
-} as ModelState
-GenericInput.defaultProps = {
-    maximumLengthText:
-        'Please type less or equal than ${maximumLength} symbols.',
-    maximumText: 'Please give a number less or equal than ${maximum}.',
-    minimumLengthText:
-        'Please type at least or equal ${minimumLength} symbols.',
-    minimumText: 'Please give a number at least or equal to ${minimum}.',
-    model: {
-        declaration: '',
-        default: null,
-        description: '',
-        editor: 'plain',
-        emptyEqualsNull: true,
-        maximum: Infinity,
-        maximumLength: Infinity,
-        minimum: 0,
-        minimumLength: 0,
-        mutable: true,
-        name: 'NO_NAME_DEFINED',
-        nullable: true,
-        regularExpressionPattern: '.*',
-        state: GenericInput.defaultModelState,
-        trim: true,
-        type: 'string',
-        writable: true
-    },
-    patternText:
-        'Your string have to match the regular expression: "${pattern}".',
-    requiredText: 'Please fill this field.',
-    rows: 4,
-    selectableEditor: false,
-    showDeclaration: undefined,
-    showInitialValidationState: false
-} as Props & Pick<Properties, 'model'>
+GenericInput.defaultModelState = defaultModelState
+GenericInput.defaultProps = defaultProps
 GenericInput.local = 'en-US'
-GenericInput.propTypes = {
-    ...baseModelPropertyTypes,
+GenericInput.propTypes = popertyTypes
+{
+    ...modelPropertyTypes,
     ...modelStatePropertyTypes,
     /*
         NOTE: Not yet working:
@@ -1720,7 +1609,6 @@ GenericInput.propTypes = {
         end: number.isRequired,
         start: number.isRequired
     }),
-    disabled: boolean,
     editorIsActive: boolean,
     fullWidth: boolean,
     /*
@@ -1735,7 +1623,7 @@ GenericInput.propTypes = {
     minimumLengthText: string,
     minimumText: string,
     model: shape<any>({
-        ...baseModelPropertyTypes,
+        ...modelPropertyTypes,
         mutable: boolean,
         state: shape(modelStatePropertyTypes),
         writable: boolean
