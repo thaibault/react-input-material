@@ -127,6 +127,9 @@ export type Properties<Type = any> =
 export type Props<Type = any> =
     Partial<Omit<Properties<Type>, 'model'>> &
     {model?:Partial<Model<Type>>}
+export type DefaultProperties<Type = any> =
+    Omit<Props<Type>, 'model'> &
+    {model:Model<Type>}
 export type State<Type = any> = {
     model:ModelState
     showDeclaration:boolean
@@ -252,7 +255,7 @@ export const defaultModel:Model = {
     type: 'string',
     writable: true
 } as const
-export const defaultProperties:Omit<Props, 'model'> & Pick<Properties, 'model'> = {
+export const defaultProperties:DefaultProperties = {
     model: {...defaultModel},
     showDeclaration: undefined,
     showInitialValidationState: false,
@@ -332,6 +335,9 @@ export type InputProperties<Type = any> =
 export type InputProps<Type = any> =
     Partial<Omit<InputProperties<Type>, 'model'>> &
     {model?:Partial<InputModel<Type>>}
+export type DefaultInputProperties<Type = any> =
+    Omit<InputProps, 'model'> &
+    {model:InputModel}
 export type InputPropertyTypes<Type = any> = {
     [key in keyof InputProperties<Type>]:ValueOf<typeof PropertyTypes>
 }
@@ -451,7 +457,7 @@ export const defaultInputModel:InputModel = {
     ...defaultModel,
     state: defaultInputModelState
 } as const
-export const defaultInputProperties:Omit<InputProps, 'model'> & Pick<InputProperties, 'model'> = {
+export const defaultInputProperties:DefaultInputProperties = {
     ...defaultProperties,
     maximumLengthText:
         'Please type less or equal than ${maximumLength} symbols.',

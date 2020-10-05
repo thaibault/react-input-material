@@ -17,18 +17,19 @@
     endregion
 */
 // region imports
-import {Mapping} from 'clientnode/type'
+import Tools from 'clientnode'
+import {Mapping, ValueOf} from 'clientnode/type'
 
-import {ModelState, Properties, Props} from './type'
+import {DefaultProperties, Model, ModelState, Properties, Props} from './type'
 // endregion
 /**
  * Determines initial value depending on given properties.
  * @param properties - Components properties.
  * @returns Determined value.
  */
-export function determineInitialValue<Type = any>(
+export const determineInitialValue = <Type = any>(
     properties:Props<Type>
-):null|Type {
+):null|Type => {
     if (properties.value !== undefined)
         return properties.value as null|Type
     if (properties.model?.value !== undefined)
@@ -48,11 +49,11 @@ export function determineInitialValue<Type = any>(
  * validator function.
  * @returns A boolean indicating if validation state has changed.
  */
-export function determineValidationState<Type = any>(
+export const determineValidationState = <Type = any>(
     configuration:Properties<Type>,
     value:null|Type,
     validators:Mapping<() => boolean> = {}
-):boolean {
+):boolean => {
     let changed:boolean = false
 
     validators = {
@@ -78,6 +79,63 @@ export function determineValidationState<Type = any>(
     }
 
     return changed
+}
+/**
+ * Synchronizes property, state and model configuration:
+ * Properties overwrites default properties which overwrites default model
+ * properties.
+ * @returns Merged properties.
+*/
+export const mapPropertiesToModel = <Type = any>(
+    properties:Props<Type>, defaultModel:Model<Type>, value:null|Type
+):DefaultProperties<Type> => {
+    /*
+        NOTE: Default props seems not to respect nested layers to merge so
+        we have to manage this for nested model structure.
+    */
+    const result:DefaultProperties<Type> = Tools.extend(
+        true,
+        {model: {...defaultModel, state: {...defaultModel.state}}},
+        properties
+    )
+    // region handle aliases
+    if (result.disabled) {
+        delete result.disabled
+        result.model.mutable = false
+    }
+    if (result.pattern) {
+        result.model.regularExpressionPattern = result.pattern
+        delete result.pattern
+    }
+    if (result.required) {
+        delete result.required
+        result.model.nullable = false
+    }
+    if (result.type === 'text')
+        result.type = 'string'
+    // endregion
+    // region handle model configuration
+    for (const [name, value] of Object.entries(result.model))
+        if (Object.prototype.hasOwnProperty.call(result, name))
+            (result.model[name as keyof Model<Type>] as ValueOf<Model<Type>>) =
+                result[name as keyof Props<Type>] as ValueOf<Model<Type>>
+    for (const [name, value] of Object.entries(result.model.state))
+        if (Object.prototype.hasOwnProperty.call(result, name))
+            result.model.state[name as keyof ModelState] =
+                result[name as keyof Props<Type>] as ValueOf<ModelState>
+    for (const key of Object.keys(result.model.state))
+        if (!Object.prototype.hasOwnProperty.call(props, key)) {
+            result.model.state = model
+            break
+        }
+
+    if (result.model.value === undefined)
+        result.model.value = (value === undefined) ?
+            result.model.default :
+            value
+    // else -> Controlled component via model's "value" property.
+    // endregion
+    return result
 }
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

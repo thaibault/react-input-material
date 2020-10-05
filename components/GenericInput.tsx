@@ -88,12 +88,14 @@ import {GenericAnimate} from './GenericAnimate'
 import styles from './GenericInput.module'
 import {
     determineInitialValue,
-    determineValidationState as determineBaseValidationState
+    determineValidationState as determineBaseValidationState,
+    mapPropertiesToModel
 } from '../helper'
 import '../material-fixes'
 import {
     DataTransformSpecification,
     defaultInputModelState as defaultModelState,
+    DefaultInputProperties as DefaultProperties,
     defaultInputProperties as defaultProperties,
     InputDataTransformation,
     InputModelState as ModelState,
@@ -717,65 +719,12 @@ export const GenericInputInner = function<Type = any>(
      * properties.
      * @returns Nothing.
     */
-    const mapPropertiesAndStateToModel = (properties:Props<Type>):Props<Type> => {
-        /*
-            NOTE: Default props seems not to respect nested layers to merge so
-            we have to manage this for nested model structure.
-        */
-        const result:Props<Type> & {model:Model} = Tools.extend(
-            true,
-            {
-                model: {
-                    ...GenericInput.defaultProps.model,
-                    state: {...GenericInput.defaultProps.model!.state}
-                }
-            },
-            properties
+    const mergePropertiesStateAndModel = (
+        properties:Props<Type>
+    ):DefaultProperties<Type> => {
+        const result:DefaultProperties<Type> = mapPropertiesToModel<Type>(
+            properties, GenericInput.defaultProps.model, value
         )
-        // region handle aliases
-        if (result.disabled) {
-            delete result.disabled
-            result.model.mutable = false
-        }
-        if (result.pattern) {
-            result.model.regularExpressionPattern = result.pattern
-            delete result.pattern
-        }
-        if (result.required) {
-            delete result.required
-            result.model.nullable = false
-        }
-        if (result.type === 'text')
-            result.type = 'string'
-        // endregion
-        // region handle model configuration
-        for (const [name, value] of Object.entries(result.model))
-            if (Object.prototype.hasOwnProperty.call(result, name))
-                (
-                    result.model[name as keyof Model<Type>] as
-                        ValueOf<Model<Type>>
-                ) = result[name as keyof Props<Type>] as ValueOf<Model<Type>>
-        for (const [name, value] of Object.entries(result.model.state))
-            if (Object.prototype.hasOwnProperty.call(result, name))
-                result.model.state[name as keyof ModelState] =
-                    result[name as keyof Props<Type>] as ValueOf<ModelState>
-        for (const key of Object.keys(result.model.state))
-            if (!Object.prototype.hasOwnProperty.call(props, key)) {
-                result.model.state = model
-                break
-            }
-
-        /*
-            NOTE: Model states are not retrieved from state but derived from
-            specification and current value.
-        */
-
-        if (result.model.value === undefined)
-            result.model.value = (value === undefined) ?
-                result.model.default :
-                value
-        // else -> Controlled component via model's "value" property.
-        // endregion
         // region handle state configuration
         if (result.cursor === undefined)
             result.cursor = cursor
@@ -809,7 +758,7 @@ export const GenericInputInner = function<Type = any>(
      * @returns External properties object.
      */
     const getConsolidatedProperties = (properties:Props<Type>):Properties<Type> => {
-        properties = mapPropertiesAndStateToModel(properties)
+        properties = mergePropertiesStateAndModel(properties)
         const result:Properties<Type> & {
             mutable?:boolean
             nullable?:boolean
