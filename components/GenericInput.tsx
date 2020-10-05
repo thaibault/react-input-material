@@ -1597,69 +1597,6 @@ GenericInput.defaultModelState = defaultModelState
 GenericInput.defaultProps = defaultProps
 GenericInput.local = 'en-US'
 GenericInput.propTypes = popertyTypes
-{
-    ...modelPropertyTypes,
-    ...modelStatePropertyTypes,
-    /*
-        NOTE: Not yet working:
-        align: oneOf(['end', 'start']),
-    */
-    align: string,
-    cursor: shape({
-        end: number.isRequired,
-        start: number.isRequired
-    }),
-    editorIsActive: boolean,
-    fullWidth: boolean,
-    /*
-        NOTE: Not yet working:
-        icon?:string|(IconOptions & {tooltip?:string|TooltipProps})
-    */
-    icon: oneOfType([string, object]),
-    initialValue: any,
-    hidden: boolean,
-    maximumLengthText: string,
-    maximumText: string,
-    minimumLengthText: string,
-    minimumText: string,
-    model: shape<any>({
-        ...modelPropertyTypes,
-        mutable: boolean,
-        state: shape(modelStatePropertyTypes),
-        writable: boolean
-    }),
-    onBlur: func,
-    onChange: func,
-    onChangeEditorIsActive: func,
-    onChangeValue: func,
-    onChangeShowDeclaration: func,
-    onChangeState: func,
-    onClick: func,
-    onFocus: func,
-    onKeyUp: func,
-    onSelectionChange: func,
-    onTouch: func,
-    outlined: boolean,
-    pattern: oneOfType([object, string]),
-    patternText: string,
-    placeholder: string,
-    representation: string,
-    required: boolean,
-    requiredText: string,
-    ripple: boolean,
-    rows: number,
-    selectableEditor: boolean,
-    showDeclaration: boolean,
-    showInitialValidationState: boolean,
-    theme: object,
-    /*
-        NOTE: Not yet working:
-        tooltip?:string|TooltipProps
-        trailingIcon?:string|(IconOptions & {tooltip?:string|TooltipProps})
-    */
-    tooltip: any,
-    trailingIcon: any
-} as Mapping<ValueOf<typeof PropertyTypes>>
 GenericInput.strict = false
 GenericInput.transformer = {
     currency: {
