@@ -29,10 +29,9 @@ import {ThemeProvider, ThemeProviderProps} from '@rmwc/theme'
 export const WrapThemeProvider:FunctionComponent<{
     children:ReactElement
     configuration?:ThemeProviderProps['options']
-}> = ({children, configuration}):ReactElement =>
-    configuration ?
-        <ThemeProvider options={configuration} wrap>{content}</ThemeProvider> :
-        content
+}> = ({children, configuration}):ReactElement => configuration ?
+    <ThemeProvider options={configuration} wrap>{children}</ThemeProvider> :
+    children
 export default WrapThemeProvider
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

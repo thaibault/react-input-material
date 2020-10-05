@@ -102,6 +102,7 @@ import {
 } from '../type'
 import styles from './GenericInput.module'
 import WrapStrict from './WrapStrict'
+import WrapThemeProvider from './WrapThemeProvider'
 import WrapTooltip from './WrapTooltip'
 // endregion
 // region code editor configuration
@@ -1361,7 +1362,7 @@ export const GenericInputInner = function<Type = any>(
     return <WrapThemeProvider><div className={
         styles['generic-input'] +
         (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
-    }><wrapStrict strict={GenericInput.strict}><WrapTooltip
+    }><WrapStrict strict={GenericInput.strict}><WrapTooltip
         options={properties.tooltip}
     ><div>
         <GenericAnimate in={Boolean(properties.selection)}>

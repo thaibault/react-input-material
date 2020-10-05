@@ -19,7 +19,7 @@
 // region imports
 import React, {FunctionComponent, ReactElement, StrictMode} from 'react'
 
-import {Renderable} '../type'
+import {Renderable} from '../type'
 // endregion
 /**
  * Generic strict wrapper component.
