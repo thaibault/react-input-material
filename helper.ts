@@ -150,6 +150,8 @@ export const mapPropertiesAndStateToModel = <P extends Props, M extends Model, M
         result.model.value = (value === undefined) ?
             result.model.default :
             value
+    else if (value !== undefined)
+        result.model.value = value
     // else -> Controlled component via model's "value" property.
     // endregion
     return result

@@ -407,10 +407,13 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 */}
+            <RequireableCheckbox onChange={onChange} />
+
+            <hr/>
+
+            <RequireableCheckbox name="checkbox1" onChange={onChange} />
             <RequireableCheckbox
-                description="check1Label"
-                name="check1"
-                onChange={onChange}
+                model={{name: 'checkbox1Model'}} onChange={onChange}
             />
 
         </div>

@@ -287,6 +287,7 @@ export type CheckboxState = State<boolean>
 // // region constants
 export const defaultCheckboxModel:Model<boolean> = {
     ...defaultModel,
+    default: false,
     type: 'boolean',
     value: false
 }
