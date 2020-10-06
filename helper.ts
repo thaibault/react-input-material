@@ -98,12 +98,15 @@ export const mapPropertiesAndStateToModel = <P extends Props, M extends Model, M
     defaultModel:M,
     value:null|Type,
     model:MS
-):P => {
+):P & {model:M} => {
     /*
         NOTE: Default props seems not to respect nested layers to merge so
         we have to manage this for nested model structure.
     */
-    const result:P = Tools.extend(
+    const result:P & {
+        model:M
+        pattern?:string
+    } = Tools.extend(
         true,
         {model: {...defaultModel, state: {...defaultModel.state}}},
         properties
@@ -128,13 +131,13 @@ export const mapPropertiesAndStateToModel = <P extends Props, M extends Model, M
     for (const [name, value] of Object.entries(result.model))
         if (Object.prototype.hasOwnProperty.call(result, name))
             (result.model[name as keyof M] as ValueOf<M>) =
-                result[name as keyof P] as ValueOf<M>
+                result[name as keyof P] as unknown as ValueOf<M>
     for (const [name, value] of Object.entries(result.model.state))
         if (Object.prototype.hasOwnProperty.call(result, name))
             result.model.state[name as keyof ModelState] =
-                result[name as keyof P] as ValueOf<ModelState>
+                result[name as keyof P] as unknown as ValueOf<ModelState>
     for (const key of Object.keys(result.model.state))
-        if (!Object.prototype.hasOwnProperty.call(props, key)) {
+        if (!Object.prototype.hasOwnProperty.call(initialProperties, key)) {
             result.model.state = model
             break
         }
@@ -152,13 +155,13 @@ export const mapPropertiesAndStateToModel = <P extends Props, M extends Model, M
  * @param properties - Properties to merge.
  * @returns External properties object.
  */
-export const getConsolidatedProperties = <Type = any>(
-    properties:Props<Type>
-):Properties<Type> => {
-    const result:Properties<Type> & {
+export const getConsolidatedProperties =
+    <P extends Props, R extends Properties>(properties:P):R => {
+    const result:R & {
         mutable?:boolean
+        pattern?:RegExp|string
         nullable?:boolean
-        regularExpressionPattern?:RegExp|string
+        regularExpressionPattern?:null|RegExp|string
         state?:null
         writable?:boolean
     } = Tools.extend(
@@ -177,7 +180,8 @@ export const getConsolidatedProperties = <Type = any>(
     result.required = !result.nullable
     delete result.nullable
 
-    result.pattern = result.regularExpressionPattern
+    if (result.regularExpressionPattern)
+        result.pattern = result.regularExpressionPattern
     // NOTE: Workaround since options configuration above is ignored.
     delete (result as {regularExpressionPattern?:RegExp|string})
         .regularExpressionPattern

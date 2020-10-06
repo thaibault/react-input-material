@@ -62,7 +62,7 @@ export type BaseModel<Type = any> = {
     minimum:number
     minimumLength:number
     name:string
-    regularExpressionPattern:RegExp|string
+    regularExpressionPattern:null|RegExp|string
     selection?:SelectProps['options']
     trim:boolean
     type:GenericInputType
@@ -249,7 +249,7 @@ export const defaultModel:Model = {
     mutable: true,
     name: 'NO_NAME_DEFINED',
     nullable: true,
-    regularExpressionPattern: '.*',
+    regularExpressionPattern: null,
     state: {...defaultModelState},
     trim: true,
     type: 'string',

@@ -206,6 +206,7 @@ export function determineValidationState<Type = any>(
                         'string' &&
                     !(new RegExp(configuration.model.regularExpressionPattern))
                         .test(value) ||
+                    configuration.model.regularExpressionPattern !== null &&
                     typeof configuration.model.regularExpressionPattern ===
                         'object' &&
                     !typeof configuration.model.regularExpressionPattern
@@ -724,14 +725,14 @@ export const GenericInputInner = function<Type = any>(
     const mergePropertiesStateAndModel = (
         properties:Props<Type>
     ):DefaultProperties<Type> => {
-        const result:Props<Type> =
+        const result:DefaultProperties<Type> =
             mapPropertiesAndStateToModel<Props<Type>, Model<Type>, ModelState, Type>(
                 properties,
                 props,
-                GenericInput.defaultProps.model,
+                GenericInput.defaultProps.model as Model<Type>,
                 value,
                 model
-            )
+            ) as DefaultProperties<Type>
         // region handle state configuration
         if (result.cursor === undefined)
             result.cursor = cursor
@@ -755,7 +756,7 @@ export const GenericInputInner = function<Type = any>(
             result as unknown as Properties<Type>, result.model.value
         )
         determineValidationState<Type>(
-            result as unknown as Properties<Type>, result.model.value
+            result as unknown as Properties<Type>, result.model.value as Type
         )
 
         return result
@@ -765,10 +766,13 @@ export const GenericInputInner = function<Type = any>(
      * @param properties - Properties to merge.
      * @returns External properties object.
      */
-    const getConsolidatedProperties = (properties:Props<Type>):Properties<Type> => {
-        properties = getBaseConsolidatedProperties(
-            mergePropertiesStateAndModel(properties)
-        )
+    const getConsolidatedProperties = (
+        properties:Props<Type>
+    ):Properties<Type> => {
+        const result:Properties<Type> =
+            getBaseConsolidatedProperties<Props<Type>, Properties<Type>>(
+                mergePropertiesStateAndModel(properties)
+            )
 
         // NOTE: If only an editor is specified it should be displayed.
         if (!(result.editor === 'plain' || result.selectableEditor))
