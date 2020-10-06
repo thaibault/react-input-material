@@ -37,12 +37,10 @@ export const WrapConfigurations:FunctionComponent<{
     strict?:boolean
     theme?:ThemeProviderProps['options']
     tooltip?:Properties['tooltip']
-}> = ({children, configuration}):ReactElement =>
-    <WrapThemeProvider configuration={configuration.theme}>
-        <WrapStrict strict={Boolean(configuration.strict)}>
-            <WrapTooltip options={configuration.tooltip}>
-                {children}
-            </WrapTooltip>
+}> = ({children, strict, theme, tooltip}):ReactElement =>
+    <WrapThemeProvider configuration={theme}>
+        <WrapStrict strict={Boolean(strict)}>
+            <WrapTooltip options={tooltip}>{children}</WrapTooltip>
         </WrapStrict>
     </WrapThemeProvider>
 export default WrapConfigurations

@@ -70,15 +70,15 @@ export const RequireableCheckboxInner = function(
         useState<ModelState>({...RequireableCheckbox.defaultModelState})
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
     let [value, setValue] =
-        useState<boolean>(determineInitialValue<boolean>(props))
+        useState<boolean>(Boolean(determineInitialValue<boolean>(props)))
 
-    const properties:Properties<Type> = getConsolidatedProperties(props)
+    const properties:Properties = getConsolidatedProperties(props)
     useImperativeHandle(
         reference,
-        ():WebComponentAdapter<Properties<Type>, State<Type>> & {
+        ():WebComponentAdapter<Properties, State> & {
             references:{
-                foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation>
-                inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>
+                foundationRef:RefObject<MDCCheckboxFoundation>
+                inputReference:RefObject<HTMLInputElement>
             }
         } => ({
             properties,
@@ -92,9 +92,9 @@ export const RequireableCheckboxInner = function(
         showDeclaration = properties.showDeclaration
 
     if (properties.value !== undefined)
-        value = properties.value as null|Type
+        value = Boolean(properties.value)
     else if (properties.model?.value !== undefined)
-        value = properties.model.value as null|Type
+        value = Boolean(properties.model.value)
     // endregion
     const materialProperties = {}
     return <WrapConfigurations
