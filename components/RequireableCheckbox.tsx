@@ -17,24 +17,31 @@
     endregion
 */
 // region imports
+import {MDCCheckboxFoundation} from '@material/checkbox'
 import {Checkbox} from '@rmwc/checkbox'
 import '@rmwc/checkbox/styles'
 import React, {
+    createRef,
     forwardRef,
     ForwardRefRenderFunction,
     FunctionComponent,
     memo as memorize,
     ReactElement,
-    RefObject
+    RefObject,
+    useImperativeHandle,
+    useState
 } from 'react'
 import {WebComponentAdapter} from 'web-component-wrapper/type'
 
+import {WrapConfigurations} from './WrapConfigurations'
+import {determineInitialValue, getConsolidatedProperties} from '../helper'
 import {
     CheckboxProperties as Properties,
     CheckboxProps as Props,
     CheckboxState as State,
     defaultModelState,
     defaultProperties,
+    CheckboxModelState as ModelState,
     propertyTypes,
     StaticFunctionComponent as StaticComponent
 } from '../type'
@@ -50,11 +57,53 @@ import {
  * @returns React elements.
  */
 export const RequireableCheckboxInner = function(
-    properties:Props,
-    reference?:RefObject<WebComponentAdapter<Properties, State>>
+    props:Props, reference?:RefObject<WebComponentAdapter<Properties, State>>
 ):ReactElement {
+    // region properties
+    // / region references
+    const inputReference:RefObject<HTMLInputElement> =
+        createRef<HTMLInputElement>()
+    const foundationRef:RefObject<MDCCheckboxFoundation> =
+        createRef<MDCCheckboxFoundation>()
+    // / endregion
+    const [model, setModel] =
+        useState<ModelState>({...RequireableCheckbox.defaultModelState})
+    let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
+    let [value, setValue] =
+        useState<boolean>(determineInitialValue<boolean>(props))
+
+    const properties:Properties<Type> = getConsolidatedProperties(props)
+    useImperativeHandle(
+        reference,
+        ():WebComponentAdapter<Properties<Type>, State<Type>> & {
+            references:{
+                foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation>
+                inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>
+            }
+        } => ({
+            properties,
+            references: {foundationRef, inputReference},
+            state: {model, showDeclaration, value}
+        })
+    )
+    // endregion
+    // region derive state variables from given properties
+    if (properties.showDeclaration !== undefined)
+        showDeclaration = properties.showDeclaration
+
+    if (properties.value !== undefined)
+        value = properties.value as null|Type
+    else if (properties.model?.value !== undefined)
+        value = properties.model.value as null|Type
+    // endregion
     const materialProperties = {}
-    return <Checkbox {...materialProperties} />
+    return <WrapConfigurations
+        strict={RequireableCheckbox.strict}
+        theme={properties.theme}
+        tooltip={properties.tooltip}
+    >
+        <Checkbox {...materialProperties} />
+    </WrapConfigurations>
 } as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>
 // NOTE: This is useful in react dev tools.
 RequireableCheckboxInner.displayName = 'RequireableCheckbox'

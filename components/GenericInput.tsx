@@ -57,6 +57,8 @@ import {
     Editor as RichTextEditor, RawEditorSettings as TinyMCEOptions
 } from 'tinymce'
 import {WebComponentAdapter} from 'web-component-wrapper/type'
+import {MDCSelectFoundation} from '@material/select'
+import {MDCTextFieldFoundation} from '@material/textfield'
 import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
@@ -86,6 +88,8 @@ import '@rmwc/typography/styles'
 
 import {GenericAnimate} from './GenericAnimate'
 import styles from './GenericInput.module'
+import WrapConfigurations from './WrapConfigurations'
+import WrapTooltip from './WrapTooltip'
 import {
     determineInitialValue,
     determineValidationState as determineBaseValidationState,
@@ -108,9 +112,6 @@ import {
     Renderable,
     StaticFunctionInputComponent as StaticComponent
 } from '../type'
-import WrapStrict from './WrapStrict'
-import WrapThemeProvider from './WrapThemeProvider'
-import WrapTooltip from './WrapTooltip'
 // endregion
 // region code editor configuration
 const CodeEditor = lazy(async ():Promise<{default:ComponentType<any>}> => {
@@ -1091,6 +1092,8 @@ export const GenericInputInner = function<Type = any>(
     let codeEditorReference:CodeEditorType|undefined
     let codeEditorInputReference:RefObject<HTMLTextAreaElement> =
         createRef<HTMLTextAreaElement>()
+    const foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation> =
+        createRef<MDCSelectFoundation|MDCTextFieldFoundation>()
     const inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement> =
         createRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>()
     let richTextEditorInputReference:RefObject<HTMLTextAreaElement> =
@@ -1120,6 +1123,7 @@ export const GenericInputInner = function<Type = any>(
             references:{
                 codeEditorReference?:CodeEditorType
                 codeEditorInputReference:RefObject<HTMLTextAreaElement>
+                foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation>
                 inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>
                 richTextEditorInputReference:RefObject<HTMLTextAreaElement>
                 richTextEditorInstance?:RichTextEditor
@@ -1130,6 +1134,7 @@ export const GenericInputInner = function<Type = any>(
             references: {
                 codeEditorReference,
                 codeEditorInputReference,
+                foundationRef,
                 inputReference,
                 richTextEditorInputReference,
                 richTextEditorInstance,
@@ -1246,18 +1251,25 @@ export const GenericInputInner = function<Type = any>(
     // / endregion
     // / region main markup
     // TODO check if mdc-classes can be retrieved
-    return <WrapThemeProvider><div className={
+    return <WrapConfigurations
+        strict={GenericInput.strict}
+        theme={properties.theme}
+        tooltip={properties.tooltip}
+    ><div className={
         styles['generic-input'] +
         (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
-    }><WrapStrict strict={GenericInput.strict}><WrapTooltip
-        options={properties.tooltip}
-    ><div>
+    }>
         <GenericAnimate in={Boolean(properties.selection)}>
             <Select
                 {...genericProperties as SelectProps}
                 {...materialProperties as SelectProps}
                 enhanced
-                inputRef={inputReference as unknown as undefined}
+                foundationRef={foundationRef as unknown as
+                    RefCallback<MDCSelectFoundation>
+                }
+                inputRef={inputReference as unknown as
+                    RefCallback<HTMLSelectElement|HTMLTextAreaElement>
+                }
                 rootProps={{name: properties.name, onClick: onClick}}
                 onChange={onChangeValue}
                 options={properties.selection}
@@ -1361,6 +1373,9 @@ export const GenericInputInner = function<Type = any>(
                 {...materialProperties as TextFieldProps}
                 align={properties.align}
                 characterCount
+                foundationRef={foundationRef as unknown as
+                    RefCallback<MDCTextFieldFoundation>
+                }
                 fullwidth={properties.fullWidth}
                 inputRef={inputReference as unknown as
                     RefCallback<HTMLInputElement|HTMLTextAreaElement>
@@ -1404,7 +1419,7 @@ export const GenericInputInner = function<Type = any>(
             !(isAdvancedEditor || properties.selection),
             richTextEditorLoadedOnce || properties.editor.startsWith('code')
         )}
-    </div></WrapTooltip></WrapStrict></div></WrapThemeProvider>
+    </div></WrapConfigurations>
     // / endregion
     // endregion
 } as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>

@@ -271,9 +271,11 @@ export type CheckboxProperties =
         indeterminate:boolean
         onChange:(properties:CheckboxProperties, event?:SyntheticEvent) => void
     }
+export type CheckboxModel = Model<boolean>
+export type CheckboxModelState = ModelState
 export type CheckboxProps =
     Partial<Omit<CheckboxProperties, 'model'>> &
-    {model?:Partial<Model<boolean>>}
+    {model?:Partial<CheckboxModel>}
 export type CheckboxState = State<boolean>
 // // region constants
 export const defaultCheckboxProperties:CheckboxProps = {
