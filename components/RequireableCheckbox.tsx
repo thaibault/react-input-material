@@ -69,8 +69,9 @@ export const RequireableCheckboxInner = function(
     const [model, setModel] =
         useState<ModelState>({...RequireableCheckbox.defaultModelState})
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
-    let [value, setValue] =
-        useState<boolean>(Boolean(determineInitialValue<boolean>(props)))
+    let [value, setValue] = useState<boolean|null>(
+        determineInitialValue<boolean>(props, props.checked)
+    )
 
     const properties:Properties = getConsolidatedProperties(props)
     useImperativeHandle(
@@ -96,13 +97,25 @@ export const RequireableCheckboxInner = function(
     else if (properties.model?.value !== undefined)
         value = Boolean(properties.model.value)
     // endregion
-    const materialProperties = {}
     return <WrapConfigurations
         strict={RequireableCheckbox.strict}
         theme={properties.theme}
         tooltip={properties.tooltip}
     >
-        <Checkbox {...materialProperties} />
+        <Checkbox
+            checked={properties.value}
+            disabled={properties.disabled}
+            id={properties.id}
+            indeterminate={
+                properties.indeterminate || properties.value === null
+            }
+            label={properties.label}
+            ripple={properties.ripple}
+            rootProps={
+                ...properties.rootProps
+            }
+            value={properties.value}
+        />
     </WrapConfigurations>
 } as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>
 // NOTE: This is useful in react dev tools.

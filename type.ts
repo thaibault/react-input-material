@@ -36,13 +36,14 @@ import {
     FocusEvent,
     ForwardRefExoticComponent,
     FunctionComponent,
+    HTMLProps,
     KeyboardEvent,
     MouseEvent,
     ReactElement,
     RefAttributes,
     SyntheticEvent
 } from 'react'
-import {IconOptions} from '@rmwc/types'
+import {IconOptions, RipplePropT} from '@rmwc/types'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
 import {
@@ -119,6 +120,8 @@ export type Properties<Type = any> =
         onTouch:(event:SyntheticEvent) => void
         required:boolean
         requiredText:string
+        ripple:RipplePropT
+        rootProps:HTMLProps<any>
         showDeclaration:boolean
         showInitialValidationState:boolean
         theme:ThemeProviderProps['options']
@@ -268,6 +271,7 @@ export type CheckboxProperties =
     Properties<boolean> &
     {
         checked:boolean
+        id:string
         indeterminate:boolean
         onChange:(properties:CheckboxProperties, event?:SyntheticEvent) => void
     }
@@ -329,7 +333,6 @@ export type InputProperties<Type = any> =
         patternText:string
         placeholder:string
         representation:string
-        ripple:boolean
         rows:number
         selectableEditor:boolean
         trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
@@ -442,6 +445,7 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     patternText: string,
     placeholder: string,
     representation: string,
+    // TODO
     ripple: boolean,
     rows: number,
     selectableEditor: boolean,

@@ -1270,7 +1270,11 @@ export const GenericInputInner = function<Type = any>(
                 inputRef={inputReference as unknown as
                     RefCallback<HTMLSelectElement|HTMLTextAreaElement>
                 }
-                rootProps={{name: properties.name, onClick: onClick}}
+                rootProps={{
+                    name: properties.name,
+                    onClick: onClick,
+                    ...properties.rootProps
+                }}
                 onChange={onChangeValue}
                 options={properties.selection}
             />
@@ -1389,7 +1393,8 @@ export const GenericInputInner = function<Type = any>(
                 rootProps={{
                     name: properties.name,
                     onClick: onClick,
-                    onKeyUp: onKeyUp
+                    onKeyUp: onKeyUp,
+                    ...properties.rootProps
                 }}
                 rows={properties.rows}
                 textarea={

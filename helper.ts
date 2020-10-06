@@ -28,8 +28,10 @@ import {DefaultProperties, Model, ModelState, Properties, Props} from './type'
  * @returns Determined value.
  */
 export const determineInitialValue = <Type = any>(
-    properties:Props<Type>
+    properties:Props<Type>, alternateValue?:Type
 ):null|Type => {
+    if (alternateValue !== undefined)
+        return alternateValue
     if (properties.value !== undefined)
         return properties.value as null|Type
     if (properties.model?.value !== undefined)
