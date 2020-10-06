@@ -92,18 +92,18 @@ export const determineValidationState = <Type = any>(
  * @param model - Current model state.
  * @returns Merged properties.
 */
-export const mapPropertiesAndStateToModel = <Type = any>(
-    properties:Props<Type>,
-    initialProperties:Props<Type>,
-    defaultModel:Model<Type>,
+export const mapPropertiesAndStateToModel = <P extends Props, M extends Model, MS extends ModelState, Type = any>(
+    properties:P,
+    initialProperties:P,
+    defaultModel:M,
     value:null|Type,
-    model:ModelState
-):DefaultProperties<Type> => {
+    model:MS
+):P => {
     /*
         NOTE: Default props seems not to respect nested layers to merge so
         we have to manage this for nested model structure.
     */
-    const result:DefaultProperties<Type> = Tools.extend(
+    const result:P = Tools.extend(
         true,
         {model: {...defaultModel, state: {...defaultModel.state}}},
         properties
@@ -127,12 +127,12 @@ export const mapPropertiesAndStateToModel = <Type = any>(
     // region handle model configuration
     for (const [name, value] of Object.entries(result.model))
         if (Object.prototype.hasOwnProperty.call(result, name))
-            (result.model[name as keyof Model<Type>] as ValueOf<Model<Type>>) =
-                result[name as keyof Props<Type>] as ValueOf<Model<Type>>
+            (result.model[name as keyof M] as ValueOf<M>) =
+                result[name as keyof P] as ValueOf<M>
     for (const [name, value] of Object.entries(result.model.state))
         if (Object.prototype.hasOwnProperty.call(result, name))
             result.model.state[name as keyof ModelState] =
-                result[name as keyof Props<Type>] as ValueOf<ModelState>
+                result[name as keyof P] as ValueOf<ModelState>
     for (const key of Object.keys(result.model.state))
         if (!Object.prototype.hasOwnProperty.call(props, key)) {
             result.model.state = model
@@ -145,6 +145,43 @@ export const mapPropertiesAndStateToModel = <Type = any>(
             value
     // else -> Controlled component via model's "value" property.
     // endregion
+    return result
+}
+/**
+ * Calculate external properties (a set of all configurable properties).
+ * @param properties - Properties to merge.
+ * @returns External properties object.
+ */
+export const getConsolidatedProperties = <Type = any>(
+    properties:Props<Type>
+):Properties<Type> => {
+    const result:Properties<Type> & {
+        mutable?:boolean
+        nullable?:boolean
+        regularExpressionPattern?:RegExp|string
+        state?:null
+        writable?:boolean
+    } = Tools.extend(
+        {},
+        properties,
+        properties.model || {},
+        (properties.model || {}).state || {}
+    )
+
+    result.disabled = !result.mutable
+    delete result.mutable
+
+    delete result.state
+    delete result.writable
+
+    result.required = !result.nullable
+    delete result.nullable
+
+    result.pattern = result.regularExpressionPattern
+    // NOTE: Workaround since options configuration above is ignored.
+    delete (result as {regularExpressionPattern?:RegExp|string})
+        .regularExpressionPattern
+
     return result
 }
 // region vim modline

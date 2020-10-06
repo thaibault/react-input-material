@@ -89,6 +89,7 @@ import styles from './GenericInput.module'
 import {
     determineInitialValue,
     determineValidationState as determineBaseValidationState,
+    getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesAndStateToModel
 } from '../helper'
 import '../material-fixes'
@@ -717,13 +718,14 @@ export const GenericInputInner = function<Type = any>(
      * Synchronizes property, state and model configuration:
      * Properties overwrites default properties which overwrites default model
      * properties.
+     * @param properties - Properties to merge.
      * @returns Nothing.
     */
     const mergePropertiesStateAndModel = (
         properties:Props<Type>
     ):DefaultProperties<Type> => {
-        const result:DefaultProperties<Type> =
-            mapPropertiesAndStateToModel<Type>(
+        const result:Props<Type> =
+            mapPropertiesAndStateToModel<Props<Type>, Model<Type>, ModelState, Type>(
                 properties,
                 props,
                 GenericInput.defaultProps.model,
@@ -760,36 +762,13 @@ export const GenericInputInner = function<Type = any>(
     }
     /**
      * Calculate external properties (a set of all configurable properties).
+     * @param properties - Properties to merge.
      * @returns External properties object.
      */
     const getConsolidatedProperties = (properties:Props<Type>):Properties<Type> => {
-        properties = mergePropertiesStateAndModel(properties)
-        const result:Properties<Type> & {
-            mutable?:boolean
-            nullable?:boolean
-            regularExpressionPattern?:RegExp|string
-            state?:null
-            writable?:boolean
-        } = Tools.extend(
-            {},
-            properties,
-            properties.model || {},
-            (properties.model || {}).state || {}
+        properties = getBaseConsolidatedProperties(
+            mergePropertiesStateAndModel(properties)
         )
-
-        result.disabled = !result.mutable
-        delete result.mutable
-
-        delete result.state
-        delete result.writable
-
-        result.required = !result.nullable
-        delete result.nullable
-
-        result.pattern = result.regularExpressionPattern
-        // NOTE: Workaround since options configuration above is ignored.
-        delete (result as {regularExpressionPattern?:RegExp|string})
-            .regularExpressionPattern
 
         // NOTE: If only an editor is specified it should be displayed.
         if (!(result.editor === 'plain' || result.selectableEditor))
