@@ -20,6 +20,7 @@
 import {MDCCheckboxFoundation} from '@material/checkbox'
 import {Checkbox} from '@rmwc/checkbox'
 import '@rmwc/checkbox/styles'
+import {Theme} from '@rmwc/theme'
 import React, {
     createRef,
     FocusEvent as ReactFocusEvent,
@@ -75,8 +76,8 @@ export const RequireableCheckboxInner = function(
      * @param properties - Properties to merge.
      * @returns External properties object.
      */
-    const getConsolidatedProperties = (properties:Props):Properties =>
-        getBaseConsolidatedProperties<Props, Properties>(
+    const getConsolidatedProperties = (properties:Props):Properties => {
+        const result:DefaultProperties =
             mapPropertiesAndStateToModel<Props, Model, ModelState, boolean>(
                 properties,
                 RequireableCheckbox.defaultProps.model as Model,
@@ -84,7 +85,9 @@ export const RequireableCheckboxInner = function(
                 model,
                 props
             ) as DefaultProperties
-        )
+        determineValidationState<boolean>(result, result.model.value)
+        return getBaseConsolidatedProperties<Props, Properties>(result)
+    }
     // region event handler
     /**
      * Triggered on blur events.
@@ -297,45 +300,52 @@ export const RequireableCheckboxInner = function(
     else if (properties.model?.value !== undefined)
         value = Boolean(properties.model.value)
     // endregion
-
+    // region markup
     // TODO Helptext, validation
-    return <WrapConfigurations
+    return (/*<WrapConfigurations
         strict={RequireableCheckbox.strict}
         theme={properties.theme}
         tooltip={properties.tooltip}
-    >
+    >*/
         <Checkbox
             checked={value === null ? undefined : value}
-            label={properties.description || properties.name}
+            disabled={properties.disabled}
+            foundationRef={
+                foundationRef as unknown as RefCallback<MDCCheckboxFoundation>
+            }
+            id={properties.id}
+            indeterminate={properties.indeterminate || value === null}
+            inputRef={
+                inputReference as unknown as RefCallback<HTMLInputElement>
+            }
+            label={(
+                properties.invalid &&
+                (
+                    properties.showInitialValidationState ||
+                    /*
+                        Material inputs show their validation state at least
+                        after a blur event so we synchronize error appearances.
+                    */
+                    properties.visited
+                )
+            ) ?
+                <Theme use="error">
+                    {properties.description || properties.name}
+                </Theme> :
+                properties.description || properties.name
+            }
+            name={properties.name}
+            onBlur={onBlur}
             onChange={onChangeValue}
+            onClick={onClick}
+            onFocus={onFocus}
+            ripple={properties.ripple}
+            value={`${value}`}
         />
-
-    </WrapConfigurations>
+    //</WrapConfigurations>
+    )
+    // endregion
 } as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>
-/*
-    checked={value === null ? undefined : value}
-    disabled={properties.disabled}
-    foundationRef={
-        foundationRef as unknown as RefCallback<MDCCheckboxFoundation>
-    }
-    id={properties.id}
-    indeterminate={properties.indeterminate || value === null}
-    inputRef={
-        inputReference as unknown as RefCallback<HTMLInputElement>
-    }
-    onBlur={onBlur}
-    onFocus={onFocus}
-    ripple={properties.ripple}
-    value={`${value}`}
-
-    TODO
-
-    rootProps={{
-        name: properties.name,
-        onClick: onClick,
-        ...properties.rootProps
-    }}
-*/
 // NOTE: This is useful in react dev tools.
 RequireableCheckboxInner.displayName = 'RequireableCheckbox'
 /**

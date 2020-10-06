@@ -416,6 +416,29 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 model={{name: 'checkbox1Model'}} onChange={onChange}
             />
 
+            <hr/>
+
+            <RequireableCheckbox
+                name="checkbox2" onChange={onChange} required
+            />
+            <RequireableCheckbox
+                model={{name: 'checkbox2Model', nullable: false}}
+                onChange={onChange}
+            />
+
+            <hr/>
+
+            <RequireableCheckbox
+                name="checkbox3"
+                onChange={onChange}
+                required
+                showInitialValidationState
+            />
+            <RequireableCheckbox
+                model={{name: 'checkbox3Model', nullable: false}}
+                onChange={onChange}
+                showInitialValidationState
+            />
         </div>
 
         <pre className="outputs">{selectedState ?

@@ -60,7 +60,12 @@ export const determineValidationState = <Type = any>(
 
     validators = {
         invalidRequired: ():boolean => (
-            configuration.model.nullable === false && value === null
+            configuration.model.nullable === false &&
+            (
+                value === null ||
+                typeof configuration.indeterminate !== 'boolean' &&
+                !value
+            )
         ),
         ...validators
     }
