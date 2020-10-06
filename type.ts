@@ -56,7 +56,6 @@ export type BaseModel<Type = any> = {
     declaration:string
     default?:null|Type
     description:string
-    editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)'
     emptyEqualsNull:boolean
     maximum:number
     maximumLength:number
@@ -111,6 +110,7 @@ export type Properties<Type = any> =
         label:string
         model:Model<Type>
         name:string
+        onBlur:(event:SyntheticEvent) => void
         onChange:(properties:Properties<Type>, event?:SyntheticEvent) => void
         onChangeShowDeclaration:(show:boolean, event?:SyntheticEvent) => void
         onChangeState:(state:ModelState, event?:SyntheticEvent) => void
@@ -218,6 +218,7 @@ export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     onTouch: func,
     required: boolean,
     requiredText: string,
+    ripple: oneOfType([boolean, object]),
     showDeclaration: boolean,
     showInitialValidationState: boolean,
     theme: object,
@@ -243,7 +244,6 @@ export const defaultModel:Model = {
     declaration: '',
     default: null,
     description: '',
-    editor: 'plain',
     emptyEqualsNull: true,
     maximum: Infinity,
     maximumLength: Infinity,
@@ -280,11 +280,20 @@ export type CheckboxModelState = ModelState
 export type CheckboxProps =
     Partial<Omit<CheckboxProperties, 'model'>> &
     {model?:Partial<CheckboxModel>}
+export type DefaultCheckboxProperties<Type = any> =
+    Omit<CheckboxProps, 'model'> &
+    {model:CheckboxModel}
 export type CheckboxState = State<boolean>
 // // region constants
+export const defaultCheckboxModel:Model<boolean> = {
+    ...defaultModel,
+    type: 'boolean',
+    value: false
+}
 export const defaultCheckboxProperties:CheckboxProps = {
     ...defaultProperties,
-    requiredText: 'Please check this field.'
+    model: {...defaultCheckboxModel},
+    requiredText: 'Please check this field.',
 } as const
 // // endregion
 // / endregion
@@ -313,6 +322,7 @@ export type InputProperties<Type = any> =
             end:number
             start:number
         }
+        editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)'
         editorIsActive:boolean
         fullWidth:boolean
         icon:string|(IconOptions & {tooltip?:string|TooltipProps})
@@ -322,7 +332,6 @@ export type InputProperties<Type = any> =
         minimumLengthText:string
         minimumText:string
         model:InputModel<Type>
-        onBlur:(event:SyntheticEvent) => void
         onChange:(properties:InputProperties<Type>, event?:SyntheticEvent) =>
             void
         onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void
@@ -445,8 +454,6 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     patternText: string,
     placeholder: string,
     representation: string,
-    // TODO
-    ripple: boolean,
     rows: number,
     selectableEditor: boolean,
     trailingIcon: any
@@ -465,6 +472,7 @@ export const defaultInputModel:InputModel = {
 } as const
 export const defaultInputProperties:DefaultInputProperties = {
     ...defaultProperties,
+    editor: 'plain',
     maximumLengthText:
         'Please type less or equal than ${maximumLength} symbols.',
     maximumText: 'Please give a number less or equal than ${maximum}.',

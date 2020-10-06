@@ -41,12 +41,13 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
     const [fadeState, setFadeState] = useState<boolean>(false)
     setInterval(
-        () => setFadeState((value:boolean):boolean => !value), 1 * 1000
+        () => setFadeState((value:boolean):boolean => !value), 10 * 1000
     )
 
     return (<>
         <div className="inputs">
 
+{/*
             <GenericInput onChange={onChange}/>
 
             <hr/>
@@ -405,9 +406,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             </div>
 
             <hr/>
-
+*/}
             <RequireableCheckbox
-                label="check1Label" name="check1" onChange={onChange} value
+                description="check1Label"
+                name="check1"
+                onChange={onChange}
             />
 
         </div>

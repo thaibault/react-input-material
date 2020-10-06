@@ -87,19 +87,19 @@ export const determineValidationState = <Type = any>(
  * Properties overwrites default properties which overwrites default model
  * properties.
  * @param properties - Properties to merge.
- * @param initialProperties - Initial unmodified properties to take into
- * account.
  * @param defaultModel - Default model to merge.
  * @param value - Current value to merge.
  * @param model - Current model state.
+ * @param initialProperties - Initial unmodified properties to take into
+ * account.
  * @returns Merged properties.
 */
 export const mapPropertiesAndStateToModel = <P extends Props, M extends Model, MS extends ModelState, Type = any>(
     properties:P,
-    initialProperties:P,
     defaultModel:M,
     value:null|Type,
-    model:MS
+    model:MS,
+    initialProperties?:P
 ):P & {model:M} => {
     /*
         NOTE: Default props seems not to respect nested layers to merge so
@@ -139,7 +139,9 @@ export const mapPropertiesAndStateToModel = <P extends Props, M extends Model, M
             result.model.state[name as keyof ModelState] =
                 result[name as keyof P] as unknown as ValueOf<ModelState>
     for (const key of Object.keys(result.model.state))
-        if (!Object.prototype.hasOwnProperty.call(initialProperties, key)) {
+        if (!Object.prototype.hasOwnProperty.call(
+            initialProperties || properties, key
+        )) {
             result.model.state = model
             break
         }

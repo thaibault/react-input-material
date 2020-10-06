@@ -34,7 +34,7 @@ import {ValidationMap} from 'prop-types'
 import React, {
     ComponentType,
     createRef,
-    FocusEvent,
+    FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardRefRenderFunction,
     KeyboardEvent as ReactKeyboardEvent,
@@ -729,10 +729,10 @@ export const GenericInputInner = function<Type = any>(
         const result:DefaultProperties<Type> =
             mapPropertiesAndStateToModel<Props<Type>, Model<Type>, ModelState, Type>(
                 properties,
-                props,
                 GenericInput.defaultProps.model as Model<Type>,
                 value,
-                model
+                model,
+                props
             ) as DefaultProperties<Type>
         // region handle state configuration
         if (result.cursor === undefined)
@@ -990,7 +990,9 @@ export const GenericInputInner = function<Type = any>(
         properties.model.value =
             parseValue(properties, value)
 
-        if (oldValue !== properties.value) {
+        if (oldValue === properties.value)
+            setRepresentation(properties.representation)
+        else {
             let stateChanged:boolean = determineValidationState<Type>(
                 properties, properties.value
             )
@@ -1013,8 +1015,7 @@ export const GenericInputInner = function<Type = any>(
 
             if (properties.onChangeValue)
                 properties.onChangeValue(properties.value, event)
-        } else
-            setRepresentation(properties.representation)
+        }
     }
     /**
      * Triggered on click events.
@@ -1032,7 +1033,7 @@ export const GenericInputInner = function<Type = any>(
      * @param event - Focus event object.
      * @returns Nothing.
      */
-    const onFocus = (event:FocusEvent):void => {
+    const onFocus = (event:ReactFocusEvent):void => {
         if (properties.onFocus)
             properties.onFocus(event)
         onTouch(event)
@@ -1062,7 +1063,7 @@ export const GenericInputInner = function<Type = any>(
      * @param event - Event object which triggered interaction.
      * @returns Nothing.
      */
-    const onTouch = (event:FocusEvent|ReactMouseEvent):void => {
+    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void => {
         let changeState:boolean = false
         if (!properties.focused) {
             changeState =

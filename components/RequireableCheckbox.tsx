@@ -22,25 +22,36 @@ import {Checkbox} from '@rmwc/checkbox'
 import '@rmwc/checkbox/styles'
 import React, {
     createRef,
+    FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardRefRenderFunction,
     FunctionComponent,
     memo as memorize,
+    MouseEvent as ReactMouseEvent,
     ReactElement,
+    RefCallback,
     RefObject,
+    SyntheticEvent,
     useImperativeHandle,
     useState
 } from 'react'
 import {WebComponentAdapter} from 'web-component-wrapper/type'
 
 import {WrapConfigurations} from './WrapConfigurations'
-import {determineInitialValue, getConsolidatedProperties} from '../helper'
 import {
+    determineInitialValue,
+    determineValidationState,
+    getConsolidatedProperties,
+    mapPropertiesAndStateToModel
+} from '../helper'
+import {
+    CheckboxModel as Model,
     CheckboxProperties as Properties,
     CheckboxProps as Props,
     CheckboxState as State,
     defaultModelState,
-    defaultProperties,
+    DefaultCheckboxProperties as DefaultProperties,
+    defaultCheckboxProperties as defaultProperties,
     CheckboxModelState as ModelState,
     propertyTypes,
     StaticFunctionComponent as StaticComponent
@@ -59,6 +70,178 @@ import {
 export const RequireableCheckboxInner = function(
     props:Props, reference?:RefObject<WebComponentAdapter<Properties, State>>
 ):ReactElement {
+    // region event handler
+    /**
+     * Triggered on blur events.
+     * @param event - Event object.
+     * @returns Nothing.
+     */
+    const onBlur = (event:SyntheticEvent):void => {
+        let changed:boolean = false
+        if (properties.focused) {
+            properties.focused =
+            properties.model.state.focused =
+                false
+            onChangeState(properties.model.state, event)
+            changed = true
+        }
+
+        if (!properties.visited) {
+            properties.visited =
+            properties.model.state.visited =
+                true
+            changed = true
+        }
+
+        if (changed)
+            onChange(event)
+        if (properties.onBlur)
+            properties.onBlur(event)
+    }
+    /**
+     * Triggered on any change events.
+     * @param event - Potential event object.
+     * @returns Nothing.
+     */
+    const onChange = (event?:SyntheticEvent):void => {
+        if (properties.onChange)
+            properties.onChange(
+                getConsolidatedProperties(
+                    /*
+                        Workaround since "Something" isn't identified as subset
+                        of "RecursivePartial"
+                    */
+                    properties as unknown as Props
+                ),
+                event
+            )
+    }
+    /**
+     * Triggered when show declaration indicator should be changed.
+     * @param event - Potential event object.
+     * @returns Nothing.
+     */
+    const onChangeShowDeclaration = (event?:ReactMouseEvent):void =>
+        setShowDeclaration((value:boolean):boolean => {
+            if (properties.onChangeShowDeclaration)
+                properties.onChangeShowDeclaration(value, event)
+            onChange(event)
+            return !value
+        })
+    /**
+     * Triggered when a value state changes like validation or focusing.
+     * @param state - Current value state.
+     * @param event - Triggering event object.
+     * @returns Nothing.
+     */
+    const onChangeState = (state:ModelState, event?:SyntheticEvent):void => {
+        for (const key of Object.keys(state))
+            if (!Object.prototype.hasOwnProperty.call(props, key)) {
+                setModel(state)
+                break
+            }
+        if (properties.onChangeState)
+            properties.onChangeState(state, event)
+    }
+    /**
+     * Triggered when ever the value changes.
+     * @param eventOrValue - Event object or new value.
+     * @returns Nothing.
+     */
+    const onChangeValue = (eventOrValue:boolean|null|SyntheticEvent):void => {
+        if (!(properties.model.mutable && properties.model.writable))
+            return
+
+        let event:SyntheticEvent|undefined
+        let value:boolean|null
+        if (
+            eventOrValue !== null &&
+            typeof eventOrValue === 'object' &&
+            (eventOrValue as SyntheticEvent).target
+        ) {
+            event = eventOrValue as SyntheticEvent
+            value =
+                typeof (event.target as {value?:boolean|null}).value ===
+                    'undefined' ?
+                        null :
+                        (event.target as unknown as {value:boolean|null}).value
+        } else
+            value = eventOrValue as boolean|null
+
+        const oldValue:boolean|null = properties.value as boolean|null
+
+        properties.value = properties.model.value = value
+
+        if (oldValue !== properties.value) {
+            let stateChanged:boolean = determineValidationState<boolean>(
+                properties, properties.value
+            )
+
+            if (properties.pristine) {
+                properties.dirty = properties.model.state.dirty = true
+                properties.pristine = properties.model.state.pristine = false
+                stateChanged = true
+            }
+            if (stateChanged)
+                onChangeState(properties.model.state, event)
+
+            setValue(properties.value)
+            onChange(event)
+
+            if (properties.onChangeValue)
+                properties.onChangeValue(properties.value, event)
+        }
+    }
+    /**
+     * Triggered on click events.
+     * @param event - Mouse event object.
+     * @returns Nothing.
+     */
+    const onClick = (event:ReactMouseEvent):void => {
+        if (properties.onClick)
+            properties.onClick(event)
+        onTouch(event)
+    }
+    /**
+     * Triggered on focus events.
+     * @param event - Focus event object.
+     * @returns Nothing.
+     */
+    const onFocus = (event:ReactFocusEvent):void => {
+        if (properties.onFocus)
+            properties.onFocus(event)
+        onTouch(event)
+    }
+    /**
+     * Triggers on start interacting with the input.
+     * @param event - Event object which triggered interaction.
+     * @returns Nothing.
+     */
+    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void => {
+        let changeState:boolean = false
+        if (!properties.focused) {
+            changeState =
+            properties.focused =
+            properties.model.state.focused =
+                true
+        }
+        if (properties.untouched) {
+            changeState =
+            properties.touched =
+            properties.model.state.touched =
+                true
+            properties.untouched =
+            properties.model.state.untouched =
+                false
+        }
+        if (changeState) {
+            onChangeState(properties.model.state, event)
+            onChange(event)
+        }
+        if (properties.onTouch)
+            properties.onTouch(event)
+    }
+    // endregion
     // region properties
     // / region references
     const inputReference:RefObject<HTMLInputElement> =
@@ -73,7 +256,14 @@ export const RequireableCheckboxInner = function(
         determineInitialValue<boolean>(props, props.checked)
     )
 
-    const properties:Properties = getConsolidatedProperties(props)
+    const properties:Properties = getConsolidatedProperties<Props, Properties>(
+        mapPropertiesAndStateToModel<Props, Model, ModelState, boolean>(
+            props,
+            RequireableCheckbox.defaultProps.model as Model,
+            value,
+            model
+        ) as DefaultProperties
+    )
     useImperativeHandle(
         reference,
         ():WebComponentAdapter<Properties, State> & {
@@ -97,27 +287,41 @@ export const RequireableCheckboxInner = function(
     else if (properties.model?.value !== undefined)
         value = Boolean(properties.model.value)
     // endregion
+    // TODO Helptext, validation
     return <WrapConfigurations
         strict={RequireableCheckbox.strict}
         theme={properties.theme}
         tooltip={properties.tooltip}
     >
         <Checkbox
-            checked={properties.value}
+            checked={properties.value === null ? undefined : properties.value}
             disabled={properties.disabled}
+            foundationRef={
+                foundationRef as unknown as RefCallback<MDCCheckboxFoundation>
+            }
             id={properties.id}
             indeterminate={
                 properties.indeterminate || properties.value === null
             }
-            label={properties.label}
-            ripple={properties.ripple}
-            rootProps={
-                ...properties.rootProps
+            inputRef={
+                inputReference as unknown as RefCallback<HTMLInputElement>
             }
-            value={properties.value}
+            label={properties.description || properties.name}
+            onBlur={onBlur}
+            onChange={onChangeValue}
+            onFocus={onFocus}
+            ripple={properties.ripple}
+
+            value={`${properties.value}`}
         />
+
     </WrapConfigurations>
 } as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>
+/*TODO            rootProps={{
+                name: properties.name,
+                onClick: onClick,
+                ...properties.rootProps
+            }}*/
 // NOTE: This is useful in react dev tools.
 RequireableCheckboxInner.displayName = 'RequireableCheckbox'
 /**
