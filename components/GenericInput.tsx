@@ -18,9 +18,8 @@
 */
 // region imports
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
-import PropertyTypes, {
+import {
     any,
-    arrayOf,
     boolean,
     func,
     number,
@@ -35,7 +34,7 @@ import {ValidationMap} from 'prop-types'
 import React, {
     ComponentType,
     createRef,
-    FocusEvent,
+    FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardRefRenderFunction,
     KeyboardEvent as ReactKeyboardEvent,
@@ -45,7 +44,6 @@ import React, {
     ReactElement,
     RefCallback,
     RefObject,
-    StrictMode,
     Suspense,
     SyntheticEvent,
     useEffect,
@@ -58,19 +56,17 @@ import {TransitionProps} from 'react-transition-group/Transition'
 import {
     Editor as RichTextEditor, RawEditorSettings as TinyMCEOptions
 } from 'tinymce'
-import {
-    EventToPropertyMapping, WebComponentAdapter
-} from 'web-component-wrapper/type'
+import {WebComponentAdapter} from 'web-component-wrapper/type'
+import {MDCSelectFoundation} from '@material/select'
+import {MDCTextFieldFoundation} from '@material/textfield'
 import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
 import {Select, SelectProps} from '@rmwc/select'
 import {TextField, TextFieldProps} from '@rmwc/textfield'
-import {Theme, ThemeProvider, ThemeProviderProps} from '@rmwc/theme'
-import {Tooltip, TooltipProps} from '@rmwc/tooltip'
+import {Theme} from '@rmwc/theme'
 import {IconOptions} from '@rmwc/types'
-import {Typography} from '@rmwc/typography'
 import {
     Editor as RichTextEditorComponent, IAllProps as RichTextEditorProps
 } from '@tinymce/tinymce-react'
@@ -91,21 +87,30 @@ import '@rmwc/tooltip/styles'
 import '@rmwc/typography/styles'
 
 import {GenericAnimate} from './GenericAnimate'
-import '../material-fixes'
-import {
-    BaseModel,
-    DataTransformSpecification,
-    GenericInputDataTransformation,
-    Model,
-    ModelState,
-    Properties,
-    PropertyTypes as InputPropertyTypes,
-    Props,
-    Renderable,
-    State,
-    StaticWebInputFunctionComponent
-} from '../type'
 import styles from './GenericInput.module'
+import WrapConfigurations from './WrapConfigurations'
+import WrapTooltip from './WrapTooltip'
+import {
+    determineInitialValue,
+    determineValidationState as determineBaseValidationState,
+    getConsolidatedProperties as getBaseConsolidatedProperties,
+    mapPropertiesAndStateToModel
+} from '../helper'
+import {
+    DataTransformSpecification,
+    defaultInputModelState as defaultModelState,
+    DefaultInputProperties as DefaultProperties,
+    defaultInputProperties as defaultProperties,
+    InputDataTransformation,
+    InputModelState as ModelState,
+    InputProperties as Properties,
+    inputPropertyTypes as propertyTypes,
+    InputProps as Props,
+    InputState as State,
+    InputModel as Model,
+    Renderable,
+    StaticFunctionInputComponent as StaticComponent
+} from '../type'
 // endregion
 // region code editor configuration
 const CodeEditor = lazy(async ():Promise<{default:ComponentType<any>}> => {
@@ -164,92 +169,52 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
     /* eslint-enable camelcase */
 }
 // endregion
-// region property type helper
-const modelStatePropertyTypes:{[key in keyof ModelState]:typeof boolean} = {
-    dirty: boolean,
-    focused: boolean,
-    invalid: boolean,
-    invalidMaximum: boolean,
-    invalidMaximumLength: boolean,
-    invalidMinimum: boolean,
-    invalidMinimumLength: boolean,
-    invalidPattern: boolean,
-    invalidRequired: boolean,
-    pristine: boolean,
-    touched: boolean,
-    untouched: boolean,
-    valid: boolean,
-    visited: boolean
-} as const
-const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
-    declaration: string,
-    default: any,
-    description: string,
-    /*
-        NOTE: Not yet working:
-        editor: oneOf([
-            'code',
-            'code(css)',
-            'code(script)',
-            'plain',
-            'text',
-            'richtext(raw)',
-            'richtext(simple)',
-            'richtext(normal)',
-            'richtext(advanced)'
-        ]),
-    */
-    editor: string,
-    emptyEqualsNull: boolean,
-    maximum: number,
-    maximumLength: number,
-    minimum: number,
-    minimumLength: number,
-    name: string,
-    regularExpressionPattern: oneOfType([object, string]),
-    selection: oneOfType([
-        arrayOf(oneOfType([number, string])),
-        objectOf(oneOfType([number, string]))
-    ]),
-    trim: boolean,
-    /*
-        NOTE: Not yet working:
-        type: oneOf([
-            'date',
-            'datetime-local',
-            'month',
-            'number',
-            'range',
-            'string',
-            'time',
-            'week'
-        ])
-    */
-    type: string,
-    value: any
-} as const
-// endregion
 // region static helper
-/**
- * Determines initial value depending on given properties.
- * @param properties - Components properties.
- * @returns Determined value.
- */
-export function determineInitialValue<Type = any>(
-    properties:Props<Type>
-):null|Type {
-    if (properties.value !== undefined)
-        return properties.value as null|Type
-    if (properties.model?.value !== undefined)
-        return properties.model.value as null|Type
-    if (
-        Object.prototype.hasOwnProperty.call(
-            properties, 'initialValue'
-        ) &&
-        typeof properties.initialValue !== 'undefined'
+export function determineValidationState<Type = any>(
+    configuration:Properties<Type>, value:null|Type
+):boolean {
+    return determineBaseValidationState<Properties<Type>, Type>(
+        configuration,
+        value,
+        {
+            invalidMaximum: ():boolean => (
+                typeof configuration.model.maximum === 'number' &&
+                typeof value === 'number' &&
+                !isNaN(value) &&
+                configuration.model.maximum < value
+            ),
+            invalidMaximumLength: ():boolean => (
+                typeof configuration.model.maximumLength === 'number' &&
+                typeof value === 'string' &&
+                configuration.model.maximumLength < value.length
+            ),
+            invalidMinimum: ():boolean => (
+                typeof configuration.model.minimum === 'number' &&
+                typeof value === 'number' &&
+                !isNaN(value) &&
+                value < configuration.model.minimum
+            ),
+            invalidMinimumLength: ():boolean => (
+                typeof configuration.model.minimumLength === 'number' &&
+                typeof value === 'string' &&
+                value.length < configuration.model.minimumLength
+            ),
+            invalidPattern: ():boolean => (
+                typeof value === 'string' &&
+                (
+                    typeof configuration.model.regularExpressionPattern ===
+                        'string' &&
+                    !(new RegExp(configuration.model.regularExpressionPattern))
+                        .test(value) ||
+                    configuration.model.regularExpressionPattern !== null &&
+                    typeof configuration.model.regularExpressionPattern ===
+                        'object' &&
+                    !typeof configuration.model.regularExpressionPattern
+                        .test(value)
+                )
+            )
+        }
     )
-        return properties.initialValue as null|Type
-    return null
 }
 /**
  * Represents configured value as string.
@@ -284,7 +249,9 @@ export function formatValue<Type = any>(
  * @param value - Current value to represent.
  * @returns Determined initial representation.
  */
-export function determineInitialRepresentation<Type = any>(properties:Props, value:null|Type):string {
+export function determineInitialRepresentation<Type = any>(
+    properties:Props, value:null|Type
+):string {
     if (typeof properties.representation === 'string')
         return properties.representation
     if (value !== null)
@@ -295,84 +262,6 @@ export function determineInitialRepresentation<Type = any>(properties:Props, val
             GenericInput.defaultProps.model!.type as string
         )
     return ''
-}
-/**
- * Derives current validation state from given value.
- * @param configuration - Input configuration.
- * @param value - Value to validate against given configuration.
- * @returns A boolean indicating if validation state has changed.
- */
-export function determineValidationState<Type = any>(
-    configuration:Properties<Type>, value:any
-):boolean {
-    let changed:boolean = false
-    let oldValue:boolean = false
-
-    oldValue = configuration.model.state.invalidMaximum
-    configuration.model.state.invalidMaximum =
-        typeof configuration.model.maximum === 'number' &&
-        typeof value === 'number' &&
-        !isNaN(value) &&
-        configuration.model.maximum < value
-    changed =
-        changed || oldValue !== configuration.model.state.invalidMaximum
-
-    oldValue = configuration.model.state.invalidMaximumLength
-    configuration.model.state.invalidMaximumLength =
-        typeof configuration.model.maximumLength === 'number' &&
-        typeof value === 'string' &&
-        configuration.model.maximumLength < value.length
-    changed =
-        changed ||
-        oldValue !== configuration.model.state.invalidMaximumLength
-
-    oldValue = configuration.model.state.invalidMinimum
-    configuration.model.state.invalidMinimum =
-        typeof configuration.model.minimum === 'number' &&
-        typeof value === 'number' &&
-        !isNaN(value) &&
-        value < configuration.model.minimum
-    changed =
-        changed || oldValue !== configuration.model.state.invalidMinimum
-
-    oldValue = configuration.model.state.invalidMinimumLength
-    configuration.model.state.invalidMinimumLength =
-        typeof configuration.model.minimumLength === 'number' &&
-        typeof value === 'string' &&
-        value.length < configuration.model.minimumLength
-    changed =
-        changed ||
-        oldValue !== configuration.model.state.invalidMinimumLength
-
-    oldValue = configuration.model.state.invalidPattern
-    configuration.model.state.invalidPattern =
-        typeof configuration.model.regularExpressionPattern === 'string' &&
-        !(new RegExp(configuration.model.regularExpressionPattern))
-            .test(value) ||
-        typeof configuration.model.regularExpressionPattern === 'object' &&
-        !typeof configuration.model.regularExpressionPattern.test(value)
-    changed =
-        changed || oldValue !== configuration.model.state.invalidPattern
-
-    oldValue = configuration.model.state.invalidRequired
-    configuration.model.state.invalidRequired =
-        configuration.model.nullable === false && value === null
-    changed =
-        changed || oldValue !== configuration.model.state.invalidRequired
-
-    if (changed) {
-        configuration.model.state.invalid =
-            configuration.model.state.invalidMaximum ||
-            configuration.model.state.invalidMaximumLength ||
-            configuration.model.state.invalidMinimum ||
-            configuration.model.state.invalidMinimumLength ||
-            configuration.model.state.invalidPattern ||
-            configuration.model.state.invalidRequired
-        configuration.model.state.valid =
-            !configuration.model.state.invalid
-    }
-
-    return changed
 }
 // endregion
 /**
@@ -465,7 +354,8 @@ export const GenericInputInner = function<Type = any>(
         return options
     }
     /**
-     * TODO
+     * Render help or error texts with current validation state color.
+     * @return Determined renderable markup specification.
      */
     const renderHelpText = ():ReactElement => <>
        <GenericAnimate in={
@@ -587,47 +477,6 @@ export const GenericInputInner = function<Type = any>(
             propertiesOrInCondition.in ? content : ''
     }
     /**
-     * Wraps given component with react strict mode component.
-     * @param content - Component or string to wrap.
-     * @returns Wrapped component.
-     */
-    const wrapStrict = (content:Renderable):ReactElement => {
-        return GenericInput.strict ?
-            <StrictMode>{content}</StrictMode> :
-            <>{content}</>
-    }
-    /**
-     * TODO
-     */
-    const wrapThemeProvider = (
-        element:ReactElement, configuration?:ThemeProviderProps['options']
-    ):ReactElement =>
-        configuration ?
-            <ThemeProvider options={configuration} wrap>
-                {element}
-            </ThemeProvider> :
-            element
-    /**
-     * Wraps given component with a tooltip component with given tooltip
-     * configuration.
-     * @param content - Component or string to wrap.
-     * @param options - Tooltip options.
-     * @returns Wrapped given content.
-     */
-    const wrapTooltip = (
-        content:ReactElement, options?:Properties['tooltip']
-    ):ReactElement => {
-        if (typeof options === 'string')
-            return <Tooltip
-                content={<Typography use="caption">{options}</Typography>}
-            >{content}</Tooltip>
-        if (options !== null && typeof options === 'object')
-            return <Tooltip {...options}>
-                <Typography use="caption">{content}</Typography>
-            </Tooltip>
-        return <>{content}</>
-    }
-    /**
      * If given icon options has an additional tooltip configuration integrate
      * a wrapping tooltip component into given configuration and remove initial
      * tooltip configuration.
@@ -642,7 +491,9 @@ export const GenericInputInner = function<Type = any>(
             delete options.tooltip
             const nestedOptions:IconOptions = {...options}
             options.strategy = 'component'
-            options.icon = wrapTooltip(<Icon icon={nestedOptions} />, tooltip)
+            options.icon = <WrapTooltip options={tooltip}>
+                <Icon icon={nestedOptions} />
+            </WrapTooltip>
         }
         return options as IconOptions|undefined
     }
@@ -868,67 +719,20 @@ export const GenericInputInner = function<Type = any>(
      * Synchronizes property, state and model configuration:
      * Properties overwrites default properties which overwrites default model
      * properties.
+     * @param properties - Properties to merge.
      * @returns Nothing.
     */
-    const mapPropertiesAndStateToModel = (properties:Props<Type>):Props<Type> => {
-        /*
-            NOTE: Default props seems not to respect nested layers to merge so
-            we have to manage this for nested model structure.
-        */
-        const result:Props<Type> & {model:Model} = Tools.extend(
-            true,
-            {
-                model: {
-                    ...GenericInput.defaultProps.model,
-                    state: {...GenericInput.defaultProps.model!.state}
-                }
-            },
-            properties
-        )
-        // region handle aliases
-        if (result.disabled) {
-            delete result.disabled
-            result.model.mutable = false
-        }
-        if (result.pattern) {
-            result.model.regularExpressionPattern = result.pattern
-            delete result.pattern
-        }
-        if (result.required) {
-            delete result.required
-            result.model.nullable = false
-        }
-        if (result.type === 'text')
-            result.type = 'string'
-        // endregion
-        // region handle model configuration
-        for (const [name, value] of Object.entries(result.model))
-            if (Object.prototype.hasOwnProperty.call(result, name))
-                (
-                    result.model[name as keyof Model<Type>] as
-                        ValueOf<Model<Type>>
-                ) = result[name as keyof Props<Type>] as ValueOf<Model<Type>>
-        for (const [name, value] of Object.entries(result.model.state))
-            if (Object.prototype.hasOwnProperty.call(result, name))
-                result.model.state[name as keyof ModelState] =
-                    result[name as keyof Props<Type>] as ValueOf<ModelState>
-        for (const key of Object.keys(result.model.state))
-            if (!Object.prototype.hasOwnProperty.call(props, key)) {
-                result.model.state = model
-                break
-            }
-
-        /*
-            NOTE: Model states are not retrieved from state but derived from
-            specification and current value.
-        */
-
-        if (result.model.value === undefined)
-            result.model.value = (value === undefined) ?
-                result.model.default :
-                value
-        // else -> Controlled component via model's "value" property.
-        // endregion
+    const mergePropertiesStateAndModel = (
+        properties:Props<Type>
+    ):DefaultProperties<Type> => {
+        const result:DefaultProperties<Type> =
+            mapPropertiesAndStateToModel<Props<Type>, Model<Type>, ModelState, Type>(
+                properties,
+                GenericInput.defaultProps.model as Model<Type>,
+                value,
+                model,
+                props
+            ) as DefaultProperties<Type>
         // region handle state configuration
         if (result.cursor === undefined)
             result.cursor = cursor
@@ -951,44 +755,24 @@ export const GenericInputInner = function<Type = any>(
         result.model.value = parseValue(
             result as unknown as Properties<Type>, result.model.value
         )
-        determineValidationState(
-            result as unknown as Properties<Type>, result.model.value
+        determineValidationState<Type>(
+            result as unknown as Properties<Type>, result.model.value as Type
         )
 
         return result
     }
     /**
      * Calculate external properties (a set of all configurable properties).
+     * @param properties - Properties to merge.
      * @returns External properties object.
      */
-    const getConsolidatedProperties = (properties:Props<Type>):Properties<Type> => {
-        properties = mapPropertiesAndStateToModel(properties)
-        const result:Properties<Type> & {
-            mutable?:boolean
-            nullable?:boolean
-            regularExpressionPattern?:RegExp|string
-            state?:null
-            writable?:boolean
-        } = Tools.extend(
-            {},
-            properties,
-            properties.model || {},
-            (properties.model || {}).state || {}
-        )
-
-        result.disabled = !result.mutable
-        delete result.mutable
-
-        delete result.state
-        delete result.writable
-
-        result.required = !result.nullable
-        delete result.nullable
-
-        result.pattern = result.regularExpressionPattern
-        // NOTE: Workaround since options configuration above is ignored.
-        delete (result as {regularExpressionPattern?:RegExp|string})
-            .regularExpressionPattern
+    const getConsolidatedProperties = (
+        properties:Props<Type>
+    ):Properties<Type> => {
+        const result:Properties<Type> =
+            getBaseConsolidatedProperties<Props<Type>, Properties<Type>>(
+                mergePropertiesStateAndModel(properties)
+            )
 
         // NOTE: If only an editor is specified it should be displayed.
         if (!(result.editor === 'plain' || result.selectableEditor))
@@ -1205,8 +989,10 @@ export const GenericInputInner = function<Type = any>(
         properties.model.value =
             parseValue(properties, value)
 
-        if (oldValue !== properties.value) {
-            let stateChanged:boolean = determineValidationState(
+        if (oldValue === properties.value)
+            setRepresentation(properties.representation)
+        else {
+            let stateChanged:boolean = determineValidationState<Type>(
                 properties, properties.value
             )
 
@@ -1228,8 +1014,7 @@ export const GenericInputInner = function<Type = any>(
 
             if (properties.onChangeValue)
                 properties.onChangeValue(properties.value, event)
-        } else
-            setRepresentation(properties.representation)
+        }
     }
     /**
      * Triggered on click events.
@@ -1247,7 +1032,7 @@ export const GenericInputInner = function<Type = any>(
      * @param event - Focus event object.
      * @returns Nothing.
      */
-    const onFocus = (event:FocusEvent):void => {
+    const onFocus = (event:ReactFocusEvent):void => {
         if (properties.onFocus)
             properties.onFocus(event)
         onTouch(event)
@@ -1277,7 +1062,7 @@ export const GenericInputInner = function<Type = any>(
      * @param event - Event object which triggered interaction.
      * @returns Nothing.
      */
-    const onTouch = (event:FocusEvent|ReactMouseEvent):void => {
+    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void => {
         let changeState:boolean = false
         if (!properties.focused) {
             changeState =
@@ -1303,15 +1088,19 @@ export const GenericInputInner = function<Type = any>(
     }
     // endregion
     // region properties
+    // / region references
     let codeEditorReference:CodeEditorType|undefined
     let codeEditorInputReference:RefObject<HTMLTextAreaElement> =
         createRef<HTMLTextAreaElement>()
+    const foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation> =
+        createRef<MDCSelectFoundation|MDCTextFieldFoundation>()
     const inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement> =
         createRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>()
     let richTextEditorInputReference:RefObject<HTMLTextAreaElement> =
         createRef<HTMLTextAreaElement>()
     let richTextEditorInstance:RichTextEditor|undefined
     let richTextEditorReference:RichTextEditorComponent|undefined
+    // / endregion
     const [cursor, setCursor] = useState<{
         end:number
         start:number
@@ -1328,19 +1117,41 @@ export const GenericInputInner = function<Type = any>(
     let [representation, setRepresentation] =
         useState<string>(determineInitialRepresentation(props, value))
     const properties:Properties<Type> = getConsolidatedProperties(props)
-    useImperativeHandle(reference, ():WebComponentAdapter<Properties<Type>, State<Type>> => ({
-        properties,
-        state: {
-            cursor,
-            editorIsActive,
-            hidden,
-            model,
-            representation,
-            selectionIsUnstable,
-            showDeclaration,
-            value
-        }
-    }))
+    useImperativeHandle(
+        reference,
+        ():WebComponentAdapter<Properties<Type>, State<Type>> & {
+            references:{
+                codeEditorReference?:CodeEditorType
+                codeEditorInputReference:RefObject<HTMLTextAreaElement>
+                foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation>
+                inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>
+                richTextEditorInputReference:RefObject<HTMLTextAreaElement>
+                richTextEditorInstance?:RichTextEditor
+                richTextEditorReference?:RichTextEditorComponent
+            }
+        } => ({
+            properties,
+            references: {
+                codeEditorReference,
+                codeEditorInputReference,
+                foundationRef,
+                inputReference,
+                richTextEditorInputReference,
+                richTextEditorInstance,
+                richTextEditorReference
+            },
+            state: {
+                cursor,
+                editorIsActive,
+                hidden,
+                model,
+                representation,
+                selectionIsUnstable,
+                showDeclaration,
+                value
+            }
+        })
+    )
     // endregion
     // region derive state variables from given properties
     if (properties.cursor) {
@@ -1440,177 +1251,182 @@ export const GenericInputInner = function<Type = any>(
     // / endregion
     // / region main markup
     // TODO check if mdc-classes can be retrieved
-    return wrapThemeProvider(
-        <div className={
-            styles['generic-input'] +
-            (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
-        }>{wrapStrict(wrapTooltip(
-            <div>
-                <GenericAnimate in={Boolean(properties.selection)}>
-                    <Select
-                        {...genericProperties as SelectProps}
-                        {...materialProperties as SelectProps}
-                        enhanced
-                        inputRef={inputReference as unknown as undefined}
-                        rootProps={{name: properties.name, onClick: onClick}}
-                        onChange={onChangeValue}
-                        options={properties.selection}
-                    />
-                </GenericAnimate>
-                {wrapAnimationConditionally(
-                    [
-                        <FormField
-                            className={
-                                'mdc-text-field' +
-                                (properties.disabled ?
-                                    ' mdc-text-field--disabled' :
-                                    ''
-                                ) +
-                                ' mdc-text-field--textarea'
-                            }
-                            key="advanced-editor-form-field"
-                        >
-                            <label>
-                                <span className={
-                                    styles['generic-input__editor__label'] +
-                                    ' mdc-floating-label' +
-                                    ' mdc-floating-label--float-above'
+    return <WrapConfigurations
+        strict={GenericInput.strict}
+        theme={properties.theme}
+        tooltip={properties.tooltip}
+    ><div className={
+        styles['generic-input'] +
+        (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
+    }>
+        <GenericAnimate in={Boolean(properties.selection)}>
+            <Select
+                {...genericProperties as SelectProps}
+                {...materialProperties as SelectProps}
+                enhanced
+                foundationRef={foundationRef as unknown as
+                    RefCallback<MDCSelectFoundation>
+                }
+                inputRef={inputReference as unknown as
+                    RefCallback<HTMLSelectElement|HTMLTextAreaElement>
+                }
+                rootProps={{
+                    name: properties.name,
+                    onClick: onClick,
+                    ...properties.rootProps
+                }}
+                onChange={onChangeValue}
+                options={properties.selection}
+            />
+        </GenericAnimate>
+        {wrapAnimationConditionally(
+            [
+                <FormField
+                    className={
+                        'mdc-text-field' +
+                        (properties.disabled ?
+                            ' mdc-text-field--disabled' :
+                            ''
+                        ) +
+                        ' mdc-text-field--textarea'
+                    }
+                    key="advanced-editor-form-field"
+                >
+                    <label>
+                        <span className={
+                            styles['generic-input__editor__label'] +
+                            ' mdc-floating-label' +
+                            ' mdc-floating-label--float-above'
+                        }>
+                            <Theme use={
+                                properties.invalid &&
+                                (
+                                    properties.showInitialValidationState ||
+                                    properties.visited
+                                ) ? 'error' : undefined
+                            }>
+                                {properties.description || properties.name}{properties.required ? '*' : ''}
+                            </Theme>
+                        </span>
+                        {
+                            properties.editor.startsWith('code') ?
+                                <Suspense fallback={
+                                    <CircularProgress size="large" />
                                 }>
-                                    <Theme use={
-                                        properties.invalid &&
-                                        (
-                                            properties.showInitialValidationState ||
-                                            properties.visited
-                                        ) ? 'error' : undefined
-                                    }>
-                                        {
-                                            properties.description ||
-                                            properties.name
-                                        }{properties.required ? '*' : ''}
-                                    </Theme>
-                                </span>
-                                {
-                                    properties.editor.startsWith('code') ?
-                                        <Suspense fallback={
-                                            <CircularProgress size="large" />
-                                        }>
-                                            <CodeEditor
-                                                {...genericProperties as
-                                                    CodeEditorProps
-                                                }
-                                                className="mdc-text-field__input"
-                                                mode="javascript"
-                                                name={properties.name}
-                                                onChange={onChangeValue}
-                                                onCursorChange={onSelectionChange}
-                                                onSelectionChange={onSelectionChange}
-                                                ref={setCodeEditorReference}
-                                                setOptions={{
-                                                    maxLines: properties.rows,
-                                                    minLines: properties.rows,
-                                                    readOnly: properties.disabled,
-                                                    tabSize: 4,
-                                                    useWorker: false
-                                                }}
-                                                theme="github"
-                                            />
-                                        </Suspense>
-                                    :
-                                        <RichTextEditorComponent
-                                            {...genericProperties as
-                                                RichTextEditorProps
-                                            }
-                                            disabled={properties.disabled}
-                                            init={tinyMCEOptions}
-                                            onClick={onClick as unknown as
-                                                RichTextEventHandler<MouseEvent>
-                                            }
-                                            onEditorChange={onChangeValue}
-                                            onKeyUp={onKeyUp as unknown as
-                                                RichTextEventHandler<KeyboardEvent>
-                                            }
-                                            ref={setRichTextEditorReference as
-                                                RefCallback<RichTextEditorComponent>
-                                            }
-                                            textareaName={properties.name}
-                                            tinymceScriptSrc={tinymceScriptPath}
-                                        />
-                                }
-                            </label>
-                        </FormField>,
-                        <div
-                            className="mdc-text-field-helper-line"
-                            key="advanced-editor-helper-line"
-                        >
-                            <p
-                                className="mdc-text-field-helper-text mdc-text-field-helper-text--persistent"
-                            >{(
-                                materialProperties.helpText as
-                                    {children:ReactElement}
-                            ).children}</p>
-                        </div>
-                    ],
-                    isAdvancedEditor,
-                    richTextEditorLoadedOnce || properties.editor.startsWith('code')
-                )}
-                {wrapAnimationConditionally(
-                    <TextField
-                        {...genericProperties as TextFieldProps}
-                        {...materialProperties as TextFieldProps}
-                        align={properties.align}
-                        characterCount
-                        fullwidth={properties.fullWidth}
-                        inputRef={inputReference as unknown as
-                            RefCallback<HTMLInputElement|HTMLTextAreaElement>
+                                    <CodeEditor
+                                        {...genericProperties as
+                                            CodeEditorProps
+                                        }
+                                        className="mdc-text-field__input"
+                                        mode="javascript"
+                                        name={properties.name}
+                                        onChange={onChangeValue}
+                                        onCursorChange={onSelectionChange}
+                                        onSelectionChange={onSelectionChange}
+                                        ref={setCodeEditorReference}
+                                        setOptions={{
+                                            maxLines: properties.rows,
+                                            minLines: properties.rows,
+                                            readOnly: properties.disabled,
+                                            tabSize: 4,
+                                            useWorker: false
+                                        }}
+                                        theme="github"
+                                    />
+                                </Suspense>
+                            :
+                                <RichTextEditorComponent
+                                    {...genericProperties as
+                                        RichTextEditorProps
+                                    }
+                                    disabled={properties.disabled}
+                                    init={tinyMCEOptions}
+                                    onClick={onClick as unknown as
+                                        RichTextEventHandler<MouseEvent>
+                                    }
+                                    onEditorChange={onChangeValue}
+                                    onKeyUp={onKeyUp as unknown as
+                                        RichTextEventHandler<KeyboardEvent>
+                                    }
+                                    ref={setRichTextEditorReference as
+                                        RefCallback<RichTextEditorComponent>
+                                    }
+                                    textareaName={properties.name}
+                                    tinymceScriptSrc={tinymceScriptPath}
+                                />
                         }
-                        max={properties.maximum}
-                        maxLength={properties.maximumLength}
-                        min={properties.minimum}
-                        minLength={properties.minimumLength}
-                        onChange={onChangeValue}
-                        ripple={properties.ripple}
-                        rootProps={{
-                            name: properties.name,
-                            onClick: onClick,
-                            onKeyUp: onKeyUp
-                        }}
-                        rows={properties.rows}
-                        textarea={
-                            properties.type === 'string' &&
-                            properties.editor !== 'plain'
-                        }
-                        trailingIcon={wrapIconWithTooltip(
-                            applyIconPreset(properties.trailingIcon)
-                        )}
-                        type={
-                            properties.type === 'string' ?
-                                properties.hidden ?
-                                    'password' :
-                                    'text' :
-                                    (
-                                        Object.prototype.hasOwnProperty.call(
-                                            GenericInput.transformer,
-                                            properties.type
-                                        ) &&
-                                        GenericInput.transformer[properties.type]
-                                            .type
-                                    ) ?
-                                        GenericInput.transformer[properties.type]
-                                            .type :
-                                        properties.type
-                        }
-                    />,
-                    !(isAdvancedEditor || properties.selection),
-                    richTextEditorLoadedOnce || properties.editor.startsWith('code')
-                )}
-            </div>,
-            properties.tooltip
-        ))}</div>,
-        properties.theme
-    )
+                    </label>
+                </FormField>,
+                <div
+                    className="mdc-text-field-helper-line"
+                    key="advanced-editor-helper-line"
+                >
+                    <p
+                        className="mdc-text-field-helper-text mdc-text-field-helper-text--persistent"
+                    >{(
+                        materialProperties.helpText as {children:ReactElement}
+                    ).children}</p>
+                </div>
+            ],
+            isAdvancedEditor,
+            richTextEditorLoadedOnce || properties.editor.startsWith('code')
+        )}
+        {wrapAnimationConditionally(
+            <TextField
+                {...genericProperties as TextFieldProps}
+                {...materialProperties as TextFieldProps}
+                align={properties.align}
+                characterCount
+                foundationRef={foundationRef as unknown as
+                    RefCallback<MDCTextFieldFoundation>
+                }
+                fullwidth={properties.fullWidth}
+                inputRef={inputReference as unknown as
+                    RefCallback<HTMLInputElement|HTMLTextAreaElement>
+                }
+                max={properties.maximum}
+                maxLength={properties.maximumLength}
+                min={properties.minimum}
+                minLength={properties.minimumLength}
+                onChange={onChangeValue}
+                ripple={properties.ripple}
+                rootProps={{
+                    name: properties.name,
+                    onClick: onClick,
+                    onKeyUp: onKeyUp,
+                    ...properties.rootProps
+                }}
+                rows={properties.rows}
+                textarea={
+                    properties.type === 'string' &&
+                    properties.editor !== 'plain'
+                }
+                trailingIcon={wrapIconWithTooltip(applyIconPreset(
+                    properties.trailingIcon
+                ))}
+                type={
+                    properties.type === 'string' ?
+                        properties.hidden ?
+                            'password' :
+                            'text' :
+                            (
+                                Object.prototype.hasOwnProperty.call(
+                                    GenericInput.transformer,
+                                    properties.type
+                                ) &&
+                                GenericInput.transformer[properties.type].type
+                            ) ?
+                                GenericInput.transformer[properties.type]
+                                    .type :
+                                properties.type
+                }
+            />,
+            !(isAdvancedEditor || properties.selection),
+            richTextEditorLoadedOnce || properties.editor.startsWith('code')
+        )}
+    </div></WrapConfigurations>
     // / endregion
     // endregion
-// TODO check if contextTypes makes sense here
 } as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>
 // NOTE: This is useful in react dev tools.
 GenericInputInner.displayName = 'GenericInput'
@@ -1618,13 +1434,8 @@ GenericInputInner.displayName = 'GenericInput'
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProps - Initial property configuration.
- * @property static:eventToPropertyMapping - Describes external event handler
- * interface.
- * @property static:propertiesToReflectAsAttributes - List of properties to
- * potentially reflect as attributes (e.g. in a wrapped web-component).
+ * @property static:local - Location hint to properly represent values.
  * @property static:propTypes - Triggers reacts runtime property value checks
- * in development mode and enables property / attribute reflection for
- * web-component wrapper instances.
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
  * @property static:transformer - Generic input data transformation
@@ -1635,148 +1446,17 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput:StaticWebInputFunctionComponent = memorize(
-    forwardRef(GenericInputInner)
-) as unknown as StaticWebInputFunctionComponent
+export const GenericInput:StaticComponent =
+    memorize(forwardRef(GenericInputInner)) as unknown as StaticComponent
 // region static properties
 // / region web-component hints
-GenericInput.eventToPropertyMapping = {onChange: true} as
-    EventToPropertyMapping
-GenericInput.propertiesToReflectAsAttributes = new Map([
-    ['dirty', true],
-    ['focused', true],
-    ['invalid', true],
-    ['invalidMaximum', true],
-    ['invalidMaximumLength', true],
-    ['invalidMinimum', true],
-    ['invalidMinimumLength', true],
-    ['invalidPattern', true],
-    ['invalidRequired', true],
-    ['name', true],
-    ['pristine', true],
-    ['touched', true],
-    ['untouched', true],
-    ['valid', true],
-    ['visited', true]
-]) as Map<keyof Properties, boolean> 
 GenericInput.wrapped = GenericInputInner
 GenericInput.webComponentAdapterWrapped = true
 // / endregion
-GenericInput.defaultModelState = {
-    dirty: false,
-    focused: false,
-    invalid: false,
-    invalidMaximum: false,
-    invalidMaximumLength: false,
-    invalidMinimum: false,
-    invalidMinimumLength: false,
-    invalidPattern: false,
-    invalidRequired: false,
-    pristine: true,
-    touched: false,
-    untouched: true,
-    valid: true,
-    visited: false
-} as ModelState
-GenericInput.defaultProps = {
-    maximumLengthText:
-        'Please type less or equal than ${maximumLength} symbols.',
-    maximumText: 'Please give a number less or equal than ${maximum}.',
-    minimumLengthText:
-        'Please type at least or equal ${minimumLength} symbols.',
-    minimumText: 'Please give a number at least or equal to ${minimum}.',
-    model: {
-        declaration: '',
-        default: null,
-        description: '',
-        editor: 'plain',
-        emptyEqualsNull: true,
-        maximum: Infinity,
-        maximumLength: Infinity,
-        minimum: 0,
-        minimumLength: 0,
-        mutable: true,
-        name: 'NO_NAME_DEFINED',
-        nullable: true,
-        regularExpressionPattern: '.*',
-        state: GenericInput.defaultModelState,
-        trim: true,
-        type: 'string',
-        writable: true
-    },
-    patternText:
-        'Your string have to match the regular expression: "${pattern}".',
-    requiredText: 'Please fill this field.',
-    rows: 4,
-    selectableEditor: false,
-    showDeclaration: undefined,
-    showInitialValidationState: false
-} as Props & Pick<Properties, 'model'>
+GenericInput.defaultModelState = defaultModelState
+GenericInput.defaultProps = defaultProperties
 GenericInput.local = 'en-US'
-GenericInput.propTypes = {
-    ...baseModelPropertyTypes,
-    ...modelStatePropertyTypes,
-    /*
-        NOTE: Not yet working:
-        align: oneOf(['end', 'start']),
-    */
-    align: string,
-    cursor: shape({
-        end: number.isRequired,
-        start: number.isRequired
-    }),
-    disabled: boolean,
-    editorIsActive: boolean,
-    fullWidth: boolean,
-    /*
-        NOTE: Not yet working:
-        icon?:string|(IconOptions & {tooltip?:string|TooltipProps})
-    */
-    icon: oneOfType([string, object]),
-    initialValue: any,
-    hidden: boolean,
-    maximumLengthText: string,
-    maximumText: string,
-    minimumLengthText: string,
-    minimumText: string,
-    model: shape<any>({
-        ...baseModelPropertyTypes,
-        mutable: boolean,
-        state: shape(modelStatePropertyTypes),
-        writable: boolean
-    }),
-    onBlur: func,
-    onChange: func,
-    onChangeEditorIsActive: func,
-    onChangeValue: func,
-    onChangeShowDeclaration: func,
-    onChangeState: func,
-    onClick: func,
-    onFocus: func,
-    onKeyUp: func,
-    onSelectionChange: func,
-    onTouch: func,
-    outlined: boolean,
-    pattern: oneOfType([object, string]),
-    patternText: string,
-    placeholder: string,
-    representation: string,
-    required: boolean,
-    requiredText: string,
-    ripple: boolean,
-    rows: number,
-    selectableEditor: boolean,
-    showDeclaration: boolean,
-    showInitialValidationState: boolean,
-    theme: object,
-    /*
-        NOTE: Not yet working:
-        tooltip?:string|TooltipProps
-        trailingIcon?:string|(IconOptions & {tooltip?:string|TooltipProps})
-    */
-    tooltip: any,
-    trailingIcon: any
-} as Mapping<ValueOf<typeof PropertyTypes>>
+GenericInput.propTypes = propertyTypes
 GenericInput.strict = false
 GenericInput.transformer = {
     currency: {
@@ -1855,7 +1535,7 @@ GenericInput.transformer = {
         type: 'text'
     },
     number: {parse: parseInt}
-} as GenericInputDataTransformation
+} as InputDataTransformation
 // endregion
 export default GenericInput
 // region vim modline

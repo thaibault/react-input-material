@@ -53,6 +53,7 @@
     "@babel/plugin-transform-proto-to-assign": "*",
     "@babel/preset-react": "*",
     "@rmwc/card": "*",
+    "@rmwc/checkbox": "*",
     "@rmwc/circular-progress": "*",
     "@rmwc/formfield": "*",
     "@rmwc/icon": "*",
@@ -113,6 +114,8 @@
   "peerDependencies": {
     "@babel/runtime": "*",
     "@rmwc/card": "*",
+    "@rmwc/checkbox": "*",
+    "@rmwc/circular-progress": "*",
     "@rmwc/formfield": "*",
     "@rmwc/icon-button": "*",
     "@rmwc/select": "*",
@@ -149,7 +152,7 @@
     },
     "injection": {
       "entry": {
-        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? './playground' : {'./components/GenericAnimate': './components/GenericAnimate', './components/GenericInput': './components/GenericInput', index: './index'}"
+        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? './playground' : {'./components/GenericAnimate': './components/GenericAnimate', './components/GenericInput': './components/GenericInput', './components/RequireableCheckbox': './components/RequireableCheckbox', index: './index'}"
       }
     },
     "module": {

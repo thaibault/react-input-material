@@ -18,24 +18,41 @@
 */
 // region imports
 import Tools from 'clientnode'
-import React, {FunctionComponent, useState} from 'react'
+import React, {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
 import ReactDOM from 'react-dom'
 
+import GenericAnimate from './components/GenericAnimate'
 import GenericInput from './components/GenericInput'
+import RequireableCheckbox from './components/RequireableCheckbox'
 import './material-fixes'
 import {Properties} from './type'
 // endregion
 GenericInput.local = 'de-DE'
-GenericInput.transformer.currency.format.final.options = {
-    currency: 'EUR'
-}
-
+GenericInput.transformer.currency.format.final.options =
+    {currency: 'EUR'}
+const represent = (state:Properties):string => Tools.represent(
+    Object.keys(state)
+        .filter((key:string):boolean => !/^on[A-Z]/.test(key))
+        .reduce(
+            (result:Partial<Properties>, key:string):Partial<Properties> => {
+                result[key as keyof Properties] =
+                    state[key as keyof Properties]
+                return result
+            },
+            {}
+        )
+)
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<Properties>()
     function onChange<Type = string>(state:Properties<Type>):void {
         setSelectedState(state)
     }
+
+    const [fadeState, setFadeState] = useState<boolean>(false)
+    useEffect(():(() => void) => Tools.timeout(
+        ():void => setFadeState((value:boolean):boolean => !value), 2 * 1000
+    ).clear)
 
     return (<>
         <div className="inputs">
@@ -215,11 +232,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 }}
             />
             <GenericInput
+                editor="text"
                 initialValue="a"
                 model={{
                     declaration: 'text',
                     description: 'input9ModelDescription',
-                    editor: 'text',
                     name: 'input9Model',
                     nullable: false,
                 }}
@@ -241,11 +258,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 selectableEditor
             />
             <GenericInput
+                editor="code"
                 initialValue="const value = 2"
                 model={{
                     declaration: 'code',
                     description: 'input10ModelDescription',
-                    editor: 'code',
                     name: 'input10Model',
                     nullable: false,
                 }}
@@ -268,10 +285,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 selectableEditor
             />
             <GenericInput
+                editor="code"
                 model={{
                     declaration: 'code',
                     description: 'input11ModelDescription',
-                    editor: 'code',
                     name: 'input11Model',
                     nullable: false
                 }}
@@ -294,11 +311,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 selectableEditor
             />
             <GenericInput
+                editor="richtext(simple)"
                 initialValue="Hello Mr. Smith,<br><br>how are you?"
                 model={{
                     declaration: 'richtext(simple)',
                     description: 'input12ModelDescription',
-                    editor: 'richtext(simple)',
                     mutable: false,
                     name: 'input12Model',
                     nullable: false
@@ -389,25 +406,57 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
             />
 
+            <hr/>
+
+            <div style={{height: '50px'}}>
+                <GenericAnimate in={fadeState}>Fade it!</GenericAnimate>
+                <br/>
+                <GenericAnimate children="Fade it!" in={!fadeState} />
+            </div>
+
+            <hr/>
+
+            <RequireableCheckbox onChange={onChange} />
+
+            <hr/>
+
+            <RequireableCheckbox name="checkbox1" onChange={onChange} />
+            <RequireableCheckbox
+                model={{name: 'checkbox1Model'}} onChange={onChange}
+            />
+
+            <hr/>
+
+            <RequireableCheckbox
+                name="checkbox2" onChange={onChange} required
+            />
+            <RequireableCheckbox
+                model={{name: 'checkbox2Model', nullable: false}}
+                onChange={onChange}
+            />
+
+            <hr/>
+
+            <RequireableCheckbox
+                name="checkbox3"
+                onChange={onChange}
+                required
+                showInitialValidationState
+            />
+            <RequireableCheckbox
+                model={{name: 'checkbox3Model', nullable: false}}
+                onChange={onChange}
+                showInitialValidationState
+                tooltip="Check this one!"
+            />
+
         </div>
 
-        <pre className="outputs">{selectedState ?
-            Tools.represent(
-                Object.keys(selectedState)
-                    .filter((key:string):boolean => !/^on[A-Z]/.test(key))
-                    .reduce(
-                        (
-                            result:Partial<Properties>, key:string
-                        ):Partial<Properties> => {
-                            result[key as keyof Properties] =
-                                selectedState[key as keyof Properties]
-                            return result
-                        },
-                        {}
-                    )
-            ) :
-            ''
-        }</pre>
+        {
+            selectedState &&
+            <pre className="outputs">{represent(selectedState)}</pre>
+        }
+
     </>)
 }
 window.onload = ():void =>

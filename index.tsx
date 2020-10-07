@@ -18,6 +18,7 @@
 */
 export {GenericAnimate} from './components/GenericAnimate'
 export {GenericInput} from './components/GenericInput'
+export {RequireableCheckbox} from './components/RequireableCheckbox'
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
