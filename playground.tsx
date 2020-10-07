@@ -20,7 +20,7 @@
 import Tools from 'clientnode'
 import React, {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
-import ReactDOM from 'react-dom'
+import {render} from 'react-dom'
 
 import GenericAnimate from './components/GenericAnimate'
 import GenericInput from './components/GenericInput'
@@ -460,7 +460,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     </>)
 }
 window.onload = ():void =>
-    ReactDOM.render(<Application />, document.querySelector('.app'))
+    render(<Application />, document.querySelector('.app'))
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
