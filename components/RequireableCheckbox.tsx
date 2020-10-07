@@ -178,13 +178,15 @@ export const RequireableCheckboxInner = function(
             (eventOrValue as SyntheticEvent).target
         ) {
             event = eventOrValue as SyntheticEvent
-            value =
-                typeof (event.target as {checked?:boolean|null}).value ===
-                    'undefined' ?
-                        null :
-                        (
-                            event.target as unknown as {checked:boolean|null}
-                        ).checked
+            value = (
+                typeof (event.target as {checked?:boolean|null}).checked ===
+                    'undefined' &&
+                typeof properties.indeterminate === 'boolean'
+            ) ?
+                null :
+                Boolean(
+                    (event.target as unknown as {checked:boolean|null}).checked
+                )
         } else
             value = eventOrValue as boolean|null
 
@@ -301,12 +303,12 @@ export const RequireableCheckboxInner = function(
         value = Boolean(properties.model.value)
     // endregion
     // region markup
-    // TODO Helptext, validation
-    return (/*<WrapConfigurations
+    // TODO Helptext
+    return <WrapConfigurations
         strict={RequireableCheckbox.strict}
         theme={properties.theme}
         tooltip={properties.tooltip}
-    >*/
+    >
         <Checkbox
             checked={value === null ? undefined : value}
             disabled={properties.disabled}
@@ -342,8 +344,7 @@ export const RequireableCheckboxInner = function(
             ripple={properties.ripple}
             value={`${value}`}
         />
-    //</WrapConfigurations>
-    )
+    </WrapConfigurations>
     // endregion
 } as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>
 // NOTE: This is useful in react dev tools.

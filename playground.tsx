@@ -18,6 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
+import {PlainObject} from 'clientnode/type'
 import React, {FunctionComponent, useState} from 'react'
 import {ReactElement} from 'react'
 import ReactDOM from 'react-dom'
@@ -32,16 +33,29 @@ GenericInput.local = 'de-DE'
 GenericInput.transformer.currency.format.final.options = {
     currency: 'EUR'
 }
-
+const represent = Tools.debounce((state:PlainObject):string => Tools.represent(
+    Object.keys(selectedState)
+        .filter((key:string):boolean => !/^on[A-Z]/.test(key))
+        .reduce(
+            (
+                result:Partial<Properties>, key:string
+            ):Partial<Properties> => {
+                result[key as keyof Properties] =
+                    selectedState[key as keyof Properties]
+                return result
+            },
+            {}
+        )
+))
 const Application:FunctionComponent<{}> = ():ReactElement => {
-    const [selectedState, setSelectedState] = useState<Properties>()
+    const [selectedState, setSelectedState] = useState<Properties>({})
     function onChange<Type = string>(state:Properties<Type>):void {
         setSelectedState(state)
     }
 
     const [fadeState, setFadeState] = useState<boolean>(false)
-    setInterval(
-        () => setFadeState((value:boolean):boolean => !value), 10 * 1000
+    Tools.timeout(
+        ():void => setFadeState((value:boolean):boolean => !value), 2 * 1000
     )
 
     return (<>
@@ -441,23 +455,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
         </div>
 
-        <pre className="outputs">{selectedState ?
-            Tools.represent(
-                Object.keys(selectedState)
-                    .filter((key:string):boolean => !/^on[A-Z]/.test(key))
-                    .reduce(
-                        (
-                            result:Partial<Properties>, key:string
-                        ):Partial<Properties> => {
-                            result[key as keyof Properties] =
-                                selectedState[key as keyof Properties]
-                            return result
-                        },
-                        {}
-                    )
-            ) :
-            ''
-        }</pre>
+        <pre className="outputs">{represent(selectedState)}</pre>
     </>)
 }
 window.onload = ():void =>
