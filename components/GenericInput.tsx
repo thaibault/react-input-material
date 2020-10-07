@@ -1451,7 +1451,7 @@ export const GenericInput:StaticComponent =
 // region static properties
 // / region web-component hints
 GenericInput.wrapped = GenericInputInner
-GenericInput.webComponentAdapterWrapped = true
+GenericInput.webComponentAdapterWrapped = 'react'
 // / endregion
 GenericInput.defaultModelState = defaultModelState
 GenericInput.defaultProps = defaultProperties

@@ -372,7 +372,7 @@ export const RequireableCheckbox:StaticComponent =
 // region static properties
 // / region web-component hints
 RequireableCheckbox.wrapped = RequireableCheckboxInner
-RequireableCheckbox.webComponentAdapterWrapped = true
+RequireableCheckbox.webComponentAdapterWrapped = 'react'
 // / endregion
 RequireableCheckbox.defaultModelState = defaultModelState
 RequireableCheckbox.defaultProps = defaultProperties
