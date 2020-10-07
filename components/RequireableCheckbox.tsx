@@ -85,7 +85,9 @@ export const RequireableCheckboxInner = function(
                 model,
                 props
             ) as DefaultProperties
-        determineValidationState<boolean>(result, result.model.value)
+        determineValidationState<Properties, boolean>(
+            result as Properties, result.model.value as boolean
+        )
         return getBaseConsolidatedProperties<Props, Properties>(result)
     }
     // region event handler
@@ -195,9 +197,10 @@ export const RequireableCheckboxInner = function(
         properties.checked = properties.value = properties.model.value = value
 
         if (oldValue !== properties.value) {
-            let stateChanged:boolean = determineValidationState<boolean>(
-                properties, properties.value
-            )
+            let stateChanged:boolean =
+                determineValidationState<Properties, boolean>(
+                    properties, properties.value
+                )
 
             if (properties.pristine) {
                 properties.dirty = properties.model.state.dirty = true

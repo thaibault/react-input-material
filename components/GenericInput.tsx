@@ -174,7 +174,7 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 export function determineValidationState<Type = any>(
     configuration:Properties<Type>, value:null|Type
 ):boolean {
-    return determineBaseValidationState<Type>(
+    return determineBaseValidationState<Properties<Type>, Type>(
         configuration,
         value,
         {

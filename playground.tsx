@@ -34,21 +34,19 @@ GenericInput.transformer.currency.format.final.options = {
     currency: 'EUR'
 }
 const represent = Tools.debounce((state:PlainObject):string => Tools.represent(
-    Object.keys(selectedState)
+    Object.keys(state)
         .filter((key:string):boolean => !/^on[A-Z]/.test(key))
         .reduce(
-            (
-                result:Partial<Properties>, key:string
-            ):Partial<Properties> => {
+            (result:Partial<Properties>, key:string):Partial<Properties> => {
                 result[key as keyof Properties] =
-                    selectedState[key as keyof Properties]
+                    state[key as keyof Properties]
                 return result
             },
             {}
         )
 ))
 const Application:FunctionComponent<{}> = ():ReactElement => {
-    const [selectedState, setSelectedState] = useState<Properties>({})
+    const [selectedState, setSelectedState] = useState<Properties>()
     function onChange<Type = string>(state:Properties<Type>):void {
         setSelectedState(state)
     }
@@ -455,7 +453,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
         </div>
 
-        <pre className="outputs">{represent(selectedState)}</pre>
+        {
+            selectedState &&
+            <pre className="outputs">{represent(selectedState)}</pre>
+        }
     </>)
 }
 window.onload = ():void =>

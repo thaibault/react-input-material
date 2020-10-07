@@ -28,7 +28,7 @@ import {DefaultProperties, Model, ModelState, Properties, Props} from './type'
  * @returns Determined value.
  */
 export const determineInitialValue = <Type = any>(
-    properties:Props<Type>, alternateValue?:Type
+    properties:Props<Type>, alternateValue?:null|Type
 ):null|Type => {
     if (alternateValue !== undefined)
         return alternateValue
@@ -51,10 +51,8 @@ export const determineInitialValue = <Type = any>(
  * validator function.
  * @returns A boolean indicating if validation state has changed.
  */
-export const determineValidationState = <Type = any>(
-    configuration:Properties<Type>,
-    value:null|Type,
-    validators:Mapping<() => boolean> = {}
+export const determineValidationState = <P extends Properties<any>, Type = any>(
+    configuration:P, value:null|Type, validators:Mapping<() => boolean> = {}
 ):boolean => {
     let changed:boolean = false
 
