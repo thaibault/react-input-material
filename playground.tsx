@@ -33,7 +33,7 @@ GenericInput.local = 'de-DE'
 GenericInput.transformer.currency.format.final.options = {
     currency: 'EUR'
 }
-const represent = Tools.debounce((state:PlainObject):string => Tools.represent(
+const represent = (state:PlainObject):string => Tools.represent(
     Object.keys(state)
         .filter((key:string):boolean => !/^on[A-Z]/.test(key))
         .reduce(
@@ -44,7 +44,7 @@ const represent = Tools.debounce((state:PlainObject):string => Tools.represent(
             },
             {}
         )
-))
+)
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<Properties>()
     function onChange<Type = string>(state:Properties<Type>):void {
