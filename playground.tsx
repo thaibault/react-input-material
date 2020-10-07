@@ -18,8 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
-import {PlainObject} from 'clientnode/type'
-import React, {FunctionComponent, useState} from 'react'
+import React, {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
 import ReactDOM from 'react-dom'
 
@@ -30,10 +29,9 @@ import './material-fixes'
 import {Properties} from './type'
 // endregion
 GenericInput.local = 'de-DE'
-GenericInput.transformer.currency.format.final.options = {
-    currency: 'EUR'
-}
-const represent = (state:PlainObject):string => Tools.represent(
+GenericInput.transformer.currency.format.final.options =
+    {currency: 'EUR'}
+const represent = (state:Properties):string => Tools.represent(
     Object.keys(state)
         .filter((key:string):boolean => !/^on[A-Z]/.test(key))
         .reduce(
@@ -52,14 +50,13 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     }
 
     const [fadeState, setFadeState] = useState<boolean>(false)
-    Tools.timeout(
+    useEffect(():(() => void) => Tools.timeout(
         ():void => setFadeState((value:boolean):boolean => !value), 2 * 1000
-    )
+    ).clear)
 
     return (<>
         <div className="inputs">
 
-{/*
             <GenericInput onChange={onChange}/>
 
             <hr/>
@@ -235,11 +232,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 }}
             />
             <GenericInput
+                editor="text"
                 initialValue="a"
                 model={{
                     declaration: 'text',
                     description: 'input9ModelDescription',
-                    editor: 'text',
                     name: 'input9Model',
                     nullable: false,
                 }}
@@ -261,11 +258,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 selectableEditor
             />
             <GenericInput
+                editor="code"
                 initialValue="const value = 2"
                 model={{
                     declaration: 'code',
                     description: 'input10ModelDescription',
-                    editor: 'code',
                     name: 'input10Model',
                     nullable: false,
                 }}
@@ -288,10 +285,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 selectableEditor
             />
             <GenericInput
+                editor="code"
                 model={{
                     declaration: 'code',
                     description: 'input11ModelDescription',
-                    editor: 'code',
                     name: 'input11Model',
                     nullable: false
                 }}
@@ -314,11 +311,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 selectableEditor
             />
             <GenericInput
+                editor="richtext(simple)"
                 initialValue="Hello Mr. Smith,<br><br>how are you?"
                 model={{
                     declaration: 'richtext(simple)',
                     description: 'input12ModelDescription',
-                    editor: 'richtext(simple)',
                     mutable: false,
                     name: 'input12Model',
                     nullable: false
@@ -418,7 +415,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             </div>
 
             <hr/>
-*/}
+
             <RequireableCheckbox onChange={onChange} />
 
             <hr/>
@@ -450,13 +447,16 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 model={{name: 'checkbox3Model', nullable: false}}
                 onChange={onChange}
                 showInitialValidationState
+                tooltip="Check this one!"
             />
+
         </div>
 
         {
             selectedState &&
             <pre className="outputs">{represent(selectedState)}</pre>
         }
+
     </>)
 }
 window.onload = ():void =>

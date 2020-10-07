@@ -96,7 +96,6 @@ import {
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesAndStateToModel
 } from '../helper'
-import '../material-fixes'
 import {
     DataTransformSpecification,
     defaultInputModelState as defaultModelState,

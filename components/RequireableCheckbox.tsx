@@ -318,7 +318,7 @@ export const RequireableCheckboxInner = function(
             foundationRef={
                 foundationRef as unknown as RefCallback<MDCCheckboxFoundation>
             }
-            id={properties.id}
+            id={properties.id || properties.name}
             indeterminate={properties.indeterminate || value === null}
             inputRef={
                 inputReference as unknown as RefCallback<HTMLInputElement>
