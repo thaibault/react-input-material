@@ -428,10 +428,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <RequireableCheckbox
-                name="checkbox2" onChange={onChange} required
+                disabled name="checkbox2" onChange={onChange} required
             />
             <RequireableCheckbox
-                model={{name: 'checkbox2Model', nullable: false}}
+                model={{name: 'checkbox2Model', mutable:false, nullable: false}}
                 onChange={onChange}
             />
 
