@@ -288,6 +288,12 @@ export type DefaultCheckboxProperties<Type = any> =
     {model:CheckboxModel}
 export type CheckboxState = State<boolean>
 // // region constants
+export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+    ...propertyTypes,
+    checked: boolean,
+    id: string,
+    indeterminate: boolean
+} as const
 export const defaultCheckboxModel:Model<boolean> = {
     ...defaultModel,
     default: false,
