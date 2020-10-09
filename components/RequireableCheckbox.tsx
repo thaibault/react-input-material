@@ -54,7 +54,7 @@ import {
     DefaultCheckboxProperties as DefaultProperties,
     defaultCheckboxProperties as defaultProperties,
     CheckboxModelState as ModelState,
-    propertyTypes,
+    checkboxPropertyTypes as propertyTypes,
     StaticFunctionComponent as StaticComponent
 } from '../type'
 // endregion
