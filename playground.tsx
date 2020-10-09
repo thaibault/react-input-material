@@ -25,6 +25,7 @@ import {render} from 'react-dom'
 import GenericAnimate from './components/GenericAnimate'
 import GenericInput from './components/GenericInput'
 import RequireableCheckbox from './components/RequireableCheckbox'
+import {useMemorizedValue} from './helper'
 import './material-fixes'
 import {Properties} from './type'
 // endregion
@@ -43,11 +44,12 @@ const represent = (state:Properties):string => Tools.represent(
             {}
         )
 )
+
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<Properties>()
-    function onChange<Type = string>(state:Properties<Type>):void {
-        setSelectedState(state)
-    }
+    const onChange = useMemorizedValue<(properties:Properties) => void>(
+        setSelectedState
+    )
 
     const [fadeState, setFadeState] = useState<boolean>(false)
     useEffect(():(() => void) => Tools.timeout(
@@ -62,14 +64,17 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <GenericInput name="input1" onChange={onChange}/>
-            <GenericInput model={{name: 'input1Model'}} onChange={onChange}/>
+            <GenericInput
+                model={useMemorizedValue({name: 'input1Model'})}
+                onChange={onChange}
+            />
 
             <hr/>
 
             <GenericInput name="input2" onChange={onChange}/>
             <GenericInput
                 initialValue="value2Model"
-                model={{name: 'input2Model'}}
+                model={useMemorizedValue({name: 'input2Model'})}
                 onChange={onChange}
             />
             <hr/>
@@ -83,11 +88,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 initialValue="value3Model"
-                model={{
+                model={useMemorizedValue({
                     declaration: 'Disabled',
                     mutable: false,
                     name: 'input3Model'
-                }}
+                })}
                 onChange={onChange}
             />
 
@@ -104,11 +109,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <GenericInput
                 icon="backup"
                 initialValue="value4Model"
-                model={{
+                model={useMemorizedValue({
                     declaration: 'placeholder',
                     name: 'input4Model',
                     nullable: false
-                }}
+                })}
                 onChange={onChange}
                 placeholder="input4Model"
                 trailingIcon="clear_preset"
@@ -128,11 +133,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 initialValue="only a`s allowed"
-                model={{
+                model={useMemorizedValue({
                     declaration: 'pattern',
                     description: 'input5ModelDescription',
                     regularExpressionPattern: 'a+'
-                }}
+                })}
                 name="input5Model"
                 onChange={onChange}
                 placeholder="input5ModelPlaceholder"
@@ -155,11 +160,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 initialValue="hans"
-                model={{
+                model={useMemorizedValue({
                     declaration: 'password',
                     description: 'input6ModelDescription',
                     regularExpressionPattern: 'a+',
-                }}
+                })}
                 name="passwordInput6Model"
                 onChange={onChange}
                 placeholder="input6ModelPlaceholder"
@@ -180,14 +185,14 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 initialValue="A"
-                model={{
+                model={useMemorizedValue({
                     declaration: 'selection',
                     description: 'input7ModelDescription',
                     name: 'input7Model',
                     mutable: false,
                     nullable: false,
                     selection: ['A', 'B', 'C'],
-                }}
+                })}
                 onChange={onChange}
                 placeholder="input7ModelPlaceholder"
             />
@@ -205,13 +210,13 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 initialValue="a"
-                model={{
+                model={useMemorizedValue({
                     declaration: 'selection',
                     description: 'input8ModelDescription',
                     name: 'input8Model',
                     nullable: false,
                     selection: {a: 'A', b: 'B', c: 'C'},
-                }}
+                })}
                 onChange={onChange}
             />
 
@@ -226,20 +231,20 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 required
                 rows={3}
-                theme={{
+                theme={useMemorizedValue({
                     primary: 'yellow',
                     secondary: 'blue'
-                }}
+                })}
             />
             <GenericInput
                 editor="text"
                 initialValue="a"
-                model={{
+                model={useMemorizedValue({
                     declaration: 'text',
                     description: 'input9ModelDescription',
                     name: 'input9Model',
                     nullable: false,
-                }}
+                })}
                 onChange={onChange}
                 rows={2}
             />
@@ -260,12 +265,12 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <GenericInput
                 editor="code"
                 initialValue="const value = 2"
-                model={{
+                model={useMemorizedValue({
                     declaration: 'code',
                     description: 'input10ModelDescription',
                     name: 'input10Model',
                     nullable: false,
-                }}
+                })}
                 onChange={onChange}
                 rows={6}
                 selectableEditor
@@ -286,12 +291,12 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 editor="code"
-                model={{
+                model={useMemorizedValue({
                     declaration: 'code',
                     description: 'input11ModelDescription',
                     name: 'input11Model',
                     nullable: false
-                }}
+                })}
                 onChange={onChange}
                 rows={6}
                 selectableEditor
@@ -313,13 +318,13 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <GenericInput
                 editor="richtext(simple)"
                 initialValue="Hello Mr. Smith,<br><br>how are you?"
-                model={{
+                model={useMemorizedValue({
                     declaration: 'richtext(simple)',
                     description: 'input12ModelDescription',
                     mutable: false,
                     name: 'input12Model',
                     nullable: false
-                }}
+                })}
                 onChange={onChange}
                 rows={6}
                 selectableEditor
@@ -340,7 +345,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 initialValue={100000}
-                model={{
+                model={useMemorizedValue({
                     declaration: 'Number',
                     description: 'input13ModelDescription',
                     maximum: 200000,
@@ -348,7 +353,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     name: 'input13Model',
                     nullable: false,
                     type: 'number'
-                }}
+                })}
                 onChange={onChange}
             />
 
@@ -367,7 +372,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 initialValue={100000.01}
-                model={{
+                model={useMemorizedValue({
                     declaration: 'Number',
                     description: 'input14ModelDescription',
                     maximum: 200000,
@@ -375,7 +380,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     name: 'input14Model',
                     nullable: false,
                     type: 'float'
-                }}
+                })}
                 onChange={onChange}
             />
 
@@ -394,7 +399,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 initialValue={100000.01}
-                model={{
+                model={useMemorizedValue({
                     declaration: 'Number',
                     description: 'input15ModelDescription',
                     maximum: 200000,
@@ -402,7 +407,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     name: 'input15Model',
                     nullable: false,
                     type: 'currency'
-                }}
+                })}
                 onChange={onChange}
             />
 
@@ -422,7 +427,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <RequireableCheckbox name="checkbox1" onChange={onChange} />
             <RequireableCheckbox
-                model={{name: 'checkbox1Model'}} onChange={onChange}
+                model={useMemorizedValue({name: 'checkbox1Model'})}
+                onChange={onChange}
             />
 
             <hr/>
@@ -431,7 +437,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 disabled name="checkbox2" onChange={onChange} required
             />
             <RequireableCheckbox
-                model={{name: 'checkbox2Model', mutable:false, nullable: false}}
+                model={useMemorizedValue(
+                    {name: 'checkbox2Model', mutable:false, nullable: false}
+                )}
                 onChange={onChange}
             />
 
@@ -444,7 +452,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 showInitialValidationState
             />
             <RequireableCheckbox
-                model={{name: 'checkbox3Model', nullable: false}}
+                model={useMemorizedValue(
+                    {name: 'checkbox3Model', nullable: false}
+                )}
                 onChange={onChange}
                 showInitialValidationState
                 tooltip="Check this one!"
