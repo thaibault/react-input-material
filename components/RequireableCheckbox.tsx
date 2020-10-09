@@ -88,6 +88,7 @@ export const RequireableCheckboxInner = function(
         determineValidationState<Properties, boolean>(
             result as Properties, result.model.value as boolean
         )
+        result.checked = value
         return getBaseConsolidatedProperties<Props, Properties>(result)
     }
     // region event handler
@@ -173,7 +174,6 @@ export const RequireableCheckboxInner = function(
             return
 
         let event:SyntheticEvent|undefined
-        let value:boolean|null
         if (
             eventOrValue !== null &&
             typeof eventOrValue === 'object' &&
@@ -192,30 +192,28 @@ export const RequireableCheckboxInner = function(
         } else
             value = eventOrValue as boolean|null
 
-        const oldValue:boolean|null = properties.value as boolean|null
+        setValue((oldValue:boolean|null):boolean|null => {
+            if (oldValue !== value) {
+                let stateChanged:boolean =
+                    determineValidationState<Properties, boolean>(
+                        properties, value
+                    )
 
-        properties.checked = properties.value = properties.model.value = value
+                if (properties.pristine) {
+                    properties.dirty = properties.model.state.dirty = true
+                    properties.pristine = properties.model.state.pristine = false
+                    stateChanged = true
+                }
+                if (stateChanged)
+                    onChangeState(properties.model.state, event)
 
-        if (oldValue !== properties.value) {
-            let stateChanged:boolean =
-                determineValidationState<Properties, boolean>(
-                    properties, properties.value
-                )
+                onChange(event)
 
-            if (properties.pristine) {
-                properties.dirty = properties.model.state.dirty = true
-                properties.pristine = properties.model.state.pristine = false
-                stateChanged = true
+                if (properties.onChangeValue)
+                    properties.onChangeValue(value, event)
             }
-            if (stateChanged)
-                onChangeState(properties.model.state, event)
-
-            setValue(properties.value)
-            onChange(event)
-
-            if (properties.onChangeValue)
-                properties.onChangeValue(properties.value, event)
-        }
+            return value
+        })
     }
     /**
      * Triggered on click events.

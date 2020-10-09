@@ -16,9 +16,10 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports
+// region imports 
 import Tools from 'clientnode'
 import {Mapping, ValueOf} from 'clientnode/type'
+import {useMemo} from 'react'
 
 import {DefaultProperties, Model, ModelState, Properties, Props} from './type'
 // endregion
@@ -197,6 +198,16 @@ export const getConsolidatedProperties =
 
     return result
 }
+/**
+ * Custom hook to memorize any values with a default empty array. Useful if
+ * using previous constant complex object within a render function.
+ * @param value - Value to memorize.
+ * @param dependencies - Optional dependencies when to update given value.
+ * @returns Given cached value.
+ */
+export const useMemorizedValue = <Type = any>(
+    value:Type, dependencies:Array<any> = []
+):Type => useMemo(():any => value, dependencies)
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
