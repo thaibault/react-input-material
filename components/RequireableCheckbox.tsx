@@ -192,28 +192,30 @@ export const RequireableCheckboxInner = function(
         } else
             value = eventOrValue as boolean|null
 
-        setValue((oldValue:boolean|null):boolean|null => {
-            if (oldValue !== value) {
-                let stateChanged:boolean =
-                    determineValidationState<Properties, boolean>(
-                        properties, value
-                    )
+        const oldValue:boolean|null = properties.value as boolean|null
 
-                if (properties.pristine) {
-                    properties.dirty = properties.model.state.dirty = true
-                    properties.pristine = properties.model.state.pristine = false
-                    stateChanged = true
-                }
-                if (stateChanged)
-                    onChangeState(properties.model.state, event)
+        properties.checked = properties.value = properties.model.value = value
 
-                onChange(event)
+        if (oldValue !== properties.value) {
+            let stateChanged:boolean =
+                determineValidationState<Properties, boolean>(
+                    properties, properties.value
+                )
 
-                if (properties.onChangeValue)
-                    properties.onChangeValue(value, event)
+            if (properties.pristine) {
+                properties.dirty = properties.model.state.dirty = true
+                properties.pristine = properties.model.state.pristine = false
+                stateChanged = true
             }
-            return value
-        })
+            if (stateChanged)
+                onChangeState(properties.model.state, event)
+
+            setValue(properties.value)
+            onChange(event)
+
+            if (properties.onChangeValue)
+                properties.onChangeValue(properties.value, event)
+        }
     }
     /**
      * Triggered on click events.
