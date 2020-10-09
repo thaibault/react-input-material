@@ -965,7 +965,6 @@ export const GenericInputInner = function<Type = any>(
             return
 
         let event:SyntheticEvent|undefined
-        let value:null|Type
         if (
             eventOrValue !== null &&
             typeof eventOrValue === 'object' &&
