@@ -873,33 +873,42 @@ export const GenericInputInner = function<Type = any>(
      * @param event - Event object.
      * @returns Nothing.
      */
-    const onBlur = (event:SyntheticEvent):void => {
-        let changed:boolean = false
-        if (properties.focused) {
-            properties.focused =
-            properties.model.state.focused =
-                false
-            // TODO
-            onChangeState(properties.model.state, event)
-            changed = true
-        }
+    const onBlur = (event:SyntheticEvent):void =>
+        setValueState((oldValueState) => {
+            let changed:boolean = false
+            if (oldValueState.model.focused) {
+                properties.focused =
+                properties.model.state.focused =
+                    false
+                changed = true
+            }
 
-        if (!properties.visited) {
-            properties.visited =
-            properties.model.state.visited =
-                true
-            changed = true
-        }
+            if (!oldValueState.model.visited) {
+                properties.visited =
+                properties.model.state.visited =
+                    true
+                changed = true
+            }
 
-        const oldValue:null|Type = properties.value as null|Type
-        onChangeValue(transformFinalValue(properties, properties.value))
-        changed = changed || oldValue !== properties.value
+            properties.value =
+            properties.model.value =
+            value =
+                transformFinalValue(properties, properties.value)
 
-        if (changed)
-            onChange(event)
-        if (properties.onBlur)
-            properties.onBlur(event)
-    }
+            if (oldValueState.value !== value)
+                changed = true
+
+            if (changed)
+                onChange(event)
+            if (properties.onBlur)
+                properties.onBlur(event)
+
+            if (changed)
+                return {
+                    ...oldValueState, model: properties.model.state, value
+                }
+            return oldValueState
+        })
     /**
      * Triggered on any change events.
      * @param event - Potential event object.
@@ -969,8 +978,6 @@ export const GenericInputInner = function<Type = any>(
             value = eventOrValue as null|Type
 
         setValueState((oldValueState) => {
-            const oldValue:null|Type = oldValueState.value
-
             properties.representation = typeof value === 'string' ?
                 value :
                 formatValue<Type>(value, properties.type)
@@ -981,7 +988,7 @@ export const GenericInputInner = function<Type = any>(
             const result = {
                 ...oldValueState, representation: properties.representation
             }
-            if (oldValue === properties.value)
+            if (oldValueState.value === properties.value)
                 return result
 
             result.value = value
