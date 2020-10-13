@@ -171,10 +171,11 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 // endregion
 // region static helper
 export function determineValidationState<Type = any>(
-    configuration:Properties<Type>, value:null|Type
+    configuration:Properties<Type>, currentState:ModelState, value:null|Type
 ):boolean {
     return determineBaseValidationState<Properties<Type>, Type>(
         configuration,
+        currentState,
         value,
         {
             invalidMaximum: ():boolean => (
@@ -756,7 +757,9 @@ export const GenericInputInner = function<Type = any>(
             result as unknown as Properties<Type>, result.model.value
         )
         determineValidationState<Type>(
-            result as unknown as Properties<Type>, result.model.value as Type
+            result as unknown as Properties<Type>,
+            result.model.state,
+            result.model.value as Type
         )
 
         return result
@@ -876,6 +879,7 @@ export const GenericInputInner = function<Type = any>(
             properties.focused =
             properties.model.state.focused =
                 false
+            // TODO
             onChangeState(properties.model.state, event)
             changed = true
         }
@@ -941,21 +945,6 @@ export const GenericInputInner = function<Type = any>(
             return !value
         })
     /**
-     * Triggered when a value state changes like validation or focusing.
-     * @param state - Current value state.
-     * @param event - Triggering event object.
-     * @returns Nothing.
-     */
-    const onChangeState = (state:ModelState, event?:SyntheticEvent):void => {
-        for (const key of Object.keys(state))
-            if (!Object.prototype.hasOwnProperty.call(props, key)) {
-                setModel(state)
-                break
-            }
-        if (properties.onChangeState)
-            properties.onChangeState(state, event)
-    }
-    /**
      * Triggered when ever the value changes.
      * @param eventOrValue - Event object or new value.
      * @returns Nothing.
@@ -979,23 +968,28 @@ export const GenericInputInner = function<Type = any>(
         } else
             value = eventOrValue as null|Type
 
-        const oldValue:null|Type = properties.value as null|Type
+        setValueState((oldValueState) => {
+            const oldValue:null|Type = oldValueState.value
 
-        properties.representation = typeof value === 'string' ?
-            value :
-            formatValue<Type>(value, properties.type)
-        properties.value =
-        properties.model.value =
-            parseValue(properties, value)
+            properties.representation = typeof value === 'string' ?
+                value :
+                formatValue<Type>(value, properties.type)
+            properties.value =
+            properties.model.value =
+                parseValue(properties, value)
 
-        if (oldValue === properties.value)
-            setRepresentation(properties.representation)
-        else {
+            const result = {
+                ...oldValueState, representation: properties.representation
+            }
+            if (oldValue === properties.value)
+                return result
+
+            result.value = value
             let stateChanged:boolean = determineValidationState<Type>(
-                properties, properties.value
+                properties, oldValueState.model, properties.value
             )
 
-            if (properties.pristine) {
+            if (oldValueState.model.pristine) {
                 properties.dirty =
                 properties.model.state.dirty =
                     true
@@ -1004,16 +998,17 @@ export const GenericInputInner = function<Type = any>(
                     false
                 stateChanged = true
             }
-            if (stateChanged)
-                onChangeState(properties.model.state, event)
+            if (stateChanged) {
+                result.model = properties.model.state
+                if (properties.onChangeState)
+                    properties.onChangeState(state, event)
+            }
 
-            setRepresentation(properties.representation)
-            setValue(properties.value)
             onChange(event)
 
             if (properties.onChangeValue)
                 properties.onChangeValue(properties.value, event)
-        }
+        })
     }
     /**
      * Triggered on click events.
@@ -1062,28 +1057,34 @@ export const GenericInputInner = function<Type = any>(
      * @returns Nothing.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void => {
-        let changeState:boolean = false
-        if (!properties.focused) {
-            changeState =
-            properties.focused =
-            properties.model.state.focused =
-                true
-        }
-        if (properties.untouched) {
-            changeState =
-            properties.touched =
-            properties.model.state.touched =
-                true
-            properties.untouched =
-            properties.model.state.untouched =
-                false
-        }
-        if (changeState) {
-            onChangeState(properties.model.state, event)
-            onChange(event)
-        }
-        if (properties.onTouch)
-            properties.onTouch(event)
+        setValueState((oldValueState) => {
+            let changedState:boolean = false
+            if (!oldValueState.model.focused) {
+                changedState =
+                properties.focused =
+                properties.model.state.focused =
+                    true
+            }
+            if (oldValueState.model.untouched) {
+                changedState =
+                properties.touched =
+                properties.model.state.touched =
+                    true
+                properties.untouched =
+                properties.model.state.untouched =
+                    false
+            }
+            let result = oldValueState
+            if (changedState) {
+                result = {...oldValueState, model: properties.model.state}
+                if (properties.onChangeState)
+                    properties.onChangeState(properties.model.state, event)
+                onChange(event)
+            }
+            if (properties.onTouch)
+                properties.onTouch(event)
+            return result
+        })
     }
     // endregion
     // region properties
@@ -1106,15 +1107,24 @@ export const GenericInputInner = function<Type = any>(
     }>({end: 0, start: 0})
     let [editorIsActive, setEditorIsActive] = useState<boolean>(false)
     let [hidden, setHidden] = useState<boolean|undefined>()
-    const [model, setModel] =
-        useState<ModelState>({...GenericInput.defaultModelState})
     const [selectionIsUnstable, setSelectionIsUnstable] =
         useState<boolean>(false)
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
-    let [value, setValue] =
-        useState<null|Type>(determineInitialValue<Type>(props))
-    let [representation, setRepresentation] =
-        useState<string>(determineInitialRepresentation(props, value))
+    const initialValue:null|type = determineInitialValue<Type>(props)
+    /*
+        NOTE: This values have to share the same state item since they have to
+        be updated in one event loop (set state callback).
+    */
+    const [valueState, setValueState] = useState<{
+        model:ModelState
+        representation:string
+        value:null|Type
+    }>({
+        model: {...GenericInput.defaultModelState},
+        representation: determineInitialRepresentation(props, initialValue),
+        value: initialValue
+    })
+    let {representation, model, value}} = valueState
     const properties:Properties<Type> = getConsolidatedProperties(props)
     useImperativeHandle(
         reference,

@@ -47,13 +47,17 @@ export const determineInitialValue = <Type = any>(
 /**
  * Derives current validation state from given value.
  * @param configuration - Input configuration.
+ * @param currentState - Current validation state.
  * @param value - Value to validate against given configuration.
  * @param validators - Mapping from validation state key to corresponding
  * validator function.
  * @returns A boolean indicating if validation state has changed.
  */
 export const determineValidationState = <P extends Properties<any>, Type = any>(
-    configuration:P, value:null|Type, validators:Mapping<() => boolean> = {}
+    configuration:P,
+    currentState:P['model']['state'],
+    value:null|Type,
+    validators:Mapping<() => boolean> = {}
 ):boolean => {
     let changed:boolean = false
 
@@ -69,12 +73,10 @@ export const determineValidationState = <P extends Properties<any>, Type = any>(
         ...validators
     }
     for (const [name, validator] of Object.entries(validators)) {
-        const oldValue:boolean =
-            configuration.model.state[name as keyof ModelState]
+        const oldValue:boolean = currentState[name as keyof ModelState]
         configuration.model.state[name as keyof ModelState] = validator()
         changed =
-            changed ||
-            oldValue !== configuration.model.state[name as keyof ModelState]
+            changed || oldValue !== currentState[name as keyof ModelState]
     }
 
     if (changed) {
