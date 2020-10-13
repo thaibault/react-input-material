@@ -1131,7 +1131,7 @@ export const GenericInputInner = function<Type = any>(
         representation: determineInitialRepresentation(props, initialValue),
         value: initialValue
     })
-    let {representation, model, value}} = valueState
+    let {representation, model, value} = valueState
     const properties:Properties<Type> = getConsolidatedProperties(props)
     useImperativeHandle(
         reference,
