@@ -46,44 +46,42 @@ export const determineInitialValue = <Type = any>(
 }
 /**
  * Derives current validation state from given value.
- * @param configuration - Input configuration.
+ * @param properties - Input configuration.
  * @param currentState - Current validation state.
- * @param value - Value to validate against given configuration.
  * @param validators - Mapping from validation state key to corresponding
  * validator function.
  * @returns A boolean indicating if validation state has changed.
  */
-export const determineValidationState = <P extends Properties<any>, Type = any>(
-    configuration:P,
+export const determineValidationState = <P extends Properties<any>>(
+    properties:P,
     currentState:P['model']['state'],
-    value:null|Type,
     validators:Mapping<() => boolean> = {}
 ):boolean => {
     let changed:boolean = false
 
     validators = {
         invalidRequired: ():boolean => (
-            configuration.model.nullable === false &&
+            properties.model.nullable === false &&
             (
-                value === null ||
-                typeof configuration.indeterminate !== 'boolean' &&
-                !value
+                properties.model.value === null ||
+                typeof properties.indeterminate !== 'boolean' &&
+                !properties.model.value
             )
         ),
         ...validators
     }
     for (const [name, validator] of Object.entries(validators)) {
         const oldValue:boolean = currentState[name as keyof ModelState]
-        configuration.model.state[name as keyof ModelState] = validator()
+        properties.model.state[name as keyof ModelState] = validator()
         changed =
             changed || oldValue !== currentState[name as keyof ModelState]
     }
 
     if (changed) {
-        configuration.model.state.invalid = Object.keys(validators).some((
+        properties.model.state.invalid = Object.keys(validators).some((
             name:string
-        ):boolean => configuration.model.state[name as keyof ModelState])
-        configuration.model.state.valid = !configuration.model.state.invalid
+        ):boolean => properties.model.state[name as keyof ModelState])
+        properties.model.state.valid = !properties.model.state.invalid
     }
 
     return changed
@@ -94,19 +92,15 @@ export const determineValidationState = <P extends Properties<any>, Type = any>(
  * properties.
  * @param properties - Properties to merge.
  * @param defaultModel - Default model to merge.
- * @param value - Current value to merge.
- * @param model - Current model state.
  * @param initialProperties - Initial unmodified properties to take into
  * account.
  * @returns Merged properties.
 */
-export const mapPropertiesAndStateToModel = <P extends Props, M extends Model, MS extends ModelState, Type = any>(
-    properties:P,
-    defaultModel:M,
-    value:null|Type,
-    model:MS,
-    initialProperties?:P
-):P & {model:M} => {
+export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
+    properties:P, defaultModel:M, initialProperties?:P
+):P => {
+    if (!initialProperties)
+        initialProperties = properties
     /*
         NOTE: Default props seems not to respect nested layers to merge so
         we have to manage this for nested model structure.
@@ -121,43 +115,34 @@ export const mapPropertiesAndStateToModel = <P extends Props, M extends Model, M
     )
     // region handle aliases
     if (result.disabled) {
-        delete result.disabled
         result.model.mutable = false
+        delete result.disabled
     }
     if (result.pattern) {
         result.model.regularExpressionPattern = result.pattern
         delete result.pattern
     }
     if (result.required) {
-        delete result.required
         result.model.nullable = false
+        delete result.required
     }
     if (result.type === 'text')
         result.type = 'string'
     // endregion
-    // region handle model configuration
+    // region map properties into model
+    // Map first level properties
     for (const [name, value] of Object.entries(result.model))
         if (Object.prototype.hasOwnProperty.call(result, name))
             (result.model[name as keyof M] as ValueOf<M>) =
                 result[name as keyof P] as unknown as ValueOf<M>
+    // Map property state into model state
     for (const [name, value] of Object.entries(result.model.state))
         if (Object.prototype.hasOwnProperty.call(result, name))
             result.model.state[name as keyof ModelState] =
                 result[name as keyof P] as unknown as ValueOf<ModelState>
-    for (const key of Object.keys(result.model.state))
-        if (!Object.prototype.hasOwnProperty.call(
-            initialProperties || properties, key
-        )) {
-            result.model.state = model
-            break
-        }
 
     if (result.model.value === undefined)
-        result.model.value = (value === undefined) ?
-            result.model.default :
-            value
-    else if (value !== undefined)
-        result.model.value = value
+        result.model.value = result.model.default
     // else -> Controlled component via model's "value" property.
     // endregion
     return result
@@ -182,7 +167,7 @@ export const getConsolidatedProperties =
         properties.model || {},
         (properties.model || {}).state || {}
     )
-
+    // region handle aliases
     result.disabled = !result.mutable
     delete result.mutable
 
@@ -197,8 +182,22 @@ export const getConsolidatedProperties =
     // NOTE: Workaround since options configuration above is ignored.
     delete (result as {regularExpressionPattern?:RegExp|string})
         .regularExpressionPattern
-
-    return result
+    // endregion
+    return result as R
+}
+/**
+ * Triggered when a value state changes like validation or focusing.
+ * @param properties - Properties to search in.
+ * @param name - Event callback name to search for in given properties.
+ * @param parameter - To forward to callback.
+ * @returns Nothing.
+ */
+export const triggerCallbackIfExists = <Type = any>(
+    properties:Properties<Type>, name:string, ...parameter:Array<any>
+):void => {
+    name = `on${Tools.stringCapitalize(name)}`
+    if (properties[name as keyof Properties<Type>])
+        (properties[name as keyof Properties<Type>] as Function)(...parameter)
 }
 /**
  * Custom hook to memorize any values with a default empty array. Useful if

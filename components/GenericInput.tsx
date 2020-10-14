@@ -54,9 +54,8 @@ import React, {
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 import {TransitionProps} from 'react-transition-group/Transition'
 import {
-    Editor as RichTextEditor, RawEditorSettings as TinyMCEOptions
+    Editor as RichTextEditor, RawEditorSettings as RawTinyMCEEditorSettings
 } from 'tinymce'
-import {WebComponentAdapter} from 'web-component-wrapper/type'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
 import {CircularProgress} from '@rmwc/circular-progress'
@@ -94,13 +93,17 @@ import {
     determineInitialValue,
     determineValidationState as determineBaseValidationState,
     getConsolidatedProperties as getBaseConsolidatedProperties,
-    mapPropertiesAndStateToModel
+    mapPropertiesIntoModel,
+    triggerCallbackIfExists
 } from '../helper'
 import {
+    CursorState,
     DataTransformSpecification,
     defaultInputModelState as defaultModelState,
     DefaultInputProperties as DefaultProperties,
     defaultInputProperties as defaultProperties,
+    EditorState,
+    InputAdapter as Adapter,
     InputDataTransformation,
     InputModelState as ModelState,
     InputProperties as Properties,
@@ -109,7 +112,8 @@ import {
     InputState as State,
     InputModel as Model,
     Renderable,
-    StaticFunctionInputComponent as StaticComponent
+    StaticFunctionInputComponent as StaticComponent,
+    ValueState
 } from '../type'
 // endregion
 // region code editor configuration
@@ -121,6 +125,10 @@ const CodeEditor = lazy(async ():Promise<{default:ComponentType<any>}> => {
 })
 // endregion
 // region rich text editor configuration
+export type TinyMCEOptions = RawTinyMCEEditorSettings & {
+    selector?:undefined
+    target?:undefined
+}
 declare var UTC_BUILD_TIMESTAMP:number
 // NOTE: Could be set via module bundler environment variables.
 if (typeof UTC_BUILD_TIMESTAMP === 'undefined')
@@ -171,47 +179,48 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 // endregion
 // region static helper
 export function determineValidationState<Type = any>(
-    configuration:Properties<Type>, currentState:ModelState, value:null|Type
+    configuration:Properties<Type>, currentState:ModelState
 ):boolean {
-    return determineBaseValidationState<Properties<Type>, Type>(
+    return determineBaseValidationState<Properties<Type>>(
         configuration,
         currentState,
-        value,
         {
             invalidMaximum: ():boolean => (
                 typeof configuration.model.maximum === 'number' &&
-                typeof value === 'number' &&
-                !isNaN(value) &&
-                configuration.model.maximum < value
+                typeof configuration.model.value === 'number' &&
+                !isNaN(configuration.model.value) &&
+                configuration.model.maximum < configuration.model.value
             ),
             invalidMaximumLength: ():boolean => (
                 typeof configuration.model.maximumLength === 'number' &&
-                typeof value === 'string' &&
-                configuration.model.maximumLength < value.length
+                typeof configuration.model.value === 'string' &&
+                configuration.model.maximumLength <
+                    configuration.model.value.length
             ),
             invalidMinimum: ():boolean => (
                 typeof configuration.model.minimum === 'number' &&
-                typeof value === 'number' &&
-                !isNaN(value) &&
-                value < configuration.model.minimum
+                typeof configuration.model.value === 'number' &&
+                !isNaN(configuration.model.value) &&
+                configuration.model.value < configuration.model.minimum
             ),
             invalidMinimumLength: ():boolean => (
                 typeof configuration.model.minimumLength === 'number' &&
-                typeof value === 'string' &&
-                value.length < configuration.model.minimumLength
+                typeof configuration.model.value === 'string' &&
+                configuration.model.value.length <
+                    configuration.model.minimumLength
             ),
             invalidPattern: ():boolean => (
-                typeof value === 'string' &&
+                typeof configuration.model.value === 'string' &&
                 (
                     typeof configuration.model.regularExpressionPattern ===
                         'string' &&
                     !(new RegExp(configuration.model.regularExpressionPattern))
-                        .test(value) ||
+                        .test(configuration.model.value) ||
                     configuration.model.regularExpressionPattern !== null &&
                     typeof configuration.model.regularExpressionPattern ===
                         'object' &&
                     !typeof configuration.model.regularExpressionPattern
-                        .test(value)
+                        .test(configuration.model.value)
                 )
             )
         }
@@ -269,6 +278,19 @@ export function determineInitialRepresentation<Type = any>(
  * Generic input wrapper component which automatically determines a useful
  * input field depending on given model specification.
  *
+ * Dataflow:
+ *
+ * 1. On-Render all states are merged with given properties into a normalized
+ *    properties object.
+ * 2. Properties, corresponding state values and sub node instances are saved
+ *    into a "ref" object (to make them accessible from the outside e.g. for
+ *    wrapper like web-components).
+ * 3. Event handler saves corresponding data modifications into state and
+ *    normalized properties object.
+ * 4. All state changes except selection changes trigger an "onChange" event
+ *    which delivers the consolidated properties object (with latest
+ *    modifications included).
+ *
  * @property static:displayName - Descriptive name for component to show in web
  * developer tools.
  *
@@ -277,8 +299,7 @@ export function determineInitialRepresentation<Type = any>(
  * @returns React elements.
  */
 export const GenericInputInner = function<Type = any>(
-    props:Props<Type>,
-    reference?:RefObject<WebComponentAdapter<Properties<Type>, State<Type>>>
+    props:Props<Type>, reference?:RefObject<Adapter<Type>>
 ):ReactElement {
     // region live-cycle
     /**
@@ -287,29 +308,35 @@ export const GenericInputInner = function<Type = any>(
      * @returns Nothing.
      */
     useEffect(():void => {
-        if (selectionIsUnstable)
-            if (editorIsActive) {
+        if (editorState.selectionIsUnstable)
+            if (properties.editorIsActive) {
                 /*
                     NOTE: If the corresponding editor are not loaded yet they
                     will set the selection state on initialisation as long as
-                    "selectionIsUnstable" is set to "true".
+                    "editorState.selectionIsUnstable" is set to "true".
                 */
                 if (codeEditorReference?.editor?.selection) {
                     codeEditorReference.editor.textInput.focus()
                     setCodeEditorSelectionState(codeEditorReference)
-                    setSelectionIsUnstable(false)
+                    setEditorState(
+                        {...editorState, selectionIsUnstable: false}
+                    )
                 } else if (richTextEditorInstance?.selection) {
                     richTextEditorInstance.focus(false)
                     setRichTextEditorSelectionState(richTextEditorInstance)
-                    setSelectionIsUnstable(false)
+                    setEditorState(
+                        {...editorState, selectionIsUnstable: false}
+                    )
                 }
             } else if (inputReference.current) {
                 inputReference.current.focus();
                 (
                     inputReference.current as
                         HTMLInputElement|HTMLTextAreaElement
-                ).setSelectionRange(cursor.start, cursor.end)
-                setSelectionIsUnstable(false)
+                ).setSelectionRange(
+                    properties.cursor.start, properties.cursor.end
+                )
+                setEditorState({...editorState, selectionIsUnstable: false})
             }
     })
     // endregion
@@ -512,7 +539,7 @@ export const GenericInputInner = function<Type = any>(
     const determineAbsoluteSymbolOffsetFromHTML = (
         contentDomNode:Element, domNode:Element, offset:number
     ):number => {
-        if (!value)
+        if (!properties.value)
             return 0
 
         const indicatorKey:string = 'generic-input-selection-indicator'
@@ -547,11 +574,11 @@ export const GenericInputInner = function<Type = any>(
     const determineAbsoluteSymbolOffsetFromTable = (
         column:number, row:number
     ):number => {
-        if (typeof value !== 'string' && !value)
+        if (typeof properties.value !== 'string' && !properties.value)
             return 0
 
         if (row > 0)
-            return column + (value as unknown as string)
+            return column + (properties.value as unknown as string)
                 .split('\n')
                 .slice(0, row)
                 .map((line:string):number => 1 + line.length)
@@ -568,8 +595,8 @@ export const GenericInputInner = function<Type = any>(
         row:number
     } => {
         const result = {column: 0, row: 0}
-        if (typeof value === 'string')
-            for (const line of value.split('\n')) {
+        if (typeof properties.value === 'string')
+            for (const line of properties.value.split('\n')) {
                 if (line.length < offset)
                     offset -= 1 + line.length
                 else {
@@ -585,9 +612,9 @@ export const GenericInputInner = function<Type = any>(
      */
     const setCodeEditorSelectionState = (instance:CodeEditorType):void => {
         const range = instance.editor.selection.getRange()
-        const endPosition = determineTablePosition(cursor.end)
+        const endPosition = determineTablePosition(properties.cursor.end)
         range.setEnd(endPosition.row, endPosition.column)
-        const startPosition = determineTablePosition(cursor.start)
+        const startPosition = determineTablePosition(properties.cursor.start)
         range.setStart(startPosition.row, startPosition.column)
         instance.editor.selection.setRange(range)
     }
@@ -602,10 +629,7 @@ export const GenericInputInner = function<Type = any>(
             end: '###generic-input-selection-indicator-end###',
             start: '###generic-input-selection-indicator-start###'
         }
-        const cursor:{
-            end:number
-            start:number
-        } = {
+        const cursor:CursorState = {
             end: properties.cursor.end + indicator.start.length,
             start: properties.cursor.start
         }
@@ -723,43 +747,22 @@ export const GenericInputInner = function<Type = any>(
      * @param properties - Properties to merge.
      * @returns Nothing.
     */
-    const mergePropertiesStateAndModel = (
+    const mapPropertiesAndValidationStateIntoModel = (
         properties:Props<Type>
     ):DefaultProperties<Type> => {
         const result:DefaultProperties<Type> =
-            mapPropertiesAndStateToModel<Props<Type>, Model<Type>, ModelState, Type>(
+            mapPropertiesIntoModel<Props<Type>, Model<Type>>(
                 properties,
                 GenericInput.defaultProps.model as Model<Type>,
-                value,
-                model,
                 props
             ) as DefaultProperties<Type>
-        // region handle state configuration
-        if (result.cursor === undefined)
-            result.cursor = cursor
 
-        if (result.editorIsActive === undefined)
-            result.editorIsActive = editorIsActive
-
-        if (result.hidden === undefined)
-            result.hidden = hidden
-
-        if (
-            result.representation === undefined &&
-            typeof representation === 'string'
-        )
-            result.representation = representation
-
-        if (result.showDeclaration === undefined)
-            result.showDeclaration = showDeclaration
-        // endregion
         result.model.value = parseValue(
             result as unknown as Properties<Type>, result.model.value
         )
+
         determineValidationState<Type>(
-            result as unknown as Properties<Type>,
-            result.model.state,
-            result.model.value as Type
+            result as unknown as Properties<Type>, result.model.state
         )
 
         return result
@@ -774,7 +777,7 @@ export const GenericInputInner = function<Type = any>(
     ):Properties<Type> => {
         const result:Properties<Type> =
             getBaseConsolidatedProperties<Props<Type>, Properties<Type>>(
-                mergePropertiesStateAndModel(properties)
+                mapPropertiesAndValidationStateIntoModel(properties)
             )
 
         // NOTE: If only an editor is specified it should be displayed.
@@ -805,10 +808,14 @@ export const GenericInputInner = function<Type = any>(
                 )
             }
 
-        if (codeEditorReference && editorIsActive && selectionIsUnstable) {
+        if (
+            codeEditorReference &&
+            properties.editorIsActive &&
+            editorState.selectionIsUnstable
+        ) {
             codeEditorReference.editor.textInput.focus()
             setCodeEditorSelectionState(codeEditorReference)
-            setSelectionIsUnstable(false)
+            setEditorState({...editorState, selectionIsUnstable: false})
         }
     }
     /**
@@ -860,7 +867,9 @@ export const GenericInputInner = function<Type = any>(
      * @param value - Current value to transform.
      * @returns Transformed value.
      */
-    const transformFinalValue = (configuration:Properties<Type>, value:any):null|Type => {
+    const transformFinalValue = (
+        configuration:Properties<Type>, value:any
+    ):null|Type => {
         if (configuration.model.trim && typeof value === 'string')
             value = value.trim().replace(/ +\n/g, '\\n')
         return parseValue(configuration, value)
@@ -873,74 +882,97 @@ export const GenericInputInner = function<Type = any>(
      * @param event - Event object.
      * @returns Nothing.
      */
-    const onBlur = (event:SyntheticEvent):void =>
-        setValueState((oldValueState) => {
-            let changed:boolean = false
-            if (oldValueState.model.focused) {
-                properties.focused =
-                properties.model.state.focused =
-                    false
-                changed = true
-            }
+    const onBlur = (event:SyntheticEvent):void => setValueState((
+        oldValueState:ValueState<Type, ModelState>
+    ):ValueState<Type, ModelState> => {
+        let changed:boolean = false
+        let stateChanged:boolean = false
 
-            if (!oldValueState.model.visited) {
-                properties.visited =
-                properties.model.state.visited =
-                    true
-                changed = true
-            }
+        if (oldValueState.model.focused) {
+            properties.focused = false
+            changed = true
+            stateChanged = true
+        }
 
-            properties.value =
-            properties.model.value =
-            value =
-                transformFinalValue(properties, properties.value)
+        if (!oldValueState.model.visited) {
+            properties.visited = true
+            changed = true
+            stateChanged = true
+        }
 
-            if (oldValueState.value !== value)
-                changed = true
+        properties.value =
+            transformFinalValue(properties, properties.value)
 
-            if (changed)
-                onChange(event)
-            if (properties.onBlur)
-                properties.onBlur(event)
+        if (oldValueState.value !== properties.value)
+            changed = true
 
-            if (changed)
-                return {
-                    ...oldValueState, model: properties.model.state, value
-                }
-            return oldValueState
-        })
+        if (changed)
+            onChange(event)
+
+        if (oldValueState.value !== properties.value)
+            triggerCallbackIfExists<Type>(
+                properties, 'valueChange', properties.value, event
+            )
+
+        if (stateChanged)
+            triggerCallbackIfExists<Type>(
+                properties, 'changeState', properties.model.state, event
+            )
+
+        triggerCallbackIfExists<Type>(properties, 'blur', event)
+
+        return changed ?
+            {
+                ...oldValueState,
+                model: properties.model.state,
+                value: properties.value
+            } :
+            oldValueState
+    })
     /**
-     * Triggered on any change events.
+     * Triggered on any change events. Consolidates properties object and
+     * triggers given on change callbacks.
      * @param event - Potential event object.
      * @returns Nothing.
      */
     const onChange = (event?:SyntheticEvent):void => {
-        if (properties.onChange)
-            properties.onChange(
-                getConsolidatedProperties(
-                    /*
-                        Workaround since "Something" isn't identified as subset
-                        of "RecursivePartial<Type>"
-                    */
-                    properties as unknown as Props<Type>
-                ),
-                event
+        Tools.extend(
+            true,
+            properties,
+            getConsolidatedProperties(
+                /*
+                    Workaround since "Type" isn't identified as subset of
+                    "RecursivePartial<Type>" yet.
+                */
+                properties as unknown as Props<Type>
             )
+        )
+
+        triggerCallbackIfExists<Type>(properties, 'change', properties, event)
     }
     /**
      * Triggered when editor is active indicator should be changed.
      * @param event - Mouse event object.
      * @returns Nothing.
      */
-    const onChangeEditorIsActive = (event?:ReactMouseEvent):void => {
-        properties.editorIsActive = !properties.editorIsActive
-        setEditorIsActive((value:boolean):boolean => !value)
-        setSelectionIsUnstable(true)
+    const onChangeEditorIsActive = (event?:ReactMouseEvent):void =>
+        setEditorState(({editorIsActive}):EditorState => {
+            properties.editorIsActive = !editorIsActive
 
-        if (properties.onChangeEditorIsActive)
-            properties.onChangeEditorIsActive(properties.editorIsActive, event)
-        onChange(event)
-    }
+            onChange(event)
+
+            triggerCallbackIfExists<Type>(
+                properties,
+                'changeEditorIsActive',
+                properties.editorIsActive,
+                event
+            )
+
+            return {
+                editorIsActive: properties.editorIsActive,
+                selectionIsUnstable: true
+            }
+        })
     /**
      * Triggered when show declaration indicator should be changed.
      * @param event - Potential event object.
@@ -948,17 +980,27 @@ export const GenericInputInner = function<Type = any>(
      */
     const onChangeShowDeclaration = (event?:ReactMouseEvent):void =>
         setShowDeclaration((value:boolean):boolean => {
-            if (properties.onChangeShowDeclaration)
-                properties.onChangeShowDeclaration(value, event)
+            properties.showDeclaration = !value
+
             onChange(event)
-            return !value
+
+            triggerCallbackIfExists<Type>(
+                properties,
+                'changeShowDeclaration',
+                properties.showDeclaration,
+                event
+            )
+
+            return properties.showDeclaration
         })
     /**
      * Triggered when ever the value changes.
      * @param eventOrValue - Event object or new value.
      * @returns Nothing.
      */
-    const onChangeValue = (eventOrValue:null|SyntheticEvent|Type):void => {
+    const onChangeValue = (
+        eventOrValue:null|SyntheticEvent|Type, editorInstance?:RichTextEditor
+    ):void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
 
@@ -969,52 +1011,57 @@ export const GenericInputInner = function<Type = any>(
             (eventOrValue as SyntheticEvent).target
         ) {
             event = eventOrValue as SyntheticEvent
-            value =
+            properties.value =
                 typeof (event.target as {value?:null|Type}).value ===
                     'undefined' ?
                         null :
                         (event.target as unknown as {value:null|Type}).value
         } else
-            value = eventOrValue as null|Type
+            properties.value = eventOrValue as null|Type
 
-        setValueState((oldValueState) => {
-            properties.representation = typeof value === 'string' ?
-                value :
-                formatValue<Type>(value, properties.type)
-            properties.value =
-            properties.model.value =
-                parseValue(properties, value)
+        setValueState((
+            oldValueState:ValueState<Type, ModelState>
+        ):ValueState<Type, ModelState> => {
+            properties.representation = typeof properties.value === 'string' ?
+                properties.value :
+                formatValue<Type>(
+                    properties.value as null|Type, properties.type
+                )
+            properties.value = parseValue(properties, properties.value)
 
-            const result = {
+            const result:ValueState<Type, ModelState> = {
                 ...oldValueState, representation: properties.representation
             }
             if (oldValueState.value === properties.value)
                 return result
 
-            result.value = value
+            result.value = properties.value
+
             let stateChanged:boolean = determineValidationState<Type>(
-                properties, oldValueState.model, properties.value
+                properties, oldValueState.model
             )
 
             if (oldValueState.model.pristine) {
-                properties.dirty =
-                properties.model.state.dirty =
-                    true
-                properties.pristine =
-                properties.model.state.pristine =
-                    false
+                properties.dirty = true
+                properties.pristine = false
                 stateChanged = true
-            }
-            if (stateChanged) {
-                result.model = properties.model.state
-                if (properties.onChangeState)
-                    properties.onChangeState(state, event)
             }
 
             onChange(event)
 
-            if (properties.onChangeValue)
-                properties.onChangeValue(properties.value, event)
+            triggerCallbackIfExists<Type>(
+                properties, 'changeValue', properties.value, event
+            )
+
+            if (stateChanged) {
+                result.model = properties.model.state
+
+                triggerCallbackIfExists<Type>(
+                    properties, 'changeState', properties.model.state, event
+                )
+            }
+
+            return result
         })
     }
     /**
@@ -1024,8 +1071,9 @@ export const GenericInputInner = function<Type = any>(
      */
     const onClick = (event:ReactMouseEvent):void => {
         onSelectionChange(event)
-        if (properties.onClick)
-            properties.onClick(event)
+
+        triggerCallbackIfExists<Type>(properties, 'click', event)
+
         onTouch(event)
     }
     /**
@@ -1034,8 +1082,8 @@ export const GenericInputInner = function<Type = any>(
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
-        if (properties.onFocus)
-            properties.onFocus(event)
+        triggerCallbackIfExists<Type>(properties, 'focus', event)
+
         onTouch(event)
     }
     /**
@@ -1045,8 +1093,8 @@ export const GenericInputInner = function<Type = any>(
      */
     const onKeyUp = (event:ReactKeyboardEvent):void => {
         onSelectionChange(event)
-        if (properties.onKeyUp)
-            properties.onKeyUp(event)
+
+        triggerCallbackIfExists<Type>(properties, 'keyUp', event)
     }
     /**
      * Triggered on selection change events.
@@ -1054,45 +1102,55 @@ export const GenericInputInner = function<Type = any>(
      * @returns Nothing.
      */
     const onSelectionChange = (event:SyntheticEvent):void => {
+        /*
+            TODO
+            We assume that this event is triggered after a property
+            consolidation.
+            Should we use a "useEffect" to be sure?
+            Is "useEffect" running after "setState"?
+        */
         saveSelectionState()
-        if (properties.onSelectionChange)
-            properties.onSelectionChange(event)
+
+        triggerCallbackIfExists<Type>(properties, 'selectionChange', event)
     }
     /**
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
      * @returns Nothing.
      */
-    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void => {
-        setValueState((oldValueState) => {
+    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
+        setValueState((
+            oldValueState:ValueState<Type, ModelState>
+        ):ValueState<Type, ModelState> => {
             let changedState:boolean = false
+
             if (!oldValueState.model.focused) {
-                changedState =
-                properties.focused =
-                properties.model.state.focused =
-                    true
+                properties.focused = true
+                changedState = true
             }
+
             if (oldValueState.model.untouched) {
-                changedState =
-                properties.touched =
-                properties.model.state.touched =
-                    true
-                properties.untouched =
-                properties.model.state.untouched =
-                    false
+                properties.touched = true
+                properties.untouched = false
+                changedState = true
             }
+
             let result = oldValueState
+
             if (changedState) {
                 result = {...oldValueState, model: properties.model.state}
-                if (properties.onChangeState)
-                    properties.onChangeState(properties.model.state, event)
+
                 onChange(event)
+
+                triggerCallbackIfExists<Type>(
+                    properties, 'changeState', properties.model.state, event
+                )
             }
-            if (properties.onTouch)
-                properties.onTouch(event)
+
+            triggerCallbackIfExists<Type>(properties, 'touch', event)
+
             return result
         })
-    }
     // endregion
     // region properties
     // / region references
@@ -1108,34 +1166,59 @@ export const GenericInputInner = function<Type = any>(
     let richTextEditorInstance:RichTextEditor|undefined
     let richTextEditorReference:RichTextEditorComponent|undefined
     // / endregion
-    const [cursor, setCursor] = useState<{
-        end:number
-        start:number
-    }>({end: 0, start: 0})
-    let [editorIsActive, setEditorIsActive] = useState<boolean>(false)
+    const givenProperties:Props<Type> = {...props}
+    const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
     let [hidden, setHidden] = useState<boolean|undefined>()
-    const [selectionIsUnstable, setSelectionIsUnstable] =
-        useState<boolean>(false)
+    let [editorState, setEditorState] = useState<EditorState>({
+        editorIsActive: false, selectionIsUnstable: false
+    })
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
-    const initialValue:null|type = determineInitialValue<Type>(props)
+    const initialValue:null|Type = determineInitialValue<Type>(props)
     /*
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
     */
-    const [valueState, setValueState] = useState<{
-        model:ModelState
-        representation:string
-        value:null|Type
-    }>({
-        model: {...GenericInput.defaultModelState},
-        representation: determineInitialRepresentation(props, initialValue),
-        value: initialValue
-    })
-    let {representation, model, value} = valueState
-    const properties:Properties<Type> = getConsolidatedProperties(props)
+    const [valueState, setValueState] = useState<ValueState<Type, ModelState>>(
+        {
+            model: {...GenericInput.defaultModelState},
+            representation: determineInitialRepresentation(
+                props, initialValue
+            ),
+            value: initialValue
+        }
+    )
+    // / region derive missing properties from state variables
+    if (!givenProperties.cursor)
+        givenProperties.cursor = {} as CursorState
+    if (givenProperties.cursor.end === undefined)
+        givenProperties.cursor.end = cursor.end
+    if (givenProperties.cursor.start === undefined)
+        givenProperties.cursor.start = cursor.start
+
+    if (givenProperties.editorIsActive === undefined)
+        givenProperties.editorIsActive = editorState.editorIsActive
+
+    if (givenProperties.hidden === undefined)
+        givenProperties.hidden = hidden
+    if (givenProperties.hidden === undefined)
+        givenProperties.hidden = givenProperties.name?.startsWith('password')
+
+    if (givenProperties.showDeclaration === undefined)
+        givenProperties.showDeclaration = showDeclaration
+
+    if (!givenProperties.model)
+        givenProperties.model = {}
+    if (givenProperties.model.value === undefined)
+        givenProperties.model.value = valueState.value
+
+    if (givenProperties.representation === undefined)
+        givenProperties.representation = valueState.representation
+    // / endregion
+    const properties:Properties<Type> =
+        getConsolidatedProperties(givenProperties)
     useImperativeHandle(
         reference,
-        ():WebComponentAdapter<Properties<Type>, State<Type>> & {
+        ():Adapter<Type> & {
             references:{
                 codeEditorReference?:CodeEditorType
                 codeEditorInputReference:RefObject<HTMLTextAreaElement>
@@ -1157,44 +1240,16 @@ export const GenericInputInner = function<Type = any>(
                 richTextEditorReference
             },
             state: {
-                cursor,
-                editorIsActive,
-                hidden,
-                model,
-                representation,
-                selectionIsUnstable,
-                showDeclaration,
-                value
+                cursor: properties.cursor,
+                editorIsActive: properties.editorIsActive,
+                hidden: properties.hidden,
+                model: properties.model.state,
+                representation: properties.representation,
+                showDeclaration: properties.showDeclaration,
+                value: properties.value as null|Type
             }
         })
     )
-    // endregion
-    // region derive state variables from given properties
-    if (properties.cursor) {
-        if (properties.cursor.end !== undefined)
-            cursor.end = properties.cursor.end
-        if (properties.cursor.start !== undefined)
-            cursor.start = properties.cursor.start
-    }
-
-    if (properties.editorIsActive !== undefined)
-        editorIsActive = properties.editorIsActive
-
-    if (properties.hidden !== undefined)
-        hidden = properties.hidden
-    if (hidden === undefined)
-        hidden = properties.name?.startsWith('password')
-
-    if (properties.showDeclaration !== undefined)
-        showDeclaration = properties.showDeclaration
-
-    if (properties.value !== undefined)
-        value = properties.value as null|Type
-    else if (properties.model?.value !== undefined)
-        value = properties.model.value as null|Type
-
-    if (properties.representation !== undefined)
-        representation = properties.representation
     // endregion
     // region render
     // / region intermediate render properties
@@ -1233,10 +1288,15 @@ export const GenericInputInner = function<Type = any>(
 
                 richTextEditorLoadedOnce = true
 
-                if (editorIsActive && selectionIsUnstable) {
+                if (
+                    properties.editorIsActive &&
+                    editorState.selectionIsUnstable
+                ) {
                     richTextEditorInstance.focus(false)
                     setRichTextEditorSelectionState(richTextEditorInstance)
-                    setSelectionIsUnstable(false)
+                    setEditorState(
+                        {...editorState, selectionIsUnstable: false}
+                    )
                 }
             })
         }
@@ -1357,11 +1417,16 @@ export const GenericInputInner = function<Type = any>(
                                     }
                                     disabled={properties.disabled}
                                     init={tinyMCEOptions}
-                                    onClick={onClick as unknown as
+                                    onClick={onClick as
+                                        unknown as
                                         RichTextEventHandler<MouseEvent>
                                     }
-                                    onEditorChange={onChangeValue}
-                                    onKeyUp={onKeyUp as unknown as
+                                    onEditorChange={onChangeValue as
+                                        unknown as
+                                        RichTextEditorProps['onEditorChange']
+                                    }
+                                    onKeyUp={onKeyUp as
+                                        unknown as
                                         RichTextEventHandler<KeyboardEvent>
                                     }
                                     ref={setRichTextEditorReference as
@@ -1443,7 +1508,7 @@ export const GenericInputInner = function<Type = any>(
     </div></WrapConfigurations>
     // / endregion
     // endregion
-} as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>
+} as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
 GenericInputInner.displayName = 'GenericInput'
 /**

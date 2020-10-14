@@ -47,7 +47,7 @@ import {IconOptions, RipplePropT} from '@rmwc/types'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
 import {
-    StaticWebComponent as StaticBaseWebComponent
+    StaticWebComponent as StaticBaseWebComponent, WebComponentAdapter
 } from 'web-component-wrapper/type'
 // endregion
 // region exports
@@ -67,6 +67,10 @@ export type BaseModel<Type = any> = {
     trim:boolean
     type:GenericInputType
     value?:null|Type
+}
+export type CursorState = {
+    end:number
+    start:number
 }
 export type Renderable = Array<ReactElement|string>|ReactElement|string
 export type ModelState = {
@@ -151,6 +155,15 @@ export type StaticComponent<Type = any> =
 export type StaticFunctionComponent<Type = any> =
     Omit<FunctionComponent<Props<Type>>, 'defaultProps'|'propTypes'> &
     StaticComponent<Type>
+export type ValueState<Type = any, MS = ModelState> = {
+    model:MS
+    representation?:string
+    value:null|Type
+}
+export type EditorState = {
+    editorIsActive:boolean
+    selectionIsUnstable:boolean
+}
 // // region constants
 export const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     declaration: string,
@@ -287,6 +300,8 @@ export type DefaultCheckboxProperties<Type = any> =
     Omit<CheckboxProps, 'model'> &
     {model:CheckboxModel}
 export type CheckboxState = State<boolean>
+export type CheckboxAdapter<Type = any> =
+    WebComponentAdapter<CheckboxProperties, CheckboxState>
 // // region constants
 export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -328,10 +343,7 @@ export type InputProperties<Type = any> =
     InputModelState &
     {
         align:'end'|'start'
-        cursor:{
-            end:number
-            start:number
-        }
+        cursor:CursorState
         editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)'
         editorIsActive:boolean
         fullWidth:boolean
@@ -368,10 +380,7 @@ export type InputPropertyTypes<Type = any> = {
 export type InputState<Type = any> =
     State<Type> &
     {
-        cursor:{
-            end:number
-            start:number
-        }
+        cursor:CursorState
         editorIsActive:boolean
         hidden?:boolean
         model:InputModelState
@@ -402,6 +411,9 @@ export interface StaticWebInputComponent<Type = any> extends StaticWebComponent<
     local:string
     transformer:InputDataTransformation<Type>
 }
+// NOTE: We hold "selectionIsUnstable" state value as internal private one.
+export type InputAdapter<Type = any> =
+    WebComponentAdapter<InputProperties<Type>, Omit<InputState<Type>, 'selectionIsUnstable'>>
 export type StaticFunctionInputComponent<Type = any> =
     Omit<FunctionComponent<Props<Type>>, 'defaultProps'|'propTypes'> &
     StaticWebInputComponent<Type>
