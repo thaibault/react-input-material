@@ -39,7 +39,7 @@ export const determineInitialValue = <Type = any>(
         return properties.model.value as null|Type
     if (
         Object.prototype.hasOwnProperty.call(properties, 'initialValue') &&
-        typeof properties.initialValue !== 'undefined'
+        properties.initialValue !== undefined
     )
         return properties.initialValue as null|Type
     return null
@@ -132,12 +132,18 @@ export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
     // region map properties into model
     // Map first level properties
     for (const [name, value] of Object.entries(result.model))
-        if (Object.prototype.hasOwnProperty.call(result, name))
+        if (
+            Object.prototype.hasOwnProperty.call(result, name) &&
+            result[name] !== undefined
+        )
             (result.model[name as keyof M] as ValueOf<M>) =
                 result[name as keyof P] as unknown as ValueOf<M>
     // Map property state into model state
     for (const [name, value] of Object.entries(result.model.state))
-        if (Object.prototype.hasOwnProperty.call(result, name))
+        if (
+            Object.prototype.hasOwnProperty.call(result, name) &&
+            result[name] !== undefined
+        )
             result.model.state[name as keyof ModelState] =
                 result[name as keyof P] as unknown as ValueOf<ModelState>
 
@@ -215,7 +221,7 @@ export const triggerCallbackIfExists = <Type = any>(
  * @returns Given cached value.
  */
 export const useMemorizedValue = <Type = any>(
-    value:Type, dependencies:Array<any> = []
+    value:Type, ...dependencies:Array<any>
 ):Type => useMemo(():any => value, dependencies)
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

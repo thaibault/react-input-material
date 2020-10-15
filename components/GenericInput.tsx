@@ -94,7 +94,8 @@ import {
     determineValidationState as determineBaseValidationState,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
-    triggerCallbackIfExists
+    triggerCallbackIfExists,
+    useMemorizedValue
 } from '../helper'
 import {
     CursorState,
@@ -179,48 +180,48 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 // endregion
 // region static helper
 export function determineValidationState<Type = any>(
-    configuration:Properties<Type>, currentState:ModelState
+    properties:Properties<Type>, currentState:ModelState
 ):boolean {
     return determineBaseValidationState<Properties<Type>>(
-        configuration,
+        properties,
         currentState,
         {
             invalidMaximum: ():boolean => (
-                typeof configuration.model.maximum === 'number' &&
-                typeof configuration.model.value === 'number' &&
-                !isNaN(configuration.model.value) &&
-                configuration.model.maximum < configuration.model.value
+                typeof properties.model.maximum === 'number' &&
+                typeof properties.model.value === 'number' &&
+                !isNaN(properties.model.value) &&
+                properties.model.maximum >= 0 &&
+                properties.model.maximum < properties.model.value
             ),
             invalidMaximumLength: ():boolean => (
-                typeof configuration.model.maximumLength === 'number' &&
-                typeof configuration.model.value === 'string' &&
-                configuration.model.maximumLength <
-                    configuration.model.value.length
+                typeof properties.model.maximumLength === 'number' &&
+                typeof properties.model.value === 'string' &&
+                properties.model.maximumLength >= 0 &&
+                properties.model.maximumLength < properties.model.value.length
             ),
             invalidMinimum: ():boolean => (
-                typeof configuration.model.minimum === 'number' &&
-                typeof configuration.model.value === 'number' &&
-                !isNaN(configuration.model.value) &&
-                configuration.model.value < configuration.model.minimum
+                typeof properties.model.minimum === 'number' &&
+                typeof properties.model.value === 'number' &&
+                !isNaN(properties.model.value) &&
+                properties.model.value < properties.model.minimum
             ),
             invalidMinimumLength: ():boolean => (
-                typeof configuration.model.minimumLength === 'number' &&
-                typeof configuration.model.value === 'string' &&
-                configuration.model.value.length <
-                    configuration.model.minimumLength
+                typeof properties.model.minimumLength === 'number' &&
+                typeof properties.model.value === 'string' &&
+                properties.model.value.length < properties.model.minimumLength
             ),
             invalidPattern: ():boolean => (
-                typeof configuration.model.value === 'string' &&
+                typeof properties.model.value === 'string' &&
                 (
-                    typeof configuration.model.regularExpressionPattern ===
+                    typeof properties.model.regularExpressionPattern ===
                         'string' &&
-                    !(new RegExp(configuration.model.regularExpressionPattern))
-                        .test(configuration.model.value) ||
-                    configuration.model.regularExpressionPattern !== null &&
-                    typeof configuration.model.regularExpressionPattern ===
+                    !(new RegExp(properties.model.regularExpressionPattern))
+                        .test(properties.model.value) ||
+                    properties.model.regularExpressionPattern !== null &&
+                    typeof properties.model.regularExpressionPattern ===
                         'object' &&
-                    !typeof configuration.model.regularExpressionPattern
-                        .test(configuration.model.value)
+                    !typeof properties.model.regularExpressionPattern
+                        .test(properties.model.value)
                 )
             )
         }
@@ -366,19 +367,28 @@ export const GenericInputInner = function<Type = any>(
                 tooltip: 'Clear input'
             }
         if (options === 'password_preset')
-            return {
-                icon: <UseAnimations
-                    animation={lock} reverse={!properties.hidden}
-                />,
-                onClick: (event:ReactMouseEvent):void => {
-                    event.preventDefault()
-                    event.stopPropagation()
-                    setHidden((value:boolean|undefined):boolean => !value)
-                    onChange(event)
+            return useMemorizedValue(
+                {
+                    icon: <UseAnimations
+                        animation={lock} reverse={!properties.hidden}
+                    />,
+                    onClick: (event:ReactMouseEvent):void => {
+                        event.preventDefault()
+                        event.stopPropagation()
+                        setHidden((value:boolean|undefined):boolean => {
+                            if (value === undefined)
+                                value = properties.hidden
+                            properties.hidden = !value
+                            onChange(event)
+                            return properties.hidden
+                        })
+                    },
+                    strategy: 'component',
+                    tooltip:
+                        `${(properties.hidden ? 'Show' : 'Hide')} password`
                 },
-                strategy: 'component',
-                tooltip: `${(properties.hidden ? 'Show' : 'Hide')} password`
-            }
+                properties.hidden
+            )
         return options
     }
     /**
@@ -909,6 +919,9 @@ export const GenericInputInner = function<Type = any>(
         if (changed)
             onChange(event)
 
+        if (determineValidationState<Type>(properties, oldValueState.model))
+            stateChanged = true
+
         if (oldValueState.value !== properties.value)
             triggerCallbackIfExists<Type>(
                 properties, 'valueChange', properties.value, event
@@ -1037,9 +1050,7 @@ export const GenericInputInner = function<Type = any>(
 
             result.value = properties.value
 
-            let stateChanged:boolean = determineValidationState<Type>(
-                properties, oldValueState.model
-            )
+            let stateChanged:boolean = false
 
             if (oldValueState.model.pristine) {
                 properties.dirty = true
@@ -1048,6 +1059,11 @@ export const GenericInputInner = function<Type = any>(
             }
 
             onChange(event)
+
+            if (determineValidationState<Type>(
+                properties, oldValueState.model
+            ))
+                stateChanged = true
 
             triggerCallbackIfExists<Type>(
                 properties, 'changeValue', properties.value, event
@@ -1138,9 +1154,9 @@ export const GenericInputInner = function<Type = any>(
             let result = oldValueState
 
             if (changedState) {
-                result = {...oldValueState, model: properties.model.state}
-
                 onChange(event)
+
+                result = {...oldValueState, model: properties.model.state}
 
                 triggerCallbackIfExists<Type>(
                     properties, 'changeState', properties.model.state, event
