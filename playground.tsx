@@ -57,7 +57,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
     return (<>
         <div className="inputs">
-{/*
+
             <GenericInput onChange={onChange}/>
 
             <hr/>
@@ -422,11 +422,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-*/}
-
             <RequireableCheckbox onChange={onChange} />
 
-{/*
             <hr/>
 
             <RequireableCheckbox name="checkbox1" onChange={onChange} />
@@ -464,7 +461,6 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 tooltip="Check this one!"
             />
 
-*/}
         </div>
 
         {
