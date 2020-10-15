@@ -23,7 +23,6 @@ import React, {
     FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardRefRenderFunction,
-    FunctionComponent,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
@@ -47,7 +46,7 @@ import {
     triggerCallbackIfExists
 } from '../helper'
 import {
-    CheckboxAdapter,
+    CheckboxAdapter as Adapter,
     CheckboxModel as Model,
     CheckboxProperties as Properties,
     CheckboxProps as Props,
@@ -70,7 +69,7 @@ import {
  * Dataflow:
  *
  * 1. On-Render all states are merged with given properties into a normalized
- *    properties object.
+ *    property object.
  * 2. Properties, corresponding state values and sub node instances are saved
  *    into a "ref" object (to make them accessible from the outside e.g. for
  *    wrapper like web-components).
@@ -88,7 +87,7 @@ import {
  * @returns React elements.
  */
 export const RequireableCheckboxInner = function(
-    props:Props, reference?:RefObject<CheckboxAdapter>
+    props:Props, reference?:RefObject<Adapter>
 ):ReactElement {
     // region property aggregation
     /**
@@ -150,7 +149,8 @@ export const RequireableCheckboxInner = function(
             oldValueState
     })
     /**
-     * Triggered on any change events.
+     * Triggered on any change events. Consolidates properties object and
+     * triggers given on change callbacks.
      * @param event - Potential event object.
      * @returns Nothing.
      */
@@ -225,12 +225,10 @@ export const RequireableCheckboxInner = function(
             if (oldValueState.value === properties.value)
                 return oldValueState
 
+            let stateChanged:boolean = false
+
             const result:ValueState<boolean, ModelState> =
                 {...oldValueState, value: properties.value as boolean|null}
-
-            let stateChanged:boolean = determineValidationState<Properties>(
-                properties, properties.model.state
-            )
 
             if (oldValueState.model.pristine) {
                 properties.dirty = true
@@ -239,6 +237,11 @@ export const RequireableCheckboxInner = function(
             }
 
             onChange(event)
+
+            if (determineValidationState<Properties>(
+                properties, oldValueState.model
+            ))
+                stateChanged = true
 
             triggerCallbackIfExists<boolean>(
                 properties, 'changeValue', properties.value, event
@@ -284,22 +287,22 @@ export const RequireableCheckboxInner = function(
         setValueState((
             oldValueState:ValueState<boolean, ModelState>
         ):ValueState<boolean, ModelState> => {
-            let changeState:boolean = false
+            let changedState:boolean = false
 
             if (!oldValueState.model.focused) {
                 properties.focused = true
-                changeState = true
+                changedState = true
             }
 
             if (oldValueState.model.untouched) {
                 properties.touched = true
                 properties.untouched = false
-                changeState = true
+                changedState = true
             }
 
             let result:ValueState<boolean, ModelState> = oldValueState
 
-            if (changeState) {
+            if (changedState) {
                 onChange(event)
 
                 result = {...oldValueState, model: properties.model.state}
@@ -337,7 +340,7 @@ export const RequireableCheckboxInner = function(
     // / region derive missing properties from state variables
     if (givenProperties.showDeclaration === undefined)
         givenProperties.showDeclaration = showDeclaration
-
+    // // region value state
     /*
         NOTE: React simply copies "defaultProps" flat to we have to do a deep
         copy here. Otherwise different rendering cycles would depend manipulate
@@ -360,11 +363,12 @@ export const RequireableCheckboxInner = function(
         )
             givenProperties.model.state[key as keyof ModelState] =
                 valueState.model[key as keyof ModelState]
+    // // endregion
     // / endregion
     const properties:Properties = getConsolidatedProperties(givenProperties)
     useImperativeHandle(
         reference,
-        ():CheckboxAdapter & {
+        ():Adapter & {
             references:{
                 foundationRef:RefObject<MDCCheckboxFoundation>
                 inputReference:RefObject<HTMLInputElement>
@@ -380,7 +384,7 @@ export const RequireableCheckboxInner = function(
         })
     )
     // endregion
-    // region markup
+    // region render
     // TODO Helptext
     return <WrapConfigurations
         strict={RequireableCheckbox.strict}
@@ -426,7 +430,7 @@ export const RequireableCheckboxInner = function(
         />
     </WrapConfigurations>
     // endregion
-} as ForwardRefRenderFunction<CheckboxAdapter, Props>
+} as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
 RequireableCheckboxInner.displayName = 'RequireableCheckbox'
 /**

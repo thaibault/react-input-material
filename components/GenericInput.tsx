@@ -18,19 +18,6 @@
 */
 // region imports
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
-import {
-    any,
-    boolean,
-    func,
-    number,
-    object,
-    objectOf,
-    oneOfType,
-    shape,
-    string
-} from 'clientnode/property-types'
-import {Mapping, PlainObject, ValueOf} from 'clientnode/type'
-import {ValidationMap} from 'prop-types'
 import React, {
     ComponentType,
     createRef,
@@ -282,7 +269,7 @@ export function determineInitialRepresentation<Type = any>(
  * Dataflow:
  *
  * 1. On-Render all states are merged with given properties into a normalized
- *    properties object.
+ *    property object.
  * 2. Properties, corresponding state values and sub node instances are saved
  *    into a "ref" object (to make them accessible from the outside e.g. for
  *    wrapper like web-components).
@@ -919,9 +906,6 @@ export const GenericInputInner = function<Type = any>(
         if (changed)
             onChange(event)
 
-        if (determineValidationState<Type>(properties, oldValueState.model))
-            stateChanged = true
-
         if (oldValueState.value !== properties.value)
             triggerCallbackIfExists<Type>(
                 properties, 'valueChange', properties.value, event
@@ -1151,7 +1135,7 @@ export const GenericInputInner = function<Type = any>(
                 changedState = true
             }
 
-            let result = oldValueState
+            let result:ValueState<Type, ModelState> = oldValueState
 
             if (changedState) {
                 onChange(event)
