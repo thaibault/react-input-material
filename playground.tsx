@@ -30,8 +30,7 @@ import './material-fixes'
 import {Properties} from './type'
 // endregion
 GenericInput.local = 'de-DE'
-GenericInput.transformer.currency.format.final.options =
-    {currency: 'EUR'}
+GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 const represent = (state:Properties):string => Tools.represent(
     Object.keys(state)
         .filter((key:string):boolean => !/^on[A-Z]/.test(key))

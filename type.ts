@@ -271,6 +271,7 @@ export const defaultModel:Model = {
     state: {...defaultModelState},
     trim: true,
     type: 'string',
+    value: null,
     writable: true
 } as const
 export const defaultProperties:DefaultProperties = {
@@ -494,6 +495,10 @@ export const defaultInputModel:InputModel = {
 } as const
 export const defaultInputProperties:DefaultInputProperties = {
     ...defaultProperties,
+    cursor: {
+        end: 0,
+        start: 0
+    },
     editor: 'plain',
     maximumLengthText:
         'Please type less or equal than ${maximumLength} symbols.',

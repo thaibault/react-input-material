@@ -197,7 +197,15 @@ export const triggerCallbackIfExists = <Type = any>(
 ):void => {
     name = `on${Tools.stringCapitalize(name)}`
     if (properties[name as keyof Properties<Type>])
-        (properties[name as keyof Properties<Type>] as Function)(...parameter)
+        /*
+            NOTE: We call callback on next event loop to first consolidate
+            internal state.
+        */
+        Tools.timeout(() =>
+            (properties[name as keyof Properties<Type>] as Function)(
+                ...parameter
+            )
+        )
 }
 /**
  * Custom hook to memorize any values with a default empty array. Useful if

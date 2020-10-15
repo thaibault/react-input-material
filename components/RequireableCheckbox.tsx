@@ -137,6 +137,7 @@ export const RequireableCheckboxInner = function(
 
         if (changed) {
             onChange(event)
+
             triggerCallbackIfExists<boolean>(
                 properties, 'changeState', properties.model.state, event
             )
@@ -166,7 +167,9 @@ export const RequireableCheckboxInner = function(
             )
         )
 
-        triggerCallbackIfExists<boolean>(properties, 'change', event)
+        triggerCallbackIfExists<boolean>(
+            properties, 'change', properties, event
+        )
     }
     /**
      * Triggered when show declaration indicator should be changed.
@@ -297,9 +300,9 @@ export const RequireableCheckboxInner = function(
             let result:ValueState<boolean, ModelState> = oldValueState
 
             if (changeState) {
-                result = {...oldValueState, model: properties.model.state}
-
                 onChange(event)
+
+                result = {...oldValueState, model: properties.model.state}
 
                 triggerCallbackIfExists<boolean>(
                     properties, 'changeState', properties.model.state, event
@@ -335,10 +338,25 @@ export const RequireableCheckboxInner = function(
     if (givenProperties.showDeclaration === undefined)
         givenProperties.showDeclaration = showDeclaration
 
-    if (!givenProperties.model)
-        givenProperties.model = {}
+    /*
+        NOTE: React simply copies "defaultProps" flat to we have to do a deep
+        copy here. Otherwise different rendering cycles would depend manipulate
+        each other.
+    */
+    givenProperties.model = {...givenProperties.model}
     if (givenProperties.model.value === undefined)
         givenProperties.model.value = valueState.value
+
+    if (givenProperties.model.state)
+        givenProperties.model.state = {...givenProperties.model.state}
+    else
+        givenProperties.model.state = {}
+    for (const key in valueState.model)
+        if (
+            Object.prototype.hasOwnProperty.call(valueState.model, key) &&
+            givenProperties.model.state[key] === undefined
+        )
+            givenProperties.model.state[key] = valueState.model[key]
     // / endregion
     const properties:Properties = getConsolidatedProperties(givenProperties)
     useImperativeHandle(
@@ -431,7 +449,11 @@ RequireableCheckbox.wrapped = RequireableCheckboxInner
 RequireableCheckbox.webComponentAdapterWrapped = 'react'
 // / endregion
 RequireableCheckbox.defaultModelState = defaultModelState
-RequireableCheckbox.defaultProps = defaultProperties
+RequireableCheckbox.defaultProps = {
+    ...defaultProperties,
+    model: {...defaultProperties.model, state: undefined, value: undefined},
+    value: undefined
+}
 RequireableCheckbox.propTypes = propertyTypes
 RequireableCheckbox.strict = false
 // endregion

@@ -1206,13 +1206,30 @@ export const GenericInputInner = function<Type = any>(
     if (givenProperties.showDeclaration === undefined)
         givenProperties.showDeclaration = showDeclaration
 
-    if (!givenProperties.model)
-        givenProperties.model = {}
+    // // region value state
+    /*
+        NOTE: React simply copies "defaultProps" flat to we have to do a deep
+        copy here. Otherwise different rendering cycles would depend manipulate
+        each other.
+    */
+    givenProperties.model = {...givenProperties.model}
     if (givenProperties.model.value === undefined)
         givenProperties.model.value = valueState.value
 
     if (givenProperties.representation === undefined)
         givenProperties.representation = valueState.representation
+
+    if (givenProperties.model.state)
+        givenProperties.model.state = {...givenProperties.model.state}
+    else
+        givenProperties.model.state = {}
+    for (const key in valueState.model)
+        if (
+            Object.prototype.hasOwnProperty.call(valueState.model, key) &&
+            givenProperties.model.state[key] === undefined
+        )
+            givenProperties.model.state[key] = valueState.model[key]
+    // // endregion
     // / endregion
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
@@ -1535,7 +1552,17 @@ GenericInput.wrapped = GenericInputInner
 GenericInput.webComponentAdapterWrapped = 'react'
 // / endregion
 GenericInput.defaultModelState = defaultModelState
-GenericInput.defaultProps = defaultProperties
+/*
+    NOTE: We set values to "undefined" to identify whether these values where
+    provided via "props" and should shadow a state saved valued.
+*/
+GenericInput.defaultProps = {
+    ...defaultProperties,
+    cursor: undefined,
+    model: {...defaultProperties.model, state: undefined, value: undefined},
+    representation: undefined,
+    value: undefined
+}
 GenericInput.local = 'en-US'
 GenericInput.propTypes = propertyTypes
 GenericInput.strict = false
