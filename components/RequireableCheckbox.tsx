@@ -350,13 +350,16 @@ export const RequireableCheckboxInner = function(
     if (givenProperties.model.state)
         givenProperties.model.state = {...givenProperties.model.state}
     else
-        givenProperties.model.state = {}
+        givenProperties.model.state = {} as ModelState
     for (const key in valueState.model)
         if (
             Object.prototype.hasOwnProperty.call(valueState.model, key) &&
-            givenProperties.model.state[key] === undefined
+            (
+                givenProperties.model.state as Partial<ModelState>
+            )[key as keyof ModelState] === undefined
         )
-            givenProperties.model.state[key] = valueState.model[key]
+            givenProperties.model.state[key as keyof ModelState] =
+                valueState.model[key as keyof ModelState]
     // / endregion
     const properties:Properties = getConsolidatedProperties(givenProperties)
     useImperativeHandle(
