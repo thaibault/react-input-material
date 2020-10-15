@@ -78,9 +78,13 @@ import WrapConfigurations from './WrapConfigurations'
 import WrapTooltip from './WrapTooltip'
 import {
     determineInitialValue,
+    determineInitialRepresentation,
     determineValidationState as determineBaseValidationState,
+    formatValue,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
+    parseValue,
+    transformValue,
     triggerCallbackIfExists,
     useMemorizedValue
 } from '../helper'
@@ -214,53 +218,6 @@ export function determineValidationState<Type = any>(
         }
     )
 }
-/**
- * Represents configured value as string.
- * @param value - To represent.
- * @param type - Input type.
- * @param final - Specifies whether it is a final representation.
- * @returns Transformed value.
- */
-export function formatValue<Type = any>(
-    value:null|Type, type:string, final:boolean = true
-):string {
-    const methodName:'final'|'intermediate' = final ? 'final' : 'intermediate'
-    if (value === null || typeof value === 'number' && isNaN(value))
-        return ''
-    if (
-        Object.prototype.hasOwnProperty.call(GenericInput.transformer, type) &&
-        GenericInput.transformer[type].format &&
-        Object.prototype.hasOwnProperty.call(
-            GenericInput.transformer[type].format, methodName
-        ) &&
-        GenericInput.transformer[type].format![methodName]!.transform
-    )
-        return (
-            GenericInput.transformer[type].format as
-                DataTransformSpecification['format']
-        )[methodName].transform(value)
-    return `${value}`
-}
-/**
- * Determines initial value representation as string.
- * @param properties - Components properties.
- * @param value - Current value to represent.
- * @returns Determined initial representation.
- */
-export function determineInitialRepresentation<Type = any>(
-    properties:Props, value:null|Type
-):string {
-    if (typeof properties.representation === 'string')
-        return properties.representation
-    if (value !== null)
-        return formatValue<Type>(
-            value,
-            properties.type ||
-            properties.model?.type ||
-            GenericInput.defaultProps.model!.type as string
-        )
-    return ''
-}
 // endregion
 /**
  * Generic input wrapper component which automatically determines a useful
@@ -346,8 +303,10 @@ export const GenericInputInner = function<Type = any>(
                 onClick: (event:ReactMouseEvent):void => {
                     event.preventDefault()
                     event.stopPropagation()
-                    onChangeValue(transformFinalValue(
-                        properties, properties.default
+                    onChangeValue(transformValue<Properties<Type>, Type>(
+                        properties,
+                        properties.default,
+                        GenericInput.transformer
                     ))
                 },
                 strategy: 'component',
@@ -754,8 +713,10 @@ export const GenericInputInner = function<Type = any>(
                 props
             ) as DefaultProperties<Type>
 
-        result.model.value = parseValue(
-            result as unknown as Properties<Type>, result.model.value
+        result.model.value = parseValue<Properties<Type>, Type>(
+            result as unknown as Properties<Type>,
+            result.model.value,
+            GenericInput.transformer
         )
 
         determineValidationState<Type>(
@@ -783,7 +744,10 @@ export const GenericInputInner = function<Type = any>(
 
         if (typeof result.representation !== 'string' && result.value)
             result.representation = formatValue<Type>(
-                result.value, result.type, !result.focused
+                result.value,
+                result.type,
+                GenericInput.transformer,
+                !result.focused
             )
 
         return result
@@ -832,46 +796,6 @@ export const GenericInputInner = function<Type = any>(
         */
     }
     // / endregion
-    // / region value transformer
-    /**
-     * Applies configured value transformations.
-     * @param configuration - Input configuration.
-     * @param value - Value to transform.
-     * @returns Transformed value.
-     */
-    const parseValue = (configuration:Properties<Type>, value:any):null|Type => {
-        if (configuration.emptyEqualsNull && value === '')
-            return null
-        if (
-            ![null, undefined].includes(value) &&
-            Object.prototype.hasOwnProperty.call(
-                GenericInput.transformer, configuration.type
-            ) &&
-            GenericInput.transformer[configuration.type].parse
-        )
-            return (
-                GenericInput.transformer[configuration.type].parse as
-                    DataTransformSpecification['parse']
-            )(value)
-        if (typeof value === 'number' && isNaN(value))
-            return null
-        return value
-    }
-    /**
-     * Applies configured value transformation when editing the input has been
-     * ended (element is not focused anymore).
-     * @param configuration - Current configuration.
-     * @param value - Current value to transform.
-     * @returns Transformed value.
-     */
-    const transformFinalValue = (
-        configuration:Properties<Type>, value:any
-    ):null|Type => {
-        if (configuration.model.trim && typeof value === 'string')
-            value = value.trim().replace(/ +\n/g, '\\n')
-        return parseValue(configuration, value)
-    }
-    // / endregion
     // endregion
     // region event handler
     /**
@@ -897,10 +821,21 @@ export const GenericInputInner = function<Type = any>(
             stateChanged = true
         }
 
-        properties.value =
-            transformFinalValue(properties, properties.value)
+        properties.value = transformValue<Properties<Type>, Type>(
+            properties, properties.value, GenericInput.transformer
+        )
+        properties.representation = typeof properties.value === 'string' ?
+            properties.value :
+            formatValue<Type>(
+                properties.value as null|Type,
+                properties.type,
+                GenericInput.transformer
+            )
 
-        if (oldValueState.value !== properties.value)
+        if (
+            oldValueState.value !== properties.value ||
+            oldValueState.representation !== properties.representation
+        )
             changed = true
 
         if (changed)
@@ -920,8 +855,8 @@ export const GenericInputInner = function<Type = any>(
 
         return changed ?
             {
-                ...oldValueState,
                 model: properties.model.state,
+                representation: properties.representation,
                 value: properties.value
             } :
             oldValueState
@@ -998,7 +933,7 @@ export const GenericInputInner = function<Type = any>(
     const onChangeValue = (
         eventOrValue:null|SyntheticEvent|Type, editorInstance?:RichTextEditor
     ):void => {
-        if (!(properties.model.mutable && properties.model.writable))
+        if (properties.disabled)
             return
 
         let event:SyntheticEvent|undefined
@@ -1022,9 +957,13 @@ export const GenericInputInner = function<Type = any>(
             properties.representation = typeof properties.value === 'string' ?
                 properties.value :
                 formatValue<Type>(
-                    properties.value as null|Type, properties.type
+                    properties.value as null|Type,
+                    properties.type,
+                    GenericInput.transformer
                 )
-            properties.value = parseValue(properties, properties.value)
+            properties.value = parseValue<Properties<Type>, Type>(
+                properties, properties.value, GenericInput.transformer
+            )
 
             const result:ValueState<Type, ModelState> = {
                 ...oldValueState, representation: properties.representation
@@ -1181,8 +1120,11 @@ export const GenericInputInner = function<Type = any>(
     const [valueState, setValueState] = useState<ValueState<Type, ModelState>>(
         {
             model: {...GenericInput.defaultModelState},
-            representation: determineInitialRepresentation(
-                props, initialValue
+            representation: determineInitialRepresentation<Props<Type>, Type>(
+                props,
+                GenericInput.defaultProps,
+                initialValue,
+                GenericInput.transformer
             ),
             value: initialValue
         }

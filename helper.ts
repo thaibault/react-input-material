@@ -21,7 +21,15 @@ import Tools from 'clientnode'
 import {Mapping, ValueOf} from 'clientnode/type'
 import {useMemo} from 'react'
 
-import {DefaultProperties, Model, ModelState, Properties, Props} from './type'
+import {
+    DataTransformSpecification,
+    DefaultProperties,
+    InputDataTransformation,
+    Model,
+    ModelState,
+    Properties,
+    Props
+} from './type'
 // endregion
 /**
  * Determines initial value depending on given properties.
@@ -134,7 +142,7 @@ export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
     for (const [name, value] of Object.entries(result.model))
         if (
             Object.prototype.hasOwnProperty.call(result, name) &&
-            result[name] !== undefined
+            result[name as keyof P] !== undefined
         )
             (result.model[name as keyof M] as ValueOf<M>) =
                 result[name as keyof P] as unknown as ValueOf<M>
@@ -142,7 +150,7 @@ export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
     for (const [name, value] of Object.entries(result.model.state))
         if (
             Object.prototype.hasOwnProperty.call(result, name) &&
-            result[name] !== undefined
+            result[name as keyof ModelState] !== undefined
         )
             result.model.state[name as keyof ModelState] =
                 result[name as keyof P] as unknown as ValueOf<ModelState>
@@ -213,6 +221,112 @@ export const triggerCallbackIfExists = <Type = any>(
             )
         )
 }
+// region value transformer
+/**
+ * Applies configured value transformations.
+ * @param configuration - Input configuration.
+ * @param value - Value to transform.
+ * @param transformer - To apply to given value.
+ * @returns Transformed value.
+ */
+export const parseValue = <P extends Properties, Type = any>(
+    configuration:P, value:any, transformer:InputDataTransformation<Type>
+):null|Type => {
+    if (configuration.emptyEqualsNull && value === '')
+        return null
+    if (
+        ![null, undefined].includes(value) &&
+        Object.prototype.hasOwnProperty.call(
+            transformer, configuration.type
+        ) &&
+        transformer[configuration.type].parse
+    )
+        value = (
+            transformer[configuration.type].parse as
+                DataTransformSpecification['parse']
+        )(value)
+    if (typeof value === 'number' && isNaN(value))
+        return null
+    return value
+}
+/**
+ * Applies configured value transformation when editing the input has been
+ * ended (element is not focused anymore).
+ * @param configuration - Current configuration.
+ * @param value - Current value to transform.
+ * @param transformer - To apply to given value.
+ * @returns Transformed value.
+ */
+export const transformValue = <P extends Properties, Type = any>(
+    configuration:P, value:any, transformer:InputDataTransformation<Type>
+):null|Type => {
+    if (configuration.model.trim && typeof value === 'string')
+        value = value.trim().replace(/ +\n/g, '\\n')
+    return parseValue<P, Type>(configuration, value, transformer)
+}
+/**
+ * Represents configured value as string.
+ * @param value - To represent.
+ * @param type - Input type.
+ * @param transformer - To apply to given value.
+ * @param final - Specifies whether it is a final representation.
+ * @returns Transformed value.
+ */
+export function formatValue<Type = any>(
+    value:null|Type,
+    type:string,
+    transformer:InputDataTransformation<Type>,
+    final:boolean = true
+):string {
+    const methodName:'final'|'intermediate' = final ? 'final' : 'intermediate'
+    if (value === null || typeof value === 'number' && isNaN(value))
+        return ''
+    if (
+        Object.prototype.hasOwnProperty.call(transformer, type) &&
+        transformer[type].format &&
+        Object.prototype.hasOwnProperty.call(
+            transformer[type].format, methodName
+        ) &&
+        transformer[type].format![methodName]!.transform
+    )
+        return (
+            transformer[type].format as DataTransformSpecification['format']
+        )[methodName].transform(value)
+    return `${value}`
+}
+/**
+ * Determines initial value representation as string.
+ * @param properties - Components properties.
+ * @param value - Current value to represent.
+ * @param transformer - To apply to given value.
+ * @returns Determined initial representation.
+ */
+export function determineInitialRepresentation<P extends {
+    model?:{type?:string}
+    representation?:string
+    type?:string
+}, Type = any>(
+    properties:P,
+    defaultProperties:Partial<P>,
+    value:null|Type, 
+    transformer:InputDataTransformation<Type>
+):string {
+    if (typeof properties.representation === 'string')
+        return properties.representation
+    if (value !== null)
+        return formatValue<Type>(
+            value,
+            (
+                properties.type ||
+                properties.model?.type ||
+                defaultProperties.model!.type as string
+            ),
+            transformer
+        )
+    return ''
+}
+// endregion
+// region hooks
 /**
  * Custom hook to memorize any values with a default empty array. Useful if
  * using previous constant complex object within a render function.
@@ -223,6 +337,7 @@ export const triggerCallbackIfExists = <Type = any>(
 export const useMemorizedValue = <Type = any>(
     value:Type, ...dependencies:Array<any>
 ):Type => useMemo(():any => value, dependencies)
+// endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
