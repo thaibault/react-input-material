@@ -564,7 +564,9 @@ export const GenericInputInner = function<Type = any>(
         return result
     }
     /**
-     * TODO
+     * Sets current cursor selection range in given code editor instance.
+     * @param instance - Code editor instance.
+     * @returns Nothing.
      */
     const setCodeEditorSelectionState = (instance:CodeEditorType):void => {
         const range = instance.editor.selection.getRange()
@@ -575,7 +577,9 @@ export const GenericInputInner = function<Type = any>(
         instance.editor.selection.setRange(range)
     }
     /**
-     * TODO
+     * Sets current cursor selection range in given rich text editor instance.
+     * @param instance - Code editor instance.
+     * @returns Nothing.
      */
     const setRichTextEditorSelectionState = (instance:RichTextEditor):void => {
         const indicator:{
@@ -1042,11 +1046,8 @@ export const GenericInputInner = function<Type = any>(
      */
     const onSelectionChange = (event:SyntheticEvent):void => {
         /*
-            TODO
             We assume that this event is triggered after a property
             consolidation.
-            Should we use a "useEffect" to be sure?
-            Is "useEffect" running after "setState"?
         */
         saveSelectionState()
 

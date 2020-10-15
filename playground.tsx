@@ -180,7 +180,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 name="input7"
                 onChange={onChange}
                 placeholder="input7Placeholder"
-                selection={['A', 'B', 'C']}
+                selection={useMemorizedValue(['A', 'B', 'C'])}
                 required
             />
             <GenericInput
@@ -205,7 +205,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 initialValue="a"
                 name="input8"
                 onChange={onChange}
-                selection={{a: 'A', b: 'B', c: 'C'}}
+                selection={useMemorizedValue({a: 'A', b: 'B', c: 'C'})}
                 required
             />
             <GenericInput
