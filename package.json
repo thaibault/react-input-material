@@ -1,6 +1,6 @@
 {
   "name": "react-input-material",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "license": "CC-BY-3.0",
   "description": "Reusable material design based input field with support for (richt-)text, code, selections, numbers, dates and so on.",
   "homepage": "https://torben.website/react-input-material",
@@ -141,7 +141,9 @@
   "webOptimizer": {
     "commandLine": {
       "test": {
-        "environments": ["jsdom"]
+        "environments": [
+          "jsdom"
+        ]
       }
     },
     "files": {
