@@ -29,8 +29,11 @@ import {ThemeProvider, ThemeProviderProps} from '@rmwc/theme'
 export const WrapThemeProvider:FunctionComponent<{
     children:ReactElement
     configuration?:ThemeProviderProps['options']
+    wrap?:boolean
 }> = ({children, configuration}):ReactElement => configuration ?
-    <ThemeProvider options={configuration} wrap>{children}</ThemeProvider> :
+    <ThemeProvider options={configuration} wrap={wrap !== false}>
+        {children}
+    </ThemeProvider> :
     children
 export default WrapThemeProvider
 // region vim modline

@@ -30,8 +30,7 @@ import './material-fixes'
 import {Properties} from './type'
 // endregion
 GenericInput.local = 'de-DE'
-GenericInput.transformer.currency.format.final.options =
-    {currency: 'EUR'}
+GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 const represent = (state:Properties):string => Tools.represent(
     Object.keys(state)
         .filter((key:string):boolean => !/^on[A-Z]/.test(key))
@@ -106,6 +105,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 required
                 trailingIcon="clear_preset"
             />
+
             <GenericInput
                 icon="backup"
                 initialValue="value4Model"
@@ -180,7 +180,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 name="input7"
                 onChange={onChange}
                 placeholder="input7Placeholder"
-                selection={['A', 'B', 'C']}
+                selection={useMemorizedValue(['A', 'B', 'C'])}
                 required
             />
             <GenericInput
@@ -205,7 +205,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 initialValue="a"
                 name="input8"
                 onChange={onChange}
-                selection={{a: 'A', b: 'B', c: 'C'}}
+                selection={useMemorizedValue({a: 'A', b: 'B', c: 'C'})}
                 required
             />
             <GenericInput
@@ -370,6 +370,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 required
                 type="integer"
             />
+
             <GenericInput
                 initialValue={100000.01}
                 model={useMemorizedValue({

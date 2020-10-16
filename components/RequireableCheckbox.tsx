@@ -17,16 +17,12 @@
     endregion
 */
 // region imports
-import {MDCCheckboxFoundation} from '@material/checkbox'
-import {Checkbox} from '@rmwc/checkbox'
-import '@rmwc/checkbox/styles'
-import {Theme} from '@rmwc/theme'
+import Tools from 'clientnode'
 import React, {
     createRef,
     FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardRefRenderFunction,
-    FunctionComponent,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
@@ -36,16 +32,21 @@ import React, {
     useImperativeHandle,
     useState
 } from 'react'
-import {WebComponentAdapter} from 'web-component-wrapper/type'
+import {MDCCheckboxFoundation} from '@material/checkbox'
+import {Checkbox} from '@rmwc/checkbox'
+import '@rmwc/checkbox/styles'
+import {Theme} from '@rmwc/theme'
 
 import {WrapConfigurations} from './WrapConfigurations'
 import {
     determineInitialValue,
     determineValidationState,
     getConsolidatedProperties as getBaseConsolidatedProperties,
-    mapPropertiesAndStateToModel
+    mapPropertiesIntoModel,
+    triggerCallbackIfExists
 } from '../helper'
 import {
+    CheckboxAdapter as Adapter,
     CheckboxModel as Model,
     CheckboxProperties as Properties,
     CheckboxProps as Props,
@@ -55,11 +56,28 @@ import {
     defaultCheckboxProperties as defaultProperties,
     CheckboxModelState as ModelState,
     checkboxPropertyTypes as propertyTypes,
-    StaticFunctionComponent as StaticComponent
+    StaticFunctionComponent as StaticComponent,
+    ValueState
 } from '../type'
 // endregion
 /**
  * Validateable checkbox wrapper component.
+ *
+ * @property static:displayName - Descriptive name for component to show in web
+ * developer tools.
+ *
+ * Dataflow:
+ *
+ * 1. On-Render all states are merged with given properties into a normalized
+ *    property object.
+ * 2. Properties, corresponding state values and sub node instances are saved
+ *    into a "ref" object (to make them accessible from the outside e.g. for
+ *    wrapper like web-components).
+ * 3. Event handler saves corresponding data modifications into state and
+ *    normalized properties object.
+ * 4. All state changes except selection changes trigger an "onChange" event
+ *    which delivers the consolidated properties object (with latest
+ *    modifications included).
  *
  * @property static:displayName - Descriptive name for component to show in web
  * developer tools.
@@ -69,73 +87,89 @@ import {
  * @returns React elements.
  */
 export const RequireableCheckboxInner = function(
-    props:Props, reference?:RefObject<WebComponentAdapter<Properties, State>>
+    props:Props, reference?:RefObject<Adapter>
 ):ReactElement {
+    // region property aggregation
     /**
      * Calculate external properties (a set of all configurable properties).
      * @param properties - Properties to merge.
      * @returns External properties object.
      */
     const getConsolidatedProperties = (properties:Props):Properties => {
-        const result:DefaultProperties =
-            mapPropertiesAndStateToModel<Props, Model, ModelState, boolean>(
-                properties,
-                RequireableCheckbox.defaultProps.model as Model,
-                value,
-                model,
-                props
-            ) as DefaultProperties
-        determineValidationState<Properties, boolean>(
-            result as Properties, result.model.value as boolean
+        let result:Props = mapPropertiesIntoModel<Props, Model>(
+            properties,
+            RequireableCheckbox.defaultProps.model as Model,
+            props
         )
-        result.checked = value
-        return getBaseConsolidatedProperties<Props, Properties>(result)
+
+        determineValidationState<Properties>(
+            result as Properties, result.model!.state as ModelState
+        )
+
+        result = getBaseConsolidatedProperties<Props, Properties>(result)
+
+        result.checked = result.value
+
+        return result as Properties
     }
+    // endregion
     // region event handler
     /**
      * Triggered on blur events.
      * @param event - Event object.
      * @returns Nothing.
      */
-    const onBlur = (event:SyntheticEvent):void => {
+    const onBlur = (event:SyntheticEvent):void => setValueState((
+        oldValueState:ValueState<boolean, ModelState>
+    ):ValueState<boolean, ModelState> => {
         let changed:boolean = false
-        if (properties.focused) {
-            properties.focused =
-            properties.model.state.focused =
-                false
-            onChangeState(properties.model.state, event)
+
+        if (oldValueState.model.focused) {
+            properties.focused = false
             changed = true
         }
 
-        if (!properties.visited) {
-            properties.visited =
-            properties.model.state.visited =
-                true
+        if (!oldValueState.model.visited) {
+            properties.visited = true
             changed = true
         }
 
-        if (changed)
+        if (changed) {
             onChange(event)
-        if (properties.onBlur)
-            properties.onBlur(event)
-    }
+
+            triggerCallbackIfExists<boolean>(
+                properties, 'changeState', properties.model.state, event
+            )
+        }
+
+        triggerCallbackIfExists<boolean>(properties, 'blur', event)
+
+        return changed ?
+            {...oldValueState, model: properties.model.state} :
+            oldValueState
+    })
     /**
-     * Triggered on any change events.
+     * Triggered on any change events. Consolidates properties object and
+     * triggers given on change callbacks.
      * @param event - Potential event object.
      * @returns Nothing.
      */
     const onChange = (event?:SyntheticEvent):void => {
-        if (properties.onChange)
-            properties.onChange(
-                getConsolidatedProperties(
-                    /*
-                        Workaround since "Something" isn't identified as subset
-                        of "RecursivePartial"
-                    */
-                    properties as unknown as Props
-                ),
-                event
+        Tools.extend(
+            true,
+            properties,
+            getConsolidatedProperties(
+                /*
+                    Workaround since "Type" isn't identified as subset of
+                    "RecursivePartial<Type>" yet.
+                */
+                properties as unknown as Props
             )
+        )
+
+        triggerCallbackIfExists<boolean>(
+            properties, 'change', properties, event
+        )
     }
     /**
      * Triggered when show declaration indicator should be changed.
@@ -144,26 +178,19 @@ export const RequireableCheckboxInner = function(
      */
     const onChangeShowDeclaration = (event?:ReactMouseEvent):void =>
         setShowDeclaration((value:boolean):boolean => {
-            if (properties.onChangeShowDeclaration)
-                properties.onChangeShowDeclaration(value, event)
+            properties.showDeclaration = !value
+
             onChange(event)
-            return !value
+
+            triggerCallbackIfExists<boolean>(
+                properties,
+                'changeShowDeclaration',
+                properties.showDeclaration,
+                event
+            )
+
+            return properties.showDeclaration
         })
-    /**
-     * Triggered when a value state changes like validation or focusing.
-     * @param state - Current value state.
-     * @param event - Triggering event object.
-     * @returns Nothing.
-     */
-    const onChangeState = (state:ModelState, event?:SyntheticEvent):void => {
-        for (const key of Object.keys(state))
-            if (!Object.prototype.hasOwnProperty.call(props, key)) {
-                setModel(state)
-                break
-            }
-        if (properties.onChangeState)
-            properties.onChangeState(state, event)
-    }
     /**
      * Triggered when ever the value changes.
      * @param eventOrValue - Event object or new value.
@@ -180,7 +207,7 @@ export const RequireableCheckboxInner = function(
             (eventOrValue as SyntheticEvent).target
         ) {
             event = eventOrValue as SyntheticEvent
-            value = (
+            properties.value = (
                 typeof (event.target as {checked?:boolean|null}).checked ===
                     'undefined' &&
                 typeof properties.indeterminate === 'boolean'
@@ -190,32 +217,46 @@ export const RequireableCheckboxInner = function(
                     (event.target as unknown as {checked:boolean|null}).checked
                 )
         } else
-            value = eventOrValue as boolean|null
+            properties.value = eventOrValue as boolean|null
 
-        const oldValue:boolean|null = properties.value as boolean|null
+        setValueState((
+            oldValueState:ValueState<boolean, ModelState>
+        ):ValueState<boolean, ModelState> => {
+            if (oldValueState.value === properties.value)
+                return oldValueState
 
-        properties.checked = properties.value = properties.model.value = value
+            let stateChanged:boolean = false
 
-        if (oldValue !== properties.value) {
-            let stateChanged:boolean =
-                determineValidationState<Properties, boolean>(
-                    properties, properties.value
-                )
+            const result:ValueState<boolean, ModelState> =
+                {...oldValueState, value: properties.value as boolean|null}
 
-            if (properties.pristine) {
-                properties.dirty = properties.model.state.dirty = true
-                properties.pristine = properties.model.state.pristine = false
+            if (oldValueState.model.pristine) {
+                properties.dirty = true
+                properties.pristine = false
                 stateChanged = true
             }
-            if (stateChanged)
-                onChangeState(properties.model.state, event)
 
-            setValue(properties.value)
             onChange(event)
 
-            if (properties.onChangeValue)
-                properties.onChangeValue(properties.value, event)
-        }
+            if (determineValidationState<Properties>(
+                properties, oldValueState.model
+            ))
+                stateChanged = true
+
+            triggerCallbackIfExists<boolean>(
+                properties, 'changeValue', properties.value, event
+            )
+
+            if (stateChanged) {
+                result.model = properties.model.state
+
+                triggerCallbackIfExists<boolean>(
+                    properties, 'changeState', properties.model.state, event
+                )
+            }
+
+            return result
+        })
     }
     /**
      * Triggered on click events.
@@ -223,8 +264,8 @@ export const RequireableCheckboxInner = function(
      * @returns Nothing.
      */
     const onClick = (event:ReactMouseEvent):void => {
-        if (properties.onClick)
-            properties.onClick(event)
+        triggerCallbackIfExists<boolean>(properties, 'click', event)
+
         onTouch(event)
     }
     /**
@@ -233,8 +274,8 @@ export const RequireableCheckboxInner = function(
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
-        if (properties.onFocus)
-            properties.onFocus(event)
+        triggerCallbackIfExists<boolean>(properties, 'focus', event)
+
         onTouch(event)
     }
     /**
@@ -242,30 +283,39 @@ export const RequireableCheckboxInner = function(
      * @param event - Event object which triggered interaction.
      * @returns Nothing.
      */
-    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void => {
-        let changeState:boolean = false
-        if (!properties.focused) {
-            changeState =
-            properties.focused =
-            properties.model.state.focused =
-                true
-        }
-        if (properties.untouched) {
-            changeState =
-            properties.touched =
-            properties.model.state.touched =
-                true
-            properties.untouched =
-            properties.model.state.untouched =
-                false
-        }
-        if (changeState) {
-            onChangeState(properties.model.state, event)
-            onChange(event)
-        }
-        if (properties.onTouch)
-            properties.onTouch(event)
-    }
+    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
+        setValueState((
+            oldValueState:ValueState<boolean, ModelState>
+        ):ValueState<boolean, ModelState> => {
+            let changedState:boolean = false
+
+            if (!oldValueState.model.focused) {
+                properties.focused = true
+                changedState = true
+            }
+
+            if (oldValueState.model.untouched) {
+                properties.touched = true
+                properties.untouched = false
+                changedState = true
+            }
+
+            let result:ValueState<boolean, ModelState> = oldValueState
+
+            if (changedState) {
+                onChange(event)
+
+                result = {...oldValueState, model: properties.model.state}
+
+                triggerCallbackIfExists<boolean>(
+                    properties, 'changeState', properties.model.state, event
+                )
+            }
+
+            triggerCallbackIfExists<boolean>(properties, 'touch', event)
+
+            return result
+        })
     // endregion
     // region properties
     // / region references
@@ -274,17 +324,51 @@ export const RequireableCheckboxInner = function(
     const foundationRef:RefObject<MDCCheckboxFoundation> =
         createRef<MDCCheckboxFoundation>()
     // / endregion
-    const [model, setModel] =
-        useState<ModelState>({...RequireableCheckbox.defaultModelState})
+    const givenProperties:Props = {...props}
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
-    let [value, setValue] = useState<boolean|null>(
+    const initialValue:boolean|null =
         determineInitialValue<boolean>(props, props.checked)
-    )
+    /*
+        NOTE: This values have to share the same state item since they have to
+        be updated in one event loop (set state callback).
+    */
+    const [valueState, setValueState] =
+        useState<ValueState<boolean, ModelState>>({
+            model: {...RequireableCheckbox.defaultModelState},
+            value: initialValue
+        })
+    // / region derive missing properties from state variables
+    if (givenProperties.showDeclaration === undefined)
+        givenProperties.showDeclaration = showDeclaration
+    // // region value state
+    /*
+        NOTE: React simply copies "defaultProps" flat to we have to do a deep
+        copy here. Otherwise different rendering cycles would depend manipulate
+        each other.
+    */
+    givenProperties.model = {...givenProperties.model}
+    if (givenProperties.model.value === undefined)
+        givenProperties.model.value = valueState.value
 
-    const properties:Properties = getConsolidatedProperties(props)
+    if (givenProperties.model.state)
+        givenProperties.model.state = {...givenProperties.model.state}
+    else
+        givenProperties.model.state = {} as ModelState
+    for (const key in valueState.model)
+        if (
+            Object.prototype.hasOwnProperty.call(valueState.model, key) &&
+            (
+                givenProperties.model.state as Partial<ModelState>
+            )[key as keyof ModelState] === undefined
+        )
+            givenProperties.model.state[key as keyof ModelState] =
+                valueState.model[key as keyof ModelState]
+    // // endregion
+    // / endregion
+    const properties:Properties = getConsolidatedProperties(givenProperties)
     useImperativeHandle(
         reference,
-        ():WebComponentAdapter<Properties, State> & {
+        ():Adapter & {
             references:{
                 foundationRef:RefObject<MDCCheckboxFoundation>
                 inputReference:RefObject<HTMLInputElement>
@@ -292,20 +376,15 @@ export const RequireableCheckboxInner = function(
         } => ({
             properties,
             references: {foundationRef, inputReference},
-            state: {model, showDeclaration, value}
+            state: {
+                model: properties.model.state,
+                showDeclaration: properties.showDeclaration,
+                value: properties.value as boolean|null
+            }
         })
     )
     // endregion
-    // region derive state variables from given properties
-    if (properties.showDeclaration !== undefined)
-        showDeclaration = properties.showDeclaration
-
-    if (properties.value !== undefined)
-        value = Boolean(properties.value)
-    else if (properties.model?.value !== undefined)
-        value = Boolean(properties.model.value)
-    // endregion
-    // region markup
+    // region render
     // TODO Helptext
     return <WrapConfigurations
         strict={RequireableCheckbox.strict}
@@ -313,13 +392,15 @@ export const RequireableCheckboxInner = function(
         tooltip={properties.tooltip}
     >
         <Checkbox
-            checked={value === null ? undefined : value}
+            checked={properties.value === null ? undefined : properties.value}
             disabled={properties.disabled}
             foundationRef={
                 foundationRef as unknown as RefCallback<MDCCheckboxFoundation>
             }
             id={properties.id || properties.name}
-            indeterminate={properties.indeterminate || value === null}
+            indeterminate={
+                properties.indeterminate || properties.value === null
+            }
             inputRef={
                 inputReference as unknown as RefCallback<HTMLInputElement>
             }
@@ -345,11 +426,11 @@ export const RequireableCheckboxInner = function(
             onClick={onClick}
             onFocus={onFocus}
             ripple={properties.ripple}
-            value={`${value}`}
+            value={`${properties.value}`}
         />
     </WrapConfigurations>
     // endregion
-} as ForwardRefRenderFunction<WebComponentAdapter<Properties, State>, Props>
+} as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
 RequireableCheckboxInner.displayName = 'RequireableCheckbox'
 /**
@@ -375,7 +456,11 @@ RequireableCheckbox.wrapped = RequireableCheckboxInner
 RequireableCheckbox.webComponentAdapterWrapped = 'react'
 // / endregion
 RequireableCheckbox.defaultModelState = defaultModelState
-RequireableCheckbox.defaultProps = defaultProperties
+RequireableCheckbox.defaultProps = {
+    ...defaultProperties,
+    model: {...defaultProperties.model, state: undefined, value: undefined},
+    value: undefined
+}
 RequireableCheckbox.propTypes = propertyTypes
 RequireableCheckbox.strict = false
 // endregion
