@@ -29,7 +29,12 @@ import {Properties} from '../type'
  * Wraps a theme provider, strict wrapper and tooltip to given element if
  * corresponding configurations are provided.
  * @param children - Component or string to wrap.
- * @param configuration - Potential provider configurations.
+ * @param strict - Indicates whether to render in strict mode.
+ * @param theme - Optional theme configurations.
+ * @param tooltip - Optional tooltip to show on hover.
+ * @param wrap - Instead of injecting a div tag, wrap a child component by
+ * merging the theme styles directly onto it. Useful when you don't want to
+ * mess with layout.
  * @returns Wrapped content.
  */
 export const WrapConfigurations:FunctionComponent<{
@@ -37,10 +42,11 @@ export const WrapConfigurations:FunctionComponent<{
     strict?:boolean
     theme?:ThemeProviderProps['options']
     tooltip?:Properties['tooltip']
-}> = ({children, strict, theme, tooltip}):ReactElement =>
+    wrap?:boolean
+}> = ({children, strict, theme, tooltip, wrap}):ReactElement =>
     <WrapStrict strict={Boolean(strict)}>
         <WrapTooltip options={tooltip}>
-            <WrapThemeProvider configuration={theme}>
+            <WrapThemeProvider configuration={theme} wrap={wrap}>
                 {children}
             </WrapThemeProvider>
         </WrapTooltip>

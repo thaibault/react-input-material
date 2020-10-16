@@ -24,13 +24,16 @@ import {ThemeProvider, ThemeProviderProps} from '@rmwc/theme'
  * Wraps a theme provider to given element if a configuration is provided.
  * @param children - Component or string to wrap.
  * @param configuration - Potential theme provider configuration.
+ * @param wrap - Instead of injecting a div tag, wrap a child component by
+ * merging the theme styles directly onto it. Useful when you don't want to
+ * mess with layout.
  * @returns Wrapped content.
  */
 export const WrapThemeProvider:FunctionComponent<{
     children:ReactElement
     configuration?:ThemeProviderProps['options']
     wrap?:boolean
-}> = ({children, configuration}):ReactElement => configuration ?
+}> = ({children, configuration, wrap}):ReactElement => configuration ?
     <ThemeProvider options={configuration} wrap={wrap !== false}>
         {children}
     </ThemeProvider> :
