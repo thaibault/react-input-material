@@ -52,6 +52,10 @@ import {
 // endregion
 // region exports
 // / region generic
+export type TestEnvironment = {
+    container:HTMLDivElement|null
+    render:(component:ReactElement) => HTMLElement|null
+}
 export type BaseModel<Type = any> = {
     declaration:string
     default:null|Type

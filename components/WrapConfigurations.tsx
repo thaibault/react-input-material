@@ -39,11 +39,11 @@ export const WrapConfigurations:FunctionComponent<{
     tooltip?:Properties['tooltip']
 }> = ({children, strict, theme, tooltip}):ReactElement =>
     <WrapStrict strict={Boolean(strict)}>
-        <WrapThemeProvider configuration={theme}>
-            <div>
-                <WrapTooltip options={tooltip}>{children}</WrapTooltip>
-            </div>
-        </WrapThemeProvider>
+        <WrapTooltip options={tooltip}>
+            <WrapThemeProvider configuration={theme}>
+                {children}
+            </WrapThemeProvider>
+        </WrapTooltip>
     </WrapStrict>
 export default WrapConfigurations
 // region vim modline

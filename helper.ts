@@ -20,6 +20,8 @@
 import Tools from 'clientnode'
 import {Mapping, ValueOf} from 'clientnode/type'
 import {useMemo} from 'react'
+import {render as renderReact, unmountComponentAtNode} from 'react-dom'
+import {act} from 'react-dom/test-utils'
 
 import {
     DataTransformSpecification,
@@ -28,9 +30,33 @@ import {
     Model,
     ModelState,
     Properties,
-    Props
+    Props,
+    TestEnvironment
 } from './type'
 // endregion
+/**
+ * Triggered when a value state changes like validation or focusing.
+ * @param properties - Properties to search in.
+ * @param name - Event callback name to search for in given properties.
+ * @param parameter - To forward to callback.
+ * @returns Nothing.
+ */
+export const triggerCallbackIfExists = <Type = any>(
+    properties:Properties<Type>, name:string, ...parameter:Array<any>
+):void => {
+    name = `on${Tools.stringCapitalize(name)}`
+    if (properties[name as keyof Properties<Type>])
+        /*
+            NOTE: We call callback on next event loop to first consolidate
+            internal state.
+        */
+        Tools.timeout(() =>
+            (properties[name as keyof Properties<Type>] as Function)(
+                ...parameter
+            )
+        )
+}
+// region consolidation state
 /**
  * Determines initial value depending on given properties.
  * @param properties - Components properties.
@@ -199,28 +225,7 @@ export const getConsolidatedProperties =
     // endregion
     return result as R
 }
-/**
- * Triggered when a value state changes like validation or focusing.
- * @param properties - Properties to search in.
- * @param name - Event callback name to search for in given properties.
- * @param parameter - To forward to callback.
- * @returns Nothing.
- */
-export const triggerCallbackIfExists = <Type = any>(
-    properties:Properties<Type>, name:string, ...parameter:Array<any>
-):void => {
-    name = `on${Tools.stringCapitalize(name)}`
-    if (properties[name as keyof Properties<Type>])
-        /*
-            NOTE: We call callback on next event loop to first consolidate
-            internal state.
-        */
-        Tools.timeout(() =>
-            (properties[name as keyof Properties<Type>] as Function)(
-                ...parameter
-            )
-        )
-}
+// endregion
 // region value transformer
 /**
  * Applies configured value transformations.
@@ -337,6 +342,34 @@ export function determineInitialRepresentation<P extends {
 export const useMemorizedValue = <Type = any>(
     value:Type, ...dependencies:Array<any>
 ):Type => useMemo(():any => value, dependencies)
+// endregion
+// region testing
+export const prepareTestEnvironment = (
+    beforeEach:Function, afterEach:Function
+):TestEnvironment => {
+    const result:TestEnvironment = {
+        container: null,
+        render: (component:ReactElement):HTMLElement|null => {
+            act(():void => {
+                renderReact(component, result.container)
+            })
+            return result.container.childNodes.length ?
+                result.container.childNodes[0] :
+                null
+        }
+    }
+    beforeEach(():void => {
+        result.container = document.createElement('div')
+        result.container.setAttribute('class', 'test-wrapper')
+        document.body.appendChild(result.container)
+    })
+    afterEach(():void => {
+        unmountComponentAtNode(result.container as HTMLDivElement);
+        (result.container as HTMLDivElement).remove()
+        result.container = null
+    })
+    return result
+}
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
