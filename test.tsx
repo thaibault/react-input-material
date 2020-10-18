@@ -43,7 +43,7 @@ describe('GenericAnimate', ():void => {
 describe('GenericInput', ():void => {
     test('render', ():void => {
         expect(render(<GenericInput/>)).toBeDefined()
-        expect(render(<GenericInput/>)!.querySelector('input')).toBeDefined()
+        expect((render(<GenericInput/>) as HTMLElement).querySelector('input')).toBeDefined()
 
         expect(render(<GenericInput/>)!.getAttribute('class'))
             .toStrictEqual('generic-input')

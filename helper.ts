@@ -19,7 +19,7 @@
 // region imports 
 import Tools from 'clientnode'
 import {Mapping, ValueOf} from 'clientnode/type'
-import {useMemo} from 'react'
+import {ReactElement, useMemo} from 'react'
 import {render as renderReact, unmountComponentAtNode} from 'react-dom'
 import {act} from 'react-dom/test-utils'
 
@@ -349,12 +349,12 @@ export const prepareTestEnvironment = (
 ):TestEnvironment => {
     const result:TestEnvironment = {
         container: null,
-        render: (component:ReactElement):HTMLElement|null => {
+        render: (component:ReactElement):ChildNode|null => {
             act(():void => {
                 renderReact(component, result.container)
             })
-            return result.container.childNodes.length ?
-                result.container.childNodes[0] :
+            return (result.container as HTMLDivElement).childNodes.length ?
+                (result.container as HTMLDivElement).childNodes[0] :
                 null
         }
     }

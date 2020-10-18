@@ -4194,9 +4194,9 @@ cli-width@^3.0.0:
   integrity sha512-FxqpkPPwu1HjuN93Omfm4h8uIanXofW0RxVEW3k5RKx+mJJYSthzNhp32Kzxxy3YAEZ/Dc/EWN1vZRY0+kOhbw==
 
 clientnode@*:
-  version "3.0.552"
-  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.552.tgz#621976a2745ced6804ade3f332e0f3c63c383b33"
-  integrity sha512-HP4S9jTpk560QdKKeRxghqDCr2CyCO20oOI8d3KCzMkbFoaE8+OysFAzff/d2fKCvVieNhipovDOwGIJ7J72OA==
+  version "3.0.553"
+  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.553.tgz#a2d3517bff5ae2646977a6c002fc4bcc55c825e9"
+  integrity sha512-16XcjpIFKTDj2qtoHQKaXZjqpIPI15/jpXEKyjKCKNXk8Ei16rHGHkEiENlIGberhvfaSUkgEhk5nj5Jf6DyVQ==
 
 cliui@^4.0.0:
   version "4.1.0"
@@ -13616,9 +13616,9 @@ wbuf@^1.1.0, wbuf@^1.7.3:
     minimalistic-assert "^1.0.0"
 
 web-component-wrapper@*:
-  version "0.0.50"
-  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.50.tgz#b954bec07d8e16bffa25cfc63926029eff6924a0"
-  integrity sha512-sal9N5FtkTO8SjpfcrF16Bi56lD8m89KUVqMUMO1bjvswz4+ufqi8NvRyT0zc93lUij2GGwXpEawd5igg8jAvg==
+  version "0.0.51"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.51.tgz#edf777d7ebdeea9536bf62c532dcd74559f3da5d"
+  integrity sha512-4HSIj3PMz8INqZYZBFVy8LC5JadqxyeAANDyhl/y4Jm53wukIJYx8Zpkx/zy+0OYa+ZVu/lO479yWvpqtRO0bA==
 
 webidl-conversions@^5.0.0:
   version "5.0.0"
