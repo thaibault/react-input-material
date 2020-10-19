@@ -43,13 +43,13 @@ describe('GenericAnimate', ():void => {
 describe('GenericInput', ():void => {
     test('render', ():void => {
         expect(render(<GenericInput/>)).toBeDefined()
-        expect((render(<GenericInput/>) as HTMLElement).querySelector('input')).toBeDefined()
-
-        expect(render(<GenericInput/>)!.getAttribute('class'))
+        expect((render(<GenericInput/>) as HTMLElement).querySelector('input'))
+            .toBeDefined()
+        expect((render(<GenericInput/>) as HTMLElement).getAttribute('class'))
             .toStrictEqual('generic-input')
-
         expect(
-            render(<GenericInput name="test"/>)!.querySelector('[name="test"]')
+            (render(<GenericInput name="test"/>) as HTMLElement)
+                .querySelector('[name="test"]')
         ).not.toStrictEqual(null)
     })
 })
@@ -58,28 +58,30 @@ describe('GenericInput', ():void => {
 describe('RequireableCheckbox', ():void => {
     test('render', ():void => {
         expect(render(<RequireableCheckbox/>)).toBeDefined()
-        expect(render(<RequireableCheckbox/>)!.querySelector('input'))
-            .toBeDefined()
+        expect(
+            (render(<RequireableCheckbox/>) as HTMLElement)
+                .querySelector('input')
+        ).toBeDefined()
 
         expect(
-            render(<RequireableCheckbox/>)!
+            (render(<RequireableCheckbox/>) as HTMLElement)
                 .querySelector('input')!
                 .getAttribute('id')
         ).toStrictEqual('NO_NAME_DEFINED')
     })
     test('render id', ():void => expect(
-        render(<RequireableCheckbox name="test"/>)!
+        (render(<RequireableCheckbox name="test"/>) as HTMLElement)
             .querySelector('input')!
             .getAttribute('id')
     ).toStrictEqual('test'))
 })
-// endregion 
+// endregion
 // region WrapConfigurations
 describe('WrapConfigurations', ():void => {
     test('render', ():void => expect(
-        render(
+        (render(
             <WrapConfigurations><div className="test"/></WrapConfigurations>
-        )!.querySelector('.test')
+        ) as HTMLElement).querySelector('.test')
     ).toBeDefined())
 })
 // endregion
@@ -87,14 +89,15 @@ describe('WrapConfigurations', ():void => {
 describe('WrapStrict', ():void => {
     test('render', ():void => {
         expect(
-            render(<WrapStrict strict><div className="test"/></WrapStrict>)!
-                .querySelector('.test')
+            (render(<WrapStrict strict><div className="test"/></WrapStrict>) as
+                HTMLElement
+            ).querySelector('.test')
         ).toBeDefined()
 
         expect(
-            render(
+            (render(
                 <WrapStrict strict={false}><div className="test"/></WrapStrict>
-            )!.querySelector('.test')
+            ) as HTMLElement).querySelector('.test')
         ).toBeDefined()
     })
 })
@@ -102,16 +105,18 @@ describe('WrapStrict', ():void => {
 // region WrapThemeProvider
 describe('WrapThemeProvider', ():void => {
     test('render', ():void => expect(
-        render(<WrapThemeProvider><div className="test"/></WrapThemeProvider>)!
-            .querySelector('.test')
+        (render(
+            <WrapThemeProvider><div className="test"/></WrapThemeProvider>
+        ) as HTMLElement).querySelector('.test')
     ).toBeDefined())
 })
 // endregion
 // region WrapTooltip
 describe('WrapTooltip', ():void => {
     test('render', ():void => expect(
-        render(<WrapTooltip><div className="test"/></WrapTooltip>)!
-            .querySelector('.test')
+        (render(
+            <WrapTooltip><div className="test"/></WrapTooltip>) as HTMLElement
+        ).querySelector('.test')
     ).toBeDefined())
 })
 // endregion
