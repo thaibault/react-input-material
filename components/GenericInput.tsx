@@ -941,20 +941,18 @@ export const GenericInputInner = function<Type = any>(
             return
 
         let event:SyntheticEvent|undefined
-        if (
-            eventOrValue !== null &&
-            typeof eventOrValue === 'object' &&
-            (eventOrValue as SyntheticEvent).target
-        ) {
-            event = eventOrValue as SyntheticEvent
-            properties.value =
-                typeof (event.target as {value?:null|Type}).value ===
-                    'undefined' ?
-                        null :
-                        (event.target as unknown as {value:null|Type}).value
+        if (eventOrValue !== null && typeof eventOrValue === 'object') {
+            const target:any =
+                (eventOrValue as SyntheticEvent).target ||
+                (eventOrValue as {detail?:any}).detail
+            if (target)
+                properties.value = typeof target.value === 'undefined' ?
+                    null :
+                    target.value
+            else
+                properties.value = eventOrValue as null|Type
         } else
             properties.value = eventOrValue as null|Type
-
         setValueState((
             oldValueState:ValueState<Type, ModelState>
         ):ValueState<Type, ModelState> => {
@@ -1427,8 +1425,8 @@ export const GenericInputInner = function<Type = any>(
                 inputRef={inputReference as unknown as
                     RefCallback<HTMLInputElement|HTMLTextAreaElement>
                 }
-                max={properties.maximum}
-                maxLength={properties.maximumLength}
+                max={properties.maximum >= 0 ? properties.maximum : Infinity}
+                maxLength={properties.maximumLength >= 0 ? properties.maximumLength : Infinity}
                 min={properties.minimum}
                 minLength={properties.minimumLength}
                 onChange={onChangeValue}
