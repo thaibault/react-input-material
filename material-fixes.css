@@ -41,6 +41,9 @@ endregion */
         }
     }
 }
+.generic-tooltip {
+    display: inline;
+}
 ::-ms-clear {
     display: none;
 }
