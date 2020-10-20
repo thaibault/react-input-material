@@ -37,11 +37,19 @@ export const WrapTooltip:FunctionComponent<{
     if (typeof options === 'string')
         return <Tooltip
             content={<Typography use="caption">{options}</Typography>}
-        >{children}</Tooltip>
-    if (options !== null && typeof options === 'object')
-        return <Tooltip {...options}>
-            <Typography use="caption">{children}</Typography>
-        </Tooltip>
+        ><div className="generic-tooltip">{children}</div></Tooltip>
+    if (options !== null && typeof options === 'object') {
+        if (typeof options.content === 'string')
+            options = {
+                ...options,
+                content: <Typography use="caption">
+                    {options.string}
+                </Typography>
+            }
+        return <Tooltip {...options}><div className="generic-tooltip">
+            {children}
+        </div></Tooltip>
+    }
     return <>{children}</>
 }
 export default WrapTooltip
