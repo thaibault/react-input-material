@@ -18,6 +18,7 @@
 */
 // region imports
 import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
+import {EvaluationResult} from 'clientnode/type'
 import React, {
     ComponentType,
     createRef,
@@ -408,31 +409,20 @@ export const GenericInputInner = function<Type = any>(
      */
     const renderMessage = (template?:any):string => {
         if (typeof template === 'string') {
-            const scopeNames:Array<keyof Properties<Type>> = Object
-                .keys(properties)
-                .filter((name:string):boolean => name !== 'default') as
-                    Array<keyof Properties<Type>>
-            let render:Function
-            try {
-                render = new Function(...scopeNames, `return \`${template}\``)
-            } catch (error) {
+            const evaluated:EvaluationResult =
+                Tools.stringEvaluate(`\`${template}\``, properties)
+            if (
+                (evaluated as {compileError:string}).compileError ||
+                (evaluated as {runtimeError:string}).runtimeError
+            ) {
                 console.warn(
-                    `Given message template "${template}" could not be ` +
-                    `parsed: "${Tools.represent(error)}".`
+                    'Given message template could not be proceed: ' +
+                    (evaluated as {compileError:string}).compileError ||
+                    (evaluated as {runtimeError:string}).runtimeError
                 )
                 return ''
             }
-            try {
-                return render(
-                    ...scopeNames.map((name:keyof Properties<Type>
-                ):any => properties[name]))
-            } catch (error) {
-                console.warn(
-                    `Given message template "${template}" failed to evaluate` +
-                    ' with given scope variables: "' +
-                    `${scopeNames.join('", "')}": "${Tools.represent(error)}".`
-                )
-            }
+            return (evaluated as {result:string}).result
         }
         return ''
     }
