@@ -43,7 +43,7 @@ export const WrapTooltip:FunctionComponent<{
             options = {
                 ...options,
                 content: <Typography use="caption">
-                    {options.string}
+                    {options.content}
                 </Typography>
             }
         return <Tooltip {...options}><div className="generic-tooltip">
