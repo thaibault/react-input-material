@@ -411,18 +411,14 @@ export const GenericInputInner = function<Type = any>(
         if (typeof template === 'string') {
             const evaluated:EvaluationResult =
                 Tools.stringEvaluate(`\`${template}\``, properties)
-            if (
-                (evaluated as {compileError:string}).compileError ||
-                (evaluated as {runtimeError:string}).runtimeError
-            ) {
+            if (evaluated.error) {
                 console.warn(
                     'Given message template could not be proceed: ' +
-                    (evaluated as {compileError:string}).compileError ||
-                    (evaluated as {runtimeError:string}).runtimeError
+                    evaluated.error
                 )
                 return ''
             }
-            return (evaluated as {result:string}).result
+            return evaluated.result
         }
         return ''
     }
