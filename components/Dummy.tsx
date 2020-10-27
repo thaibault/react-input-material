@@ -26,6 +26,10 @@ import {Renderable} from '../type'
  */
 export const Dummy:FunctionComponent<any> = (properties:Mapping<any>):ReactElement =>
     <div/>
+export const CodeEditor = Dummy
+export const Editor = Dummy
+export const RichTextEditor = Dummy
+export const TextEditor = Dummy
 export default Dummy
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
