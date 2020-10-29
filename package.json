@@ -109,8 +109,6 @@
     "typescript-plugin-css-modules": "*",
     "web-component-wrapper": "*",
     "weboptimizer": "*",
-    "webpack": "*",
-    "webpack-cli": "*",
     "webpack-dev-server": "*"
   },
   "peerDependencies": {
