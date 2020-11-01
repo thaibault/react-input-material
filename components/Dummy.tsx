@@ -18,7 +18,13 @@
 */
 // region imports
 import {Mapping} from 'clientnode/type'
-import React, {forwardRef, RefObject} from 'react'
+import React, {
+    forwardRef,
+    ForwardRefRenderFunction,
+    FunctionComponent,
+    ReactElement,
+    RefObject
+} from 'react'
 
 import {Renderable} from '../type'
 // endregion
@@ -26,7 +32,9 @@ import {Renderable} from '../type'
  * Generic strict wrapper component.
  */
 export const Dummy:FunctionComponent<any> = forwardRef(
-    (properties:Mapping<any>, reference?:RefObject<any>):ReactElement => <div/>
+    ((properties:Mapping<any>, reference:null|RefObject<any>):ReactElement =>
+        <div/>
+    ) as ForwardRefRenderFunction<any, Mapping<any>>
 )
 export const CodeEditor = Dummy
 export const Editor = Dummy

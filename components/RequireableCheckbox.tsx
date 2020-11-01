@@ -34,7 +34,6 @@ import React, {
 } from 'react'
 import {MDCCheckboxFoundation} from '@material/checkbox'
 import {Checkbox} from '@rmwc/checkbox'
-import '@rmwc/checkbox/styles'
 import {Theme} from '@rmwc/theme'
 
 import {WrapConfigurations} from './WrapConfigurations'
