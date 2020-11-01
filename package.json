@@ -210,12 +210,12 @@
         "replacements": {
           "normal": {
             "#": "Mock unneeded optional dependencies away.",
-            "ace-builds$": "./components/Dummy",
-            "@tinymce/tinymce-react$": "./components/Dummy",
-            "react-ace$": "./components/Dummy",
-            "react-useanimations$": "./components/Dummy",
-            "react-useanimations/lib/lock$": "./components/Dummy",
-            "react-useanimations/lib/plusToX$": "./components/Dummy"
+            "ace-builds$": "./Dummy",
+            "@tinymce/tinymce-react$": "./Dummy",
+            "react-ace$": "./Dummy",
+            "react-useanimations$": "./Dummy",
+            "react-useanimations/lib/lock$": "./Dummy",
+            "react-useanimations/lib/plusToX$": "./Dummy"
           }
         }
       }
