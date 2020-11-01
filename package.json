@@ -24,7 +24,7 @@
     "helper.js",
     "helper.ts",
     "index.styles.compiled.css",
-    "index.ts",
+    "index.tsx",
     "material-fixes.css",
     "type.ts"
   ],
@@ -163,7 +163,7 @@
     },
     "injection": {
       "entry": {
-        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? './playground' : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'test' ? './test' : {'./components/Dummy': './components/Dummy', './components/GenericAnimate': './components/GenericAnimate', './components/GenericInput': './components/GenericInput', './components/RequireableCheckbox': './components/RequireableCheckbox', helper: './helper', index: './index'}"
+        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? './playground' : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'test' ? './test' : {'./components/Dummy': './components/Dummy', './components/GenericAnimate': './components/GenericAnimate', './components/GenericInput': './components/GenericInput', './components/RequireableCheckbox': './components/RequireableCheckbox', helper: './helper', index: ['./index.css', './index.tsx']}"
       }
     },
     "module": {

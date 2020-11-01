@@ -16,9 +16,14 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
+export {Dummy} from './components/Dummy'
 export {GenericAnimate} from './components/GenericAnimate'
 export {GenericInput} from './components/GenericInput'
 export {RequireableCheckbox} from './components/RequireableCheckbox'
+export {WrapConfigurations} from './components/WrapConfigurations'
+export {WrapStrict} from './components/WrapStrict'
+export {WrapThemeProvider} from './components/WrapThemeProvider'
+export {WrapTooltip} from './components/WrapTooltip'
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
