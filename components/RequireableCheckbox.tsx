@@ -36,6 +36,7 @@ import {MDCCheckboxFoundation} from '@material/checkbox'
 import {Checkbox} from '@rmwc/checkbox'
 import {Theme} from '@rmwc/theme'
 
+import styles from './RequireableCheckbox.module'
 import {WrapConfigurations} from './WrapConfigurations'
 import {
     determineInitialValue,
@@ -389,7 +390,7 @@ export const RequireableCheckboxInner = function(
         strict={RequireableCheckbox.strict}
         theme={properties.theme}
         tooltip={properties.tooltip}
-    >
+    ><div className={styles['requireable-checkbox']}>
         <Checkbox
             checked={properties.value === null ? undefined : properties.value}
             disabled={properties.disabled}
@@ -427,7 +428,7 @@ export const RequireableCheckboxInner = function(
             ripple={properties.ripple}
             value={`${properties.value}`}
         />
-    </WrapConfigurations>
+    </div></WrapConfigurations>
     // endregion
 } as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.

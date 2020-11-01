@@ -16,7 +16,7 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports
+// region importsD%*w5@6Pj9@@5SkdIHXE$ewy&QM*X7!6^5pm6%#8c45E4@@2!ys^h#4p#3mQh5gF%
 import Tools from 'clientnode'
 import React, {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
@@ -24,9 +24,7 @@ import {render} from 'react-dom'
 
 import GenericAnimate from './components/GenericAnimate'
 import GenericInput from './components/GenericInput'
-import './components/GenericInput.module.styles'
 import RequireableCheckbox from './components/RequireableCheckbox'
-import './components/RequireableCheckbox.module.styles'
 import {useMemorizedValue} from './helper'
 import './material-fixes'
 import {Properties} from './type'

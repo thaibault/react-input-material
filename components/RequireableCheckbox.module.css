@@ -13,8 +13,11 @@ endregion */
 /*import '@rmwc/checkbox/styles'*/
 @import '@material/checkbox/dist/mdc.checkbox.css'
 @import '@material/form-field/dist/mdc.form-field.css'
-@import '@material/ripple/dist/mdc.ripple.css'
+@import '@material/ripple/dist/mdc.ripple.css';
 /* endregion */
+.requireable-checkbox {
+    display: block;
+}
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:
 vim: foldmethod=marker foldmarker=region,endregion:
