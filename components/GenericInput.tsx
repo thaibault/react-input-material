@@ -453,7 +453,9 @@ export const GenericInputInner = function<Type = any>(
      * configuration.
      * @returns Resolved icon configuration.
      */
-    const wrapIconWithTooltip = (options?:Properties['icon']):IconOptions|undefined => {
+    const wrapIconWithTooltip = (
+        options?:Properties['icon']
+    ):IconOptions|undefined => {
         if (typeof options === 'object' && options?.tooltip) {
             const tooltip:Properties['tooltip'] = options.tooltip
             options = {...options}
@@ -948,6 +950,7 @@ export const GenericInputInner = function<Type = any>(
                 properties.value = eventOrValue as null|Type
         } else
             properties.value = eventOrValue as null|Type
+
         setValueState((
             oldValueState:ValueState<Type, ModelState>
         ):ValueState<Type, ModelState> => {
@@ -1123,7 +1126,7 @@ export const GenericInputInner = function<Type = any>(
             value: initialValue
         }
     )
-    // / region derive missing properties from state variables
+    // / region derive missing properties from state variables and back
     if (!givenProperties.cursor)
         givenProperties.cursor = {} as CursorState
     if (givenProperties.cursor.end === undefined)
@@ -1151,8 +1154,11 @@ export const GenericInputInner = function<Type = any>(
     if (givenProperties.model.value === undefined)
         givenProperties.model.value = valueState.value
 
-    if (givenProperties.representation === undefined)
-        givenProperties.representation = valueState.representation
+    if (givenProperties.value === undefined)
+        if (givenProperties.representation === undefined)
+            givenProperties.representation = valueState.representation
+    else
+        givenProperties.representation = undefined
 
     if (givenProperties.model.state)
         givenProperties.model.state = {...givenProperties.model.state}
@@ -1168,9 +1174,30 @@ export const GenericInputInner = function<Type = any>(
             givenProperties.model.state[key as keyof ModelState] =
                 valueState.model[key as keyof ModelState]
     // // endregion
-    // / endregion
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
+    if (!Tools.equals(properties.cursor, cursor))
+        setCursor(properties.cursor)
+    if (properties.editorIsActive !== editorState.editorIsActive)
+        setEditorState({
+            ...editorState,
+            editorIsActive: properties.editorIsActive
+        })
+    if (properties.hidden !== hidden)
+        setHidden(properties.hidden)
+    if (properties.showDeclaration !== showDeclaration)
+        setShowDeclaration(properties.showDeclaration)
+    if (!(
+        properties.value === valueState.value &&
+        properties.representation === valueState.representation &&
+        Tools.equals(properties.model.state, valueState.model)
+    ))
+        setValueState({
+            model: properties.model.state,
+            representation: properties.representation,
+            value: properties.value as null|Type
+        })
+    // / endregion
     useImperativeHandle(
         reference,
         ():Adapter<Type> & {
