@@ -337,7 +337,7 @@ export const RequireableCheckboxInner = function(
             model: {...RequireableCheckbox.defaultModelState},
             value: initialValue
         })
-    // / region derive missing properties from state variables
+    // / region derive missing properties from state variables and back
     if (givenProperties.showDeclaration === undefined)
         givenProperties.showDeclaration = showDeclaration
     // // region value state
@@ -364,8 +364,18 @@ export const RequireableCheckboxInner = function(
             givenProperties.model.state[key as keyof ModelState] =
                 valueState.model[key as keyof ModelState]
     // // endregion
-    // / endregion
     const properties:Properties = getConsolidatedProperties(givenProperties)
+    if (properties.showDeclaration !== showDeclaration)
+        setShowDeclaration(properties.showDeclaration)
+    if (!(
+        properties.value === valueState.value &&
+        Tools.equals(properties.model.state, valueState.model)
+    ))
+        setValueState({
+            model: properties.model.state,
+            value: properties.value as boolean|null
+        })
+    // / endregion
     useImperativeHandle(
         reference,
         ():Adapter & {
