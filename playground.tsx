@@ -16,17 +16,14 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region importsD%*w5@6Pj9@@5SkdIHXE$ewy&QM*X7!6^5pm6%#8c45E4@@2!ys^h#4p#3mQh5gF%
+// region imports
 import Tools from 'clientnode'
 import React, {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
 import {render} from 'react-dom'
 
-import GenericAnimate from './components/GenericAnimate'
-import GenericInput from './components/GenericInput'
-import RequireableCheckbox from './components/RequireableCheckbox'
+import {GenericAnimate, GenericInput, RequireableCheckbox} from './index'
 import {useMemorizedValue} from './helper'
-import './material-fixes'
 import {Properties} from './type'
 // endregion
 GenericInput.local = 'de-DE'

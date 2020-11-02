@@ -11,8 +11,8 @@ This library written by Torben Sickert stand under a creative commons naming
 endregion */
 /* region imports */
 /*import '@rmwc/checkbox/styles'*/
-@import '@material/checkbox/dist/mdc.checkbox.css'
-@import '@material/form-field/dist/mdc.form-field.css'
+@import '@material/checkbox/dist/mdc.checkbox.css';
+@import '@material/form-field/dist/mdc.form-field.css';
 @import '@material/ripple/dist/mdc.ripple.css';
 /* endregion */
 .requireable-checkbox {
