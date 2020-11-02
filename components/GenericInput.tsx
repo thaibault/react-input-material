@@ -64,7 +64,7 @@ import UseAnimations from 'react-useanimations'
 import lock from 'react-useanimations/lib/lock'
 import plusToX from 'react-useanimations/lib/plusToX'
 
-import Dummy from './GenericAnimate'
+import Dummy from './Dummy'
 import GenericAnimate from './GenericAnimate'
 import styles from './GenericInput.module'
 import WrapConfigurations from './WrapConfigurations'
