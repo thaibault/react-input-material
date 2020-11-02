@@ -43,10 +43,13 @@ describe('GenericAnimate', ():void => {
 describe('GenericInput', ():void => {
     test('render', ():void => {
         expect(render(<GenericInput/>)).toBeDefined()
+
         expect((render(<GenericInput/>) as HTMLElement).querySelector('input'))
             .toBeDefined()
+
         expect((render(<GenericInput/>) as HTMLElement).getAttribute('class'))
             .toStrictEqual('generic-input')
+
         expect(
             (render(<GenericInput name="test"/>) as HTMLElement)
                 .querySelector('[name="test"]')
@@ -58,10 +61,16 @@ describe('GenericInput', ():void => {
 describe('RequireableCheckbox', ():void => {
     test('render', ():void => {
         expect(render(<RequireableCheckbox/>)).toBeDefined()
+
         expect(
             (render(<RequireableCheckbox/>) as HTMLElement)
                 .querySelector('input')
         ).toBeDefined()
+
+        expect(
+            (render(<RequireableCheckbox/>) as HTMLElement)
+                .getAttribute('class')
+        ).toStrictEqual('requireable-checkbox')
 
         expect(
             (render(<RequireableCheckbox/>) as HTMLElement)
