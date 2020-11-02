@@ -64,7 +64,8 @@ import UseAnimations from 'react-useanimations'
 import lock from 'react-useanimations/lib/lock'
 import plusToX from 'react-useanimations/lib/plusToX'
 
-import {GenericAnimate} from './GenericAnimate'
+import Dummy from './GenericAnimate'
+import GenericAnimate from './GenericAnimate'
 import styles from './GenericInput.module'
 import WrapConfigurations from './WrapConfigurations'
 import WrapTooltip from './WrapTooltip'
@@ -290,7 +291,10 @@ export const GenericInputInner = function<Type = any>(
                 icon: <GenericAnimate
                     in={properties.value !== properties.default}
                 >
-                    <UseAnimations animation={plusToX} reverse={true}/>
+                    {Dummy === UseAnimations ?
+                        <IconButton icon="clear"/> :
+                        <UseAnimations animation={plusToX} reverse={true}/>
+                    }
                 </GenericAnimate>,
                 onClick: (event:ReactMouseEvent):void => {
                     event.preventDefault()
@@ -307,9 +311,13 @@ export const GenericInputInner = function<Type = any>(
         if (options === 'password_preset')
             return useMemorizedValue(
                 {
-                    icon: <UseAnimations
-                        animation={lock} reverse={!properties.hidden}
-                    />,
+                    icon: Dummy === UseAnimations ?
+                        <IconButton
+                            icon={properties.hidden ? 'lock_open' : 'lock'}
+                        /> :
+                        <UseAnimations
+                            animation={lock} reverse={!properties.hidden}
+                        />,
                     onClick: (event:ReactMouseEvent):void => {
                         event.preventDefault()
                         event.stopPropagation()
