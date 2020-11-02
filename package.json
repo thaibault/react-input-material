@@ -85,6 +85,7 @@
     "clientnode": "*",
     "css-loader": "*",
     "cssnano": "*",
+    "documentation-website": "*",
     "eslint": "*",
     "eslint-config-google": "*",
     "eslint-plugin-jsdoc": "*",
