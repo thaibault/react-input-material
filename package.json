@@ -39,7 +39,7 @@
     "build:export": "weboptimizer build '{__reference__: \"target:export\"}'",
     "check": "yarn check:types; yarn lint",
     "check:types": "weboptimizer check:types",
-    "clear": "weboptimizer clear && rm *.styles.css components/*.styles.css",
+    "clear": "weboptimizer clear && (rm *.styles.css components/*.styles.css 2>/dev/null || true)",
     "document": "weboptimizer document",
     "lint": "weboptimizer lint",
     "prepare": "yarn build",
