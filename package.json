@@ -52,7 +52,6 @@
     "update:documentation": "documentationWebsite --log-level info",
     "watch": "weboptimizer build --watch"
   },
-  "#": "Because of the cascading style sheets.",
   "devDependencies": {
     "@babel/plugin-transform-proto-to-assign": "*",
     "@babel/preset-react": "*",
