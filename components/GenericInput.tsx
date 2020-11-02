@@ -876,7 +876,11 @@ export const GenericInputInner = function<Type = any>(
      * @param event - Mouse event object.
      * @returns Nothing.
      */
-    const onChangeEditorIsActive = (event?:ReactMouseEvent):void =>
+    const onChangeEditorIsActive = (event?:ReactMouseEvent):void => {
+        if (event) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
         setEditorState(({editorIsActive}):EditorState => {
             properties.editorIsActive = !editorIsActive
 
@@ -894,12 +898,17 @@ export const GenericInputInner = function<Type = any>(
                 selectionIsUnstable: true
             }
         })
+    }
     /**
      * Triggered when show declaration indicator should be changed.
      * @param event - Potential event object.
      * @returns Nothing.
      */
-    const onChangeShowDeclaration = (event?:ReactMouseEvent):void =>
+    const onChangeShowDeclaration = (event?:ReactMouseEvent):void => {
+        if (event) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
         setShowDeclaration((value:boolean):boolean => {
             properties.showDeclaration = !value
 
@@ -914,6 +923,7 @@ export const GenericInputInner = function<Type = any>(
 
             return properties.showDeclaration
         })
+    }
     /**
      * Triggered when ever the value changes.
      * @param eventOrValue - Event object or new value.
