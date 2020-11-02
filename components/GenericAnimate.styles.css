@@ -1,2 +1,0 @@
-/* !/usr/bin/env css
--*- coding: utf-8 -*- */.generic-animate{opacity:1}.generic-animate-appear,.generic-animate-enter{opacity:0}.generic-animate-appear-active,.generic-animate-enter-active{opacity:1;-webkit-transition:opacity .2s ease-in;transition:opacity .2s ease-in}.generic-animate-exit{opacity:1}.generic-animate-exit-active{opacity:0;-webkit-transition:opacity .2s ease-in;transition:opacity .2s ease-in}.generic-animate-exit-done{display:none}.generic-animate__list-wrapper{opacity:1}
