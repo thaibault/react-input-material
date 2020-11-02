@@ -3561,6 +3561,16 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
+boostnode@*:
+  version "1.0.26"
+  resolved "https://registry.yarnpkg.com/boostnode/-/boostnode-1.0.26.tgz#8917c83e2f41d627dc9a9973d291d47bb0cf2f23"
+  integrity sha512-DuiczS5c6kXuEPU4aDXhoNXZq+8azV+fADI26R/MLl7iZM77myqsAjuxsHb4xM08J3tBL/yW7Z5kndgY1QQdDQ==
+
+bootstrap@^3.3.7:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.4.1.tgz#c3a347d419e289ad11f4033e3c4132b87c081d72"
+  integrity sha512-yN5oZVmRCwe5aKwzRj6736nSmKDX7pLYwsXiCj/EYmo16hODaBiT4En5btW/jhBF/seV+XMx3aYwukYC3A49DA==
+
 brace-expansion@^1.1.7:
   version "1.1.11"
   resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.11.tgz#3c7fcbf529d87226f3d2f52b966ff5271eb441dd"
@@ -3929,9 +3939,9 @@ cli-table3@^0.5.0:
     colors "^1.1.2"
 
 clientnode@*:
-  version "3.0.592"
-  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.592.tgz#ecd3f053a056b5f6d32f9cc9c55a17c20d8eed09"
-  integrity sha512-NuC/vifzfkb59jI2SQjUN8KvrnXF+pgpg/XocDvRkXMLB/OJ0deeytmDn1y8sSHaAX6jWGXE/laJfP/9vteNQQ==
+  version "3.0.594"
+  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.594.tgz#d2db5cf36d774717fd63d507c4cce9d137b3f30b"
+  integrity sha512-oSI96FR4lzZTjbgcXAwK5ofo8JPXwzZvMHiNa6W45sNLtmcIjcokq/o9mhND3M7s913c1bSpAU5KO245wgVgRg==
 
 cliui@^4.0.0:
   version "4.1.0"
@@ -4742,6 +4752,15 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
+
+documentation-website@*:
+  version "1.0.234"
+  resolved "https://registry.yarnpkg.com/documentation-website/-/documentation-website-1.0.234.tgz#bc90958f5c416b676a68c26544cfba91cc28b7d9"
+  integrity sha512-o7EzV0SnbfYFTvcJ+jbH9mOOaGnzDMKRmsZQBsKwiaQa/msysV9kJiDj20jtBuNnFdU0LJr8a1XcXTYYeOBNCg==
+  dependencies:
+    boostnode "*"
+    bootstrap "^3.3.7"
+    website-utilities "*"
 
 dom-align@^1.7.0:
   version "1.12.0"
@@ -6330,6 +6349,11 @@ internal-ip@^4.3.0:
     default-gateway "^4.2.0"
     ipaddr.js "^1.9.0"
 
+internationalisation@*:
+  version "1.0.211"
+  resolved "https://registry.yarnpkg.com/internationalisation/-/internationalisation-1.0.211.tgz#f172df635250ba5b2178d6decf1cdf18222fd262"
+  integrity sha512-aRSf0616BNRcXxXvydCKntiVy1+iknZ/QVXuFtahdl7VtkEDi37zA96Qnir8/CzR02/kOUN0o4+uvyJEMnYVvQ==
+
 interpret@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-2.2.0.tgz#1a78a0b5965c40a5416d007ad6f50ad27c417df9"
@@ -7174,6 +7198,18 @@ jest@*:
     "@jest/core" "^26.6.1"
     import-local "^3.0.2"
     jest-cli "^26.6.1"
+
+jquery.scrollto@*:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/jquery.scrollto/-/jquery.scrollto-2.1.2.tgz#e7580d9c7ac46ef5bb25319483f6f45713fd7c6c"
+  integrity sha1-51gNnHrEbvW7JTGUg/b0VxP9fGw=
+  dependencies:
+    jquery ">=1.8"
+
+jquery@*, jquery@>=1.8:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.1.tgz#d7b4d08e1bfdb86ad2f1a3d039ea17304717abb5"
+  integrity sha512-XwIBPqcMn57FxfT+Go5pzySnm4KWkT1Tv7gjrpT1srtf8Weynl6R273VJ5GjkRb51IzMp5nbaPjJXMWeju2MKg==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
@@ -10605,6 +10641,11 @@ specificity@^0.4.1:
   resolved "https://registry.yarnpkg.com/specificity/-/specificity-0.4.1.tgz#aab5e645012db08ba182e151165738d00887b019"
   integrity sha512-1klA3Gi5PD1Wv9Q0wUoOQN1IWAuPu0D1U03ThXTr0cJ20+/iq2tHSDnK7Kk/0LXJ1ztUB2/1Os0wKmfyNgUQfg==
 
+spin.js@*:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/spin.js/-/spin.js-4.1.0.tgz#afcf12738fafd5f6aa0a385a5b4cec45c86a3555"
+  integrity sha512-WI8O1OdJlKjialIhB9Z5RfFFM4pI7Hohik76bB3N4Ep3N/vTDPZiRU8QeefyLbmpI5n2bFQXgticl2g+/KiKYA==
+
 split-string@^3.0.1, split-string@^3.0.2:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/split-string/-/split-string-3.1.0.tgz#7cb09dda3a86585705c64b39a6466038682e8fe2"
@@ -11645,9 +11686,9 @@ wbuf@^1.1.0, wbuf@^1.7.3:
     minimalistic-assert "^1.0.0"
 
 web-component-wrapper@*:
-  version "0.0.81"
-  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.81.tgz#6a72f7792ba7d90c33aeb5870fce9ee8d1deda03"
-  integrity sha512-EjfNXZsien67iCUMSIPWvLRhO6yq6I54MNz0gwaAtM4tvMfKXGJ/sKF74uG7KwNt3XEn0Hd2jTp/9UDSB+u7VA==
+  version "0.0.82"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.82.tgz#9e8c53c68b13f264b2eddf2dae83a4664aa5a6d7"
+  integrity sha512-I0PywGF0VHg/2Q3wZr8642c5LNPTUrtcg/yJt2Ww1N4FbBykOpH7NJmY/SRw71GpP78cucYyHFu4fUC9Wzh2jQ==
 
 webidl-conversions@^5.0.0:
   version "5.0.0"
@@ -11660,9 +11701,9 @@ webidl-conversions@^6.1.0:
   integrity sha512-qBIvFLGiBpLjfwmYAaHPXsn+ho5xZnGvyGvsarywGNc8VyQJUMHJ8OBKGGrPER0okBeMDaan4mNBlgBROxuI8w==
 
 weboptimizer@*:
-  version "2.0.819"
-  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.819.tgz#345f56e4e744decaa4a81458ab91b00393ca1f0b"
-  integrity sha512-kTdcho4CMAKEk9fDCm93UR2vvg0OAGW4AolRJ6+s5pgerGessUUcictf1mCjhk/p+9eY0LtcOE1WTy61N8Lb4A==
+  version "2.0.821"
+  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.821.tgz#93b8232854a7de5d428d269ec8808a2edae1763b"
+  integrity sha512-Bw/PH+5tjnto5Ap4WLmTk5yVRv4tH5cPfhpp60A05fHIWjNCuUUNssfAWZ81aln7zc+0kqUJUJSF50ZtaflAIA==
   dependencies:
     "@babel/core" "*"
     "@babel/plugin-proposal-class-properties" "*"
@@ -11823,6 +11864,17 @@ webpack@*:
     terser-webpack-plugin "^5.0.3"
     watchpack "^2.0.0"
     webpack-sources "^2.1.1"
+
+website-utilities@*:
+  version "1.0.221"
+  resolved "https://registry.yarnpkg.com/website-utilities/-/website-utilities-1.0.221.tgz#f7966bc8c4be08d1beb0272950a81842cc6d2a5d"
+  integrity sha512-8lIcFz6QTwBdUNzsWlzlhRJ4I2vJOsBX7oX1TH3SdC24jGo6PkTg/phhAAoX1eifG+fLliW/ocMOg3U1vyjrWw==
+  dependencies:
+    clientnode "*"
+    internationalisation "*"
+    jquery "*"
+    jquery.scrollto "*"
+    spin.js "*"
 
 websocket-driver@0.6.5:
   version "0.6.5"

@@ -138,7 +138,7 @@
     "react-useanimations": "*",
     "tinymce": "^5.0.0"
   },
-  "sideEffects": true,
+  "sideEffects": false,
   "webOptimizer": {
     "commandLine": {
       "test": {
