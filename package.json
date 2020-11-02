@@ -23,9 +23,10 @@
     "components",
     "helper.js",
     "helper.ts",
-    "index.styles.compiled.css",
+    "index.styles.css",
     "index.tsx",
     "material-fixes.css",
+    "material-fixes.styles.css",
     "type.ts"
   ],
   "main": "index.js",
@@ -38,7 +39,7 @@
     "build:export": "weboptimizer build '{__reference__: \"target:export\"}'",
     "check": "yarn check:types; yarn lint",
     "check:types": "weboptimizer check:types",
-    "clear": "weboptimizer clear",
+    "clear": "weboptimizer clear && rm *.styles.css components/*.styles.css",
     "document": "weboptimizer document",
     "lint": "weboptimizer lint",
     "prepare": "yarn build",
@@ -149,7 +150,7 @@
     "files": {
       "compose": {
         "cascadingStyleSheet": {
-          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['test:browser', 'serve'].includes(self.givenCommandLineArguments[2]) ? null : `${path.resolve(self.path.target.asset.cascadingStyleSheet, '[name].styles.compiled.css')}?${self.hashAlgorithm}=[chunkhash]`"
+          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['test:browser', 'serve'].includes(self.givenCommandLineArguments[2]) ? null : `${path.resolve(self.path.target.asset.cascadingStyleSheet, '[name].styles.css')}?${self.hashAlgorithm}=[chunkhash]`"
         }
       }
     },
