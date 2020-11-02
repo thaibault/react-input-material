@@ -291,7 +291,7 @@ export const GenericInputInner = function<Type = any>(
                 icon: <GenericAnimate
                     in={properties.value !== properties.default}
                 >
-                    {Dummy === UseAnimations ?
+                    {(UseAnimations as typeof Dummy).isDummy ?
                         <IconButton icon="clear"/> :
                         <UseAnimations animation={plusToX} reverse={true}/>
                     }
@@ -311,7 +311,7 @@ export const GenericInputInner = function<Type = any>(
         if (options === 'password_preset')
             return useMemorizedValue(
                 {
-                    icon: Dummy === UseAnimations ?
+                    icon: (UseAnimations as typeof Dummy).isDummy ?
                         <IconButton
                             icon={properties.hidden ? 'lock_open' : 'lock'}
                         /> :

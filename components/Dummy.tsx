@@ -31,11 +31,12 @@ import {Renderable} from '../type'
 /**
  * Generic strict wrapper component.
  */
-export const Dummy:FunctionComponent<any> = forwardRef(
+export const Dummy:FunctionComponent<any> & {isDummy:true} = forwardRef(
     ((properties:Mapping<any>, reference:null|RefObject<any>):ReactElement =>
         <div/>
     ) as ForwardRefRenderFunction<any, Mapping<any>>
-)
+) as unknown as FunctionComponent<any> & {isDummy:true}
+Dummy.isDummy = true
 export const CodeEditor = Dummy
 export const Editor = Dummy
 export const RichTextEditor = Dummy
