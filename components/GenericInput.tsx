@@ -703,9 +703,7 @@ export const GenericInputInner = function<Type = any>(
     ):DefaultProperties<Type> => {
         const result:DefaultProperties<Type> =
             mapPropertiesIntoModel<Props<Type>, Model<Type>>(
-                properties,
-                GenericInput.defaultProps.model as Model<Type>,
-                props
+                properties, GenericInput.defaultProps.model as Model<Type>
             ) as DefaultProperties<Type>
 
         result.model.value = parseValue<Properties<Type>, Type>(
@@ -1117,7 +1115,7 @@ export const GenericInputInner = function<Type = any>(
     })
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
     const initialValue:null|Type = determineInitialValue<Type>(
-        props, GenericInput.defaultProps.model?.default
+        givenProperties, GenericInput.defaultProps.model?.default
     )
     /*
         NOTE: This values have to share the same state item since they have to
@@ -1127,7 +1125,7 @@ export const GenericInputInner = function<Type = any>(
         {
             modelState: {...GenericInput.defaultModelState},
             representation: determineInitialRepresentation<Props<Type>, Type>(
-                props,
+                givenProperties,
                 GenericInput.defaultProps,
                 initialValue,
                 GenericInput.transformer
