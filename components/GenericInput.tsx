@@ -18,7 +18,6 @@
 */
 // region imports
 import Tools from 'clientnode'
-import {UndefinedSymbol} from 'clientnode/property-types'
 import {EvaluationResult} from 'clientnode/type'
 import React, {
     ComponentType,
@@ -79,6 +78,7 @@ import {
     mapPropertiesIntoModel,
     parseValue,
     transformValue,
+    translateKnownSymbols,
     triggerCallbackIfExists,
     useMemorizedValue
 } from '../helper'
@@ -737,9 +737,12 @@ export const GenericInputInner = function<Type = any>(
         if (!(result.editor === 'plain' || result.selectableEditor))
             result.editorIsActive = true
 
-        if (typeof result.representation !== 'string' && result.value)
+        if (
+            typeof result.representation !== 'string' &&
+            ![null, undefined].includes(result.value as null)
+        )
             result.representation = formatValue<Type>(
-                result.value,
+                result.value as Type,
                 result.type,
                 GenericInput.transformer,
                 !result.focused
@@ -804,13 +807,13 @@ export const GenericInputInner = function<Type = any>(
         let changed:boolean = false
         let stateChanged:boolean = false
 
-        if (oldValueState.model.focused) {
+        if (oldValueState.modelState.focused) {
             properties.focused = false
             changed = true
             stateChanged = true
         }
 
-        if (!oldValueState.model.visited) {
+        if (!oldValueState.modelState.visited) {
             properties.visited = true
             changed = true
             stateChanged = true
@@ -850,7 +853,7 @@ export const GenericInputInner = function<Type = any>(
 
         return changed ?
             {
-                model: properties.model.state,
+                modelState: properties.model.state,
                 representation: properties.representation,
                 value: properties.value
             } :
@@ -979,7 +982,7 @@ export const GenericInputInner = function<Type = any>(
 
             let stateChanged:boolean = false
 
-            if (oldValueState.model.pristine) {
+            if (oldValueState.modelState.pristine) {
                 properties.dirty = true
                 properties.pristine = false
                 stateChanged = true
@@ -988,7 +991,7 @@ export const GenericInputInner = function<Type = any>(
             onChange(event)
 
             if (determineValidationState<Type>(
-                properties, oldValueState.model
+                properties, oldValueState.modelState
             ))
                 stateChanged = true
 
@@ -997,7 +1000,7 @@ export const GenericInputInner = function<Type = any>(
             )
 
             if (stateChanged) {
-                result.model = properties.model.state
+                result.modelState = properties.model.state
 
                 triggerCallbackIfExists<Type>(
                     properties, 'changeState', properties.model.state, event
@@ -1064,12 +1067,12 @@ export const GenericInputInner = function<Type = any>(
         ):ValueState<Type, ModelState> => {
             let changedState:boolean = false
 
-            if (!oldValueState.model.focused) {
+            if (!oldValueState.modelState.focused) {
                 properties.focused = true
                 changedState = true
             }
 
-            if (oldValueState.model.untouched) {
+            if (oldValueState.modelState.untouched) {
                 properties.touched = true
                 properties.untouched = false
                 changedState = true
@@ -1080,7 +1083,7 @@ export const GenericInputInner = function<Type = any>(
             if (changedState) {
                 onChange(event)
 
-                result = {...oldValueState, model: properties.model.state}
+                result = {...oldValueState, modelState: properties.model.state}
 
                 triggerCallbackIfExists<Type>(
                     properties, 'changeState', properties.model.state, event
@@ -1106,7 +1109,7 @@ export const GenericInputInner = function<Type = any>(
     let richTextEditorInstance:RichTextEditor|undefined
     let richTextEditorReference:RichTextEditorComponent|undefined
     // / endregion
-    const givenProperties:Props<Type> = {...props}
+    const givenProperties:Props<Type> = translateKnownSymbols(props)
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
     let [hidden, setHidden] = useState<boolean|undefined>()
     let [editorState, setEditorState] = useState<EditorState>({
@@ -1122,7 +1125,7 @@ export const GenericInputInner = function<Type = any>(
     */
     const [valueState, setValueState] = useState<ValueState<Type, ModelState>>(
         {
-            model: {...GenericInput.defaultModelState},
+            modelState: {...GenericInput.defaultModelState},
             representation: determineInitialRepresentation<Props<Type>, Type>(
                 props,
                 GenericInput.defaultProps,
@@ -1138,32 +1141,20 @@ export const GenericInputInner = function<Type = any>(
         typeof givenProperties.cursor !== 'object'
     )
         givenProperties.cursor = {} as CursorState
-    if ([undefined, UndefinedSymbol].includes(
-        givenProperties.cursor.end as unknown as undefined
-    ))
+    if (givenProperties.cursor.end === undefined)
         givenProperties.cursor.end = cursor.end
-    if ([undefined, UndefinedSymbol].includes(
-        givenProperties.cursor.start as unknown as undefined
-    ))
+    if (givenProperties.cursor.start === undefined)
         givenProperties.cursor.start = cursor.start
 
-    if ([undefined, UndefinedSymbol].includes(
-        givenProperties.editorIsActive as unknown as undefined
-    ))
+    if (givenProperties.editorIsActive === undefined)
         givenProperties.editorIsActive = editorState.editorIsActive
 
-    if ([undefined, UndefinedSymbol].includes(
-        givenProperties.hidden as unknown as undefined
-    ))
+    if (givenProperties.hidden === undefined)
         givenProperties.hidden = hidden
-    if ([undefined, UndefinedSymbol].includes(
-        givenProperties.hidden as unknown as undefined
-    ))
+    if (givenProperties.hidden === undefined)
         givenProperties.hidden = givenProperties.name?.startsWith('password')
 
-    if ([undefined, UndefinedSymbol].includes(
-        givenProperties.showDeclaration as unknown as undefined
-    ))
+    if (givenProperties.showDeclaration === undefined)
         givenProperties.showDeclaration = showDeclaration
     // // region value state
     /*
@@ -1172,34 +1163,28 @@ export const GenericInputInner = function<Type = any>(
         each other.
     */
     givenProperties.model = {...givenProperties.model}
-    if ([undefined, UndefinedSymbol].includes(
-        givenProperties.model.value as unknown as undefined
-    ))
+    if (givenProperties.model.value === undefined)
         givenProperties.model.value = valueState.value
 
-    if ([undefined, UndefinedSymbol].includes(
-        givenProperties.value as unknown as undefined
-    ))
-        if ([undefined, UndefinedSymbol].includes(
-            givenProperties.representation as unknown as undefined
-        ))
+    if (givenProperties.value === undefined) {
+        if (givenProperties.representation === undefined)
             givenProperties.representation = valueState.representation
-    else
+    } else
         givenProperties.representation = undefined
 
     if (givenProperties.model.state)
         givenProperties.model.state = {...givenProperties.model.state}
     else
         givenProperties.model.state = {} as ModelState
-    for (const key in valueState.model)
+    for (const key in valueState.modelState)
         if (
-            Object.prototype.hasOwnProperty.call(valueState.model, key) &&
-            [undefined, UndefinedSymbol].includes((
+            Object.prototype.hasOwnProperty.call(valueState.modelState, key) &&
+            (
                 givenProperties.model.state as Partial<ModelState>
-            )[key as keyof ModelState] as unknown as undefined)
+            )[key as keyof ModelState] === undefined
         )
             givenProperties.model.state[key as keyof ModelState] =
-                valueState.model[key as keyof ModelState]
+                valueState.modelState[key as keyof ModelState]
     // // endregion
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
@@ -1214,13 +1199,14 @@ export const GenericInputInner = function<Type = any>(
         setHidden(properties.hidden)
     if (properties.showDeclaration !== showDeclaration)
         setShowDeclaration(properties.showDeclaration)
+
     if (!(
         properties.value === valueState.value &&
         properties.representation === valueState.representation &&
-        Tools.equals(properties.model.state, valueState.model)
+        Tools.equals(properties.model.state, valueState.modelState)
     ))
         setValueState({
-            model: properties.model.state,
+            modelState: properties.model.state,
             representation: properties.representation,
             value: properties.value as null|Type
         })
@@ -1252,7 +1238,7 @@ export const GenericInputInner = function<Type = any>(
                 cursor: properties.cursor,
                 editorIsActive: properties.editorIsActive,
                 hidden: properties.hidden,
-                model: properties.model.state,
+                modelState: properties.model.state,
                 representation: properties.representation,
                 showDeclaration: properties.showDeclaration,
                 value: properties.value as null|Type
