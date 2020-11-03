@@ -27,7 +27,8 @@ import PropertyTypes, {
     objectOf,
     oneOfType,
     shape,
-    string
+    string,
+    symbol
 } from 'clientnode/property-types'
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
@@ -41,6 +42,7 @@ import {
     MouseEvent,
     ReactElement,
     RefAttributes,
+    Requireable,
     SyntheticEvent
 } from 'react'
 import {IconOptions, RipplePropT} from '@rmwc/types'
@@ -195,17 +197,17 @@ export const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     value: any
 } as const
 export const modelStatePropertyTypes:{
-    [key in keyof ModelState]:typeof boolean
+    [key in keyof ModelState]:Requireable<boolean|symbol>
 } = {
-    dirty: boolean,
-    focused: boolean,
-    invalid: boolean,
-    invalidRequired: boolean,
-    pristine: boolean,
-    touched: boolean,
-    untouched: boolean,
-    valid: boolean,
-    visited: boolean
+    dirty: oneOfType([boolean, symbol]),
+    focused: oneOfType([boolean, symbol]),
+    invalid: oneOfType([boolean, symbol]),
+    invalidRequired: oneOfType([boolean, symbol]),
+    pristine: oneOfType([boolean, symbol]),
+    touched: oneOfType([boolean, symbol]),
+    untouched: oneOfType([boolean, symbol]),
+    valid: oneOfType([boolean, symbol]),
+    visited: oneOfType([boolean, symbol])
 } as const
 export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...baseModelPropertyTypes,
@@ -238,7 +240,7 @@ export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     required: boolean,
     requiredText: string,
     ripple: oneOfType([boolean, object]),
-    showDeclaration: boolean,
+    showDeclaration: oneOfType([boolean, symbol]),
     showInitialValidationState: boolean,
     theme: object,
     /*
@@ -424,14 +426,14 @@ export type StaticFunctionInputComponent<Type = any> =
     StaticWebInputComponent<Type>
 // // region constants
 export const inputModelStatePropertyTypes:{
-    [key in keyof InputModelState]:typeof boolean
+    [key in keyof InputModelState]:Requireable<boolean|symbol>
 } = {
     ...modelStatePropertyTypes,
-    invalidMaximum: boolean,
-    invalidMaximumLength: boolean,
-    invalidMinimum: boolean,
-    invalidMinimumLength: boolean,
-    invalidPattern: boolean
+    invalidMaximum: oneOfType([boolean, symbol]),
+    invalidMaximumLength: oneOfType([boolean, symbol]),
+    invalidMinimum: oneOfType([boolean, symbol]),
+    invalidMinimumLength: oneOfType([boolean, symbol]),
+    invalidPattern: oneOfType([boolean, symbol])
 } as const
 export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -442,10 +444,13 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
         align: oneOf(['end', 'start']),
     */
     align: string,
-    cursor: shape({
-        end: number.isRequired,
-        start: number.isRequired
-    }),
+    cursor: oneOfType([
+        shape({
+            end: number.isRequired,
+            start: number.isRequired
+        }),
+        symbol
+    ]),
     /*
         NOTE: Not yet working:
         editor: oneOf([
@@ -461,14 +466,14 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
         ]),
     */
     editor: string,
-    editorIsActive: boolean,
+    editorIsActive: oneOfType([boolean, symbol]),
     fullWidth: boolean,
     /*
         NOTE: Not yet working:
         icon?:string|(IconOptions & {tooltip?:string|TooltipProps})
     */
     icon: oneOfType([string, object]),
-    hidden: boolean,
+    hidden: oneOfType([boolean, symbol]),
     maximumLengthText: string,
     maximumText: string,
     minimumLengthText: string,
