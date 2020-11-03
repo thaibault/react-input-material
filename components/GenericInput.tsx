@@ -17,7 +17,8 @@
     endregion
 */
 // region imports
-import Tools, {IgnoreNullAndUndefinedSymbol} from 'clientnode'
+import Tools from 'clientnode'
+import {UndefinedSymbol} from 'clientnode/property-types'
 import {EvaluationResult} from 'clientnode/type'
 import React, {
     ComponentType,
@@ -285,7 +286,9 @@ export const GenericInputInner = function<Type = any>(
      * @param options - Icon options to extend of known preset identified.
      * @return Given potential extended icon configuration.
      */
-    const applyIconPreset = (options?:Properties['icon']):IconOptions|string|undefined => {
+    const applyIconPreset = (
+        options?:Properties['icon']
+    ):IconOptions|string|undefined => {
         if (options === 'clear_preset')
             return {
                 icon: <GenericAnimate
@@ -430,7 +433,8 @@ export const GenericInputInner = function<Type = any>(
      */
     const wrapAnimationConditionally = (
         content:Renderable,
-        propertiesOrInCondition:boolean|Partial<TransitionProps<HTMLElement|undefined>> = {},
+        propertiesOrInCondition:boolean|Partial<TransitionProps<HTMLElement|undefined>> =
+            {},
         condition:boolean = true
     ):Renderable => {
         if (typeof propertiesOrInCondition === 'boolean')
@@ -1109,7 +1113,9 @@ export const GenericInputInner = function<Type = any>(
         editorIsActive: false, selectionIsUnstable: false
     })
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
-    const initialValue:null|Type = determineInitialValue<Type>(props)
+    const initialValue:null|Type = determineInitialValue<Type>(
+        props, GenericInput.defaultProps.model?.default
+    )
     /*
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
@@ -1127,22 +1133,37 @@ export const GenericInputInner = function<Type = any>(
         }
     )
     // / region derive missing properties from state variables and back
-    if (!givenProperties.cursor)
+    if (
+        givenProperties.cursor === null ||
+        typeof givenProperties.cursor !== 'object'
+    )
         givenProperties.cursor = {} as CursorState
-    if (givenProperties.cursor.end === undefined)
+    if ([undefined, UndefinedSymbol].includes(
+        givenProperties.cursor.end as unknown as undefined
+    ))
         givenProperties.cursor.end = cursor.end
-    if (givenProperties.cursor.start === undefined)
+    if ([undefined, UndefinedSymbol].includes(
+        givenProperties.cursor.start as unknown as undefined
+    ))
         givenProperties.cursor.start = cursor.start
 
-    if (givenProperties.editorIsActive === undefined)
+    if ([undefined, UndefinedSymbol].includes(
+        givenProperties.editorIsActive as unknown as undefined
+    ))
         givenProperties.editorIsActive = editorState.editorIsActive
 
-    if (givenProperties.hidden === undefined)
+    if ([undefined, UndefinedSymbol].includes(
+        givenProperties.hidden as unknown as undefined
+    ))
         givenProperties.hidden = hidden
-    if (givenProperties.hidden === undefined)
+    if ([undefined, UndefinedSymbol].includes(
+        givenProperties.hidden as unknown as undefined
+    ))
         givenProperties.hidden = givenProperties.name?.startsWith('password')
 
-    if (givenProperties.showDeclaration === undefined)
+    if ([undefined, UndefinedSymbol].includes(
+        givenProperties.showDeclaration as unknown as undefined
+    ))
         givenProperties.showDeclaration = showDeclaration
     // // region value state
     /*
@@ -1151,11 +1172,17 @@ export const GenericInputInner = function<Type = any>(
         each other.
     */
     givenProperties.model = {...givenProperties.model}
-    if (givenProperties.model.value === undefined)
+    if ([undefined, UndefinedSymbol].includes(
+        givenProperties.model.value as unknown as undefined
+    ))
         givenProperties.model.value = valueState.value
 
-    if (givenProperties.value === undefined)
-        if (givenProperties.representation === undefined)
+    if ([undefined, UndefinedSymbol].includes(
+        givenProperties.value as unknown as undefined
+    ))
+        if ([undefined, UndefinedSymbol].includes(
+            givenProperties.representation as unknown as undefined
+        ))
             givenProperties.representation = valueState.representation
     else
         givenProperties.representation = undefined
@@ -1167,9 +1194,9 @@ export const GenericInputInner = function<Type = any>(
     for (const key in valueState.model)
         if (
             Object.prototype.hasOwnProperty.call(valueState.model, key) &&
-            (
+            [undefined, UndefinedSymbol].includes((
                 givenProperties.model.state as Partial<ModelState>
-            )[key as keyof ModelState] === undefined
+            )[key as keyof ModelState] as unknown as undefined)
         )
             givenProperties.model.state[key as keyof ModelState] =
                 valueState.model[key as keyof ModelState]

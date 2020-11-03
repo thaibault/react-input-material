@@ -322,7 +322,6 @@ export const defaultCheckboxModel:Model<boolean> = {
 }
 export const defaultCheckboxProperties:CheckboxProps = {
     ...defaultProperties,
-    initialValue: false,
     model: {...defaultCheckboxModel},
     requiredText: 'Please check this field.',
 } as const

@@ -18,6 +18,7 @@
 */
 // region imports 
 import Tools from 'clientnode'
+import {UndefinedSymbol} from 'clientnode/property-types'
 import {Mapping, ValueOf} from 'clientnode/type'
 import {ReactElement, useMemo} from 'react'
 import {render as renderReact, unmountComponentAtNode} from 'react-dom'
@@ -63,19 +64,30 @@ export const triggerCallbackIfExists = <Type = any>(
  * @returns Determined value.
  */
 export const determineInitialValue = <Type = any>(
-    properties:Props<Type>, alternateValue?:null|Type
+    properties:Props<Type>, defaultValue?:null|Type, alternateValue?:null|Type
 ):null|Type => {
-    if (alternateValue !== undefined)
-        return alternateValue
-    if (properties.value !== undefined)
+    if (![UndefinedSymbol, undefined].includes(alternateValue as undefined))
+        return alternateValue as null|Type
+    if (![UndefinedSymbol, undefined].includes(properties.value as undefined))
         return properties.value as null|Type
-    if (properties.model?.value !== undefined)
-        return properties.model.value as null|Type
-    if (
-        Object.prototype.hasOwnProperty.call(properties, 'initialValue') &&
-        properties.initialValue !== undefined
-    )
+    if (![UndefinedSymbol, undefined].includes(
+        properties.model?.value as undefined
+    ))
+        return properties.model!.value as null|Type
+    if (![UndefinedSymbol, undefined].includes(
+        properties.initialValue as undefined
+    ))
         return properties.initialValue as null|Type
+    if (![UndefinedSymbol, undefined].includes(
+        properties.default as undefined
+    ))
+        return properties.default as null|Type
+    if (![UndefinedSymbol, undefined].includes(
+        properties.model?.default as undefined
+    ))
+        return properties.model!.default as null|Type
+    if (![UndefinedSymbol, undefined].includes(defaultValue as undefined))
+        return defaultValue as null|Type
     return null
 }
 /**
@@ -168,7 +180,9 @@ export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
     for (const [name, value] of Object.entries(result.model))
         if (
             Object.prototype.hasOwnProperty.call(result, name) &&
-            result[name as keyof P] !== undefined
+            ![UndefinedSymbol, undefined].includes(
+                result[name as keyof P] as unknown as undefined
+            )
         )
             (result.model[name as keyof M] as ValueOf<M>) =
                 result[name as keyof P] as unknown as ValueOf<M>
@@ -176,12 +190,14 @@ export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
     for (const [name, value] of Object.entries(result.model.state))
         if (
             Object.prototype.hasOwnProperty.call(result, name) &&
-            result[name as keyof ModelState] !== undefined
+            ![UndefinedSymbol, undefined].includes(
+                result[name as keyof ModelState] as undefined
+            )
         )
             result.model.state[name as keyof ModelState] =
                 result[name as keyof P] as unknown as ValueOf<ModelState>
 
-    if (result.model.value === undefined)
+    if ([UndefinedSymbol, undefined].includes(result.model.value))
         result.model.value = result.model.default
     // else -> Controlled component via model's "value" property.
     // endregion
@@ -240,7 +256,7 @@ export const parseValue = <P extends Properties, Type = any>(
     if (configuration.emptyEqualsNull && value === '')
         return null
     if (
-        ![null, undefined].includes(value) &&
+        ![null, UndefinedSymbol, undefined].includes(value) &&
         Object.prototype.hasOwnProperty.call(
             transformer, configuration.type
         ) &&

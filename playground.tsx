@@ -83,9 +83,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
             />
             <GenericInput
-                initialValue="value3Model"
                 model={useMemorizedValue({
                     declaration: 'Disabled',
+                    default: 'value3Model',
                     mutable: false,
                     name: 'input3Model'
                 })}
@@ -102,10 +102,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 required
                 trailingIcon="clear_preset"
             />
-
             <GenericInput
+                default="value4Model"
                 icon="backup"
-                initialValue="value4Model"
                 model={useMemorizedValue({
                     declaration: 'placeholder',
                     name: 'input4Model',
@@ -432,7 +431,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <RequireableCheckbox
-                disabled name="checkbox2" onChange={onChange} required
+                default disabled name="checkbox2" onChange={onChange} required
             />
             <RequireableCheckbox
                 model={useMemorizedValue(
@@ -444,15 +443,19 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <RequireableCheckbox
+                description="checkbox3Description"
                 name="checkbox3"
                 onChange={onChange}
                 required
                 showInitialValidationState
             />
             <RequireableCheckbox
-                model={useMemorizedValue(
-                    {name: 'checkbox3Model', nullable: false}
-                )}
+                model={useMemorizedValue({
+                    default: true,
+                    description: 'checkbox3ModelDescription',
+                    name: 'checkbox3Model',
+                    nullable: false
+                })}
                 onChange={onChange}
                 showInitialValidationState
                 tooltip="Check this one!"
