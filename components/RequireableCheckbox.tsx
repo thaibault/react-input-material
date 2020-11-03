@@ -18,6 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
+import {UndefinedSymbol} from 'clientnode/property-types'
 import React, {
     createRef,
     FocusEvent as ReactFocusEvent,
@@ -208,8 +209,17 @@ export const RequireableCheckboxInner = function(
         ) {
             event = eventOrValue as SyntheticEvent
             properties.value = (
-                typeof (event.target as {checked?:boolean|null}).checked ===
-                    'undefined' &&
+                (
+                    typeof (
+                        event.target as {checked?:boolean|null}
+                    ).checked === 'undefined' ||
+                    (
+                        event.target as
+                            unknown as
+                            {checked:typeof UndefinedSymbol}
+                    ).checked === UndefinedSymbol
+                )
+                &&
                 typeof properties.indeterminate === 'boolean'
             ) ?
                 null :
@@ -326,8 +336,9 @@ export const RequireableCheckboxInner = function(
     // / endregion
     const givenProperties:Props = {...props}
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
-    const initialValue:boolean|null =
-        determineInitialValue<boolean>(props, props.checked)
+    const initialValue:boolean|null = determineInitialValue<boolean>(
+        props, RequireableCheckbox.defaultProps.model.default, props.checked
+    )
     /*
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
@@ -338,7 +349,9 @@ export const RequireableCheckboxInner = function(
             value: initialValue
         })
     // / region derive missing properties from state variables and back
-    if (givenProperties.showDeclaration === undefined)
+    if ([UndefinedSymbol, undefined].includes(
+        givenProperties.showDeclaration as unknown as undefined
+    ))
         givenProperties.showDeclaration = showDeclaration
     // // region value state
     /*
@@ -347,7 +360,9 @@ export const RequireableCheckboxInner = function(
         each other.
     */
     givenProperties.model = {...givenProperties.model}
-    if (givenProperties.model.value === undefined)
+    if ([UndefinedSymbol, undefined].includes(
+        givenProperties.model.value as unknown as undefined
+    ))
         givenProperties.model.value = valueState.value
 
     if (givenProperties.model.state)
@@ -357,9 +372,9 @@ export const RequireableCheckboxInner = function(
     for (const key in valueState.model)
         if (
             Object.prototype.hasOwnProperty.call(valueState.model, key) &&
-            (
+            [UndefinedSymbol, undefined].includes((
                 givenProperties.model.state as Partial<ModelState>
-            )[key as keyof ModelState] === undefined
+            )[key as keyof ModelState] as unknown as undefined)
         )
             givenProperties.model.state[key as keyof ModelState] =
                 valueState.model[key as keyof ModelState]
@@ -402,7 +417,7 @@ export const RequireableCheckboxInner = function(
         tooltip={properties.tooltip}
     ><div className={styles['requireable-checkbox']}>
         <Checkbox
-            checked={properties.value === null ? undefined : properties.value}
+            checked={Boolean(properties.value)}
             disabled={properties.disabled}
             foundationRef={
                 foundationRef as unknown as RefCallback<MDCCheckboxFoundation>
