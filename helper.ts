@@ -119,12 +119,7 @@ export const determineValidationState = <P extends Properties<any>>(
 
     validators = {
         invalidRequired: ():boolean => (
-            properties.model.nullable === false &&
-            (
-                properties.model.value === null ||
-                typeof properties.indeterminate !== 'boolean' &&
-                !properties.model.value
-            )
+            properties.model.nullable === false && !properties.model.value
         ),
         ...validators
     }
@@ -151,15 +146,11 @@ export const determineValidationState = <P extends Properties<any>>(
  * properties.
  * @param properties - Properties to merge.
  * @param defaultModel - Default model to merge.
- * @param initialProperties - Initial unmodified properties to take into
- * account.
  * @returns Merged properties.
 */
 export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
-    properties:P, defaultModel:M, initialProperties?:P
+    properties:P, defaultModel:M
 ):P => {
-    if (!initialProperties)
-        initialProperties = properties
     /*
         NOTE: Default props seems not to respect nested layers to merge so
         we have to manage this for nested model structure.

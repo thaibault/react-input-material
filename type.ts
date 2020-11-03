@@ -116,7 +116,6 @@ export type Properties<Type = any> =
     {
         disabled:boolean
         id:string
-        indeterminate:boolean|null
         initialValue:null|Type
         label:string
         model:Model<Type>
@@ -227,7 +226,6 @@ export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...baseModelPropertyTypes,
     ...modelStatePropertyTypes,
     disabled: boolean,
-    indeterminate: boolean,
     initialValue: any,
     model: shape<any>(modelPropertyTypes),
     onChange: func,
@@ -281,7 +279,6 @@ export const defaultModel:Model = {
     writable: true
 } as const
 export const defaultProperties:DefaultProperties = {
-    indeterminate: null,
     model: {...defaultModel},
     showDeclaration: undefined,
     showInitialValidationState: false,
@@ -293,9 +290,8 @@ export const defaultProperties:DefaultProperties = {
 export type CheckboxProperties =
     Properties<boolean> &
     {
-        checked:null|boolean
+        checked:boolean
         id:string
-        indeterminate:boolean|null
         onChange:(properties:CheckboxProperties, event?:SyntheticEvent) => void
     }
 export type CheckboxModel = Model<boolean>
@@ -314,7 +310,6 @@ export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
     checked: boolean,
     id: string,
-    indeterminate: boolean
 } as const
 export const defaultCheckboxModel:Model<boolean> = {
     ...defaultModel,

@@ -98,9 +98,7 @@ export const RequireableCheckboxInner = function(
      */
     const getConsolidatedProperties = (properties:Props):Properties => {
         let result:Props = mapPropertiesIntoModel<Props, Model>(
-            properties,
-            RequireableCheckbox.defaultProps.model as Model,
-            props
+            properties, RequireableCheckbox.defaultProps.model as Model
         )
 
         determineValidationState<Properties>(
@@ -109,7 +107,7 @@ export const RequireableCheckboxInner = function(
 
         result = getBaseConsolidatedProperties<Props, Properties>(result)
 
-        result.checked = result.value
+        result.checked = Boolean(result.value)
 
         return result as Properties
     }
@@ -208,22 +206,9 @@ export const RequireableCheckboxInner = function(
             (eventOrValue as SyntheticEvent).target
         ) {
             event = eventOrValue as SyntheticEvent
-            properties.value = (
-                (
-                    typeof (
-                        event.target as {checked?:boolean|null}
-                    ).checked === 'undefined' ||
-                    (
-                        event.target as unknown as {checked:undefined}
-                    ).checked === undefined
-                )
-                &&
-                typeof properties.indeterminate === 'boolean'
-            ) ?
-                null :
-                Boolean(
-                    (event.target as unknown as {checked:boolean|null}).checked
-                )
+            properties.value = Boolean(
+                (event.target as unknown as {checked:boolean|null}).checked
+            )
         } else
             properties.value = eventOrValue as boolean|null
 
@@ -335,7 +320,9 @@ export const RequireableCheckboxInner = function(
     const givenProperties:Props = translateKnownSymbols(props)
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
     const initialValue:boolean|null = determineInitialValue<boolean>(
-        props, RequireableCheckbox.defaultProps.model.default, props.checked
+        givenProperties,
+        RequireableCheckbox.defaultProps.model.default,
+        givenProperties.checked
     )
     /*
         NOTE: This values have to share the same state item since they have to
@@ -417,9 +404,7 @@ export const RequireableCheckboxInner = function(
                 foundationRef as unknown as RefCallback<MDCCheckboxFoundation>
             }
             id={properties.id || properties.name}
-            indeterminate={
-                properties.indeterminate || properties.value === null
-            }
+            indeterminate={properties.value === null}
             inputRef={
                 inputReference as unknown as RefCallback<HTMLInputElement>
             }
