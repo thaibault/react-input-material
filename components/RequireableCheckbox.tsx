@@ -18,7 +18,6 @@
 */
 // region imports
 import Tools from 'clientnode'
-import {UndefinedSymbol} from 'clientnode/property-types'
 import React, {
     createRef,
     FocusEvent as ReactFocusEvent,
@@ -44,6 +43,7 @@ import {
     determineValidationState,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
+    translateKnownSymbols,
     triggerCallbackIfExists
 } from '../helper'
 import {
@@ -125,12 +125,12 @@ export const RequireableCheckboxInner = function(
     ):ValueState<boolean, ModelState> => {
         let changed:boolean = false
 
-        if (oldValueState.model.focused) {
+        if (oldValueState.modelState.focused) {
             properties.focused = false
             changed = true
         }
 
-        if (!oldValueState.model.visited) {
+        if (!oldValueState.modelState.visited) {
             properties.visited = true
             changed = true
         }
@@ -146,7 +146,7 @@ export const RequireableCheckboxInner = function(
         triggerCallbackIfExists<boolean>(properties, 'blur', event)
 
         return changed ?
-            {...oldValueState, model: properties.model.state} :
+            {...oldValueState, modelState: properties.model.state} :
             oldValueState
     })
     /**
@@ -214,10 +214,8 @@ export const RequireableCheckboxInner = function(
                         event.target as {checked?:boolean|null}
                     ).checked === 'undefined' ||
                     (
-                        event.target as
-                            unknown as
-                            {checked:typeof UndefinedSymbol}
-                    ).checked === UndefinedSymbol
+                        event.target as unknown as {checked:undefined}
+                    ).checked === undefined
                 )
                 &&
                 typeof properties.indeterminate === 'boolean'
@@ -240,7 +238,7 @@ export const RequireableCheckboxInner = function(
             const result:ValueState<boolean, ModelState> =
                 {...oldValueState, value: properties.value as boolean|null}
 
-            if (oldValueState.model.pristine) {
+            if (oldValueState.modelState.pristine) {
                 properties.dirty = true
                 properties.pristine = false
                 stateChanged = true
@@ -249,7 +247,7 @@ export const RequireableCheckboxInner = function(
             onChange(event)
 
             if (determineValidationState<Properties>(
-                properties, oldValueState.model
+                properties, oldValueState.modelState
             ))
                 stateChanged = true
 
@@ -258,7 +256,7 @@ export const RequireableCheckboxInner = function(
             )
 
             if (stateChanged) {
-                result.model = properties.model.state
+                result.modelState = properties.model.state
 
                 triggerCallbackIfExists<boolean>(
                     properties, 'changeState', properties.model.state, event
@@ -299,12 +297,12 @@ export const RequireableCheckboxInner = function(
         ):ValueState<boolean, ModelState> => {
             let changedState:boolean = false
 
-            if (!oldValueState.model.focused) {
+            if (!oldValueState.modelState.focused) {
                 properties.focused = true
                 changedState = true
             }
 
-            if (oldValueState.model.untouched) {
+            if (oldValueState.modelState.untouched) {
                 properties.touched = true
                 properties.untouched = false
                 changedState = true
@@ -315,7 +313,7 @@ export const RequireableCheckboxInner = function(
             if (changedState) {
                 onChange(event)
 
-                result = {...oldValueState, model: properties.model.state}
+                result = {...oldValueState, modelState: properties.model.state}
 
                 triggerCallbackIfExists<boolean>(
                     properties, 'changeState', properties.model.state, event
@@ -334,7 +332,7 @@ export const RequireableCheckboxInner = function(
     const foundationRef:RefObject<MDCCheckboxFoundation> =
         createRef<MDCCheckboxFoundation>()
     // / endregion
-    const givenProperties:Props = {...props}
+    const givenProperties:Props = translateKnownSymbols(props)
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
     const initialValue:boolean|null = determineInitialValue<boolean>(
         props, RequireableCheckbox.defaultProps.model.default, props.checked
@@ -345,13 +343,11 @@ export const RequireableCheckboxInner = function(
     */
     const [valueState, setValueState] =
         useState<ValueState<boolean, ModelState>>({
-            model: {...RequireableCheckbox.defaultModelState},
+            modelState: {...RequireableCheckbox.defaultModelState},
             value: initialValue
         })
     // / region derive missing properties from state variables and back
-    if ([UndefinedSymbol, undefined].includes(
-        givenProperties.showDeclaration as unknown as undefined
-    ))
+    if (givenProperties.showDeclaration === undefined)
         givenProperties.showDeclaration = showDeclaration
     // // region value state
     /*
@@ -360,34 +356,32 @@ export const RequireableCheckboxInner = function(
         each other.
     */
     givenProperties.model = {...givenProperties.model}
-    if ([UndefinedSymbol, undefined].includes(
-        givenProperties.model.value as unknown as undefined
-    ))
+    if (givenProperties.model.value === undefined)
         givenProperties.model.value = valueState.value
 
     if (givenProperties.model.state)
         givenProperties.model.state = {...givenProperties.model.state}
     else
         givenProperties.model.state = {} as ModelState
-    for (const key in valueState.model)
+    for (const key in valueState.modelState)
         if (
-            Object.prototype.hasOwnProperty.call(valueState.model, key) &&
-            [UndefinedSymbol, undefined].includes((
+            Object.prototype.hasOwnProperty.call(valueState.modelState, key) &&
+            (
                 givenProperties.model.state as Partial<ModelState>
-            )[key as keyof ModelState] as unknown as undefined)
+            )[key as keyof ModelState] === undefined
         )
             givenProperties.model.state[key as keyof ModelState] =
-                valueState.model[key as keyof ModelState]
+                valueState.modelState[key as keyof ModelState]
     // // endregion
     const properties:Properties = getConsolidatedProperties(givenProperties)
     if (properties.showDeclaration !== showDeclaration)
         setShowDeclaration(properties.showDeclaration)
     if (!(
         properties.value === valueState.value &&
-        Tools.equals(properties.model.state, valueState.model)
+        Tools.equals(properties.model.state, valueState.modelState)
     ))
         setValueState({
-            model: properties.model.state,
+            modelState: properties.model.state,
             value: properties.value as boolean|null
         })
     // / endregion
@@ -402,7 +396,7 @@ export const RequireableCheckboxInner = function(
             properties,
             references: {foundationRef, inputReference},
             state: {
-                model: properties.model.state,
+                modelState: properties.model.state,
                 showDeclaration: properties.showDeclaration,
                 value: properties.value as boolean|null
             }

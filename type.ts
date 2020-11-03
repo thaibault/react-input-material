@@ -145,7 +145,7 @@ export type DefaultProperties<Type = any> =
     Omit<Props<Type>, 'model'> &
     {model:Model<Type>}
 export type State<Type = any> = {
-    model:ModelState
+    modelState:ModelState
     showDeclaration:boolean
     value:null|Type
 }
@@ -162,7 +162,7 @@ export type StaticFunctionComponent<Type = any> =
     Omit<FunctionComponent<Props<Type>>, 'defaultProps'|'propTypes'> &
     StaticComponent<Type>
 export type ValueState<Type = any, MS = ModelState> = {
-    model:MS
+    modelState:MS
     representation?:string
     value:null|Type
 }
@@ -390,7 +390,7 @@ export type InputState<Type = any> =
         cursor:CursorState
         editorIsActive:boolean
         hidden?:boolean
-        model:InputModelState
+        modelState:InputModelState
         representation?:string
         selectionIsUnstable:boolean
     }
@@ -485,7 +485,7 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     outlined: boolean,
     patternText: string,
     placeholder: string,
-    representation: string,
+    representation: oneOfType([string, symbol]),
     rows: number,
     selectableEditor: boolean,
     trailingIcon: any

@@ -18,7 +18,7 @@
 */
 // region imports 
 import Tools from 'clientnode'
-import {UndefinedSymbol} from 'clientnode/property-types'
+import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 import {Mapping, ValueOf} from 'clientnode/type'
 import {ReactElement, useMemo} from 'react'
 import {render as renderReact, unmountComponentAtNode} from 'react-dom'
@@ -59,35 +59,47 @@ export const triggerCallbackIfExists = <Type = any>(
 }
 // region consolidation state
 /**
+ * Translate known symbols in properties.
+ * @param properties - Object to translate.
+ * @returns Transformed properties.
+ */
+export const translateKnownSymbols = <Type = any>(
+    properties:Mapping<typeof NullSymbol|Type|typeof UndefinedSymbol>
+):Mapping<Type> => {
+    const result:Mapping<Type> = {}
+    for (const [name, value] of Object.entries(properties))
+        if (value === UndefinedSymbol)
+            (result[name] as unknown as undefined) = undefined
+        else if (value === NullSymbol)
+            (result[name] as unknown as null) = null
+        else
+            result[name] = properties[name] as Type
+    return result
+}
+/**
  * Determines initial value depending on given properties.
  * @param properties - Components properties.
+ * @param defaultValue - Internal fallback value.
+ * @param alternateValue - Alternate value to respect.
  * @returns Determined value.
  */
 export const determineInitialValue = <Type = any>(
     properties:Props<Type>, defaultValue?:null|Type, alternateValue?:null|Type
 ):null|Type => {
-    if (![UndefinedSymbol, undefined].includes(alternateValue as undefined))
+    if (alternateValue !== undefined)
         return alternateValue as null|Type
-    if (![UndefinedSymbol, undefined].includes(properties.value as undefined))
+    if (properties.value !== undefined)
         return properties.value as null|Type
-    if (![UndefinedSymbol, undefined].includes(
-        properties.model?.value as undefined
-    ))
+    if (properties.model?.value !== undefined)
         return properties.model!.value as null|Type
-    if (![UndefinedSymbol, undefined].includes(
-        properties.initialValue as undefined
-    ))
+    if (properties.initialValue !== undefined)
         return properties.initialValue as null|Type
-    if (![UndefinedSymbol, undefined].includes(
-        properties.default as undefined
-    ))
+    if (properties.default !== undefined)
         return properties.default as null|Type
-    if (![UndefinedSymbol, undefined].includes(
-        properties.model?.default as undefined
-    ))
+    if (properties.model?.default !== undefined)
         return properties.model!.default as null|Type
-    if (![UndefinedSymbol, undefined].includes(defaultValue as undefined))
-        return defaultValue as null|Type
+    if (defaultValue !== undefined)
+        return defaultValue
     return null
 }
 /**
@@ -120,7 +132,8 @@ export const determineValidationState = <P extends Properties<any>>(
         const oldValue:boolean = currentState[name as keyof ModelState]
         properties.model.state[name as keyof ModelState] = validator()
         changed =
-            changed || oldValue !== currentState[name as keyof ModelState]
+            changed ||
+            oldValue !== currentState[name as keyof ModelState]
     }
 
     if (changed) {
@@ -180,9 +193,7 @@ export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
     for (const [name, value] of Object.entries(result.model))
         if (
             Object.prototype.hasOwnProperty.call(result, name) &&
-            ![UndefinedSymbol, undefined].includes(
-                result[name as keyof P] as unknown as undefined
-            )
+            result[name as keyof P] !== undefined
         )
             (result.model[name as keyof M] as ValueOf<M>) =
                 result[name as keyof P] as unknown as ValueOf<M>
@@ -190,14 +201,12 @@ export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
     for (const [name, value] of Object.entries(result.model.state))
         if (
             Object.prototype.hasOwnProperty.call(result, name) &&
-            ![UndefinedSymbol, undefined].includes(
-                result[name as keyof ModelState] as undefined
-            )
+            result[name as keyof ModelState] !== undefined
         )
             result.model.state[name as keyof ModelState] =
                 result[name as keyof P] as unknown as ValueOf<ModelState>
 
-    if ([UndefinedSymbol, undefined].includes(result.model.value))
+    if (result.model.value === undefined)
         result.model.value = result.model.default
     // else -> Controlled component via model's "value" property.
     // endregion
@@ -256,7 +265,7 @@ export const parseValue = <P extends Properties, Type = any>(
     if (configuration.emptyEqualsNull && value === '')
         return null
     if (
-        ![null, UndefinedSymbol, undefined].includes(value) &&
+        ![null, undefined].includes(value) &&
         Object.prototype.hasOwnProperty.call(
             transformer, configuration.type
         ) &&
@@ -300,7 +309,11 @@ export function formatValue<Type = any>(
     final:boolean = true
 ):string {
     const methodName:'final'|'intermediate' = final ? 'final' : 'intermediate'
-    if (value === null || typeof value === 'number' && isNaN(value))
+    if (
+        [null, undefined].includes(value as null) ||
+        typeof value === 'number' &&
+        isNaN(value)
+    )
         return ''
     if (
         Object.prototype.hasOwnProperty.call(transformer, type) &&
