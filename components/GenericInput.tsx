@@ -1114,8 +1114,15 @@ export const GenericInputInner = function<Type = any>(
     const initialValue:null|Type = determineInitialValue<Type>(
         givenProperties, GenericInput.defaultProperties.model?.default
     )
+    /*
+        NOTE: This only way to extend default properties with given properties
+        while not modifying default property object is create an intermediate
+        copy like this.
+    */
     Tools.extend(
-        true, givenProperties, GenericInput.defaultProperties, givenProperties
+        true,
+        givenProperties,
+        Tools.extend(true, {}, GenericInput.defaultProperties, givenProperties)
     )
     /*
         NOTE: This values have to share the same state item since they have to
@@ -1155,11 +1162,19 @@ export const GenericInputInner = function<Type = any>(
     if (givenProperties.showDeclaration === undefined)
         givenProperties.showDeclaration = showDeclaration
     // // region value state
+    /*
+        NOTE: This logic is important to re-determine representation when a new
+        values is provided via properties.
+    */
     if (givenProperties.model!.value === undefined)
         givenProperties.model!.value = valueState.value
-
+    else
+        givenProperties.representation = undefined
     if (givenProperties.value === undefined) {
-        if (givenProperties.representation === undefined)
+        if (
+            givenProperties.representation === undefined &&
+            givenProperties.model!.value === undefined
+        )
             givenProperties.representation = valueState.representation
     } else
         givenProperties.representation = undefined
