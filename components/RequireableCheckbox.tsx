@@ -324,11 +324,17 @@ export const RequireableCheckboxInner = function(
         RequireableCheckbox.defaultProperties.model.default,
         givenProperties.checked
     )
+    /*
+        NOTE: This only way to extend default properties with given properties
+        while not modifying default property object is create an intermediate
+        copy like this.
+    */
     Tools.extend(
         true,
         givenProperties,
-        RequireableCheckbox.defaultProperties,
-        givenProperties
+        Tools.extend(
+            true, {}, RequireableCheckbox.defaultProperties, givenProperties
+        )
     )
     /*
         NOTE: This values have to share the same state item since they have to
