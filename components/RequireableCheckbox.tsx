@@ -98,7 +98,7 @@ export const RequireableCheckboxInner = function(
      */
     const getConsolidatedProperties = (properties:Props):Properties => {
         let result:Props = mapPropertiesIntoModel<Props, Model>(
-            properties, RequireableCheckbox.defaultProps.model as Model
+            properties, RequireableCheckbox.defaultProperties.model as Model
         )
 
         determineValidationState<Properties>(
@@ -321,8 +321,14 @@ export const RequireableCheckboxInner = function(
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
     const initialValue:boolean|null = determineInitialValue<boolean>(
         givenProperties,
-        RequireableCheckbox.defaultProps.model.default,
+        RequireableCheckbox.defaultProperties.model.default,
         givenProperties.checked
+    )
+    Tools.extend(
+        true,
+        givenProperties,
+        RequireableCheckbox.defaultProperties,
+        givenProperties
     )
     /*
         NOTE: This values have to share the same state item since they have to
@@ -337,27 +343,21 @@ export const RequireableCheckboxInner = function(
     if (givenProperties.showDeclaration === undefined)
         givenProperties.showDeclaration = showDeclaration
     // // region value state
-    /*
-        NOTE: React simply copies "defaultProps" flat to we have to do a deep
-        copy here. Otherwise different rendering cycles would depend manipulate
-        each other.
-    */
-    givenProperties.model = {...givenProperties.model}
-    if (givenProperties.model.value === undefined)
-        givenProperties.model.value = valueState.value
+    if (givenProperties.model!.value === undefined)
+        givenProperties.model!.value = valueState.value
 
-    if (givenProperties.model.state)
-        givenProperties.model.state = {...givenProperties.model.state}
+    if (givenProperties.model!.state)
+        givenProperties.model!.state = {...givenProperties.model!.state}
     else
-        givenProperties.model.state = {} as ModelState
+        givenProperties.model!.state = {} as ModelState
     for (const key in valueState.modelState)
         if (
             Object.prototype.hasOwnProperty.call(valueState.modelState, key) &&
             (
-                givenProperties.model.state as Partial<ModelState>
+                givenProperties.model!.state as Partial<ModelState>
             )[key as keyof ModelState] === undefined
         )
-            givenProperties.model.state[key as keyof ModelState] =
+            givenProperties.model!.state[key as keyof ModelState] =
                 valueState.modelState[key as keyof ModelState]
     // // endregion
     const properties:Properties = getConsolidatedProperties(givenProperties)
@@ -440,7 +440,7 @@ RequireableCheckboxInner.displayName = 'RequireableCheckbox'
 /**
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
- * @property static:defaultProps - Initial property configuration.
+ * @property static:defaultProperties - Initial property configuration.
  * @property static:propTypes - Triggers reacts runtime property value checks
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
@@ -460,7 +460,7 @@ RequireableCheckbox.wrapped = RequireableCheckboxInner
 RequireableCheckbox.webComponentAdapterWrapped = 'react'
 // / endregion
 RequireableCheckbox.defaultModelState = defaultModelState
-RequireableCheckbox.defaultProps = {
+RequireableCheckbox.defaultProperties = {
     ...defaultProperties,
     model: {...defaultProperties.model, state: undefined, value: undefined},
     value: undefined

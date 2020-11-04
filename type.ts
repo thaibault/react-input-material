@@ -151,14 +151,14 @@ export type State<Type = any> = {
 export interface StaticWebComponent<P = Props> extends StaticBaseWebComponent {
     new (properties:P):Component<P>
     defaultModelState:ModelState
-    defaultProps:P
+    defaultProperties:P
     strict:boolean
 }
 export type StaticComponent<Type = any> =
-    Omit<ComponentClass<Props<Type>>, 'defaultProps'|'propTypes'> &
+    Omit<ComponentClass<Props<Type>>, 'propTypes'> &
     StaticWebComponent<Type>
 export type StaticFunctionComponent<Type = any> =
-    Omit<FunctionComponent<Props<Type>>, 'defaultProps'|'propTypes'> &
+    Omit<FunctionComponent<Props<Type>>, 'propTypes'> &
     StaticComponent<Type>
 export type ValueState<Type = any, MS = ModelState> = {
     modelState:MS
@@ -320,7 +320,6 @@ export const defaultCheckboxModel:Model<boolean> = {
 export const defaultCheckboxProperties:CheckboxProps = {
     ...defaultProperties,
     default: false,
-    initialValue: false,
     model: {...defaultCheckboxModel},
     requiredText: 'Please check this field.',
 } as const
@@ -419,7 +418,7 @@ export interface StaticWebInputComponent<Type = any> extends StaticWebComponent<
 export type InputAdapter<Type = any> =
     WebComponentAdapter<InputProperties<Type>, Omit<InputState<Type>, 'selectionIsUnstable'>>
 export type StaticFunctionInputComponent<Type = any> =
-    Omit<FunctionComponent<Props<Type>>, 'defaultProps'|'propTypes'> &
+    Omit<FunctionComponent<Props<Type>>, 'propTypes'> &
     StaticWebInputComponent<Type>
 // // region constants
 export const inputModelStatePropertyTypes:{
