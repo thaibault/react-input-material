@@ -703,7 +703,7 @@ export const GenericInputInner = function<Type = any>(
     ):DefaultProperties<Type> => {
         const result:DefaultProperties<Type> =
             mapPropertiesIntoModel<Props<Type>, Model<Type>>(
-                properties, GenericInput.defaultProps.model as Model<Type>
+                properties, GenericInput.defaultProperties.model as Model<Type>
             ) as DefaultProperties<Type>
 
         result.model.value = parseValue<Properties<Type>, Type>(
@@ -1112,7 +1112,10 @@ export const GenericInputInner = function<Type = any>(
     })
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
     const initialValue:null|Type = determineInitialValue<Type>(
-        givenProperties, GenericInput.defaultProps.model?.default
+        givenProperties, GenericInput.defaultProperties.model?.default
+    )
+    Tools.extend(
+        true, givenProperties, GenericInput.defaultProperties, givenProperties
     )
     /*
         NOTE: This values have to share the same state item since they have to
@@ -1123,7 +1126,7 @@ export const GenericInputInner = function<Type = any>(
             modelState: {...GenericInput.defaultModelState},
             representation: determineInitialRepresentation<Props<Type>, Type>(
                 givenProperties,
-                GenericInput.defaultProps,
+                GenericInput.defaultProperties,
                 initialValue,
                 GenericInput.transformer
             ),
@@ -1152,14 +1155,8 @@ export const GenericInputInner = function<Type = any>(
     if (givenProperties.showDeclaration === undefined)
         givenProperties.showDeclaration = showDeclaration
     // // region value state
-    /*
-        NOTE: React simply copies "defaultProps" flat to we have to do a deep
-        copy here. Otherwise different rendering cycles would depend manipulate
-        each other.
-    */
-    givenProperties.model = {...givenProperties.model}
-    if (givenProperties.model.value === undefined)
-        givenProperties.model.value = valueState.value
+    if (givenProperties.model!.value === undefined)
+        givenProperties.model!.value = valueState.value
 
     if (givenProperties.value === undefined) {
         if (givenProperties.representation === undefined)
@@ -1167,18 +1164,18 @@ export const GenericInputInner = function<Type = any>(
     } else
         givenProperties.representation = undefined
 
-    if (givenProperties.model.state)
-        givenProperties.model.state = {...givenProperties.model.state}
+    if (givenProperties.model!.state)
+        givenProperties.model!.state = {...givenProperties.model!.state}
     else
-        givenProperties.model.state = {} as ModelState
+        givenProperties.model!.state = {} as ModelState
     for (const key in valueState.modelState)
         if (
             Object.prototype.hasOwnProperty.call(valueState.modelState, key) &&
             (
-                givenProperties.model.state as Partial<ModelState>
+                givenProperties.model!.state as Partial<ModelState>
             )[key as keyof ModelState] === undefined
         )
-            givenProperties.model.state[key as keyof ModelState] =
+            givenProperties.model!.state[key as keyof ModelState] =
                 valueState.modelState[key as keyof ModelState]
     // // endregion
     const properties:Properties<Type> =
@@ -1504,7 +1501,7 @@ GenericInputInner.displayName = 'GenericInput'
 /**
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
- * @property static:defaultProps - Initial property configuration.
+ * @property static:defaultProperties - Initial property configuration.
  * @property static:local - Location hint to properly represent values.
  * @property static:propTypes - Triggers reacts runtime property value checks
  * @property static:strict - Indicates whether we should wrap render output in
@@ -1529,7 +1526,7 @@ GenericInput.defaultModelState = defaultModelState
     NOTE: We set values to "undefined" to identify whether these values where
     provided via "props" and should shadow a state saved valued.
 */
-GenericInput.defaultProps = {
+GenericInput.defaultProperties = {
     ...defaultProperties,
     cursor: undefined,
     model: {...defaultProperties.model, state: undefined, value: undefined},

@@ -23,12 +23,21 @@ import WrapConfigurations from './components/WrapConfigurations'
 import WrapStrict from './components/WrapStrict'
 import WrapThemeProvider from './components/WrapThemeProvider'
 import WrapTooltip from './components/WrapTooltip'
-import {prepareTestEnvironment} from './helper'
+import {determineInitialValue, prepareTestEnvironment} from './helper'
 import {TestEnvironment} from './type'
 // endregion
 const testEnvironment:TestEnvironment =
     prepareTestEnvironment(beforeEach, afterEach)
 const {render} = testEnvironment
+// region helper
+describe('helper', ():void => {
+    test('determineInitialValue', ():void => {
+        expect(
+            determineInitialValue({model: {default: true}}, false)
+        ).toStrictEqual(true)
+    })
+})
+// endregion
 // region GenericAnimate
 describe('GenericAnimate', ():void => {
     test('render', ():void => {
