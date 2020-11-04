@@ -587,7 +587,7 @@ export const GenericInputInner = function<Type = any>(
         const keysSorted:Array<keyof typeof indicator> =
             ['start', 'end']
 
-        let value:string = properties.representation || ''
+        let value:string = properties.representation
         for (const type of keysSorted)
             value = (
                 value.substring(0, cursor[type as keyof typeof indicator]) +
@@ -735,12 +735,9 @@ export const GenericInputInner = function<Type = any>(
         if (!(result.editor === 'plain' || result.selectableEditor))
             result.editorIsActive = true
 
-        if (
-            typeof result.representation !== 'string' &&
-            ![null, undefined].includes(result.value as null)
-        )
+        if (typeof result.representation !== 'string')
             result.representation = formatValue<Type>(
-                result.value as Type,
+                result.value as null|Type,
                 result.type,
                 GenericInput.transformer,
                 !result.focused
