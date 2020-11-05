@@ -1171,7 +1171,7 @@ export const GenericInputInner = function<Type = any>(
     else
         givenProperties.representation = undefined
     if (givenProperties.value === undefined) {
-        givenProperties.value === valueState.value
+        givenProperties.value = valueState.value
         if (
             givenProperties.representation === undefined &&
             givenProperties.model!.value === undefined
@@ -1194,10 +1194,8 @@ export const GenericInputInner = function<Type = any>(
             givenProperties.model!.state[key as keyof ModelState] =
                 valueState.modelState[key as keyof ModelState]
     // // endregion
-    console.log('A', Tools.copy(givenProperties))
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
-    console.log('B', properties.value)
     if (!Tools.equals(properties.cursor, cursor))
         setCursor(properties.cursor)
     if (properties.editorIsActive !== editorState.editorIsActive)
