@@ -351,6 +351,8 @@ export const RequireableCheckboxInner = function(
     // // region value state
     if (givenProperties.model!.value === undefined)
         givenProperties.model!.value = valueState.value
+     if (givenProperties.value === undefined)
+        givenProperties.value = valueState.value
 
     if (givenProperties.model!.state)
         givenProperties.model!.state = {...givenProperties.model!.state}
