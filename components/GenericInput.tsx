@@ -1164,13 +1164,14 @@ export const GenericInputInner = function<Type = any>(
     // // region value state
     /*
         NOTE: This logic is important to re-determine representation when a new
-        values is provided via properties.
+        value is provided via properties.
     */
     if (givenProperties.model!.value === undefined)
         givenProperties.model!.value = valueState.value
     else
         givenProperties.representation = undefined
     if (givenProperties.value === undefined) {
+        givenProperties.value === valueState.value
         if (
             givenProperties.representation === undefined &&
             givenProperties.model!.value === undefined
@@ -1193,8 +1194,10 @@ export const GenericInputInner = function<Type = any>(
             givenProperties.model!.state[key as keyof ModelState] =
                 valueState.modelState[key as keyof ModelState]
     // // endregion
+    console.log('A', Tools.copy(givenProperties))
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
+    console.log('B', properties.value)
     if (!Tools.equals(properties.cursor, cursor))
         setCursor(properties.cursor)
     if (properties.editorIsActive !== editorState.editorIsActive)
