@@ -1164,13 +1164,14 @@ export const GenericInputInner = function<Type = any>(
     // // region value state
     /*
         NOTE: This logic is important to re-determine representation when a new
-        values is provided via properties.
+        value is provided via properties.
     */
     if (givenProperties.model!.value === undefined)
         givenProperties.model!.value = valueState.value
     else
         givenProperties.representation = undefined
     if (givenProperties.value === undefined) {
+        givenProperties.value = valueState.value
         if (
             givenProperties.representation === undefined &&
             givenProperties.model!.value === undefined
