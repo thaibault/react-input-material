@@ -2000,9 +2000,9 @@
     "@types/react" "*"
 
 "@types/react@*":
-  version "16.9.55"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.9.55.tgz#47078587f5bfe028a23b6b46c7b94ac0d436acff"
-  integrity sha512-6KLe6lkILeRwyyy7yG9rULKJ0sXplUsl98MGoCfpteXf9sPWFWWMknDcsvubcpaTdBuxtsLF6HDUwdApZL/xIg==
+  version "16.9.56"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.9.56.tgz#ea25847b53c5bec064933095fc366b1462e2adf0"
+  integrity sha512-gIkl4J44G/qxbuC6r2Xh+D3CGZpJ+NdWTItAPmZbR5mUS+JQ8Zvzpl0ea5qT/ZT3ZNTUcDKUVqV3xBE8wv/DyQ==
   dependencies:
     "@types/prop-types" "*"
     csstype "^3.0.2"
@@ -3945,9 +3945,9 @@ cli-table3@^0.5.0:
     colors "^1.1.2"
 
 clientnode@*:
-  version "3.0.600"
-  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.600.tgz#ee5e58ad7bf4d612317419b037b35448fb963f68"
-  integrity sha512-LSbW5DBki0jyPMfUP3TSWkuWtabD5OfRj2itP9rnJGC+vwQHcKq1GO3M4fv0mX5NWl9yT/RQ3p/fLiPG6TeT6w==
+  version "3.0.601"
+  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.601.tgz#9899757cb2a05dcf261b0df833e25362a1711c81"
+  integrity sha512-VUKn9kwGrBDMEgiv2PDZ2bvwpcR8hIIMtnlBos74uHC+210v5aqbUqIu7Eg0SGjn3qTGzxv6xooLQTICx0FNKw==
 
 cliui@^4.0.0:
   version "4.1.0"
@@ -4902,9 +4902,9 @@ ejs@*:
     jake "^10.6.1"
 
 electron-to-chromium@^1.3.47, electron-to-chromium@^1.3.585:
-  version "1.3.588"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.588.tgz#c6515571737bfb42678115a5eaa818384593a9a5"
-  integrity sha512-0zr+ZfytnLeJZxGgmEpPTcItu5Mm4A5zHPZXLfHcGp0mdsk95rmD7ePNewYtK1yIdLbk8Z1U2oTRRfOtR4gbYg==
+  version "1.3.589"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.589.tgz#bd26183ed8697dde6ac19acbc16a3bf33b1f8220"
+  integrity sha512-rQItBTFnol20HaaLm26UgSUduX7iGerwW7pEYX17MB1tI6LzFajiLV7iZ7LVcUcsN/7HrZUoCLrBauChy/IqEg==
 
 emittery@^0.7.1:
   version "0.7.2"
@@ -5650,9 +5650,9 @@ fsevents@^1.2.7:
     nan "^2.12.1"
 
 fsevents@^2.1.2:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.2.0.tgz#4150396a427ecb5baa747725b70270a72b17bc17"
-  integrity sha512-pKnaUh2TNvk+/egJdBw1h46LwyLx8BzEq+MGCf/RMCVfEHHsGOCWG00dqk91kUPPArIIwMBg9T/virxwzP03cA==
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.2.1.tgz#1fb02ded2036a8ac288d507a65962bd87b97628d"
+  integrity sha512-bTLYHSeC0UH/EFXS9KqWnXuOl/wHK5Z/d+ghd5AsFMYN7wIGkUCOJyzy88+wJKkZPGON8u4Z9f6U4FdgURE9qA==
 
 fsevents@~2.1.2:
   version "2.1.3"
@@ -6084,9 +6084,9 @@ html-tags@^3.1.0:
   integrity sha512-1qYz89hW3lFDEazhjW0yVAV87lw8lVkrJocr72XmBkMKsoSVJCQx3W8BXsC7hO2qAt8BoVjYjtAcZ9perqGnNg==
 
 html-webpack-plugin@^5.0.0-alpha.7:
-  version "5.0.0-alpha.10"
-  resolved "https://registry.yarnpkg.com/html-webpack-plugin/-/html-webpack-plugin-5.0.0-alpha.10.tgz#edc754eb32240c4a54b82b4d0a1df1bfa045b27c"
-  integrity sha512-e8FUuysEchFL7hvc9f0ip4zFIAMeWMXFB6kk0+6CL1UkEflbwGvHrxlWHCVhmV8co+O5zgB41yoYxPlG2vlAhg==
+  version "5.0.0-alpha.11"
+  resolved "https://registry.yarnpkg.com/html-webpack-plugin/-/html-webpack-plugin-5.0.0-alpha.11.tgz#44e2d3293c61fe8c881e6492dc1a4f31666ce5cd"
+  integrity sha512-5zV7WFCKHza8432Yim8tmWmf4MRoHnkeI28OTQg12ox7C8Zln36ttNabvTJCM4/XqP8EPeGpbTVEFMYIvQVWQw==
   dependencies:
     "@types/html-minifier-terser" "^5.0.0"
     "@types/tapable" "^1.0.5"
@@ -8020,7 +8020,7 @@ nan@^2.12.1, nan@^2.14.0:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.2.tgz#f5376400695168f4cc694ac9393d0c9585eeea19"
   integrity sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
 
-nanoid@^3.1.15:
+nanoid@^3.1.16:
   version "3.1.16"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.16.tgz#b21f0a7d031196faf75314d7c65d36352beeef64"
   integrity sha512-+AK8MN0WHji40lj8AEuwLOvLSbWYApQpre/aFJZD71r43wVRLrOYS4FmJOPQYon1TqB462RzrrxlfA74XRES8w==
@@ -9422,13 +9422,13 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.17, postcss@^7.0.2
     supports-color "^6.1.0"
 
 postcss@^8.1.4:
-  version "8.1.4"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.1.4.tgz#356dfef367a70f3d04347f74560c85846e20e4c1"
-  integrity sha512-LfqcwgMq9LOd8pX7K2+r2HPitlIGC5p6PoZhVELlqhh2YGDVcXKpkCseqan73Hrdik6nBd2OvoDPUaP/oMj9hQ==
+  version "8.1.6"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.1.6.tgz#b022ba2cfb8701da234d073ed3128c5a384c35ff"
+  integrity sha512-JuifSl4h8dJ70SiMXKjzCxhalE6p2TnMHuq9G8ftyXj2jg6SXzqCsEuxMj9RkmJoO5D+Z9YrWunNkxqpRT02qg==
   dependencies:
     colorette "^1.2.1"
     line-column "^1.0.2"
-    nanoid "^3.1.15"
+    nanoid "^3.1.16"
     source-map "^0.6.1"
 
 prelude-ls@^1.2.1:
@@ -11714,9 +11714,9 @@ wbuf@^1.1.0, wbuf@^1.7.3:
     minimalistic-assert "^1.0.0"
 
 web-component-wrapper@*:
-  version "0.0.93"
-  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.93.tgz#1ad01446f7d520fbb4e58d7ef11e7beeeab79760"
-  integrity sha512-oiJ1C/GSs+wBqmvo1BUQ6PZDWnE1k1xPTjmLSKHVc2yb8YfeR0a9/6feBnh4/q1oX1u20IijZLVDNNYV68MvsA==
+  version "0.0.94"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.94.tgz#e0dee9fe070d34185c5675e3ffdd7fa7bef42cc6"
+  integrity sha512-fYpzd1EDls5wti6Y5EAGMKG/NA33jVrBfvyDmv8ym/n0v5k4rcZumqsEYpKBcO4fK5KoI4UJa6r/GZMzPuPymg==
 
 webidl-conversions@^5.0.0:
   version "5.0.0"
@@ -11729,9 +11729,9 @@ webidl-conversions@^6.1.0:
   integrity sha512-qBIvFLGiBpLjfwmYAaHPXsn+ho5xZnGvyGvsarywGNc8VyQJUMHJ8OBKGGrPER0okBeMDaan4mNBlgBROxuI8w==
 
 weboptimizer@*:
-  version "2.0.826"
-  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.826.tgz#a8cfe6a8acd91d4602d62a635b92adb1c6c97e0c"
-  integrity sha512-j5/L1AyDMSFKbwhOk4pMyRoYLKAacPajMwmuI1DjdhYXARbHxS7tniZPKXeKDObg30Kx6/bWtqd5OpnIVgIZ/Q==
+  version "2.0.827"
+  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.827.tgz#e7d86126a641589014463e64f215e9932753449a"
+  integrity sha512-Bibw/hX2OT3BjE4LmMvMsB+XyJnz4Kz0sNwnlRNOl/lZCkTCWHFP/zYdVEGHoab3hFeISmkjVifDuPYFbGbpgA==
   dependencies:
     "@babel/core" "*"
     "@babel/plugin-proposal-class-properties" "*"

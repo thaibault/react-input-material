@@ -23,7 +23,8 @@ import WrapConfigurations from './components/WrapConfigurations'
 import WrapStrict from './components/WrapStrict'
 import WrapThemeProvider from './components/WrapThemeProvider'
 import WrapTooltip from './components/WrapTooltip'
-import {determineInitialValue, prepareTestEnvironment} from './helper'
+import {determineInitialValue} from './helper'
+import prepareTestEnvironment from './testHelper'
 import {TestEnvironment} from './type'
 // endregion
 const testEnvironment:TestEnvironment =
