@@ -16,13 +16,12 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports 
+// region imports
 import Tools from 'clientnode'
 import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 import {Mapping, ValueOf} from 'clientnode/type'
 import {ReactElement, useMemo} from 'react'
 import {render as renderReact, unmountComponentAtNode} from 'react-dom'
-import {act} from 'react-dom/test-utils'
 
 import {
     DataTransformSpecification,
@@ -362,34 +361,6 @@ export function determineInitialRepresentation<P extends {
 export const useMemorizedValue = <Type = any>(
     value:Type, ...dependencies:Array<any>
 ):Type => useMemo(():any => value, dependencies)
-// endregion
-// region testing
-export const prepareTestEnvironment = (
-    beforeEach:Function, afterEach:Function
-):TestEnvironment => {
-    const result:TestEnvironment = {
-        container: null,
-        render: (component:ReactElement):ChildNode|null => {
-            act(():void => {
-                renderReact(component, result.container)
-            })
-            return (result.container as HTMLDivElement).childNodes.length ?
-                (result.container as HTMLDivElement).childNodes[0] :
-                null
-        }
-    }
-    beforeEach(():void => {
-        result.container = document.createElement('div')
-        result.container.setAttribute('class', 'test-wrapper')
-        document.body.appendChild(result.container)
-    })
-    afterEach(():void => {
-        unmountComponentAtNode(result.container as HTMLDivElement);
-        (result.container as HTMLDivElement).remove()
-        result.container = null
-    })
-    return result
-}
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
