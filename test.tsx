@@ -14,10 +14,12 @@
     endregion
 */
 // region imports
+import {Mapping} from 'clientnode/type'
 import React from 'react'
+import {SelectProps} from '@rmwc/select'
 
 import GenericAnimate from './components/GenericAnimate'
-import GenericInput from './components/GenericInput'
+import GenericInput, {normalizeSelection} from './components/GenericInput'
 import RequireableCheckbox from './components/RequireableCheckbox'
 import WrapConfigurations from './components/WrapConfigurations'
 import WrapStrict from './components/WrapStrict'
@@ -51,6 +53,30 @@ describe('GenericAnimate', ():void => {
 // endregion
 // region GenericInput
 describe('GenericInput', ():void => {
+    test.each([
+        [[], []],
+        [
+            [{label: 'A', value: 'a'}, {'label': 'B', value: 'b'}],
+            [['a', 'A'], ['b', 'B']]
+        ]/*,
+        [
+            [{label: 'A', value: 'a'}, {'label': 'B', value: 'b'}],
+            ['a', 'b']
+        ],
+        [
+            [{label: 'A', value: 'a'}, {'label': 'B', value: 'b'}],
+            ['a', 'b'],
+            ['A', 'B']
+        ]*/
+    ])(
+        '%p === normalizeSelection(%p, %p)',
+        (
+            expected:SelectProps['options'],
+            selection:Array<[string, string]>|SelectProps['options'],
+            labels?:Array<string>|Mapping,
+        ):void => expect(normalizeSelection(selection, labels))
+            .toStrictEqual(expected)
+    )
     test('render', ():void => {
         expect(render(<GenericInput/>)).toBeDefined()
 

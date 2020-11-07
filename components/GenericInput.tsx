@@ -18,7 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
-import {EvaluationResult} from 'clientnode/type'
+import {EvaluationResult, Mapping} from 'clientnode/type'
 import React, {
     ComponentType,
     createRef,
@@ -50,7 +50,9 @@ import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
-import {Select, SelectProps} from '@rmwc/select'
+import {
+    FormattedOption as FormattedSelectionOption, Select, SelectProps
+} from '@rmwc/select'
 import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
 import {IconOptions} from '@rmwc/types'
@@ -164,6 +166,72 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 }
 // endregion
 // region static helper
+export function normalizeSelection(
+    selection:Array<[string, string]>|SelectProps['options'],
+    labels?:Array<string>|Mapping
+):SelectProps['options'] {
+    if (Array.isArray(selection) && selection.length) {
+        const result:Array<FormattedSelectionOption> = []
+        let index:number = 0
+        if (Array.isArray(selection[0]))
+            for (
+                const [value, label] of selection as Array<[string, string]>
+            ) {
+                result.push({
+                    label: Array.isArray(labels) && index < labels.length ?
+                        labels[index] :
+                        label,
+                    value
+                })
+                index += 1
+            }
+        else if (selection[0] !== null && typeof selection[0] === 'object')
+            for (
+                const option of selection as Array<FormattedSelectionOption>
+            ) {
+                result.push({
+                    ...(option as FormattedSelectionOption),
+                    label: Array.isArray(labels) && index < labels.length ?
+                        labels[index] :
+                        option.label
+                })
+                index += 1
+            }
+        else
+            for (const value of selection as Array<string>) {
+                result.push({
+                    label: Array.isArray(labels) && index < labels.length ?
+                        labels[index] :
+                        value,
+                    value
+                })
+                index += 1
+            }
+        selection = result
+    }
+    if (labels !== null && typeof labels === 'object') {
+        if (Array.isArray(selection)) {
+            const result:Array<FormattedSelectionOption> = []
+            for (const option of selection as Array<FormattedSelectionOption>)
+                result.push({
+                    ...option,
+                    label: labels.hasOwnProperty(
+                        (option.value || option.label) as string
+                    ) ?
+                        (
+                            labels as Mapping
+                        )[(option.value || option.label) as string] :
+                        option.label
+                })
+            return result
+        }
+        for (const [value, label] of Object.entries(selection as Mapping))
+            (selection as Mapping)[value] = labels.hasOwnProperty(value) ?
+                (labels as Mapping)[value] as string :
+                label
+    }
+    return selection as SelectProps['options']
+}
 export function determineValidationState<Type = any>(
     properties:Properties<Type>, currentState:ModelState
 ):boolean {
@@ -1355,7 +1423,9 @@ export const GenericInputInner = function<Type = any>(
                     ...properties.rootProps
                 }}
                 onChange={onChangeValue}
-                options={properties.selection}
+                options={
+                    normalizeSelection(properties.selection, properties.labels)
+                }
             />
         </GenericAnimate>
         {wrapAnimationConditionally(
