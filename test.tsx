@@ -54,26 +54,28 @@ describe('GenericAnimate', ():void => {
 // region GenericInput
 describe('GenericInput', ():void => {
     test.each([
-        [[], []],
+        [[], [], undefined],
         [
-            [{label: 'A', value: 'a'}, {'label': 'B', value: 'b'}],
-            [['a', 'A'], ['b', 'B']]
-        ]/*,
-        [
-            [{label: 'A', value: 'a'}, {'label': 'B', value: 'b'}],
-            ['a', 'b']
+            [{label: 'A', value: 'a'}, {label: 'B', value: 'b'}],
+            [['a', 'A'], ['b', 'B']] as Array<[string, string]>,
+            undefined
         ],
         [
-            [{label: 'A', value: 'a'}, {'label': 'B', value: 'b'}],
+            [{label: 'a', value: 'a'}, {label: 'b', value: 'b'}],
+            ['a', 'b'],
+            undefined
+        ],
+        [
+            [{label: 'A', value: 'a'}, {label: 'B', value: 'b'}],
             ['a', 'b'],
             ['A', 'B']
-        ]*/
+        ]
     ])(
         '%p === normalizeSelection(%p, %p)',
         (
             expected:SelectProps['options'],
             selection:Array<[string, string]>|SelectProps['options'],
-            labels?:Array<string>|Mapping,
+            labels:Array<string>|Mapping|undefined
         ):void => expect(normalizeSelection(selection, labels))
             .toStrictEqual(expected)
     )
