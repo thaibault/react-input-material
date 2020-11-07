@@ -350,8 +350,9 @@ export type InputProperties<Type = any> =
         editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)'
         editorIsActive:boolean
         fullWidth:boolean
-        icon:string|(IconOptions & {tooltip?:string|TooltipProps})
         hidden:boolean
+        icon:string|(IconOptions & {tooltip?:string|TooltipProps})
+        labels:Array<string>|Mapping
         maximumLengthText:string
         maximumText:string
         minimumLengthText:string
