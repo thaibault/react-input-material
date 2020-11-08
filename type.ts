@@ -465,12 +465,13 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     editor: string,
     editorIsActive: oneOfType([boolean, symbol]),
     fullWidth: boolean,
+    hidden: oneOfType([boolean, symbol]),
     /*
         NOTE: Not yet working:
         icon?:string|(IconOptions & {tooltip?:string|TooltipProps})
     */
     icon: oneOfType([string, object]),
-    hidden: oneOfType([boolean, symbol]),
+    labels: oneOfType([arrayOf(string), object]),
     maximumLengthText: string,
     maximumText: string,
     minimumLengthText: string,
