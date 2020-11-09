@@ -167,9 +167,13 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 // endregion
 // region static helper
 export function normalizeSelection(
-    selection:Array<[string, string]>|SelectProps['options'],
+    selection?:Array<[string, string]>|SelectProps['options'],
     labels?:Array<string>|Mapping
 ):SelectProps['options'] {
+    if (!selection) {
+        selection = labels
+        labels = undefined
+    }
     if (Array.isArray(selection) && selection.length) {
         const result:Array<FormattedSelectionOption> = []
         let index:number = 0
