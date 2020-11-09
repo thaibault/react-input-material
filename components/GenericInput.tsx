@@ -1240,12 +1240,15 @@ export const GenericInputInner = function<Type = any>(
     */
     if (givenProperties.representation === undefined)
         givenProperties.representation = valueState.representation
-    // TODO resolve!
-    console.log('A', givenProperties.representation, givenProperties.model!.value)
-    if (givenProperties.model!.value === undefined)
-        givenProperties.model!.value = valueState.value
-    else
-        givenProperties.representation = undefined
+    /*
+        NOTE: Avoid writing into mutable model object properties. So project
+        value to properties directly.
+    */
+    if (
+        givenProperties.model!.value !== undefined &&
+        givenProperties.value === undefined
+    )
+        givenProperties.value = givenProperties.model!.value
     if (givenProperties.value === undefined) {
         givenProperties.value = valueState.value
         if (
@@ -1253,9 +1256,8 @@ export const GenericInputInner = function<Type = any>(
             givenProperties.model!.value === undefined
         )
             givenProperties.representation = valueState.representation
-    } else
+    } else if (givenProperties.value !== valueState.value)
         givenProperties.representation = undefined
-    console.log('B', givenProperties.representation)
 
     if (givenProperties.model!.state)
         givenProperties.model!.state = {...givenProperties.model!.state}
