@@ -349,8 +349,15 @@ export const RequireableCheckboxInner = function(
     if (givenProperties.showDeclaration === undefined)
         givenProperties.showDeclaration = showDeclaration
     // // region value state
-    if (givenProperties.model!.value === undefined)
-        givenProperties.model!.value = valueState.value
+    /*
+        NOTE: Avoid writing into mutable model object properties. So project
+        value to properties directly.
+    */
+    if (
+        givenProperties.model!.value !== undefined &&
+        givenProperties.value === undefined
+    )
+        givenProperties.value = givenProperties.model!.value
      if (givenProperties.value === undefined)
         givenProperties.value = valueState.value
 

@@ -347,6 +347,14 @@ export type InputProperties<Type = any> =
     {
         align:'end'|'start'
         cursor:CursorState
+        /*
+            plain -> input field
+            text -> textarea
+            richtext(raw) -> texteditor without formatting
+            richtext(simple) -> texteditor with semantic text modifications
+            richtext(normal) -> texteditor with additional text formatting
+            richtext(advanced) -> texteditor with advanced text formatting
+         */
         editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)'
         editorIsActive:boolean
         fullWidth:boolean
