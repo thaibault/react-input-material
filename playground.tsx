@@ -181,6 +181,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 initialValue="A"
+                labels={useMemorizedValue(['Label A', 'Label B', 'Label C'])}
                 model={useMemorizedValue({
                     declaration: 'selection',
                     description: 'input7ModelDescription',
