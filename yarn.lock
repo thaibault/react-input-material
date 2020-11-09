@@ -2523,7 +2523,7 @@ arr-union@^3.1.0:
   resolved "https://registry.yarnpkg.com/arr-union/-/arr-union-3.1.0.tgz#e39b09aea9def866a8f206e288af63919bae39c4"
   integrity sha1-45sJrqne+Gao8gbiiK9jkZuuOcQ=
 
-array-back@^4.0.0, array-back@^4.0.1:
+array-back@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/array-back/-/array-back-4.0.1.tgz#9b80312935a52062e1a233a9c7abeb5481b30e90"
   integrity sha512-Z/JnaVEXv+A9xabHzN43FiiiWEE7gPCRXMrVmRm00tWbjZRul1iHm7ECzlyNq1p4a4ATXz+G9FJ3GqGOkOV3fg==
@@ -3766,9 +3766,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000844, caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001154:
-  version "1.0.30001156"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001156.tgz#75c20937b6012fe2b02ab58b30d475bf0718de97"
-  integrity sha512-z7qztybA2eFZTB6Z3yvaQBIoJpQtsewRD74adw2UbRWwsRq3jIPvgrQGawBMbfafekQaD21FWuXNcywtTDGGCw==
+  version "1.0.30001157"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001157.tgz#2d11aaeb239b340bc1aa730eca18a37fdb07a9ab"
+  integrity sha512-gOerH9Wz2IRZ2ZPdMfBvyOi3cjaz4O4dgNwPGzx8EhqAs4+2IL/O+fJsbt+znSigujoZG8bVcIAUM/I/E5K3MA==
 
 canvas@*:
   version "2.6.1"
@@ -3945,9 +3945,9 @@ cli-table3@^0.5.0:
     colors "^1.1.2"
 
 clientnode@*:
-  version "3.0.601"
-  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.601.tgz#9899757cb2a05dcf261b0df833e25362a1711c81"
-  integrity sha512-VUKn9kwGrBDMEgiv2PDZ2bvwpcR8hIIMtnlBos74uHC+210v5aqbUqIu7Eg0SGjn3qTGzxv6xooLQTICx0FNKw==
+  version "3.0.602"
+  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.602.tgz#b24a143a1660edb7af2610964f4fb948ba28d039"
+  integrity sha512-PKhJfTtVtqkv6xWq6LKSJxXevSXgsYxW6we7K/M5jtKB3mv/iKF5BDIncUVSu701QCdLHyDiI3yVyPl7OuH67A==
 
 cliui@^4.0.0:
   version "4.1.0"
@@ -4078,13 +4078,13 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
     delayed-stream "~1.0.0"
 
 command-line-usage@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/command-line-usage/-/command-line-usage-6.1.0.tgz#f28376a3da3361ff3d36cfd31c3c22c9a64c7cb6"
-  integrity sha512-Ew1clU4pkUeo6AFVDFxCbnN7GIZfXl48HIOQeFQnkO3oOqvpI7wdqtLRwv9iOCZ/7A+z4csVZeiDdEcj8g6Wiw==
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/command-line-usage/-/command-line-usage-6.1.1.tgz#c908e28686108917758a49f45efb4f02f76bc03f"
+  integrity sha512-F59pEuAR9o1SF/bD0dQBDluhpT4jJQNWUHEuVBqpDmCUo6gPjCi+m9fCWnWZVR/oG6cMTUms4h+3NPl74wGXvA==
   dependencies:
-    array-back "^4.0.0"
+    array-back "^4.0.1"
     chalk "^2.4.2"
-    table-layout "^1.0.0"
+    table-layout "^1.0.1"
     typical "^5.2.0"
 
 commander@^2.19.0, commander@^2.20.0:
@@ -11044,7 +11044,7 @@ symbol-tree@^3.2.4:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
 
-table-layout@^1.0.0:
+table-layout@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/table-layout/-/table-layout-1.0.1.tgz#8411181ee951278ad0638aea2f779a9ce42894f9"
   integrity sha512-dEquqYNJiGwY7iPfZ3wbXDI944iqanTSchrACLL2nOB+1r+h1Nzu2eH+DuPPvWvm5Ry7iAPeFlgEtP5bIp5U7Q==
@@ -11079,10 +11079,15 @@ taffydb@2.6.2:
   resolved "https://registry.yarnpkg.com/taffydb/-/taffydb-2.6.2.tgz#7cbcb64b5a141b6a2efc2c5d2c67b4e150b2a268"
   integrity sha1-fLy2S1oUG2ou/CxdLGe04VCyomg=
 
-tapable@2.0.0, tapable@^2.0.0:
+tapable@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/tapable/-/tapable-2.0.0.tgz#a49c3d6a8a2bb606e7db372b82904c970d537a08"
   integrity sha512-bjzn0C0RWoffnNdTzNi7rNDhs1Zlwk2tRXgk8EiHKAOX1Mag3d6T0Y5zNa7l9CJ+EoUne/0UHdwS8tMbkh9zDg==
+
+tapable@^2.0.0:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/tapable/-/tapable-2.1.1.tgz#b01cc1902d42a7bb30514e320ce21c456f72fd3f"
+  integrity sha512-Wib1S8m2wdpLbmQz0RBEVosIyvb/ykfKXf3ZIDqvWoMg/zTNm6G/tDSuUM61J1kNCDXWJrLHGSFeMhAG+gAGpQ==
 
 tar@^4:
   version "4.4.13"
@@ -11714,9 +11719,9 @@ wbuf@^1.1.0, wbuf@^1.7.3:
     minimalistic-assert "^1.0.0"
 
 web-component-wrapper@*:
-  version "0.0.94"
-  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.94.tgz#e0dee9fe070d34185c5675e3ffdd7fa7bef42cc6"
-  integrity sha512-fYpzd1EDls5wti6Y5EAGMKG/NA33jVrBfvyDmv8ym/n0v5k4rcZumqsEYpKBcO4fK5KoI4UJa6r/GZMzPuPymg==
+  version "0.0.95"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.95.tgz#3903e9af773b277a1b743c64d7685615b82ce3b8"
+  integrity sha512-eZOrrDGB6r8M6mAVNvPmrK90v7T2FfgPVMziy/zeb+yYS9IIc56Z0Ha4ym4RjT5+esQpwMWr8wpjZoLeJjrS5Q==
 
 webidl-conversions@^5.0.0:
   version "5.0.0"
@@ -11729,9 +11734,9 @@ webidl-conversions@^6.1.0:
   integrity sha512-qBIvFLGiBpLjfwmYAaHPXsn+ho5xZnGvyGvsarywGNc8VyQJUMHJ8OBKGGrPER0okBeMDaan4mNBlgBROxuI8w==
 
 weboptimizer@*:
-  version "2.0.827"
-  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.827.tgz#e7d86126a641589014463e64f215e9932753449a"
-  integrity sha512-Bibw/hX2OT3BjE4LmMvMsB+XyJnz4Kz0sNwnlRNOl/lZCkTCWHFP/zYdVEGHoab3hFeISmkjVifDuPYFbGbpgA==
+  version "2.0.828"
+  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.828.tgz#4fc4382558076ca8a74140d6f96092ba8cb3ed0a"
+  integrity sha512-HbVPBglo4akYKko8AoW9Fzy0ABzf0QqmtdpiRgjLpamYSs4sFJ1O+PVq7mI5DqzNIRyAXo7G4TWxXuJkrC3BUg==
   dependencies:
     "@babel/core" "*"
     "@babel/plugin-proposal-class-properties" "*"
@@ -12041,9 +12046,9 @@ ws@^6.2.1:
     async-limiter "~1.0.0"
 
 ws@^7.2.3:
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-7.3.1.tgz#d0547bf67f7ce4f12a72dfe31262c68d7dc551c8"
-  integrity sha512-D3RuNkynyHmEJIpD2qrgVkc9DQ23OrN/moAwZX4L8DfvszsJxpjQuUq3LMx6HoYji9fbIOBY18XWBsAux1ZZUA==
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-7.4.0.tgz#a5dd76a24197940d4a8bb9e0e152bb4503764da7"
+  integrity sha512-kyFwXuV/5ymf+IXhS6f0+eAFvydbaBW3zjpT6hUdAh/hbVjTIB5EHBGi0bPoCLSK2wcuz3BrEkB9LrYv1Nm4NQ==
 
 xml-name-validator@^3.0.0:
   version "3.0.0"

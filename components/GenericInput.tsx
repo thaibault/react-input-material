@@ -1238,6 +1238,10 @@ export const GenericInputInner = function<Type = any>(
         NOTE: This logic is important to re-determine representation when a new
         value is provided via properties.
     */
+    if (givenProperties.representation === undefined)
+        givenProperties.representation = valueState.representation
+    // TODO resolve!
+    console.log('A', givenProperties.representation, givenProperties.model!.value)
     if (givenProperties.model!.value === undefined)
         givenProperties.model!.value = valueState.value
     else
@@ -1251,6 +1255,7 @@ export const GenericInputInner = function<Type = any>(
             givenProperties.representation = valueState.representation
     } else
         givenProperties.representation = undefined
+    console.log('B', givenProperties.representation)
 
     if (givenProperties.model!.state)
         givenProperties.model!.state = {...givenProperties.model!.state}
