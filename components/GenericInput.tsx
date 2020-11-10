@@ -798,6 +798,12 @@ export const GenericInputInner = function<Type = any>(
     const getConsolidatedProperties = (
         properties:Props<Type>
     ):Properties<Type> => {
+        if (!properties.selection && properties.type === 'boolean')
+            // NOTE: Select-Fields restricts values to strings.
+            properties.selection = [
+                {label: 'No', value: false as unknown as string},
+                {label: 'Yes', value: true as unknown as string}
+            ]
         const result:Properties<Type> =
             getBaseConsolidatedProperties<Props<Type>, Properties<Type>>(
                 mapPropertiesAndValidationStateIntoModel(properties)
