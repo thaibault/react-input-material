@@ -72,7 +72,7 @@ export const translateKnownSymbols = <Type = any>(
         else if (value === NullSymbol)
             (result[name] as unknown as null) = null
         else
-            result[name] = properties[name] as Type
+            result[name] = Tools.copy(properties[name] as Type)
     return result
 }
 /**
