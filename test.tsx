@@ -69,12 +69,17 @@ describe('GenericInput', ():void => {
             [{label: 'A', value: 'a'}, {label: 'B', value: 'b'}],
             ['a', 'b'],
             ['A', 'B']
+        ],
+        [
+            [{label: 'NEIN', value: false}, {label: 'JA', value: true}],
+            [{label: 'No', value: false}, {label: 'Yes', value: true}],
+            {false: 'NEIN', true: 'JA'}
         ]
     ])(
         '%p === normalizeSelection(%p, %p)',
         (
-            expected:SelectProps['options'],
-            selection:Array<[string, string]>|SelectProps['options'],
+            expected:SelectProps['options']|Array<{label?:string;value:any}>,
+            selection:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:any}>,
             labels:Array<string>|Mapping|undefined
         ):void => expect(normalizeSelection(selection, labels))
             .toStrictEqual(expected)

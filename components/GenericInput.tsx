@@ -167,7 +167,7 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 // endregion
 // region static helper
 export function normalizeSelection(
-    selection?:Array<[string, string]>|SelectProps['options'],
+    selection?:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:any}>,
     labels?:Array<string>|Mapping
 ):SelectProps['options'] {
     if (!selection) {
@@ -225,7 +225,21 @@ export function normalizeSelection(
                         (
                             labels as Mapping
                         )[(option.value || option.label) as string] :
-                        option.label
+                        // Map boolean values to their string representation.
+                        (
+                            (option as unknown as {value:boolean}).value ===
+                                true &&
+                            (labels as {true:string}).true
+                        ) ?
+                            (labels as {true:string}).true :
+                            (
+                                (
+                                    option as unknown as {value:boolean}
+                                ).value === false &&
+                                (labels as {false:string}).false
+                            ) ?
+                                (labels as {false:string}).false :
+                                option.label
                 })
             return result
         }
@@ -798,16 +812,17 @@ export const GenericInputInner = function<Type = any>(
     const getConsolidatedProperties = (
         properties:Props<Type>
     ):Properties<Type> => {
-        if (!properties.selection && properties.type === 'boolean')
-            // NOTE: Select-Fields restricts values to strings.
-            properties.selection = [
-                {label: 'No', value: false as unknown as string},
-                {label: 'Yes', value: true as unknown as string}
-            ]
         const result:Properties<Type> =
             getBaseConsolidatedProperties<Props<Type>, Properties<Type>>(
                 mapPropertiesAndValidationStateIntoModel(properties)
             )
+
+        if (!result.selection && result.type === 'boolean')
+            // NOTE: Select-Fields restricts values to strings.
+            result.selection = [
+                {label: 'No', value: false as unknown as string},
+                {label: 'Yes', value: true as unknown as string}
+            ]
 
         // NOTE: If only an editor is specified it should be displayed.
         if (!(result.editor === 'plain' || result.selectableEditor))
@@ -1640,6 +1655,20 @@ GenericInput.local = 'en-US'
 GenericInput.propTypes = propertyTypes
 GenericInput.strict = false
 GenericInput.transformer = {
+    boolean: {
+        format: {
+            final: {transform: (value:boolean):string => String(value)},
+            intermediate: {transform: (value:boolean):string =>
+                GenericInput.transformer.boolean.format.final.transform(value)
+            }
+        },
+        parse: (value:string):any => (
+            value === 'true' ?
+                true :
+                value === 'false' ? false : value
+        ),
+        type: 'text'
+    },
     currency: {
         format: {
             final: {
