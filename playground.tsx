@@ -194,13 +194,37 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 placeholder="input7ModelPlaceholder"
             />
 
+            <GenericInput
+                declaration="selection"
+                description="input8Description"
+                initialValue="true"
+                name="input8"
+                onChange={onChange}
+                placeholder="input8Placeholder"
+                type="boolean"
+                required
+            />
+            <GenericInput
+                initialValue="false"
+                labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
+                model={useMemorizedValue({
+                    declaration: 'selection',
+                    description: 'input8ModelDescription',
+                    name: 'input8Model',
+                    nullable: false,
+                    type: 'boolean'
+                })}
+                onChange={onChange}
+                placeholder="input8ModelPlaceholder"
+            />
+
             <hr/>
 
             <GenericInput
                 declaration="selection"
-                description="input8Description"
+                description="input9Description"
                 initialValue="a"
-                name="input8"
+                name="input9"
                 onChange={onChange}
                 selection={useMemorizedValue({a: 'A', b: 'B', c: 'C'})}
                 required
@@ -209,8 +233,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 initialValue="a"
                 model={useMemorizedValue({
                     declaration: 'selection',
-                    description: 'input8ModelDescription',
-                    name: 'input8Model',
+                    description: 'input9ModelDescription',
+                    name: 'input9Model',
                     nullable: false,
                     selection: {a: 'A', b: 'B', c: 'C'},
                 })}
@@ -224,7 +248,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 description="input9Description"
                 editor="text"
                 initialValue="a"
-                name="input9"
+                name="input10"
                 onChange={onChange}
                 required
                 rows={3}
@@ -239,7 +263,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 model={useMemorizedValue({
                     declaration: 'text',
                     description: 'input9ModelDescription',
-                    name: 'input9Model',
+                    name: 'input10Model',
                     nullable: false,
                 })}
                 onChange={onChange}
@@ -254,7 +278,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 disabled
                 editor="code"
                 initialValue="const value = 2"
-                name="input10"
+                name="input11"
                 onChange={onChange}
                 rows={2}
                 selectableEditor
@@ -265,7 +289,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 model={useMemorizedValue({
                     declaration: 'code',
                     description: 'input10ModelDescription',
-                    name: 'input10Model',
+                    name: 'input11Model',
                     nullable: false,
                 })}
                 onChange={onChange}
@@ -280,7 +304,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 description="input11Description"
                 editor="code"
                 maximumLength={10}
-                name="input11"
+                name="input12"
                 onChange={onChange}
                 required
                 rows={2}
@@ -291,7 +315,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 model={useMemorizedValue({
                     declaration: 'code',
                     description: 'input11ModelDescription',
-                    name: 'input11Model',
+                    name: 'input12Model',
                     nullable: false
                 })}
                 onChange={onChange}
@@ -305,7 +329,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 declaration="richtext(raw)"
                 description="input12Description"
                 editor="richtext(raw)"
-                name="input12"
+                name="input13"
                 onChange={onChange}
                 placeholder="Hello Mr. Smith,<br><br>this is a Placeholder."
                 required
@@ -319,7 +343,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     declaration: 'richtext(simple)',
                     description: 'input12ModelDescription',
                     mutable: false,
-                    name: 'input12Model',
+                    name: 'input13Model',
                     nullable: false
                 })}
                 onChange={onChange}
@@ -334,7 +358,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 description="input13Description"
                 maximum={200000}
                 minimum={10}
-                name="input13"
+                name="input14"
                 onChange={onChange}
                 placeholder="100000"
                 required
@@ -347,7 +371,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     description: 'input13ModelDescription',
                     maximum: 200000,
                     minimum: 10,
-                    name: 'input13Model',
+                    name: 'input14Model',
                     nullable: false,
                     type: 'number'
                 })}
@@ -361,7 +385,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 description="input14Description"
                 maximum={200000}
                 minimum={10}
-                name="input14"
+                name="input15"
                 onChange={onChange}
                 placeholder="100.000"
                 required
@@ -375,7 +399,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     description: 'input14ModelDescription',
                     maximum: 200000,
                     minimum: 10,
-                    name: 'input14Model',
+                    name: 'input15Model',
                     nullable: false,
                     type: 'float'
                 })}
@@ -389,7 +413,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 description="input15Description"
                 maximum={200000}
                 minimum={10}
-                name="input15"
+                name="input16"
                 onChange={onChange}
                 placeholder="100.000"
                 required
@@ -399,10 +423,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 initialValue={100000.01}
                 model={useMemorizedValue({
                     declaration: 'Number',
-                    description: 'input15ModelDescription',
+                    description: 'input16ModelDescription',
                     maximum: 200000,
                     minimum: 10,
-                    name: 'input15Model',
+                    name: 'input16Model',
                     nullable: false,
                     type: 'currency'
                 })}

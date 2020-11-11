@@ -118,7 +118,18 @@ export const determineValidationState = <P extends Properties<any>>(
 
     validators = {
         invalidRequired: ():boolean => (
-            properties.model.nullable === false && !properties.model.value
+            properties.model.nullable === false &&
+            (
+                properties.model.type !== 'boolean' &&
+                !properties.model.value
+            ) ||
+            (
+                properties.model.type === 'boolean' &&
+                !(
+                    typeof properties.model.value === 'boolean' ||
+                    ['false', 'true'].includes(properties.model.value)
+                )
+            )
         ),
         ...validators
     }

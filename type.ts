@@ -402,6 +402,7 @@ export type InputState<Type = any> =
 export type InputDataTransformation<Type = any> =
     Mapping<RecursivePartial<DataTransformSpecification<Type>>> &
     {
+        boolean: DataTransformSpecification<Type>
         currency: DataTransformSpecification<Type>
         float: DataTransformSpecification<Type>
         integer: {
