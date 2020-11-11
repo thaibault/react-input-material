@@ -40,7 +40,7 @@ import styles from './RequireableCheckbox.module'
 import {WrapConfigurations} from './WrapConfigurations'
 import {
     determineInitialValue,
-    determineValidationState,
+    determineValidationState as determineBaseValidationState,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
     translateKnownSymbols,
@@ -60,6 +60,19 @@ import {
     StaticFunctionComponent as StaticComponent,
     ValueState
 } from '../type'
+// endregion
+// region static helper
+export function determineValidationState(
+    properties:Properties, currentState:ModelState
+):boolean {
+    return determineBaseValidationState<Properties>(
+        properties,
+        currentState,
+        {invalidRequired: ():boolean =>
+            properties.model.nullable === false && !properties.model.value
+        }
+    )
+}
 // endregion
 /**
  * Validateable checkbox wrapper component.
@@ -101,7 +114,7 @@ export const RequireableCheckboxInner = function(
             properties, RequireableCheckbox.defaultProperties.model as Model
         )
 
-        determineValidationState<Properties>(
+        determineValidationState(
             result as Properties, result.model!.state as ModelState
         )
 
@@ -231,9 +244,7 @@ export const RequireableCheckboxInner = function(
 
             onChange(event)
 
-            if (determineValidationState<Properties>(
-                properties, oldValueState.modelState
-            ))
+            if (determineValidationState(properties, oldValueState.modelState))
                 stateChanged = true
 
             triggerCallbackIfExists<boolean>(
