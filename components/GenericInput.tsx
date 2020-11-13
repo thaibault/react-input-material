@@ -1438,7 +1438,9 @@ export const GenericInputInner = function<Type = any>(
         styles['generic-input'] +
         (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
     }>
-        <GenericAnimate in={Boolean(properties.selection)}>
+        <GenericAnimate
+            in={Boolean(properties.selection) || Boolean(properties.labels)}
+        >
             <Select
                 {...genericProperties as SelectProps}
                 {...materialProperties as SelectProps}
@@ -1607,7 +1609,7 @@ export const GenericInputInner = function<Type = any>(
                                 properties.type
                 }
             />,
-            !(isAdvancedEditor || properties.selection),
+            !(isAdvancedEditor || properties.selection || properties.labels),
             richTextEditorLoadedOnce || properties.editor.startsWith('code')
         )}
     </div></WrapConfigurations>
