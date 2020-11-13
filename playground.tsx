@@ -223,8 +223,32 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <GenericInput
                 declaration="selection"
                 description="input9Description"
-                initialValue="a"
+                initialValue="true"
+                labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
                 name="input9"
+                onChange={onChange}
+                required
+            />
+            <GenericInput
+                initialValue="false"
+                labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
+                model={useMemorizedValue({
+                    declaration: 'selection',
+                    description: 'input9ModelDescription',
+                    name: 'input9Model',
+                    nullable: false,
+                    type: 'string'
+                })}
+                onChange={onChange}
+            />
+
+            <hr/>
+
+            <GenericInput
+                declaration="selection"
+                description="input10Description"
+                initialValue="a"
+                name="input10"
                 onChange={onChange}
                 selection={useMemorizedValue({a: 'A', b: 'B', c: 'C'})}
                 required
@@ -233,8 +257,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 initialValue="a"
                 model={useMemorizedValue({
                     declaration: 'selection',
-                    description: 'input9ModelDescription',
-                    name: 'input9Model',
+                    description: 'input10ModelDescription',
+                    name: 'input10Model',
                     nullable: false,
                     selection: {a: 'A', b: 'B', c: 'C'},
                 })}
@@ -245,10 +269,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <GenericInput
                 declaration="text"
-                description="input9Description"
+                description="input11Description"
                 editor="text"
                 initialValue="a"
-                name="input10"
+                name="input11"
                 onChange={onChange}
                 required
                 rows={3}
@@ -262,61 +286,35 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 initialValue="a"
                 model={useMemorizedValue({
                     declaration: 'text',
-                    description: 'input9ModelDescription',
-                    name: 'input10Model',
-                    nullable: false,
-                })}
-                onChange={onChange}
-                rows={2}
-            />
-
-            <hr/>
-
-            <GenericInput
-                declaration="code"
-                description="input10Description"
-                disabled
-                editor="code"
-                initialValue="const value = 2"
-                name="input11"
-                onChange={onChange}
-                rows={2}
-                selectableEditor
-            />
-            <GenericInput
-                editor="code"
-                initialValue="const value = 2"
-                model={useMemorizedValue({
-                    declaration: 'code',
-                    description: 'input10ModelDescription',
+                    description: 'input11ModelDescription',
                     name: 'input11Model',
                     nullable: false,
                 })}
                 onChange={onChange}
-                rows={6}
-                selectableEditor
+                rows={2}
             />
 
             <hr/>
 
             <GenericInput
                 declaration="code"
-                description="input11Description"
+                description="input12Description"
+                disabled
                 editor="code"
-                maximumLength={10}
+                initialValue="const value = 2"
                 name="input12"
                 onChange={onChange}
-                required
                 rows={2}
                 selectableEditor
             />
             <GenericInput
                 editor="code"
+                initialValue="const value = 2"
                 model={useMemorizedValue({
                     declaration: 'code',
-                    description: 'input11ModelDescription',
+                    description: 'input12ModelDescription',
                     name: 'input12Model',
-                    nullable: false
+                    nullable: false,
                 })}
                 onChange={onChange}
                 rows={6}
@@ -326,23 +324,21 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <GenericInput
-                declaration="richtext(raw)"
-                description="input12Description"
-                editor="richtext(raw)"
+                declaration="code"
+                description="input13Description"
+                editor="code"
+                maximumLength={10}
                 name="input13"
                 onChange={onChange}
-                placeholder="Hello Mr. Smith,<br><br>this is a Placeholder."
                 required
                 rows={2}
                 selectableEditor
             />
             <GenericInput
-                editor="richtext(simple)"
-                initialValue="Hello Mr. Smith,<br><br>how are you?"
+                editor="code"
                 model={useMemorizedValue({
-                    declaration: 'richtext(simple)',
-                    description: 'input12ModelDescription',
-                    mutable: false,
+                    declaration: 'code',
+                    description: 'input13ModelDescription',
                     name: 'input13Model',
                     nullable: false
                 })}
@@ -354,11 +350,39 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <GenericInput
+                declaration="richtext(raw)"
+                description="input14Description"
+                editor="richtext(raw)"
+                name="input14"
+                onChange={onChange}
+                placeholder="Hello Mr. Smith,<br><br>this is a Placeholder."
+                required
+                rows={2}
+                selectableEditor
+            />
+            <GenericInput
+                editor="richtext(simple)"
+                initialValue="Hello Mr. Smith,<br><br>how are you?"
+                model={useMemorizedValue({
+                    declaration: 'richtext(simple)',
+                    description: 'input14ModelDescription',
+                    mutable: false,
+                    name: 'input14Model',
+                    nullable: false
+                })}
+                onChange={onChange}
+                rows={6}
+                selectableEditor
+            />
+
+            <hr/>
+
+            <GenericInput
                 declaration="Number"
-                description="input13Description"
+                description="input15Description"
                 maximum={200000}
                 minimum={10}
-                name="input14"
+                name="input15"
                 onChange={onChange}
                 placeholder="100000"
                 required
@@ -368,10 +392,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 initialValue={100000}
                 model={useMemorizedValue({
                     declaration: 'Number',
-                    description: 'input13ModelDescription',
+                    description: 'input15ModelDescription',
                     maximum: 200000,
                     minimum: 10,
-                    name: 'input14Model',
+                    name: 'input15Model',
                     nullable: false,
                     type: 'number'
                 })}
@@ -382,7 +406,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <GenericInput
                 declaration="Number"
-                description="input14Description"
+                description="input16Description"
                 maximum={200000}
                 minimum={10}
                 name="input15"
@@ -391,15 +415,14 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 required
                 type="integer"
             />
-
             <GenericInput
                 initialValue={100000.01}
                 model={useMemorizedValue({
                     declaration: 'Number',
-                    description: 'input14ModelDescription',
+                    description: 'input16ModelDescription',
                     maximum: 200000,
                     minimum: 10,
-                    name: 'input15Model',
+                    name: 'input16Model',
                     nullable: false,
                     type: 'float'
                 })}
@@ -410,7 +433,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <GenericInput
                 declaration="Number"
-                description="input15Description"
+                description="input1Description"
                 maximum={200000}
                 minimum={10}
                 name="input16"
@@ -423,10 +446,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 initialValue={100000.01}
                 model={useMemorizedValue({
                     declaration: 'Number',
-                    description: 'input16ModelDescription',
+                    description: 'input1ModelDescription',
                     maximum: 200000,
                     minimum: 10,
-                    name: 'input16Model',
+                    name: 'input17Model',
                     nullable: false,
                     type: 'currency'
                 })}
