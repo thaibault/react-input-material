@@ -58,7 +58,7 @@ export const triggerCallbackIfExists = <Type = any>(
 }
 // region consolidation state
 /**
- * Translate known symbols in properties.
+ * Translate known symbols in a copied and return properties object.
  * @param properties - Object to translate.
  * @returns Transformed properties.
  */
