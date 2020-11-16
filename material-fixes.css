@@ -18,6 +18,15 @@ endregion */
         }
     }
 
+    /*
+        Fading input elements with pre-filled inputs or placeholder are not
+        over background outline.
+    */
+    & .mdc-floating-label--float-above {
+        background-color: var(--mdc-theme-surface);
+        padding: 0 8px 2px 8px;
+    }
+
     & .mdc-icon-button {
         font-size: 1rem;
         height: 30px;
