@@ -1197,7 +1197,7 @@ export const GenericInputInner = function<Type = any>(
     let richTextEditorInstance:RichTextEditor|undefined
     let richTextEditorReference:RichTextEditorComponent|undefined
     // / endregion
-    const givenProperties:Props<Type> = translateKnownSymbols(props)
+    const givenProps:Props<Type> = translateKnownSymbols(props)
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
     let [hidden, setHidden] = useState<boolean|undefined>()
     let [editorState, setEditorState] = useState<EditorState>({
@@ -1205,17 +1205,15 @@ export const GenericInputInner = function<Type = any>(
     })
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
     const initialValue:null|Type = determineInitialValue<Type>(
-        givenProperties, GenericInput.defaultProperties.model?.default
+        givenProps, GenericInput.defaultProperties.model?.default
     )
     /*
         NOTE: This only way to extend default properties with given properties
         while not modifying default property object is create an intermediate
         copy like this.
     */
-    Tools.extend(
-        true,
-        givenProperties,
-        Tools.extend(true, {}, GenericInput.defaultProperties, givenProperties)
+    const givenProperties:Props<Type> = Tools.extend(
+        true, Tools.copy(GenericInput.defaultProperties), givenProps
     )
     /*
         NOTE: This values have to share the same state item since they have to

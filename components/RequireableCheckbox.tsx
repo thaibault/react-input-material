@@ -328,24 +328,20 @@ export const RequireableCheckboxInner = function(
     const foundationRef:RefObject<MDCCheckboxFoundation> =
         createRef<MDCCheckboxFoundation>()
     // / endregion
-    const givenProperties:Props = translateKnownSymbols(props)
+    const givenProps:Props = translateKnownSymbols(props)
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
     const initialValue:boolean|null = determineInitialValue<boolean>(
-        givenProperties,
+        givenProps,
         RequireableCheckbox.defaultProperties.model.default,
-        givenProperties.checked
+        givenProps.checked
     )
     /*
         NOTE: This only way to extend default properties with given properties
         while not modifying default property object is create an intermediate
         copy like this.
     */
-    Tools.extend(
-        true,
-        givenProperties,
-        Tools.extend(
-            true, {}, RequireableCheckbox.defaultProperties, givenProperties
-        )
+    const givenProperties:Props = Tools.extend(
+        true, Tools.copy(RequireableCheckbox.defaultProperties), givenProps
     )
     /*
         NOTE: This values have to share the same state item since they have to
