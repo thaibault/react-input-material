@@ -518,10 +518,10 @@ export const defaultInputProperties:DefaultInputProperties = {
     editor: 'plain',
     maximumLengthText:
         'Please type less or equal than ${maximumLength} symbols.',
-    maximumText: 'Please give a number less or equal than ${maximum}.',
+    maximumText: 'Please type less or equal than ${formatValue(maximum)}.',
     minimumLengthText:
         'Please type at least or equal ${minimumLength} symbols.',
-    minimumText: 'Please give a number at least or equal to ${minimum}.',
+    minimumText: 'Please type at least or equal ${formatValue(minimum)}.',
     model: defaultInputModel,
     patternText:
         'Your string have to match the regular expression: "${pattern}".',

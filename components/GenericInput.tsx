@@ -497,8 +497,16 @@ export const GenericInputInner = function<Type = any>(
      */
     const renderMessage = (template?:any):string => {
         if (typeof template === 'string') {
-            const evaluated:EvaluationResult =
-                Tools.stringEvaluate(`\`${template}\``, properties)
+            const evaluated:EvaluationResult = Tools.stringEvaluate(
+                `\`${template}\``,
+                 {
+                    formatValue: (value:Type, type=properties.type):string =>
+                        formatValue<Type>(
+                            value, type, GenericInput.transformer
+                        ),
+                    ...properties
+                }
+            )
             if (evaluated.error) {
                 console.warn(
                     'Given message template could not be proceed: ' +
