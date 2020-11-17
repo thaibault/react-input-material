@@ -433,10 +433,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <GenericInput
                 declaration="Number"
-                description="input1Description"
+                description="input17Description"
                 maximum={200000}
                 minimum={10}
-                name="input16"
+                minimumText="Please at least ${formatValue(minimum)}."
+                name="input17"
                 onChange={onChange}
                 placeholder="100.000"
                 required
@@ -446,7 +447,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 initialValue={100000.01}
                 model={useMemorizedValue({
                     declaration: 'Number',
-                    description: 'input1ModelDescription',
+                    description: 'input17ModelDescription',
                     maximum: 200000,
                     minimum: 10,
                     name: 'input17Model',
