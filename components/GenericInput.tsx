@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import Tools from 'clientnode'
+import Tools, {optionalRequire} from 'clientnode'
 import {EvaluationResult, Mapping} from 'clientnode/type'
 import React, {
     ComponentType,
@@ -62,9 +62,6 @@ import {
 import {
     EventHandler as RichTextEventHandler
 } from '@tinymce/tinymce-react/lib/cjs/main/ts/Events'
-import UseAnimations from 'react-useanimations'
-import lock from 'react-useanimations/lib/lock'
-import plusToX from 'react-useanimations/lib/plusToX'
 
 import Dummy from './Dummy'
 import GenericAnimate from './GenericAnimate'
@@ -103,6 +100,17 @@ import {
     StaticFunctionInputComponent as StaticComponent,
     ValueState
 } from '../type'
+
+const isBrowser:boolean =
+    !(TARGET_TECHNOLOGY === 'node' || typeof window === undefined)
+const UseAnimations:any|null =
+    isBrowser ? optionalRequire('react-useanimations') : null
+const lock:any|null = isBrowser ?
+    optionalRequire('react-useanimations/lib/lock') :
+    null
+const plusToX:any|null = isBrowser ?
+    optionalRequire('react-useanimations/lib/plusToX') :
+    null
 // endregion
 // region code editor configuration
 const CodeEditor = lazy(async ():Promise<{default:ComponentType<any>}> => {
@@ -380,7 +388,10 @@ export const GenericInputInner = function<Type = any>(
                 icon: <GenericAnimate
                     in={properties.value !== properties.default}
                 >
-                    {(UseAnimations as typeof Dummy).isDummy ?
+                    {(
+                        UseAnimations === null ||
+                        (UseAnimations as typeof Dummy).isDummy
+                    ) ?
                         <IconButton icon="clear"/> :
                         <UseAnimations animation={plusToX} reverse={true}/>
                     }
@@ -400,7 +411,10 @@ export const GenericInputInner = function<Type = any>(
         if (options === 'password_preset')
             return useMemorizedValue(
                 {
-                    icon: (UseAnimations as typeof Dummy).isDummy ?
+                    icon: (
+                        UseAnimations === null ||
+                        (UseAnimations as typeof Dummy).isDummy
+                    ) ?
                         <IconButton
                             icon={properties.hidden ? 'lock_open' : 'lock'}
                         /> :
