@@ -10,7 +10,8 @@ This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
 .generic-input {
-    & label, & .mdc-form-field {
+    & label,
+    & .mdc-form-field {
         width: 100%;
 
         &.mdc-text-field--textarea {
@@ -22,9 +23,12 @@ endregion */
         Fading input elements with pre-filled inputs or placeholder are not
         over background outline.
     */
-    & .mdc-floating-label--float-above {
-        background-color: var(--mdc-theme-surface);
-        padding: 0 8px 2px 8px;
+    & .mdc-select--outlined,
+    & .mdc-text-field--outlined {
+        & .mdc-floating-label--float-above {
+            background-color: var(--mdc-theme-surface);
+            padding: 0 8px 2px 8px;
+        }
     }
 
     & .mdc-icon-button {
@@ -54,9 +58,11 @@ endregion */
         }
     }
 }
+
 .generic-tooltip {
     display: inline;
 }
+
 ::-ms-clear {
     display: none;
 }
