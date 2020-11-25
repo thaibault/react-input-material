@@ -369,6 +369,7 @@ export type InputProperties<Type = any> =
         onChange:(properties:InputProperties<Type>, event?:SyntheticEvent) =>
             void
         onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void
+        onKeyDown:(event:KeyboardEvent) => void
         onKeyUp:(event:KeyboardEvent) => void
         onSelectionChange:(event:SyntheticEvent) => void
         outlined:boolean
@@ -487,6 +488,7 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     minimumText: string,
     onBlur: func,
     onChangeEditorIsActive: func,
+    onKeyDown: func,
     onKeyUp: func,
     onSelectionChange: func,
     outlined: boolean,
