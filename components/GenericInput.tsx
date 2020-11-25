@@ -101,6 +101,7 @@ import {
     ValueState
 } from '../type'
 
+declare var TARGET_TECHNOLOGY:string
 const isBrowser:boolean =
     !(TARGET_TECHNOLOGY === 'node' || typeof window === undefined)
 const UseAnimations:any|null =
@@ -1143,6 +1144,25 @@ export const GenericInputInner = function<Type = any>(
         onTouch(event)
     }
     /**
+     * Triggered on down up events.
+     * @param event - Key up event object.
+     * @returns Nothing.
+     */
+    const onKeyDown = (event:ReactKeyboardEvent):void => {
+        /*
+            NOTE: We do not want to forward keydown enter events coming from
+            textareas.
+        */
+        if (
+            Tools.keyCode.ENTER === event.keyCode &&
+            properties.type === 'string' &&
+            properties.editor !== 'plain'
+        )
+            event.stopPropagation()
+
+        triggerCallbackIfExists<Type>(properties, 'keyDown', event)
+    }
+    /**
      * Triggered on key up events.
      * @param event - Key up event object.
      * @returns Nothing.
@@ -1601,6 +1621,7 @@ export const GenericInputInner = function<Type = any>(
                 rootProps={{
                     name: properties.name,
                     onClick: onClick,
+                    onKeyDown: onKeyDown,
                     onKeyUp: onKeyUp,
                     ...properties.rootProps
                 }}
