@@ -520,7 +520,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     </>)
 }
 window.onload = ():void =>
-    render(<Application />, document.querySelector('.app'))
+    render(<Application />, document.querySelector('application'))
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
