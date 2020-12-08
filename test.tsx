@@ -81,8 +81,9 @@ describe('GenericInput', ():void => {
             expected:SelectProps['options']|Array<{label?:string;value:any}>,
             selection:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:any}>,
             labels:Array<string>|Mapping|undefined
-        ):void => expect(normalizeSelection(selection, labels))
-            .toStrictEqual(expected)
+        ):void =>
+            expect(normalizeSelection(selection, labels))
+                .toStrictEqual(expected)
     )
     test('render', ():void => {
         expect(render(<GenericInput/>)).toBeDefined()

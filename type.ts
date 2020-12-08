@@ -3,7 +3,7 @@
 'use strict'
 /* !
     region header
-    [Project page](https://torben.website/storelocator)
+    [Project page](https://torben.website/react-material-input)
 
     Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
 
