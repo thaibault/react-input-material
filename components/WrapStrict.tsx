@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import React, {FunctionComponent, ReactElement, StrictMode} from 'react'
+import {FunctionComponent, ReactElement, StrictMode} from 'react'
 
 import {Renderable} from '../type'
 // endregion

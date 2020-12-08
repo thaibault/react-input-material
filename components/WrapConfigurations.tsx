@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import React, {FunctionComponent, ReactElement} from 'react'
+import {FunctionComponent, ReactElement} from 'react'
 import {ThemeProviderProps} from '@rmwc/theme'
 
 import {WrapStrict} from './WrapStrict'
