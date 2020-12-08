@@ -247,14 +247,14 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <GenericInput
                 declaration="selection"
                 description="input10Description"
-                initialValue="a"
+                initialValue="b"
                 name="input10"
                 onChange={onChange}
                 selection={useMemorizedValue({a: 'A', b: 'B', c: 'C'})}
                 required
             />
             <GenericInput
-                initialValue="a"
+                initialValue="b"
                 model={useMemorizedValue({
                     declaration: 'selection',
                     description: 'input10ModelDescription',

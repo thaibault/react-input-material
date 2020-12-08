@@ -110,7 +110,7 @@
     "style-loader": "*",
     "stylelint": "*",
     "stylelint-config-standard": "*",
-    "tinymce": "^5.0.0",
+    "tinymce": "*",
     "typescript-plugin-css-modules": "*",
     "web-component-wrapper": "*",
     "weboptimizer": "*",
