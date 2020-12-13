@@ -13,11 +13,11 @@
     "trackingCode": "TODO"
   },
   "keywords": [
+    "form-field",
     "input",
-    "text",
-    "rich-text",
     "number-input",
-    "form-field"
+    "rich-text",
+    "text"
   ],
   "files": [
     "components",
