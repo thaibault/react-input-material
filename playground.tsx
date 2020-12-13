@@ -18,7 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
-import React, {FunctionComponent, useEffect, useState} from 'react'
+import {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
 import {render} from 'react-dom'
 

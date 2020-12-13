@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import React, {FunctionComponent, ReactElement} from 'react'
+import {FunctionComponent, ReactElement} from 'react'
 import {Typography} from '@rmwc/typography'
 import {Tooltip} from '@rmwc/tooltip'
 

@@ -19,7 +19,7 @@
 // region imports
 import Tools, {optionalRequire} from 'clientnode'
 import {EvaluationResult, Mapping} from 'clientnode/type'
-import React, {
+import {
     ComponentType,
     createRef,
     FocusEvent as ReactFocusEvent,

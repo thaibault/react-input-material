@@ -336,14 +336,17 @@ export function formatValue<Type = any>(
  * @param transformer - To apply to given value.
  * @returns Determined initial representation.
  */
-export function determineInitialRepresentation<P extends {
-    model?:{type?:string}
-    representation?:string
-    type?:string
-}, Type = any>(
+export function determineInitialRepresentation<
+    P extends {
+        model?:{type?:string}
+        representation?:string
+        type?:string
+    },
+    Type = any
+>(
     properties:P,
     defaultProperties:Partial<P>,
-    value:null|Type, 
+    value:null|Type,
     transformer:InputDataTransformation<Type>
 ):string {
     if (typeof properties.representation === 'string')

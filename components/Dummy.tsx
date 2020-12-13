@@ -18,7 +18,7 @@
 */
 // region imports
 import {Mapping} from 'clientnode/type'
-import React, {
+import {
     forwardRef,
     ForwardRefRenderFunction,
     FunctionComponent,
