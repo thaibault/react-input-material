@@ -234,11 +234,11 @@ export const getConsolidatedProperties =
         (properties.model || {}).state || {}
     )
     // region handle aliases
-    result.disabled = !result.mutable
+    result.disabled = !(result.mutable && result.writable)
     delete result.mutable
+    delete result.writable
 
     delete result.state
-    delete result.writable
 
     result.required = !result.nullable
     delete result.nullable
