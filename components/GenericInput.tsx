@@ -33,7 +33,6 @@ import {
     RefCallback,
     RefObject,
     Suspense,
-    SyntheticEvent,
     useEffect,
     useImperativeHandle,
     useState,
@@ -88,6 +87,7 @@ import {
     DefaultInputProperties as DefaultProperties,
     defaultInputProperties as defaultProperties,
     EditorState,
+    GenericEvent,
     InputAdapter as Adapter,
     InputDataTransformation,
     InputModelState as ModelState,
@@ -912,7 +912,7 @@ export const GenericInputInner = function<Type = any>(
      * @param event - Event object.
      * @returns Nothing.
      */
-    const onBlur = (event:SyntheticEvent):void => setValueState((
+    const onBlur = (event:GenericEvent):void => setValueState((
         oldValueState:ValueState<Type, ModelState>
     ):ValueState<Type, ModelState> => {
         let changed:boolean = false
@@ -976,7 +976,7 @@ export const GenericInputInner = function<Type = any>(
      * @param event - Potential event object.
      * @returns Nothing.
      */
-    const onChange = (event?:SyntheticEvent):void => {
+    const onChange = (event?:GenericEvent):void => {
         Tools.extend(
             true,
             properties,
@@ -1050,16 +1050,16 @@ export const GenericInputInner = function<Type = any>(
      * @returns Nothing.
      */
     const onChangeValue = (
-        eventOrValue:null|SyntheticEvent|Type, editorInstance?:RichTextEditor
+        eventOrValue:null|GenericEvent|Type, editorInstance?:RichTextEditor
     ):void => {
         if (properties.disabled)
             return
 
-        let event:SyntheticEvent|undefined
+        let event:GenericEvent|undefined
         if (eventOrValue !== null && typeof eventOrValue === 'object') {
             const target:any =
-                (eventOrValue as SyntheticEvent).target ||
-                (eventOrValue as {detail?:any}).detail
+                (eventOrValue as GenericEvent).target ||
+                (eventOrValue as GenericEvent).detail
             if (target)
                 properties.value = typeof target.value === 'undefined' ?
                     null :
@@ -1177,7 +1177,7 @@ export const GenericInputInner = function<Type = any>(
      * @param event - Event which triggered selection change.
      * @returns Nothing.
      */
-    const onSelectionChange = (event:SyntheticEvent):void => {
+    const onSelectionChange = (event:GenericEvent):void => {
         /*
             We assume that this event is triggered after a property
             consolidation.

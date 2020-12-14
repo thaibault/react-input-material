@@ -54,6 +54,7 @@ import {
 // endregion
 // region exports
 // / region generic
+export type GenericEvent = SyntheticEvent & {detail?:any}
 export type TestEnvironment = {
     container:HTMLDivElement|null
     render:(component:ReactElement) => ChildNode|null
@@ -120,14 +121,14 @@ export type Properties<Type = any> =
         label:string
         model:Model<Type>
         name:string
-        onBlur:(event:SyntheticEvent) => void
-        onChange:(properties:Properties<Type>, event?:SyntheticEvent) => void
-        onChangeShowDeclaration:(show:boolean, event?:SyntheticEvent) => void
-        onChangeState:(state:ModelState, event?:SyntheticEvent) => void
-        onChangeValue:(value:null|Type, event?:SyntheticEvent) => void
+        onBlur:(event:GenericEvent) => void
+        onChange:(properties:Properties<Type>, event?:GenericEvent) => void
+        onChangeShowDeclaration:(show:boolean, event?:GenericEvent) => void
+        onChangeState:(state:ModelState, event?:GenericEvent) => void
+        onChangeValue:(value:null|Type, event?:GenericEvent) => void
         onClick:(event:MouseEvent) => void
         onFocus:(event:FocusEvent) => void
-        onTouch:(event:SyntheticEvent) => void
+        onTouch:(event:GenericEvent) => void
         required:boolean
         requiredText:string
         ripple:RipplePropT
@@ -292,7 +293,7 @@ export type CheckboxProperties =
     {
         checked:boolean
         id:string
-        onChange:(properties:CheckboxProperties, event?:SyntheticEvent) => void
+        onChange:(properties:CheckboxProperties, event?:GenericEvent) => void
     }
 export type CheckboxModel = Model<boolean>
 export type CheckboxModelState = ModelState
@@ -366,12 +367,12 @@ export type InputProperties<Type = any> =
         minimumLengthText:string
         minimumText:string
         model:InputModel<Type>
-        onChange:(properties:InputProperties<Type>, event?:SyntheticEvent) =>
+        onChange:(properties:InputProperties<Type>, event?:GenericEvent) =>
             void
         onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void
         onKeyDown:(event:KeyboardEvent) => void
         onKeyUp:(event:KeyboardEvent) => void
-        onSelectionChange:(event:SyntheticEvent) => void
+        onSelectionChange:(event:GenericEvent) => void
         outlined:boolean
         pattern:RegExp|string
         patternText:string
