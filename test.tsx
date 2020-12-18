@@ -14,6 +14,7 @@
     endregion
 */
 // region imports
+import {testEach} from 'clientnode/testHelper'
 import {Mapping} from 'clientnode/type'
 import React from 'react'
 import {SelectProps} from '@rmwc/select'
@@ -53,7 +54,10 @@ describe('GenericAnimate', ():void => {
 // endregion
 // region GenericInput
 describe('GenericInput', ():void => {
-    test.each([
+    testEach<typeof normalizeSelection>(
+        'normalizeSelection',
+        normalizeSelection,
+
         [[], [], undefined],
         [
             [{label: 'A', value: 'a'}, {label: 'B', value: 'b'}],
@@ -75,15 +79,6 @@ describe('GenericInput', ():void => {
             [{label: 'No', value: false}, {label: 'Yes', value: true}],
             {false: 'NEIN', true: 'JA'}
         ]
-    ])(
-        '%p === normalizeSelection(%p, %p)',
-        (
-            expected:SelectProps['options']|Array<{label?:string;value:any}>,
-            selection:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:any}>,
-            labels:Array<string>|Mapping|undefined
-        ):void =>
-            expect(normalizeSelection(selection, labels))
-                .toStrictEqual(expected)
     )
     test('render', ():void => {
         expect(render(<GenericInput/>)).toBeDefined()
