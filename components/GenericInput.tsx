@@ -178,7 +178,7 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 export function normalizeSelection(
     selection?:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:any}>,
     labels?:Array<string>|Mapping
-):SelectProps['options'] {
+):SelectProps['options']|Array<{label?:string;value:any}> {
     if (!selection) {
         selection = labels
         labels = undefined
@@ -1497,9 +1497,9 @@ export const GenericInputInner = function<Type = any>(
                     ...properties.rootProps
                 }}
                 onChange={onChangeValue}
-                options={
-                    normalizeSelection(properties.selection, properties.labels)
-                }
+                options={normalizeSelection(
+                    properties.selection, properties.labels
+                ) as SelectProps['options']}
             />
         </GenericAnimate>
         {wrapAnimationConditionally(
