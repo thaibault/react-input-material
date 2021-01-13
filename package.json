@@ -220,16 +220,14 @@
     },
     "target:minimal": {
       "module": {
-        "replacements": {
-          "normal": {
-            "#": "Mock unneeded optional dependencies away.",
-            "ace-builds$": "./Dummy",
-            "@tinymce/tinymce-react$": "./Dummy",
-            "react-ace$": "./Dummy",
-            "react-useanimations$": "./Dummy",
-            "react-useanimations/lib/lock$": "./Dummy",
-            "react-useanimations/lib/plusToX$": "./Dummy"
-          }
+        "aliases": {
+          "#": "Remove unneeded optional dependencies.",
+          "ace-builds$": false,
+          "@tinymce/tinymce-react$": false,
+          "react-ace$": false,
+          "react-useanimations$": false,
+          "react-useanimations/lib/lock$": false,
+          "react-useanimations/lib/plusToX$": false
         }
       }
     }
