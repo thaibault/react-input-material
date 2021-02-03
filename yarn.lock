@@ -3831,9 +3831,9 @@ cli-table3@^0.5.0:
     colors "^1.1.2"
 
 clientnode@*:
-  version "3.0.673"
-  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.673.tgz#e76336704e23d60ed796749120c29ec3ebc51e34"
-  integrity sha512-h1qqj8gWG/t/TsZQ7PnCJhVKf+9cvPxQbnutWPf3vNJf7M8O6YVfdi9uRzy7p8bGR42cmY65JBKPByQgl1PT3Q==
+  version "3.0.675"
+  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.675.tgz#946fd614ed42670744dd0792ce52a7055e7dd2ff"
+  integrity sha512-AtHGsCbktQOtODIlfhyXo5+z8cMZC3HvYQBiok2Z3FJTjRFQlghQuLv5dIsXYaftvIZyR3qaNWw8Gn/YXFO7pA==
 
 cliui@^4.0.0:
   version "4.1.0"
@@ -11236,9 +11236,9 @@ wbuf@^1.1.0, wbuf@^1.7.3:
     minimalistic-assert "^1.0.0"
 
 web-component-wrapper@*:
-  version "0.0.191"
-  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.191.tgz#4a1bb10e78de9526c590455921f6cbb0344d631d"
-  integrity sha512-I9W7LhZ73Z/g29N+fQG6gilbv7Q+gZUpOVemmYhdqTSvUaE0Iwlpmakhg1RLvctj64i7NLbjartYsQZHbB0Dhw==
+  version "0.0.193"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.193.tgz#fcf27b83e33bae52e99627acb1d9be39c456102c"
+  integrity sha512-Et7CjGvZw0gcHdzusE5H6W0q0JyacgKNvJ4LfdyYsHaODqq9dxnk7oMXIUVq8Zm01Gpa/j6/60vZXa20qfdLnA==
 
 webidl-conversions@^5.0.0:
   version "5.0.0"
@@ -11251,9 +11251,9 @@ webidl-conversions@^6.1.0:
   integrity sha512-qBIvFLGiBpLjfwmYAaHPXsn+ho5xZnGvyGvsarywGNc8VyQJUMHJ8OBKGGrPER0okBeMDaan4mNBlgBROxuI8w==
 
 weboptimizer@*:
-  version "2.0.906"
-  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.906.tgz#d975f61c106f414ac5f14fcb92a36d7fc3f06991"
-  integrity sha512-5C+jQEYvetjwPtud5dN6Knzh9lffZbwJH3MwJYMXEBv2ahZViKJDk3XA6Ps4EPiZOviS8ywEmlW5YfVFPlhB4Q==
+  version "2.0.909"
+  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.909.tgz#e432f2be46924b5de04bed151f95287ce6c24b18"
+  integrity sha512-4NNU72t3df3FFTrBp7/5CDpSVX1oisQuSlnyhNTsLeHkLoV6vvxwr7r1K+QPPrAyo0jbSixw+tJhhN6023Lyyw==
   dependencies:
     "@babel/core" "*"
     "@babel/plugin-proposal-class-properties" "*"
