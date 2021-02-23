@@ -1050,7 +1050,7 @@ export const GenericInputInner = function<Type = any>(
      * @returns Nothing.
      */
     const onChangeValue = (
-        eventOrValue:null|GenericEvent|Type, editorInstance?:RichTextEditor
+        eventOrValue:GenericEvent|null|Type, editorInstance?:RichTextEditor
     ):void => {
         if (properties.disabled)
             return
@@ -1168,9 +1168,12 @@ export const GenericInputInner = function<Type = any>(
      * @returns Nothing.
      */
     const onKeyUp = (event:ReactKeyboardEvent):void => {
-        onSelectionChange(event)
+        // NOTE: Avoid breaking password-filler on non textarea fields!
+        if (event.keyCode) {
+            onSelectionChange(event)
 
-        triggerCallbackIfExists<Type>(properties, 'keyUp', event)
+            triggerCallbackIfExists<Type>(properties, 'keyUp', event)
+        }
     }
     /**
      * Triggered on selection change events.
@@ -1469,7 +1472,6 @@ export const GenericInputInner = function<Type = any>(
     )
     // / endregion
     // / region main markup
-    // TODO check if mdc-classes can be retrieved
     return <WrapConfigurations
         strict={GenericInput.strict}
         theme={properties.theme}
@@ -1613,7 +1615,10 @@ export const GenericInputInner = function<Type = any>(
                     RefCallback<HTMLInputElement|HTMLTextAreaElement>
                 }
                 max={properties.maximum >= 0 ? properties.maximum : Infinity}
-                maxLength={properties.maximumLength >= 0 ? properties.maximumLength : Infinity}
+                maxLength={properties.maximumLength >= 0 ?
+                    properties.maximumLength :
+                    Infinity
+                }
                 min={properties.minimum}
                 minLength={properties.minimumLength}
                 onChange={onChangeValue}
