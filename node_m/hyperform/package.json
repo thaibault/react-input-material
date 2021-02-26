@@ -1,0 +1,82 @@
+{
+  "name": "hyperform",
+  "version": "0.11.0",
+  "description": "Capture form validation back from the browser",
+  "main": "dist/hyperform.cjs.js",
+  "types": "index.d.ts",
+  "jsnext:main": "src/hyperform.js",
+  "module": "src/hyperform.js",
+  "style": "css/hyperform.css",
+  "scripts": {
+    "test": "jshint src && ava",
+    "preversion": "npm test",
+    "version": "make version VERSION=$npm_package_version && make all && git add src/version.js dist/ bower.json CHANGELOG.md",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperform/hyperform.git"
+  },
+  "keywords": [
+    "html5",
+    "form",
+    "forms",
+    "input",
+    "validation"
+  ],
+  "author": "Manuel Strehl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hyperform/hyperform/issues"
+  },
+  "homepage": "https://hyperform.js.org/",
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/register": "^7.4.4",
+    "ava": "^1.4.1",
+    "jsdom": "^9.10.0",
+    "jshint": "^2.10.2",
+    "karma": "^4.1.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-firefox-launcher": "^1.0.0",
+    "karma-mocha": "^1.3.0",
+    "karma-sauce-launcher": "^2.0.2",
+    "mocha": "^6.1.4",
+    "rollup": "^1.12.3",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-node-resolve": "^5.0.0",
+    "selenium-webdriver": "^3.0.1",
+    "uglify-js": "^3.5.15"
+  },
+  "files": [
+    "css",
+    "dist",
+    "src",
+    "test"
+  ],
+  "jshintConfig": {
+    "esversion": 6,
+    "strict": "global",
+    "laxbreak": true,
+    "globals": {
+      "window": true,
+      "document": true
+    }
+  },
+  "ava": {
+    "require": [
+      "@babel/register",
+      "./test/helpers/setup-browser-env.js"
+    ],
+    "files": [
+      "test/unit/**/*.js"
+    ],
+    "concurrency": 5
+  },
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ]
+  }
+}
