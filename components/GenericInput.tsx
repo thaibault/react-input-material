@@ -1474,7 +1474,7 @@ export const GenericInputInner = function<Type = any>(
     // / region main markup
     return <WrapConfigurations
         strict={GenericInput.strict}
-        theme={properties.theme}
+        themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
     ><div className={
         styles['generic-input'] +

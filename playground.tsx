@@ -276,7 +276,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 required
                 rows={3}
-                theme={useMemorizedValue({
+                themeConfiguration={useMemorizedValue({
                     primary: 'yellow',
                     secondary: 'blue'
                 })}

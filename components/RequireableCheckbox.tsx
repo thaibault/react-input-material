@@ -416,7 +416,7 @@ export const RequireableCheckboxInner = function(
     // TODO Helptext
     return <WrapConfigurations
         strict={RequireableCheckbox.strict}
-        theme={properties.theme}
+        themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
     ><div className={styles['requireable-checkbox']}>
         <Checkbox
