@@ -18,13 +18,21 @@
 */
 // region imports
 import {FirstParameter, GenericFunction} from 'clientnode/type'
-import {ComponentType, FunctionComponent, ReactElement} from 'react'
-import {ThemeProviderProps} from '@rmwc/theme'
+import {
+    ComponentType,
+    forwardRef,
+    ForwardRefRenderFunction,
+    FunctionComponent,
+    ReactElement,
+    RefObject
+} from 'react'
+import {Theme, ThemeProviderProps} from '@rmwc/theme'
+import {ThemePropT} from '@rmwc/types'
 
 import {WrapStrict} from './WrapStrict'
 import {WrapThemeProvider} from './WrapThemeProvider'
 import {WrapTooltip} from './WrapTooltip'
-import {Properties} from '../type'
+import {ConfigurationProperties, Properties} from '../type'
 // endregion
 /**
  * Wraps a theme provider, strict wrapper and tooltip to given element if
@@ -38,13 +46,9 @@ import {Properties} from '../type'
  * mess with layout.
  * @returns Wrapped content.
  */
-export const WrapConfigurations:FunctionComponent<{
-    children:ReactElement
-    strict?:boolean
-    theme?:ThemeProviderProps['options']
-    tooltip?:Properties['tooltip']
-    wrap?:boolean
-}> = ({children, strict, theme, tooltip, wrap}):ReactElement =>
+export const WrapConfigurations:FunctionComponent<
+    ConfigurationProperties & {children:ReactElement}
+> = ({children, strict, theme, tooltip, wrap}):ReactElement =>
     <WrapStrict strict={Boolean(strict)}>
         <WrapTooltip options={tooltip}>
             <WrapThemeProvider configuration={theme} wrap={wrap}>
@@ -53,18 +57,36 @@ export const WrapConfigurations:FunctionComponent<{
         </WrapTooltip>
     </WrapStrict>
 
-export function createWrapConfigurationsComponent<Type extends GenericFunction = GenericFunction>(
-    WrappedComponent:Type
-):FunctionComponent<FirstParameter<Type> & {
-    strict?:boolean
-    theme?:ThemeProviderProps['options']
-    tooltip?:Properties['tooltip']
-    wrap?:boolean
-}> {
-    return ({strict, theme, tooltip, wrap, ...properties}):ReactElement =>
-        <WrapConfigurations {...{strict, theme, tooltip, wrap}}>
-            <WrappedComponent {...(properties as FirstParameter<Type>)} />
+export function createWrapConfigurationsComponent<
+    Type extends GenericFunction = GenericFunction, Reference = unknown
+>(
+    WrappedComponent:Type, withReference:boolean = false
+):FunctionComponent<
+    FirstParameter<Type> & ConfigurationProperties & {themeUsage?:ThemePropT}
+> {
+    const component:FunctionComponent<
+        FirstParameter<Type> &
+        ConfigurationProperties &
+        {themeUsage?:ThemePropT}
+    > = (
+        {strict, theme, themeUsage, tooltip, wrap, ...properties},
+        reference?:RefObject<Reference>
+    ):ReactElement => {
+        const wrapped = <WrappedComponent {...{
+            ...(properties as FirstParameter<Type>),
+            ...(withReference ? {ref: reference} : {})
+        }} />
+
+        return <WrapConfigurations {...{strict, theme, tooltip, wrap}}>
+            {themeUsage ?
+                <Theme use={themeUsage} wrap={wrap}>{wrapped}</Theme> :
+                wrapped
+            }
         </WrapConfigurations>
+    }
+    return withReference ?
+        forwardRef(component as ForwardRefRenderFunction<typeof component>) :
+        component
 }
 
 export default WrapConfigurations

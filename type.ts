@@ -533,6 +533,12 @@ export const defaultInputProperties:DefaultInputProperties = {
 } as const
 // // endregion
 // / endregion
+export type ConfigurationProperties = {
+    strict?:boolean
+    theme?:ThemeProviderProps['options']
+    tooltip?:Properties['tooltip']
+    wrap?:boolean
+}
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
