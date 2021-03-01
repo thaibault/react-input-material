@@ -135,7 +135,7 @@ export type Properties<Type = any> =
         rootProps:HTMLProps<any>
         showDeclaration:boolean
         showInitialValidationState:boolean
-        theme:ThemeProviderProps['options']
+        themeConfiguration:ThemeProviderProps['options']
         tooltip:string|TooltipProps
     }
 export type Props<Type = any> =
@@ -241,7 +241,7 @@ export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ripple: oneOfType([boolean, object]),
     showDeclaration: oneOfType([boolean, symbol]),
     showInitialValidationState: boolean,
-    theme: object,
+    themeConfiguration: object,
     /*
         NOTE: Not yet working:
         tooltip?:string|TooltipProps
@@ -535,7 +535,7 @@ export const defaultInputProperties:DefaultInputProperties = {
 // / endregion
 export type ConfigurationProperties = {
     strict?:boolean
-    theme?:ThemeProviderProps['options']
+    themeConfiguration?:ThemeProviderProps['options']
     tooltip?:Properties['tooltip']
     wrap?:boolean
 }

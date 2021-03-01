@@ -48,10 +48,10 @@ import {ConfigurationProperties, Properties} from '../type'
  */
 export const WrapConfigurations:FunctionComponent<
     ConfigurationProperties & {children:ReactElement}
-> = ({children, strict, theme, tooltip, wrap}):ReactElement =>
+> = ({children, strict, themeConfiguration, tooltip, wrap}):ReactElement =>
     <WrapStrict strict={Boolean(strict)}>
         <WrapTooltip options={tooltip}>
-            <WrapThemeProvider configuration={theme} wrap={wrap}>
+            <WrapThemeProvider configuration={themeConfiguration} wrap={wrap}>
                 {children}
             </WrapThemeProvider>
         </WrapTooltip>
@@ -59,27 +59,30 @@ export const WrapConfigurations:FunctionComponent<
 
 export function createWrapConfigurationsComponent<
     Type extends GenericFunction = GenericFunction, Reference = unknown
->(
-    WrappedComponent:Type, withReference:boolean = false
-):FunctionComponent<
-    FirstParameter<Type> & ConfigurationProperties & {themeUsage?:ThemePropT}
+>(WrappedComponent:Type, withReference?:boolean):FunctionComponent<
+    FirstParameter<Type> & ConfigurationProperties & {theme?:ThemePropT}
 > {
     const component:FunctionComponent<
         FirstParameter<Type> &
         ConfigurationProperties &
-        {themeUsage?:ThemePropT}
+        {theme?:ThemePropT}
     > = (
-        {strict, theme, themeUsage, tooltip, wrap, ...properties},
+        {strict, theme, themeConfiguration, tooltip, wrap, ...properties},
         reference?:RefObject<Reference>
     ):ReactElement => {
         const wrapped = <WrappedComponent {...{
             ...(properties as FirstParameter<Type>),
-            ...(withReference ? {ref: reference} : {})
+            ...(withReference === false ?
+                {} :
+                reference ? {ref: reference} : {}
+            )
         }} />
 
-        return <WrapConfigurations {...{strict, theme, tooltip, wrap}}>
-            {themeUsage ?
-                <Theme use={themeUsage} wrap={wrap}>{wrapped}</Theme> :
+        return <WrapConfigurations
+            {...{strict, theme: themeConfiguration, tooltip, wrap}}
+        >
+            {theme ?
+                <Theme use={theme} wrap={wrap}>{wrapped}</Theme> :
                 wrapped
             }
         </WrapConfigurations>
