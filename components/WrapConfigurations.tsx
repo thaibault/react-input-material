@@ -37,13 +37,13 @@ import {ConfigurationProperties, Properties} from '../type'
 /**
  * Wraps a theme provider, strict wrapper and tooltip to given element if
  * corresponding configurations are provided.
- * @param children - Component or string to wrap.
- * @param strict - Indicates whether to render in strict mode.
- * @param theme - Optional theme configurations.
- * @param tooltip - Optional tooltip to show on hover.
- * @param wrap - Instead of injecting a div tag, wrap a child component by
- * merging the theme styles directly onto it. Useful when you don't want to
- * mess with layout.
+ * @param properties.children - Component or string to wrap.
+ * @param properties.strict - Indicates whether to render in strict mode.
+ * @param properties.themeConfiguration - Optional theme configurations.
+ * @param properties.tooltip - Optional tooltip to show on hover.
+ * @param properties.wrap - Instead of injecting a div tag, wrap a child
+ * component by merging the theme styles directly onto it. Useful when you
+ * don't want to mess with layout.
  * @returns Wrapped content.
  */
 export const WrapConfigurations:FunctionComponent<
@@ -59,7 +59,10 @@ export const WrapConfigurations:FunctionComponent<
 
 export function createWrapConfigurationsComponent<
     Type extends GenericFunction = GenericFunction, Reference = unknown
->(WrappedComponent:Type, withReference?:boolean):FunctionComponent<
+>(
+    WrappedComponent:Type,
+    options:{withReference:boolean|null, withThemeWrapper:boolean} = {}
+):FunctionComponent<
     FirstParameter<Type> & ConfigurationProperties & {theme?:ThemePropT}
 > {
     const component:FunctionComponent<
@@ -72,22 +75,23 @@ export function createWrapConfigurationsComponent<
     ):ReactElement => {
         const wrapped = <WrappedComponent {...{
             ...(properties as FirstParameter<Type>),
-            ...(withReference === false ?
+            ...(options.withReference === false ?
                 {} :
                 reference ? {ref: reference} : {}
-            )
+            ),
+            ...(options.withThemeWrapper && theme ? {} : {theme})
         }} />
 
         return <WrapConfigurations
             {...{strict, theme: themeConfiguration, tooltip, wrap}}
         >
-            {theme ?
+            {options.withThemeWrapper && theme ?
                 <Theme use={theme} wrap={wrap}>{wrapped}</Theme> :
                 wrapped
             }
         </WrapConfigurations>
     }
-    return withReference ?
+    return options.withReference ?
         forwardRef(component as ForwardRefRenderFunction<typeof component>) :
         component
 }
