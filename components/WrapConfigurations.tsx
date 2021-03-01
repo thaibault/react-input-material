@@ -17,7 +17,8 @@
     endregion
 */
 // region imports
-import {FunctionComponent, ReactElement} from 'react'
+import {FirstParameter, GenericFunction} from 'clientnode/type'
+import {ComponentType, FunctionComponent, ReactElement} from 'react'
 import {ThemeProviderProps} from '@rmwc/theme'
 
 import {WrapStrict} from './WrapStrict'
@@ -51,6 +52,21 @@ export const WrapConfigurations:FunctionComponent<{
             </WrapThemeProvider>
         </WrapTooltip>
     </WrapStrict>
+
+export function createWrapConfigurationsComponent<Type extends GenericFunction = GenericFunction>(
+    WrappedComponent:Type
+):FunctionComponent<FirstParameter<Type> & {
+    strict?:boolean
+    theme?:ThemeProviderProps['options']
+    tooltip?:Properties['tooltip']
+    wrap?:boolean
+}> {
+    return ({strict, theme, tooltip, wrap, ...properties}):ReactElement =>
+        <WrapConfigurations {...{strict, theme, tooltip, wrap}}>
+            <WrappedComponent {...(properties as FirstParameter<Type>)} />
+        </WrapConfigurations>
+}
+
 export default WrapConfigurations
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
