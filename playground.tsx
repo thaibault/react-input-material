@@ -475,6 +475,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <RequireableCheckbox
                 model={useMemorizedValue({name: 'checkbox1Model'})}
                 onChange={onChange}
+                themeConfiguration={useMemorizedValue({
+                    primary: 'yellow',
+                    secondary: 'blue'
+                })}
             />
 
             <hr/>
