@@ -83,7 +83,7 @@ export function createWrapConfigurationsComponent<
         }} />
 
         return <WrapConfigurations
-            {...{strict, theme: themeConfiguration, tooltip, wrap}}
+            {...{strict, themeConfiguration, tooltip, wrap}}
         >
             {options.withThemeWrapper && theme ?
                 <Theme use={theme} wrap={wrap}>{wrapped}</Theme> :
