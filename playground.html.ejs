@@ -62,21 +62,16 @@
             overflow: auto;
             position: fixed;
         }
+        <%-
+            require('material-icons/iconfont/material-icons.css')
+                .replace(
+                    /(url\()"?(MaterialIcons-Regular\.[^.")]+)"?(\))/g,
+                    '$1material-icons/iconfont/$2$3'
+                )
+        %>
     </style>
     <body class="no-javascript">
-
         <application></application>
-
-        <style>
-            <%-
-                require('material-icons/iconfont/material-icons.css')
-                    .replace(
-                        /(url\()"?(MaterialIcons-Regular\.[^.")]+)"?(\))/g,
-                        '$1material-icons/iconfont/$2$3'
-                    )
-             %>
-        </style>
-
     </body>
 <html>
 <%_ /*
