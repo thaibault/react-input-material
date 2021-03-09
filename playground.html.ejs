@@ -69,10 +69,10 @@
 
         <style>
             <%-
-                require('material-design-icons-iconfont')
+                require('material-icons/iconfont/material-icons.css')
                     .replace(
-                        /(url\()([^)]+\/)?(MaterialIcons-Regular\.[^.]+\))/g,
-                        '$1./material-design-icons-iconfont/dist/fonts/$3'
+                        /(url\()"?(MaterialIcons-Regular\.[^.")]+)"?(\))/g,
+                        '$1material-icons/iconfont/$2$3'
                     )
              %>
         </style>
