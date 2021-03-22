@@ -114,10 +114,14 @@ const plusToX:any|null = isBrowser ?
     null
 // endregion
 // region code editor configuration
+export const ACEEditorOptions = {
+    basePath: '/node_modules/ace-builds/src-noconflict/',
+    useWorker: false
+}
 const CodeEditor = lazy(async ():Promise<{default:ComponentType<any>}> => {
     const {config} = await import('ace-builds')
-    config.set('basePath', '/node_modules/ace-builds/src-noconflict/')
-    config.set('useWorker', false)
+    for (const [name, value] of Object.entries(ACEEditorOptions))
+        config.set(name, value)
     return await import('react-ace')
 })
 // endregion
