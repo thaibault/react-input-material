@@ -1542,7 +1542,16 @@ export const GenericInputInner = function<Type = any>(
                                             CodeEditorProps
                                         }
                                         className="mdc-text-field__input"
-                                        mode="javascript"
+                                        mode={(
+                                            properties.editor.startsWith('code(') &&
+                                            properties.editor.endsWith(')')
+                                        ) ?
+                                            properties.editor.substring(
+                                                'code('.length,
+                                                properties.editor.length - 1
+                                            ) :
+                                            'javascript'
+                                        }
                                         name={properties.name}
                                         onChange={onChangeValue}
                                         onCursorChange={onSelectionChange}
