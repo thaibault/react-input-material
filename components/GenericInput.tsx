@@ -134,7 +134,6 @@ if (typeof UTC_BUILD_TIMESTAMP === 'undefined')
     /* eslint-enable no-var */
 let richTextEditorLoadedOnce:boolean = false
 const tinymceBasePath:string = '/node_modules/tinymce/'
-const tinymceScriptPath:string = `${tinymceBasePath}tinymce.min.js`
 export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
     /* eslint-disable camelcase */
     // region paths
@@ -1582,7 +1581,7 @@ export const GenericInputInner = function<Type = any>(
                                         RefCallback<RichTextEditorComponent>
                                     }
                                     textareaName={properties.name}
-                                    tinymceScriptSrc={tinymceScriptPath}
+                                    tinymceScriptSrc={`${TINYMCE_DEFAULT_OPTIONS.base_url}tinymce.min.js`}
                                 />
                         }
                     </label>
