@@ -1731,49 +1731,43 @@ GenericInput.transformer = {
     },
     currency: {
         format: {
-            final: {
-                transform: (value:number):string => (new Intl.NumberFormat(
-                    GenericInput.local,
-                    {
-                        currency: 'USD',
-                        style: 'currency',
-                        ...(
-                            GenericInput.transformer.currency.format.final
-                                .options ||
-                            {}
-                        )
-                    }
-                )).format(value)
-            },
-            intermediate: {
-                transform: (value:string):any =>
-                    GenericInput.transformer.float.format.intermediate
-                        .transform(value)
+            final: {transform: (value:number):string => (new Intl.NumberFormat(
+                GenericInput.local,
+                {
+                    currency: 'USD',
+                    style: 'currency',
+                    ...(
+                        GenericInput.transformer.currency.format.final
+                            .options ||
+                        {}
+                    )
+                }
+            )).format(value)},
+            intermediate: {transform: (value:string):any =>
+                GenericInput.transformer.float.format.intermediate
+                    .transform(value)
             }
         },
-        parse: (value:string):any =>
+        parse: (value:number|string):any =>
             GenericInput.transformer.float.parse(value),
         type: 'text'
     },
     date: {
         format: {
-            final: {
-                transform: (value:number):string => {
-                    value = GenericInput.transformer.float.parse(value)
-                    if (isNaN(value))
-                        value = 0
+            final: {transform: (value:number|string):string => {
+                value = GenericInput.transformer.float.parse(value)
+                if (isNaN(value as number))
+                    value = 0
 
-                    const formattedValue:string =
-                        (new Date(value * 1000)).toISOString()
+                const formattedValue:string =
+                    (new Date((value as number) * 1000)).toISOString()
 
-                    return formattedValue.substring(
-                        0, formattedValue.indexOf('T')
-                    )
-                }
-            },
-            intermediate: {
-                transform: (value:number):string =>
-                    GenericInput.transformer.date.format.final.transform(value)
+                return formattedValue.substring(
+                    0, formattedValue.indexOf('T')
+                )
+            }},
+            intermediate: {transform: (value:number):string =>
+                GenericInput.transformer.date.format.final.transform(value)
             }
         },
         parse: (value:string):number => typeof value === 'number' ?
@@ -1785,24 +1779,21 @@ GenericInput.transformer = {
     // TODO
     'datetime-local': {
         format: {
-            final: {
-                transform: (value:number):string => {
-                    value = GenericInput.transformer.float.parse(value)
-                    if (isNaN(value))
-                        value = 0
+            final: {transform: (value:number):string => {
+                value = GenericInput.transformer.float.parse(value)
+                if (isNaN(value))
+                    value = 0
 
-                    const formattedValue:string =
-                        (new Date(value * 1000)).toISOString()
+                const formattedValue:string =
+                    (new Date(value * 1000)).toISOString()
 
-                    return formattedValue.substring(
-                        0, formattedValue.length - 1
-                    )
-                }
-            },
-            intermediate: {
-                transform: (value:number):string =>
-                    GenericInput.transformer['datetime-local'].format.final
-                        .transform(value)
+                return formattedValue.substring(
+                    0, formattedValue.length - 1
+                )
+            }},
+            intermediate: {transform: (value:number):string =>
+                GenericInput.transformer['datetime-local'].format.final
+                    .transform(value)
             }
         },
         parse: (value:string):number =>
@@ -1810,45 +1801,41 @@ GenericInput.transformer = {
     },
     float: {
         format: {
-            final: {
-                transform: (value:number):string => (new Intl.NumberFormat(
-                    GenericInput.local,
-                    {
-                        style: 'decimal',
-                        ...(
-                            GenericInput.transformer.float.format.final
-                                .options ||
-                            {}
-                        )
-                    }
-                )).format(value)
-            },
-            intermediate: {
-                transform: (value:number):string => `${value}`
-            }
+            final: {transform: (value:number):string => (new Intl.NumberFormat(
+                GenericInput.local,
+                {
+                    style: 'decimal',
+                    ...(
+                        GenericInput.transformer.float.format.final
+                            .options ||
+                        {}
+                    )
+                }
+            )).format(value)},
+            intermediate: {transform: (value:number):string => `${value}`}
         },
-        parse: (value:string):any => parseFloat(
-            typeof value === 'string' && GenericInput.local === 'de-DE' ?
-                value.replace(/\./g, '').replace(/\,/g, '.') :
-                value
-        ),
+        parse: (value:number|string):number => typeof value === 'string' ?
+            parseFloat(
+                GenericInput.local === 'de-DE' ?
+                    value.replace(/\./g, '').replace(/\,/g, '.') :
+                    value
+            ) :
+            value,
         type: 'text'
     },
     integer: {
         format: {
-            final: {
-                transform: (value:number):string => (new Intl.NumberFormat(
-                    GenericInput.local,
-                    {
-                        maximumFractionDigits: 0,
-                        ...(
-                            GenericInput.transformer.integer.format.final
-                                .options ||
-                            {}
-                        )
-                    }
-                )).format(value)
-            }
+            final: {transform: (value:number):string => (new Intl.NumberFormat(
+                GenericInput.local,
+                {
+                    maximumFractionDigits: 0,
+                    ...(
+                        GenericInput.transformer.integer.format.final
+                            .options ||
+                        {}
+                    )
+                }
+            )).format(value)}
         },
         parse: (value:string):any => parseInt(
             typeof value === 'string' && GenericInput.local === 'de-DE' ?
@@ -1860,32 +1847,29 @@ GenericInput.transformer = {
     number: {parse: parseInt},
     time: {
         format: {
-            final: {
-                transform: (value:number):string => {
-                    value = GenericInput.transformer.integer.parse(value)
-                    if (isNaN(value))
-                        value = 0
+            final: {transform: (value:number):string => {
+                value = GenericInput.transformer.integer.parse(value)
+                if (isNaN(value))
+                    value = 0
 
-                    const formattedValue:string =
-                        (new Date(value * 1000)).toISOString()
+                const formattedValue:string =
+                    (new Date(value * 1000)).toISOString()
 
-                    return formattedValue.substring(
-                        formattedValue.indexOf('T') + 1,
-                        formattedValue.length - 1
-                    )
-                }
-            },
-            intermediate: {
-                transform: (value:number):string =>
-                    GenericInput.transformer.date.format.final.transform(value)
+                return formattedValue.substring(
+                    formattedValue.indexOf('T') + 1,
+                    formattedValue.length - 1
+                )
+            }},
+            intermediate: {transform: (value:number):string =>
+                GenericInput.transformer.date.format.final.transform(value)
             }
         },
         parse: (value:string):number => typeof value === 'number' ?
             value :
             parseInt(value.replace(
                 /^([0-9]{2}):([0-9]{2})$/,
-                (_:string, hour:string, minute:string):number =>
-                    parseInt(hour) * 60 ** 2 + parseInt(minute) * 60
+                (_:string, hour:string, minute:string):string =>
+                    `${parseInt(hour) * 60 ** 2 + parseInt(minute) * 60}`
             ))
     },
 } as InputDataTransformation

@@ -108,7 +108,7 @@ export type DataTransformSpecification<Type = any> = {
         final:FormatSpecification
         intermediate:FormatSpecification
     }
-    parse:(value:string) => null|Type
+    parse:(value:any) => null|Type
     type:NativeInputType
 }
 export type Properties<Type = any> =
@@ -404,10 +404,12 @@ export type InputState<Type = any> =
 export type InputDataTransformation<Type = any> =
     Mapping<RecursivePartial<DataTransformSpecification<Type>>> &
     {
-        boolean: DataTransformSpecification<Type>
-        currency: DataTransformSpecification<Type>
-        float: DataTransformSpecification<Type>
-        integer: {
+        boolean:DataTransformSpecification<Type>
+        currency:DataTransformSpecification<Type>
+        date:DataTransformSpecification<Type>
+        'datetime-local':DataTransformSpecification<Type>
+        float:DataTransformSpecification<Type>
+        integer:{
             format:{
                 final:FormatSpecification<Type>
                 intermediate?:DataTransformSpecification<Type>['format']['intermediate']
@@ -415,11 +417,12 @@ export type InputDataTransformation<Type = any> =
             parse:DataTransformSpecification<Type>['parse']
             type:NativeInputType
         }
-        number: {
+        number:{
             format?:DataTransformSpecification<Type>['format']
             parse:DataTransformSpecification<Type>['parse']
             type?:DataTransformSpecification<Type>['type']
         }
+        time:DataTransformSpecification<Type>
     }
 export interface StaticWebInputComponent<Type = any> extends StaticWebComponent<InputProps<Type>> {
     defaultModelState:InputModelState
