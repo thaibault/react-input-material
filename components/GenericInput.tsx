@@ -1755,6 +1755,59 @@ GenericInput.transformer = {
             GenericInput.transformer.float.parse(value),
         type: 'text'
     },
+    date: {
+        format: {
+            final: {
+                transform: (value:number):string => {
+                    value = GenericInput.transformer.float.parse(value)
+                    if (isNaN(value))
+                        value = 0
+
+                    const formattedValue:string =
+                        (new Date(value * 1000)).toISOString()
+
+                    return formattedValue.substring(
+                        0, formattedValue.indexOf('T')
+                    )
+                }
+            },
+            intermediate: {
+                transform: (value:number):string =>
+                    GenericInput.transformer.date.format.final.transform(value)
+            }
+        },
+        parse: (value:string):number => typeof value === 'number' ?
+            value :
+            `${parseFloat(value)}` === value ?
+                parseFloat(value) :
+                Date.parse(value) / 1000
+    },
+    // TODO
+    'datetime-local': {
+        format: {
+            final: {
+                transform: (value:number):string => {
+                    value = GenericInput.transformer.float.parse(value)
+                    if (isNaN(value))
+                        value = 0
+
+                    const formattedValue:string =
+                        (new Date(value * 1000)).toISOString()
+
+                    return formattedValue.substring(
+                        0, formattedValue.length - 1
+                    )
+                }
+            },
+            intermediate: {
+                transform: (value:number):string =>
+                    GenericInput.transformer['datetime-local'].format.final
+                        .transform(value)
+            }
+        },
+        parse: (value:string):number =>
+            GenericInput.transformer.date.parse(value)
+    },
     float: {
         format: {
             final: {
@@ -1804,7 +1857,37 @@ GenericInput.transformer = {
         ),
         type: 'text'
     },
-    number: {parse: parseInt}
+    number: {parse: parseInt},
+    time: {
+        format: {
+            final: {
+                transform: (value:number):string => {
+                    value = GenericInput.transformer.integer.parse(value)
+                    if (isNaN(value))
+                        value = 0
+
+                    const formattedValue:string =
+                        (new Date(value * 1000)).toISOString()
+
+                    return formattedValue.substring(
+                        formattedValue.indexOf('T') + 1,
+                        formattedValue.length - 1
+                    )
+                }
+            },
+            intermediate: {
+                transform: (value:number):string =>
+                    GenericInput.transformer.date.format.final.transform(value)
+            }
+        },
+        parse: (value:string):number => typeof value === 'number' ?
+            value :
+            parseInt(value.replace(
+                /^([0-9]{2}):([0-9]{2})$/,
+                (_:string, hour:string, minute:string):number =>
+                    parseInt(hour) * 60 ** 2 + parseInt(minute) * 60
+            ))
+    },
 } as InputDataTransformation
 // endregion
 export default GenericInput
