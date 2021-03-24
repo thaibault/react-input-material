@@ -49,19 +49,28 @@
         <!--endregion-->
     </head>
     <style>
-        .generic-input {
-            margin-bottom: 20px;
+        .playground__generic-animate .generic-animate-appear-active,
+        .playground__generic-animate .generic-animate-enter-active,
+        .playground__generic-animate .generic-animate-exit-active {
+            transition: opacity 2000ms ease-in !important;
         }
-        .inputs {
+
+        .playground__inputs {
             float: left;
             width: 500px;
         }
-        .outputs {
+
+        .generic-input {
+            margin-bottom: 20px;
+        }
+
+        .playground__outputs {
             height: -webkit-fill-available;
             margin-left: 500px;
             overflow: auto;
             position: fixed;
         }
+
         <%-
             require('material-icons/iconfont/material-icons.css')
                 .replace(
@@ -70,7 +79,7 @@
                 )
         %>
     </style>
-    <body class="no-javascript">
+    <body class="no-javascript playground">
         <application></application>
     </body>
 <html>

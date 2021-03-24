@@ -14,7 +14,7 @@ endregion */
         Dummy value to avoid removing this class name during static
         optimisation.
     */
-    opacity: 1;
+    visibility: visible;
 }
 
 .generic-animate-appear,
@@ -41,12 +41,20 @@ endregion */
     display: none;
 }
 
+.generic-animate__wrapper {
+    /*
+        Dummy value to avoid removing this class name during static
+        optimisation.
+    */
+    visibility: visible;
+}
+
 .generic-animate__list-wrapper {
     /*
         Dummy value to avoid removing this class name during static
         optimisation.
     */
-    opacity: 1;
+    visibility: visible;
 }
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:

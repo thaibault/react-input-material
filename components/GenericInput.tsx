@@ -1618,7 +1618,11 @@ export const GenericInputInner = function<Type = any>(
                 {...genericProperties as TextFieldProps}
                 {...materialProperties as TextFieldProps}
                 {...(properties.type === 'number' ?
-                    {max: properties.maximum, min: properties.minimum} :
+                    {
+                        max: properties.maximum,
+                        min: properties.minimum,
+                        step: properties.step
+                    } :
                     properties.type === 'string' ?
                         {
                             maxLength: properties.maximumLength >= 0 ?
@@ -1626,7 +1630,11 @@ export const GenericInputInner = function<Type = any>(
                                 Infinity,
                             minLength: properties.minimumLength >= 0 ?
                                 properties.minimumLength :
-                                0
+                                0,
+                            ...(properties.editor === 'plain' ?
+                                {} :
+                                {rows: properties.rows}
+                            )
                         } :
                         ['date', 'datetime-local', 'time'].includes(
                             properties.type
@@ -1641,7 +1649,8 @@ export const GenericInputInner = function<Type = any>(
                                     properties.minimum as unknown as Type,
                                     properties.type,
                                     GenericInput.transformer
-                                )
+                                ),
+                                step: properties.step
                             } :
                             {}
                 )}
@@ -1663,7 +1672,6 @@ export const GenericInputInner = function<Type = any>(
                     onKeyUp: onKeyUp,
                     ...properties.rootProps
                 }}
-                rows={properties.rows}
                 textarea={
                     properties.type === 'string' &&
                     properties.editor !== 'plain'
@@ -1765,8 +1773,8 @@ GenericInput.transformer = {
     date: {
         format: {final: {transform: (value:number|string):string => {
             value = typeof value === 'number' ? value : parseFloat(value)
-            if (isNaN(value as number))
-                value = 0
+            if (!isFinite(value))
+                return ''
 
             const formattedValue:string =
                 (new Date(Math.round((value as number) * 1000))).toISOString()
@@ -1783,8 +1791,8 @@ GenericInput.transformer = {
     'datetime-local': {
         format: {final: {transform: (value:number):string => {
             value = typeof value === 'number' ? value : parseFloat(value)
-            if (isNaN(value))
-                value = 0
+            if (!isFinite(value))
+                return ''
 
             const formattedValue:string =
                 (new Date(Math.round((value as number) * 1000))).toISOString()
@@ -1872,12 +1880,15 @@ GenericInput.transformer = {
         },
         type: 'text'
     },
-    number: {parse: parseInt},
+    number: {parse: (value:number|string):number => typeof value === 'number' ?
+        value :
+        parseInt(value)
+    },
     time: {
         format: {final: {transform: (value:number):string => {
             value = typeof value === 'number' ? value : parseFloat(value)
-            if (isNaN(value))
-                value = 0
+            if (!isFinite(value))
+                return ''
 
             const formattedValue:string =
                 (new Date(Math.round((value as number) * 1000))).toISOString()

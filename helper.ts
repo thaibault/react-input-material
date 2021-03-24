@@ -27,6 +27,7 @@ import {
     DataTransformSpecification,
     DefaultProperties,
     InputDataTransformation,
+    InputProperties,
     Model,
     ModelState,
     Properties,
@@ -260,7 +261,7 @@ export const getConsolidatedProperties =
  * @param transformer - To apply to given value.
  * @returns Transformed value.
  */
-export const parseValue = <P extends Properties, Type = any>(
+export const parseValue = <P extends InputProperties, Type = any>(
     configuration:P, value:any, transformer:InputDataTransformation<Type>
 ):null|Type => {
     if (configuration.emptyEqualsNull && value === '')
@@ -291,7 +292,7 @@ export const parseValue = <P extends Properties, Type = any>(
  * @param transformer - To apply to given value.
  * @returns Transformed value.
  */
-export const transformValue = <P extends Properties, Type = any>(
+export const transformValue = <P extends InputProperties, Type = any>(
     configuration:P, value:any, transformer:InputDataTransformation<Type>
 ):null|Type => {
     if (configuration.model.trim && typeof value === 'string')
@@ -322,16 +323,12 @@ export function formatValue<Type = any>(
         return ''
 
     if (
-        Object.prototype.hasOwnProperty.call(transformer, type) &&
-        transformer[type].format &&
-        Object.prototype.hasOwnProperty.call(
-            transformer[type].format, methodName
-        ) &&
-        transformer[type].format![methodName]!.transform
+        transformer[type]?.format &&
+        transformer[type].format![methodName]?.transform
     )
         return (
             transformer[type].format as DataTransformSpecification['format']
-        )[methodName].transform(value)
+        )[methodName]!.transform(value)
 
     return String(value)
 }
