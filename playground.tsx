@@ -93,6 +93,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     maximum: 3600,
                     minimum: 1,
                     name: 'input3Model',
+                    step: 1,
                     type: 'time'
                 })}
                 onChange={onChange}
