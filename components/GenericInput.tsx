@@ -1617,6 +1617,34 @@ export const GenericInputInner = function<Type = any>(
             <TextField
                 {...genericProperties as TextFieldProps}
                 {...materialProperties as TextFieldProps}
+                {...(properties.type === 'number' ?
+                    {max: properties.maximum, min: properties.minimum} :
+                    properties.type === 'string' ?
+                        {
+                            maxLength: properties.maximumLength >= 0 ?
+                                properties.maximumLength :
+                                Infinity,
+                            minLength: properties.minimumLength >= 0 ?
+                                properties.minimumLength :
+                                0
+                        } :
+                        ['date', 'datetime-local', 'time'].includes(
+                            properties.type
+                        ) ?
+                            {
+                                max: formatValue<Type>(
+                                    properties.maximum as unknown as Type,
+                                    properties.type,
+                                    GenericInput.transformer
+                                ),
+                                min: formatValue<Type>(
+                                    properties.minimum as unknown as Type,
+                                    properties.type,
+                                    GenericInput.transformer
+                                )
+                            } :
+                            {}
+                )}
                 align={properties.align}
                 characterCount
                 foundationRef={foundationRef as unknown as
@@ -1626,13 +1654,6 @@ export const GenericInputInner = function<Type = any>(
                 inputRef={inputReference as unknown as
                     RefCallback<HTMLInputElement|HTMLTextAreaElement>
                 }
-                max={properties.maximum >= 0 ? properties.maximum : Infinity}
-                maxLength={properties.maximumLength >= 0 ?
-                    properties.maximumLength :
-                    Infinity
-                }
-                min={properties.minimum}
-                minLength={properties.minimumLength}
                 onChange={onChangeValue}
                 ripple={properties.ripple}
                 rootProps={{
@@ -1716,24 +1737,14 @@ GenericInput.propTypes = propertyTypes
 GenericInput.strict = false
 GenericInput.transformer = {
     boolean: {
-        format: {
-            final: {transform: (value:boolean):string => String(value)},
-            intermediate: {transform: (...parameters:Parameters<
-                typeof GenericInput.transformer.boolean.format.final.transform
-            >):string =>
-                GenericInput.transformer.boolean.format.final.transform(
-                    ...parameters
-                )
-            }
-        },
         parse: (value:string):any => (
             value === 'true' ? true : value === 'false' ? false : value
         ),
         type: 'text'
     },
     currency: {
-        format: {
-            final: {transform: (value:number):string => (new Intl.NumberFormat(
+        format: {final: {transform: (value:number):string => (
+            new Intl.NumberFormat(
                 GenericInput.local,
                 {
                     currency: 'USD',
@@ -1744,88 +1755,59 @@ GenericInput.transformer = {
                         {}
                     )
                 }
-            )).format(value)},
-            intermediate: {transform: (...parameters:Parameters<
-                typeof GenericInput.transformer.float.format.intermediate
-                    .transform
-            >):any =>
-                GenericInput.transformer.float.format.intermediate.transform(
-                    ...parameters
-                )
-            }
-        },
+            )
+        ).format(value)}},
         parse: (...parameters:Parameters<
             typeof GenericInput.transformer.float.parse
         >):any => GenericInput.transformer.float.parse(...parameters),
         type: 'text'
     },
     date: {
-        format: {
-            final: {transform: (value:number|string):string => {
-                // TODO
-                value = GenericInput.transformer.float.parse(value)
-                if (isNaN(value as number))
-                    value = 0
+        format: {final: {transform: (value:number|string):string => {
+            value = typeof value === 'number' ? value : parseFloat(value)
+            if (isNaN(value as number))
+                value = 0
 
-                const formattedValue:string =
-                    (new Date((value as number) * 1000)).toISOString()
+            const formattedValue:string =
+                (new Date(Math.round((value as number) * 1000))).toISOString()
 
-                return formattedValue.substring(
-                    0, formattedValue.indexOf('T')
-                )
-            }},
-            intermediate: {transform: (...parameters:Parameters<
-                typeof GenericInput.transformer.date.format.final.transform
-            >):string => GenericInput.transformer.date.format.final.transform(
-                ...parameters
-            )}
-        },
-        parse: (value:string):number => typeof value === 'number' ?
+            return formattedValue.substring(0, formattedValue.indexOf('T'))
+        }}},
+        parse: (value:number|string):number => typeof value === 'number' ?
             value :
             `${parseFloat(value)}` === value ?
                 parseFloat(value) :
                 Date.parse(value) / 1000
     },
-    // TODO
+    // TODO respect local to utc conversion.
     'datetime-local': {
-        format: {
-            final: {transform: (value:number):string => {
-                // TODO
-                value = GenericInput.transformer.float.parse(value)
-                if (isNaN(value))
-                    value = 0
+        format: {final: {transform: (value:number):string => {
+            value = typeof value === 'number' ? value : parseFloat(value)
+            if (isNaN(value))
+                value = 0
 
-                const formattedValue:string =
-                    (new Date(value * 1000)).toISOString()
+            const formattedValue:string =
+                (new Date(Math.round((value as number) * 1000))).toISOString()
 
-                return formattedValue.substring(
-                    0, formattedValue.length - 1
-                )
-            }},
-            intermediate: {transform: (value:number):string =>
-                GenericInput.transformer['datetime-local'].format.final
-                    .transform(value)
-            }
-        },
+            return formattedValue.substring(0, formattedValue.length - 1)
+        }}},
         parse: (...parameters:Parameters<
             typeof GenericInput.transformer.date.parse
         >):number => GenericInput.transformer.date.parse(...parameters)
     },
     float: {
-        format: {
-            final: {transform: (value:number):string => (new Intl.NumberFormat(
+        format: {final: {transform: (value:number):string => (
+            new Intl.NumberFormat(
                 GenericInput.local,
                 {
                     style: 'decimal',
                     ...(
-                        GenericInput.transformer.float.format.final
-                            .options ||
+                        GenericInput.transformer.float.format.final.options ||
                         {}
                     )
                 }
-            )).format(value)},
-            intermediate: {transform: (value:number):string => `${value}`}
-        },
+            )
+        ).format(value)}},
         parse: (value:number|string, configuration:Properties):number => {
             if (typeof value === 'string')
                 value = parseFloat(GenericInput.local === 'de-DE' ?
@@ -1836,10 +1818,13 @@ GenericInput.transformer = {
             // Fix sign if possible.
             if (
                 typeof value === 'number' &&
-                typeof configuration.min === 'number' &&
                 (
-                    value < 0 && configuration.min >= 0 ||
-                    value > 0 && configuration.max <= 0
+                    typeof configuration.minimum === 'number' &&
+                    configuration.minimum >= 0 &&
+                    value < 0 ||
+                    typeof configuration.maximum === 'number' &&
+                    configuration.maximum <= 0 &&
+                    value > 0
                 )
             )
                 value *= -1
@@ -1849,8 +1834,8 @@ GenericInput.transformer = {
         type: 'text'
     },
     integer: {
-        format: {
-            final: {transform: (value:number):string => (new Intl.NumberFormat(
+        format: {final: {transform: (value:number):string => (
+            new Intl.NumberFormat(
                 GenericInput.local,
                 {
                     maximumFractionDigits: 0,
@@ -1860,9 +1845,9 @@ GenericInput.transformer = {
                         {}
                     )
                 }
-            )).format(value)}
-        },
-        parse: (value:string):any => {
+            )).format(value)
+        }},
+        parse: (value:number|string, configuration:Properties):any => {
             if (typeof value === 'string')
                 value = parseInt(GenericInput.local === 'de-DE' ?
                     value.replace(/[,.]/g, '') :
@@ -1872,10 +1857,13 @@ GenericInput.transformer = {
             // Fix sign if possible.
             if (
                 typeof value === 'number' &&
-                typeof configuration.min === 'number' &&
                 (
-                    value < 0 && configuration.min >= 0 ||
-                    value > 0 && configuration.max <= 0
+                    typeof configuration.minimum === 'number' &&
+                    configuration.minimum >= 0 &&
+                    value < 0 ||
+                    typeof configuration.maximum === 'number' &&
+                    configuration.maximum <= 0 &&
+                    value > 0
                 )
             )
                 value *= -1
@@ -1886,31 +1874,24 @@ GenericInput.transformer = {
     },
     number: {parse: parseInt},
     time: {
-        format: {
-            final: {transform: (value:number):string => {
-                // TODO
-                value = GenericInput.transformer.integer.parse(value)
-                if (isNaN(value))
-                    value = 0
+        format: {final: {transform: (value:number):string => {
+            value = typeof value === 'number' ? value : parseFloat(value)
+            if (isNaN(value))
+                value = 0
 
-                const formattedValue:string =
-                    (new Date(value * 1000)).toISOString()
+            const formattedValue:string =
+                (new Date(Math.round((value as number) * 1000))).toISOString()
 
-                return formattedValue.substring(
-                    formattedValue.indexOf('T') + 1,
-                    formattedValue.length - 1
-                )
-            }},
-            intermediate: {transform: (value:number):string =>
-                GenericInput.transformer.date.format.final.transform(value)
-            }
-        },
-        parse: (value:string):number => typeof value === 'number' ?
+            return formattedValue.substring(
+                formattedValue.indexOf('T') + 1, formattedValue.length - 1
+            )
+        }}},
+        parse: (value:number|string):number => typeof value === 'number' ?
             value :
             parseInt(value.replace(
                 /^([0-9]{2}):([0-9]{2})$/,
                 (_:string, hour:string, minute:string):string =>
-                    `${parseInt(hour) * 60 ** 2 + parseInt(minute) * 60}`
+                    String(parseInt(hour) * 60 ** 2 + parseInt(minute) * 60)
             ))
     },
 } as InputDataTransformation

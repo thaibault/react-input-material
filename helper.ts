@@ -333,7 +333,7 @@ export function formatValue<Type = any>(
             transformer[type].format as DataTransformSpecification['format']
         )[methodName].transform(value)
 
-    return `${value}`
+    return String(value)
 }
 /**
  * Determines initial value representation as string.

@@ -64,9 +64,9 @@ export type BaseModel<Type = any> = {
     default:null|Type
     description:string
     emptyEqualsNull:boolean
-    maximum:number
+    maximum:number|string
     maximumLength:number
-    minimum:number
+    minimum:number|string
     minimumLength:number
     name:string
     regularExpressionPattern:null|RegExp|string
@@ -212,9 +212,9 @@ export const modelStatePropertyTypes:{
 export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...baseModelPropertyTypes,
     emptyEqualsNull: boolean,
-    maximum: number,
+    maximum: oneOfType([number, string]),
     maximumLength: number,
-    minimum: number,
+    minimum: oneOfType([number, string]),
     minimumLength: number,
     mutable: boolean,
     pattern: oneOfType([object, string]),
@@ -405,6 +405,11 @@ export type InputDataTransformation<Type = any> =
     Mapping<RecursivePartial<DataTransformSpecification<Type>>> &
     {
         boolean:DataTransformSpecification<Type>
+        boolean:{
+            format?:DataTransformSpecification<Type>['format']
+            parse:DataTransformSpecification<Type>['parse']
+            type:NativeInputType
+        }
         currency:DataTransformSpecification<Type>
         date:DataTransformSpecification<Type>
         'datetime-local':DataTransformSpecification<Type>
