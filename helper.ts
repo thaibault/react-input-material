@@ -27,6 +27,7 @@ import {
     DataTransformSpecification,
     DefaultProperties,
     InputDataTransformation,
+    InputProperties,
     Model,
     ModelState,
     Properties,
@@ -260,11 +261,12 @@ export const getConsolidatedProperties =
  * @param transformer - To apply to given value.
  * @returns Transformed value.
  */
-export const parseValue = <P extends Properties, Type = any>(
+export const parseValue = <P extends InputProperties, Type = any>(
     configuration:P, value:any, transformer:InputDataTransformation<Type>
 ):null|Type => {
     if (configuration.emptyEqualsNull && value === '')
         return null
+
     if (
         ![null, undefined].includes(value) &&
         Object.prototype.hasOwnProperty.call(
@@ -275,9 +277,11 @@ export const parseValue = <P extends Properties, Type = any>(
         value = (
             transformer[configuration.type].parse as
                 DataTransformSpecification['parse']
-        )(value)
+        )(value, configuration)
+
     if (typeof value === 'number' && isNaN(value))
         return null
+
     return value
 }
 /**
@@ -288,11 +292,12 @@ export const parseValue = <P extends Properties, Type = any>(
  * @param transformer - To apply to given value.
  * @returns Transformed value.
  */
-export const transformValue = <P extends Properties, Type = any>(
+export const transformValue = <P extends InputProperties, Type = any>(
     configuration:P, value:any, transformer:InputDataTransformation<Type>
 ):null|Type => {
     if (configuration.model.trim && typeof value === 'string')
         value = value.trim().replace(/ +\n/g, '\\n')
+
     return parseValue<P, Type>(configuration, value, transformer)
 }
 /**
@@ -316,18 +321,16 @@ export function formatValue<Type = any>(
         isNaN(value)
     )
         return ''
+
     if (
-        Object.prototype.hasOwnProperty.call(transformer, type) &&
-        transformer[type].format &&
-        Object.prototype.hasOwnProperty.call(
-            transformer[type].format, methodName
-        ) &&
-        transformer[type].format![methodName]!.transform
+        transformer[type]?.format &&
+        transformer[type].format![methodName]?.transform
     )
         return (
             transformer[type].format as DataTransformSpecification['format']
-        )[methodName].transform(value)
-    return `${value}`
+        )[methodName]!.transform(value)
+
+    return String(value)
 }
 /**
  * Determines initial value representation as string.
@@ -351,6 +354,7 @@ export function determineInitialRepresentation<
 ):string {
     if (typeof properties.representation === 'string')
         return properties.representation
+
     if (value !== null)
         return formatValue<Type>(
             value,
@@ -361,6 +365,7 @@ export function determineInitialRepresentation<
             ),
             transformer
         )
+
     return ''
 }
 // endregion

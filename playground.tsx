@@ -53,7 +53,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     ).clear)
 
     return (<>
-        <div className="inputs">
+        <div className="playground__inputs">
 
             <GenericInput onChange={onChange}/>
 
@@ -89,7 +89,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 model={useMemorizedValue({
-                    default: 60, name: 'input3Model', type: 'time'
+                    default: 60,
+                    maximum: 3600,
+                    minimum: 1,
+                    name: 'input3Model',
+                    type: 'time'
                 })}
                 onChange={onChange}
             />
@@ -482,10 +486,17 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-            <div style={{height: '50px'}}>
-                <GenericAnimate in={fadeState}>Fade it!</GenericAnimate>
+            <div
+                className="playground__generic-animate"
+                style={{height: '50px'}}
+            >
+                <GenericAnimate in={fadeState} timeout={2000}>
+                    Fade it!
+                </GenericAnimate>
                 <br/>
-                <GenericAnimate children="Fade it!" in={!fadeState} />
+                <GenericAnimate
+                    children="Fade it!" in={!fadeState} timeout={2000}
+                />
             </div>
 
             <hr/>
@@ -539,9 +550,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
         </div>
 
-        {
-            selectedState &&
-            <pre className="outputs">{represent(selectedState)}</pre>
+        {selectedState ?
+            <pre className="playground__outputs">
+                {represent(selectedState)}
+            </pre> :
+            ''
         }
 
     </>)

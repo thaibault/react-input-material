@@ -39,7 +39,9 @@ export const GenericAnimate:FunctionComponent<Partial<TransitionProps<HTMLElemen
             {...properties}
         >{
             typeof properties.children === 'string' ?
-                <span>{properties.children}</span> :
+                <span className={styles['generic-animate__wrapper']}>
+                    {properties.children}
+                </span> :
                 Array.isArray(properties.children) ?
                     <div className={styles['generic-animate__list-wrapper']}>
                         {properties.children}

@@ -64,9 +64,9 @@ export type BaseModel<Type = any> = {
     default:null|Type
     description:string
     emptyEqualsNull:boolean
-    maximum:number
+    maximum:number|string
     maximumLength:number
-    minimum:number
+    minimum:number|string
     minimumLength:number
     name:string
     regularExpressionPattern:null|RegExp|string
@@ -106,10 +106,10 @@ export type FormatSpecification<Type = any> = {
 export type DataTransformSpecification<Type = any> = {
     format:{
         final:FormatSpecification
-        intermediate:FormatSpecification
+        intermediate?:FormatSpecification
     }
-    parse:(value:any) => null|Type
-    type:NativeInputType
+    parse:(value:any, configuration:InputProperties<Type>) => null|Type
+    type?:NativeInputType
 }
 export type Properties<Type = any> =
     BaseModel<Type> &
@@ -212,9 +212,9 @@ export const modelStatePropertyTypes:{
 export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...baseModelPropertyTypes,
     emptyEqualsNull: boolean,
-    maximum: number,
+    maximum: oneOfType([number, string]),
     maximumLength: number,
-    minimum: number,
+    minimum: oneOfType([number, string]),
     minimumLength: number,
     mutable: boolean,
     pattern: oneOfType([object, string]),
@@ -265,9 +265,9 @@ export const defaultModel:Model = {
     default: null,
     description: '',
     emptyEqualsNull: true,
-    maximum: -1,
+    maximum: Infinity,
     maximumLength: -1,
-    minimum: 0,
+    minimum: -Infinity,
     minimumLength: 0,
     mutable: true,
     name: 'NO_NAME_DEFINED',
@@ -380,6 +380,7 @@ export type InputProperties<Type = any> =
         representation:string
         rows:number
         selectableEditor:boolean
+        step:number
         trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
     }
 export type InputProps<Type = any> =
@@ -404,16 +405,17 @@ export type InputState<Type = any> =
 export type InputDataTransformation<Type = any> =
     Mapping<RecursivePartial<DataTransformSpecification<Type>>> &
     {
-        boolean:DataTransformSpecification<Type>
+        boolean:{
+            format?:DataTransformSpecification<Type>['format']
+            parse:DataTransformSpecification<Type>['parse']
+            type:NativeInputType
+        }
         currency:DataTransformSpecification<Type>
         date:DataTransformSpecification<Type>
         'datetime-local':DataTransformSpecification<Type>
         float:DataTransformSpecification<Type>
         integer:{
-            format:{
-                final:FormatSpecification<Type>
-                intermediate?:DataTransformSpecification<Type>['format']['intermediate']
-            }
+            format:DataTransformSpecification<Type>['format']
             parse:DataTransformSpecification<Type>['parse']
             type:NativeInputType
         }
@@ -501,6 +503,7 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     representation: oneOfType([string, symbol]),
     rows: number,
     selectableEditor: boolean,
+    step: number,
     trailingIcon: any
 } as const
 export const defaultInputModelState:InputModelState = {
@@ -532,7 +535,8 @@ export const defaultInputProperties:DefaultInputProperties = {
     patternText:
         'Your string have to match the regular expression: "${pattern}".',
     rows: 4,
-    selectableEditor: false
+    selectableEditor: false,
+    step: 1
 } as const
 // // endregion
 // / endregion
