@@ -93,6 +93,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     maximum: 3600,
                     minimum: 1,
                     name: 'input3Model',
+                    step: 1,
                     type: 'time'
                 })}
                 onChange={onChange}
@@ -487,7 +488,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <div
-                className="playground__generic-animate"
+                className="playground__inputs__generic-animate"
                 style={{height: '50px'}}
             >
                 <GenericAnimate in={fadeState} timeout={2000}>
