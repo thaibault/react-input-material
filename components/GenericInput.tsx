@@ -1718,14 +1718,16 @@ GenericInput.transformer = {
     boolean: {
         format: {
             final: {transform: (value:boolean):string => String(value)},
-            intermediate: {transform: (value:boolean):string =>
-                GenericInput.transformer.boolean.format.final.transform(value)
+            intermediate: {transform: (...parameters:Parameters<
+                typeof GenericInput.transformer.boolean.format.final.transform
+            >):string =>
+                GenericInput.transformer.boolean.format.final.transform(
+                    ...parameters
+                )
             }
         },
         parse: (value:string):any => (
-            value === 'true' ?
-                true :
-                value === 'false' ? false : value
+            value === 'true' ? true : value === 'false' ? false : value
         ),
         type: 'text'
     },
@@ -1743,18 +1745,24 @@ GenericInput.transformer = {
                     )
                 }
             )).format(value)},
-            intermediate: {transform: (value:string):any =>
-                GenericInput.transformer.float.format.intermediate
-                    .transform(value)
+            intermediate: {transform: (...parameters:Parameters<
+                typeof GenericInput.transformer.float.format.intermediate
+                    .transform
+            >):any =>
+                GenericInput.transformer.float.format.intermediate.transform(
+                    ...parameters
+                )
             }
         },
-        parse: (value:number|string):any =>
-            GenericInput.transformer.float.parse(value),
+        parse: (...parameters:Parameters<
+            typeof GenericInput.transformer.float.parse
+        >):any => GenericInput.transformer.float.parse(...parameters),
         type: 'text'
     },
     date: {
         format: {
             final: {transform: (value:number|string):string => {
+                // TODO
                 value = GenericInput.transformer.float.parse(value)
                 if (isNaN(value as number))
                     value = 0
@@ -1766,9 +1774,11 @@ GenericInput.transformer = {
                     0, formattedValue.indexOf('T')
                 )
             }},
-            intermediate: {transform: (value:number):string =>
-                GenericInput.transformer.date.format.final.transform(value)
-            }
+            intermediate: {transform: (...parameters:Parameters<
+                typeof GenericInput.transformer.date.format.final.transform
+            >):string => GenericInput.transformer.date.format.final.transform(
+                ...parameters
+            )}
         },
         parse: (value:string):number => typeof value === 'number' ?
             value :
@@ -1780,6 +1790,7 @@ GenericInput.transformer = {
     'datetime-local': {
         format: {
             final: {transform: (value:number):string => {
+                // TODO
                 value = GenericInput.transformer.float.parse(value)
                 if (isNaN(value))
                     value = 0
@@ -1796,8 +1807,9 @@ GenericInput.transformer = {
                     .transform(value)
             }
         },
-        parse: (value:string):number =>
-            GenericInput.transformer.date.parse(value)
+        parse: (...parameters:Parameters<
+            typeof GenericInput.transformer.date.parse
+        >):number => GenericInput.transformer.date.parse(...parameters)
     },
     float: {
         format: {
@@ -1814,13 +1826,26 @@ GenericInput.transformer = {
             )).format(value)},
             intermediate: {transform: (value:number):string => `${value}`}
         },
-        parse: (value:number|string):number => typeof value === 'string' ?
-            parseFloat(
-                GenericInput.local === 'de-DE' ?
+        parse: (value:number|string, configuration:Properties):number => {
+            if (typeof value === 'string')
+                value = parseFloat(GenericInput.local === 'de-DE' ?
                     value.replace(/\./g, '').replace(/\,/g, '.') :
                     value
-            ) :
-            value,
+                )
+
+            // Fix sign if possible.
+            if (
+                typeof value === 'number' &&
+                typeof configuration.min === 'number' &&
+                (
+                    value < 0 && configuration.min >= 0 ||
+                    value > 0 && configuration.max <= 0
+                )
+            )
+                value *= -1
+
+            return value
+        },
         type: 'text'
     },
     integer: {
@@ -1837,17 +1862,33 @@ GenericInput.transformer = {
                 }
             )).format(value)}
         },
-        parse: (value:string):any => parseInt(
-            typeof value === 'string' && GenericInput.local === 'de-DE' ?
-                value.replace(/[,.]/g, '') :
-                value
-        ),
+        parse: (value:string):any => {
+            if (typeof value === 'string')
+                value = parseInt(GenericInput.local === 'de-DE' ?
+                    value.replace(/[,.]/g, '') :
+                    value
+                )
+
+            // Fix sign if possible.
+            if (
+                typeof value === 'number' &&
+                typeof configuration.min === 'number' &&
+                (
+                    value < 0 && configuration.min >= 0 ||
+                    value > 0 && configuration.max <= 0
+                )
+            )
+                value *= -1
+
+            return value
+        },
         type: 'text'
     },
     number: {parse: parseInt},
     time: {
         format: {
             final: {transform: (value:number):string => {
+                // TODO
                 value = GenericInput.transformer.integer.parse(value)
                 if (isNaN(value))
                     value = 0

@@ -108,8 +108,8 @@ export type DataTransformSpecification<Type = any> = {
         final:FormatSpecification
         intermediate:FormatSpecification
     }
-    parse:(value:any) => null|Type
-    type:NativeInputType
+    parse:(value:any, configuration:Properties<Type>) => null|Type
+    type?:NativeInputType
 }
 export type Properties<Type = any> =
     BaseModel<Type> &
