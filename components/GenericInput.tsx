@@ -1771,16 +1771,22 @@ GenericInput.transformer = {
         type: 'text'
     },
     date: {
-        format: {final: {transform: (value:number|string):string => {
-            value = typeof value === 'number' ? value : parseFloat(value)
-            if (!isFinite(value))
-                return ''
+        format: {
+            final: {transform: (value:number|string):string => {
+                value = typeof value === 'number' ? value : parseFloat(value)
+                if (!isFinite(value))
+                    return ''
 
-            const formattedValue:string =
-                (new Date(Math.round((value as number) * 1000))).toISOString()
+                const formattedValue:string =
+                    (new Date(Math.round((value as number) * 1000)))
+                        .toISOString()
 
-            return formattedValue.substring(0, formattedValue.indexOf('T'))
-        }}},
+                return formattedValue.substring(0, formattedValue.indexOf('T'))
+            }},
+            intermediate: {transform: (value:number|string):string =>
+                GenericInput.transformer.date.format.final.transform(value)
+            }
+        },
         parse: (value:number|string):number => typeof value === 'number' ?
             value :
             `${parseFloat(value)}` === value ?
@@ -1789,16 +1795,23 @@ GenericInput.transformer = {
     },
     // TODO respect local to utc conversion.
     'datetime-local': {
-        format: {final: {transform: (value:number):string => {
-            value = typeof value === 'number' ? value : parseFloat(value)
-            if (!isFinite(value))
-                return ''
+        format: {
+            final: {transform: (value:number):string => {
+                value = typeof value === 'number' ? value : parseFloat(value)
+                if (!isFinite(value))
+                    return ''
 
-            const formattedValue:string =
-                (new Date(Math.round((value as number) * 1000))).toISOString()
+                const formattedValue:string =
+                    (new Date(Math.round((value as number) * 1000)))
+                        .toISOString()
 
-            return formattedValue.substring(0, formattedValue.length - 1)
-        }}},
+                return formattedValue.substring(0, formattedValue.length - 1)
+            }},
+            intermediate: {transform: (value:number|string):string =>
+                GenericInput.transformer['datetime-local'].format.final
+                    .transform(value)
+            }
+        },
         parse: (...parameters:Parameters<
             typeof GenericInput.transformer.date.parse
         >):number => GenericInput.transformer.date.parse(...parameters)
@@ -1885,18 +1898,23 @@ GenericInput.transformer = {
         parseInt(value)
     },
     time: {
-        format: {final: {transform: (value:number):string => {
-            value = typeof value === 'number' ? value : parseFloat(value)
-            if (!isFinite(value))
-                return ''
+        format: {
+            final: {transform: (value:number):string => {
+                value = typeof value === 'number' ? value : parseFloat(value)
+                if (!isFinite(value))
+                    return ''
 
-            const formattedValue:string =
-                (new Date(Math.round((value as number) * 1000))).toISOString()
+                const formattedValue:string =
+                    (new Date(Math.round((value as number) * 1000))).toISOString()
 
-            return formattedValue.substring(
-                formattedValue.indexOf('T') + 1, formattedValue.length - 1
-            )
-        }}},
+                return formattedValue.substring(
+                    formattedValue.indexOf('T') + 1, formattedValue.length - 1
+                )
+            }},
+            intermediate: {transform: (value:number|string):string =>
+                GenericInput.transformer.time.format.final.transform(value)
+            }
+        },
         parse: (value:number|string):number => typeof value === 'number' ?
             value :
             parseInt(value.replace(
