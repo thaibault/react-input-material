@@ -37,25 +37,34 @@ import {
 // endregion
 /**
  * Triggered when a value state changes like validation or focusing.
+ *
  * @param properties - Properties to search in.
  * @param name - Event callback name to search for in given properties.
- * @param parameter - To forward to callback.
+ * @param synchronous - Indicates whether to trigger callback immediately or
+ * later. Controlled components should call synchronously and uncontrolled
+ * otherwise as long as callbacks are called in a state setter context.
+ * @param parameters - Additional arguments to forward to callback.
+ *
  * @returns Nothing.
  */
 export const triggerCallbackIfExists = <Type = any>(
-    properties:Properties<Type>, name:string, ...parameter:Array<any>
+    properties:Properties<Type>,
+    name:string,
+    synchronous:boolean = true,
+    ...parameters:Array<any>
 ):void => {
     name = `on${Tools.stringCapitalize(name)}`
     if (properties[name as keyof Properties<Type>])
-        /*
-            NOTE: We call callback on next event loop to first consolidate
-            internal state.
-        */
-        Tools.timeout(() =>
+        if (synchronous)
             (properties[name as keyof Properties<Type>] as Function)(
-                ...parameter
+                ...parameters
             )
-        )
+        else
+            Tools.timeout(() =>
+                (properties[name as keyof Properties<Type>] as Function)(
+                    ...parameters
+                )
+            )
 }
 // region consolidation state
 /**
