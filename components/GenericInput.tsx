@@ -433,6 +433,7 @@ export const GenericInputInner = function<Type = any>(
                                 value = properties.hidden
                             properties.hidden = !value
                             onChange(event)
+
                             return properties.hidden
                         })
                     },
