@@ -381,7 +381,10 @@ export const RequireableCheckboxInner = function(
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
     const controlled:boolean = Boolean(
-        givenProps.value !== undefined &&
+        (
+            givenProps.model?.value !== undefined ||
+            givenProps.value !== undefined
+        ) &&
         (givenProps.onChange || givenProps.onChangeValue)
     )
 
