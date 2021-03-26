@@ -18,7 +18,7 @@
 */
 // region imports
 import Tools, {optionalRequire} from 'clientnode'
-import {EvaluationResult, Mapping} from 'clientnode/type'
+import {EvaluationResult, FirstParameter, Mapping} from 'clientnode/type'
 import {
     ComponentType,
     createRef,
@@ -803,6 +803,71 @@ export const GenericInputInner = function<Type = any>(
     }
     // / endregion
     // / region property aggregation
+    const deriveMissingPropertiesFromState = () => {
+        if (
+            givenProperties.cursor === null ||
+            typeof givenProperties.cursor !== 'object'
+        )
+            givenProperties.cursor = {} as CursorState
+        if (givenProperties.cursor.end === undefined)
+            givenProperties.cursor.end = cursor.end
+        if (givenProperties.cursor.start === undefined)
+            givenProperties.cursor.start = cursor.start
+
+        if (givenProperties.editorIsActive === undefined)
+            givenProperties.editorIsActive = editorState.editorIsActive
+
+        if (givenProperties.hidden === undefined)
+            givenProperties.hidden = hidden
+        if (givenProperties.hidden === undefined)
+            givenProperties.hidden =
+                givenProperties.name?.startsWith('password')
+
+        if (givenProperties.showDeclaration === undefined)
+            givenProperties.showDeclaration = showDeclaration
+        // region value state
+        /*
+            NOTE: This logic is important to re-determine representation when a
+            new value is provided via properties.
+        */
+        if (givenProperties.representation === undefined)
+            givenProperties.representation = valueState.representation
+        /*
+            NOTE: Avoid writing into mutable model object properties. So
+            project value to properties directly.
+        */
+        if (
+            givenProperties.model!.value !== undefined &&
+            givenProperties.value === undefined
+        )
+            givenProperties.value = givenProperties.model!.value
+        if (givenProperties.value === undefined) {
+            givenProperties.value = valueState.value
+            if (
+                givenProperties.representation === undefined &&
+                givenProperties.model!.value === undefined
+            )
+                givenProperties.representation = valueState.representation
+        } else if (givenProperties.value !== valueState.value)
+            givenProperties.representation = undefined
+
+        if (givenProperties.model!.state)
+            givenProperties.model!.state = {...givenProperties.model!.state}
+        else
+            givenProperties.model!.state = {} as ModelState
+        for (const key in valueState.modelState)
+            if (
+                Object.prototype.hasOwnProperty.call(
+                    valueState.modelState, key
+                ) &&
+                (
+                    givenProperties.model!.state as Partial<ModelState>
+                )[key as keyof ModelState] === undefined
+            )
+                givenProperties.model!.state[key as keyof ModelState] =
+                    valueState.modelState[key as keyof ModelState]
+        // endregion
+    }
     /**
      * Synchronizes property, state and model configuration:
      * Properties overwrites default properties which overwrites default model
@@ -955,15 +1020,19 @@ export const GenericInputInner = function<Type = any>(
 
         if (oldValueState.value !== properties.value)
             triggerCallbackIfExists<Type>(
-                properties, 'valueChange', properties.value, event
+                properties, 'valueChange', controlled, properties.value, event
             )
 
         if (stateChanged)
             triggerCallbackIfExists<Type>(
-                properties, 'changeState', properties.model.state, event
+                properties,
+                'changeState',
+                controlled,
+                properties.model.state,
+                event
             )
 
-        triggerCallbackIfExists<Type>(properties, 'blur', event)
+        triggerCallbackIfExists<Type>(properties, 'blur', controlled, event)
 
         return changed ?
             {
@@ -992,7 +1061,9 @@ export const GenericInputInner = function<Type = any>(
             )
         )
 
-        triggerCallbackIfExists<Type>(properties, 'change', properties, event)
+        triggerCallbackIfExists<Type>(
+            properties, 'change', controlled, properties, event
+        )
     }
     /**
      * Triggered when editor is active indicator should be changed.
@@ -1012,6 +1083,7 @@ export const GenericInputInner = function<Type = any>(
             triggerCallbackIfExists<Type>(
                 properties,
                 'changeEditorIsActive',
+                controlled,
                 properties.editorIsActive,
                 event
             )
@@ -1040,6 +1112,7 @@ export const GenericInputInner = function<Type = any>(
             triggerCallbackIfExists<Type>(
                 properties,
                 'changeShowDeclaration',
+                controlled,
                 properties.showDeclaration,
                 event
             )
@@ -1110,14 +1183,18 @@ export const GenericInputInner = function<Type = any>(
                 stateChanged = true
 
             triggerCallbackIfExists<Type>(
-                properties, 'changeValue', properties.value, event
+                properties, 'changeValue', controlled, properties.value, event
             )
 
             if (stateChanged) {
                 result.modelState = properties.model.state
 
                 triggerCallbackIfExists<Type>(
-                    properties, 'changeState', properties.model.state, event
+                    properties,
+                    'changeState',
+                    controlled,
+                    properties.model.state,
+                    event
                 )
             }
 
@@ -1132,7 +1209,7 @@ export const GenericInputInner = function<Type = any>(
     const onClick = (event:ReactMouseEvent):void => {
         onSelectionChange(event)
 
-        triggerCallbackIfExists<Type>(properties, 'click', event)
+        triggerCallbackIfExists<Type>(properties, 'click', controlled, event)
 
         onTouch(event)
     }
@@ -1142,7 +1219,7 @@ export const GenericInputInner = function<Type = any>(
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
-        triggerCallbackIfExists<Type>(properties, 'focus', event)
+        triggerCallbackIfExists<Type>(properties, 'focus', controlled, event)
 
         onTouch(event)
     }
@@ -1163,7 +1240,7 @@ export const GenericInputInner = function<Type = any>(
         )
             event.stopPropagation()
 
-        triggerCallbackIfExists<Type>(properties, 'keyDown', event)
+        triggerCallbackIfExists<Type>(properties, 'keyDown', controlled, event)
     }
     /**
      * Triggered on key up events.
@@ -1175,7 +1252,9 @@ export const GenericInputInner = function<Type = any>(
         if (event.keyCode) {
             onSelectionChange(event)
 
-            triggerCallbackIfExists<Type>(properties, 'keyUp', event)
+            triggerCallbackIfExists<Type>(
+                properties, 'keyUp', controlled, event
+            )
         }
     }
     /**
@@ -1190,7 +1269,9 @@ export const GenericInputInner = function<Type = any>(
         */
         saveSelectionState()
 
-        triggerCallbackIfExists<Type>(properties, 'selectionChange', event)
+        triggerCallbackIfExists<Type>(
+            properties, 'selectionChange', controlled, event
+        )
     }
     /**
      * Triggers on start interacting with the input.
@@ -1222,11 +1303,17 @@ export const GenericInputInner = function<Type = any>(
                 result = {...oldValueState, modelState: properties.model.state}
 
                 triggerCallbackIfExists<Type>(
-                    properties, 'changeState', properties.model.state, event
+                    properties,
+                    'changeState',
+                    controlled,
+                    properties.model.state,
+                    event
                 )
             }
 
-            triggerCallbackIfExists<Type>(properties, 'touch', event)
+            triggerCallbackIfExists<Type>(
+                properties, 'touch', controlled, event
+            )
 
             return result
         })
@@ -1246,19 +1333,23 @@ export const GenericInputInner = function<Type = any>(
     let richTextEditorReference:RichTextEditorComponent|undefined
     // / endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
+    const controlled:boolean =
+        Boolean(props.value !== undefined && props.onChangeValue)
+
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
     let [hidden, setHidden] = useState<boolean|undefined>()
     let [editorState, setEditorState] = useState<EditorState>({
         editorIsActive: false, selectionIsUnstable: false
     })
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
+
     const initialValue:null|Type = determineInitialValue<Type>(
         givenProps, GenericInput.defaultProperties.model?.default
     )
     /*
-        NOTE: This only way to extend default properties with given properties
-        while not modifying default property object is create an intermediate
-        copy like this.
+        NOTE: Extend default properties with given properties while letting
+        default property object untouched for unchanged usage in other
+        instances.
     */
     const givenProperties:Props<Type> = Tools.extend(
         true, Tools.copy(GenericInput.defaultProperties), givenProps
@@ -1267,8 +1358,8 @@ export const GenericInputInner = function<Type = any>(
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
     */
-    const [valueState, setValueState] = useState<ValueState<Type, ModelState>>(
-        {
+    let [valueState, setValueState] = useState<ValueState<Type, ModelState>>(
+        () => ({
             modelState: {...GenericInput.defaultModelState},
             representation: determineInitialRepresentation<Props<Type>, Type>(
                 givenProperties,
@@ -1277,94 +1368,49 @@ export const GenericInputInner = function<Type = any>(
                 GenericInput.transformer
             ),
             value: initialValue
-        }
+        })
     )
-    // / region derive missing properties from state variables and back
-    if (
-        givenProperties.cursor === null ||
-        typeof givenProperties.cursor !== 'object'
-    )
-        givenProperties.cursor = {} as CursorState
-    if (givenProperties.cursor.end === undefined)
-        givenProperties.cursor.end = cursor.end
-    if (givenProperties.cursor.start === undefined)
-        givenProperties.cursor.start = cursor.start
 
-    if (givenProperties.editorIsActive === undefined)
-        givenProperties.editorIsActive = editorState.editorIsActive
+    deriveMissingPropertiesFromState()
 
-    if (givenProperties.hidden === undefined)
-        givenProperties.hidden = hidden
-    if (givenProperties.hidden === undefined)
-        givenProperties.hidden = givenProperties.name?.startsWith('password')
-
-    if (givenProperties.showDeclaration === undefined)
-        givenProperties.showDeclaration = showDeclaration
-    // // region value state
-    /*
-        NOTE: This logic is important to re-determine representation when a new
-        value is provided via properties.
-    */
-    if (givenProperties.representation === undefined)
-        givenProperties.representation = valueState.representation
-    /*
-        NOTE: Avoid writing into mutable model object properties. So project
-        value to properties directly.
-    */
-    if (
-        givenProperties.model!.value !== undefined &&
-        givenProperties.value === undefined
-    )
-        givenProperties.value = givenProperties.model!.value
-    if (givenProperties.value === undefined) {
-        givenProperties.value = valueState.value
-        if (
-            givenProperties.representation === undefined &&
-            givenProperties.model!.value === undefined
-        )
-            givenProperties.representation = valueState.representation
-    } else if (givenProperties.value !== valueState.value)
-        givenProperties.representation = undefined
-
-    if (givenProperties.model!.state)
-        givenProperties.model!.state = {...givenProperties.model!.state}
-    else
-        givenProperties.model!.state = {} as ModelState
-    for (const key in valueState.modelState)
-        if (
-            Object.prototype.hasOwnProperty.call(valueState.modelState, key) &&
-            (
-                givenProperties.model!.state as Partial<ModelState>
-            )[key as keyof ModelState] === undefined
-        )
-            givenProperties.model!.state[key as keyof ModelState] =
-                valueState.modelState[key as keyof ModelState]
-    // // endregion
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
+    // region synchronize properties into state where values are not controlled
     if (!Tools.equals(properties.cursor, cursor))
         setCursor(properties.cursor)
     if (properties.editorIsActive !== editorState.editorIsActive)
         setEditorState({
-            ...editorState,
-            editorIsActive: properties.editorIsActive
+            ...editorState, editorIsActive: properties.editorIsActive
         })
     if (properties.hidden !== hidden)
         setHidden(properties.hidden)
     if (properties.showDeclaration !== showDeclaration)
         setShowDeclaration(properties.showDeclaration)
 
+    const currentValueState:ValueState<Type, ModelState> = {
+        modelState: properties.model.state,
+        representation: properties.representation,
+        value: properties.value!
+    }
+    if (controlled)
+        /*
+            NOTE: We act as a controlled component by overwriting internal
+            state setter.
+        */
+        setValueState = (
+            callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
+        ):void => {
+            if (typeof callbackOrData === 'function')
+                callbackOrData(currentValueState)
+        }
     if (!(
+        !controlled &&
         properties.value === valueState.value &&
         properties.representation === valueState.representation &&
         Tools.equals(properties.model.state, valueState.modelState)
     ))
-        setValueState({
-            modelState: properties.model.state,
-            representation: properties.representation,
-            value: properties.value as null|Type
-        })
-    // / endregion
+        setValueState(currentValueState)
+    // endregion
     useImperativeHandle(
         reference,
         ():Adapter<Type> & {

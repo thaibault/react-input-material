@@ -18,6 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
+import {FirstParameter} from 'clientnode/type'
 import {
     createRef,
     FocusEvent as ReactFocusEvent,
@@ -104,6 +105,37 @@ export const RequireableCheckboxInner = function(
     props:Props, reference?:RefObject<Adapter>
 ):ReactElement {
     // region property aggregation
+    const deriveMissingPropertiesFromState = () => {
+        if (givenProperties.showDeclaration === undefined)
+            givenProperties.showDeclaration = showDeclaration
+        // region value state
+        /*
+            NOTE: Avoid writing into mutable model object properties. So project
+            value to properties directly.
+        */
+        if (
+            givenProperties.model!.value !== undefined &&
+            givenProperties.value === undefined
+        )
+            givenProperties.value = givenProperties.model!.value
+         if (givenProperties.value === undefined)
+            givenProperties.value = valueState.value
+
+        if (givenProperties.model!.state)
+            givenProperties.model!.state = {...givenProperties.model!.state}
+        else
+            givenProperties.model!.state = {} as ModelState
+        for (const key in valueState.modelState)
+            if (
+                Object.prototype.hasOwnProperty.call(valueState.modelState, key) &&
+                (
+                    givenProperties.model!.state as Partial<ModelState>
+                )[key as keyof ModelState] === undefined
+            )
+                givenProperties.model!.state[key as keyof ModelState] =
+                    valueState.modelState[key as keyof ModelState]
+        // endregion
+    }
     /**
      * Calculate external properties (a set of all configurable properties).
      * @param properties - Properties to merge.
@@ -150,11 +182,15 @@ export const RequireableCheckboxInner = function(
             onChange(event)
 
             triggerCallbackIfExists<boolean>(
-                properties, 'changeState', properties.model.state, event
+                properties,
+                'changeState',
+                controlled,
+                properties.model.state,
+                event
             )
         }
 
-        triggerCallbackIfExists<boolean>(properties, 'blur', event)
+        triggerCallbackIfExists<boolean>(properties, 'blur', controlled, event)
 
         return changed ?
             {...oldValueState, modelState: properties.model.state} :
@@ -180,7 +216,7 @@ export const RequireableCheckboxInner = function(
         )
 
         triggerCallbackIfExists<boolean>(
-            properties, 'change', properties, event
+            properties, 'change', controlled, properties, event
         )
     }
     /**
@@ -197,6 +233,7 @@ export const RequireableCheckboxInner = function(
             triggerCallbackIfExists<boolean>(
                 properties,
                 'changeShowDeclaration',
+                controlled,
                 properties.showDeclaration,
                 event
             )
@@ -248,14 +285,18 @@ export const RequireableCheckboxInner = function(
                 stateChanged = true
 
             triggerCallbackIfExists<boolean>(
-                properties, 'changeValue', properties.value, event
+                properties, 'changeValue', controlled, properties.value, event
             )
 
             if (stateChanged) {
                 result.modelState = properties.model.state
 
                 triggerCallbackIfExists<boolean>(
-                    properties, 'changeState', properties.model.state, event
+                    properties,
+                    'changeState',
+                    controlled,
+                    properties.model.state,
+                    event
                 )
             }
 
@@ -268,7 +309,9 @@ export const RequireableCheckboxInner = function(
      * @returns Nothing.
      */
     const onClick = (event:ReactMouseEvent):void => {
-        triggerCallbackIfExists<boolean>(properties, 'click', event)
+        triggerCallbackIfExists<boolean>(
+            properties, 'click', controlled, event
+        )
 
         onTouch(event)
     }
@@ -278,7 +321,9 @@ export const RequireableCheckboxInner = function(
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
-        triggerCallbackIfExists<boolean>(properties, 'focus', event)
+        triggerCallbackIfExists<boolean>(
+            properties, 'focus', controlled, event
+        )
 
         onTouch(event)
     }
@@ -312,11 +357,17 @@ export const RequireableCheckboxInner = function(
                 result = {...oldValueState, modelState: properties.model.state}
 
                 triggerCallbackIfExists<boolean>(
-                    properties, 'changeState', properties.model.state, event
+                    properties,
+                    'changeState',
+                    controlled,
+                    properties.model.state,
+                    event
                 )
             }
 
-            triggerCallbackIfExists<boolean>(properties, 'touch', event)
+            triggerCallbackIfExists<boolean>(
+                properties, 'touch', controlled, event
+            )
 
             return result
         })
@@ -329,16 +380,20 @@ export const RequireableCheckboxInner = function(
         createRef<MDCCheckboxFoundation>()
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
+    const controlled:boolean =
+        Boolean(props.value !== undefined && props.onChangeValue)
+
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
+
     const initialValue:boolean|null = determineInitialValue<boolean>(
         givenProps,
         RequireableCheckbox.defaultProperties.model.default,
         givenProps.checked
     )
     /*
-        NOTE: This only way to extend default properties with given properties
-        while not modifying default property object is create an intermediate
-        copy like this.
+        NOTE: Extend default properties with given properties while letting
+        default property object untouched for unchanged usage in other
+        instances.
     */
     const givenProperties:Props = Tools.extend(
         true, Tools.copy(RequireableCheckbox.defaultProperties), givenProps
@@ -347,53 +402,41 @@ export const RequireableCheckboxInner = function(
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
     */
-    const [valueState, setValueState] =
+    let [valueState, setValueState] =
         useState<ValueState<boolean, ModelState>>({
             modelState: {...RequireableCheckbox.defaultModelState},
             value: initialValue
         })
-    // / region derive missing properties from state variables and back
-    if (givenProperties.showDeclaration === undefined)
-        givenProperties.showDeclaration = showDeclaration
-    // // region value state
-    /*
-        NOTE: Avoid writing into mutable model object properties. So project
-        value to properties directly.
-    */
-    if (
-        givenProperties.model!.value !== undefined &&
-        givenProperties.value === undefined
-    )
-        givenProperties.value = givenProperties.model!.value
-     if (givenProperties.value === undefined)
-        givenProperties.value = valueState.value
 
-    if (givenProperties.model!.state)
-        givenProperties.model!.state = {...givenProperties.model!.state}
-    else
-        givenProperties.model!.state = {} as ModelState
-    for (const key in valueState.modelState)
-        if (
-            Object.prototype.hasOwnProperty.call(valueState.modelState, key) &&
-            (
-                givenProperties.model!.state as Partial<ModelState>
-            )[key as keyof ModelState] === undefined
-        )
-            givenProperties.model!.state[key as keyof ModelState] =
-                valueState.modelState[key as keyof ModelState]
-    // // endregion
+    deriveMissingPropertiesFromState()
+
     const properties:Properties = getConsolidatedProperties(givenProperties)
+    // region synchronize properties into state where values are not controlled
     if (properties.showDeclaration !== showDeclaration)
         setShowDeclaration(properties.showDeclaration)
+
+    const currentValueState:ValueState<boolean, ModelState> = {
+        modelState: properties.model.state,
+        value: properties.value as boolean|null
+    }
+    if (controlled)
+        /*
+            NOTE: We act as a controlled component by overwriting internal
+            state setter.
+        */
+        setValueState = (
+            callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
+        ):void => {
+            if (typeof callbackOrData === 'function')
+                callbackOrData(currentValueState)
+        }
     if (!(
+        !controlled &&
         properties.value === valueState.value &&
         Tools.equals(properties.model.state, valueState.modelState)
     ))
-        setValueState({
-            modelState: properties.model.state,
-            value: properties.value as boolean|null
-        })
-    // / endregion
+        setValueState(currentValueState)
+    // endregion
     useImperativeHandle(
         reference,
         ():Adapter & {
