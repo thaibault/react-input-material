@@ -1333,8 +1333,9 @@ export const GenericInputInner = function<Type = any>(
     let richTextEditorReference:RichTextEditorComponent|undefined
     // / endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
-    const controlled:boolean =
-        Boolean(props.value !== undefined && props.onChangeValue)
+    const controlled:boolean = Boolean(
+        props.value !== undefined && (props.onChangeValue || props.onChange)
+    )
 
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
     let [hidden, setHidden] = useState<boolean|undefined>()

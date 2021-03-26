@@ -380,8 +380,10 @@ export const RequireableCheckboxInner = function(
         createRef<MDCCheckboxFoundation>()
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
-    const controlled:boolean =
-        Boolean(props.value !== undefined && props.onChangeValue)
+    const controlled:boolean = Boolean(
+        givenProps.value !== undefined &&
+        (givenProps.onChange || givenProps.onChangeValue)
+    )
 
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
 
