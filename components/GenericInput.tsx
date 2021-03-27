@@ -1761,7 +1761,7 @@ GenericInputInner.displayName = 'GenericInput'
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProperties - Initial property configuration.
- * @property static:local - Location hint to properly represent values.
+ * @property static:locale - Location hint to properly represent values.
  * @property static:propTypes - Triggers reacts runtime property value checks
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
@@ -1792,7 +1792,7 @@ GenericInput.defaultProperties = {
     representation: undefined,
     value: undefined
 }
-GenericInput.local = 'en-US'
+GenericInput.locale = 'en-US'
 GenericInput.propTypes = propertyTypes
 GenericInput.strict = false
 GenericInput.transformer = {
@@ -1805,7 +1805,7 @@ GenericInput.transformer = {
     currency: {
         format: {final: {transform: (value:number):string => (
             new Intl.NumberFormat(
-                GenericInput.local,
+                GenericInput.locale,
                 {
                     currency: 'USD',
                     style: 'currency',
@@ -1871,7 +1871,7 @@ GenericInput.transformer = {
     float: {
         format: {final: {transform: (value:number):string => (
             new Intl.NumberFormat(
-                GenericInput.local,
+                GenericInput.locale,
                 {
                     style: 'decimal',
                     ...(
@@ -1883,7 +1883,7 @@ GenericInput.transformer = {
         ).format(value)}},
         parse: (value:number|string, configuration:Properties):number => {
             if (typeof value === 'string')
-                value = parseFloat(GenericInput.local === 'de-DE' ?
+                value = parseFloat(GenericInput.locale === 'de-DE' ?
                     value.replace(/\./g, '').replace(/\,/g, '.') :
                     value
                 )
@@ -1909,7 +1909,7 @@ GenericInput.transformer = {
     integer: {
         format: {final: {transform: (value:number):string => (
             new Intl.NumberFormat(
-                GenericInput.local,
+                GenericInput.locale,
                 {
                     maximumFractionDigits: 0,
                     ...(
@@ -1922,7 +1922,7 @@ GenericInput.transformer = {
         }},
         parse: (value:number|string, configuration:Properties):any => {
             if (typeof value === 'string')
-                value = parseInt(GenericInput.local === 'de-DE' ?
+                value = parseInt(GenericInput.locale === 'de-DE' ?
                     value.replace(/[,.]/g, '') :
                     value
                 )

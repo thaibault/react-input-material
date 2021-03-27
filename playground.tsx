@@ -26,7 +26,7 @@ import {GenericAnimate, GenericInput, RequireableCheckbox} from './index'
 import {useMemorizedValue} from './helper'
 import {Properties} from './type'
 // endregion
-GenericInput.local = 'de-DE'
+GenericInput.locale = 'de-DE'
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 const represent = (state:Properties):string => Tools.represent(
     Object.keys(state)
