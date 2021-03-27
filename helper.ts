@@ -19,7 +19,7 @@
 // region imports
 import Tools from 'clientnode'
 import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
-import {Mapping, ValueOf} from 'clientnode/type'
+import {Mapping, RecursivePartial, ValueOf} from 'clientnode/type'
 import {ReactElement, useMemo} from 'react'
 import {render as renderReact, unmountComponentAtNode} from 'react-dom'
 
@@ -228,20 +228,22 @@ export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
  * @param properties - Properties to merge.
  * @returns External properties object.
  */
-export const getConsolidatedProperties =
-    <P extends Props, R extends Properties>(properties:P):R => {
-    const result:R & {
+export const getConsolidatedProperties = <
+    P extends Props, R extends Properties
+>(properties:P):R => {
+    type Result = R & {
         mutable?:boolean
         pattern?:RegExp|string
         nullable?:boolean
         regularExpressionPattern?:null|RegExp|string
         state?:null
         writable?:boolean
-    } = ({
+    }
+    const result:Result = ({
         ...properties,
         ...(properties.model || {}),
         ...((properties.model || {}).state || {})
-    })
+    }) as unknown as Result
     // region handle aliases
     result.disabled = !(result.mutable && result.writable)
     delete result.mutable
@@ -271,7 +273,14 @@ export const getConsolidatedProperties =
  *
  * @returns Transformed value.
  */
-export const parseValue = <P extends InputProperties, Type = any>(
+export const parseValue = <
+    P extends {
+        emptyEqualsNull:boolean
+        transformer?:RecursivePartial<DataTransformSpecification<Type>>
+        type:string
+    },
+    Type = any
+>(
     configuration:P, value:any, transformer:InputDataTransformation<Type>
 ):null|Type => {
     if (configuration.emptyEqualsNull && value === '')
@@ -279,7 +288,9 @@ export const parseValue = <P extends InputProperties, Type = any>(
 
     if (configuration.transformer)
         transformer = Tools.extend(
-            true, Tools.copy(transformer), configuration.transformer
+            true,
+            Tools.copy(transformer[configuration.type]) || {},
+            configuration.transformer
         )
 
     if (
@@ -289,7 +300,11 @@ export const parseValue = <P extends InputProperties, Type = any>(
         value = (
             transformer[configuration.type].parse as
                 DataTransformSpecification['parse']
-        )(value, configuration, transformer)
+        )(
+            value,
+            configuration as unknown as InputProperties<Type>,
+            transformer
+        )
 
     if (typeof value === 'number' && isNaN(value))
         return null
@@ -306,17 +321,25 @@ export const parseValue = <P extends InputProperties, Type = any>(
  *
  * @returns Transformed value.
  */
-export const transformValue = <P extends InputProperties, Type = any>(
-    configuration:P,
-    value:any,
-    transformer:InputDataTransformation<Type>
+export const transformValue = <
+    P extends {
+        emptyEqualsNull:boolean
+        model:{trim:boolean}
+        transformer?:RecursivePartial<DataTransformSpecification<Type>>
+        type:string
+    },
+    Type = any
+>(
+    configuration:P, value:any, transformer:InputDataTransformation<Type>
 ):null|Type => {
     if (configuration.model.trim && typeof value === 'string')
         value = value.trim().replace(/ +\n/g, '\\n')
 
     if (configuration.transformer)
         transformer = Tools.extend(
-            true, Tools.copy(transformer), configuration.transformer
+            true,
+            Tools.copy(transformer[configuration.type]) || {},
+            configuration.transformer
         )
 
     return parseValue<P, Type>(configuration, value, transformer)
@@ -331,7 +354,13 @@ export const transformValue = <P extends InputProperties, Type = any>(
  *
  * @returns Transformed value.
  */
-export function formatValue<P extends InputProperties, Type = any>(
+export function formatValue<
+    P extends {
+        transformer?:RecursivePartial<DataTransformSpecification<Type>>
+        type:string
+    },
+    Type = any
+>(
     configuration:P,
     value:null|Type,
     transformer:InputDataTransformation<Type>,
@@ -347,7 +376,9 @@ export function formatValue<P extends InputProperties, Type = any>(
 
     if (configuration.transformer)
         transformer = Tools.extend(
-            true, Tools.copy(transformer), configuration.transformer
+            true,
+            Tools.copy(transformer[configuration.type]) || {},
+            configuration.transformer
         )
 
     if (
@@ -357,21 +388,28 @@ export function formatValue<P extends InputProperties, Type = any>(
         return (
             transformer[configuration.type].format as
                 DataTransformSpecification['format']
-        )[methodName]!.transform(value, configuration, transformer)
+        )[methodName]!.transform(
+            value,
+            configuration as unknown as InputProperties<Type>,
+            transformer
+        )
 
     return String(value)
 }
 /**
  * Determines initial value representation as string.
+ *
  * @param properties - Components properties.
  * @param value - Current value to represent.
  * @param transformer - To apply to given value.
+ *
  * @returns Determined initial representation.
  */
 export function determineInitialRepresentation<
     P extends {
         model?:{type?:string}
         representation?:string
+        transformer?:RecursivePartial<DataTransformSpecification<Type>>
         type?:string
     },
     Type = any
@@ -385,7 +423,7 @@ export function determineInitialRepresentation<
         return properties.representation
 
     if (value !== null)
-        return formatValue<Type>(
+        return formatValue<P & {type:string}, Type>(
             {
                 ...properties,
                 type: (

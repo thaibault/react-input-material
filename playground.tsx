@@ -454,10 +454,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     type: 'float'
                 })}
                 onChange={onChange}
-                transformer={{float: {format: {final: {options: {
+                transformer={{format: {final: {options: {
                     maximumFractionDigits: 20,
                     minimumFractionDigits: 2
-                }}}}}}
+                }}}}}
             />
 
             <hr/>

@@ -1844,7 +1844,9 @@ GenericInput.transformer = {
                 configuration:Properties,
                 transformer:InputDataTransformation
             ):string =>
-                transformer.date.format.final.transform(value)
+                transformer.date.format.final.transform(
+                    value, configuration, transformer
+                )
             }
         },
         parse: (value:number|string):number => typeof value === 'number' ?
@@ -1872,7 +1874,9 @@ GenericInput.transformer = {
                 configuration:Properties,
                 transformer:InputDataTransformation
             ):string =>
-                transformer['datetime-local'].format.final.transform(value)
+                transformer['datetime-local'].format.final.transform(
+                    value, configuration, transformer
+                )
             }
         },
         parse: (
@@ -1893,7 +1897,7 @@ GenericInput.transformer = {
         parse: (value:number|string, configuration:Properties):number => {
             if (typeof value === 'string')
                 value = parseFloat(
-                    [].concat(GenericInput.locales)[0] === 'de-DE' ?
+                    GenericInput.locales[0] === 'de-DE' ?
                         value.replace(/\./g, '').replace(/\,/g, '.') :
                         value
                 )
@@ -1933,7 +1937,7 @@ GenericInput.transformer = {
         parse: (value:number|string, configuration:Properties):any => {
             if (typeof value === 'string')
                 value = parseInt(
-                    [].concat(GenericInput.locales)[0] === 'de-DE' ?
+                    GenericInput.locales[0] === 'de-DE' ?
                         value.replace(/[,.]/g, '') :
                         value
                 )
