@@ -101,14 +101,22 @@ export type Model<Type = any> =
     }
 export type FormatSpecification<Type = any> = {
     options?:PlainObject
-    transform:(value:null|Type) => string
+    transform:(
+        value:null|Type,
+        configuration:InputProperties<Type>,
+        transformer:InputDataTransformation<Type>
+    ) => string
 }
 export type DataTransformSpecification<Type = any> = {
     format:{
         final:FormatSpecification
         intermediate?:FormatSpecification
     }
-    parse:(value:any, configuration:InputProperties<Type>) => null|Type
+    parse:(
+        value:any,
+        configuration:InputProperties<Type>,
+        transformer:InputDataTransformation<Type>
+    ) => null|Type
     type?:NativeInputType
 }
 export type Properties<Type = any> =
@@ -382,7 +390,7 @@ export type InputProperties<Type = any> =
         selectableEditor:boolean
         step:number
         trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
-        transformer:Mapping<RecursivePartial<DataTransformSpecification<Type>>>
+        transformer:RecursivePartial<DataTransformSpecification<Type>>
     }
 export type InputProps<Type = any> =
     Partial<Omit<InputProperties<Type>, 'model'>> &
@@ -429,7 +437,7 @@ export type InputDataTransformation<Type = any> =
     }
 export interface StaticWebInputComponent<Type = any> extends StaticWebComponent<InputProps<Type>> {
     defaultModelState:InputModelState
-    locale:string
+    locales:Array<string>
     transformer:InputDataTransformation<Type>
 }
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
