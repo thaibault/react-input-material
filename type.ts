@@ -428,7 +428,7 @@ export type InputDataTransformation<Type = any> =
     }
 export interface StaticWebInputComponent<Type = any> extends StaticWebComponent<InputProps<Type>> {
     defaultModelState:InputModelState
-    local:string
+    locale:string
     transformer:InputDataTransformation<Type>
 }
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
