@@ -449,7 +449,6 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     declaration: 'Number',
                     description: 'input17ModelDescription',
                     maximum: 200000,
-                    minimum: 10,
                     name: 'input17Model',
                     nullable: false,
                     type: 'float'
