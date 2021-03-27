@@ -382,6 +382,7 @@ export type InputProperties<Type = any> =
         selectableEditor:boolean
         step:number
         trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
+        transformer:Mapping<RecursivePartial<DataTransformSpecification<Type>>>
     }
 export type InputProps<Type = any> =
     Partial<Omit<InputProperties<Type>, 'model'>> &
@@ -504,7 +505,8 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     rows: number,
     selectableEditor: boolean,
     step: number,
-    trailingIcon: any
+    trailingIcon: any,
+    transformer: object
 } as const
 export const defaultInputModelState:InputModelState = {
     ...defaultModelState,

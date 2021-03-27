@@ -403,6 +403,7 @@ export const GenericInputInner = function<Type = any>(
                 onClick: (event:ReactMouseEvent):void => {
                     event.preventDefault()
                     event.stopPropagation()
+
                     onChangeValue(transformValue<Properties<Type>, Type>(
                         properties,
                         properties.default,
@@ -519,11 +520,11 @@ export const GenericInputInner = function<Type = any>(
             const evaluated:EvaluationResult = Tools.stringEvaluate(
                 `\`${template}\``,
                  {
-                    formatValue: (value:Type, type=properties.type):string =>
-                        formatValue<Type>(
-                            value, type, GenericInput.transformer
-                        ),
-                    ...properties
+                     formatValue: (value:Type):string =>
+                         formatValue<Properties<Type>, Type>(
+                             properties, value, GenericInput.transformer
+                         ),
+                     ...properties
                 }
             )
             if (evaluated.error) {
@@ -849,7 +850,11 @@ export const GenericInputInner = function<Type = any>(
                 givenProperties.model!.value === undefined
             )
                 givenProperties.representation = valueState.representation
-        } else if (givenProperties.value !== valueState.value)
+        } else if (!controlled && givenProperties.value !== valueState.value)
+            /*
+                NOTE: Only re-determine value's representation if component
+                isn't controlled.
+            */
             givenProperties.representation = undefined
 
         if (givenProperties.model!.state)
@@ -921,9 +926,9 @@ export const GenericInputInner = function<Type = any>(
             result.editorIsActive = true
 
         if (typeof result.representation !== 'string')
-            result.representation = formatValue<Type>(
+            result.representation = formatValue<Properties<Type>, Type>(
+                result,
                 result.value as null|Type,
-                result.type,
                 GenericInput.transformer,
                 !result.focused
             )
@@ -1002,13 +1007,11 @@ export const GenericInputInner = function<Type = any>(
         properties.value = transformValue<Properties<Type>, Type>(
             properties, properties.value, GenericInput.transformer
         )
-        properties.representation = typeof properties.value === 'string' ?
-            properties.value :
-            formatValue<Type>(
-                properties.value as null|Type,
-                properties.type,
-                GenericInput.transformer
-            )
+        properties.representation = formatValue<Properties<Type>, Type>(
+            properties,
+            properties.value as null|Type,
+            GenericInput.transformer
+        )
 
         if (
             oldValueState.value !== properties.value ||
@@ -1151,9 +1154,9 @@ export const GenericInputInner = function<Type = any>(
         ):ValueState<Type, ModelState> => {
             properties.representation = typeof properties.value === 'string' ?
                 properties.value :
-                formatValue<Type>(
+                formatValue<Properties<Type>, Type>(
+                    properties,
                     properties.value as null|Type,
-                    properties.type,
                     GenericInput.transformer
                 )
             properties.value = parseValue<Properties<Type>, Type>(
@@ -1163,7 +1166,7 @@ export const GenericInputInner = function<Type = any>(
             const result:ValueState<Type, ModelState> = {
                 ...oldValueState, representation: properties.representation
             }
-            if (oldValueState.value === properties.value)
+            if (!controlled && oldValueState.value === properties.value)
                 return result
 
             result.value = properties.value
@@ -1692,14 +1695,14 @@ export const GenericInputInner = function<Type = any>(
                             properties.type
                         ) ?
                             {
-                                max: formatValue<Type>(
+                                max: formatValue<Properties<Type>, Type>(
+                                    properties,
                                     properties.maximum as unknown as Type,
-                                    properties.type,
                                     GenericInput.transformer
                                 ),
-                                min: formatValue<Type>(
+                                min: formatValue<Properties<Type>, Type>(
+                                    properties,
                                     properties.minimum as unknown as Type,
-                                    properties.type,
                                     GenericInput.transformer
                                 ),
                                 step: properties.step
@@ -1761,7 +1764,6 @@ GenericInputInner.displayName = 'GenericInput'
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProperties - Initial property configuration.
- * @property static:locale - Location hint to properly represent values.
  * @property static:propTypes - Triggers reacts runtime property value checks
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
@@ -1792,7 +1794,6 @@ GenericInput.defaultProperties = {
     representation: undefined,
     value: undefined
 }
-GenericInput.locale = 'en-US'
 GenericInput.propTypes = propertyTypes
 GenericInput.strict = false
 GenericInput.transformer = {
@@ -1803,23 +1804,24 @@ GenericInput.transformer = {
         type: 'text'
     },
     currency: {
-        format: {final: {transform: (value:number):string => (
-            new Intl.NumberFormat(
-                GenericInput.locale,
-                {
-                    currency: 'USD',
-                    style: 'currency',
-                    ...(
-                        GenericInput.transformer.currency.format.final
-                            .options ||
-                        {}
-                    )
-                }
-            )
-        ).format(value)}},
-        parse: (...parameters:Parameters<
-            typeof GenericInput.transformer.float.parse
-        >):any => GenericInput.transformer.float.parse(...parameters),
+        format: {final: {transform: (
+            value:number,
+            configuration:Properties,
+            transformer:InputDataTransformation
+        ):string => (new Intl.NumberFormat(
+            Tools.locales,
+            {
+                currency: 'USD',
+                style: 'currency',
+                ...(transformer.currency.format.final.options || {})
+            }
+        )).format(value)}},
+        parse: (
+            value:string,
+            configuration:Properties,
+            transformer:InputDataTransformation
+        ):any =>
+            transformer.float.parse(value, configuration, transformer),
         type: 'text'
     },
     date: {
@@ -1835,8 +1837,12 @@ GenericInput.transformer = {
 
                 return formattedValue.substring(0, formattedValue.indexOf('T'))
             }},
-            intermediate: {transform: (value:number|string):string =>
-                GenericInput.transformer.date.format.final.transform(value)
+            intermediate: {transform: (
+                value:number|string,
+                configuration:Properties,
+                transformer:InputDataTransformation
+            ):string =>
+                transformer.date.format.final.transform(value)
             }
         },
         parse: (value:number|string):number => typeof value === 'number' ?
@@ -1859,33 +1865,35 @@ GenericInput.transformer = {
 
                 return formattedValue.substring(0, formattedValue.length - 1)
             }},
-            intermediate: {transform: (value:number|string):string =>
-                GenericInput.transformer['datetime-local'].format.final
-                    .transform(value)
+            intermediate: {transform: (
+                value:number|string,
+                configuration:Properties,
+                transformer:InputDataTransformation
+            ):string =>
+                transformer['datetime-local'].format.final.transform(value)
             }
         },
-        parse: (...parameters:Parameters<
-            typeof GenericInput.transformer.date.parse
-        >):number => GenericInput.transformer.date.parse(...parameters)
+        parse: (
+            value:number|string,
+            configuration:Properties,
+            transformer:InputDataTransformation
+        ):number =>
+            transformer.date.parse(value, configuration, transformer)
     },
     float: {
-        format: {final: {transform: (value:number):string => (
-            new Intl.NumberFormat(
-                GenericInput.locale,
-                {
-                    style: 'decimal',
-                    ...(
-                        GenericInput.transformer.float.format.final.options ||
-                        {}
-                    )
-                }
-            )
-        ).format(value)}},
+        format: {final: {transform: (
+            value:number,
+            configuration:Properties,
+            transformer:InputDataTransformation
+        ):string => (new Intl.NumberFormat(
+            Tools.locales, transformer.float.format.final.options || {}
+        )).format(value)}},
         parse: (value:number|string, configuration:Properties):number => {
             if (typeof value === 'string')
-                value = parseFloat(GenericInput.locale === 'de-DE' ?
-                    value.replace(/\./g, '').replace(/\,/g, '.') :
-                    value
+                value = parseFloat(
+                    [].concat(Tools.locales)[0] === 'de-DE' ?
+                        value.replace(/\./g, '').replace(/\,/g, '.') :
+                        value
                 )
 
             // Fix sign if possible.
@@ -1907,24 +1915,25 @@ GenericInput.transformer = {
         type: 'text'
     },
     integer: {
-        format: {final: {transform: (value:number):string => (
+        format: {final: {transform: (
+            value:number,
+            configuration:Properties,
+            transformer:InputDataTransformation
+        ):string => (
             new Intl.NumberFormat(
-                GenericInput.locale,
+                Tools.locales,
                 {
                     maximumFractionDigits: 0,
-                    ...(
-                        GenericInput.transformer.integer.format.final
-                            .options ||
-                        {}
-                    )
+                    ...(transformer.integer.format.final.options || {})
                 }
             )).format(value)
         }},
         parse: (value:number|string, configuration:Properties):any => {
             if (typeof value === 'string')
-                value = parseInt(GenericInput.locale === 'de-DE' ?
-                    value.replace(/[,.]/g, '') :
-                    value
+                value = parseInt(
+                    [].concat(Tools.locales)[0] === 'de-DE' ?
+                        value.replace(/[,.]/g, '') :
+                        value
                 )
 
             // Fix sign if possible.
@@ -1945,9 +1954,8 @@ GenericInput.transformer = {
         },
         type: 'text'
     },
-    number: {parse: (value:number|string):number => typeof value === 'number' ?
-        value :
-        parseInt(value)
+    number: {parse: (value:number|string):number =>
+        typeof value === 'number' ? value : parseInt(value)
     },
     time: {
         format: {
@@ -1957,15 +1965,20 @@ GenericInput.transformer = {
                     return ''
 
                 const formattedValue:string =
-                    (new Date(Math.round((value as number) * 1000))).toISOString()
+                    (new Date(Math.round((value as number) * 1000)))
+                        .toISOString()
 
                 return formattedValue.substring(
                     formattedValue.indexOf('T') + 1, formattedValue.length - 1
                 )
             }},
-            intermediate: {transform: (value:number|string):string =>
-                GenericInput.transformer.time.format.final.transform(value)
-            }
+            intermediate: {transform: (
+                value:number|string,
+                configuration:Properties,
+                transformer:InputDataTransformation
+            ):string => transformer.time.format.final.transform(
+                value, configuration, transformer
+            )}
         },
         parse: (value:number|string):number => typeof value === 'number' ?
             value :
