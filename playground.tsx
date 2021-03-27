@@ -26,7 +26,7 @@ import {GenericAnimate, GenericInput, RequireableCheckbox} from './index'
 import {useMemorizedValue} from './helper'
 import {Properties} from './type'
 // endregion
-Tools.locales = 'de-DE'
+Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 const represent = (state:Properties):string => Tools.represent(
     Object.keys(state)
@@ -449,7 +449,6 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     declaration: 'Number',
                     description: 'input17ModelDescription',
                     maximum: 200000,
-                    minimum: 10,
                     name: 'input17Model',
                     nullable: false,
                     type: 'float'

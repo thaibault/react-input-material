@@ -1764,6 +1764,7 @@ GenericInputInner.displayName = 'GenericInput'
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProperties - Initial property configuration.
+ * @property static:locales - Defines input formatting locales.
  * @property static:propTypes - Triggers reacts runtime property value checks
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
@@ -1794,6 +1795,7 @@ GenericInput.defaultProperties = {
     representation: undefined,
     value: undefined
 }
+GenericInput.locales = Tools.locales
 GenericInput.propTypes = propertyTypes
 GenericInput.strict = false
 GenericInput.transformer = {
@@ -1809,7 +1811,7 @@ GenericInput.transformer = {
             configuration:Properties,
             transformer:InputDataTransformation
         ):string => (new Intl.NumberFormat(
-            Tools.locales,
+            GenericInput.locales,
             {
                 currency: 'USD',
                 style: 'currency',
@@ -1886,12 +1888,12 @@ GenericInput.transformer = {
             configuration:Properties,
             transformer:InputDataTransformation
         ):string => (new Intl.NumberFormat(
-            Tools.locales, transformer.float.format.final.options || {}
+            GenericInput.locales, transformer.float.format.final.options || {}
         )).format(value)}},
         parse: (value:number|string, configuration:Properties):number => {
             if (typeof value === 'string')
                 value = parseFloat(
-                    [].concat(Tools.locales)[0] === 'de-DE' ?
+                    [].concat(GenericInput.locales)[0] === 'de-DE' ?
                         value.replace(/\./g, '').replace(/\,/g, '.') :
                         value
                 )
@@ -1921,7 +1923,7 @@ GenericInput.transformer = {
             transformer:InputDataTransformation
         ):string => (
             new Intl.NumberFormat(
-                Tools.locales,
+                GenericInput.locales,
                 {
                     maximumFractionDigits: 0,
                     ...(transformer.integer.format.final.options || {})
@@ -1931,7 +1933,7 @@ GenericInput.transformer = {
         parse: (value:number|string, configuration:Properties):any => {
             if (typeof value === 'string')
                 value = parseInt(
-                    [].concat(Tools.locales)[0] === 'de-DE' ?
+                    [].concat(GenericInput.locales)[0] === 'de-DE' ?
                         value.replace(/[,.]/g, '') :
                         value
                 )
