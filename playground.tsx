@@ -26,7 +26,7 @@ import {GenericAnimate, GenericInput, RequireableCheckbox} from './index'
 import {useMemorizedValue} from './helper'
 import {Properties} from './type'
 // endregion
-GenericInput.locale = 'de-DE'
+Tools.locales = 'de-DE'
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 const represent = (state:Properties):string => Tools.represent(
     Object.keys(state)
@@ -455,6 +455,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     type: 'float'
                 })}
                 onChange={onChange}
+                transformer={{float: {format: {final: {options: {
+                    maximumFractionDigits: 20,
+                    minimumFractionDigits: 2
+                }}}}}}
             />
 
             <hr/>

@@ -237,12 +237,11 @@ export const getConsolidatedProperties =
         regularExpressionPattern?:null|RegExp|string
         state?:null
         writable?:boolean
-    } = Tools.extend(
-        {},
-        properties,
-        properties.model || {},
-        (properties.model || {}).state || {}
-    )
+    } = ({
+        ...properties,
+        ...(properties.model || {}),
+        ...((properties.model || {}).state || {})
+    })
     // region handle aliases
     result.disabled = !(result.mutable && result.writable)
     delete result.mutable
@@ -265,9 +264,11 @@ export const getConsolidatedProperties =
 // region value transformer
 /**
  * Applies configured value transformations.
+ *
  * @param configuration - Input configuration.
  * @param value - Value to transform.
  * @param transformer - To apply to given value.
+ *
  * @returns Transformed value.
  */
 export const parseValue = <P extends InputProperties, Type = any>(
@@ -276,17 +277,19 @@ export const parseValue = <P extends InputProperties, Type = any>(
     if (configuration.emptyEqualsNull && value === '')
         return null
 
+    if (configuration.transformer)
+        transformer = Tools.extend(
+            true, Tools.copy(transformer), configuration.transformer
+        )
+
     if (
         ![null, undefined].includes(value) &&
-        Object.prototype.hasOwnProperty.call(
-            transformer, configuration.type
-        ) &&
-        transformer[configuration.type].parse
+        transformer[configuration.type]?.parse
     )
         value = (
             transformer[configuration.type].parse as
                 DataTransformSpecification['parse']
-        )(value, configuration)
+        )(value, configuration, transformer)
 
     if (typeof value === 'number' && isNaN(value))
         return null
@@ -296,48 +299,65 @@ export const parseValue = <P extends InputProperties, Type = any>(
 /**
  * Applies configured value transformation when editing the input has been
  * ended (element is not focused anymore).
+ *
  * @param configuration - Current configuration.
  * @param value - Current value to transform.
  * @param transformer - To apply to given value.
+ *
  * @returns Transformed value.
  */
 export const transformValue = <P extends InputProperties, Type = any>(
-    configuration:P, value:any, transformer:InputDataTransformation<Type>
+    configuration:P,
+    value:any,
+    transformer:InputDataTransformation<Type>
 ):null|Type => {
     if (configuration.model.trim && typeof value === 'string')
         value = value.trim().replace(/ +\n/g, '\\n')
+
+    if (configuration.transformer)
+        transformer = Tools.extend(
+            true, Tools.copy(transformer), configuration.transformer
+        )
 
     return parseValue<P, Type>(configuration, value, transformer)
 }
 /**
  * Represents configured value as string.
+ *
+ * @param configuration - Input configuration.
  * @param value - To represent.
- * @param type - Input type.
  * @param transformer - To apply to given value.
  * @param final - Specifies whether it is a final representation.
+ *
  * @returns Transformed value.
  */
-export function formatValue<Type = any>(
+export function formatValue<P extends InputProperties, Type = any>(
+    configuration:P,
     value:null|Type,
-    type:string,
     transformer:InputDataTransformation<Type>,
     final:boolean = true
 ):string {
     const methodName:'final'|'intermediate' = final ? 'final' : 'intermediate'
+
     if (
         [null, undefined].includes(value as null) ||
-        typeof value === 'number' &&
-        isNaN(value)
+        typeof value === 'number' && isNaN(value)
     )
         return ''
 
+    if (configuration.transformer)
+        transformer = Tools.extend(
+            true, Tools.copy(transformer), configuration.transformer
+        )
+
     if (
-        transformer[type]?.format &&
-        transformer[type].format![methodName]?.transform
+        transformer[configuration.type]?.format &&
+        transformer[configuration.type].format![methodName]?.transform
     )
         return (
-            transformer[type].format as DataTransformSpecification['format']
-        )[methodName]!.transform(value)
+            transformer[configuration.type].format as
+                DataTransformSpecification['format']
+        )[methodName]!.transform(value, configuration, transformer)
 
     return String(value)
 }
@@ -366,12 +386,15 @@ export function determineInitialRepresentation<
 
     if (value !== null)
         return formatValue<Type>(
+            {
+                ...properties,
+                type: (
+                    properties.type ||
+                    properties.model?.type ||
+                    defaultProperties.model!.type as string
+                )
+            },
             value,
-            (
-                properties.type ||
-                properties.model?.type ||
-                defaultProperties.model!.type as string
-            ),
             transformer
         )
 
