@@ -850,10 +850,13 @@ export const GenericInputInner = function<Type = any>(
                 givenProperties.model!.value === undefined
             )
                 givenProperties.representation = valueState.representation
-        } else if (!controlled && givenProperties.value !== valueState.value)
+        } else if (
+            !representationControlled &&
+            givenProperties.value !== valueState.value
+        )
             /*
-                NOTE: Only re-determine value's representation if component
-                isn't controlled.
+                NOTE: Only re-determine value's representation if component's
+                input representation isn't controlled.
             */
             givenProperties.representation = undefined
 
@@ -1342,6 +1345,10 @@ export const GenericInputInner = function<Type = any>(
             givenProps.model?.value !== undefined ||
             givenProps.value !== undefined
         ) &&
+        (givenProps.onChange || givenProps.onChangeValue)
+    )
+    const representationControlled:boolean = Boolean(
+        givenProps.representation !== undefined &&
         (givenProps.onChange || givenProps.onChangeValue)
     )
 
