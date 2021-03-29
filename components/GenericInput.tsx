@@ -355,6 +355,7 @@ export const GenericInputInner = function<Type = any>(
                 if (codeEditorReference?.editor?.selection) {
                     codeEditorReference.editor.textInput.focus()
                     setCodeEditorSelectionState(codeEditorReference)
+
                     if (editorState.selectionIsUnstable)
                         setEditorState(
                             {...editorState, selectionIsUnstable: false}
@@ -362,19 +363,22 @@ export const GenericInputInner = function<Type = any>(
                 } else if (richTextEditorInstance?.selection) {
                     richTextEditorInstance.focus(false)
                     setRichTextEditorSelectionState(richTextEditorInstance)
+
                     if (editorState.selectionIsUnstable)
                         setEditorState(
                             {...editorState, selectionIsUnstable: false}
                         )
                 }
             } else if (inputReference.current) {
-                inputReference.current.focus();
-                (
+                inputReference.current.focus()
+
+                ;(
                     inputReference.current as
                         HTMLInputElement|HTMLTextAreaElement
                 ).setSelectionRange(
                     properties.cursor.start, properties.cursor.end
                 )
+
                 if (editorState.selectionIsUnstable)
                     setEditorState(
                         {...editorState, selectionIsUnstable: false}
@@ -956,6 +960,7 @@ export const GenericInputInner = function<Type = any>(
                 controlled || !result.focused
             )
             // NOTE: We will try to restore last known selection state.
+            // TODO only do for input type text or textarea!
             if (result.representation !== result.value as unknown as string)
                 selectionIsUnstable = true
         }
@@ -1768,13 +1773,7 @@ export const GenericInputInner = function<Type = any>(
                         properties.hidden ?
                             'password' :
                             'text' :
-                            (
-                                Object.prototype.hasOwnProperty.call(
-                                    GenericInput.transformer,
-                                    properties.type
-                                ) &&
-                                GenericInput.transformer[properties.type].type
-                            ) ?
+                            GenericInput.transformer[properties.type]?.type ?
                                 GenericInput.transformer[properties.type]
                                     .type :
                                 properties.type
