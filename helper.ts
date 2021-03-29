@@ -26,6 +26,7 @@ import {render as renderReact, unmountComponentAtNode} from 'react-dom'
 import {
     DataTransformSpecification,
     DefaultProperties,
+    FormatSpecification,
     InputDataTransformation,
     InputProperties,
     Model,
@@ -287,19 +288,22 @@ export const parseValue = <
         return null
 
     if (configuration.transformer)
-        transformer = Tools.extend(
-            true,
-            Tools.copy(transformer[configuration.type]) || {},
-            configuration.transformer
-        )
+        transformer = {
+            ...transformer,
+            [configuration.type]: Tools.extend(
+                true,
+                Tools.copy(transformer[configuration.type]) || {},
+                configuration.transformer
+            )
+        }
 
     if (
         ![null, undefined].includes(value) &&
         transformer[configuration.type]?.parse
     )
         value = (
-            transformer[configuration.type].parse as
-                DataTransformSpecification['parse']
+            transformer[configuration.type]!.parse as
+                DataTransformSpecification<Type>['parse']
         )(
             value,
             configuration as unknown as InputProperties<Type>,
@@ -335,13 +339,6 @@ export const transformValue = <
     if (configuration.model.trim && typeof value === 'string')
         value = value.trim().replace(/ +\n/g, '\\n')
 
-    if (configuration.transformer)
-        transformer = Tools.extend(
-            true,
-            Tools.copy(transformer[configuration.type]) || {},
-            configuration.transformer
-        )
-
     return parseValue<P, Type>(configuration, value, transformer)
 }
 /**
@@ -375,20 +372,23 @@ export function formatValue<
         return ''
 
     if (configuration.transformer)
-        transformer = Tools.extend(
-            true,
-            Tools.copy(transformer[configuration.type]) || {},
-            configuration.transformer
-        )
+        transformer = {
+            ...transformer,
+            [configuration.type]: Tools.extend(
+                true,
+                Tools.copy(transformer[configuration.type]) || {},
+                configuration.transformer
+            )
+        }
 
     if (
         transformer[configuration.type]?.format &&
-        transformer[configuration.type].format![methodName]?.transform
+        transformer[configuration.type]!.format![methodName]?.transform
     )
         return (
-            transformer[configuration.type].format as
-                DataTransformSpecification['format']
-        )[methodName]!.transform(
+            transformer[configuration.type]!.format![methodName]!.transform as
+                FormatSpecification<Type>['transform']
+        )(
             value,
             configuration as unknown as InputProperties<Type>,
             transformer
