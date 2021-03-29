@@ -345,7 +345,7 @@ export const GenericInputInner = function<Type = any>(
      * @returns Nothing.
      */
     useEffect(():void => {
-        if (editorState.selectionIsUnstable)
+        if (selectionIsUnstable || editorState.selectionIsUnstable)
             if (properties.editorIsActive) {
                 /*
                     NOTE: If the corresponding editor are not loaded yet they
@@ -355,15 +355,17 @@ export const GenericInputInner = function<Type = any>(
                 if (codeEditorReference?.editor?.selection) {
                     codeEditorReference.editor.textInput.focus()
                     setCodeEditorSelectionState(codeEditorReference)
-                    setEditorState(
-                        {...editorState, selectionIsUnstable: false}
-                    )
+                    if (editorState.selectionIsUnstable)
+                        setEditorState(
+                            {...editorState, selectionIsUnstable: false}
+                        )
                 } else if (richTextEditorInstance?.selection) {
                     richTextEditorInstance.focus(false)
                     setRichTextEditorSelectionState(richTextEditorInstance)
-                    setEditorState(
-                        {...editorState, selectionIsUnstable: false}
-                    )
+                    if (editorState.selectionIsUnstable)
+                        setEditorState(
+                            {...editorState, selectionIsUnstable: false}
+                        )
                 }
             } else if (inputReference.current) {
                 inputReference.current.focus();
@@ -373,7 +375,10 @@ export const GenericInputInner = function<Type = any>(
                 ).setSelectionRange(
                     properties.cursor.start, properties.cursor.end
                 )
-                setEditorState({...editorState, selectionIsUnstable: false})
+                if (editorState.selectionIsUnstable)
+                    setEditorState(
+                        {...editorState, selectionIsUnstable: false}
+                    )
             }
     })
     // endregion
@@ -748,9 +753,10 @@ export const GenericInputInner = function<Type = any>(
     // // endregion
     /**
      * Saves current selection/cursor state in components state.
+     * @param event - Event which triggered selection change.
      * @returns Nothing.
      */
-    const saveSelectionState = ():void => {
+    const saveSelectionState = (event:GenericEvent):void => {
         /*
             NOTE: Known issues is that we do not get the absolute positions but
             the one in current selected node.
@@ -800,8 +806,16 @@ export const GenericInputInner = function<Type = any>(
         else if (
             typeof selectionEnd === 'number' &&
             typeof selectionStart === 'number'
-        )
-            setCursor({end: selectionEnd, start: selectionStart})
+        ) {
+            const add:0|1|-1 =
+                (event as unknown as KeyboardEvent)?.key?.length === 1 ?
+                1 :
+                (event as unknown as KeyboardEvent)?.key === 'Backspace' &&
+                properties.representation.length > selectionStart ?
+                    -1 :
+                    0
+            setCursor({end: selectionEnd + add, start: selectionStart + add})
+        }
     }
     // / endregion
     // / region property aggregation
@@ -928,13 +942,23 @@ export const GenericInputInner = function<Type = any>(
         if (!(result.editor === 'plain' || result.selectableEditor))
             result.editorIsActive = true
 
-        if (typeof result.representation !== 'string')
+        if (typeof result.representation !== 'string') {
             result.representation = formatValue<Properties<Type>, Type>(
                 result,
                 result.value as null|Type,
                 GenericInput.transformer,
-                !result.focused
+                /*
+                    NOTE: Handle two cases:
+                    1. Representation has to be determine initially.
+                    2. If value is controlled and representation not, it has
+                       always to be derived.
+                */
+                controlled || !result.focused
             )
+            // NOTE: We will try to restore last known selection state.
+            if (result.representation !== result.value as unknown as string)
+                selectionIsUnstable = true
+        }
 
         return result
     }
@@ -1270,11 +1294,7 @@ export const GenericInputInner = function<Type = any>(
      * @returns Nothing.
      */
     const onSelectionChange = (event:GenericEvent):void => {
-        /*
-            We assume that this event is triggered after a property
-            consolidation.
-        */
-        saveSelectionState()
+        saveSelectionState(event)
 
         triggerCallbackIfExists<Type>(
             properties, 'selectionChange', controlled, event
@@ -1340,6 +1360,7 @@ export const GenericInputInner = function<Type = any>(
     let richTextEditorReference:RichTextEditorComponent|undefined
     // / endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
+
     const controlled:boolean = Boolean(
         (
             givenProps.model?.value !== undefined ||
@@ -1351,6 +1372,7 @@ export const GenericInputInner = function<Type = any>(
         givenProps.representation !== undefined &&
         (givenProps.onChange || givenProps.onChangeValue)
     )
+    let selectionIsUnstable:boolean = false
 
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
     let [hidden, setHidden] = useState<boolean|undefined>()
