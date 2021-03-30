@@ -96,6 +96,7 @@ import {
     InputProps as Props,
     InputState as State,
     InputModel as Model,
+    NativeInputType,
     Renderable,
     StaticFunctionInputComponent as StaticComponent,
     ValueState
@@ -456,6 +457,22 @@ export const GenericInputInner = function<Type = any>(
         return options
     }
     /**
+     * Derives native input type from given input property configuration.
+     * @param properties - Input configuration to derive native input type
+     * from.
+     * @returns Determined input type.
+     */
+    const determineNativeType = (
+        properties:Properties<Type>
+    ):NativeInputType =>
+        (
+            properties.type === 'string' ?
+                properties.hidden ?
+                    'password' :
+                    'text' :
+                    transformer[properties.type]?.type ?? properties.type
+        ) as NativeInputType
+    /**
      * Render help or error texts with current validation state color.
      * @return Determined renderable markup specification.
      */
@@ -531,7 +548,7 @@ export const GenericInputInner = function<Type = any>(
                  {
                      formatValue: (value:Type):string =>
                          formatValue<Properties<Type>, Type>(
-                             properties, value, GenericInput.transformer
+                             properties, value, transformer
                          ),
                      ...properties
                 }
@@ -839,9 +856,6 @@ export const GenericInputInner = function<Type = any>(
 
         if (givenProperties.hidden === undefined)
             givenProperties.hidden = hidden
-        if (givenProperties.hidden === undefined)
-            givenProperties.hidden =
-                givenProperties.name?.startsWith('password')
 
         if (givenProperties.showDeclaration === undefined)
             givenProperties.showDeclaration = showDeclaration
@@ -913,7 +927,7 @@ export const GenericInputInner = function<Type = any>(
         result.model.value = parseValue<Properties<Type>, Type>(
             result as unknown as Properties<Type>,
             result.model.value,
-            GenericInput.transformer
+            transformer
         )
 
         determineValidationState<Type>(
@@ -950,7 +964,7 @@ export const GenericInputInner = function<Type = any>(
             result.representation = formatValue<Properties<Type>, Type>(
                 result,
                 result.value as null|Type,
-                GenericInput.transformer,
+                transformer,
                 /*
                     NOTE: Handle two cases:
                     1. Representation has to be determine initially.
@@ -960,8 +974,10 @@ export const GenericInputInner = function<Type = any>(
                 controlled || !result.focused
             )
             // NOTE: We will try to restore last known selection state.
-            // TODO only do for input type text or textarea!
-            if (result.representation !== result.value as unknown as string)
+            if (
+                result.representation !== result.value as unknown as string &&
+                ['password', 'text'].includes(determineNativeType(result))
+            )
                 selectionIsUnstable = true
         }
 
@@ -1037,12 +1053,10 @@ export const GenericInputInner = function<Type = any>(
         }
 
         properties.value = transformValue<Properties<Type>, Type>(
-            properties, properties.value, GenericInput.transformer
+            properties, properties.value, transformer
         )
         properties.representation = formatValue<Properties<Type>, Type>(
-            properties,
-            properties.value as null|Type,
-            GenericInput.transformer
+            properties, properties.value as null|Type, transformer
         )
 
         if (
@@ -1187,12 +1201,10 @@ export const GenericInputInner = function<Type = any>(
             properties.representation = typeof properties.value === 'string' ?
                 properties.value :
                 formatValue<Properties<Type>, Type>(
-                    properties,
-                    properties.value as null|Type,
-                    GenericInput.transformer
+                    properties, properties.value as null|Type, transformer
                 )
             properties.value = parseValue<Properties<Type>, Type>(
-                properties, properties.value, GenericInput.transformer
+                properties, properties.value, transformer
             )
 
             const result:ValueState<Type, ModelState> = {
@@ -1397,6 +1409,21 @@ export const GenericInputInner = function<Type = any>(
     const givenProperties:Props<Type> = Tools.extend(
         true, Tools.copy(GenericInput.defaultProperties), givenProps
     )
+
+    const type:string|undefined =
+        givenProperties.type || givenProperties.model?.type
+    const transformer:InputDataTransformation<Type> =
+        type && givenProperties.transformer ?
+            {
+                ...GenericInput.transformer,
+                [type]: Tools.extend(
+                    true,
+                    Tools.copy(GenericInput.transformer[type]) || {},
+                    givenProperties.transformer
+                )
+            } :
+            GenericInput.transformer
+
     /*
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
@@ -1408,7 +1435,7 @@ export const GenericInputInner = function<Type = any>(
                 givenProperties,
                 GenericInput.defaultProperties,
                 initialValue,
-                GenericInput.transformer
+                transformer
             ),
             value: initialValue
         })
@@ -1418,6 +1445,9 @@ export const GenericInputInner = function<Type = any>(
 
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
+
+    if (properties.hidden === undefined)
+        properties.hidden = properties.name?.startsWith('password')
     // region synchronize properties into state where values are not controlled
     if (!Tools.equals(properties.cursor, cursor))
         setCursor(properties.cursor)
@@ -1732,12 +1762,12 @@ export const GenericInputInner = function<Type = any>(
                                 max: formatValue<Properties<Type>, Type>(
                                     properties,
                                     properties.maximum as unknown as Type,
-                                    GenericInput.transformer
+                                    transformer
                                 ),
                                 min: formatValue<Properties<Type>, Type>(
                                     properties,
                                     properties.minimum as unknown as Type,
-                                    GenericInput.transformer
+                                    transformer
                                 ),
                                 step: properties.step
                             } :
@@ -1768,16 +1798,7 @@ export const GenericInputInner = function<Type = any>(
                 trailingIcon={wrapIconWithTooltip(applyIconPreset(
                     properties.trailingIcon
                 ))}
-                type={
-                    properties.type === 'string' ?
-                        properties.hidden ?
-                            'password' :
-                            'text' :
-                            GenericInput.transformer[properties.type]?.type ?
-                                GenericInput.transformer[properties.type]
-                                    .type :
-                                properties.type
-                }
+                type={determineNativeType(properties)}
             />,
             !(isAdvancedEditor || properties.selection || properties.labels),
             richTextEditorLoadedOnce || properties.editor.startsWith('code')

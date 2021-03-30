@@ -287,6 +287,10 @@ export const defaultModel:Model = {
     value: null,
     writable: true
 } as const
+/*
+    NOTE: Avoid setting any properties already defined in model here since they
+    would permanently shadow them.
+*/
 export const defaultProperties:DefaultProperties = {
     model: {...defaultModel},
     showDeclaration: undefined,
@@ -326,6 +330,10 @@ export const defaultCheckboxModel:Model<boolean> = {
     type: 'boolean',
     value: false
 }
+/*
+    NOTE: Avoid setting any properties already defined in model here since they
+    would permanently shadow them.
+*/
 export const defaultCheckboxProperties:CheckboxProps = {
     ...defaultProperties,
     default: false,
@@ -528,6 +536,10 @@ export const defaultInputModel:InputModel = {
     ...defaultModel,
     state: defaultInputModelState
 } as const
+/*
+    NOTE: Avoid setting any properties already defined in model here since they
+    would permanently shadow them.
+*/
 export const defaultInputProperties:DefaultInputProperties = {
     ...defaultProperties,
     cursor: {
