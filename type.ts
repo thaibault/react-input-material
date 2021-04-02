@@ -317,7 +317,7 @@ export type DefaultCheckboxProperties<Type = any> =
     {model:CheckboxModel}
 export type CheckboxState = State<boolean>
 export type CheckboxAdapter<Type = any> =
-    WebComponentAdapter<CheckboxProperties, CheckboxState>
+    WebComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
 // // region constants
 export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -450,7 +450,10 @@ export interface StaticWebInputComponent<Type = any> extends StaticWebComponent<
 }
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
 export type InputAdapter<Type = any> =
-    WebComponentAdapter<InputProperties<Type>, Omit<InputState<Type>, 'selectionIsUnstable'>>
+    WebComponentAdapter<
+        InputProperties<Type>,
+        Omit<InputState<Type>, 'representation'|'selectionIsUnstable'|'value'>
+    >
 export type StaticFunctionInputComponent<Type = any> =
     Omit<FunctionComponent<Props<Type>>, 'propTypes'> &
     StaticWebInputComponent<Type>

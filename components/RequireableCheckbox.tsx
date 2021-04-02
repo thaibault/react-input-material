@@ -455,7 +455,10 @@ export const RequireableCheckboxInner = function(
             state: {
                 modelState: properties.model.state,
                 showDeclaration: properties.showDeclaration,
-                value: properties.value as boolean|null
+                ...(controlled ?
+                    {} :
+                    {value: properties.value as boolean|null}
+                )
             }
         })
     )
