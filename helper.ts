@@ -287,16 +287,6 @@ export const parseValue = <
     if (configuration.emptyEqualsNull && value === '')
         return null
 
-    if (configuration.transformer)
-        transformer = {
-            ...transformer,
-            [configuration.type]: Tools.extend(
-                true,
-                Tools.copy(transformer[configuration.type]) || {},
-                configuration.transformer
-            )
-        }
-
     if (
         ![null, undefined].includes(value) &&
         transformer[configuration.type]?.parse
@@ -370,16 +360,6 @@ export function formatValue<
         typeof value === 'number' && isNaN(value)
     )
         return ''
-
-    if (configuration.transformer)
-        transformer = {
-            ...transformer,
-            [configuration.type]: Tools.extend(
-                true,
-                Tools.copy(transformer[configuration.type]) || {},
-                configuration.transformer
-            )
-        }
 
     if (
         transformer[configuration.type]?.format &&
