@@ -1491,7 +1491,9 @@ export const GenericInputInner = function<Type = any>(
                 codeEditorReference?:CodeEditorType
                 codeEditorInputReference:RefObject<HTMLTextAreaElement>
                 foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation>
-                inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>
+                inputReference:RefObject<
+                    HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement
+                >
                 richTextEditorInputReference:RefObject<HTMLTextAreaElement>
                 richTextEditorInstance?:RichTextEditor
                 richTextEditorReference?:RichTextEditorComponent
@@ -1512,9 +1514,15 @@ export const GenericInputInner = function<Type = any>(
                 editorIsActive: properties.editorIsActive,
                 hidden: properties.hidden,
                 modelState: properties.model.state,
-                representation: properties.representation,
                 showDeclaration: properties.showDeclaration,
-                value: properties.value as null|Type
+                ...(representationControlled ?
+                    {} :
+                    {representation: properties.representation}
+                ),
+                ...(controlled ?
+                    {} :
+                    {value: properties.value as null|Type}
+                )
             }
         })
     )

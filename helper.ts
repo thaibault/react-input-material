@@ -144,6 +144,8 @@ export const determineValidationState = <P extends Properties<any>>(
         ),
         ...validators
     }
+
+    properties.model.state = properties.model.state || {}
     for (const [name, validator] of Object.entries(validators)) {
         const oldValue:boolean = currentState[name as keyof ModelState]
         properties.model.state[name as keyof ModelState] = validator()
@@ -153,9 +155,10 @@ export const determineValidationState = <P extends Properties<any>>(
     }
 
     if (changed) {
-        properties.model.state.invalid = Object.keys(validators).some((
-            name:string
-        ):boolean => properties.model.state[name as keyof ModelState])
+        properties.model.state.invalid =
+            Object.keys(validators).some((name:string):boolean =>
+                properties.model.state[name as keyof ModelState]
+            )
         properties.model.state.valid = !properties.model.state.invalid
     }
 
