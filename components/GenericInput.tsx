@@ -1840,6 +1840,7 @@ export const GenericInput:StaticComponent =
 GenericInput.wrapped = GenericInputInner
 GenericInput.webComponentAdapterWrapped = 'react'
 // / endregion
+GenericInput.controllableProperties = ['representation', 'value']
 GenericInput.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where

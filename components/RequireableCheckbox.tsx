@@ -532,7 +532,12 @@ export const RequireableCheckbox:StaticComponent =
 RequireableCheckbox.wrapped = RequireableCheckboxInner
 RequireableCheckbox.webComponentAdapterWrapped = 'react'
 // / endregion
+RequireableCheckbox.controllableProperties = ['value']
 RequireableCheckbox.defaultModelState = defaultModelState
+/*
+    NOTE: We set values to "undefined" to identify whether these values where
+    provided via "props" and should shadow a state saved valued.
+*/
 RequireableCheckbox.defaultProperties = {
     ...defaultProperties,
     model: {...defaultProperties.model, state: undefined, value: undefined},
