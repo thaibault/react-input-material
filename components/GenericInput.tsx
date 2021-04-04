@@ -371,7 +371,7 @@ export const GenericInputInner = function<Type = any>(
                         )
                 }
             } else if (inputReference.current) {
-                inputReference.current.focus()
+                // TODO check if needed: "inputReference.current.focus()"
 
                 ;(
                     inputReference.current as
@@ -973,7 +973,10 @@ export const GenericInputInner = function<Type = any>(
                 */
                 controlled || !result.focused
             )
-            // NOTE: We will try to restore last known selection state.
+            /*
+                NOTE: We will try to restore last known selection state if
+                representation has been modified.
+            */
             if (
                 result.representation !== result.value as unknown as string &&
                 ['password', 'text'].includes(determineNativeType(result))
@@ -1840,7 +1843,7 @@ export const GenericInput:StaticComponent =
 GenericInput.wrapped = GenericInputInner
 GenericInput.webComponentAdapterWrapped = 'react'
 // / endregion
-GenericInput.controllableProperties = ['representation', 'value']
+GenericInput.controllableProperties = ['value']
 GenericInput.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where
