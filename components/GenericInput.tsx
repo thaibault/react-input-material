@@ -967,14 +967,19 @@ export const GenericInputInner = function<Type = any>(
                 transformer,
                 /*
                     NOTE: Handle two cases:
-                    1. Representation has to be determine initially.
-                    2. If value is controlled and representation not, it has
-                       always to be derived.
+                    1. Representation has to be determine initially
+                       (-> usually no focus).
+                    2. Representation was set from the outside
+                       (-> usually no focus).
                 */
-                controlled || !result.focused
+                !result.focused
             )
-            // NOTE: We will try to restore last known selection state.
+            /*
+                NOTE: We will try to restore last known selection state if
+                representation has been modified.
+            */
             if (
+                result.focused &&
                 result.representation !== result.value as unknown as string &&
                 ['password', 'text'].includes(determineNativeType(result))
             )
@@ -1840,7 +1845,7 @@ export const GenericInput:StaticComponent =
 GenericInput.wrapped = GenericInputInner
 GenericInput.webComponentAdapterWrapped = 'react'
 // / endregion
-GenericInput.controllableProperties = ['representation', 'value']
+GenericInput.controllableProperties = ['value']
 GenericInput.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where
