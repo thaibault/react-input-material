@@ -380,13 +380,6 @@ export const RequireableCheckboxInner = function(
         createRef<MDCCheckboxFoundation>()
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
-    const controlled:boolean = Boolean(
-        (
-            givenProps.model?.value !== undefined ||
-            givenProps.value !== undefined
-        ) &&
-        (givenProps.onChange || givenProps.onChangeValue)
-    )
 
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
 
@@ -412,6 +405,14 @@ export const RequireableCheckboxInner = function(
             modelState: {...RequireableCheckbox.defaultModelState},
             value: initialValue
         })
+
+    const controlled:boolean =
+        !givenProperties.enforceUncontrolled &&
+        (
+            givenProps.model?.value !== undefined ||
+            givenProps.value !== undefined
+        ) &&
+        Boolean(givenProps.onChange || givenProps.onChangeValue)
 
     deriveMissingPropertiesFromState()
 
@@ -532,7 +533,6 @@ export const RequireableCheckbox:StaticComponent =
 RequireableCheckbox.wrapped = RequireableCheckboxInner
 RequireableCheckbox.webComponentAdapterWrapped = 'react'
 // / endregion
-RequireableCheckbox.controllableProperties = ['value']
 RequireableCheckbox.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where

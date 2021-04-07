@@ -371,8 +371,6 @@ export const GenericInputInner = function<Type = any>(
                         )
                 }
             } else if (inputReference.current) {
-                inputReference.current.focus()
-
                 ;(
                     inputReference.current as
                         HTMLInputElement|HTMLTextAreaElement
@@ -887,8 +885,8 @@ export const GenericInputInner = function<Type = any>(
             givenProperties.value !== valueState.value
         )
             /*
-                NOTE: Only re-determine value's representation if component's
-                input representation isn't controlled.
+                NOTE: Set representation to "undefined" to trigger to derive
+                current representation from current value.
             */
             givenProperties.representation = undefined
 
@@ -1383,19 +1381,6 @@ export const GenericInputInner = function<Type = any>(
     // / endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
 
-    const controlled:boolean = Boolean(
-        (
-            givenProps.model?.value !== undefined ||
-            givenProps.value !== undefined
-        ) &&
-        (givenProps.onChange || givenProps.onChangeValue)
-    )
-    const representationControlled:boolean = Boolean(
-        givenProps.representation !== undefined &&
-        (givenProps.onChange || givenProps.onChangeValue)
-    )
-    let selectionIsUnstable:boolean = false
-
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
     let [hidden, setHidden] = useState<boolean|undefined>()
     let [editorState, setEditorState] = useState<EditorState>({
@@ -1445,6 +1430,21 @@ export const GenericInputInner = function<Type = any>(
             value: initialValue
         })
     )
+
+    /*
+        NOTE: Sometimes we need real given properties or derived (default
+        extended) "given" properties.
+    */
+    const controlled:boolean =
+        !givenProperties.enforceUncontrolled &&
+        (
+            givenProps.model?.value !== undefined ||
+            givenProps.value !== undefined
+        ) &&
+        Boolean(givenProps.onChange || givenProps.onChangeValue)
+    const representationControlled:boolean =
+        controlled && givenProps.representation !== undefined
+    let selectionIsUnstable:boolean = false
 
     deriveMissingPropertiesFromState()
 
@@ -1845,7 +1845,6 @@ export const GenericInput:StaticComponent =
 GenericInput.wrapped = GenericInputInner
 GenericInput.webComponentAdapterWrapped = 'react'
 // / endregion
-GenericInput.controllableProperties = ['value']
 GenericInput.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where

@@ -124,6 +124,7 @@ export type Properties<Type = any> =
     ModelState &
     {
         disabled:boolean
+        enforceUncontrolled:boolean
         id:string
         initialValue:null|Type
         label:string
@@ -235,6 +236,7 @@ export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...baseModelPropertyTypes,
     ...modelStatePropertyTypes,
     disabled: boolean,
+    enforceUncontrolled: boolean,
     initialValue: any,
     model: shape<any>(modelPropertyTypes),
     onChange: func,
@@ -292,6 +294,7 @@ export const defaultModel:Model = {
     would permanently shadow them.
 */
 export const defaultProperties:DefaultProperties = {
+    enforceUncontrolled: false,
     model: {...defaultModel},
     showDeclaration: undefined,
     showInitialValidationState: false,
