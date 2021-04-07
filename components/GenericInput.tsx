@@ -1613,7 +1613,8 @@ export const GenericInputInner = function<Type = any>(
         tooltip={properties.tooltip}
     ><div className={
         styles['generic-input'] +
-        (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
+        (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '') +
+        (properties.className ? ` ${properties.className}` : '')
     }>
         <GenericAnimate
             in={Boolean(properties.selection) || Boolean(properties.labels)}

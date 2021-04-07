@@ -28,6 +28,7 @@ import {
 } from 'react'
 
 import GenericInput from './GenericInput'
+import styles from './Interval.module'
 import WrapConfigurations from './WrapConfigurations'
 import {
     IntervalAdapter as Adapter,
@@ -59,9 +60,11 @@ export const IntervalInner = ((
     )
 
     const endProperties = properties.end || {}
+    const iconProperties = properties.icon || {}
     const startProperties = properties.start || {}
 
     delete properties.end
+    delete properties.icon
     delete properties.start
 
     Tools.extend(true, endProperties, properties)
@@ -85,9 +88,12 @@ export const IntervalInner = ((
         strict={Interval.strict}
         themeConfiguration={properties.themeConfiguration}
     >
-        <div className="interval">
+        <div className={
+            styles.interval +
+            (properties.className ? ` ${properties.className}` : '')
+        }>
             <GenericInput {...startProperties} />
-            <Icon icon="timelapse" />
+            <Icon {...iconProperties} />
             <GenericInput {...endProperties} />
         </div>
     </WrapConfigurations>
@@ -113,7 +119,11 @@ export const Interval:StaticComponent =
 Interval.wrapped = IntervalInner
 Interval.webComponentAdapterWrapped = 'react'
 // / endregion
-Interval.defaultProperties = {}
+Interval.defaultProperties = {
+    end: {className: `${styles.interval}__end`},
+    icon: {className: `${styles.interval}__icon`, icon: 'timelapse'},
+    start: {className: `${styles.interval}__start`}
+}
 Interval.propTypes = propertyTypes
 Interval.strict = false
 // endregion

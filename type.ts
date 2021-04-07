@@ -123,6 +123,7 @@ export type Properties<Type = any> =
     BaseModel<Type> &
     ModelState &
     {
+        className:string
         disabled:boolean
         enforceUncontrolled:boolean
         id:string
@@ -235,6 +236,7 @@ export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
 export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...baseModelPropertyTypes,
     ...modelStatePropertyTypes,
+    className: string,
     disabled: boolean,
     enforceUncontrolled: boolean,
     initialValue: any,
