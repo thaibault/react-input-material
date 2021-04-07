@@ -22,7 +22,9 @@ import {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
 import {render} from 'react-dom'
 
-import {GenericAnimate, GenericInput, RequireableCheckbox} from './index'
+import {
+    GenericAnimate, GenericInput, Interval, RequireableCheckbox
+} from './index'
 import {useMemorizedValue} from './helper'
 import {Properties} from './type'
 // endregion
@@ -490,25 +492,20 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-            <GenericInterval
-                end={
-                    declaration="End"
-                    description="endDescription"
-                    minimum={10}
-                    minimumText="Please at least ${formatValue(minimum)}."
-                    name="interval"
-                    required
-                }
-                start={
-                    declaration="Start"
-                    description="startDescription"
-                    maximum={3600}
-                    minimumText="Please at least ${formatValue(minimum)}."
-                    name="interval"
-                    required
-                }
-                type="time"
+            <Interval
+                end={useMemorizedValue({
+                    description: 'endDescription',
+                    minimum: 120
+                })}
+                minimumText="Please at least ${formatValue(minimum)}."
                 onChange={onChange}
+                required
+                start={useMemorizedValue({
+                    description: 'startDescription',
+                    maximum: 3600
+                })}
+                step={60}
+                type="time"
             />
 
             <hr/>

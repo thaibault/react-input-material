@@ -17,6 +17,8 @@
     endregion
 */
 // region imports
+import Tools from 'clientnode'
+import {Icon} from '@rmwc/icon'
 import {
     createRef,
     forwardRef,
@@ -25,6 +27,7 @@ import {
     RefObject
 } from 'react'
 
+import GenericInput from './GenericInput'
 import WrapConfigurations from './WrapConfigurations'
 import {
     IntervalAdapter as Adapter,
@@ -43,22 +46,57 @@ import {
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const IntervalInner = (
+export const IntervalInner = ((
     props:Props, reference?:RefObject<Adapter>
 ):ReactElement => {
+    /*
+        NOTE: Extend default properties with given properties while letting
+        default property object untouched for unchanged usage in other
+        instances.
+    */
+    const properties:Props<Type> = Tools.extend(
+        true, Tools.copy(Interval.defaultProperties), props
+    )
+
+    const endProperties = properties.end || {}
+    const startProperties = properties.start || {}
+
+    delete properties.end
+    delete properties.start
+
+    Tools.extend(true, endProperties, properties)
+    Tools.extend(true, startProperties, properties)
+
+    startProperties.maximum = Math.min(
+        startProperties.maximum || Infinity,
+        endProperties.value || Infinity,
+        endProperties.maximum || Infinity
+    )
+    startProperties.minimum = startProperties.minimum || Infinity
+
+    endProperties.maximum = endProperties.maximum || Infinity
+    endProperties.minimum = Math.max(
+        endProperties.minimum || -Infinity,
+        startProperties.value || -Infinity,
+        startProperties.minimum || -Infinity
+    )
+
     return <WrapConfigurations
         strict={Interval.strict}
         themeConfiguration={properties.themeConfiguration}
-    ><div className="interval">
-
-        TODO Interval
-
-    </div></WrapConfigurations>
-} as ForwardRefRenderFunction<Adapter, Props>
+    >
+        <div className="interval">
+            <GenericInput {...startProperties} />
+            <Icon icon="timelapse" />
+            <GenericInput {...endProperties} />
+        </div>
+    </WrapConfigurations>
+}) as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
-GenericInputInner.displayName = 'Interval'
+IntervalInner.displayName = 'Interval'
 /**
  * Wrapping web component compatible react component.
+ * @property static:defaultProperties - Initial property configuration.
  * @property static:propTypes - Triggers reacts runtime property value checks
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
@@ -75,6 +113,7 @@ export const Interval:StaticComponent =
 Interval.wrapped = IntervalInner
 Interval.webComponentAdapterWrapped = 'react'
 // / endregion
+Interval.defaultProperties = {}
 Interval.propTypes = propertyTypes
 Interval.strict = false
 // endregion

@@ -571,16 +571,16 @@ export const defaultInputProperties:DefaultInputProperties = {
 // / region interval
 export type IntervalProperties = {
     end:InputProperties<Date>
-    starte:InputProperties<Date>
+    start:InputProperties<Date>
 }
 export type IntervalProps = {
-    end:IntervalProperties<Date>
-    start:IntervalProperties<Date>
+    end:InputProps<Date>
+    start:InputProps<Date>
 }
-export type InputPropertyTypes<Type = any> = {
-    [key in keyof InputProperties<Type>]:ValueOf<typeof PropertyTypes>
+export type IntervalPropertyTypes<Type = any> = {
+    [key in keyof IntervalProperties<Type>]:ValueOf<typeof PropertyTypes>
 }
-export type InputAdapter = {
+export type IntervalAdapter = {
     end:InputAdapter<Date>
     start:InputAdapter<Date>
 }
