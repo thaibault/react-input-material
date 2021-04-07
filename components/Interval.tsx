@@ -49,7 +49,7 @@ export const IntervalInner = (
     return <WrapConfigurations
         strict={Interval.strict}
         themeConfiguration={properties.themeConfiguration}
-    ><div className={'interval' || styles.interval}>
+    ><div className="interval">
 
         TODO Interval
 
