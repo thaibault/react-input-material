@@ -568,6 +568,29 @@ export const defaultInputProperties:DefaultInputProperties = {
 } as const
 // // endregion
 // / endregion
+// / region interval
+export type IntervalProperties = {
+    end:InputProperties<Date>
+    starte:InputProperties<Date>
+}
+export type IntervalProps = {
+    end:IntervalProperties<Date>
+    start:IntervalProperties<Date>
+}
+export type InputPropertyTypes<Type = any> = {
+    [key in keyof InputProperties<Type>]:ValueOf<typeof PropertyTypes>
+}
+export type InputAdapter = {
+    end:InputAdapter<Date>
+    start:InputAdapter<Date>
+}
+// // region constants
+export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+    end: shape(inputPropertyTypes),
+    start: shape(inputPropertyTypes)
+} as const
+// // endregion
+// / endregion
 export type ConfigurationProperties = {
     strict?:boolean
     themeConfiguration?:ThemeProviderProps['options']

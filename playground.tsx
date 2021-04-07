@@ -490,6 +490,29 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
+            <GenericInterval
+                end={
+                    declaration="End"
+                    description="endDescription"
+                    minimum={10}
+                    minimumText="Please at least ${formatValue(minimum)}."
+                    name="interval"
+                    required
+                }
+                start={
+                    declaration="Start"
+                    description="startDescription"
+                    maximum={3600}
+                    minimumText="Please at least ${formatValue(minimum)}."
+                    name="interval"
+                    required
+                }
+                type="time"
+                onChange={onChange}
+            />
+
+            <hr/>
+
             <div
                 className="playground__inputs__generic-animate"
                 style={{height: '50px'}}
