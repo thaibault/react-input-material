@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module generic-interval */
+/** @module interval */
 'use strict'
 /* !
     region header
@@ -18,7 +18,6 @@
 */
 // region imports
 import {
-    ComponentType,
     createRef,
     forwardRef,
     ForwardRefRenderFunction,
@@ -44,31 +43,42 @@ import {
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericIntervalInner = (
+export const IntervalInner = (
     props:Props, reference?:RefObject<Adapter>
 ):ReactElement => {
+    return <WrapConfigurations
+        strict={Interval.strict}
+        themeConfiguration={properties.themeConfiguration}
+    ><div className={'interval' || styles.interval}>
+
+        TODO Interval
+
+    </div></WrapConfigurations>
 } as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
-GenericInputInner.displayName = 'GenericInterval'
+GenericInputInner.displayName = 'Interval'
 /**
  * Wrapping web component compatible react component.
  * @property static:propTypes - Triggers reacts runtime property value checks
+ * @property static:strict - Indicates whether we should wrap render output in
+ * reacts strict component.
  * @property static:wrapped - Wrapped component.
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInterval:StaticComponent =
-    memorize(forwardRef(GenericIntervalInner)) as unknown as StaticComponent
+export const Interval:StaticComponent =
+    memorize(forwardRef(IntervalInner)) as unknown as StaticComponent
 // region static properties
 // / region web-component hints
-GenericInterval.wrapped = GenericIntervalInner
-GenericInterval.webComponentAdapterWrapped = 'react'
+Interval.wrapped = IntervalInner
+Interval.webComponentAdapterWrapped = 'react'
 // / endregion
-GenericInterval.propTypes = propertyTypes
+Interval.propTypes = propertyTypes
+Interval.strict = false
 // endregion
-export default GenericInterval
+export default Interval
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
