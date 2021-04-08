@@ -19,8 +19,10 @@
 // region imports
 import Tools from 'clientnode'
 import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
-import {Mapping, RecursivePartial, ValueOf} from 'clientnode/type'
-import {ReactElement, useMemo} from 'react'
+import {
+    FirstParameter, Mapping, RecursivePartial, ValueOf
+} from 'clientnode/type'
+import {ReactElement, useMemo, useState} from 'react'
 import {render as renderReact, unmountComponentAtNode} from 'react-dom'
 
 import {
@@ -36,6 +38,22 @@ import {
     TestEnvironment
 } from './type'
 // endregion
+/**
+ * Creates a mocked a state setter. Useful to dynamically convert a component
+ * from uncontrolled to controlled.
+ *
+ * @param value - Parameter for state setter.
+ *
+ * @returns Nothing.
+ */
+export const createDummyStateSetter = <Type = any>(
+    value:Type
+):ReturnType<typeof useState>[1] => (
+    callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
+):void => {
+    if (typeof callbackOrData === 'function')
+        callbackOrData(value)
+}
 /**
  * Triggered when a value state changes like validation or focusing.
  *

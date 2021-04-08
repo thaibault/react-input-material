@@ -32,8 +32,10 @@ import {
 import GenericInput from './GenericInput'
 import styles from './Interval.module'
 import WrapConfigurations from './WrapConfigurations'
+import {createDummyStateSetter, translateKnownSymbols} from '../helper'
 import {
     IntervalAdapter as Adapter,
+    IntervalAdapterWithReferences as AdapterWithReferences,
     IntervalProperties as Properties,
     intervalPropertyTypes as propertyTypes,
     IntervalProps as Props
@@ -52,13 +54,15 @@ import {
 export const IntervalInner = ((
     props:Props, reference?:RefObject<Adapter>
 ):ReactElement => {
+    // region consolidate properties
+    const givenProps:Props<Type> = translateKnownSymbols(props)
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
         instances.
     */
     const properties:Props = Tools.extend(
-        true, Tools.copy(Interval.defaultProperties), props
+        true, Tools.copy(Interval.defaultProperties), givenProps
     )
 
     const endProperties = properties.end
@@ -67,9 +71,24 @@ export const IntervalInner = ((
     const onChange = properties.onChange
     const onChangeValue = properties.onChangeValue
 
-    const [value, setValue] = useState<{end:Date;start:Date}>({
+    /*
+        NOTE: Sometimes we need real given properties or derived (default
+        extended) "given" properties.
+    */
+    const controlled:boolean =
+        !properties.enforceUncontrolled &&
+        (
+            givenProps.model?.value !== undefined ||
+            givenProps.value !== undefined
+        ) &&
+        Boolean(onChange || onChangeValue)
+
+    let [value, setValue] = useState<{end:number;start:number}>({
         end: endProperties.value, start: startProperties.value
     })
+    properties.value = properties.value ?? value
+
+    delete properties.enforceUncontrolled
 
     delete properties.end
     delete properties.icon
@@ -87,7 +106,7 @@ export const IntervalInner = ((
         endProperties.maximum || Infinity
     )
     startProperties.minimum = startProperties.minimum || -Infinity
-    startProperties.value = value.start
+    startProperties.value = properties.value.start
 
     endProperties.maximum = endProperties.maximum || Infinity
     endProperties.minimum = Math.max(
@@ -95,46 +114,107 @@ export const IntervalInner = ((
         startProperties.value || -Infinity,
         startProperties.minimum || -Infinity
     )
-    endProperties.value = value.end
+    endProperties.value = properties.value.end
 
     endProperties.ref = createRef<GenericInput>()
     startProperties.ref = createRef<GenericInput>()
-    // TODO
+
+
+    if (controlled)
+        /*
+            NOTE: We act as a controlled component by overwriting internal
+            state setter.
+        */
+        setValue = createDummyStateSetter<number>(properties.value)
+    // endregion
     useImperativeHandle(
         reference,
-        /*TODO & {
-            references:{
-                end:,
-                start:
-            }
-        }*/
-        ():Adapter => ({
+        ():AdapterWithReferences => ({
             properties,
             references: {end: endProperties.ref, start: startPropertes.ref},
-            state: {value}
+            state: {
+                ...(controlled ?
+                    {} :
+                    {value: properties.value as null|number}
+                )
+            }
         })
     )
-
+    // region attach event handler
     if (onChange) {
-        endProperties.onChange = (properties:Properties):void =>
-            onChange({end: properties, start: 'TODO'})
-        startProperties.onChange = (properties:Properties):void =>
-            onChange({end: 'TODO', start: properties})
+        endProperties.onChange = (properties:InputProperties<number>):void => {
+            const startValue:number = Math.min(
+                startProperties.ref.current?.properties.value ?? Infinity,
+                properties.value
+            )
+
+            onChange({
+                end: properties,
+                value: {
+                    end: properties.value,
+                    start: startValue
+                },
+                start: {
+                    ...(startProperties.ref.current?.properties || {}),
+                    model: {
+                        ...(
+                            startProperties.ref.current?.properties.model || {}
+                        ),
+                        value: startValue
+                    },
+                    value: startValue
+                }
+            })
+        }
+        startProperties.onChange = (properties:InputProperties<number>):void => {
+            const endValue:number = Math.max(
+                endProperties.ref.current?.properties.value ?? -Infinity,
+                properties.value
+            )
+
+            onChange({
+                end: {
+                    ...(endProperties.ref.current?.properties || {}),
+                    model: {
+                        ...(
+                            endProperties.ref.current?.properties.model || {}
+                        ),
+                        value: endValue
+                    },
+                    value: endValue
+                },
+                value: {
+                    end: endValue,
+                    start: properties.value
+                },
+                start: properties
+            })
+        }
     }
 
-    endProperties.onChangeValue = (value:Date):void =>
-        setValue(({start}) => {
-            const newValue = {start: Math.min(start ?? Infinity, value), end: value}
-            onChangeValue && onChangeValue(newValue)
-            return newValue
-        })
-    startProperties.onChangeValue = (value:Date):void =>
-        setValue(({end}) => {
-            const newValue = {end: Math.max(end ?? -Infinity, value), start: value}
-            onChangeValue && onChangeValue(newValue)
-            return newValue
-        })
-
+    endProperties.onChangeValue = (value:number):void => {
+        const newValue = {
+            end: value,
+            start: Math.min(
+                startProperties.ref.current?.properties.value ?? Infinity,
+                value
+            )
+        }
+        onChangeValue && onChangeValue(newValue)
+        setValue(newValue)
+    }
+    startProperties.onChangeValue = (value:number):void => {
+        const newValue = {
+            end: Math.max(
+                endProperties.ref.current?.properties.value ?? -Infinity,
+                value
+            ),
+            start: value
+        }
+        onChangeValue && onChangeValue(newValue)
+        setValue(newValue)
+    }
+    // endregion
     return <WrapConfigurations
         strict={Interval.strict}
         themeConfiguration={properties.themeConfiguration}
@@ -165,21 +245,25 @@ IntervalInner.displayName = 'Interval'
  */
 export const Interval:StaticComponent =
     memorize(forwardRef(IntervalInner)) as unknown as StaticComponent
-// region static properties
+// region static propertie s
 // / region web-component hints
 Interval.wrapped = IntervalInner
 Interval.webComponentAdapterWrapped = 'react'
 // / endregion
 Interval.defaultProperties = {
     end: {
-        className: `${styles.interval}__end`
+        className: `${styles.interval}__end`,
+        description: 'End'
     },
+    enforceUncontrolled: false,
     icon: {className: `${styles.interval}__icon`, icon: 'timelapse'},
     maximumText: 'Please provide somthing earlier than ${formatValue(maximum)}.',
     minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
     start: {
-        className: `${styles.interval}__start`
-    }
+        className: `${styles.interval}__start`,
+        description: 'Start'
+    },
+    type: 'time'
 }
 Interval.propTypes = propertyTypes
 Interval.strict = false

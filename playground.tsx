@@ -30,24 +30,32 @@ import {Properties} from './type'
 // endregion
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
-const represent = (state:Properties):string => Tools.represent(
+
+const filterCallbacks = (state:Properties):Partial<Properties> =>
     Object.keys(state)
         .filter((key:string):boolean => !/^on[A-Z]/.test(key))
         .reduce(
             (result:Partial<Properties>, key:string):Partial<Properties> => {
-                result[key as keyof Properties] =
+                result[key as keyof Properties] = (
+                    state[key as keyof Properties] !== null &&
+                    typeof state[key as keyof Properties] === 'object'
+                ) ?
+                    filterCallbacks(state[key as keyof Properties]) :
                     state[key as keyof Properties]
+
                 return result
             },
             {}
         )
-)
 
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<Properties>()
     const onChange = useMemorizedValue<(properties:Properties) => void>(
         setSelectedState
     )
+
+    const [value, setValue] = useState<any>()
+    const onChangeValue = useMemorizedValue<(value:any) => void>(setValue)
 
     const [fadeState, setFadeState] = useState<boolean>(false)
     useEffect(():(() => void) => Tools.timeout(
@@ -58,6 +66,12 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         <div className="playground__inputs">
 
             <GenericInput onChange={onChange}/>
+            <GenericInput
+                name="controlled"
+                type="float"
+                onChange={onChange}
+                onChangeValue={onChangeValue}
+            />
 
             <hr/>
 
@@ -495,18 +509,20 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <Interval
                 end={useMemorizedValue({
                     default: 240,
-                    description: 'endDescription',
                     minimum: 120
                 })}
                 onChange={onChange}
                 required
                 start={useMemorizedValue({
                     default: 120,
-                    description: 'startDescription',
                     maximum: 3600
                 })}
                 step={60}
-                type="time"
+            />
+            <Interval
+                name="controlled"
+                onChange={onChange}
+                onChangeValue={onChangeValue}
             />
 
             <hr/>
@@ -577,7 +593,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
         {selectedState ?
             <pre className="playground__outputs">
-                {represent(selectedState)}
+                {Tools.represent(filterCallbacks(selectedState))}
             </pre> :
             ''
         }

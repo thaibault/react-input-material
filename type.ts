@@ -454,11 +454,23 @@ export interface StaticWebInputComponent<Type = any> extends StaticWebComponent<
     transformer:InputDataTransformation<Type>
 }
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
-export type InputAdapter<Type = any> =
-    WebComponentAdapter<
-        InputProperties<Type>,
-        Omit<InputState<Type>, 'representation'|'selectionIsUnstable'|'value'>
-    >
+export type InputAdapter<Type = any> = WebComponentAdapter<
+    InputProperties<Type>,
+    Omit<InputState<Type>, 'representation'|'selectionIsUnstable'|'value'>
+>
+export type InputAdapterWithReferences<Type = any> = InputAdapter<Type> & {
+    references:{
+        codeEditorReference?:CodeEditorType
+        codeEditorInputReference:RefObject<HTMLTextAreaElement>
+        foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation>
+        inputReference:RefObject<
+            HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement
+        >
+        richTextEditorInputReference:RefObject<HTMLTextAreaElement>
+        richTextEditorInstance?:RichTextEditor
+        richTextEditorReference?:RichTextEditorComponent
+    }
+}
 export type StaticFunctionInputComponent<Type = any> =
     Omit<FunctionComponent<Props<Type>>, 'propTypes'> &
     StaticWebInputComponent<Type>
@@ -572,19 +584,28 @@ export const defaultInputProperties:DefaultInputProperties = {
 // / endregion
 // / region interval
 export type IntervalProperties = {
-    end:InputProperties<Date>
-    start:InputProperties<Date>
+    end:InputProperties<number>
+    start:InputProperties<number>
 }
 export type IntervalProps = {
-    end:InputProps<Date>
-    start:InputProps<Date>
+    end:InputProps<numnber>
+    start:InputProps<number>
 }
 export type IntervalPropertyTypes<Type = any> = {
     [key in keyof IntervalProperties<Type>]:ValueOf<typeof PropertyTypes>
 }
-export type IntervalAdapter = {
-    end:InputAdapter<Date>
-    start:InputAdapter<Date>
+export type IntervalAdapter = WebComponentAdapter<
+    IntervalProperties,
+    {value?:{
+        end:number
+        start:number
+    }}
+>
+export type IntervalAdapterWithReferences = IntervalAdapter & {
+    references:{
+        end:InputAdapterWithReferences<number>
+        start:InputAdapterWithReferences<number>
+    }
 }
 // // region constants
 export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {

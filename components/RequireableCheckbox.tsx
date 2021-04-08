@@ -42,6 +42,7 @@ import {WrapConfigurations} from './WrapConfigurations'
 import {
     determineInitialValue,
     determineValidationState as determineBaseValidationState,
+    createDummyStateSetter,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
     translateKnownSymbols,
@@ -430,12 +431,10 @@ export const RequireableCheckboxInner = function(
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValueState = (
-            callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
-        ):void => {
-            if (typeof callbackOrData === 'function')
-                callbackOrData(currentValueState)
-        }
+        setValueState =
+            createDummyStateSetter<ValueState<boolean, ModelState>>(
+                currentValueState
+            )
     if (!(
         !controlled &&
         properties.value === valueState.value &&

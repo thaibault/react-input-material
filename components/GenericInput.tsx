@@ -71,6 +71,7 @@ import {
     determineInitialValue,
     determineInitialRepresentation,
     determineValidationState as determineBaseValidationState,
+    createDummyStateSetter,
     formatValue,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
@@ -89,6 +90,7 @@ import {
     EditorState,
     GenericEvent,
     InputAdapter as Adapter,
+    InputAdapterWithReferences as AdapterWithReferences,
     InputDataTransformation,
     InputModelState as ModelState,
     InputProperties as Properties,
@@ -1475,12 +1477,9 @@ export const GenericInputInner = function<Type = any>(
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValueState = (
-            callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
-        ):void => {
-            if (typeof callbackOrData === 'function')
-                callbackOrData(currentValueState)
-        }
+        setValueState = createDummyStateSetter<ValueState<Type, ModelState>>(
+            currentValueState
+        )
     if (!(
         !controlled &&
         properties.value === valueState.value &&
@@ -1491,19 +1490,7 @@ export const GenericInputInner = function<Type = any>(
     // endregion
     useImperativeHandle(
         reference,
-        ():Adapter<Type> & {
-            references:{
-                codeEditorReference?:CodeEditorType
-                codeEditorInputReference:RefObject<HTMLTextAreaElement>
-                foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation>
-                inputReference:RefObject<
-                    HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement
-                >
-                richTextEditorInputReference:RefObject<HTMLTextAreaElement>
-                richTextEditorInstance?:RichTextEditor
-                richTextEditorReference?:RichTextEditorComponent
-            }
-        } => ({
+        ():AdapterWithReferences<Type> => ({
             properties,
             references: {
                 codeEditorReference,
