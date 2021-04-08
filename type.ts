@@ -16,7 +16,6 @@
     endregion
 */
 // region imports
-import {SelectProps} from '@rmwc/select'
 import PropertyTypes, {
     any,
     arrayOf,
@@ -42,15 +41,23 @@ import {
     MouseEvent,
     ReactElement,
     RefAttributes,
+    RefObject,
     Requireable,
     SyntheticEvent
 } from 'react'
-import {IconOptions, RipplePropT} from '@rmwc/types'
-import {ThemeProviderProps} from '@rmwc/theme'
-import {TooltipProps} from '@rmwc/tooltip'
+import CodeEditorType from 'react-ace'
+
+import {Editor as RichTextEditor} from 'tinymce'
 import {
     StaticWebComponent as StaticBaseWebComponent, WebComponentAdapter
 } from 'web-component-wrapper/type'
+import {MDCSelectFoundation} from '@material/select'
+import {MDCTextFieldFoundation} from '@material/textfield'
+import {SelectProps} from '@rmwc/select'
+import {ThemeProviderProps} from '@rmwc/theme'
+import {TooltipProps} from '@rmwc/tooltip'
+import {IconOptions, RipplePropT} from '@rmwc/types'
+import {Editor as RichTextEditorComponent} from '@tinymce/tinymce-react'
 // endregion
 // region exports
 // / region generic
@@ -583,24 +590,25 @@ export const defaultInputProperties:DefaultInputProperties = {
 // // endregion
 // / endregion
 // / region interval
-export type IntervalProperties = {
+export type IntervalValue = {
+    end:null|number
+    start:null|number
+}
+export type IntervalProperties = Omit<InputProperties<number>, 'value'> & {
     end:InputProperties<number>
     start:InputProperties<number>
+    value:IntervalValue
 }
-export type IntervalProps = {
-    end:InputProps<numnber>
+export type IntervalProps = Omit<InputProps<number>, 'value'> & Partial<{
+    end:InputProps<number>
     start:InputProps<number>
-}
+    value:IntervalValue
+}>
 export type IntervalPropertyTypes<Type = any> = {
-    [key in keyof IntervalProperties<Type>]:ValueOf<typeof PropertyTypes>
+    [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
 }
-export type IntervalAdapter = WebComponentAdapter<
-    IntervalProperties,
-    {value?:{
-        end:number
-        start:number
-    }}
->
+export type IntervalAdapter =
+    WebComponentAdapter<IntervalProperties, {value?:IntervalValue}>
 export type IntervalAdapterWithReferences = IntervalAdapter & {
     references:{
         end:InputAdapterWithReferences<number>

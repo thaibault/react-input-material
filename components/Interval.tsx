@@ -19,11 +19,13 @@
 // region imports
 import Tools from 'clientnode'
 import {Icon} from '@rmwc/icon'
+import {IconOptions} from '@rmwc/types'
 import {
     createRef,
     forwardRef,
     ForwardRefRenderFunction,
     memo as memorize,
+    ReactElement,
     RefObject,
     useImperativeHandle,
     useState
@@ -34,11 +36,15 @@ import styles from './Interval.module'
 import WrapConfigurations from './WrapConfigurations'
 import {createDummyStateSetter, translateKnownSymbols} from '../helper'
 import {
+    InputProps,
+    InputAdapterWithReferences,
     IntervalAdapter as Adapter,
     IntervalAdapterWithReferences as AdapterWithReferences,
     IntervalProperties as Properties,
     intervalPropertyTypes as propertyTypes,
-    IntervalProps as Props
+    IntervalProps as Props,
+    IntervalValue as Value,
+    StaticFunctionInputComponent as StaticComponent
 } from '../type'
 // endregion
 /**
@@ -55,7 +61,7 @@ export const IntervalInner = ((
     props:Props, reference?:RefObject<Adapter>
 ):ReactElement => {
     // region consolidate properties
-    const givenProps:Props<Type> = translateKnownSymbols(props)
+    const givenProps:Props = translateKnownSymbols(props) as Props
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
@@ -65,11 +71,11 @@ export const IntervalInner = ((
         true, Tools.copy(Interval.defaultProperties), givenProps
     )
 
-    const endProperties = properties.end
-    const iconProperties = properties.icon
-    const startProperties = properties.start
-    const onChange = properties.onChange
-    const onChangeValue = properties.onChangeValue
+    const endProperties:InputProps<number> = properties.end!
+    const iconProperties:IconOptions|string|undefined = properties.icon
+    const startProperties:InputProps<number> = properties.start!
+    const onChange:Function|undefined = properties.onChange
+    const onChangeValue:Function|undefined = properties.onChangeValue
 
     /*
         NOTE: Sometimes we need real given properties or derived (default
@@ -83,8 +89,17 @@ export const IntervalInner = ((
         ) &&
         Boolean(onChange || onChangeValue)
 
-    let [value, setValue] = useState<{end:number;start:number}>({
-        end: endProperties.value, start: startProperties.value
+    let [value, setValue] = useState<Value>({
+        end:
+            endProperties.value ??
+            endProperties.default ??
+            endProperties.model?.default ??
+            null,
+        start:
+            startProperties.value ??
+            startProperties.default ??
+            startProperties.model?.default ??
+            null,
     })
     properties.value = properties.value ?? value
 
@@ -116,8 +131,8 @@ export const IntervalInner = ((
     )
     endProperties.value = properties.value.end
 
-    endProperties.ref = createRef<GenericInput>()
-    startProperties.ref = createRef<GenericInput>()
+    endProperties.ref = createRef<InputAdapterWithReferences<number>>()
+    startProperties.ref = createRef<InputAdapterWithReferences<number>>()
 
 
     if (controlled)
@@ -125,18 +140,15 @@ export const IntervalInner = ((
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValue = createDummyStateSetter<number>(properties.value)
+        setValue = createDummyStateSetter<Value>(properties.value)
     // endregion
     useImperativeHandle(
         reference,
         ():AdapterWithReferences => ({
             properties,
-            references: {end: endProperties.ref, start: startPropertes.ref},
+            references: {end: endProperties.ref, start: startProperties.ref},
             state: {
-                ...(controlled ?
-                    {} :
-                    {value: properties.value as null|number}
-                )
+                ...(controlled ? {} : {value: properties.value as null|Value})
             }
         })
     )
@@ -245,7 +257,7 @@ IntervalInner.displayName = 'Interval'
  */
 export const Interval:StaticComponent =
     memorize(forwardRef(IntervalInner)) as unknown as StaticComponent
-// region static propertie s
+// region static properties
 // / region web-component hints
 Interval.wrapped = IntervalInner
 Interval.webComponentAdapterWrapped = 'react'

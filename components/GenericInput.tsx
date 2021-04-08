@@ -1864,7 +1864,8 @@ GenericInput.transformer = {
                 transformer:InputDataTransformation
             ):string => {
                 const currency:string =
-                    transformer.currency.format.final.options.currency
+                    transformer.currency.format.final.options!.currency as
+                        string
 
                 return value === Infinity ?
                     `Infinity ${currency}` :

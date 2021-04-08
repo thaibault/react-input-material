@@ -26,7 +26,7 @@ import {
     GenericAnimate, GenericInput, Interval, RequireableCheckbox
 } from './index'
 import {useMemorizedValue} from './helper'
-import {Properties} from './type'
+import {InputProperties, Properties} from './type'
 // endregion
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
@@ -54,28 +54,66 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         setSelectedState
     )
 
-    const [value, setValue] = useState<any>()
-    const onChangeValue = useMemorizedValue<(value:any) => void>(setValue)
-
     const [fadeState, setFadeState] = useState<boolean>(false)
     useEffect(():(() => void) => Tools.timeout(
         ():void => setFadeState((value:boolean):boolean => !value), 2 * 1000
     ).clear)
+    // region controlled state
+    const [value1, setValue1] = useState<string>('')
+    const onChangeValue1 = useMemorizedValue<(value:string) => void>(setValue1)
 
+    type FloatValueState = {
+        value?:null|number
+        representation:string
+    }
+    const [value2, setValue2] = useState<FloatValueState>({
+        value: 1234.34, representation: '1.234,34'
+    })
+    const onChangeValue2 =
+        useMemorizedValue<(value:FloatValueState) => void>(setValue2)
+
+    type IntervalValueState = {
+        end:number
+        start:number
+    }
+    const [value3, setValue3] =
+        useState<IntervalValueState>({end: 120, start: 60})
+    const onChangeValue3 =
+        useMemorizedValue<(value:IntervalValueState) => void>(setValue3)
+
+    const [value4, setValue4] = useState<boolean>(false)
+    const onChangeValue4 =
+        useMemorizedValue<(value:boolean) => void>(setValue4)
+    // endregion
     return (<>
         <div className="playground__inputs">
 
-            <GenericInput onChange={onChange}/>
+            <GenericInput onChange={onChange} />
             <GenericInput
                 name="controlled"
-                type="float"
                 onChange={onChange}
-                onChangeValue={onChangeValue}
+                onChangeValue={onChangeValue1}
+                value={value1}
+            />
+            <GenericInput
+                name="controlled"
+                onChange={useMemorizedValue((
+                    properties:InputProperties<number>
+                ) => {
+                    onChange(properties)
+                    onChangeValue2({
+                        representation: properties.representation,
+                        value: properties.value
+                    })
+                })}
+                representation={value2.representation}
+                type="float"
+                value={value2.value}
             />
 
             <hr/>
 
-            <GenericInput name="input1" onChange={onChange}/>
+            <GenericInput name="input1" onChange={onChange} />
             <GenericInput
                 model={useMemorizedValue({name: 'input1Model'})}
                 onChange={onChange}
@@ -521,8 +559,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <Interval
                 name="controlled"
+                default={120}
                 onChange={onChange}
-                onChangeValue={onChangeValue}
+                onChangeValue={onChangeValue3}
+                step={60}
+                value={value3}
             />
 
             <hr/>
@@ -543,6 +584,12 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <RequireableCheckbox onChange={onChange} />
+            <RequireableCheckbox
+                name="controlled"
+                onChange={onChange}
+                onChangeValue={onChangeValue4}
+                value={value4}
+            />
 
             <hr/>
 
