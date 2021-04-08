@@ -22,24 +22,31 @@ import {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
 import {render} from 'react-dom'
 
-import {GenericAnimate, GenericInput, RequireableCheckbox} from './index'
+import {
+    GenericAnimate, GenericInput, Interval, RequireableCheckbox
+} from './index'
 import {useMemorizedValue} from './helper'
-import {Properties} from './type'
+import {InputProperties, Properties} from './type'
 // endregion
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
-const represent = (state:Properties):string => Tools.represent(
+
+const filterCallbacks = (state:Properties):Partial<Properties> =>
     Object.keys(state)
         .filter((key:string):boolean => !/^on[A-Z]/.test(key))
         .reduce(
             (result:Partial<Properties>, key:string):Partial<Properties> => {
-                result[key as keyof Properties] =
+                result[key as keyof Properties] = (
+                    state[key as keyof Properties] !== null &&
+                    typeof state[key as keyof Properties] === 'object'
+                ) ?
+                    filterCallbacks(state[key as keyof Properties]) :
                     state[key as keyof Properties]
+
                 return result
             },
             {}
         )
-)
 
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<Properties>()
@@ -51,15 +58,62 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     useEffect(():(() => void) => Tools.timeout(
         ():void => setFadeState((value:boolean):boolean => !value), 2 * 1000
     ).clear)
+    // region controlled state
+    const [value1, setValue1] = useState<string>('')
+    const onChangeValue1 = useMemorizedValue<(value:string) => void>(setValue1)
 
+    type FloatValueState = {
+        value?:null|number
+        representation:string
+    }
+    const [value2, setValue2] = useState<FloatValueState>({
+        value: 1234.34, representation: '1.234,34'
+    })
+    const onChangeValue2 =
+        useMemorizedValue<(value:FloatValueState) => void>(setValue2)
+
+    type IntervalValueState = {
+        end:number
+        start:number
+    }
+    const [value3, setValue3] =
+        useState<IntervalValueState>({end: 120, start: 60})
+    const onChangeValue3 =
+        useMemorizedValue<(value:IntervalValueState) => void>(setValue3)
+
+    const [value4, setValue4] = useState<boolean>(false)
+    const onChangeValue4 =
+        useMemorizedValue<(value:boolean) => void>(setValue4)
+    // endregion
     return (<>
         <div className="playground__inputs">
 
-            <GenericInput onChange={onChange}/>
+            <GenericInput onChange={onChange} />
+            <GenericInput
+                name="controlled"
+                onChange={onChange}
+                onChangeValue={onChangeValue1}
+                value={value1}
+            />
+            <GenericInput
+                name="controlled"
+                onChange={useMemorizedValue((
+                    properties:InputProperties<number>
+                ) => {
+                    onChange(properties)
+                    onChangeValue2({
+                        representation: properties.representation,
+                        value: properties.value
+                    })
+                })}
+                representation={value2.representation}
+                type="float"
+                value={value2.value}
+            />
 
             <hr/>
 
-            <GenericInput name="input1" onChange={onChange}/>
+            <GenericInput name="input1" onChange={onChange} />
             <GenericInput
                 model={useMemorizedValue({name: 'input1Model'})}
                 onChange={onChange}
@@ -490,6 +544,30 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
+            <Interval
+                end={useMemorizedValue({
+                    default: 240,
+                    minimum: 120
+                })}
+                onChange={onChange}
+                required
+                start={useMemorizedValue({
+                    default: 120,
+                    maximum: 3600
+                })}
+                step={60}
+            />
+            <Interval
+                name="controlled"
+                default={120}
+                onChange={onChange}
+                onChangeValue={onChangeValue3}
+                step={60}
+                value={value3}
+            />
+
+            <hr/>
+
             <div
                 className="playground__inputs__generic-animate"
                 style={{height: '50px'}}
@@ -506,6 +584,12 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <RequireableCheckbox onChange={onChange} />
+            <RequireableCheckbox
+                name="controlled"
+                onChange={onChange}
+                onChangeValue={onChangeValue4}
+                value={value4}
+            />
 
             <hr/>
 
@@ -556,7 +640,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
         {selectedState ?
             <pre className="playground__outputs">
-                {represent(selectedState)}
+                {Tools.represent(filterCallbacks(selectedState))}
             </pre> :
             ''
         }

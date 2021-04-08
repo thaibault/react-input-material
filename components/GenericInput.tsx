@@ -71,6 +71,7 @@ import {
     determineInitialValue,
     determineInitialRepresentation,
     determineValidationState as determineBaseValidationState,
+    createDummyStateSetter,
     formatValue,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
@@ -89,6 +90,7 @@ import {
     EditorState,
     GenericEvent,
     InputAdapter as Adapter,
+    InputAdapterWithReferences as AdapterWithReferences,
     InputDataTransformation,
     InputModelState as ModelState,
     InputProperties as Properties,
@@ -371,8 +373,6 @@ export const GenericInputInner = function<Type = any>(
                         )
                 }
             } else if (inputReference.current) {
-                inputReference.current.focus()
-
                 ;(
                     inputReference.current as
                         HTMLInputElement|HTMLTextAreaElement
@@ -887,8 +887,8 @@ export const GenericInputInner = function<Type = any>(
             givenProperties.value !== valueState.value
         )
             /*
-                NOTE: Only re-determine value's representation if component's
-                input representation isn't controlled.
+                NOTE: Set representation to "undefined" to trigger to derive
+                current representation from current value.
             */
             givenProperties.representation = undefined
 
@@ -1383,19 +1383,6 @@ export const GenericInputInner = function<Type = any>(
     // / endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
 
-    const controlled:boolean = Boolean(
-        (
-            givenProps.model?.value !== undefined ||
-            givenProps.value !== undefined
-        ) &&
-        (givenProps.onChange || givenProps.onChangeValue)
-    )
-    const representationControlled:boolean = Boolean(
-        givenProps.representation !== undefined &&
-        (givenProps.onChange || givenProps.onChangeValue)
-    )
-    let selectionIsUnstable:boolean = false
-
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
     let [hidden, setHidden] = useState<boolean|undefined>()
     let [editorState, setEditorState] = useState<EditorState>({
@@ -1446,6 +1433,21 @@ export const GenericInputInner = function<Type = any>(
         })
     )
 
+    /*
+        NOTE: Sometimes we need real given properties or derived (default
+        extended) "given" properties.
+    */
+    const controlled:boolean =
+        !givenProperties.enforceUncontrolled &&
+        (
+            givenProps.model?.value !== undefined ||
+            givenProps.value !== undefined
+        ) &&
+        Boolean(givenProps.onChange || givenProps.onChangeValue)
+    const representationControlled:boolean =
+        controlled && givenProps.representation !== undefined
+    let selectionIsUnstable:boolean = false
+
     deriveMissingPropertiesFromState()
 
     const properties:Properties<Type> =
@@ -1475,12 +1477,9 @@ export const GenericInputInner = function<Type = any>(
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValueState = (
-            callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
-        ):void => {
-            if (typeof callbackOrData === 'function')
-                callbackOrData(currentValueState)
-        }
+        setValueState = createDummyStateSetter<ValueState<Type, ModelState>>(
+            currentValueState
+        )
     if (!(
         !controlled &&
         properties.value === valueState.value &&
@@ -1491,19 +1490,7 @@ export const GenericInputInner = function<Type = any>(
     // endregion
     useImperativeHandle(
         reference,
-        ():Adapter<Type> & {
-            references:{
-                codeEditorReference?:CodeEditorType
-                codeEditorInputReference:RefObject<HTMLTextAreaElement>
-                foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation>
-                inputReference:RefObject<
-                    HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement
-                >
-                richTextEditorInputReference:RefObject<HTMLTextAreaElement>
-                richTextEditorInstance?:RichTextEditor
-                richTextEditorReference?:RichTextEditorComponent
-            }
-        } => ({
+        ():AdapterWithReferences<Type> => ({
             properties,
             references: {
                 codeEditorReference,
@@ -1613,7 +1600,8 @@ export const GenericInputInner = function<Type = any>(
         tooltip={properties.tooltip}
     ><div className={
         styles['generic-input'] +
-        (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '')
+        (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '') +
+        (properties.className ? ` ${properties.className}` : '')
     }>
         <GenericAnimate
             in={Boolean(properties.selection) || Boolean(properties.labels)}
@@ -1845,7 +1833,6 @@ export const GenericInput:StaticComponent =
 GenericInput.wrapped = GenericInputInner
 GenericInput.webComponentAdapterWrapped = 'react'
 // / endregion
-GenericInput.controllableProperties = ['value']
 GenericInput.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where
@@ -1869,18 +1856,30 @@ GenericInput.transformer = {
         type: 'text'
     },
     currency: {
-        format: {final: {transform: (
-            value:number,
-            configuration:Properties,
-            transformer:InputDataTransformation
-        ):string => (new Intl.NumberFormat(
-            GenericInput.locales,
-            {
-                currency: 'USD',
-                style: 'currency',
-                ...(transformer.currency.format.final.options || {})
+        format: {final: {
+            options: {currency: 'USD'},
+            transform: (
+                value:number,
+                configuration:Properties,
+                transformer:InputDataTransformation
+            ):string => {
+                const currency:string =
+                    transformer.currency.format.final.options!.currency as
+                        string
+
+                return value === Infinity ?
+                    `Infinity ${currency}` :
+                    value === -Infinity ?
+                        `- Infinity ${currency}` :
+                        (new Intl.NumberFormat(
+                            GenericInput.locales,
+                            {
+                                style: 'currency',
+                                ...transformer.currency.format.final.options
+                            }
+                        )).format(value)
             }
-        )).format(value)}},
+        }},
         parse: (
             value:string,
             configuration:Properties,
@@ -1893,6 +1892,11 @@ GenericInput.transformer = {
         format: {
             final: {transform: (value:number|string):string => {
                 value = typeof value === 'number' ? value : parseFloat(value)
+
+                if (value === Infinity)
+                    return 'infinitely far in the future'
+                if (value === -Infinity)
+                    return 'infinitely early in the past'
                 if (!isFinite(value))
                     return ''
 
@@ -1923,6 +1927,11 @@ GenericInput.transformer = {
         format: {
             final: {transform: (value:number):string => {
                 value = typeof value === 'number' ? value : parseFloat(value)
+
+                if (value === Infinity)
+                    return 'infinitely far in the future'
+                if (value === -Infinity)
+                    return 'infinitely early in the past'
                 if (!isFinite(value))
                     return ''
 
@@ -1954,9 +1963,14 @@ GenericInput.transformer = {
             value:number,
             configuration:Properties,
             transformer:InputDataTransformation
-        ):string => (new Intl.NumberFormat(
-            GenericInput.locales, transformer.float.format.final.options || {}
-        )).format(value)}},
+        ):string =>
+            value === Infinity ? 'Infinity' : value === -Infinity ?
+                '- Infinity' :
+                (new Intl.NumberFormat(
+                    GenericInput.locales,
+                    transformer.float.format.final.options || {}
+                )).format(value)
+        }},
         parse: (value:number|string, configuration:Properties):number => {
             if (typeof value === 'string')
                 value = parseFloat(
@@ -2030,6 +2044,11 @@ GenericInput.transformer = {
         format: {
             final: {transform: (value:number):string => {
                 value = typeof value === 'number' ? value : parseFloat(value)
+
+                if (value === Infinity)
+                    return 'infinitely far in the future'
+                if (value === -Infinity)
+                    return 'infinitely early in the past'
                 if (!isFinite(value))
                     return ''
 

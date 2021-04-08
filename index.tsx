@@ -19,6 +19,7 @@
 export {Dummy} from './components/Dummy'
 export {GenericAnimate} from './components/GenericAnimate'
 export {GenericInput} from './components/GenericInput'
+export {Interval} from './components/Interval'
 export {RequireableCheckbox} from './components/RequireableCheckbox'
 export {WrapConfigurations} from './components/WrapConfigurations'
 export {WrapStrict} from './components/WrapStrict'

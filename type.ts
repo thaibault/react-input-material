@@ -16,7 +16,6 @@
     endregion
 */
 // region imports
-import {SelectProps} from '@rmwc/select'
 import PropertyTypes, {
     any,
     arrayOf,
@@ -42,15 +41,23 @@ import {
     MouseEvent,
     ReactElement,
     RefAttributes,
+    RefObject,
     Requireable,
     SyntheticEvent
 } from 'react'
-import {IconOptions, RipplePropT} from '@rmwc/types'
-import {ThemeProviderProps} from '@rmwc/theme'
-import {TooltipProps} from '@rmwc/tooltip'
+import CodeEditorType from 'react-ace'
+
+import {Editor as RichTextEditor} from 'tinymce'
 import {
     StaticWebComponent as StaticBaseWebComponent, WebComponentAdapter
 } from 'web-component-wrapper/type'
+import {MDCSelectFoundation} from '@material/select'
+import {MDCTextFieldFoundation} from '@material/textfield'
+import {SelectProps} from '@rmwc/select'
+import {ThemeProviderProps} from '@rmwc/theme'
+import {TooltipProps} from '@rmwc/tooltip'
+import {IconOptions, RipplePropT} from '@rmwc/types'
+import {Editor as RichTextEditorComponent} from '@tinymce/tinymce-react'
 // endregion
 // region exports
 // / region generic
@@ -123,7 +130,9 @@ export type Properties<Type = any> =
     BaseModel<Type> &
     ModelState &
     {
+        className:string
         disabled:boolean
+        enforceUncontrolled:boolean
         id:string
         initialValue:null|Type
         label:string
@@ -234,7 +243,9 @@ export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
 export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...baseModelPropertyTypes,
     ...modelStatePropertyTypes,
+    className: string,
     disabled: boolean,
+    enforceUncontrolled: boolean,
     initialValue: any,
     model: shape<any>(modelPropertyTypes),
     onChange: func,
@@ -292,6 +303,7 @@ export const defaultModel:Model = {
     would permanently shadow them.
 */
 export const defaultProperties:DefaultProperties = {
+    enforceUncontrolled: false,
     model: {...defaultModel},
     showDeclaration: undefined,
     showInitialValidationState: false,
@@ -449,11 +461,23 @@ export interface StaticWebInputComponent<Type = any> extends StaticWebComponent<
     transformer:InputDataTransformation<Type>
 }
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
-export type InputAdapter<Type = any> =
-    WebComponentAdapter<
-        InputProperties<Type>,
-        Omit<InputState<Type>, 'representation'|'selectionIsUnstable'|'value'>
-    >
+export type InputAdapter<Type = any> = WebComponentAdapter<
+    InputProperties<Type>,
+    Omit<InputState<Type>, 'representation'|'selectionIsUnstable'|'value'>
+>
+export type InputAdapterWithReferences<Type = any> = InputAdapter<Type> & {
+    references:{
+        codeEditorReference?:CodeEditorType
+        codeEditorInputReference:RefObject<HTMLTextAreaElement>
+        foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation>
+        inputReference:RefObject<
+            HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement
+        >
+        richTextEditorInputReference:RefObject<HTMLTextAreaElement>
+        richTextEditorInstance?:RichTextEditor
+        richTextEditorReference?:RichTextEditorComponent
+    }
+}
 export type StaticFunctionInputComponent<Type = any> =
     Omit<FunctionComponent<Props<Type>>, 'propTypes'> &
     StaticWebInputComponent<Type>
@@ -562,6 +586,39 @@ export const defaultInputProperties:DefaultInputProperties = {
     rows: 4,
     selectableEditor: false,
     step: 1
+} as const
+// // endregion
+// / endregion
+// / region interval
+export type IntervalValue = {
+    end:null|number
+    start:null|number
+}
+export type IntervalProperties = Omit<InputProperties<number>, 'value'> & {
+    end:InputProperties<number>
+    start:InputProperties<number>
+    value:IntervalValue
+}
+export type IntervalProps = Omit<InputProps<number>, 'value'> & Partial<{
+    end:InputProps<number>
+    start:InputProps<number>
+    value:IntervalValue
+}>
+export type IntervalPropertyTypes<Type = any> = {
+    [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
+}
+export type IntervalAdapter =
+    WebComponentAdapter<IntervalProperties, {value?:IntervalValue}>
+export type IntervalAdapterWithReferences = IntervalAdapter & {
+    references:{
+        end:InputAdapterWithReferences<number>
+        start:InputAdapterWithReferences<number>
+    }
+}
+// // region constants
+export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+    end: shape(inputPropertyTypes),
+    start: shape(inputPropertyTypes)
 } as const
 // // endregion
 // / endregion

@@ -42,6 +42,7 @@ import {WrapConfigurations} from './WrapConfigurations'
 import {
     determineInitialValue,
     determineValidationState as determineBaseValidationState,
+    createDummyStateSetter,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
     translateKnownSymbols,
@@ -380,13 +381,6 @@ export const RequireableCheckboxInner = function(
         createRef<MDCCheckboxFoundation>()
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
-    const controlled:boolean = Boolean(
-        (
-            givenProps.model?.value !== undefined ||
-            givenProps.value !== undefined
-        ) &&
-        (givenProps.onChange || givenProps.onChangeValue)
-    )
 
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
 
@@ -413,6 +407,14 @@ export const RequireableCheckboxInner = function(
             value: initialValue
         })
 
+    const controlled:boolean =
+        !givenProperties.enforceUncontrolled &&
+        (
+            givenProps.model?.value !== undefined ||
+            givenProps.value !== undefined
+        ) &&
+        Boolean(givenProps.onChange || givenProps.onChangeValue)
+
     deriveMissingPropertiesFromState()
 
     const properties:Properties = getConsolidatedProperties(givenProperties)
@@ -429,12 +431,10 @@ export const RequireableCheckboxInner = function(
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValueState = (
-            callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
-        ):void => {
-            if (typeof callbackOrData === 'function')
-                callbackOrData(currentValueState)
-        }
+        setValueState =
+            createDummyStateSetter<ValueState<boolean, ModelState>>(
+                currentValueState
+            )
     if (!(
         !controlled &&
         properties.value === valueState.value &&
@@ -469,7 +469,10 @@ export const RequireableCheckboxInner = function(
         strict={RequireableCheckbox.strict}
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
-    ><div className={styles['requireable-checkbox']}>
+    ><div className={
+        styles['requireable-checkbox'] +
+        (properties.className ? ` ${properties.className}` : '')
+    }>
         <Checkbox
             checked={Boolean(properties.value)}
             disabled={properties.disabled}
@@ -532,7 +535,6 @@ export const RequireableCheckbox:StaticComponent =
 RequireableCheckbox.wrapped = RequireableCheckboxInner
 RequireableCheckbox.webComponentAdapterWrapped = 'react'
 // / endregion
-RequireableCheckbox.controllableProperties = ['value']
 RequireableCheckbox.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where
