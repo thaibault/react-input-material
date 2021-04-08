@@ -494,13 +494,14 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <Interval
                 end={useMemorizedValue({
+                    default: 240,
                     description: 'endDescription',
                     minimum: 120
                 })}
-                minimumText="Please at least ${formatValue(minimum)}."
                 onChange={onChange}
                 required
                 start={useMemorizedValue({
+                    default: 120,
                     description: 'startDescription',
                     maximum: 3600
                 })}

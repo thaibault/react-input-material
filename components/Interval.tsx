@@ -24,7 +24,9 @@ import {
     forwardRef,
     ForwardRefRenderFunction,
     memo as memorize,
-    RefObject
+    RefObject,
+    useImperativeHandle,
+    useState
 } from 'react'
 
 import GenericInput from './GenericInput'
@@ -55,17 +57,26 @@ export const IntervalInner = ((
         default property object untouched for unchanged usage in other
         instances.
     */
-    const properties:Props<Type> = Tools.extend(
+    const properties:Props = Tools.extend(
         true, Tools.copy(Interval.defaultProperties), props
     )
 
-    const endProperties = properties.end || {}
-    const iconProperties = properties.icon || {}
-    const startProperties = properties.start || {}
+    const endProperties = properties.end
+    const iconProperties = properties.icon
+    const startProperties = properties.start
+    const onChange = properties.onChange
+    const onChangeValue = properties.onChangeValue
+
+    const [value, setValue] = useState<{end:Date;start:Date}>({
+        end: endProperties.value, start: startProperties.value
+    })
 
     delete properties.end
     delete properties.icon
     delete properties.start
+
+    delete properties.onChange
+    delete properties.onChangeValue
 
     Tools.extend(true, endProperties, properties)
     Tools.extend(true, startProperties, properties)
@@ -75,7 +86,8 @@ export const IntervalInner = ((
         endProperties.value || Infinity,
         endProperties.maximum || Infinity
     )
-    startProperties.minimum = startProperties.minimum || Infinity
+    startProperties.minimum = startProperties.minimum || -Infinity
+    startProperties.value = value.start
 
     endProperties.maximum = endProperties.maximum || Infinity
     endProperties.minimum = Math.max(
@@ -83,6 +95,45 @@ export const IntervalInner = ((
         startProperties.value || -Infinity,
         startProperties.minimum || -Infinity
     )
+    endProperties.value = value.end
+
+    endProperties.ref = createRef<GenericInput>()
+    startProperties.ref = createRef<GenericInput>()
+    // TODO
+    useImperativeHandle(
+        reference,
+        /*TODO & {
+            references:{
+                end:,
+                start:
+            }
+        }*/
+        ():Adapter => ({
+            properties,
+            references: {end: endProperties.ref, start: startPropertes.ref},
+            state: {value}
+        })
+    )
+
+    if (onChange) {
+        endProperties.onChange = (properties:Properties):void =>
+            onChange({end: properties, start: 'TODO'})
+        startProperties.onChange = (properties:Properties):void =>
+            onChange({end: 'TODO', start: properties})
+    }
+
+    endProperties.onChangeValue = (value:Date):void =>
+        setValue(({start}) => {
+            const newValue = {start: Math.min(start ?? Infinity, value), end: value}
+            onChangeValue && onChangeValue(newValue)
+            return newValue
+        })
+    startProperties.onChangeValue = (value:Date):void =>
+        setValue(({end}) => {
+            const newValue = {end: Math.max(end ?? -Infinity, value), start: value}
+            onChangeValue && onChangeValue(newValue)
+            return newValue
+        })
 
     return <WrapConfigurations
         strict={Interval.strict}
@@ -120,9 +171,15 @@ Interval.wrapped = IntervalInner
 Interval.webComponentAdapterWrapped = 'react'
 // / endregion
 Interval.defaultProperties = {
-    end: {className: `${styles.interval}__end`},
+    end: {
+        className: `${styles.interval}__end`
+    },
     icon: {className: `${styles.interval}__icon`, icon: 'timelapse'},
-    start: {className: `${styles.interval}__start`}
+    maximumText: 'Please provide somthing earlier than ${formatValue(maximum)}.',
+    minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
+    start: {
+        className: `${styles.interval}__start`
+    }
 }
 Interval.propTypes = propertyTypes
 Interval.strict = false
