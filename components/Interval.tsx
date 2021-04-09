@@ -164,16 +164,16 @@ export const IntervalInner = ((
     )
     // region attach event handler
     if (onChange) {
-        endProperties.onChange = (properties:InputProperties<number>):void => {
+        endProperties.onChange = (inputProperties:InputProperties<number>):void => {
             const startValue:number = Math.min(
                 endInputReference.current?.properties?.value ?? Infinity,
-                properties.value ?? Infinity
+                inputProperties.value ?? Infinity
             )
 
-            onChange({
-                end: properties,
+            const properties = {
+                end: inputProperties,
                 value: {
-                    end: properties.value,
+                    end: inputProperties.value,
                     start: startValue
                 },
                 start: {
@@ -186,15 +186,19 @@ export const IntervalInner = ((
                     },
                     value: startValue
                 }
-            })
+            }
+            properties.model = {
+                end: properties.end.model, start: properties.start.model
+            }
+            onChange(properties)
         }
-        startProperties.onChange = (properties:InputProperties<number>):void => {
+        startProperties.onChange = (inputProperties:InputProperties<number>):void => {
             const endValue:number = Math.max(
                 endInputReference.current?.properties?.value ?? -Infinity,
-                properties.value ?? -Infinity
+                inputProperties.value ?? -Infinity
             )
 
-            onChange({
+            const properties = {
                 end: {
                     ...(endInputReference.current?.properties || {}),
                     model: {
@@ -207,10 +211,14 @@ export const IntervalInner = ((
                 },
                 value: {
                     end: endValue,
-                    start: properties.value
+                    start: inputProperties.value
                 },
-                start: properties
-            })
+                start: inputProperties
+            }
+            properties.model = {
+                end: properties.end.model, start: properties.start.model
+            }
+            onChange(properties)
         }
     }
 
@@ -245,9 +253,9 @@ export const IntervalInner = ((
             styles.interval +
             (properties.className ? ` ${properties.className}` : '')
         }>
-            <GenericInput {...startProperties} />
+            <GenericInput {...startProperties} ref={startInputReference} />
             <Icon icon={iconProperties} />
-            <GenericInput {...endProperties} />
+            <GenericInput {...endProperties} ref={endInputReference} />
         </div>
     </WrapConfigurations>
 }) as ForwardRefRenderFunction<Adapter, Props>
