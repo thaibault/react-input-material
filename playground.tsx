@@ -31,28 +31,10 @@ import {InputProperties, Properties} from './type'
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 
-const filterCallbacks = (state:Properties):Partial<Properties> =>
-    Object.keys(state)
-        .filter((key:string):boolean => !/^on[A-Z]/.test(key))
-        .reduce(
-            (result:Partial<Properties>, key:string):Partial<Properties> => {
-                result[key as keyof Properties] = (
-                    state[key as keyof Properties] !== null &&
-                    typeof state[key as keyof Properties] === 'object'
-                ) ?
-                    filterCallbacks(state[key as keyof Properties]) :
-                    state[key as keyof Properties]
-
-                return result
-            },
-            {}
-        )
-
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<Properties>()
-    const onChange = useMemorizedValue<(properties:Properties) => void>(
-        setSelectedState
-    )
+    const onChange =
+        useMemorizedValue(({model}):void => setSelectedState(model))
 
     const [fadeState, setFadeState] = useState<boolean>(false)
     useEffect(():(() => void) => Tools.timeout(
@@ -60,7 +42,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     ).clear)
     // region controlled state
     const [value1, setValue1] = useState<string>('')
-    const onChangeValue1 = useMemorizedValue<(value:string) => void>(setValue1)
+    const onChangeValue1 = useMemorizedValue(setValue1)
 
     type FloatValueState = {
         value?:null|number
@@ -69,8 +51,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     const [value2, setValue2] = useState<FloatValueState>({
         value: 1234.34, representation: '1.234,34'
     })
-    const onChangeValue2 =
-        useMemorizedValue<(value:FloatValueState) => void>(setValue2)
+    const onChangeValue2 = useMemorizedValue(setValue2)
 
     type IntervalValueState = {
         end:number
@@ -78,12 +59,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     }
     const [value3, setValue3] =
         useState<IntervalValueState>({end: 120, start: 60})
-    const onChangeValue3 =
-        useMemorizedValue<(value:IntervalValueState) => void>(setValue3)
+    const onChangeValue3 = useMemorizedValue(setValue3)
 
     const [value4, setValue4] = useState<boolean>(false)
-    const onChangeValue4 =
-        useMemorizedValue<(value:boolean) => void>(setValue4)
+    const onChangeValue4 = useMemorizedValue(setValue4)
     // endregion
     return (<>
         <div className="playground__inputs">
@@ -640,7 +619,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
         {selectedState ?
             <pre className="playground__outputs">
-                {Tools.represent(filterCallbacks(selectedState))}
+                {Tools.represent(selectedState)}
             </pre> :
             ''
         }

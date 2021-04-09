@@ -450,7 +450,7 @@ export function determineInitialRepresentation<
  */
 export const useMemorizedValue = <Type = any>(
     value:Type, ...dependencies:Array<any>
-):Type => useMemo(():any => value, dependencies)
+):Type => useMemo(():Type => value, dependencies)
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
