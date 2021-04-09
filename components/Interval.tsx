@@ -37,6 +37,7 @@ import WrapConfigurations from './WrapConfigurations'
 import {createDummyStateSetter, translateKnownSymbols} from '../helper'
 import {
     InputProps,
+    InputProperties,
     InputAdapterWithReferences,
     IntervalAdapter as Adapter,
     IntervalAdapterWithReferences as AdapterWithReferences,
@@ -116,24 +117,33 @@ export const IntervalInner = ((
     Tools.extend(true, startProperties, properties)
 
     startProperties.maximum = Math.min(
-        startProperties.maximum || Infinity,
+        typeof startProperties.maximum === 'number' ?
+            startProperties.maximum :
+            Infinity,
         endProperties.value || Infinity,
-        endProperties.maximum || Infinity
+        typeof endProperties.maximum === 'number' ?
+            endProperties.maximum :
+            Infinity
     )
     startProperties.minimum = startProperties.minimum || -Infinity
     startProperties.value = properties.value.start
 
-    endProperties.maximum = endProperties.maximum || Infinity
+    endProperties.maximum = typeof endProperties.maximum === 'number' ?
+        endProperties.maximum :
+        Infinity
     endProperties.minimum = Math.max(
-        endProperties.minimum || -Infinity,
+        typeof endProperties.minimum === 'number' ?
+            endProperties.minimum :
+            -Infinity,
         startProperties.value || -Infinity,
-        startProperties.minimum || -Infinity
+        typeof startProperties.minimum === 'number' ?
+            startProperties.minimum :
+            -Infinity
     )
     endProperties.value = properties.value.end
 
-    endProperties.ref = createRef<InputAdapterWithReferences<number>>()
-    startProperties.ref = createRef<InputAdapterWithReferences<number>>()
-
+    const endInputReference = createRef<InputAdapterWithReferences<number>>()
+    const startInputReference = createRef<InputAdapterWithReferences<number>>()
 
     if (controlled)
         /*
@@ -145,8 +155,8 @@ export const IntervalInner = ((
     useImperativeHandle(
         reference,
         ():AdapterWithReferences => ({
-            properties,
-            references: {end: endProperties.ref, start: startProperties.ref},
+            properties: properties as Properties,
+            references: {end: endInputReference, start: startInputReference},
             state: {
                 ...(controlled ? {} : {value: properties.value as null|Value})
             }
@@ -156,8 +166,8 @@ export const IntervalInner = ((
     if (onChange) {
         endProperties.onChange = (properties:InputProperties<number>):void => {
             const startValue:number = Math.min(
-                startProperties.ref.current?.properties.value ?? Infinity,
-                properties.value
+                endInputReference.current?.properties?.value ?? Infinity,
+                properties.value ?? Infinity
             )
 
             onChange({
@@ -167,10 +177,10 @@ export const IntervalInner = ((
                     start: startValue
                 },
                 start: {
-                    ...(startProperties.ref.current?.properties || {}),
+                    ...(startInputReference.current?.properties || {}),
                     model: {
                         ...(
-                            startProperties.ref.current?.properties.model || {}
+                            startInputReference.current?.properties?.model || {}
                         ),
                         value: startValue
                     },
@@ -180,16 +190,16 @@ export const IntervalInner = ((
         }
         startProperties.onChange = (properties:InputProperties<number>):void => {
             const endValue:number = Math.max(
-                endProperties.ref.current?.properties.value ?? -Infinity,
-                properties.value
+                endInputReference.current?.properties?.value ?? -Infinity,
+                properties.value ?? -Infinity
             )
 
             onChange({
                 end: {
-                    ...(endProperties.ref.current?.properties || {}),
+                    ...(endInputReference.current?.properties || {}),
                     model: {
                         ...(
-                            endProperties.ref.current?.properties.model || {}
+                            endInputReference.current?.properties?.model || {}
                         ),
                         value: endValue
                     },
@@ -208,7 +218,7 @@ export const IntervalInner = ((
         const newValue = {
             end: value,
             start: Math.min(
-                startProperties.ref.current?.properties.value ?? Infinity,
+                startInputReference.current?.properties?.value ?? Infinity,
                 value
             )
         }
@@ -218,7 +228,7 @@ export const IntervalInner = ((
     startProperties.onChangeValue = (value:number):void => {
         const newValue = {
             end: Math.max(
-                endProperties.ref.current?.properties.value ?? -Infinity,
+                endInputReference.current?.properties?.value ?? -Infinity,
                 value
             ),
             start: value
@@ -236,7 +246,7 @@ export const IntervalInner = ((
             (properties.className ? ` ${properties.className}` : '')
         }>
             <GenericInput {...startProperties} />
-            <Icon {...iconProperties} />
+            <Icon icon={iconProperties} />
             <GenericInput {...endProperties} />
         </div>
     </WrapConfigurations>
