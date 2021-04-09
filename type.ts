@@ -313,7 +313,7 @@ export const defaultProperties:DefaultProperties = {
 // / endregion
 // / region checkbox
 export type CheckboxProperties =
-    Properties<boolean> &
+    Omit<Properties<boolean>, 'onChange'> &
     {
         checked:boolean
         id:string
@@ -371,7 +371,7 @@ export type InputModel<Type = any> =
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
 export type InputProperties<Type = any> =
-    Properties<Type> &
+    Omit<Properties<Type>, 'onChange'> &
     InputModelState &
     {
         align:'end'|'start'
@@ -594,31 +594,35 @@ export type IntervalValue = {
     end:null|number
     start:null|number
 }
-export type IntervalProperties = Omit<InputProperties<number>, 'value'> & {
-    end:InputProperties<number>
-    start:InputProperties<number>
-    value:IntervalValue
-}
-export type IntervalProps = Omit<InputProps<number>, 'value'> & Partial<{
-    end:InputProps<number>
-    start:InputProps<number>
-    value:IntervalValue
-}>
+export type IntervalProperties =
+    Omit<InputProperties<number>, 'onChange'|'onChangeValue'|'value'> &
+    {
+        end:InputProperties<number>
+        start:InputProperties<number>
+        value:IntervalValue
+    }
+export type IntervalProps =
+    Omit<InputProps<number>, 'onChange'|'onChangeValue'|'value'> &
+    Partial<{
+        end:InputProps<number>
+        start:InputProps<number>
+        value:IntervalValue
+    }>
 export type IntervalPropertyTypes<Type = any> = {
     [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
 }
 export type IntervalAdapter =
-    WebComponentAdapter<IntervalProperties, {value?:IntervalValue}>
+    WebComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
 export type IntervalAdapterWithReferences = IntervalAdapter & {
     references:{
-        end:InputAdapterWithReferences<number>
-        start:InputAdapterWithReferences<number>
+        end:RefObject<InputAdapterWithReferences<number>>
+        start:RefObject<InputAdapterWithReferences<number>>
     }
 }
 // // region constants
 export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
-    end: shape(inputPropertyTypes),
-    start: shape(inputPropertyTypes)
+    end: shape<any>(inputPropertyTypes),
+    start: shape<any>(inputPropertyTypes)
 } as const
 // // endregion
 // / endregion
