@@ -75,6 +75,8 @@ export const IntervalInner = ((
     const endProperties:InputProps<number> = properties.end!
     const iconProperties:IconOptions|string|undefined = properties.icon
     const startProperties:InputProps<number> = properties.start!
+
+    const model = properties.model
     const onChange:Function|undefined = properties.onChange
     const onChangeValue:Function|undefined = properties.onChangeValue
 
@@ -93,16 +95,18 @@ export const IntervalInner = ((
     let [value, setValue] = useState<Value>({
         end:
             endProperties.value ??
+            model?.end?.value ??
             endProperties.default ??
-            endProperties.model?.default ??
+            model?.end?.default ??
             null,
         start:
             startProperties.value ??
+            model?.end?.value ??
             startProperties.default ??
-            startProperties.model?.default ??
+            model?.start?.default ??
             null,
     })
-    properties.value = properties.value ?? value
+    value = properties.value ?? value
 
     delete properties.enforceUncontrolled
 
@@ -110,37 +114,42 @@ export const IntervalInner = ((
     delete properties.icon
     delete properties.start
 
+    delete properties.model
     delete properties.onChange
     delete properties.onChangeValue
+    delete properties.value
 
-    Tools.extend(true, endProperties, properties)
-    Tools.extend(true, startProperties, properties)
+    Tools.extend(true, endProperties, {model: model.end}, properties)
+    Tools.extend(true, startProperties, {model: model.start}, properties)
+
+    const endConfiguration = {...endProperties.model, ...endProperties}
+    const startConfiguration = {...startProperties.model, ...startProperties}
 
     startProperties.maximum = Math.min(
-        typeof startProperties.maximum === 'number' ?
-            startProperties.maximum :
+        typeof startConfiguration.maximum === 'number' ?
+            startConfiguration.maximum :
             Infinity,
-        endProperties.value || Infinity,
-        typeof endProperties.maximum === 'number' ?
-            endProperties.maximum :
+        value.end || Infinity,
+        typeof endConfiguration.maximum === 'number' ?
+            endConfiguration.maximum :
             Infinity
     )
-    startProperties.minimum = startProperties.minimum || -Infinity
-    startProperties.value = properties.value.start
+    startProperties.minimum = startConfiguration.minimum || -Infinity
+    startProperties.value = value.start
 
-    endProperties.maximum = typeof endProperties.maximum === 'number' ?
-        endProperties.maximum :
+    endProperties.maximum = typeof endConfiguration.maximum === 'number' ?
+        endConfiguration.maximum :
         Infinity
     endProperties.minimum = Math.max(
-        typeof endProperties.minimum === 'number' ?
-            endProperties.minimum :
+        typeof endConfiguration.minimum === 'number' ?
+            endConfiguration.minimum :
             -Infinity,
-        startProperties.value || -Infinity,
-        typeof startProperties.minimum === 'number' ?
-            startProperties.minimum :
+        value.start || -Infinity,
+        typeof startConfiguration.minimum === 'number' ?
+            startConfiguration.minimum :
             -Infinity
     )
-    endProperties.value = properties.value.end
+    endProperties.value = value.end
 
     const endInputReference = createRef<InputAdapterWithReferences<number>>()
     const startInputReference = createRef<InputAdapterWithReferences<number>>()
@@ -150,21 +159,21 @@ export const IntervalInner = ((
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValue = createDummyStateSetter<Value>(properties.value)
+        setValue = createDummyStateSetter<Value>(value)
     // endregion
     useImperativeHandle(
         reference,
         ():AdapterWithReferences => ({
             properties: properties as Properties,
             references: {end: endInputReference, start: startInputReference},
-            state: {
-                ...(controlled ? {} : {value: properties.value as null|Value})
-            }
+            state: controlled ? {} : {value}
         })
     )
     // region attach event handler
     if (onChange) {
-        endProperties.onChange = (inputProperties:InputProperties<number>):void => {
+        endProperties.onChange = (
+            inputProperties:InputProperties<number>
+        ):void => {
             const startValue:number = Math.min(
                 endInputReference.current?.properties?.value ?? Infinity,
                 inputProperties.value ?? Infinity
