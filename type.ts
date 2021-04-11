@@ -126,7 +126,7 @@ export type DataTransformSpecification<Type = any> = {
     ) => null|Type
     type?:NativeInputType
 }
-export type Properties<Type = any> =
+export type Properties<Type = any, PropertiesType extends {model:Model<Type>} = {model:Model<Type>}> =
     BaseModel<Type> &
     ModelState &
     {
@@ -139,7 +139,7 @@ export type Properties<Type = any> =
         model:Model<Type>
         name:string
         onBlur:(event:GenericEvent) => void
-        onChange:(properties:Properties<Type>, event?:GenericEvent) => void
+        onChange:(properties:PropertiesType, event?:GenericEvent) => void
         onChangeShowDeclaration:(show:boolean, event?:GenericEvent) => void
         onChangeState:(state:ModelState, event?:GenericEvent) => void
         onChangeValue:(value:null|Type, event?:GenericEvent) => void
@@ -313,12 +313,7 @@ export const defaultProperties:DefaultProperties = {
 // / endregion
 // / region checkbox
 export type CheckboxProperties =
-    Omit<Properties<boolean>, 'onChange'> &
-    {
-        checked:boolean
-        id:string
-        onChange:(properties:CheckboxProperties, event?:GenericEvent) => void
-    }
+    Properties<boolean> & {checked:boolean;id:string}
 export type CheckboxModel = Model<boolean>
 export type CheckboxModelState = ModelState
 export type CheckboxProps =
@@ -371,7 +366,7 @@ export type InputModel<Type = any> =
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
 export type InputProperties<Type = any> =
-    Omit<Properties<Type>, 'onChange'> &
+    Properties<Type> &
     InputModelState &
     {
         align:'end'|'start'
@@ -395,8 +390,6 @@ export type InputProperties<Type = any> =
         minimumLengthText:string
         minimumText:string
         model:InputModel<Type>
-        onChange:(properties:InputProperties<Type>, event?:GenericEvent) =>
-            void
         onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void
         onKeyDown:(event:KeyboardEvent) => void
         onKeyUp:(event:KeyboardEvent) => void
