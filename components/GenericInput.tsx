@@ -1826,8 +1826,10 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput:StaticComponent =
-    memorize(forwardRef(GenericInputInner)) as unknown as StaticComponent
+export const GenericInput:StaticComponentProps =
+    memorize(forwardRef(GenericInputInner)) as
+        unknown as
+        StaticComponent<Props>
 // region static properties
 // / region web-component hints
 GenericInput.wrapped = GenericInputInner

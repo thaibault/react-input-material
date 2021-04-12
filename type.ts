@@ -126,7 +126,7 @@ export type DataTransformSpecification<Type = any> = {
     ) => null|Type
     type?:NativeInputType
 }
-export type Properties<Type = any, PropertiesType extends {model:Model<Type>} = {model:Model<Type>}> =
+export type BaseProperties<Type> =
     BaseModel<Type> &
     ModelState &
     {
@@ -139,7 +139,6 @@ export type Properties<Type = any, PropertiesType extends {model:Model<Type>} = 
         model:Model<Type>
         name:string
         onBlur:(event:GenericEvent) => void
-        onChange:(properties:PropertiesType, event?:GenericEvent) => void
         onChangeShowDeclaration:(show:boolean, event?:GenericEvent) => void
         onChangeState:(state:ModelState, event?:GenericEvent) => void
         onChangeValue:(value:null|Type, event?:GenericEvent) => void
@@ -155,12 +154,19 @@ export type Properties<Type = any, PropertiesType extends {model:Model<Type>} = 
         themeConfiguration:ThemeProviderProps['options']
         tooltip:string|TooltipProps
     }
-export type Props<Type = any> =
-    Partial<Omit<Properties<Type>, 'model'>> &
+export type Properties<
+    Type = any,
+    ExternalProperties extends BaseProperties<Type> = BaseProperties<Type>
+> =
+    BaseProperties<Type> &
+    {onChange:(properties:ExternalProperties, event?:GenericEvent) => void}
+export type Props<
+    Type = any, ExternalProperties extends Properties<Type> = Properties<Type>
+> =
+    Partial<Omit<Properties<Type, ExternalProperties>, 'model'>> &
     {model?:Partial<Model<Type>>}
 export type DefaultProperties<Type = any> =
-    Omit<Props<Type>, 'model'> &
-    {model:Model<Type>}
+    Omit<Props<Type>, 'model'> & {model:Model<Type>}
 export type State<Type = any> = {
     modelState:ModelState
     showDeclaration:boolean
@@ -172,12 +178,10 @@ export interface StaticWebComponent<P = Props> extends StaticBaseWebComponent {
     defaultProperties:P
     strict:boolean
 }
-export type StaticComponent<Type = any> =
-    Omit<ComponentClass<Props<Type>>, 'propTypes'> &
-    StaticWebComponent<Type>
-export type StaticFunctionComponent<Type = any> =
-    Omit<FunctionComponent<Props<Type>>, 'propTypes'> &
-    StaticComponent<Type>
+export type StaticComponent<P = Props> =
+    Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<P>
+export type StaticFunctionComponent<P = Props> =
+    Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P>
 export type ValueState<Type = any, MS = ModelState> = {
     modelState:MS
     representation?:string
@@ -312,16 +316,17 @@ export const defaultProperties:DefaultProperties = {
 // // endregion
 // / endregion
 // / region checkbox
+export type AdditionalCheckboxProperties = {checked:boolean;id:string}
 export type CheckboxProperties =
-    Properties<boolean> & {checked:boolean;id:string}
+    Properties<boolean, Properties<boolean> & AdditionalCheckboxProperties> &
+    AdditionalCheckboxProperties
 export type CheckboxModel = Model<boolean>
 export type CheckboxModelState = ModelState
 export type CheckboxProps =
     Partial<Omit<CheckboxProperties, 'model'>> &
     {model?:Partial<CheckboxModel>}
 export type DefaultCheckboxProperties<Type = any> =
-    Omit<CheckboxProps, 'model'> &
-    {model:CheckboxModel}
+    Omit<CheckboxProps, 'model'> & {model:CheckboxModel}
 export type CheckboxState = State<boolean>
 export type CheckboxAdapter<Type = any> =
     WebComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
@@ -365,8 +370,7 @@ export type InputModel<Type = any> =
     {state:InputModelState}
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export type InputProperties<Type = any> =
-    Properties<Type> &
+export type AdditionalInputProperties<Type> =
     InputModelState &
     {
         align:'end'|'start'
@@ -405,6 +409,9 @@ export type InputProperties<Type = any> =
         trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
         transformer:RecursivePartial<DataTransformSpecification<Type>>
     }
+export type InputProperties<Type = any> =
+    Properties<Type, Properties<Type> & AdditionalInputProperties<Type>> &
+    AdditionalInputProperties<Type>
 export type InputProps<Type = any> =
     Partial<Omit<InputProperties<Type>, 'model'>> &
     {model?:Partial<InputModel<Type>>}
@@ -587,17 +594,25 @@ export type IntervalValue = {
     end:null|number
     start:null|number
 }
-export type IntervalProperties =
-    Omit<InputProperties<number>, 'onChange'|'onChangeValue'|'value'> &
+export type AdditionalIntervalProperties =
     {
         end:InputProperties<number>
+        model:{end:InputModel<number>;start:InputModel<number>}
+        onChangeValue:(value:null|IntervalValue, event?:GenericEvent) => void
         start:InputProperties<number>
         value:IntervalValue
     }
+export type IntervalProperties =
+    Omit<InputProperties<number>, 'model'|'onChange'|'onChangeValue'|'value'> &
+    AdditionalIntervalProperties &
+    {onChange:(properties:IntervalProperties, event?:GenericEvent) => void}
 export type IntervalProps =
-    Omit<InputProps<number>, 'onChange'|'onChangeValue'|'value'> &
+    Omit<InputProps<number>, 'model'|'onChange'|'onChangeValue'|'value'> &
     Partial<{
         end:InputProps<number>
+        model:IntervalProperties['model']
+        onChange:IntervalProperties['onChange']
+        onChangeValue:IntervalProperties['onChangeValue']
         start:InputProps<number>
         value:IntervalValue
     }>

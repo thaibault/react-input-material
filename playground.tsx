@@ -16,7 +16,7 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports
+// region imports 
 import Tools from 'clientnode'
 import {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
@@ -26,15 +26,16 @@ import {
     GenericAnimate, GenericInput, Interval, RequireableCheckbox
 } from './index'
 import {useMemorizedValue} from './helper'
-import {InputProperties, Properties} from './type'
+import {InputProperties, Properties, Model} from './type'
 // endregion
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 
 const Application:FunctionComponent<{}> = ():ReactElement => {
-    const [selectedState, setSelectedState] = useState<Properties>()
-    const onChange =
-        useMemorizedValue(({model}):void => setSelectedState(model))
+    const [selectedState, setSelectedState] = useState<Model>()
+    const onChange:((properties:{model:Model}) => void) = useMemorizedValue<
+        (properties:{model:Model}) => void
+    >(({model}):void => setSelectedState(model))
 
     const [fadeState, setFadeState] = useState<boolean>(false)
     useEffect(():(() => void) => Tools.timeout(

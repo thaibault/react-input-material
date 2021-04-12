@@ -282,8 +282,8 @@ IntervalInner.displayName = 'Interval'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Interval:StaticComponent =
-    memorize(forwardRef(IntervalInner)) as unknown as StaticComponent
+export const Interval:StaticComponent<Props> =
+    memorize(forwardRef(IntervalInner)) as unknown as StaticComponent<Props>
 // region static properties
 // / region web-component hints
 Interval.wrapped = IntervalInner

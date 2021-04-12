@@ -526,10 +526,10 @@ RequireableCheckboxInner.displayName = 'RequireableCheckbox'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const RequireableCheckbox:StaticComponent =
+export const RequireableCheckbox:StaticComponent<Props> =
     memorize(forwardRef(RequireableCheckboxInner)) as
         unknown as
-        StaticComponent
+        StaticComponent<Props>
 // region static properties
 // / region web-component hints
 RequireableCheckbox.wrapped = RequireableCheckboxInner
