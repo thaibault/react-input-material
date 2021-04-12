@@ -16,7 +16,7 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports 
+// region imports
 import Tools from 'clientnode'
 import {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
@@ -26,15 +26,15 @@ import {
     GenericAnimate, GenericInput, Interval, RequireableCheckbox
 } from './index'
 import {useMemorizedValue} from './helper'
-import {InputProperties, Properties, Model} from './type'
+import {InputProperties, IntervalValue, Properties, Model} from './type'
 // endregion
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<Model>()
-    const onChange:((properties:{model:Model}) => void) = useMemorizedValue<
-        (properties:{model:Model}) => void
+    const onChange:((properties:{model:unknown}) => void) = useMemorizedValue<
+        (properties:{model:unknown}) => void
     >(({model}):void => setSelectedState(model))
 
     const [fadeState, setFadeState] = useState<boolean>(false)
@@ -43,7 +43,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     ).clear)
     // region controlled state
     const [value1, setValue1] = useState<string>('')
-    const onChangeValue1 = useMemorizedValue(setValue1)
+    const onChangeValue1 = useMemorizedValue<(value:string) => void>(setValue1)
 
     type FloatValueState = {
         value?:null|number
@@ -52,18 +52,16 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     const [value2, setValue2] = useState<FloatValueState>({
         value: 1234.34, representation: '1.234,34'
     })
-    const onChangeValue2 = useMemorizedValue(setValue2)
+    const onChangeValue2 =
+        useMemorizedValue<(value:FloatValueState) => void>(setValue2)
 
-    type IntervalValueState = {
-        end:number
-        start:number
-    }
-    const [value3, setValue3] =
-        useState<IntervalValueState>({end: 120, start: 60})
-    const onChangeValue3 = useMemorizedValue(setValue3)
+    const [value3, setValue3] = useState<IntervalValue>({end: 120, start: 60})
+    const onChangeValue3 =
+        useMemorizedValue<(value:IntervalValue|null) => void>(setValue3)
 
     const [value4, setValue4] = useState<boolean>(false)
-    const onChangeValue4 = useMemorizedValue(setValue4)
+    const onChangeValue4 =
+        useMemorizedValue<(value:boolean|null) => void>(setValue4)
     // endregion
     return (<>
         <div className="playground__inputs">

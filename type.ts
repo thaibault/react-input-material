@@ -455,10 +455,12 @@ export type InputDataTransformation<Type = any> =
         }
         time:DataTransformSpecification<Type>
     }
-export interface StaticWebInputComponent<Type = any> extends StaticWebComponent<InputProps<Type>> {
+export interface StaticWebInputComponent<
+    P extends InputProps = InputProps
+> extends StaticWebComponent<P> {
     defaultModelState:InputModelState
     locales:Array<string>
-    transformer:InputDataTransformation<Type>
+    transformer:InputDataTransformation<P['value']>
 }
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
 export type InputAdapter<Type = any> = WebComponentAdapter<
@@ -478,9 +480,8 @@ export type InputAdapterWithReferences<Type = any> = InputAdapter<Type> & {
         richTextEditorReference?:RichTextEditorComponent
     }
 }
-export type StaticFunctionInputComponent<Type = any> =
-    Omit<FunctionComponent<Props<Type>>, 'propTypes'> &
-    StaticWebInputComponent<Type>
+export type StaticFunctionInputComponent<P = Props> =
+    Omit<FunctionComponent<P>, 'propTypes'> & StaticWebInputComponent<P>
 // // region constants
 export const inputModelStatePropertyTypes:{
     [key in keyof InputModelState]:Requireable<boolean|symbol>

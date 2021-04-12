@@ -1826,7 +1826,7 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput:StaticComponentProps =
+export const GenericInput:StaticComponent<Props> =
     memorize(forwardRef(GenericInputInner)) as
         unknown as
         StaticComponent<Props>
