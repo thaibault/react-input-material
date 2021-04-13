@@ -645,7 +645,7 @@ export type IntervalAdapterWithReferences = IntervalAdapter & {
 }
 // // region constants
 export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
-    ...propertyTypes,
+    ...inputPropertyTypes,
     end: shape<any>(inputPropertyTypes),
     start: shape<any>(inputPropertyTypes)
 } as const
