@@ -26,6 +26,8 @@ import {ReactElement, useMemo, useState} from 'react'
 import {render as renderReact, unmountComponentAtNode} from 'react-dom'
 
 import {
+    BaseProperties,
+    BaseProps,
     DataTransformSpecification,
     DefaultProperties,
     FormatSpecification,
@@ -33,8 +35,6 @@ import {
     InputProperties,
     Model,
     ModelState,
-    Properties,
-    Props,
     TestEnvironment
 } from './type'
 // endregion
@@ -66,23 +66,20 @@ export const createDummyStateSetter = <Type = any>(
  *
  * @returns Nothing.
  */
-export const triggerCallbackIfExists = <Type = any>(
-    properties:Properties<Type>,
+export const triggerCallbackIfExists = <P extends BaseProperties>(
+    properties:P,
     name:string,
     synchronous:boolean = true,
-    ...parameters:Array<any>
+    ...parameters:Array<unknown>
 ):void => {
     name = `on${Tools.stringCapitalize(name)}`
-    if (properties[name as keyof Properties<Type>])
+
+    if (properties[name as keyof P])
         if (synchronous)
-            (properties[name as keyof Properties<Type>] as Function)(
-                ...parameters
-            )
+            (properties[name as keyof P] as Function)(...parameters)
         else
             Tools.timeout(() =>
-                (properties[name as keyof Properties<Type>] as Function)(
-                    ...parameters
-                )
+                (properties[name as keyof P] as Function)(...parameters)
             )
 }
 // region consolidation state
@@ -112,7 +109,9 @@ export const translateKnownSymbols = <Type = any>(
  * @returns Determined value.
  */
 export const determineInitialValue = <Type = any>(
-    properties:Props<Type>, defaultValue?:null|Type, alternateValue?:null|Type
+    properties:BaseProps<Type>,
+    defaultValue?:null|Type,
+    alternateValue?:null|Type
 ):null|Type => {
     if (alternateValue !== undefined)
         return alternateValue as null|Type
@@ -138,7 +137,7 @@ export const determineInitialValue = <Type = any>(
  * validator function.
  * @returns A boolean indicating if validation state has changed.
  */
-export const determineValidationState = <P extends Properties<any>>(
+export const determineValidationState = <P extends BaseProperties>(
     properties:P,
     currentState:P['model']['state'],
     validators:Mapping<() => boolean> = {}
@@ -190,7 +189,7 @@ export const determineValidationState = <P extends Properties<any>>(
  * @param defaultModel - Default model to merge.
  * @returns Merged properties.
 */
-export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
+export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
     properties:P, defaultModel:M
 ):P => {
     /*
@@ -251,7 +250,7 @@ export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
  * @returns External properties object.
  */
 export const getConsolidatedProperties = <
-    P extends Props, R extends Properties
+    P extends BaseProps, R extends Properties
 >(properties:P):R => {
     type Result = R & {
         mutable?:boolean

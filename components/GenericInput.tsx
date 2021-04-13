@@ -1074,12 +1074,12 @@ export const GenericInputInner = function<Type = any>(
             onChange(event)
 
         if (oldValueState.value !== properties.value)
-            triggerCallbackIfExists<Type>(
-                properties, 'valueChange', controlled, properties.value, event
+            triggerCallbackIfExists<Properties<Type>>(
+                properties, 'changeValue', controlled, properties.value, event
             )
 
         if (stateChanged)
-            triggerCallbackIfExists<Type>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeState',
                 controlled,
@@ -1087,7 +1087,9 @@ export const GenericInputInner = function<Type = any>(
                 event
             )
 
-        triggerCallbackIfExists<Type>(properties, 'blur', controlled, event)
+        triggerCallbackIfExists<Properties<Type>>(
+            properties, 'blur', controlled, event
+        )
 
         return changed ?
             {
@@ -1116,7 +1118,7 @@ export const GenericInputInner = function<Type = any>(
             )
         )
 
-        triggerCallbackIfExists<Type>(
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'change', controlled, properties, event
         )
     }
@@ -1135,7 +1137,7 @@ export const GenericInputInner = function<Type = any>(
 
             onChange(event)
 
-            triggerCallbackIfExists<Type>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeEditorIsActive',
                 controlled,
@@ -1164,7 +1166,7 @@ export const GenericInputInner = function<Type = any>(
 
             onChange(event)
 
-            triggerCallbackIfExists<Type>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeShowDeclaration',
                 controlled,
@@ -1235,14 +1237,14 @@ export const GenericInputInner = function<Type = any>(
             ))
                 stateChanged = true
 
-            triggerCallbackIfExists<Type>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties, 'changeValue', controlled, properties.value, event
             )
 
             if (stateChanged) {
                 result.modelState = properties.model.state
 
-                triggerCallbackIfExists<Type>(
+                triggerCallbackIfExists<Properties<Type>>(
                     properties,
                     'changeState',
                     controlled,
@@ -1262,7 +1264,9 @@ export const GenericInputInner = function<Type = any>(
     const onClick = (event:ReactMouseEvent):void => {
         onSelectionChange(event)
 
-        triggerCallbackIfExists<Type>(properties, 'click', controlled, event)
+        triggerCallbackIfExists<Properties<Type>>(
+            properties, 'click', controlled, event
+        )
 
         onTouch(event)
     }
@@ -1272,7 +1276,9 @@ export const GenericInputInner = function<Type = any>(
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
-        triggerCallbackIfExists<Type>(properties, 'focus', controlled, event)
+        triggerCallbackIfExists<Properties<Type>>(
+            properties, 'focus', controlled, event
+        )
 
         onTouch(event)
     }
@@ -1293,7 +1299,9 @@ export const GenericInputInner = function<Type = any>(
         )
             event.stopPropagation()
 
-        triggerCallbackIfExists<Type>(properties, 'keyDown', controlled, event)
+        triggerCallbackIfExists<Properties<Type>>(
+            properties, 'keyDown', controlled, event
+        )
     }
     /**
      * Triggered on key up events.
@@ -1305,7 +1313,7 @@ export const GenericInputInner = function<Type = any>(
         if (event.keyCode) {
             onSelectionChange(event)
 
-            triggerCallbackIfExists<Type>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties, 'keyUp', controlled, event
             )
         }
@@ -1318,7 +1326,7 @@ export const GenericInputInner = function<Type = any>(
     const onSelectionChange = (event:GenericEvent):void => {
         saveSelectionState(event)
 
-        triggerCallbackIfExists<Type>(
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'selectionChange', controlled, event
         )
     }
@@ -1351,7 +1359,7 @@ export const GenericInputInner = function<Type = any>(
 
                 result = {...oldValueState, modelState: properties.model.state}
 
-                triggerCallbackIfExists<Type>(
+                triggerCallbackIfExists<Properties<Type>>(
                     properties,
                     'changeState',
                     controlled,
@@ -1360,7 +1368,7 @@ export const GenericInputInner = function<Type = any>(
                 )
             }
 
-            triggerCallbackIfExists<Type>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties, 'touch', controlled, event
             )
 

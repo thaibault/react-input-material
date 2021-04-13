@@ -182,7 +182,7 @@ export const RequireableCheckboxInner = function(
         if (changed) {
             onChange(event)
 
-            triggerCallbackIfExists<boolean>(
+            triggerCallbackIfExists<Properties>(
                 properties,
                 'changeState',
                 controlled,
@@ -191,7 +191,9 @@ export const RequireableCheckboxInner = function(
             )
         }
 
-        triggerCallbackIfExists<boolean>(properties, 'blur', controlled, event)
+        triggerCallbackIfExists<Properties>(
+            properties, 'blur', controlled, event
+        )
 
         return changed ?
             {...oldValueState, modelState: properties.model.state} :
@@ -216,7 +218,7 @@ export const RequireableCheckboxInner = function(
             )
         )
 
-        triggerCallbackIfExists<boolean>(
+        triggerCallbackIfExists<Properties>(
             properties, 'change', controlled, properties, event
         )
     }
@@ -231,7 +233,7 @@ export const RequireableCheckboxInner = function(
 
             onChange(event)
 
-            triggerCallbackIfExists<boolean>(
+            triggerCallbackIfExists<Properties>(
                 properties,
                 'changeShowDeclaration',
                 controlled,
@@ -285,14 +287,14 @@ export const RequireableCheckboxInner = function(
             if (determineValidationState(properties, oldValueState.modelState))
                 stateChanged = true
 
-            triggerCallbackIfExists<boolean>(
+            triggerCallbackIfExists<Properties>(
                 properties, 'changeValue', controlled, properties.value, event
             )
 
             if (stateChanged) {
                 result.modelState = properties.model.state
 
-                triggerCallbackIfExists<boolean>(
+                triggerCallbackIfExists<Properties>(
                     properties,
                     'changeState',
                     controlled,
@@ -310,7 +312,7 @@ export const RequireableCheckboxInner = function(
      * @returns Nothing.
      */
     const onClick = (event:ReactMouseEvent):void => {
-        triggerCallbackIfExists<boolean>(
+        triggerCallbackIfExists<Properties>(
             properties, 'click', controlled, event
         )
 
@@ -322,7 +324,7 @@ export const RequireableCheckboxInner = function(
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
-        triggerCallbackIfExists<boolean>(
+        triggerCallbackIfExists<Properties>(
             properties, 'focus', controlled, event
         )
 
@@ -357,7 +359,7 @@ export const RequireableCheckboxInner = function(
 
                 result = {...oldValueState, modelState: properties.model.state}
 
-                triggerCallbackIfExists<boolean>(
+                triggerCallbackIfExists<Properties>(
                     properties,
                     'changeState',
                     controlled,
@@ -366,7 +368,7 @@ export const RequireableCheckboxInner = function(
                 )
             }
 
-            triggerCallbackIfExists<boolean>(
+            triggerCallbackIfExists<Properties>(
                 properties, 'touch', controlled, event
             )
 

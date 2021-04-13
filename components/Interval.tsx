@@ -34,8 +34,13 @@ import {
 import GenericInput from './GenericInput'
 import styles from './Interval.module'
 import WrapConfigurations from './WrapConfigurations'
-import {createDummyStateSetter, translateKnownSymbols} from '../helper'
 import {
+    createDummyStateSetter, translateKnownSymbols, triggerCallbackIfExists
+} from '../helper'
+import {
+    AdditionalIntervalProperties as AdditionalProperties,
+    defaultIntervalProperties as defaultProperties,
+    GenericEvent,
     InputProps,
     InputProperties,
     InputAdapterWithReferences,
@@ -73,7 +78,9 @@ export const IntervalInner = ((
     )
 
     const endProperties:InputProps<number> = properties.end!
-    const iconProperties:IconOptions|string|undefined = properties.icon
+    const iconProperties:IconOptions = typeof properties.icon === 'string' ?
+        {icon: properties.icon} :
+        properties.icon!
     const startProperties:InputProps<number> = properties.start!
 
     const model = properties.model
@@ -87,7 +94,8 @@ export const IntervalInner = ((
     const controlled:boolean =
         !properties.enforceUncontrolled &&
         (
-            givenProps.model?.value !== undefined ||
+            givenProps.model?.end?.value !== undefined ||
+            givenProps.model?.start?.value !== undefined ||
             givenProps.value !== undefined
         ) &&
         Boolean(onChange || onChangeValue)
@@ -119,8 +127,15 @@ export const IntervalInner = ((
     delete properties.onChangeValue
     delete properties.value
 
-    Tools.extend(true, endProperties, {model: model.end}, properties)
-    Tools.extend(true, startProperties, {model: model.start}, properties)
+    Tools.extend(true, endProperties, {model: model?.end}, properties)
+    Tools.extend(true, startProperties, {model: model?.start}, properties)
+
+    if (!endProperties.className)
+        endProperties.className = `${styles.interval}__end`
+    if (!iconProperties.className)
+        iconProperties.className = `${styles.interval}__icon`
+    if (!startProperties.className)
+        startProperties.className = `${styles.interval}__start`
 
     const endConfiguration = {...endProperties.model, ...endProperties}
     const startConfiguration = {...startProperties.model, ...startProperties}
@@ -172,14 +187,14 @@ export const IntervalInner = ((
     // region attach event handler
     if (onChange) {
         endProperties.onChange = (
-            inputProperties:InputProperties<number>
+            inputProperties:InputProperties<number>, event?:GenericEvent
         ):void => {
             const startValue:number = Math.min(
                 endInputReference.current?.properties?.value ?? Infinity,
                 inputProperties.value ?? Infinity
             )
 
-            const properties = {
+            const properties:AdditionalProperties = {
                 end: inputProperties,
                 value: {
                     end: inputProperties.value,
@@ -189,7 +204,8 @@ export const IntervalInner = ((
                     ...(startInputReference.current?.properties || {}),
                     model: {
                         ...(
-                            startInputReference.current?.properties?.model || {}
+                            startInputReference.current?.properties?.model ||
+                            {}
                         ),
                         value: startValue
                     },
@@ -199,15 +215,19 @@ export const IntervalInner = ((
             properties.model = {
                 end: properties.end.model, start: properties.start.model
             }
-            onChange(properties)
+            triggerCallbackIfExists<AdditionalProperties>(
+                properties, 'change', controlled, properties, event
+            )
         }
-        startProperties.onChange = (inputProperties:InputProperties<number>):void => {
+        startProperties.onChange = (
+            inputProperties:InputProperties<number>, event?:GenericEvent
+        ):void => {
             const endValue:number = Math.max(
                 endInputReference.current?.properties?.value ?? -Infinity,
                 inputProperties.value ?? -Infinity
             )
 
-            const properties = {
+            const properties:AdditionalProperties = {
                 end: {
                     ...(endInputReference.current?.properties || {}),
                     model: {
@@ -227,11 +247,13 @@ export const IntervalInner = ((
             properties.model = {
                 end: properties.end.model, start: properties.start.model
             }
-            onChange(properties)
+            triggerCallbackIfExists<AdditionalProperties>(
+                properties, 'change', controlled, properties, event
+            )
         }
     }
 
-    endProperties.onChangeValue = (value:number):void => {
+    endProperties.onChangeValue = (value:number, event?:GenericEvent):void => {
         const newValue = {
             end: value,
             start: Math.min(
@@ -239,10 +261,14 @@ export const IntervalInner = ((
                 value
             )
         }
-        onChangeValue && onChangeValue(newValue)
+        triggerCallbackIfExists<Properties>(
+            properties, 'changeValue', controlled, newValue, event
+        )
         setValue(newValue)
     }
-    startProperties.onChangeValue = (value:number):void => {
+    startProperties.onChangeValue = (
+        value:number, event?:GenericEvent
+    ):void => {
         const newValue = {
             end: Math.max(
                 endInputReference.current?.properties?.value ?? -Infinity,
@@ -250,7 +276,9 @@ export const IntervalInner = ((
             ),
             start: value
         }
-        onChangeValue && onChangeValue(newValue)
+        triggerCallbackIfExists<Properties>(
+            properties, 'changeValue', controlled, newValue, event
+        )
         setValue(newValue)
     }
     // endregion
@@ -284,26 +312,12 @@ IntervalInner.displayName = 'Interval'
  */
 export const Interval:StaticComponent<Props> =
     memorize(forwardRef(IntervalInner)) as unknown as StaticComponent<Props>
-// region static properties
+// region static  properties
 // / region web-component hints
 Interval.wrapped = IntervalInner
 Interval.webComponentAdapterWrapped = 'react'
 // / endregion
-Interval.defaultProperties = {
-    end: {
-        className: `${styles.interval}__end`,
-        description: 'End'
-    },
-    enforceUncontrolled: false,
-    icon: {className: `${styles.interval}__icon`, icon: 'timelapse'},
-    maximumText: 'Please provide somthing earlier than ${formatValue(maximum)}.',
-    minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
-    start: {
-        className: `${styles.interval}__start`,
-        description: 'Start'
-    },
-    type: 'time'
-}
+Interval.defaultProperties = defaultProperties
 Interval.propTypes = propertyTypes
 Interval.strict = false
 // endregion

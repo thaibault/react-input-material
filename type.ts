@@ -160,8 +160,12 @@ export type Properties<
 > =
     BaseProperties<Type> &
     {onChange:(properties:ExternalProperties, event?:GenericEvent) => void}
+export type BaseProps<Type = any> =
+    Partial<Omit<BaseProperties<Type>, 'model'>> &
+    {model?:Partial<Model<Type>>}
 export type Props<
-    Type = any, ExternalProperties extends Properties<Type> = Properties<Type>
+    Type = any,
+    ExternalProperties extends BaseProperties<Type> = BaseProperties<Type>
 > =
     Partial<Omit<Properties<Type, ExternalProperties>, 'model'>> &
     {model?:Partial<Model<Type>>}
@@ -592,25 +596,36 @@ export const defaultInputProperties:DefaultInputProperties = {
 // / endregion
 // / region interval
 export type IntervalValue = {
-    end:null|number
-    start:null|number
+    end?:null|number
+    start?:null|number
 }
-export type AdditionalIntervalProperties =
-    {
-        end:InputProperties<number>
-        model:{end:InputModel<number>;start:InputModel<number>}
-        onChangeValue:(value:null|IntervalValue, event?:GenericEvent) => void
-        start:InputProperties<number>
-        value:IntervalValue
-    }
+export type IntervalModel = {end:InputModel<number>;start:InputModel<number>}
+export type AdditionalIntervalProperties = {
+    end:InputProperties<number>
+    icon:IconOptions
+    model:IntervalModel
+    start:InputProperties<number>
+    value:IntervalValue
+}
 export type IntervalProperties =
-    Omit<InputProperties<number>, 'model'|'onChange'|'onChangeValue'|'value'> &
+    Omit<
+        InputProperties<number>,
+        'icon'|'model'|'onChange'|'onChangeValue'|'value'
+    > &
     AdditionalIntervalProperties &
-    {onChange:(properties:IntervalProperties, event?:GenericEvent) => void}
+    {
+        onChange:(
+            properties:AdditionalIntervalProperties, event?:GenericEvent
+        ) => void
+        onChangeValue:(value:null|IntervalValue, event?:GenericEvent) => void
+    }
 export type IntervalProps =
-    Omit<InputProps<number>, 'model'|'onChange'|'onChangeValue'|'value'> &
+    Omit<
+        InputProps<number>, 'icon'|'model'|'onChange'|'onChangeValue'|'value'
+    > &
     Partial<{
         end:InputProps<number>
+        icon:IntervalProperties['icon']
         model:IntervalProperties['model']
         onChange:IntervalProperties['onChange']
         onChangeValue:IntervalProperties['onChangeValue']
@@ -630,9 +645,21 @@ export type IntervalAdapterWithReferences = IntervalAdapter & {
 }
 // // region constants
 export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+    ...propertyTypes,
     end: shape<any>(inputPropertyTypes),
     start: shape<any>(inputPropertyTypes)
 } as const
+export const defaultIntervalProperties:IntervalProps = {
+    ...defaultProperties,
+    end: {description: 'End'},
+    icon: {icon: 'timelapse'},
+    maximumText: 'Please provide somthing earlier than ${formatValue(maximum)}.',
+    minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
+    requiredText: 'Please provide a range.',
+    start: {description: 'Start'},
+    type: 'time'
+} as const
+// // endregion
 // // endregion
 // / endregion
 export type ConfigurationProperties = {
