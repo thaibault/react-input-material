@@ -39,7 +39,6 @@ describe('Interval', ():void => {
     test('render', ():void => {
         expect(render(<Interval/>)).toBeDefined()
 
-        return
         expect(Array.from(
             (render(<Interval/>) as HTMLElement).querySelectorAll('input')
         )).toHaveLength(2)

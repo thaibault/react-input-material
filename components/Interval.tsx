@@ -116,7 +116,6 @@ export const IntervalInner = ((
     })
     if (!properties.value)
         properties.value = value
-    console.log(properties.value)
     const propertiesToForward:InputProps<number> =
         Tools.mask<InputProps<number>>(
             properties as InputProps<number>,
@@ -131,6 +130,7 @@ export const IntervalInner = ((
                 value: true
             }}
         )
+
     Tools.extend(true, endProperties, {model: model?.end}, propertiesToForward)
     Tools.extend(
         true, startProperties, {model: model?.start}, propertiesToForward
