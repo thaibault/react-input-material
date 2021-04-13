@@ -650,12 +650,14 @@ export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     start: shape<any>(inputPropertyTypes)
 } as const
 export const defaultIntervalProperties:IntervalProps = {
-    end: {description: 'End'},
+    end: {description: 'End', name: 'end'},
     icon: {icon: 'timelapse'},
-    maximumText: 'Please provide somthing earlier than ${formatValue(maximum)}.',
+    maximumText:
+        'Please provide somthing earlier than ${formatValue(maximum)}.',
     minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
+    name: 'NO_NAME_DEFINED',
     requiredText: 'Please provide a range.',
-    start: {description: 'Start'},
+    start: {description: 'Start', name: 'start'},
     type: 'time'
 } as const
 // // endregion

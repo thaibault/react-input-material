@@ -125,6 +125,7 @@ export const IntervalInner = ((
                 icon: true,
                 start: true,
                 model: true,
+                name: true,
                 onChange: true,
                 onChangeValue: true,
                 value: true
@@ -201,6 +202,37 @@ export const IntervalInner = ((
     )
     // region attach event handler
     if (onChange) {
+        const getBaseProperties = () => {
+            const endModel = {...(
+                endInputReference.current?.properties?.model ||
+                {} as unknown as InputModel<number>
+            )}
+            const startModel = {...(
+                startInputReference.current?.properties?.model ||
+                {} as unknown as InputModel<number>
+            )}
+
+            return {
+                ...properties as Properties,
+                end: {
+                    ...(
+                        endInputReference.current?.properties ||
+                        endProperties as unknown as InputProperties<number>
+                    ),
+                    model: endModel
+                },
+                icon: iconProperties,
+                model: {end: endModel, start: startModel},
+                start: {
+                    ...(
+                        startInputReference.current?.properties ||
+                        startProperties as unknown as InputProperties<number>
+                    ),
+                    model: startModel
+                }
+            }
+        }
+
         endProperties.onChange = (
             inputProperties:InputProperties<number>, event?:GenericEvent
         ):void => {
@@ -208,34 +240,50 @@ export const IntervalInner = ((
                 endInputReference.current?.properties?.value ?? Infinity,
                 inputProperties.value ?? Infinity
             )
-            const startModel:InputModel<number> = {
-                ...(
-                    startInputReference.current?.properties?.model ||
-                    {} as unknown as InputModel<number>
-                ),
-                value: startValue
-            }
 
-            const externalProperties:Properties = {
-                ...properties as Properties,
-                end: inputProperties,
-                icon: iconProperties,
-                model: {end: inputProperties.model, start: startModel},
-                value: {end: inputProperties.value, start: startValue},
-                start: {
-                    ...(
-                        startInputReference.current?.properties ||
-                        startProperties as unknown as InputProperties<number>
-                    ),
-                    model: startModel,
-                    value: startValue
-                }
-            }
+            const baseProperties = getBaseProperties()
             triggerCallbackIfExists<Properties>(
                 properties as Properties,
                 'change',
                 controlled,
-                externalProperties,
+                {
+                    ...baseProperties,
+                    dirty: inputProperties.dirty || baseProperties.start.dirty,
+                    end: inputProperties,
+                    focused:
+                        inputProperties.focused ||
+                        baseProperties.start.focused,
+                    invalid:
+                        inputProperties.invalid ||
+                        baseProperties.start.invalid,
+                    invalidRequired:
+                        inputProperties.invalidRequired ||
+                        baseProperties.start.invalidRequired,
+                    model: {
+                        ...baseProperties.model, end: inputProperties.model
+                    },
+                    pristine:
+                        inputProperties.pristine &&
+                        baseProperties.start.pristine,
+                    touched:
+                        inputProperties.touched ||
+                        baseProperties.start.touched,
+                    untouched:
+                        inputProperties.untouched &&
+                        baseProperties.start.untouched,
+                    valid: inputProperties.valid && baseProperties.start.valid,
+                    value: {end: inputProperties.value, start: startValue},
+                    visited:
+                        inputProperties.visited ||
+                        baseProperties.start.visited,
+                    start: {
+                        ...baseProperties.start,
+                        model: {
+                            ...baseProperties.start.model, value: startValue
+                        },
+                        value: startValue
+                    }
+                },
                 event
             )
         }
@@ -246,34 +294,46 @@ export const IntervalInner = ((
                 endInputReference.current?.properties?.value ?? -Infinity,
                 inputProperties.value ?? -Infinity
             )
-            const endModel:InputModel<number> = {
-                ...(
-                    endInputReference.current?.properties?.model ||
-                    {} as unknown as InputModel<number>
-                ),
-                value: endValue
-            }
 
-            const externalProperties:Properties = {
-                ...properties as Properties,
-                end: {
-                    ...(
-                        endInputReference.current?.properties ||
-                        endProperties as unknown as InputProperties<number>
-                    ),
-                    model: endModel,
-                    value: endValue
-                },
-                icon: iconProperties,
-                model: {end: endModel, start: inputProperties.model},
-                value: {end: endValue, start: inputProperties.value},
-                start: inputProperties
-            }
+            const baseProperties = getBaseProperties()
             triggerCallbackIfExists<Properties>(
                 properties as Properties,
                 'change',
                 controlled,
-                externalProperties,
+                {
+                    ...baseProperties,
+                    dirty: inputProperties.dirty || baseProperties.end.dirty,
+                    end: {
+                        ...baseProperties.end,
+                        model: {
+                            ...baseProperties.end.model, value: endValue
+                        },
+                        value: endValue
+                    },
+                    focused:
+                        inputProperties.focused || baseProperties.end.focused,
+                    invalid:
+                        inputProperties.invalid || baseProperties.end.invalid,
+                    invalidRequired:
+                        inputProperties.invalidRequired ||
+                        baseProperties.end.invalidRequired,
+                    model: {
+                        ...baseProperties.model, start: inputProperties.model
+                    },
+                    pristine:
+                        inputProperties.pristine &&
+                        baseProperties.end.pristine,
+                    touched:
+                        inputProperties.touched || baseProperties.end.touched,
+                    untouched:
+                        inputProperties.untouched &&
+                        baseProperties.end.untouched,
+                    valid: inputProperties.valid && baseProperties.end.valid,
+                    value: {end: endValue, start: inputProperties.value},
+                    visited:
+                        inputProperties.visited || baseProperties.end.visited,
+                    start: inputProperties
+                },
                 event
             )
         }
@@ -322,10 +382,13 @@ export const IntervalInner = ((
         strict={Interval.strict}
         themeConfiguration={properties.themeConfiguration}
     >
-        <div className={
-            styles.interval +
-            (properties.className ? ` ${properties.className}` : '')
-        }>
+        <div
+            className={
+                styles.interval +
+                (properties.className ? ` ${properties.className}` : '')
+            }
+            data-name={properties.name}
+        >
             <GenericInput
                 {...startProperties} ref={startInputReference as any}
             />

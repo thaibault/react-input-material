@@ -58,8 +58,8 @@ describe('Interval', ():void => {
 
         expect(
             (render(<Interval name="test"/>) as HTMLElement)
-                .querySelector('[name="test"]')
-        ).not.toStrictEqual(null)
+                .getAttribute('data-name')
+        ).toStrictEqual('test')
     })
 })
 // endregion
