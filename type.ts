@@ -126,7 +126,7 @@ export type DataTransformSpecification<Type = any> = {
     ) => null|Type
     type?:NativeInputType
 }
-export type Properties<Type = any> =
+export type BaseProperties<Type = any> =
     BaseModel<Type> &
     ModelState &
     {
@@ -139,7 +139,6 @@ export type Properties<Type = any> =
         model:Model<Type>
         name:string
         onBlur:(event:GenericEvent) => void
-        onChange:(properties:Properties<Type>, event?:GenericEvent) => void
         onChangeShowDeclaration:(show:boolean, event?:GenericEvent) => void
         onChangeState:(state:ModelState, event?:GenericEvent) => void
         onChangeValue:(value:null|Type, event?:GenericEvent) => void
@@ -155,12 +154,23 @@ export type Properties<Type = any> =
         themeConfiguration:ThemeProviderProps['options']
         tooltip:string|TooltipProps
     }
-export type Props<Type = any> =
-    Partial<Omit<Properties<Type>, 'model'>> &
+export type Properties<
+    Type = any,
+    ExternalProperties extends BaseProperties<Type> = BaseProperties<Type>
+> =
+    BaseProperties<Type> &
+    {onChange:(properties:ExternalProperties, event?:GenericEvent) => void}
+export type BaseProps<Type = any> =
+    Partial<Omit<BaseProperties<Type>, 'model'>> &
+    {model?:Partial<Model<Type>>}
+export type Props<
+    Type = any,
+    ExternalProperties extends BaseProperties<Type> = BaseProperties<Type>
+> =
+    Partial<Omit<Properties<Type, ExternalProperties>, 'model'>> &
     {model?:Partial<Model<Type>>}
 export type DefaultProperties<Type = any> =
-    Omit<Props<Type>, 'model'> &
-    {model:Model<Type>}
+    Omit<Props<Type>, 'model'> & {model:Model<Type>}
 export type State<Type = any> = {
     modelState:ModelState
     showDeclaration:boolean
@@ -172,12 +182,10 @@ export interface StaticWebComponent<P = Props> extends StaticBaseWebComponent {
     defaultProperties:P
     strict:boolean
 }
-export type StaticComponent<Type = any> =
-    Omit<ComponentClass<Props<Type>>, 'propTypes'> &
-    StaticWebComponent<Type>
-export type StaticFunctionComponent<Type = any> =
-    Omit<FunctionComponent<Props<Type>>, 'propTypes'> &
-    StaticComponent<Type>
+export type StaticComponent<P = Props> =
+    Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<P>
+export type StaticFunctionComponent<P = Props> =
+    Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P>
 export type ValueState<Type = any, MS = ModelState> = {
     modelState:MS
     representation?:string
@@ -312,21 +320,17 @@ export const defaultProperties:DefaultProperties = {
 // // endregion
 // / endregion
 // / region checkbox
+export type AdditionalCheckboxProperties = {checked:boolean;id:string}
 export type CheckboxProperties =
-    Omit<Properties<boolean>, 'onChange'> &
-    {
-        checked:boolean
-        id:string
-        onChange:(properties:CheckboxProperties, event?:GenericEvent) => void
-    }
+    Properties<boolean, Properties<boolean> & AdditionalCheckboxProperties> &
+    AdditionalCheckboxProperties
 export type CheckboxModel = Model<boolean>
 export type CheckboxModelState = ModelState
 export type CheckboxProps =
     Partial<Omit<CheckboxProperties, 'model'>> &
     {model?:Partial<CheckboxModel>}
 export type DefaultCheckboxProperties<Type = any> =
-    Omit<CheckboxProps, 'model'> &
-    {model:CheckboxModel}
+    Omit<CheckboxProps, 'model'> & {model:CheckboxModel}
 export type CheckboxState = State<boolean>
 export type CheckboxAdapter<Type = any> =
     WebComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
@@ -370,8 +374,7 @@ export type InputModel<Type = any> =
     {state:InputModelState}
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export type InputProperties<Type = any> =
-    Omit<Properties<Type>, 'onChange'> &
+export type AdditionalInputProperties<Type> =
     InputModelState &
     {
         align:'end'|'start'
@@ -395,8 +398,6 @@ export type InputProperties<Type = any> =
         minimumLengthText:string
         minimumText:string
         model:InputModel<Type>
-        onChange:(properties:InputProperties<Type>, event?:GenericEvent) =>
-            void
         onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void
         onKeyDown:(event:KeyboardEvent) => void
         onKeyUp:(event:KeyboardEvent) => void
@@ -412,6 +413,9 @@ export type InputProperties<Type = any> =
         trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
         transformer:RecursivePartial<DataTransformSpecification<Type>>
     }
+export type InputProperties<Type = any> =
+    Properties<Type, Properties<Type> & AdditionalInputProperties<Type>> &
+    AdditionalInputProperties<Type>
 export type InputProps<Type = any> =
     Partial<Omit<InputProperties<Type>, 'model'>> &
     {model?:Partial<InputModel<Type>>}
@@ -455,10 +459,12 @@ export type InputDataTransformation<Type = any> =
         }
         time:DataTransformSpecification<Type>
     }
-export interface StaticWebInputComponent<Type = any> extends StaticWebComponent<InputProps<Type>> {
+export interface StaticWebInputComponent<
+    P extends InputProps = InputProps
+> extends StaticWebComponent<P> {
     defaultModelState:InputModelState
     locales:Array<string>
-    transformer:InputDataTransformation<Type>
+    transformer:InputDataTransformation<P['value']>
 }
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
 export type InputAdapter<Type = any> = WebComponentAdapter<
@@ -478,9 +484,8 @@ export type InputAdapterWithReferences<Type = any> = InputAdapter<Type> & {
         richTextEditorReference?:RichTextEditorComponent
     }
 }
-export type StaticFunctionInputComponent<Type = any> =
-    Omit<FunctionComponent<Props<Type>>, 'propTypes'> &
-    StaticWebInputComponent<Type>
+export type StaticFunctionInputComponent<P = Props> =
+    Omit<FunctionComponent<P>, 'propTypes'> & StaticWebInputComponent<P>
 // // region constants
 export const inputModelStatePropertyTypes:{
     [key in keyof InputModelState]:Requireable<boolean|symbol>
@@ -591,22 +596,41 @@ export const defaultInputProperties:DefaultInputProperties = {
 // / endregion
 // / region interval
 export type IntervalValue = {
-    end:null|number
-    start:null|number
+    end?:null|number
+    start?:null|number
+}
+export type IntervalModel = {end:InputModel<number>;start:InputModel<number>}
+export type AdditionalIntervalProperties = {
+    end:InputProperties<number>
+    icon:IconOptions
+    model:IntervalModel
+    start:InputProperties<number>
+    value:IntervalValue|null
 }
 export type IntervalProperties =
-    Omit<InputProperties<number>, 'onChange'|'onChangeValue'|'value'> &
+    Omit<
+        InputProperties<number>,
+        'icon'|'model'|'onChange'|'onChangeValue'|'value'
+    > &
+    AdditionalIntervalProperties &
     {
-        end:InputProperties<number>
-        start:InputProperties<number>
-        value:IntervalValue
+        onChange:(
+            properties:AdditionalIntervalProperties, event?:GenericEvent
+        ) => void
+        onChangeValue:(value:null|IntervalValue, event?:GenericEvent) => void
     }
 export type IntervalProps =
-    Omit<InputProps<number>, 'onChange'|'onChangeValue'|'value'> &
+    Omit<
+        InputProps<number>, 'icon'|'model'|'onChange'|'onChangeValue'|'value'
+    > &
     Partial<{
         end:InputProps<number>
+        icon:IntervalProperties['icon']
+        model:IntervalProperties['model']
+        onChange:IntervalProperties['onChange']
+        onChangeValue:IntervalProperties['onChangeValue']
         start:InputProps<number>
-        value:IntervalValue
+        value:IntervalValue|null
     }>
 export type IntervalPropertyTypes<Type = any> = {
     [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
@@ -621,9 +645,20 @@ export type IntervalAdapterWithReferences = IntervalAdapter & {
 }
 // // region constants
 export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+    ...propertyTypes,
     end: shape<any>(inputPropertyTypes),
     start: shape<any>(inputPropertyTypes)
 } as const
+export const defaultIntervalProperties:IntervalProps = {
+    end: {description: 'End'},
+    icon: {icon: 'timelapse'},
+    maximumText: 'Please provide somthing earlier than ${formatValue(maximum)}.',
+    minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
+    requiredText: 'Please provide a range.',
+    start: {description: 'Start'},
+    type: 'time'
+} as const
+// // endregion
 // // endregion
 // / endregion
 export type ConfigurationProperties = {

@@ -34,8 +34,13 @@ import {
 import GenericInput from './GenericInput'
 import styles from './Interval.module'
 import WrapConfigurations from './WrapConfigurations'
-import {createDummyStateSetter, translateKnownSymbols} from '../helper'
 import {
+    createDummyStateSetter, translateKnownSymbols, triggerCallbackIfExists
+} from '../helper'
+import {
+    defaultIntervalProperties as defaultProperties,
+    GenericEvent,
+    InputModel,
     InputProps,
     InputProperties,
     InputAdapterWithReferences,
@@ -73,8 +78,12 @@ export const IntervalInner = ((
     )
 
     const endProperties:InputProps<number> = properties.end!
-    const iconProperties:IconOptions|string|undefined = properties.icon
+    const iconProperties:IconOptions = typeof properties.icon === 'string' ?
+        {icon: properties.icon} :
+        properties.icon!
     const startProperties:InputProps<number> = properties.start!
+
+    const model = properties.model
     const onChange:Function|undefined = properties.onChange
     const onChangeValue:Function|undefined = properties.onChangeValue
 
@@ -85,7 +94,8 @@ export const IntervalInner = ((
     const controlled:boolean =
         !properties.enforceUncontrolled &&
         (
-            givenProps.model?.value !== undefined ||
+            givenProps.model?.end?.value !== undefined ||
+            givenProps.model?.start?.value !== undefined ||
             givenProps.value !== undefined
         ) &&
         Boolean(onChange || onChangeValue)
@@ -93,57 +103,86 @@ export const IntervalInner = ((
     let [value, setValue] = useState<Value>({
         end:
             endProperties.value ??
+            model?.end?.value ??
             endProperties.default ??
-            endProperties.model?.default ??
+            model?.end?.default ??
             null,
         start:
             startProperties.value ??
+            model?.end?.value ??
             startProperties.default ??
-            startProperties.model?.default ??
+            model?.start?.default ??
             null,
     })
-    properties.value = properties.value ?? value
+    if (!properties.value)
+        properties.value = value
+    const propertiesToForward:InputProps<number> =
+        Tools.mask<InputProps<number>>(
+            properties as InputProps<number>,
+            {exclude: {
+                enforceUncontrolled: true,
+                end: true,
+                icon: true,
+                start: true,
+                model: true,
+                onChange: true,
+                onChangeValue: true,
+                value: true
+            }}
+        )
 
-    delete properties.enforceUncontrolled
+    Tools.extend(
+        true,
+        endProperties,
+        model?.end ? {model: model.end} : {},
+        propertiesToForward)
+    Tools.extend(
+        true,
+        startProperties,
+        model?.start ? {model: model.start} : {},
+        propertiesToForward
+    )
 
-    delete properties.end
-    delete properties.icon
-    delete properties.start
+    if (!endProperties.className)
+        endProperties.className = `${styles.interval}__end`
+    if (!iconProperties.className)
+        iconProperties.className = `${styles.interval}__icon`
+    if (!startProperties.className)
+        startProperties.className = `${styles.interval}__start`
 
-    delete properties.onChange
-    delete properties.onChangeValue
-
-    Tools.extend(true, endProperties, properties)
-    Tools.extend(true, startProperties, properties)
+    const endConfiguration = {...endProperties.model, ...endProperties}
+    const startConfiguration = {...startProperties.model, ...startProperties}
 
     startProperties.maximum = Math.min(
-        typeof startProperties.maximum === 'number' ?
-            startProperties.maximum :
+        typeof startConfiguration.maximum === 'number' ?
+            startConfiguration.maximum :
             Infinity,
-        endProperties.value || Infinity,
-        typeof endProperties.maximum === 'number' ?
-            endProperties.maximum :
+        properties.value.end || Infinity,
+        typeof endConfiguration.maximum === 'number' ?
+            endConfiguration.maximum :
             Infinity
     )
-    startProperties.minimum = startProperties.minimum || -Infinity
+    startProperties.minimum = startConfiguration.minimum || -Infinity
     startProperties.value = properties.value.start
 
-    endProperties.maximum = typeof endProperties.maximum === 'number' ?
-        endProperties.maximum :
+    endProperties.maximum = typeof endConfiguration.maximum === 'number' ?
+        endConfiguration.maximum :
         Infinity
     endProperties.minimum = Math.max(
-        typeof endProperties.minimum === 'number' ?
-            endProperties.minimum :
+        typeof endConfiguration.minimum === 'number' ?
+            endConfiguration.minimum :
             -Infinity,
-        startProperties.value || -Infinity,
-        typeof startProperties.minimum === 'number' ?
-            startProperties.minimum :
+        properties.value.start || -Infinity,
+        typeof startConfiguration.minimum === 'number' ?
+            startConfiguration.minimum :
             -Infinity
     )
     endProperties.value = properties.value.end
 
-    const endInputReference = createRef<InputAdapterWithReferences<number>>()
-    const startInputReference = createRef<InputAdapterWithReferences<number>>()
+    const endInputReference:RefObject<InputAdapterWithReferences<number>> =
+        createRef<InputAdapterWithReferences<number>>()
+    const startInputReference:RefObject<InputAdapterWithReferences<number>> =
+        createRef<InputAdapterWithReferences<number>>()
 
     if (controlled)
         /*
@@ -157,91 +196,125 @@ export const IntervalInner = ((
         ():AdapterWithReferences => ({
             properties: properties as Properties,
             references: {end: endInputReference, start: startInputReference},
-            state: {
-                ...(controlled ? {} : {value: properties.value as null|Value})
-            }
+            state: controlled ? {} : {value: properties.value}
         })
     )
     // region attach event handler
     if (onChange) {
-        endProperties.onChange = (inputProperties:InputProperties<number>):void => {
+        endProperties.onChange = (
+            inputProperties:InputProperties<number>, event?:GenericEvent
+        ):void => {
             const startValue:number = Math.min(
                 endInputReference.current?.properties?.value ?? Infinity,
                 inputProperties.value ?? Infinity
             )
+            const startModel:InputModel<number> = {
+                ...(
+                    startInputReference.current?.properties?.model ||
+                    {} as unknown as InputModel<number>
+                ),
+                value: startValue
+            }
 
-            const properties = {
+            const externalProperties:Properties = {
+                ...properties as Properties,
                 end: inputProperties,
-                value: {
-                    end: inputProperties.value,
-                    start: startValue
-                },
+                icon: iconProperties,
+                model: {end: inputProperties.model, start: startModel},
+                value: {end: inputProperties.value, start: startValue},
                 start: {
-                    ...(startInputReference.current?.properties || {}),
-                    model: {
-                        ...(
-                            startInputReference.current?.properties?.model || {}
-                        ),
-                        value: startValue
-                    },
+                    ...(
+                        startInputReference.current?.properties ||
+                        startProperties as unknown as InputProperties<number>
+                    ),
+                    model: startModel,
                     value: startValue
                 }
             }
-            properties.model = {
-                end: properties.end.model, start: properties.start.model
-            }
-            onChange(properties)
+            triggerCallbackIfExists<Properties>(
+                properties as Properties,
+                'change',
+                controlled,
+                externalProperties,
+                event
+            )
         }
-        startProperties.onChange = (inputProperties:InputProperties<number>):void => {
+        startProperties.onChange = (
+            inputProperties:InputProperties<number>, event?:GenericEvent
+        ):void => {
             const endValue:number = Math.max(
                 endInputReference.current?.properties?.value ?? -Infinity,
                 inputProperties.value ?? -Infinity
             )
+            const endModel:InputModel<number> = {
+                ...(
+                    endInputReference.current?.properties?.model ||
+                    {} as unknown as InputModel<number>
+                ),
+                value: endValue
+            }
 
-            const properties = {
+            const externalProperties:Properties = {
+                ...properties as Properties,
                 end: {
-                    ...(endInputReference.current?.properties || {}),
-                    model: {
-                        ...(
-                            endInputReference.current?.properties?.model || {}
-                        ),
-                        value: endValue
-                    },
+                    ...(
+                        endInputReference.current?.properties ||
+                        endProperties as unknown as InputProperties<number>
+                    ),
+                    model: endModel,
                     value: endValue
                 },
-                value: {
-                    end: endValue,
-                    start: inputProperties.value
-                },
+                icon: iconProperties,
+                model: {end: endModel, start: inputProperties.model},
+                value: {end: endValue, start: inputProperties.value},
                 start: inputProperties
             }
-            properties.model = {
-                end: properties.end.model, start: properties.start.model
-            }
-            onChange(properties)
+            triggerCallbackIfExists<Properties>(
+                properties as Properties,
+                'change',
+                controlled,
+                externalProperties,
+                event
+            )
         }
     }
 
-    endProperties.onChangeValue = (value:number):void => {
+    endProperties.onChangeValue = (
+        value:null|number, event?:GenericEvent
+    ):void => {
+        const startValue:number = Math.min(
+            startInputReference.current?.properties?.value ?? Infinity,
+            value ?? Infinity
+        )
         const newValue = {
-            end: value,
-            start: Math.min(
-                startInputReference.current?.properties?.value ?? Infinity,
-                value
-            )
+            end: value, start: isFinite(startValue) ? startValue : value
         }
-        onChangeValue && onChangeValue(newValue)
+        triggerCallbackIfExists<Properties>(
+            properties as Properties,
+            'changeValue',
+            controlled,
+            newValue,
+            event
+        )
         setValue(newValue)
     }
-    startProperties.onChangeValue = (value:number):void => {
+    startProperties.onChangeValue = (
+        value:null|number, event?:GenericEvent
+    ):void => {
+        const endValue:number = Math.max(
+            endInputReference.current?.properties?.value ?? -Infinity,
+            value ?? -Infinity
+        )
         const newValue = {
-            end: Math.max(
-                endInputReference.current?.properties?.value ?? -Infinity,
-                value
-            ),
-            start: value
+            end: isFinite(endValue) ? endValue : value, start: value
         }
-        onChangeValue && onChangeValue(newValue)
+        triggerCallbackIfExists<Properties>(
+            properties as Properties,
+            'changeValue',
+            controlled,
+            newValue,
+            event
+        )
         setValue(newValue)
     }
     // endregion
@@ -253,9 +326,11 @@ export const IntervalInner = ((
             styles.interval +
             (properties.className ? ` ${properties.className}` : '')
         }>
-            <GenericInput {...startProperties} ref={startInputReference} />
+            <GenericInput
+                {...startProperties} ref={startInputReference as any}
+            />
             <Icon icon={iconProperties} />
-            <GenericInput {...endProperties} ref={endInputReference} />
+            <GenericInput {...endProperties} ref={endInputReference as any} />
         </div>
     </WrapConfigurations>
 }) as ForwardRefRenderFunction<Adapter, Props>
@@ -273,28 +348,14 @@ IntervalInner.displayName = 'Interval'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Interval:StaticComponent =
-    memorize(forwardRef(IntervalInner)) as unknown as StaticComponent
-// region static properties
+export const Interval:StaticComponent<Props> =
+    memorize(forwardRef(IntervalInner)) as unknown as StaticComponent<Props>
+// region static  properties
 // / region web-component hints
 Interval.wrapped = IntervalInner
 Interval.webComponentAdapterWrapped = 'react'
 // / endregion
-Interval.defaultProperties = {
-    end: {
-        className: `${styles.interval}__end`,
-        description: 'End'
-    },
-    enforceUncontrolled: false,
-    icon: {className: `${styles.interval}__icon`, icon: 'timelapse'},
-    maximumText: 'Please provide somthing earlier than ${formatValue(maximum)}.',
-    minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
-    start: {
-        className: `${styles.interval}__start`,
-        description: 'Start'
-    },
-    type: 'time'
-}
+Interval.defaultProperties = defaultProperties
 Interval.propTypes = propertyTypes
 Interval.strict = false
 // endregion
