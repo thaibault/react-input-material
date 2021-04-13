@@ -46,11 +46,15 @@ describe('Interval', ():void => {
         expect((render(<Interval/>) as HTMLElement).getAttribute('class'))
             .toStrictEqual('interval')
 
-        expect(
-            (render(<Interval/>) as HTMLElement)
-                .querySelector('input')!
-                .getAttribute('class')
-        ).toStrictEqual('interval__input')
+        expect((render(<Interval/>) as HTMLElement)
+            .querySelectorAll('.interval__end')
+        ).toBeDefined()
+        expect((render(<Interval/>) as HTMLElement)
+            .querySelectorAll('.interval__icon')
+        ).toBeDefined()
+        expect((render(<Interval/>) as HTMLElement)
+            .querySelectorAll('.interval__start')
+        ).toBeDefined()
 
         expect(
             (render(<Interval name="test"/>) as HTMLElement)
