@@ -27,12 +27,12 @@ import {
 } from './index'
 import {useMemorizedValue} from './helper'
 import {InputProperties, IntervalValue, Properties, Model} from './type'
-// endregion
+// endregion 
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 
 const Application:FunctionComponent<{}> = ():ReactElement => {
-    const [selectedState, setSelectedState] = useState<Model>()
+    const [selectedState, setSelectedState] = useState<unknown>()
     const onChange:((properties:{model:unknown}) => void) = useMemorizedValue<
         (properties:{model:unknown}) => void
     >(({model}):void => setSelectedState(model))
@@ -55,11 +55,12 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     const onChangeValue2 =
         useMemorizedValue<(value:FloatValueState) => void>(setValue2)
 
-    const [value3, setValue3] = useState<IntervalValue>({end: 120, start: 60})
+    const [value3, setValue3] =
+        useState<IntervalValue|null>({end: 120, start: 60})
     const onChangeValue3 =
         useMemorizedValue<(value:IntervalValue|null) => void>(setValue3)
 
-    const [value4, setValue4] = useState<boolean>(false)
+    const [value4, setValue4] = useState<boolean|null>(false)
     const onChangeValue4 =
         useMemorizedValue<(value:boolean|null) => void>(setValue4)
     // endregion

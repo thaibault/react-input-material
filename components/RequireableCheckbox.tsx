@@ -388,7 +388,7 @@ export const RequireableCheckboxInner = function(
 
     const initialValue:boolean|null = determineInitialValue<boolean>(
         givenProps,
-        RequireableCheckbox.defaultProperties.model.default,
+        RequireableCheckbox.defaultProperties.model!.default,
         givenProps.checked
     )
     /*

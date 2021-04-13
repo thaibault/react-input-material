@@ -19,6 +19,7 @@ import {Mapping} from 'clientnode/type'
 import React from 'react'
 import {SelectProps} from '@rmwc/select'
 
+import Interval from './components/Interval'
 import GenericAnimate from './components/GenericAnimate'
 import GenericInput, {normalizeSelection} from './components/GenericInput'
 import RequireableCheckbox from './components/RequireableCheckbox'
@@ -33,6 +34,31 @@ import {TestEnvironment} from './type'
 const testEnvironment:TestEnvironment =
     prepareTestEnvironment(beforeEach, afterEach)
 const {render} = testEnvironment
+// region Interval
+describe('Interval', ():void => {
+    test('render', ():void => {
+        expect(render(<Interval/>)).toBeDefined()
+
+        expect(Array.from(
+            (render(<Interval/>) as HTMLElement).querySelectorAll('input')
+        )).toHaveLength(2)
+
+        expect((render(<Interval/>) as HTMLElement).getAttribute('class'))
+            .toStrictEqual('interval')
+
+        expect(
+            (render(<Interval/>) as HTMLElement)
+                .querySelector('input')!
+                .getAttribute('class')
+        ).toStrictEqual('interval__input')
+
+        expect(
+            (render(<Interval name="test"/>) as HTMLElement)
+                .querySelector('[name="test"]')
+        ).not.toStrictEqual(null)
+    })
+})
+// endregion
 // region helper
 describe('helper', ():void => {
     test('determineInitialValue', ():void => {

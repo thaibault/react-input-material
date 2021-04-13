@@ -126,7 +126,7 @@ export type DataTransformSpecification<Type = any> = {
     ) => null|Type
     type?:NativeInputType
 }
-export type BaseProperties<Type> =
+export type BaseProperties<Type = any> =
     BaseModel<Type> &
     ModelState &
     {
@@ -605,7 +605,7 @@ export type AdditionalIntervalProperties = {
     icon:IconOptions
     model:IntervalModel
     start:InputProperties<number>
-    value:IntervalValue
+    value:IntervalValue|null
 }
 export type IntervalProperties =
     Omit<
@@ -630,7 +630,7 @@ export type IntervalProps =
         onChange:IntervalProperties['onChange']
         onChangeValue:IntervalProperties['onChangeValue']
         start:InputProps<number>
-        value:IntervalValue
+        value:IntervalValue|null
     }>
 export type IntervalPropertyTypes<Type = any> = {
     [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
@@ -650,7 +650,6 @@ export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     start: shape<any>(inputPropertyTypes)
 } as const
 export const defaultIntervalProperties:IntervalProps = {
-    ...defaultProperties,
     end: {description: 'End'},
     icon: {icon: 'timelapse'},
     maximumText: 'Please provide somthing earlier than ${formatValue(maximum)}.',

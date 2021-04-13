@@ -34,8 +34,7 @@ import {
     InputDataTransformation,
     InputProperties,
     Model,
-    ModelState,
-    TestEnvironment
+    ModelState
 } from './type'
 // endregion
 /**
@@ -66,7 +65,9 @@ export const createDummyStateSetter = <Type = any>(
  *
  * @returns Nothing.
  */
-export const triggerCallbackIfExists = <P extends BaseProperties>(
+export const triggerCallbackIfExists = <
+    P extends Omit<BaseProperties, 'model'> & {model:unknown}
+>(
     properties:P,
     name:string,
     synchronous:boolean = true,
@@ -76,10 +77,10 @@ export const triggerCallbackIfExists = <P extends BaseProperties>(
 
     if (properties[name as keyof P])
         if (synchronous)
-            (properties[name as keyof P] as Function)(...parameters)
+            (properties[name as keyof P] as unknown as Function)(...parameters)
         else
             Tools.timeout(() =>
-                (properties[name as keyof P] as Function)(...parameters)
+                (properties[name as keyof P] as unknown as Function)(...parameters)
             )
 }
 // region consolidation state
@@ -250,7 +251,7 @@ export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
  * @returns External properties object.
  */
 export const getConsolidatedProperties = <
-    P extends BaseProps, R extends Properties
+    P extends BaseProps, R extends BaseProperties
 >(properties:P):R => {
     type Result = R & {
         mutable?:boolean

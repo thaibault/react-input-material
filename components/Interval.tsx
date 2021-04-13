@@ -38,7 +38,6 @@ import {
     createDummyStateSetter, translateKnownSymbols, triggerCallbackIfExists
 } from '../helper'
 import {
-    AdditionalIntervalProperties as AdditionalProperties,
     defaultIntervalProperties as defaultProperties,
     GenericEvent,
     InputModel,
@@ -115,21 +114,23 @@ export const IntervalInner = ((
             model?.start?.default ??
             null,
     })
-    value = properties.value ?? value
+    if (!properties.value)
+        properties.value = value
 
-    delete properties.enforceUncontrolled
-
-    delete properties.end
-    delete properties.icon
-    delete properties.start
-
-    delete properties.model
-    delete properties.onChange
-    delete properties.onChangeValue
-    delete properties.value
-
-    // TODO
-    const propertiesToForward = Tools.mask(properties, {})
+    const propertiesToForward:InputProps<number> =
+        Tools.mask<InputProps<number>>(
+            properties as InputProps<number>,
+            {exclude: {
+                enforceUncontrolled: true,
+                end: true,
+                icon: true,
+                start: true,
+                model: true,
+                onChange: true,
+                onChangeValue: true,
+                value: true
+            }}
+        )
     Tools.extend(true, endProperties, {model: model?.end}, propertiesToForward)
     Tools.extend(
         true, startProperties, {model: model?.start}, propertiesToForward
@@ -149,13 +150,13 @@ export const IntervalInner = ((
         typeof startConfiguration.maximum === 'number' ?
             startConfiguration.maximum :
             Infinity,
-        value.end || Infinity,
+        properties.value.end || Infinity,
         typeof endConfiguration.maximum === 'number' ?
             endConfiguration.maximum :
             Infinity
     )
     startProperties.minimum = startConfiguration.minimum || -Infinity
-    startProperties.value = value.start
+    startProperties.value = properties.value.start
 
     endProperties.maximum = typeof endConfiguration.maximum === 'number' ?
         endConfiguration.maximum :
@@ -164,32 +165,33 @@ export const IntervalInner = ((
         typeof endConfiguration.minimum === 'number' ?
             endConfiguration.minimum :
             -Infinity,
-        value.start || -Infinity,
+        properties.value.start || -Infinity,
         typeof startConfiguration.minimum === 'number' ?
             startConfiguration.minimum :
             -Infinity
     )
-    endProperties.value = value.end
+    endProperties.value = properties.value.end
 
-    const endInputReference = createRef<InputAdapterWithReferences<number>>()
-    const startInputReference = createRef<InputAdapterWithReferences<number>>()
+    const endInputReference:RefObject<InputAdapterWithReferences<number>> =
+        createRef<InputAdapterWithReferences<number>>()
+    const startInputReference:RefObject<InputAdapterWithReferences<number>> =
+        createRef<InputAdapterWithReferences<number>>()
 
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValue = createDummyStateSetter<Value>(value)
+        setValue = createDummyStateSetter<Value>(properties.value)
     // endregion
     useImperativeHandle(
         reference,
         ():AdapterWithReferences => ({
             properties: properties as Properties,
             references: {end: endInputReference, start: startInputReference},
-            state: controlled ? {} : {value}
+            state: controlled ? {} : {value: properties.value}
         })
     )
-    // TODO callback where already deleted so trigger helper is useless!
     // region attach event handler
     if (onChange) {
         endProperties.onChange = (
@@ -207,7 +209,8 @@ export const IntervalInner = ((
                 value: startValue
             }
 
-            const properties:AdditionalProperties = {
+            const externalProperties:Properties = {
+                ...properties as Properties,
                 end: inputProperties,
                 icon: iconProperties,
                 model: {end: inputProperties.model, start: startModel},
@@ -221,8 +224,12 @@ export const IntervalInner = ((
                     value: startValue
                 }
             }
-            triggerCallbackIfExists<AdditionalProperties>(
-                properties, 'change', controlled, properties, event
+            triggerCallbackIfExists<Properties>(
+                properties as Properties,
+                'change',
+                controlled,
+                externalProperties,
+                event
             )
         }
         startProperties.onChange = (
@@ -240,7 +247,8 @@ export const IntervalInner = ((
                 value: endValue
             }
 
-            const properties:AdditionalProperties = {
+            const externalProperties:Properties = {
+                ...properties as Properties,
                 end: {
                     ...(
                         endInputReference.current?.properties ||
@@ -254,8 +262,12 @@ export const IntervalInner = ((
                 value: {end: endValue, start: inputProperties.value},
                 start: inputProperties
             }
-            triggerCallbackIfExists<AdditionalProperties>(
-                properties, 'change', controlled, properties, event
+            triggerCallbackIfExists<Properties>(
+                properties as Properties,
+                'change',
+                controlled,
+                externalProperties,
+                event
             )
         }
     }
@@ -271,7 +283,11 @@ export const IntervalInner = ((
             end: value, start: isFinite(startValue) ? startValue : value
         }
         triggerCallbackIfExists<Properties>(
-            properties, 'changeValue', controlled, newValue, event
+            properties as Properties,
+            'changeValue',
+            controlled,
+            newValue,
+            event
         )
         setValue(newValue)
     }
@@ -286,7 +302,11 @@ export const IntervalInner = ((
             end: isFinite(endValue) ? endValue : value, start: value
         }
         triggerCallbackIfExists<Properties>(
-            properties, 'changeValue', controlled, newValue, event
+            properties as Properties,
+            'changeValue',
+            controlled,
+            newValue,
+            event
         )
         setValue(newValue)
     }
@@ -299,9 +319,11 @@ export const IntervalInner = ((
             styles.interval +
             (properties.className ? ` ${properties.className}` : '')
         }>
-            <GenericInput {...startProperties} ref={startInputReference} />
+            <GenericInput
+                {...startProperties} ref={startInputReference as any}
+            />
             <Icon icon={iconProperties} />
-            <GenericInput {...endProperties} ref={endInputReference} />
+            <GenericInput {...endProperties} ref={endInputReference as any} />
         </div>
     </WrapConfigurations>
 }) as ForwardRefRenderFunction<Adapter, Props>
