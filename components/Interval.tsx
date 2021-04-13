@@ -128,8 +128,12 @@ export const IntervalInner = ((
     delete properties.onChangeValue
     delete properties.value
 
-    Tools.extend(true, endProperties, {model: model?.end}, properties)
-    Tools.extend(true, startProperties, {model: model?.start}, properties)
+    // TODO
+    const propertiesToForward = Tools.mask(properties, {})
+    Tools.extend(true, endProperties, {model: model?.end}, propertiesToForward)
+    Tools.extend(
+        true, startProperties, {model: model?.start}, propertiesToForward
+    )
 
     if (!endProperties.className)
         endProperties.className = `${styles.interval}__end`
