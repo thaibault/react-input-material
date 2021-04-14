@@ -367,7 +367,6 @@ export type InputModelState =
         invalidMinimum:boolean
         invalidMinimumLength:boolean
         invalidPattern:boolean
-        invalidRequired:boolean
     }
 export type InputModel<Type = any> =
     Omit<Model<Type>, 'state'> &
@@ -599,7 +598,12 @@ export type IntervalValue = {
     end?:null|number
     start?:null|number
 }
-export type IntervalModel = {end:InputModel<number>;start:InputModel<number>}
+export type IntervalModelState = ModelState
+export type IntervalModel = {
+    end:InputModel<number>
+    start:InputModel<number>
+    state:IntervalModelState
+}
 export type AdditionalIntervalProperties = {
     end:InputProperties<number>
     icon:IconOptions
