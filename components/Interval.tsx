@@ -245,7 +245,7 @@ export const IntervalInner = ((
         endProperties.onChange = (
             inputProperties:InputProperties<number>, event?:GenericEvent
         ):void => {
-            const start =
+            const start:InputProperties<number> =
                 startInputReference.current?.properties ||
                 startProperties as unknown as InputProperties<number>
             start.value = Math.min(
@@ -264,7 +264,7 @@ export const IntervalInner = ((
         startProperties.onChange = (
             inputProperties:InputProperties<number>, event?:GenericEvent
         ):void => {
-            const end =
+            const end:InputProperties<number> =
                 endInputReference.current?.properties ||
                 endProperties as unknown as InputProperties<number>
             end.value = Math.max(
