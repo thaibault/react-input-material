@@ -42,11 +42,11 @@ import {WrapConfigurations} from './WrapConfigurations'
 import {
     determineInitialValue,
     determineValidationState as determineBaseValidationState,
-    createDummyStateSetter,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
     translateKnownSymbols,
-    triggerCallbackIfExists
+    triggerCallbackIfExists,
+    wrapStateSetter
 } from '../helper'
 import {
     CheckboxAdapter as Adapter,
@@ -428,21 +428,20 @@ export const RequireableCheckboxInner = function(
         modelState: properties.model.state,
         value: properties.value as boolean|null
     }
-    if (controlled)
-        /*
-            NOTE: We act as a controlled component by overwriting internal
-            state setter.
-        */
-        setValueState =
-            createDummyStateSetter<ValueState<boolean, ModelState>>(
-                currentValueState
-            )
+    /*
+        NOTE: If value is controlled only trigger/save state changes when model
+        state has changed.
+    */
     if (!(
         !controlled &&
-        properties.value === valueState.value &&
+        properties.value === valueState.value ||
         Tools.equals(properties.model.state, valueState.modelState)
     ))
         setValueState(currentValueState)
+    if (controlled)
+        setValueState = wrapStateSetter<ValueState<Type, ModelState>>(
+            setValueState, currentValueState
+        )
     // endregion
     useImperativeHandle(
         reference,
