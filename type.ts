@@ -603,6 +603,7 @@ export type IntervalModel = {
     end:InputModel<number>
     start:InputModel<number>
     state:IntervalModelState
+    value:IntervalValue
 }
 export type AdditionalIntervalProperties = {
     end:InputProperties<number>

@@ -297,7 +297,7 @@ export const InputsInner = ((
     }
     // endregion
     return <WrapConfigurations
-        strict={Interval.strict}
+        strict={Inputs.strict}
         themeConfiguration={properties.themeConfiguration}
     >
         <div
@@ -327,14 +327,14 @@ InputsInner.displayName = 'Inputs'
  */
 export const Inputs:StaticComponent<Props> =
     memorize(forwardRef(InputsInner)) as unknown as StaticComponent<Props>
-// region static  properties 
+// region static properties 
 // / region web-component hints
-Interval.wrapped = InputsInner
-Interval.webComponentAdapterWrapped = 'react'
+Inputs.wrapped = InputsInner
+Inputs.webComponentAdapterWrapped = 'react'
 // / endregion
-Interval.defaultProperties = defaultProperties
-Interval.propTypes = propertyTypes
-Interval.strict = false
+Inputs.defaultProperties = defaultProperties
+Inputs.propTypes = propertyTypes
+Inputs.strict = false
 // endregion
 export default Inputs
 // region vim modline
