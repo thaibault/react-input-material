@@ -54,6 +54,29 @@ export const createDummyStateSetter = <Type = any>(
         callbackOrData(value)
 }
 /**
+ * Creates a hybrid a state setter wich only triggers when model state changes
+ * occur. Useful to dynamically convert a component from uncontrolled to
+ * controlled while model state should be uncontrolled either.
+ *
+ * @param value - Parameter for state setter.
+ *
+ * @returns Nothing.
+ */
+export const wrapStateSetter = <Type = any>(
+    setValueState:ReturnType<typeof useState>[1], currentValueState:Type
+):ReturnType<typeof useState>[1] => (
+    callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
+) => {
+    const result = typeof callbackOrData === 'function' ?
+        callbackOrData(currentValueState) :
+        callbackOrData
+
+    if (!Tools.equals(
+        callbackOrData.modelState, currentValueState.modelState
+    ))
+        setValueState(result)
+}
+/**
  * Triggered when a value state changes like validation or focusing.
  *
  * @param properties - Properties to search in.

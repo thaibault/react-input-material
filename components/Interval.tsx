@@ -137,7 +137,8 @@ export const IntervalInner = ((
         true,
         endProperties,
         model?.end ? {model: model.end} : {},
-        propertiesToForward)
+        propertiesToForward
+    )
     Tools.extend(
         true,
         startProperties,
@@ -223,7 +224,11 @@ export const IntervalInner = ((
             startProperties:InputProperties<number>,
             endProperties:InputProperties<number>
         ):Properties => {
-            const modelState = getModelState(startProperties, endProperties)
+            const modelState:ModelState =
+                getModelState(startProperties, endProperties)
+            const value:Value = {
+                end: endProperties.value, start: startProperties.value
+            }
 
             return {
                 ...properties as Properties,
@@ -233,12 +238,11 @@ export const IntervalInner = ((
                 model: {
                     end: endProperties.model,
                     start: startProperties.model,
-                    state: modelState
+                    state: modelState,
+                    value
                 },
                 start: startProperties,
-                value: {
-                    end: endProperties.value, start: startProperties.value
-                }
+                value
             }
         }
 
@@ -249,7 +253,7 @@ export const IntervalInner = ((
                 startInputReference.current?.properties ||
                 startProperties as unknown as InputProperties<number>
             start.value = Math.min(
-                endInputReference.current?.properties?.value ?? Infinity,
+                startInputReference.current?.properties?.value ?? Infinity,
                 inputProperties.value ?? Infinity
             )
 
@@ -292,6 +296,7 @@ export const IntervalInner = ((
         const newValue:Value = {
             end: value, start: isFinite(startValue) ? startValue : value
         }
+
         triggerCallbackIfExists<Properties>(
             properties as Properties,
             'changeValue',
@@ -299,6 +304,7 @@ export const IntervalInner = ((
             newValue,
             event
         )
+
         setValue(newValue)
     }
     startProperties.onChangeValue = (
@@ -311,6 +317,7 @@ export const IntervalInner = ((
         const newValue:Value = {
             end: isFinite(endValue) ? endValue : value, start: value
         }
+
         triggerCallbackIfExists<Properties>(
             properties as Properties,
             'changeValue',
@@ -318,6 +325,7 @@ export const IntervalInner = ((
             newValue,
             event
         )
+
         setValue(newValue)
     }
     // endregion

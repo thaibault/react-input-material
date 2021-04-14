@@ -71,7 +71,6 @@ import {
     determineInitialValue,
     determineInitialRepresentation,
     determineValidationState as determineBaseValidationState,
-    createDummyStateSetter,
     formatValue,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
@@ -79,7 +78,8 @@ import {
     transformValue,
     translateKnownSymbols,
     triggerCallbackIfExists,
-    useMemorizedValue
+    useMemorizedValue,
+    wrapStateSetter
 } from '../helper'
 import {
     CursorState,
@@ -1214,10 +1214,31 @@ export const GenericInputInner = function<Type = any>(
                 properties, properties.value, transformer
             )
 
+            if (
+                !representationControlled &&
+                oldValueState.representation === properties.representation
+            )
+                /*
+                    NOTE: No representation update and no controlled value or
+                    representation:
+
+                        -> No value update
+                        -> No state update
+                        -> Nothing to trigger
+                */
+                return oldValueState
+
             const result:ValueState<Type, ModelState> = {
                 ...oldValueState, representation: properties.representation
             }
+
             if (!controlled && oldValueState.value === properties.value)
+                /*
+                    NOTE: No value update and no controlled value:
+
+                        -> No state update
+                        -> Nothing to trigger
+                */
                 return result
 
             result.value = properties.value
@@ -1428,7 +1449,6 @@ export const GenericInputInner = function<Type = any>(
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
     */
-    // TODO What about model state when controlled?
     let [valueState, setValueState] = useState<ValueState<Type, ModelState>>(
         () => ({
             modelState: {...GenericInput.defaultModelState},
@@ -1481,21 +1501,21 @@ export const GenericInputInner = function<Type = any>(
         representation: properties.representation,
         value: properties.value!
     }
-    if (controlled)
-        /*
-            NOTE: We act as a controlled component by overwriting internal
-            state setter.
-        */
-        setValueState = createDummyStateSetter<ValueState<Type, ModelState>>(
-            currentValueState
-        )
+    /*
+        NOTE: If value is controlled only trigger/save state changes when model
+        state has changed.
+    */
     if (!(
         !controlled &&
         properties.value === valueState.value &&
-        properties.representation === valueState.representation &&
+        properties.representation === valueState.representation ||
         Tools.equals(properties.model.state, valueState.modelState)
     ))
         setValueState(currentValueState)
+    if (controlled)
+        setValueState = wrapStateSetter<ValueState<Type, ModelState>>(
+            setValueState, currentValueState
+        )
     // endregion
     useImperativeHandle(
         reference,
