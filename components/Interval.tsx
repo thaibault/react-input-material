@@ -46,6 +46,7 @@ import {
     InputAdapterWithReferences,
     IntervalAdapter as Adapter,
     IntervalAdapterWithReferences as AdapterWithReferences,
+    IntervalModelState as ModelState,
     IntervalProperties as Properties,
     intervalPropertyTypes as propertyTypes,
     IntervalProps as Props,
@@ -202,33 +203,41 @@ export const IntervalInner = ((
     )
     // region attach event handler
     if (onChange) {
-        const getBaseProperties = () => {
-            const endModel = {...(
-                endInputReference.current?.properties?.model ||
-                {} as unknown as InputModel<number>
-            )}
-            const startModel = {...(
-                startInputReference.current?.properties?.model ||
-                {} as unknown as InputModel<number>
-            )}
+        const getModelState = (
+            startProperties:InputProperties<number>,
+            endProperties:InputProperties<number>
+        ):ModelState => ({
+            dirty: startProperties.dirty || endProperties.dirty,
+            focused: startProperties.focused || endProperties.focused,
+            invalid: startProperties.invalid || endProperties.invalid,
+            invalidRequired:
+                startProperties.invalidRequired ||
+                endProperties.invalidRequired,
+            pristine: startProperties.pristine && endProperties.pristine,
+            touched: startProperties.touched || endProperties.touched,
+            untouched: startProperties.untouched && endProperties.untouched,
+            valid: startProperties.valid && endProperties.valid,
+            visited: startProperties.visited || endProperties.visited
+        })
+        const getExternalProperties = (
+            startProperties:InputProperties<number>,
+            endProperties:InputProperties<number>
+        ):Properties => {
+            const modelState = getModelState(startProperties, endProperties)
 
             return {
                 ...properties as Properties,
-                end: {
-                    ...(
-                        endInputReference.current?.properties ||
-                        endProperties as unknown as InputProperties<number>
-                    ),
-                    model: endModel
-                },
+                ...modelState,
+                end: endProperties,
                 icon: iconProperties,
-                model: {end: endModel, start: startModel},
-                start: {
-                    ...(
-                        startInputReference.current?.properties ||
-                        startProperties as unknown as InputProperties<number>
-                    ),
-                    model: startModel
+                model: {
+                    end: endProperties.model,
+                    start: startProperties.model,
+                    state: modelState
+                },
+                start: startProperties,
+                value: {
+                    end: endProperties.value, start: startProperties.value
                 }
             }
         }
@@ -236,104 +245,38 @@ export const IntervalInner = ((
         endProperties.onChange = (
             inputProperties:InputProperties<number>, event?:GenericEvent
         ):void => {
-            const startValue:number = Math.min(
+            const start =
+                startInputReference.current?.properties ||
+                startProperties as unknown as InputProperties<number>
+            start.value = Math.min(
                 endInputReference.current?.properties?.value ?? Infinity,
                 inputProperties.value ?? Infinity
             )
 
-            const baseProperties = getBaseProperties()
             triggerCallbackIfExists<Properties>(
                 properties as Properties,
                 'change',
                 controlled,
-                {
-                    ...baseProperties,
-                    dirty: inputProperties.dirty || baseProperties.start.dirty,
-                    end: inputProperties,
-                    focused:
-                        inputProperties.focused ||
-                        baseProperties.start.focused,
-                    invalid:
-                        inputProperties.invalid ||
-                        baseProperties.start.invalid,
-                    invalidRequired:
-                        inputProperties.invalidRequired ||
-                        baseProperties.start.invalidRequired,
-                    model: {
-                        ...baseProperties.model, end: inputProperties.model
-                    },
-                    pristine:
-                        inputProperties.pristine &&
-                        baseProperties.start.pristine,
-                    touched:
-                        inputProperties.touched ||
-                        baseProperties.start.touched,
-                    untouched:
-                        inputProperties.untouched &&
-                        baseProperties.start.untouched,
-                    valid: inputProperties.valid && baseProperties.start.valid,
-                    value: {end: inputProperties.value, start: startValue},
-                    visited:
-                        inputProperties.visited ||
-                        baseProperties.start.visited,
-                    start: {
-                        ...baseProperties.start,
-                        model: {
-                            ...baseProperties.start.model, value: startValue
-                        },
-                        value: startValue
-                    }
-                },
+                getExternalProperties(start, inputProperties),
                 event
             )
         }
         startProperties.onChange = (
             inputProperties:InputProperties<number>, event?:GenericEvent
         ):void => {
-            const endValue:number = Math.max(
+            const end =
+                endInputReference.current?.properties ||
+                endProperties as unknown as InputProperties<number>
+            end.value = Math.max(
                 endInputReference.current?.properties?.value ?? -Infinity,
                 inputProperties.value ?? -Infinity
             )
 
-            const baseProperties = getBaseProperties()
             triggerCallbackIfExists<Properties>(
                 properties as Properties,
                 'change',
                 controlled,
-                {
-                    ...baseProperties,
-                    dirty: inputProperties.dirty || baseProperties.end.dirty,
-                    end: {
-                        ...baseProperties.end,
-                        model: {
-                            ...baseProperties.end.model, value: endValue
-                        },
-                        value: endValue
-                    },
-                    focused:
-                        inputProperties.focused || baseProperties.end.focused,
-                    invalid:
-                        inputProperties.invalid || baseProperties.end.invalid,
-                    invalidRequired:
-                        inputProperties.invalidRequired ||
-                        baseProperties.end.invalidRequired,
-                    model: {
-                        ...baseProperties.model, start: inputProperties.model
-                    },
-                    pristine:
-                        inputProperties.pristine &&
-                        baseProperties.end.pristine,
-                    touched:
-                        inputProperties.touched || baseProperties.end.touched,
-                    untouched:
-                        inputProperties.untouched &&
-                        baseProperties.end.untouched,
-                    valid: inputProperties.valid && baseProperties.end.valid,
-                    value: {end: endValue, start: inputProperties.value},
-                    visited:
-                        inputProperties.visited || baseProperties.end.visited,
-                    start: inputProperties
-                },
+                getExternalProperties(inputProperties, end),
                 event
             )
         }
@@ -346,7 +289,7 @@ export const IntervalInner = ((
             startInputReference.current?.properties?.value ?? Infinity,
             value ?? Infinity
         )
-        const newValue = {
+        const newValue:Value = {
             end: value, start: isFinite(startValue) ? startValue : value
         }
         triggerCallbackIfExists<Properties>(
@@ -365,7 +308,7 @@ export const IntervalInner = ((
             endInputReference.current?.properties?.value ?? -Infinity,
             value ?? -Infinity
         )
-        const newValue = {
+        const newValue:Value = {
             end: isFinite(endValue) ? endValue : value, start: value
         }
         triggerCallbackIfExists<Properties>(
