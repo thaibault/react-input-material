@@ -1428,6 +1428,7 @@ export const GenericInputInner = function<Type = any>(
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
     */
+    // TODO What about model state when controlled?
     let [valueState, setValueState] = useState<ValueState<Type, ModelState>>(
         () => ({
             modelState: {...GenericInput.defaultModelState},
