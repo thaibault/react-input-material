@@ -23,7 +23,7 @@ import {ReactElement} from 'react'
 import {render} from 'react-dom'
 
 import {
-    GenericAnimate, GenericInput, Interval, RequireableCheckbox
+    GenericAnimate, GenericInput, Inputs, Interval, RequireableCheckbox
 } from './index'
 import {useMemorizedValue} from './helper'
 import {InputProperties, IntervalValue, Properties, Model} from './type'
@@ -614,6 +614,17 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 showInitialValidationState
                 tooltip="Check this one!"
             />
+
+            <hr/>
+
+            <Inputs
+                name="inputs1"
+                onChange={onChange}
+                required
+                showInitialValidationState
+            >
+                <RequireableCheckbox />
+            </Inputs>
 
         </div>
 
