@@ -622,8 +622,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 required
                 showInitialValidationState
-            >
-                <RequireableCheckbox />
+            >(properties:Properties<boolean>, index:number):ReactElement =>
+                <RequireableCheckbox {...properties} key={index} />
             </Inputs>
 
         </div>

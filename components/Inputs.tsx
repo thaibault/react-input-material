@@ -306,9 +306,9 @@ export const InputsInner = ((
                 (properties.className ? ` ${properties.className}` : '')
             }
             data-name={properties.name}
-        >
-            {children}
-        </div>
+        >{properties.model.map((model, index:number):ReactElement =>
+            properties.children({model}, index)
+        )}</div>
     </WrapConfigurations>
 }) as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
