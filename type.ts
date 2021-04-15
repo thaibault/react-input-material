@@ -173,7 +173,6 @@ export type DefaultProperties<Type = any> =
     Omit<Props<Type>, 'model'> & {model:Model<Type>}
 export type State<Type = any> = {
     modelState:ModelState
-    showDeclaration:boolean
     value:null|Type
 }
 export interface StaticWebComponent<P = Props> extends StaticBaseWebComponent {
@@ -331,7 +330,7 @@ export type CheckboxProps =
     {model?:Partial<CheckboxModel>}
 export type DefaultCheckboxProperties<Type = any> =
     Omit<CheckboxProps, 'model'> & {model:CheckboxModel}
-export type CheckboxState = State<boolean>
+export type CheckboxState = State<boolean> & {showDeclaration:boolean}
 export type CheckboxAdapter<Type = any> =
     WebComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
 // // region constants
@@ -433,6 +432,7 @@ export type InputState<Type = any> =
         modelState:InputModelState
         representation?:string
         selectionIsUnstable:boolean
+        showDeclaration:boolean
     }
 export type InputDataTransformation<Type = any> =
     Mapping<RecursivePartial<DataTransformSpecification<Type>>> &
@@ -484,6 +484,137 @@ export type InputAdapterWithReferences<Type = any> = InputAdapter<Type> & {
     }
 }
 export type StaticFunctionInputComponent<P = Props> =
+    Omit<FunctionComponent<P>, 'propTypes'> & StaticWebInputComponent<P>
+// // region constants
+export const inputModelStatePropertyTypes:{
+    [key in keyof InputModelState]:Requireable<boolean|symbol>
+} = {
+    ...modelStatePropertyTypes,
+    invalidMaximum: oneOfType([boolean, symbol]),
+    invalidMaximumLength: oneOfType([boolean, symbol]),
+    invalidMinimum: oneOfType([boolean, symbol]),
+    invalidMinimumLength: oneOfType([boolean, symbol]),
+    invalidPattern: oneOfType([boolean, symbol])
+} as const
+export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+    ...propertyTypes,
+    ...modelPropertyTypes,
+    ...inputModelStatePropertyTypes,
+    /*
+        NOTE: Not yet working:
+        align: oneOf(['end', 'start']),
+    */
+    align: string,
+    cursor: oneOfType([
+        shape({
+            end: number.isRequired,
+            start: number.isRequired
+        }),
+        symbol
+    ]),
+    /*
+        NOTE: Not yet working:
+        editor: oneOf([
+            'code',
+            'code(css)',
+            'code(script)',
+            'plain',
+            'text',
+            'richtext(raw)',
+            'richtext(simple)',
+            'richtext(normal)',
+            'richtext(advanced)'
+        ]),
+    */
+    editor: string,
+    editorIsActive: oneOfType([boolean, symbol]),
+    fullWidth: boolean,
+    hidden: oneOfType([boolean, symbol]),
+    /*
+        NOTE: Not yet working:
+        icon?:string|(IconOptions & {tooltip?:string|TooltipProps})
+    */
+    icon: oneOfType([string, object]),
+    labels: oneOfType([arrayOf(string), object]),
+    maximumLengthText: string,
+    maximumText: string,
+    minimumLengthText: string,
+    minimumText: string,
+    onBlur: func,
+    onChangeEditorIsActive: func,
+    onKeyDown: func,
+    onKeyUp: func,
+    onSelectionChange: func,
+    outlined: boolean,
+    patternText: string,
+    placeholder: string,
+    representation: oneOfType([string, symbol]),
+    rows: number,
+    selectableEditor: boolean,
+    step: number,
+    trailingIcon: any,
+    transformer: object
+} as const
+export const defaultInputModelState:InputModelState = {
+    ...defaultModelState,
+    invalidMaximum: false,
+    invalidMaximumLength: false,
+    invalidMinimum: false,
+    invalidMinimumLength: false,
+    invalidPattern: false
+} as const
+export const defaultInputModel:InputModel = {
+    ...defaultModel,
+    state: defaultInputModelState
+} as const
+/*
+    NOTE: Avoid setting any properties already defined in model here since they
+    would permanently shadow them.
+*/
+export const defaultInputProperties:DefaultInputProperties = {
+    ...defaultProperties,
+    cursor: {
+        end: 0,
+        start: 0
+    },
+    editor: 'plain',
+    maximumLengthText:
+        'Please type less or equal than ${maximumLength} symbols.',
+    maximumText: 'Please type less or equal than ${formatValue(maximum)}.',
+    minimumLengthText:
+        'Please type at least or equal ${minimumLength} symbols.',
+    minimumText: 'Please type at least or equal ${formatValue(minimum)}.',
+    model: defaultInputModel,
+    patternText:
+        'Your string have to match the regular expression: "${pattern}".',
+    rows: 4,
+    selectableEditor: false,
+    step: 1
+} as const
+// // endregion
+// / endregion
+// / region inputs
+export type InputsModelState = ModelState
+export type InputsModel<Type = any> = <Model<Array<Type>>
+export type InputsProperties<Type = any> =
+    Properties<Array<Type>, Array<Properties<Type>> &
+    AdditionalInputProperties<Type>
+export type InputsProps<Type = any> =
+    Partial<Omit<InputsProperties<Type>, 'model'>> &
+    {model?:Partial<InputsModel<Type>>}
+export type DefaultInputsProperties<Type = any> =
+    Omit<InputsProps, 'model'> & {model:InputsModel}
+export type InputsPropertyTypes<Type = any> = {
+    [key in keyof InputsProperties<Type>]:ValueOf<typeof PropertyTypes>
+}
+export type InputsState<Type = any> = State<Array<Type>>
+export type InputsAdapter<Type = any> =
+    WebComponentAdapter<InputsProperties<Type>, State<Array<Type>>>
+export type InputsAdapterWithReferences<Type = any, RefType = unknown> =
+    InputsAdapter<Type> &
+    {references:Array<RefObject<RefType>>}
+// TODO
+export type StaticFunctionInputsComponent<P = Props> =
     Omit<FunctionComponent<P>, 'propTypes'> & StaticWebInputComponent<P>
 // // region constants
 export const inputModelStatePropertyTypes:{
