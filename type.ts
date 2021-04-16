@@ -628,7 +628,7 @@ export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultInputProperties:DefaultInputProperties = {
+export const defaultInputsProperties:DefaultInputProperties = {
     ...defaultProperties,
     maximumNumber:Infinity,
     minimumNumber:0

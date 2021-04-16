@@ -28,16 +28,19 @@ import {
     useImperativeHandle,
     useState
 } from 'react'
+import {WebComponentAdapter} from 'web-component-wrapper/type'
 
 import WrapConfigurations from './WrapConfigurations'
 import {
     createDummyStateSetter, translateKnownSymbols, triggerCallbackIfExists
 } from '../helper'
 import {
+    defaultInputsProperties as defaultProperties,
     GenericEvent,
-    InputsAdapter,
-    InputsModelState,
+    InputsAdapter as Adapter,
+    InputsModelState as ModelState,
     InputsProperties,
+    inputsPropertyTypes as propertyTypes,
     InputsProps,
     Properties,
     Props,
@@ -46,12 +49,61 @@ import {
 // endregion
 const propertiesListToValues = function<Type, Properties>(
     propertiesList:Array<Properties>
-):Array<Type> =>
-    propertiesList.map(({value}):Type =>
+):Array<Type> {
+    return propertiesList.map(({value}):Type =>
         typeof properties.value === undefined ?
             properties.model?.value :
             properties.value
     )
+}
+const getModelState = function<Properties>(
+    propertiesList:Array<Properties>
+):ModelState {
+    return {
+        dirty: propertiesList.some((properties:Properties):boolean =>
+            properties.dirty
+        ),
+        focused: propertiesList.some((properties:Properties):boolean =>
+            properties.focused
+        ),
+        invalid: propertiesList.some((properties:Properties):boolean =>
+            properties.invalid
+        ),
+        invalidRequired: propertiesList.some((
+            properties:Properties
+        ):boolean => properties.invalidRequired),
+        pristine: propertiesList.every((properties:Properties):boolean =>
+            properties.pristine
+        ),
+        touched: propertiesList.some((properties:Properties):boolean =>
+            properties.touched
+        ),
+        untouched: propertiesList.every((properties:Properties):boolean =>
+            properties.untouched
+        ),
+        valid: propertiesList.every((properties:Properties):boolean =>
+            properties.untouched
+        ),
+        visited: propertiesList.some((properties:Properties):boolean =>
+            properties.visited
+        )
+    }
+}
+const getExternalProperties = function<Type, Properties>(
+    propertiesList:Array<Properties>
+):InputsProperties {
+    const modelState:ModelState = getModelState<Properties>(propertiesList)
+
+    return {
+        ...properties as Properties,
+        ...modelState,
+        model: {
+            value: propertiesList.map(({model}) => model),
+            state: modelState
+        },
+        value: propertiesListToValues<Type, Properties>(propertiesList)
+    }
+}
 /**
  * Generic inputs wrapper component.
  *
@@ -65,9 +117,10 @@ const propertiesListToValues = function<Type, Properties>(
 export const InputsInner = function<
     Type = any,
     Props extends Props = Props,
-    Properties extends Properties = Properties
+    Properties extends Properties = Properties,
+    State = Mapping<any>
 >((
-    props:InputsProps<Type>, reference?:RefObject<InputsAdapter<Type>>
+    props:InputsProps<Type>, reference?:RefObject<Adapter<Type>>
 ):ReactElement => {
     // region consolidate properties
     const givenProps:InputsProps<Type> =
@@ -97,37 +150,56 @@ export const InputsInner = function<
     let [value, setValue] = useState<Array<Type>>([])
     if (!properties.value)
         properties.value = value
-    const propertiesToForward:Props =
-        Tools.mask<Props>(
-            properties as Props,
-            {exclude: {
-                enforceUncontrolled: true,
-                model: true,
-                name: true,
-                onChange: true,
-                onChangeValue: true,
-                value: true
-            }}
-        )
-
-    cons propertiesList:Array<Properties> = []
+    const references:Array<RefObject<<WebComponentAdapter<
+        Properties, State
+    >>> = []
+    const propertiesList:Array<Properties> = []
     for (let index:number = 0; index < Math.max(
-        properties.value?.length || 0, properties.model?.length || 0
-    ); index += 1)
+        properties.value?.length || 0, properties.model?.value?.length || 0
+    ); index += 1) {
+        const reference:RefObject<<WebComponentAdapter<Properties, State>> =
+            createRef<WebComponentAdapter<Properties, State>>()
+        references.push(reference)
         propertiesList.push(Tools.extend(
             true,
-            {},
-            propertiesToForward,
-            properties.model && properties.model.length > index ?
-                {model: properties.model[index]} :
+            {
+                onChange: (
+                    inputProperties:Properties, event?:GenericEvent
+                ):void => {
+                    propertiesList[index] = inputProperties
+                    triggerCallbackIfExists<Properties>(
+                        properties as InputsProperties,
+                        'change',
+                        controlled,
+                        getExternalProperties<Type, Properties>(
+                            propertiesList
+                        ),
+                        event
+                    )
+                },
+                onChangeValue: = (
+                    value:null|number, event?:GenericEvent
+                ):void => {
+                    values[index] = value
+                    triggerCallbackIfExists<Properties>(
+                        properties as InputsProperties,
+                        'changeValue',
+                        controlled,
+                        values,
+                        event
+                    )
+                    setValue(values)
+                },
+                ref: reference
+            },
+            properties.model?.value && properties.model.length > index ?
+                {model: properties.model.value[index]} :
                 {},
             properties.value && properties.value.length > index ?
                 {value: properties.value[index]} :
                 {}
         ))
-
-    const inputReferences:Array<RefObject<InputAdapterWithReferences<Type>>> =
-        createRef<Array<InputAdapterWithReferences<Type>>>()
+    }
 
     const values:Array<Type> =
         propertiesListToValues<Type, Properties>(propertiesList)
@@ -141,86 +213,12 @@ export const InputsInner = function<
     useImperativeHandle(
         reference,
         ():AdapterWithReferences => ({
-            properties: propertiesList,
-            references: inputReferences,
+            properties,
+            references,
             state: controlled ? {} : {value: values}
         })
     )
-    // region attach event handler
-    if (onChange) {
-        const getModelState = (
-            propertiesList:Array<Properties>
-        ):InputsModelState => ({
-            dirty: propertiesList.some((properties:Properties):boolean =>
-                properties.dirty
-            ),
-            focused: propertiesList.some((properties:Properties):boolean =>
-                properties.focused
-            ),
-            invalid: propertiesList.some((properties:Properties):boolean =>
-                properties.invalid
-            ),
-            invalidRequired: propertiesList.some((
-                properties:Properties
-            ):boolean => properties.invalidRequired),
-            pristine: propertiesList.every((properties:Properties):boolean =>
-                properties.pristine
-            ),
-            touched: propertiesList.some((properties:Properties):boolean =>
-                properties.touched
-            ),
-            untouched: propertiesList.every((properties:Properties):boolean =>
-                properties.untouched
-            ),
-            valid: propertiesList.every((properties:Properties):boolean =>
-                properties.untouched
-            ),
-            visited: propertiesList.some((properties:Properties):boolean =>
-                properties.visited
-            )
-        })
-        const getExternalProperties = (
-            propertiesList:Array<Properties>
-        ):InputsProperties => {
-            const modelState = getModelState(propertiesList)
 
-            return {
-                ...properties as Properties,
-                ...modelState,
-                model: {
-
-                    state: modelState
-                },
-                value: propertiesListToValues<Type, Properties>(propertiesList)
-            }
-        }
-
-        endProperties.onChange = (
-            properties:Properties, event?:GenericEvent
-        ):void => {
-            triggerCallbackIfExists<Properties>(
-                properties as Properties,
-                'change',
-                controlled,
-                getExternalProperties(start, inputProperties),
-                event
-            )
-        }
-    }
-
-    endProperties.onChangeValue = (
-        value:null|number, event?:GenericEvent
-    ):void => {
-        triggerCallbackIfExists<Properties>(
-            properties as Properties,
-            'changeValue',
-            controlled,
-            newValue,
-            event
-        )
-        setValue(newValue)
-    }
-    // endregion
     return <WrapConfigurations
         strict={Inputs.strict}
         themeConfiguration={properties.themeConfiguration}
@@ -239,7 +237,7 @@ export const InputsInner = function<
             )}
         </div>
     </WrapConfigurations>
-}) as ForwardRefRenderFunction<Adapter, Props>
+}) as ForwardRefRenderFunction<Adapter, InputsProps>
 // NOTE: This is useful in react dev tools.
 InputsInner.displayName = 'Inputs'
 /**
@@ -254,9 +252,11 @@ InputsInner.displayName = 'Inputs'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Inputs:StaticComponent<Props> =
-    memorize(forwardRef(InputsInner)) as unknown as StaticComponent<Props>
-// region static properties 
+export const Inputs:StaticComponent<InputsProps> =
+    memorize(forwardRef(InputsInner)) as
+        unknown as
+        StaticComponent<InputsProps>
+// region static properties
 // / region web-component hints
 Inputs.wrapped = InputsInner
 Inputs.webComponentAdapterWrapped = 'react'

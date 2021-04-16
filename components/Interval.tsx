@@ -84,9 +84,6 @@ export const IntervalInner = ((
         properties.icon!
     let startProperties:InputProps<number> = properties.start!
 
-    const onChange:Function|undefined = properties.onChange
-    const onChangeValue:Function|undefined = properties.onChangeValue
-
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
@@ -98,7 +95,7 @@ export const IntervalInner = ((
             givenProps.model?.start?.value !== undefined ||
             givenProps.value !== undefined
         ) &&
-        Boolean(onChange || onChangeValue)
+        Boolean(properties.onChange || properties.onChangeValue)
 
     let [value, setValue] = useState<Value>({
         end:
@@ -204,7 +201,7 @@ export const IntervalInner = ((
         })
     )
     // region attach event handler
-    if (onChange) {
+    if (properties.onChange) {
         const getModelState = (
             startProperties:InputProperties<number>,
             endProperties:InputProperties<number>
@@ -365,7 +362,7 @@ IntervalInner.displayName = 'Interval'
  */
 export const Interval:StaticComponent<Props> =
     memorize(forwardRef(IntervalInner)) as unknown as StaticComponent<Props>
-// region static  properties
+// region static properties
 // / region web-component hints
 Interval.wrapped = IntervalInner
 Interval.webComponentAdapterWrapped = 'react'
