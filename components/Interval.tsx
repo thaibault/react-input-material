@@ -78,11 +78,11 @@ export const IntervalInner = ((
         true, Tools.copy(Interval.defaultProperties), givenProps
     )
 
-    const endProperties:InputProps<number> = properties.end!
+    let endProperties:InputProps<number> = properties.end!
     const iconProperties:IconOptions = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
         properties.icon!
-    const startProperties:InputProps<number> = properties.start!
+    let startProperties:InputProps<number> = properties.start!
 
     const onChange:Function|undefined = properties.onChange
     const onChangeValue:Function|undefined = properties.onChangeValue
@@ -132,17 +132,19 @@ export const IntervalInner = ((
             }}
         )
 
-    Tools.extend(
+    endProperties = Tools.extend(
         true,
-        endProperties,
+        {},
+        propertiesToForward,
         properties.model?.end ? {model: properties.model.end} : {},
-        propertiesToForward
+        endProperties
     )
-    Tools.extend(
+    startProperties = Tools.extend(
         true,
-        startProperties,
+        {},
+        propertiesToForward,
         properties.model?.start ? {model: properties.model.start} : {},
-        propertiesToForward
+        startProperties
     )
 
     if (!endProperties.className)
