@@ -44,6 +44,14 @@ import {
     StaticComponent
 } from '../type'
 // endregion
+const propertiesListToValues = function<Type, Properties>(
+    propertiesList:Array<Properties>
+):Array<Type> =>
+    propertiesList.map(({value}):Type =>
+        typeof properties.value === undefined ?
+            properties.model?.value :
+            properties.value
+    )
 /**
  * Generic inputs wrapper component.
  *
@@ -121,11 +129,8 @@ export const InputsInner = function<
     const inputReferences:Array<RefObject<InputAdapterWithReferences<Type>>> =
         createRef<Array<InputAdapterWithReferences<Type>>>()
 
-    const values:Array<Type> = propertiesList.map(({value}):Type =>
-        typeof properties.value === undefined ?
-            properties.model?.value :
-            properties.value
-    )
+    const values:Array<Type> =
+        propertiesListToValues<Type, Properties>(propertiesList)
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
@@ -182,15 +187,11 @@ export const InputsInner = function<
             return {
                 ...properties as Properties,
                 ...modelState,
-                end: endProperties,
                 model: {
-                    end: endProperties.model,
-                    start: startProperties.model,
+
                     state: modelState
                 },
-                value: {
-                    end: endProperties.value, start: startProperties.value
-                }
+                value: propertiesListToValues<Type, Properties>(propertiesList)
             }
         }
 
