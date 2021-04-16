@@ -598,25 +598,35 @@ export const defaultInputProperties:DefaultInputProperties = {
 // // endregion
 // / endregion
 // / region inputs
-export type InputsModelState = ModelState
-export type InputsModel<Type = any> = Array<Model<Type>>
-export type InputsProperties<Type = any> =
-    Properties<Array<Type>, Array<Properties<Type>> &
+export type InputsModel<M = Model> = {
+    state:ModelState
+    value:Array<M>
+}
+export type AdditionalInputsProperties<P extends Properties = Properties> =
+    ModelState &
+    {
+        model:InputsModel<P['model']>
+        inputProperties:Array<P>
+        value:Array<P['value']>
+    }
+export type InputsProperties<P extends Properties = Properties> =
+    Properties<Array<P['value']>, AdditionalInputsProperties<P>> &
     {
         maximumNumber:number
         minimumNumber:number
+        inputProperties:Array<P>
     }
-export type InputsProps<Type = any> = Partial<InputsProperties<Type>>
-export type DefaultInputsProperties<Type = any> =
-    Omit<InputsProps, 'model'> & {model:InputsModel}
-export type InputsPropertyTypes<Type = any> = {
-    [key in keyof InputsProperties<Type>]:ValueOf<typeof PropertyTypes>
+export type InputsProps<P = Properties> = Partial<InputsProperties<P>>
+export type DefaultInputsProperties<P extends Properties = Properties> =
+    Omit<InputsProps<P>, 'model'> & {model:InputsModel<P['model']}
+export type InputsPropertyTypes<P = Properties> = {
+    [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
 }
 export type InputsState<Type = any> = State<Array<Type>>
-export type InputsAdapter<Type = any> =
-    WebComponentAdapter<InputsProperties<Type>, InputsState<Type>>
-export type InputsAdapterWithReferences<Type = any, RefType = unknown> =
-    InputsAdapter<Type> &
+export type InputsAdapter<P extends Properties = Properties> =
+    WebComponentAdapter<InputsProperties<P>, InputsState<P['value']>>
+export type InputsAdapterWithReferences<P = Properties, RefType = unknown> =
+    InputsAdapter<P> &
     {references:Array<RefObject<RefType>>}
 // // region constants
 export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {

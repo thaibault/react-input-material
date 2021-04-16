@@ -38,70 +38,54 @@ import {
     defaultInputsProperties as defaultProperties,
     GenericEvent,
     InputsAdapter as Adapter,
-    InputsModelState as ModelState,
+    ModelState,
+    InputsAdapterWithReferences as AdapterWithReferences,
     InputsProperties,
     inputsPropertyTypes as propertyTypes,
     InputsProps,
     Properties,
-    Props,
     StaticComponent
 } from '../type'
 // endregion
-const propertiesListToValues = function<Type, Properties>(
-    propertiesList:Array<Properties>
-):Array<Type> {
-    return propertiesList.map(({value}):Type =>
-        typeof properties.value === undefined ?
-            properties.model?.value :
-            properties.value
+const inputPropertiesToValues = function<P extends Properties>(
+    inputProperties:Array<P>
+):Array<P['value']> {
+    return inputProperties.map(({model, value}):P['value'] =>
+        typeof value === undefined ? model?.value : value
     )
 }
-const getModelState = function<Properties>(
-    propertiesList:Array<Properties>
+const getModelState = function<P extends Properties>(
+    inputProperties:Array<P>
 ):ModelState {
     return {
-        dirty: propertiesList.some((properties:Properties):boolean =>
-            properties.dirty
+        dirty: inputProperties.some(({dirty}):boolean => dirty),
+        focused: inputProperties.some(({focused}):boolean => focused),
+        invalid: inputProperties.some(({invalid}):boolean => invalid),
+        invalidRequired: inputProperties.some(({invalidRequired}):boolean =>
+            invalidRequired
         ),
-        focused: propertiesList.some((properties:Properties):boolean =>
-            properties.focused
-        ),
-        invalid: propertiesList.some((properties:Properties):boolean =>
-            properties.invalid
-        ),
-        invalidRequired: propertiesList.some((
-            properties:Properties
-        ):boolean => properties.invalidRequired),
-        pristine: propertiesList.every((properties:Properties):boolean =>
-            properties.pristine
-        ),
-        touched: propertiesList.some((properties:Properties):boolean =>
-            properties.touched
-        ),
-        untouched: propertiesList.every((properties:Properties):boolean =>
-            properties.untouched
-        ),
-        valid: propertiesList.every((properties:Properties):boolean =>
-            properties.untouched
-        ),
-        visited: propertiesList.some((properties:Properties):boolean =>
-            properties.visited
-        )
+        pristine: inputPproperties.every(({pristine}):boolean => pristine),
+        touched: inputProperties.some(({touched}):boolean => touched),
+        untouched: inputProperties.every(({untouched}):boolean => untouched),
+        valid: inputProperties.every(({valid}):boolean => valid),
+        visited: inputProperties.some(({visited}):boolean => visited)
     }
 }
-const getExternalProperties = function<Type, Properties>(
-    propertiesList:Array<Properties>
-):InputsProperties {
-    const modelState:ModelState = getModelState<Properties>(propertiesList)
+const getExternalProperties = function<P extends Properties>(
+    properties:InputsProperties<P>
+):InputsProperties<P> {
+    const modelState:ModelState = getModelState<P>(properties.inputProperties)
 
     return {
-        ...properties as Properties,
+        ...properties,
         ...modelState,
         model: {
-            value: propertiesList.map(({model}) => model),
-            state: modelState
+            state: modelState,
+            value: properties.inputProperties.map(
+                ({model}):Properties['model'] => model
+            )
         },
-        value: propertiesListToValues<Type, Properties>(propertiesList)
+        value: inputPropertiesToValues<Properties>(properties.inputProperties)
     }
 }
 /**
@@ -115,22 +99,17 @@ const getExternalProperties = function<Type, Properties>(
  * @returns React elements.
  */
 export const InputsInner = function<
-    Type = any,
-    Props extends Props = Props,
-    Properties extends Properties = Properties,
-    State = Mapping<any>
->((
-    props:InputsProps<Type>, reference?:RefObject<Adapter<Type>>
-):ReactElement => {
+    P extends Properties = Properties, State = Mapping<any>
+>((props:InputsProps<P>, reference?:RefObject<Adapter<P>>):ReactElement => {
     // region consolidate properties
-    const givenProps:InputsProps<Type> =
-        translateKnownSymbols(props) as PropsInputs<Type>
+    const givenProps:InputsProps<P> =
+        translateKnownSymbols(props) as PropsInputs<P>
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
         instances.
     */
-    const properties:InputsProps<Type> = Tools.extend(
+    const properties:InputsProps<P> = Tools.extend(
         true, Tools.copy(Inputs.defaultProperties), givenProps
     )
     /*
@@ -140,49 +119,54 @@ export const InputsInner = function<
     const controlled:boolean =
         !properties.enforceUncontrolled &&
         (
-            Array.isArray(givenProps.model) &&
-            givenProps.model.every(({value}):boolean => value !== undefined) ||
+            Array.isArray(givenProps.model?.value) &&
+            givenProps.model.value.every(({value}):boolean =>
+                value !== undefined
+            ) ||
             Array.isArray(givenProps.value) &&
-            givenProps.value.every((value:Type):boolean value !== undefined)
+            givenProps.value.every((value:P['value']):boolean =>
+                value !== undefined
+            )
         ) &&
         Boolean(onChange || onChangeValue)
 
-    let [value, setValue] = useState<Array<Type>>([])
+    let [value, setValue] = useState<Array<P['value']>>([])
     if (!properties.value)
         properties.value = value
-    const references:Array<RefObject<<WebComponentAdapter<
-        Properties, State
-    >>> = []
-    const propertiesList:Array<Properties> = []
+    const references:Array<RefObject<<WebComponentAdapter<P, State>>> = []
+    properties.inputProperties:Array<P> = properties.inputProperties || []
     for (let index:number = 0; index < Math.max(
-        properties.value?.length || 0, properties.model?.value?.length || 0
+        properties.inputProperties.length || 0,
+        properties.model?.value?.length || 0,
+        properties.value?.length || 0
     ); index += 1) {
-        const reference:RefObject<<WebComponentAdapter<Properties, State>> =
-            createRef<WebComponentAdapter<Properties, State>>()
+        const reference:RefObject<<WebComponentAdapter<P, State>> =
+            createRef<WebComponentAdapter<P, State>>()
         references.push(reference)
-        propertiesList.push(Tools.extend(
+
+        if (index >= properties.inputProperties.length)
+            properties.inputProperties.push({})
+
+        properties.inputProperties[index] = Tools.extend(
             true,
             {
-                onChange: (
-                    inputProperties:Properties, event?:GenericEvent
-                ):void => {
-                    propertiesList[index] = inputProperties
-                    triggerCallbackIfExists<Properties>(
-                        properties as InputsProperties,
+                ...properties.inputProperties[index],
+                onChange: (inputProperties:P, event?:GenericEvent):void => {
+                    properties.inputProperties[index] = inputProperties
+                    triggerCallbackIfExists<P>(
+                        properties as InputsProperties<P>,
                         'change',
                         controlled,
-                        getExternalProperties<Type, Properties>(
-                            propertiesList
-                        ),
+                        getExternalProperties<P>(properties),
                         event
                     )
                 },
                 onChangeValue: = (
-                    value:null|number, event?:GenericEvent
+                    value:null|P['value'], event?:GenericEvent
                 ):void => {
                     values[index] = value
-                    triggerCallbackIfExists<Properties>(
-                        properties as InputsProperties,
+                    triggerCallbackIfExists<P>(
+                        properties as InputsProperties<P>,
                         'changeValue',
                         controlled,
                         values,
@@ -192,28 +176,28 @@ export const InputsInner = function<
                 },
                 ref: reference
             },
-            properties.model?.value && properties.model.length > index ?
+            properties.model?.value && properties.model.value.length > index ?
                 {model: properties.model.value[index]} :
                 {},
             properties.value && properties.value.length > index ?
                 {value: properties.value[index]} :
                 {}
-        ))
+        )
     }
 
-    const values:Array<Type> =
-        propertiesListToValues<Type, Properties>(propertiesList)
+    const values:Array<P['value']> =
+        inputPropertiesToValues<P>(properties.inputProperties)
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValue = createDummyStateSetter<Array<Type>>(values)
+        setValue = createDummyStateSetter<Array<P['value']>>(values)
     // endregion
     useImperativeHandle(
         reference,
-        ():AdapterWithReferences => ({
-            properties,
+        ():AdapterWithReferences<P> => ({
+            properties: properties as InputsProperties<P>,
             references,
             state: controlled ? {} : {value: values}
         })
@@ -230,11 +214,15 @@ export const InputsInner = function<
             }
             data-name={properties.name}
         >
-            {propertiesList.map((
-                properties:Properties<Type>, index:number
-            ):ReactElement =>
-                properties.children(properties, index)
-            )}
+            {properties.inputProperties.map((
+                inputProperties:P, index:number
+            ):ReactElement => <>
+                {properties.children(inputProperties, index)}
+                {/*TODO*/}
+                <button>delete</button>
+            </>)}
+            {/*TODO*/}
+            <button>add</button>
         </div>
     </WrapConfigurations>
 }) as ForwardRefRenderFunction<Adapter, InputsProps>
