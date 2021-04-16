@@ -34,7 +34,7 @@ import {TestEnvironment} from './type'
 const testEnvironment:TestEnvironment =
     prepareTestEnvironment(beforeEach, afterEach)
 const {render} = testEnvironment
-// region Interval
+// region Inputs
 describe('Inputs', ():void => {
     test('render', ():void => {
         // TODO
