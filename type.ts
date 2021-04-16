@@ -172,8 +172,8 @@ export type Props<
 export type DefaultProperties<Type = any> =
     Omit<Props<Type>, 'model'> & {model:Model<Type>}
 export type State<Type = any> = {
-    modelState:ModelState
-    value:null|Type
+    modelState?:ModelState
+    value?:null|Type
 }
 export interface StaticWebComponent<P = Props> extends StaticBaseWebComponent {
     new (properties:P):Component<P>
@@ -471,7 +471,7 @@ export type InputAdapter<Type = any> = WebComponentAdapter<
     Omit<InputState<Type>, 'representation'|'selectionIsUnstable'|'value'> &
     {
         representation?:string
-        value?:string
+        value?:null|Type
     }
 >
 export type InputAdapterWithReferences<Type = any> = InputAdapter<Type> & {
@@ -610,22 +610,31 @@ export type AdditionalInputsProperties<P extends Properties = Properties> =
         value:Array<P['value']>
     }
 export type InputsProperties<P extends Properties = Properties> =
-    Properties<Array<P['value']>, AdditionalInputsProperties<P>> &
+    Omit<
+        Properties<Array<P['value']>, AdditionalInputsProperties<P>>,
+        'model'|'onChangeValue'
+    > &
     {
+        children:(properties:P, index:number) => ReactElement
+        inputProperties:Array<P>
         maximumNumber:number
         minimumNumber:number
-        inputProperties:Array<P>
+        model:InputsModel<P['model']>
+        onChangeValue:(value:Array<P['value']>, event?:GenericEvent) => void
     }
-export type InputsProps<P = Properties> = Partial<InputsProperties<P>>
+export type InputsProps<P extends Properties = Properties> =
+    Partial<InputsProperties<P>>
 export type DefaultInputsProperties<P extends Properties = Properties> =
-    Omit<InputsProps<P>, 'model'> & {model:InputsModel<P['model']}
-export type InputsPropertyTypes<P = Properties> = {
+    Omit<InputsProps<P>, 'model'> & {model:InputsModel<P['model']>}
+export type InputsPropertyTypes<P extends Properties = Properties> = {
     [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
 }
 export type InputsState<Type = any> = State<Array<Type>>
 export type InputsAdapter<P extends Properties = Properties> =
     WebComponentAdapter<InputsProperties<P>, InputsState<P['value']>>
-export type InputsAdapterWithReferences<P = Properties, RefType = unknown> =
+export type InputsAdapterWithReferences<
+    P extends Properties = Properties, RefType = unknown
+> =
     InputsAdapter<P> &
     {references:Array<RefObject<RefType>>}
 // // region constants
@@ -638,10 +647,10 @@ export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultInputsProperties:DefaultInputProperties = {
+export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties,
-    maximumNumber:Infinity,
-    minimumNumber:0
+    maximumNumber: Infinity,
+    minimumNumber: 0
 } as const
 // // endregion
 // / endregion

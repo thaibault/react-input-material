@@ -18,6 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
+import {Mapping} from 'clientnode/type'
 import {
     createRef,
     forwardRef,
@@ -47,6 +48,7 @@ import {
     StaticComponent
 } from '../type'
 // endregion
+// region helper
 const inputPropertiesToValues = function<P extends Properties>(
     inputProperties:Array<P>
 ):Array<P['value']> {
@@ -64,7 +66,7 @@ const getModelState = function<P extends Properties>(
         invalidRequired: inputProperties.some(({invalidRequired}):boolean =>
             invalidRequired
         ),
-        pristine: inputPproperties.every(({pristine}):boolean => pristine),
+        pristine: inputProperties.every(({pristine}):boolean => pristine),
         touched: inputProperties.some(({touched}):boolean => touched),
         untouched: inputProperties.every(({untouched}):boolean => untouched),
         valid: inputProperties.every(({valid}):boolean => valid),
@@ -80,6 +82,7 @@ const getExternalProperties = function<P extends Properties>(
         ...properties,
         ...modelState,
         model: {
+            ...(properties.model || {}),
             state: modelState,
             value: properties.inputProperties.map(
                 ({model}):Properties['model'] => model
@@ -88,6 +91,7 @@ const getExternalProperties = function<P extends Properties>(
         value: inputPropertiesToValues<Properties>(properties.inputProperties)
     }
 }
+// endregion
 /**
  * Generic inputs wrapper component.
  *
@@ -100,10 +104,10 @@ const getExternalProperties = function<P extends Properties>(
  */
 export const InputsInner = function<
     P extends Properties = Properties, State = Mapping<any>
->((props:InputsProps<P>, reference?:RefObject<Adapter<P>>):ReactElement => {
+>(props:InputsProps<P>, reference?:RefObject<Adapter<P>>):ReactElement {
     // region consolidate properties
     const givenProps:InputsProps<P> =
-        translateKnownSymbols(props) as PropsInputs<P>
+        translateKnownSymbols(props) as InputsProps<P>
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
@@ -120,7 +124,7 @@ export const InputsInner = function<
         !properties.enforceUncontrolled &&
         (
             Array.isArray(givenProps.model?.value) &&
-            givenProps.model.value.every(({value}):boolean =>
+            givenProps.model!.value.every(({value}):boolean =>
                 value !== undefined
             ) ||
             Array.isArray(givenProps.value) &&
@@ -128,44 +132,46 @@ export const InputsInner = function<
                 value !== undefined
             )
         ) &&
-        Boolean(onChange || onChangeValue)
+        Boolean(properties.onChange || properties.onChangeValue)
 
     let [value, setValue] = useState<Array<P['value']>>([])
     if (!properties.value)
         properties.value = value
-    const references:Array<RefObject<<WebComponentAdapter<P, State>>> = []
-    properties.inputProperties:Array<P> = properties.inputProperties || []
+    const references:Array<RefObject<WebComponentAdapter<P, State>>> = []
+    properties.inputProperties = properties.inputProperties || []
     for (let index:number = 0; index < Math.max(
         properties.inputProperties.length || 0,
         properties.model?.value?.length || 0,
         properties.value?.length || 0
     ); index += 1) {
-        const reference:RefObject<<WebComponentAdapter<P, State>> =
+        const reference:RefObject<WebComponentAdapter<P, State>> =
             createRef<WebComponentAdapter<P, State>>()
         references.push(reference)
 
         if (index >= properties.inputProperties.length)
-            properties.inputProperties.push({})
+            properties.inputProperties.push({} as P)
 
         properties.inputProperties[index] = Tools.extend(
             true,
             {
                 ...properties.inputProperties[index],
                 onChange: (inputProperties:P, event?:GenericEvent):void => {
-                    properties.inputProperties[index] = inputProperties
-                    triggerCallbackIfExists<P>(
+                    properties.inputProperties![index] = inputProperties
+                    triggerCallbackIfExists<InputsProperties<P>>(
                         properties as InputsProperties<P>,
                         'change',
                         controlled,
-                        getExternalProperties<P>(properties),
+                        getExternalProperties<P>(
+                            properties as InputsProperties<P>
+                        ),
                         event
                     )
                 },
-                onChangeValue: = (
+                onChangeValue: (
                     value:null|P['value'], event?:GenericEvent
                 ):void => {
                     values[index] = value
-                    triggerCallbackIfExists<P>(
+                    triggerCallbackIfExists<InputsProperties<P>>(
                         properties as InputsProperties<P>,
                         'changeValue',
                         controlled,
@@ -217,7 +223,10 @@ export const InputsInner = function<
             {properties.inputProperties.map((
                 inputProperties:P, index:number
             ):ReactElement => <>
-                {properties.children(inputProperties, index)}
+                {properties.children ?
+                    properties.children(inputProperties, index) :
+                    Tools.represent(inputProperties)
+                }
                 {/*TODO*/}
                 <button>delete</button>
             </>)}
@@ -225,7 +234,7 @@ export const InputsInner = function<
             <button>add</button>
         </div>
     </WrapConfigurations>
-}) as ForwardRefRenderFunction<Adapter, InputsProps>
+} as ForwardRefRenderFunction<Adapter, InputsProps>
 // NOTE: This is useful in react dev tools.
 InputsInner.displayName = 'Inputs'
 /**
