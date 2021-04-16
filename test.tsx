@@ -35,6 +35,37 @@ const testEnvironment:TestEnvironment =
     prepareTestEnvironment(beforeEach, afterEach)
 const {render} = testEnvironment
 // region Interval
+describe('Inputs', ():void => {
+    test('render', ():void => {
+        // TODO
+        return
+        expect(render(<Inputs/>)).toBeDefined()
+
+        expect(Array.from(
+            (render(<Interval/>) as HTMLElement).querySelectorAll('input')
+        )).toHaveLength(2)
+
+        expect((render(<Interval/>) as HTMLElement).getAttribute('class'))
+            .toStrictEqual('interval')
+
+        expect((render(<Interval/>) as HTMLElement)
+            .querySelectorAll('.interval__end')
+        ).toBeDefined()
+        expect((render(<Interval/>) as HTMLElement)
+            .querySelectorAll('.interval__icon')
+        ).toBeDefined()
+        expect((render(<Interval/>) as HTMLElement)
+            .querySelectorAll('.interval__start')
+        ).toBeDefined()
+
+        expect(
+            (render(<Interval name="test"/>) as HTMLElement)
+                .getAttribute('data-name')
+        ).toStrictEqual('test')
+    })
+})
+// endregion
+// region Interval
 describe('Interval', ():void => {
     test('render', ():void => {
         expect(render(<Interval/>)).toBeDefined()
