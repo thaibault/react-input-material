@@ -222,14 +222,16 @@ export const InputsInner = function<
         >
             {properties.inputProperties.map((
                 inputProperties:P, index:number
-            ):ReactElement => <>
-                {properties.children ?
-                    properties.children(inputProperties, index) :
-                    Tools.represent(inputProperties)
-                }
-                {/*TODO*/}
-                <button>delete</button>
-            </>)}
+            ):ReactElement =>
+                <div key={index}>
+                    {properties.children ?
+                        properties.children(inputProperties, index) :
+                        Tools.represent(inputProperties)
+                    }
+                    {/*TODO*/}
+                    <button>delete</button>
+                </div>
+            )}
             {/*TODO*/}
             <button>add</button>
         </div>
