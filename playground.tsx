@@ -63,6 +63,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     const [value4, setValue4] = useState<boolean|null>(false)
     const onChangeValue4 =
         useMemorizedValue<(value:boolean|null) => void>(setValue4)
+
+    const [value5, setValue5] = useState<Array<string>>([])
+    const onChangeValue5 =
+        useMemorizedValue<(value:string|null) => void>(setValue5)
     // endregion
     return (<>
         <div className="playground__inputs">
@@ -624,6 +628,16 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 showInitialValidationState
             >(properties:Properties<boolean>, index:number):ReactElement =>
                 <RequireableCheckbox {...properties} key={index} />
+            </Inputs>
+            <Inputs
+                name="inputs2"
+                onChange={onChange}
+                onChangeValue={onChangeValue5}
+                required
+                showInitialValidationState
+                value={value5}
+            >(properties:Properties<boolean>, index:number):ReactElement =>
+                <GenericInput {...properties} key={index} />
             </Inputs>
 
         </div>

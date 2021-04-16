@@ -84,7 +84,6 @@ export const IntervalInner = ((
         properties.icon!
     const startProperties:InputProps<number> = properties.start!
 
-    const model = properties.model
     const onChange:Function|undefined = properties.onChange
     const onChangeValue:Function|undefined = properties.onChangeValue
 
@@ -104,15 +103,15 @@ export const IntervalInner = ((
     let [value, setValue] = useState<Value>({
         end:
             endProperties.value ??
-            model?.end?.value ??
+            properties.model?.end?.value ??
             endProperties.default ??
-            model?.end?.default ??
+            properties.model?.end?.default ??
             null,
         start:
             startProperties.value ??
-            model?.end?.value ??
+            properties.model?.end?.value ??
             startProperties.default ??
-            model?.start?.default ??
+            properties.model?.start?.default ??
             null,
     })
     if (!properties.value)
@@ -136,13 +135,13 @@ export const IntervalInner = ((
     Tools.extend(
         true,
         endProperties,
-        model?.end ? {model: model.end} : {},
+        properties.model?.end ? {model: properties.model.end} : {},
         propertiesToForward
     )
     Tools.extend(
         true,
         startProperties,
-        model?.start ? {model: model.start} : {},
+        properties.model?.start ? {model: properties.model.start} : {},
         propertiesToForward
     )
 

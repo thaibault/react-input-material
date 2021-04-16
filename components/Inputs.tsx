@@ -35,7 +35,12 @@ import {
 } from '../helper'
 import {
     GenericEvent,
-    StaticFunctionInputComponent as StaticComponent
+    InputsAdapter,
+    InputsProperties,
+    InputsProps,
+    Properties,
+    Props,
+    StaticComponent
 } from '../type'
 // endregion
 /**
@@ -48,21 +53,24 @@ import {
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const InputsInner = ((
-    props:Props, reference?:RefObject<Adapter>
+export const InputsInner = function<
+    Type = any,
+    Props extends Props = Props,
+    Properties extends Properties = Properties
+>((
+    props:InputsProps<Type>, reference?:RefObject<InputsAdapter<Type>>
 ):ReactElement => {
     // region consolidate properties
-    const givenProps:Props = translateKnownSymbols(props) as Props
+    const givenProps:InputsProps<Type> =
+        translateKnownSymbols(props) as PropsInputs<Type>
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
         instances.
     */
-    const properties:Props = Tools.extend(
+    const properties:InputsProps<Type> = Tools.extend(
         true, Tools.copy(Inputs.defaultProperties), givenProps
     )
-
-    // TODO
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
@@ -70,36 +78,21 @@ export const InputsInner = ((
     const controlled:boolean =
         !properties.enforceUncontrolled &&
         (
-            givenProps.model?.end?.value !== undefined ||
-            givenProps.model?.start?.value !== undefined ||
-            givenProps.value !== undefined
+            Array.isArray(givenProps.model) &&
+            givenProps.model.every(({value}):boolean => value !== undefined) ||
+            Array.isArray(givenProps.value) &&
+            givenProps.value.every((value:Type):boolean value !== undefined)
         ) &&
         Boolean(onChange || onChangeValue)
 
-    let [value, setValue] = useState<Value>({
-        end:
-            endProperties.value ??
-            model?.end?.value ??
-            endProperties.default ??
-            model?.end?.default ??
-            null,
-        start:
-            startProperties.value ??
-            model?.end?.value ??
-            startProperties.default ??
-            model?.start?.default ??
-            null,
-    })
+    let [value, setValue] = useState<Array<Type>>([])
     if (!properties.value)
         properties.value = value
-    const propertiesToForward:InputProps<number> =
-        Tools.mask<InputProps<number>>(
-            properties as InputProps<number>,
+    const propertiesToForward:Props =
+        Tools.mask<Props>(
+            properties as Props,
             {exclude: {
                 enforceUncontrolled: true,
-                end: true,
-                icon: true,
-                start: true,
                 model: true,
                 name: true,
                 onChange: true,
@@ -108,65 +101,29 @@ export const InputsInner = ((
             }}
         )
 
-    Tools.extend(
-        true,
-        endProperties,
-        model?.end ? {model: model.end} : {},
-        propertiesToForward)
-    Tools.extend(
-        true,
-        startProperties,
-        model?.start ? {model: model.start} : {},
-        propertiesToForward
+    // TODO
+    cons propertiesList:Array<Properties> = properties.model.map((
+        properties:Properties<Type>, index:number
+    ):Properties<Type> =>
+        Tools.extend(
+            true,
+            properties,
+            properties.model && properties.model.length > index ?
+                {model: properties.model[index]} :
+                {},
+            propertiesToForward
+        )
     )
 
-    if (!endProperties.className)
-        endProperties.className = `${styles.interval}__end`
-    if (!iconProperties.className)
-        iconProperties.className = `${styles.interval}__icon`
-    if (!startProperties.className)
-        startProperties.className = `${styles.interval}__start`
-
-    const endConfiguration = {...endProperties.model, ...endProperties}
-    const startConfiguration = {...startProperties.model, ...startProperties}
-
-    startProperties.maximum = Math.min(
-        typeof startConfiguration.maximum === 'number' ?
-            startConfiguration.maximum :
-            Infinity,
-        properties.value.end || Infinity,
-        typeof endConfiguration.maximum === 'number' ?
-            endConfiguration.maximum :
-            Infinity
-    )
-    startProperties.minimum = startConfiguration.minimum || -Infinity
-    startProperties.value = properties.value.start
-
-    endProperties.maximum = typeof endConfiguration.maximum === 'number' ?
-        endConfiguration.maximum :
-        Infinity
-    endProperties.minimum = Math.max(
-        typeof endConfiguration.minimum === 'number' ?
-            endConfiguration.minimum :
-            -Infinity,
-        properties.value.start || -Infinity,
-        typeof startConfiguration.minimum === 'number' ?
-            startConfiguration.minimum :
-            -Infinity
-    )
-    endProperties.value = properties.value.end
-
-    const endInputReference:RefObject<InputAdapterWithReferences<number>> =
-        createRef<InputAdapterWithReferences<number>>()
-    const startInputReference:RefObject<InputAdapterWithReferences<number>> =
-        createRef<InputAdapterWithReferences<number>>()
+    const inputReferences:Array<RefObject<InputAdapterWithReferences<Type>>> =
+        createRef<Array<InputAdapterWithReferences<Type>>>()
 
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValue = createDummyStateSetter<Value>(properties.value)
+        setValue = createDummyStateSetter<Array<Type>>(properties.value)
     // endregion
     useImperativeHandle(
         reference,
@@ -295,20 +252,24 @@ export const InputsInner = ((
         )
         setValue(newValue)
     }
-    // endregion
+    // endregion 
     return <WrapConfigurations
         strict={Inputs.strict}
         themeConfiguration={properties.themeConfiguration}
     >
         <div
             className={
-                styles.interval +
+                styles.inputs +
                 (properties.className ? ` ${properties.className}` : '')
             }
             data-name={properties.name}
-        >{properties.model.map((model, index:number):ReactElement =>
-            properties.children({model}, index)
-        )}</div>
+        >
+            {propertiesList.map((
+                properties:Properties<Type>, index:number
+            ):ReactElement =>
+                properties.children(properties, index)
+            )}
+        </div>
     </WrapConfigurations>
 }) as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
