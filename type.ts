@@ -605,8 +605,10 @@ export type InputsModel<M = Model> = {
 export type AdditionalInputsProperties<P extends Properties = Properties> =
     ModelState &
     {
-        model:InputsModel<P['model']>
+        addIcon:IconOptions
         inputProperties:Array<P>
+        model:InputsModel<P['model']>
+        removeIcon:IconOptions
         value:Array<P['value']>
     }
 export type InputsProperties<P extends Properties = Properties> =
@@ -617,8 +619,6 @@ export type InputsProperties<P extends Properties = Properties> =
     {
         children:(properties:P, index:number) => ReactElement
         inputProperties:Array<P>
-        maximumNumber:number
-        minimumNumber:number
         model:InputsModel<P['model']>
         onChangeValue:(value:Array<P['value']>, event?:GenericEvent) => void
     }
@@ -639,9 +639,12 @@ export type InputsAdapterWithReferences<
     {references:Array<RefObject<RefType>>}
 // // region constants
 export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
-    ...propertyTypes,
-    maximumNumber:number,
-    minimumNumber:number
+    ...propertyTypes
+} as const
+export const defaultInputsModel:InputModel = {
+    ...defaultModel,
+    minimumLength: 0,
+    type: 'string[]'
 } as const
 /*
     NOTE: Avoid setting any properties already defined in model here since they
@@ -649,8 +652,10 @@ export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
 */
 export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties,
-    maximumNumber: Infinity,
-    minimumNumber: 0
+    ...defaultInputsModel,
+    addIcon: {icon: 'add'},
+    model: defaultInputsModel,
+    removeIcon: {icon: 'clear'}
 } as const
 // // endregion
 // / endregion

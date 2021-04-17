@@ -30,7 +30,9 @@ import {
     useState
 } from 'react'
 import {WebComponentAdapter} from 'web-component-wrapper/type'
+import {IconButton} from '@rmwc/icon-button'
 
+import styles from './Inputs.module'
 import WrapConfigurations from './WrapConfigurations'
 import {
     createDummyStateSetter, translateKnownSymbols, triggerCallbackIfExists
@@ -154,9 +156,12 @@ export const InputsInner = function<
         properties.inputProperties[index] = Tools.extend(
             true,
             {
+                // TODO do we really have the latest state in change handler?
                 ...properties.inputProperties[index],
+                className: styles.inputs__item__input,
                 onChange: (inputProperties:P, event?:GenericEvent):void => {
                     properties.inputProperties![index] = inputProperties
+
                     triggerCallbackIfExists<InputsProperties<P>>(
                         properties as InputsProperties<P>,
                         'change',
@@ -171,6 +176,7 @@ export const InputsInner = function<
                     value:null|P['value'], event?:GenericEvent
                 ):void => {
                     values[index] = value
+
                     triggerCallbackIfExists<InputsProperties<P>>(
                         properties as InputsProperties<P>,
                         'changeValue',
@@ -178,6 +184,7 @@ export const InputsInner = function<
                         values,
                         event
                     )
+
                     setValue(values)
                 },
                 ref: reference
@@ -215,7 +222,7 @@ export const InputsInner = function<
     >
         <div
             className={
-                'inputs' +
+                styles.inputs +
                 (properties.className ? ` ${properties.className}` : '')
             }
             data-name={properties.name}
@@ -223,17 +230,23 @@ export const InputsInner = function<
             {properties.inputProperties.map((
                 inputProperties:P, index:number
             ):ReactElement =>
-                <div key={index}>
+                <div className={styles.inputs__item} key={index}>
                     {properties.children ?
                         properties.children(inputProperties, index) :
                         Tools.represent(inputProperties)
                     }
-                    {/*TODO*/}
-                    <button>delete</button>
+
+                    {properties.writable ?
+                        <IconButton icon={properties.removeIcon}/> :
+                        ''
+                    }
                 </div>
             )}
-            {/*TODO*/}
-            <button>add</button>
+
+            {properties.writable ?
+                <IconButton icon={properties.addIcon}/> :
+                ''
+            }
         </div>
     </WrapConfigurations>
 } as ForwardRefRenderFunction<Adapter, InputsProps>

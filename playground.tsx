@@ -64,7 +64,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     const onChangeValue4 =
         useMemorizedValue<(value:boolean|null) => void>(setValue4)
 
-    const [value5, setValue5] = useState<Array<null|string>>([{}])
+    const [value5, setValue5] = useState<Array<null|string>>(['first item'])
     const onChangeValue5 =
         useMemorizedValue<(value:Array<null|string>) => void>(setValue5)
     // endregion
@@ -622,26 +622,33 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <Inputs
-                name="inputs1"
+                model={useMemorizedValue({
+                    name: 'inputs1',
+                    value: [{}]
+                })}
                 onChange={onChange}
-                required
                 showInitialValidationState
             >
-                {(properties:Properties<boolean>):ReactElement =>
-                    <RequireableCheckbox {...properties} />
-                }
+                {useMemorizedValue((
+                    properties:Properties<boolean>, index:number
+                ):ReactElement =>
+                    <RequireableCheckbox
+                        {...properties} name={`inputs1-${index}`}
+                    />
+                )}
             </Inputs>
             <Inputs
                 name="inputs2"
                 onChange={onChange}
                 onChangeValue={onChangeValue5}
-                required
                 showInitialValidationState
                 value={value5}
             >
-                {(properties:Properties<boolean>):ReactElement =>
-                    <GenericInput {...properties} />
-                }
+                {useMemorizedValue((
+                    properties:Properties<boolean>, index:number
+                ):ReactElement =>
+                    <GenericInput {...properties} name={`inputs2-${index}`} />
+                )}
             </Inputs>
 
         </div>
