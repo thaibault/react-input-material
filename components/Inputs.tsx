@@ -156,10 +156,15 @@ export const InputsInner = function<
         properties.inputProperties[index] = Tools.extend(
             true,
             {
-                // TODO do we really have the latest state in change handler?
                 ...properties.inputProperties[index],
                 className: styles.inputs__item__input,
                 onChange: (inputProperties:P, event?:GenericEvent):void => {
+                    properties.inputProperties = references.map((
+                        {current}, index:number
+                    ):P =>
+                        current?.properties ||
+                        properties.inputProperties[index]
+                    )
                     properties.inputProperties![index] = inputProperties
 
                     triggerCallbackIfExists<InputsProperties<P>>(
@@ -175,6 +180,11 @@ export const InputsInner = function<
                 onChangeValue: (
                     value:null|P['value'], event?:GenericEvent
                 ):void => {
+                    values = references.map((
+                        {current}, index:number
+                    ):P['value'] =>
+                        current?.properties?.value || values[index]
+                    )
                     values[index] = value
 
                     triggerCallbackIfExists<InputsProperties<P>>(
@@ -216,6 +226,21 @@ export const InputsInner = function<
         })
     )
 
+    const add = (event?:GenericEvent):void => {
+        setValue((values:Array<P['value']>):Array<P['value']> => {
+            values = values.concat(properties.prototype.value)
+        })
+        // TODO trigger onChange and onChangeValue
+    }
+    const remove = (event?:GenericEvent):void => {
+        setValue((values:Array<P['value']>):Array<P['value']> => {
+            values.filter((item:P['value'], subIndex:number):boolean =>
+                index !== subIndex
+            )
+        })
+        // TODO trigger onChange and onChangeValue
+    }
+
     return <WrapConfigurations
         strict={Inputs.strict}
         themeConfiguration={properties.themeConfiguration}
@@ -237,14 +262,16 @@ export const InputsInner = function<
                     }
 
                     {properties.writable ?
-                        <IconButton icon={properties.removeIcon}/> :
+                        <IconButton
+                            icon={properties.removeIcon} onClick={remove}
+                        /> :
                         ''
                     }
                 </div>
             )}
 
             {properties.writable ?
-                <IconButton icon={properties.addIcon}/> :
+                <IconButton icon={properties.addIcon} onClick={add}/> :
                 ''
             }
         </div>

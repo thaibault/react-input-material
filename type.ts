@@ -621,6 +621,7 @@ export type InputsProperties<P extends Properties = Properties> =
         inputProperties:Array<P>
         model:InputsModel<P['model']>
         onChangeValue:(value:Array<P['value']>, event?:GenericEvent) => void
+        prototype:P['model']
     }
 export type InputsProps<P extends Properties = Properties> =
     Partial<InputsProperties<P>>
@@ -655,6 +656,7 @@ export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultInputsModel,
     addIcon: {icon: 'add'},
     model: defaultInputsModel,
+    prototype: {},
     removeIcon: {icon: 'clear'}
 } as const
 // // endregion
