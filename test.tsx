@@ -19,9 +19,10 @@ import {Mapping} from 'clientnode/type'
 import React from 'react'
 import {SelectProps} from '@rmwc/select'
 
-import Interval from './components/Interval'
 import GenericAnimate from './components/GenericAnimate'
 import GenericInput, {normalizeSelection} from './components/GenericInput'
+import Inputs from './components/Inputs'
+import Interval from './components/Interval'
 import RequireableCheckbox from './components/RequireableCheckbox'
 import WrapConfigurations from './components/WrapConfigurations'
 import WrapStrict from './components/WrapStrict'
@@ -37,12 +38,11 @@ const {render} = testEnvironment
 // region Inputs
 describe('Inputs', ():void => {
     test('render', ():void => {
+        expect(render(<Inputs/>)).toBeDefined()
         // TODO
         return
-        expect(render(<Inputs/>)).toBeDefined()
-
         expect(Array.from(
-            (render(<Interval/>) as HTMLElement).querySelectorAll('input')
+            (render(<Inputs/>) as HTMLElement).querySelectorAll('input')
         )).toHaveLength(2)
 
         expect((render(<Interval/>) as HTMLElement).getAttribute('class'))

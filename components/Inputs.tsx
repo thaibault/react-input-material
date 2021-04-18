@@ -136,11 +136,68 @@ export const InputsInner = function<
         ) &&
         Boolean(properties.onChange || properties.onChangeValue)
 
-    let [value, setValue] = useState<Array<P['value']>>([])
+    let [value, setValue] = useState<Array<P['value']>>(
+        properties.value ||
+        properties.inputProperties &&
+        inputPropertiesToValues<P>(properties.inputProperties) ||
+        []
+    )
     if (!properties.value)
         properties.value = value
     const references:Array<RefObject<WebComponentAdapter<P, State>>> = []
     properties.inputProperties = properties.inputProperties || []
+
+    const triggerOnChange = (
+        values:Array<P['value']>,
+        event?:GenericEvent,
+        inputProperties?:P,
+        index?:number
+    ):void => {
+        properties.inputProperties = values.map((
+            _:P['value'], index:number
+        ):P =>
+            references[index]?.current?.properties ||
+            properties.inputProperties![index]
+        )
+        if (typeof index === 'number')
+            properties.inputProperties![index] = inputProperties as P
+        else if (inputProperties)
+            properties.inputProperties!.push(inputProperties)
+
+        triggerCallbackIfExists<InputsProperties<P>>(
+            properties as InputsProperties<P>,
+            'change',
+            controlled,
+            getExternalProperties<P>(properties as InputsProperties<P>),
+            event
+        )
+    }
+    const triggerOnChangeValue = (
+        values:Array<P['value']>,
+        event?:GenericEvent,
+        value?:P['value'],
+        index?:number
+    ):Array<P['value']> => {
+        if (value === undefined)
+            values = values.filter((_:P['value'], subIndex:number):boolean =>
+                index !== subIndex
+            )
+        else if (typeof index === 'number')
+            values[index] = value
+        else
+            values = values.concat(value)
+
+        triggerCallbackIfExists<InputsProperties<P>>(
+            properties as InputsProperties<P>,
+            'changeValue',
+            controlled,
+            values,
+            event
+        )
+
+        return values
+    }
+
     for (let index:number = 0; index < Math.max(
         properties.inputProperties.length || 0,
         properties.model?.value?.length || 0,
@@ -158,45 +215,14 @@ export const InputsInner = function<
             {
                 ...properties.inputProperties[index],
                 className: styles.inputs__item__input,
-                onChange: (inputProperties:P, event?:GenericEvent):void => {
-                    properties.inputProperties = references.map((
-                        {current}, index:number
-                    ):P =>
-                        current?.properties ||
-                        properties.inputProperties[index]
-                    )
-                    properties.inputProperties![index] = inputProperties
-
-                    triggerCallbackIfExists<InputsProperties<P>>(
-                        properties as InputsProperties<P>,
-                        'change',
-                        controlled,
-                        getExternalProperties<P>(
-                            properties as InputsProperties<P>
-                        ),
-                        event
-                    )
-                },
+                onChange: (inputProperties:P, event?:GenericEvent):void =>
+                    triggerOnChange(values, event, inputProperties, index),
                 onChangeValue: (
                     value:null|P['value'], event?:GenericEvent
-                ):void => {
-                    values = references.map((
-                        {current}, index:number
-                    ):P['value'] =>
-                        current?.properties?.value || values[index]
-                    )
-                    values[index] = value
-
-                    triggerCallbackIfExists<InputsProperties<P>>(
-                        properties as InputsProperties<P>,
-                        'changeValue',
-                        controlled,
-                        values,
-                        event
-                    )
-
-                    setValue(values)
-                },
+                ):void =>
+                    setValue((values:Array<P['value']>):Array<P['value']> =>
+                        triggerOnChangeValue(values, event, value, index)
+                    ),
                 ref: reference
             },
             properties.model?.value && properties.model.value.length > index ?
@@ -226,20 +252,24 @@ export const InputsInner = function<
         })
     )
 
-    const add = (event?:GenericEvent):void => {
-        setValue((values:Array<P['value']>):Array<P['value']> => {
-            values = values.concat(properties.prototype.value)
-        })
-        // TODO trigger onChange and onChangeValue
-    }
-    const remove = (event?:GenericEvent):void => {
-        setValue((values:Array<P['value']>):Array<P['value']> => {
-            values.filter((item:P['value'], subIndex:number):boolean =>
-                index !== subIndex
-            )
-        })
-        // TODO trigger onChange and onChangeValue
-    }
+    const add = (event?:GenericEvent):void => setValue((
+        values:Array<P['value']>
+    ):Array<P['value']> => {
+        const newProperties:P = properties.createPrototype<P>(
+            values.length, values
+        )
+        console.log('A', values)
+        values = triggerOnChangeValue(values, event, newProperties.value)
+        triggerOnChange(values, event, newProperties)
+        return values
+    })
+    const remove = (event?:GenericEvent):void => setValue((
+        values:Array<P['value']>
+    ):Array<P['value']> => {
+        values = triggerOnChangeValue(values, event)
+        triggerOnChange(values, event)
+        return values
+    })
 
     return <WrapConfigurations
         strict={Inputs.strict}

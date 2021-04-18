@@ -599,8 +599,11 @@ export const defaultInputProperties:DefaultInputProperties = {
 // / endregion
 // / region inputs
 export type InputsModel<M = Model> = {
+    maximumLength:number
+    minimumLength:number
     state:ModelState
     value:Array<M>
+    writable:boolean
 }
 export type AdditionalInputsProperties<P extends Properties = Properties> =
     ModelState &
@@ -610,18 +613,20 @@ export type AdditionalInputsProperties<P extends Properties = Properties> =
         model:InputsModel<P['model']>
         removeIcon:IconOptions
         value:Array<P['value']>
+        writable:boolean
     }
 export type InputsProperties<P extends Properties = Properties> =
     Omit<
         Properties<Array<P['value']>, AdditionalInputsProperties<P>>,
         'model'|'onChangeValue'
     > &
+    AdditionalInputsProperties<P> &
     {
         children:(properties:P, index:number) => ReactElement
+        createPrototype:(index:number, values:Array<P['value']>) => P
         inputProperties:Array<P>
         model:InputsModel<P['model']>
         onChangeValue:(value:Array<P['value']>, event?:GenericEvent) => void
-        prototype:P['model']
     }
 export type InputsProps<P extends Properties = Properties> =
     Partial<InputsProperties<P>>
@@ -655,8 +660,10 @@ export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties,
     ...defaultInputsModel,
     addIcon: {icon: 'add'},
+    createPrototype: <P extends Properties = Properties>(index:number):P => (
+        {...defaultProperties, name: `inputsInput${index + 1}`}
+    ),
     model: defaultInputsModel,
-    prototype: {},
     removeIcon: {icon: 'clear'}
 } as const
 // // endregion
