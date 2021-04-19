@@ -39,29 +39,31 @@ const {render} = testEnvironment
 describe('Inputs', ():void => {
     test('render', ():void => {
         expect(render(<Inputs/>)).toBeDefined()
-        // TODO
-        return
-        expect(Array.from(
-            (render(<Inputs/>) as HTMLElement).querySelectorAll('input')
-        )).toHaveLength(2)
 
-        expect((render(<Interval/>) as HTMLElement).getAttribute('class'))
-            .toStrictEqual('interval')
+        let domNode:HTMLElement = render(<Inputs/>) as HTMLElement
+        expect(domNode.querySelector('input')).toStrictEqual(null)
+        expect(domNode.querySelector('.inputs__add')).not.toStrictEqual(null)
+        expect(domNode.querySelector('.inputs__item__remove')).toStrictEqual(null)
 
-        expect((render(<Interval/>) as HTMLElement)
-            .querySelectorAll('.interval__end')
-        ).toBeDefined()
-        expect((render(<Interval/>) as HTMLElement)
-            .querySelectorAll('.interval__icon')
-        ).toBeDefined()
-        expect((render(<Interval/>) as HTMLElement)
-            .querySelectorAll('.interval__start')
-        ).toBeDefined()
+        domNode = render(<Inputs value={['a']}/>) as HTMLElement
+        expect(Array.from(domNode.querySelectorAll('input'))).toHaveLength(1)
+        expect(Array.from(domNode.querySelectorAll('.inputs__add')))
+            .toHaveLength(1)
+        expect(Array.from(domNode.querySelectorAll('.inputs__item__remove')))
+            .toHaveLength(1)
+
+        domNode = render(<Inputs value={['a', ['b']]}/>) as HTMLElement
+        expect(Array.from(domNode.querySelectorAll('input'))).toHaveLength(2)
+        expect(Array.from(domNode.querySelectorAll('.inputs__add')))
+            .toHaveLength(1)
+        expect(Array.from(domNode.querySelectorAll('.inputs__item__remove')))
+            .toHaveLength(2)
 
         expect(
-            (render(<Interval name="test"/>) as HTMLElement)
-                .getAttribute('data-name')
-        ).toStrictEqual('test')
+            (render(<Inputs value={['a']}/>) as HTMLElement)
+                .querySelector('input')
+                .value
+        ).toStrictEqual('a')
     })
 })
 // endregion

@@ -622,14 +622,14 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <Inputs
+                createPrototype={useMemorizedValue(() => ({
+                    type: 'boolean', value: false
+                }))}
                 model={useMemorizedValue({
                     default: [false],
                     name: 'inputs1',
                 })}
                 onChange={onChange}
-                createPrototype={useMemorizedValue(() => ({
-                    type: 'boolean', value: false
-                }))}
                 showInitialValidationState
             >
                 {useMemorizedValue((
@@ -646,13 +646,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChangeValue={onChangeValue5}
                 showInitialValidationState
                 value={value5}
-            >
-                {useMemorizedValue((
-                    properties:Properties<boolean>, index:number
-                ):ReactElement =>
-                    <GenericInput {...properties} name={`inputs2-${index}`} />
-                )}
-            </Inputs>
+            />
 
         </div>
 

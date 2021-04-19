@@ -598,7 +598,7 @@ export const defaultInputProperties:DefaultInputProperties = {
 // // endregion
 // / endregion
 // / region inputs
-export type InputsModel<M = Model> = {
+export type InputsModel<M extends Model = Model> = Model<Array<M['value']>> & {
     maximumLength:number
     minimumLength:number
     state:ModelState
@@ -622,16 +622,20 @@ export type InputsProperties<P extends Properties = Properties> =
     > &
     AdditionalInputsProperties<P> &
     {
-        children:(properties:P, index:number) => ReactElement
-        createPrototype:(values:Array<P['value']>) => P
+        children:(
+            properties:P, index:number, parentProperties:InputsProperties<P>
+        ) => ReactElement
+        createPrototype:(values:Array<P['value']>) => Partial<P>
         inputProperties:Array<P>
         model:InputsModel<P['model']>
         onChangeValue:(value:Array<P['value']>, event?:GenericEvent) => void
     }
 export type InputsProps<P extends Properties = Properties> =
-    Partial<InputsProperties<P>>
+    Partial<Omit<InputsProperties<P>, 'model'>> &
+    {model?:Partial<InputsModel<P['model']>>}
 export type DefaultInputsProperties<P extends Properties = Properties> =
-    Omit<InputsProps<P>, 'model'> & {model:InputsModel<P['model']>}
+    Omit<InputsProps<P>, 'model'> &
+    {model:InputsModel<P['model']>}
 export type InputsPropertyTypes<P extends Properties = Properties> = {
     [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
 }
@@ -663,9 +667,7 @@ export const defaultInputsProperties:DefaultInputsProperties = {
     addIcon: {icon: 'add'},
     createPrototype: <P extends Properties = Properties>(
         values:Array<P['value']>
-    ):P => (
-        {...defaultProperties, name: `inputsInput${values.length}`}
-    ),
+    ):Partial<P> => ({...defaultProperties} as Partial<P>),
     model: defaultInputsModel,
     removeIcon: {icon: 'clear'}
 } as const

@@ -20,6 +20,10 @@ endregion */
     flex-direction: column;
 }
 
+.inputs__add {
+    visibility: visible;
+}
+
 .inputs__item {
     display: flex;
     flex-direction: row;
@@ -28,6 +32,10 @@ endregion */
 
 .inputs__item__input {
     width: 100%;
+}
+
+.inputs__item__remove {
+    visibility: visible;
 }
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:

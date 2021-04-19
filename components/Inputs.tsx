@@ -32,6 +32,7 @@ import {
 import {WebComponentAdapter} from 'web-component-wrapper/type'
 import {IconButton} from '@rmwc/icon-button'
 
+import GenericInput from './GenericInput'
 import styles from './Inputs.module'
 import WrapConfigurations from './WrapConfigurations'
 import {
@@ -64,8 +65,9 @@ const inputPropertiesToValues = function<P extends Properties>(
 const getModelState = function<P extends Properties>(
     inputProperties:Array<P>
 ):ModelState {
-    const unpack = (name:string, defaultValue:boolean = false) =>
-        (properties:P):boolean => properties[name] ?? defaultValue
+    const unpack = (name:keyof P, defaultValue:boolean = false) =>
+        (properties:P):boolean =>
+            properties[name] as unknown as boolean ?? defaultValue
 
     return {
         dirty: inputProperties.some(unpack('dirty')),
@@ -143,7 +145,8 @@ export const InputsInner = function<
     let [values, setValues] = useState<Array<P['value']>>(
         determineInitialValue<Array<P['value']>>(
             givenProps, Inputs.defaultProperties.model?.default
-        )
+        ) ||
+        []
     )
     if (!properties.value)
         properties.value = values
@@ -153,7 +156,7 @@ export const InputsInner = function<
     const triggerOnChange = (
         values:Array<P['value']>,
         event?:GenericEvent,
-        inputProperties?:P,
+        inputProperties?:Partial<P>,
         index?:number
     ):void => {
         properties.inputProperties = values.map((
@@ -163,12 +166,13 @@ export const InputsInner = function<
             properties.inputProperties![index]
         )
 
-        if (inputProperties === undefined)
+        if (inputProperties === undefined && typeof index === 'number')
             properties.inputProperties.splice(index, 1)
-        else if (typeof index === 'number')
-            properties.inputProperties![index] = inputProperties as P
         else if (inputProperties)
-            properties.inputProperties!.push(inputProperties)
+            if (typeof index === 'number')
+                properties.inputProperties![index] = inputProperties as P
+            else
+                properties.inputProperties!.push(inputProperties as P)
 
         triggerCallbackIfExists<InputsProperties<P>>(
             properties as InputsProperties<P>,
@@ -184,10 +188,11 @@ export const InputsInner = function<
         value?:P['value'],
         index?:number
     ):Array<P['value']> => {
-        if (value === undefined)
-            values.splice(index, 1)
-        else if (typeof index === 'number')
-            values[index] = value
+        if (typeof index === 'number')
+            if (value === undefined)
+                values.splice(index, 1)
+            else
+                values[index] = value
         else
             values.push(value)
 
@@ -223,7 +228,7 @@ export const InputsInner = function<
                 className: styles.inputs__item__input,
                 onChange: (inputProperties:P, event?:GenericEvent):void =>
                     triggerOnChange(
-                        properties.value, event, inputProperties, index
+                        properties.value!, event, inputProperties, index
                     ),
                 onChangeValue: (
                     value:null|P['value'], event?:GenericEvent
@@ -262,7 +267,7 @@ export const InputsInner = function<
     const add = (event?:GenericEvent):void => setValues((
         values:Array<P['value']>
     ):Array<P['value']> => {
-        const newProperties:P = properties.createPrototype<P>(values)
+        const newProperties:Partial<P> = properties.createPrototype!(values)
         triggerOnChange(values, event, newProperties)
         values = triggerOnChangeValue(
             values,
@@ -295,12 +300,20 @@ export const InputsInner = function<
             ):ReactElement =>
                 <div className={styles.inputs__item} key={index}>
                     {properties.children ?
-                        properties.children(inputProperties, index) :
-                        Tools.represent(inputProperties)
+                        properties.children(
+                            inputProperties,
+                            index,
+                            properties as InputsProperties<P>
+                        ) :
+                        <GenericInput
+                            {...inputProperties}
+                            name={`${properties.name}${index}`}
+                        />
                     }
 
                     {properties.writable ?
                         <IconButton
+                            className={styles.inputs__item__remove}
                             icon={properties.removeIcon}
                             onClick={createRemove(index)}
                         /> :
@@ -310,7 +323,11 @@ export const InputsInner = function<
             )}
 
             {properties.writable ?
-                <IconButton icon={properties.addIcon} onClick={add}/> :
+                <IconButton
+                    className={styles.inputs__add}
+                    icon={properties.addIcon}
+                    onClick={add}
+                /> :
                 ''
             }
         </div>
