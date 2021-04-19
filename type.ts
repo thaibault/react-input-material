@@ -79,7 +79,7 @@ export type BaseModel<Type = any> = {
     regularExpressionPattern:null|RegExp|string
     selection?:SelectProps['options']
     trim:boolean
-    type:GenericInputType
+    type:string
     value?:null|Type
 }
 export type CursorState = {
@@ -598,13 +598,15 @@ export const defaultInputProperties:DefaultInputProperties = {
 // // endregion
 // / endregion
 // / region inputs
-export type InputsModel<M extends Model = Model> = Model<Array<M['value']>> & {
-    maximumLength:number
-    minimumLength:number
-    state:ModelState
-    value:Array<M>
-    writable:boolean
-}
+export type InputsModel<M extends Model = Model> =
+    Model<Array<M['value']>> &
+    {
+        maximumLength:number
+        minimumLength:number
+        state:ModelState
+        value:Array<M>|null
+        writable:boolean
+    }
 export type AdditionalInputsProperties<P extends Properties = Properties> =
     ModelState &
     {
@@ -612,12 +614,15 @@ export type AdditionalInputsProperties<P extends Properties = Properties> =
         inputProperties:Array<P>
         model:InputsModel<P['model']>
         removeIcon:IconOptions
-        value:Array<P['value']>
+        value:Array<P['value']>|null
         writable:boolean
     }
 export type InputsProperties<P extends Properties = Properties> =
     Omit<
-        Properties<Array<P['value']>, AdditionalInputsProperties<P>>,
+        Properties<
+            Array<P['value']>,
+            Properties<Array<P['value']>> & AdditionalInputsProperties<P>
+        >,
         'model'|'onChangeValue'
     > &
     AdditionalInputsProperties<P> &
@@ -625,10 +630,13 @@ export type InputsProperties<P extends Properties = Properties> =
         children:(
             properties:P, index:number, parentProperties:InputsProperties<P>
         ) => ReactElement
-        createPrototype:(values:Array<P['value']>) => Partial<P>
+        createPrototype:(
+            properties:InputsProperties<P>, values:Array<P['value']>
+        ) => Partial<P>
         inputProperties:Array<P>
         model:InputsModel<P['model']>
-        onChangeValue:(value:Array<P['value']>, event?:GenericEvent) => void
+        onChangeValue:(values:Array<P['value']>|null, event?:GenericEvent) =>
+            void
     }
 export type InputsProps<P extends Properties = Properties> =
     Partial<Omit<InputsProperties<P>, 'model'>> &
@@ -651,11 +659,12 @@ export type InputsAdapterWithReferences<
 export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes
 } as const
-export const defaultInputsModel:InputModel = {
+export const defaultInputsModel:Omit<
+    InputsModel, 'value'
+> & {value?:InputsModel['value']} = {
     ...defaultModel,
-    default: [],
     minimumLength: 0,
-    type: 'string[]',
+    type: 'string[]'
 } as const
 /*
     NOTE: Avoid setting any properties already defined in model here since they
@@ -666,8 +675,14 @@ export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultInputsModel,
     addIcon: {icon: 'add'},
     createPrototype: <P extends Properties = Properties>(
-        values:Array<P['value']>
-    ):Partial<P> => ({...defaultProperties} as Partial<P>),
+        properties:InputProperties<P>
+    ):Partial<P> => ({
+        ...defaultProperties,
+        ...((properties.default as Array<P['value']>)?.length > 0 ?
+            {value: properties.default![0]} :
+            {}
+        )
+    } as Partial<P>),
     model: defaultInputsModel,
     removeIcon: {icon: 'clear'}
 } as const

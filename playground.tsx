@@ -64,9 +64,12 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     const onChangeValue4 =
         useMemorizedValue<(value:boolean|null) => void>(setValue4)
 
-    const [value5, setValue5] = useState<Array<null|string>>(['first item'])
+    const [value5, setValue5] =
+        useState<Array<boolean|null|string>|null>(['first item'])
     const onChangeValue5 =
-        useMemorizedValue<(value:Array<null|string>) => void>(setValue5)
+        useMemorizedValue<(values:Array<boolean|null|string>|null) => void>(
+            setValue5
+        )
     // endregion
     return (<>
         <div className="playground__inputs">

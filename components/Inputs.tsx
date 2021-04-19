@@ -267,7 +267,9 @@ export const InputsInner = function<
     const add = (event?:GenericEvent):void => setValues((
         values:Array<P['value']>
     ):Array<P['value']> => {
-        const newProperties:Partial<P> = properties.createPrototype!(values)
+        const newProperties:Partial<P> = properties.createPrototype!(
+            properties as InputsProperties<P>, values
+        )
         triggerOnChange(values, event, newProperties)
         values = triggerOnChangeValue(
             values,
