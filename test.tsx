@@ -62,8 +62,7 @@ describe('Inputs', ():void => {
         expect(
             (render(<Inputs value={['a']}/>) as HTMLElement)
                 .querySelector('input')
-                .value
-        ).toStrictEqual('a')
+        ).toHaveProperty('value', 'a')
     })
 })
 // endregion
