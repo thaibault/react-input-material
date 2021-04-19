@@ -623,7 +623,7 @@ export type InputsProperties<P extends Properties = Properties> =
     AdditionalInputsProperties<P> &
     {
         children:(properties:P, index:number) => ReactElement
-        createPrototype:(index:number, values:Array<P['value']>) => P
+        createPrototype:(values:Array<P['value']>) => P
         inputProperties:Array<P>
         model:InputsModel<P['model']>
         onChangeValue:(value:Array<P['value']>, event?:GenericEvent) => void
@@ -649,8 +649,9 @@ export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
 } as const
 export const defaultInputsModel:InputModel = {
     ...defaultModel,
+    default: [],
     minimumLength: 0,
-    type: 'string[]'
+    type: 'string[]',
 } as const
 /*
     NOTE: Avoid setting any properties already defined in model here since they
@@ -660,8 +661,10 @@ export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties,
     ...defaultInputsModel,
     addIcon: {icon: 'add'},
-    createPrototype: <P extends Properties = Properties>(index:number):P => (
-        {...defaultProperties, name: `inputsInput${index + 1}`}
+    createPrototype: <P extends Properties = Properties>(
+        values:Array<P['value']>
+    ):P => (
+        {...defaultProperties, name: `inputsInput${values.length}`}
     ),
     model: defaultInputsModel,
     removeIcon: {icon: 'clear'}

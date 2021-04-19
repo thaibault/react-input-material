@@ -35,7 +35,10 @@ import {IconButton} from '@rmwc/icon-button'
 import styles from './Inputs.module'
 import WrapConfigurations from './WrapConfigurations'
 import {
-    createDummyStateSetter, translateKnownSymbols, triggerCallbackIfExists
+    createDummyStateSetter,
+    determineInitialValue,
+    translateKnownSymbols,
+    triggerCallbackIfExists
 } from '../helper'
 import {
     defaultInputsProperties as defaultProperties,
@@ -61,18 +64,19 @@ const inputPropertiesToValues = function<P extends Properties>(
 const getModelState = function<P extends Properties>(
     inputProperties:Array<P>
 ):ModelState {
+    const unpack = (name:string, defaultValue:boolean = false) =>
+        (properties:P):boolean => properties[name] ?? defaultValue
+
     return {
-        dirty: inputProperties.some(({dirty}):boolean => dirty),
-        focused: inputProperties.some(({focused}):boolean => focused),
-        invalid: inputProperties.some(({invalid}):boolean => invalid),
-        invalidRequired: inputProperties.some(({invalidRequired}):boolean =>
-            invalidRequired
-        ),
-        pristine: inputProperties.every(({pristine}):boolean => pristine),
-        touched: inputProperties.some(({touched}):boolean => touched),
-        untouched: inputProperties.every(({untouched}):boolean => untouched),
-        valid: inputProperties.every(({valid}):boolean => valid),
-        visited: inputProperties.some(({visited}):boolean => visited)
+        dirty: inputProperties.some(unpack('dirty')),
+        focused: inputProperties.some(unpack('focused')),
+        invalid: inputProperties.some(unpack('invalid', true)),
+        invalidRequired: inputProperties.some(unpack('invalidRequired')),
+        pristine: inputProperties.every(unpack('pristine', true)),
+        touched: inputProperties.some(unpack('touched')),
+        untouched: inputProperties.every(unpack('untouched', true)),
+        valid: inputProperties.every(unpack('valid')),
+        visited: inputProperties.some(unpack('visited'))
     }
 }
 const getExternalProperties = function<P extends Properties>(
@@ -87,7 +91,7 @@ const getExternalProperties = function<P extends Properties>(
             ...(properties.model || {}),
             state: modelState,
             value: properties.inputProperties.map(
-                ({model}):Properties['model'] => model
+                ({model}):Properties['model'] => model || {}
             )
         },
         value: inputPropertiesToValues<Properties>(properties.inputProperties)
@@ -136,14 +140,13 @@ export const InputsInner = function<
         ) &&
         Boolean(properties.onChange || properties.onChangeValue)
 
-    let [value, setValue] = useState<Array<P['value']>>(
-        properties.value ||
-        properties.inputProperties &&
-        inputPropertiesToValues<P>(properties.inputProperties) ||
-        []
+    let [values, setValues] = useState<Array<P['value']>>(
+        determineInitialValue<Array<P['value']>>(
+            givenProps, Inputs.defaultProperties.model?.default
+        )
     )
     if (!properties.value)
-        properties.value = value
+        properties.value = values
     const references:Array<RefObject<WebComponentAdapter<P, State>>> = []
     properties.inputProperties = properties.inputProperties || []
 
@@ -159,11 +162,17 @@ export const InputsInner = function<
             references[index]?.current?.properties ||
             properties.inputProperties![index]
         )
-        if (typeof index === 'number')
+
+        if (inputProperties === undefined)
+            properties.inputProperties.splice(index, 1)
+        else if (typeof index === 'number')
             properties.inputProperties![index] = inputProperties as P
         else if (inputProperties)
             properties.inputProperties!.push(inputProperties)
 
+        // TODO
+            getExternalProperties<P>(properties as InputsProperties<P>)
+        return
         triggerCallbackIfExists<InputsProperties<P>>(
             properties as InputsProperties<P>,
             'change',
@@ -179,13 +188,13 @@ export const InputsInner = function<
         index?:number
     ):Array<P['value']> => {
         if (value === undefined)
-            values = values.filter((_:P['value'], subIndex:number):boolean =>
-                index !== subIndex
-            )
+            values.splice(index, 1)
         else if (typeof index === 'number')
             values[index] = value
         else
-            values = values.concat(value)
+            values.push(value)
+
+        values = [...values]
 
         triggerCallbackIfExists<InputsProperties<P>>(
             properties as InputsProperties<P>,
@@ -216,11 +225,13 @@ export const InputsInner = function<
                 ...properties.inputProperties[index],
                 className: styles.inputs__item__input,
                 onChange: (inputProperties:P, event?:GenericEvent):void =>
-                    triggerOnChange(values, event, inputProperties, index),
+                    triggerOnChange(
+                        properties.value, event, inputProperties, index
+                    ),
                 onChangeValue: (
                     value:null|P['value'], event?:GenericEvent
                 ):void =>
-                    setValue((values:Array<P['value']>):Array<P['value']> =>
+                    setValues((values:Array<P['value']>):Array<P['value']> =>
                         triggerOnChangeValue(values, event, value, index)
                     ),
                 ref: reference
@@ -234,40 +245,40 @@ export const InputsInner = function<
         )
     }
 
-    const values:Array<P['value']> =
-        inputPropertiesToValues<P>(properties.inputProperties)
+    properties.value = inputPropertiesToValues<P>(properties.inputProperties)
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValue = createDummyStateSetter<Array<P['value']>>(values)
+        setValues = createDummyStateSetter<Array<P['value']>>(properties.value)
     // endregion
     useImperativeHandle(
         reference,
         ():AdapterWithReferences<P> => ({
             properties: properties as InputsProperties<P>,
             references,
-            state: controlled ? {} : {value: values}
+            state: controlled ? {} : {value: properties.value}
         })
     )
 
-    const add = (event?:GenericEvent):void => setValue((
+    const add = (event?:GenericEvent):void => setValues((
         values:Array<P['value']>
     ):Array<P['value']> => {
-        const newProperties:P = properties.createPrototype<P>(
-            values.length, values
+        const newProperties:P = properties.createPrototype<P>(values)
+        values = triggerOnChangeValue(
+            values,
+            event,
+            newProperties.value ?? newProperties.model?.value ?? null
         )
-        console.log('A', values)
-        values = triggerOnChangeValue(values, event, newProperties.value)
         triggerOnChange(values, event, newProperties)
         return values
     })
-    const remove = (event?:GenericEvent):void => setValue((
+    const createRemove = (index:number) => (event?:GenericEvent):void => setValues((
         values:Array<P['value']>
     ):Array<P['value']> => {
-        values = triggerOnChangeValue(values, event)
-        triggerOnChange(values, event)
+        values = triggerOnChangeValue(values, event, undefined, index)
+        triggerOnChange(values, event, undefined, index)
         return values
     })
 
@@ -293,7 +304,8 @@ export const InputsInner = function<
 
                     {properties.writable ?
                         <IconButton
-                            icon={properties.removeIcon} onClick={remove}
+                            icon={properties.removeIcon}
+                            onClick={createRemove(index)}
                         /> :
                         ''
                     }

@@ -623,13 +623,13 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <Inputs
                 model={useMemorizedValue({
-                    default: [{type: 'boolean'}],
+                    default: [false],
                     name: 'inputs1',
                 })}
                 onChange={onChange}
-                createPrototype={useMemorizedValue(() => (
-                    {model: {type: 'boolean'}}
-                ))}
+                createPrototype={useMemorizedValue(() => ({
+                    type: 'boolean', value: false
+                }))}
                 showInitialValidationState
             >
                 {useMemorizedValue((
