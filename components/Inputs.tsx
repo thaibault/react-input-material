@@ -170,9 +170,6 @@ export const InputsInner = function<
         else if (inputProperties)
             properties.inputProperties!.push(inputProperties)
 
-        // TODO
-            getExternalProperties<P>(properties as InputsProperties<P>)
-        return
         triggerCallbackIfExists<InputsProperties<P>>(
             properties as InputsProperties<P>,
             'change',
@@ -266,12 +263,12 @@ export const InputsInner = function<
         values:Array<P['value']>
     ):Array<P['value']> => {
         const newProperties:P = properties.createPrototype<P>(values)
+        triggerOnChange(values, event, newProperties)
         values = triggerOnChangeValue(
             values,
             event,
             newProperties.value ?? newProperties.model?.value ?? null
         )
-        triggerOnChange(values, event, newProperties)
         return values
     })
     const createRemove = (index:number) => (event?:GenericEvent):void => setValues((
