@@ -23,7 +23,7 @@ import {ReactElement} from 'react'
 import {render} from 'react-dom'
 
 import {
-    GenericAnimate, GenericInput, Interval, RequireableCheckbox
+    GenericAnimate, GenericInput, Inputs, Interval, RequireableCheckbox
 } from './index'
 import {useMemorizedValue} from './helper'
 import {InputProperties, IntervalValue, Properties, Model} from './type'
@@ -63,6 +63,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     const [value4, setValue4] = useState<boolean|null>(false)
     const onChangeValue4 =
         useMemorizedValue<(value:boolean|null) => void>(setValue4)
+
+    const [value5, setValue5] = useState<Array<null|string>>(['first item'])
+    const onChangeValue5 =
+        useMemorizedValue<(value:Array<null|string>) => void>(setValue5)
     // endregion
     return (<>
         <div className="playground__inputs">
@@ -613,6 +617,35 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 showInitialValidationState
                 tooltip="Check this one!"
+            />
+
+            <hr/>
+
+            <Inputs
+                createPrototype={useMemorizedValue(() => ({
+                    type: 'boolean', value: false
+                }))}
+                model={useMemorizedValue({
+                    default: [false],
+                    name: 'inputs1',
+                })}
+                onChange={onChange}
+                showInitialValidationState
+            >
+                {useMemorizedValue((
+                    properties:Properties<boolean>, index:number
+                ):ReactElement =>
+                    <RequireableCheckbox
+                        {...properties} name={`inputs1-${index}`}
+                    />
+                )}
+            </Inputs>
+            <Inputs
+                name="inputs2"
+                onChange={onChange}
+                onChangeValue={onChangeValue5}
+                showInitialValidationState
+                value={value5}
             />
 
         </div>

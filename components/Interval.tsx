@@ -78,15 +78,11 @@ export const IntervalInner = ((
         true, Tools.copy(Interval.defaultProperties), givenProps
     )
 
-    const endProperties:InputProps<number> = properties.end!
+    let endProperties:InputProps<number> = properties.end!
     const iconProperties:IconOptions = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
         properties.icon!
-    const startProperties:InputProps<number> = properties.start!
-
-    const model = properties.model
-    const onChange:Function|undefined = properties.onChange
-    const onChangeValue:Function|undefined = properties.onChangeValue
+    let startProperties:InputProps<number> = properties.start!
 
     /*
         NOTE: Sometimes we need real given properties or derived (default
@@ -99,20 +95,20 @@ export const IntervalInner = ((
             givenProps.model?.start?.value !== undefined ||
             givenProps.value !== undefined
         ) &&
-        Boolean(onChange || onChangeValue)
+        Boolean(properties.onChange || properties.onChangeValue)
 
     let [value, setValue] = useState<Value>({
         end:
             endProperties.value ??
-            model?.end?.value ??
+            properties.model?.end?.value ??
             endProperties.default ??
-            model?.end?.default ??
+            properties.model?.end?.default ??
             null,
         start:
             startProperties.value ??
-            model?.end?.value ??
+            properties.model?.end?.value ??
             startProperties.default ??
-            model?.start?.default ??
+            properties.model?.start?.default ??
             null,
     })
     if (!properties.value)
@@ -133,17 +129,19 @@ export const IntervalInner = ((
             }}
         )
 
-    Tools.extend(
+    endProperties = Tools.extend(
         true,
-        endProperties,
-        model?.end ? {model: model.end} : {},
-        propertiesToForward
+        {},
+        propertiesToForward,
+        properties.model?.end ? {model: properties.model.end} : {},
+        endProperties
     )
-    Tools.extend(
+    startProperties = Tools.extend(
         true,
-        startProperties,
-        model?.start ? {model: model.start} : {},
-        propertiesToForward
+        {},
+        propertiesToForward,
+        properties.model?.start ? {model: properties.model.start} : {},
+        startProperties
     )
 
     if (!endProperties.className)
@@ -203,7 +201,7 @@ export const IntervalInner = ((
         })
     )
     // region attach event handler
-    if (onChange) {
+    if (properties.onChange) {
         const getModelState = (
             startProperties:InputProperties<number>,
             endProperties:InputProperties<number>
@@ -364,7 +362,7 @@ IntervalInner.displayName = 'Interval'
  */
 export const Interval:StaticComponent<Props> =
     memorize(forwardRef(IntervalInner)) as unknown as StaticComponent<Props>
-// region static  properties
+// region static properties
 // / region web-component hints
 Interval.wrapped = IntervalInner
 Interval.webComponentAdapterWrapped = 'react'

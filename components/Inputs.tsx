@@ -18,6 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
+import {Mapping} from 'clientnode/type'
 import {
     createRef,
     forwardRef,
@@ -28,15 +29,76 @@ import {
     useImperativeHandle,
     useState
 } from 'react'
+import {WebComponentAdapter} from 'web-component-wrapper/type'
+import {IconButton} from '@rmwc/icon-button'
 
+import GenericInput from './GenericInput'
+import styles from './Inputs.module'
 import WrapConfigurations from './WrapConfigurations'
 import {
-    createDummyStateSetter, translateKnownSymbols, triggerCallbackIfExists
+    createDummyStateSetter,
+    determineInitialValue,
+    translateKnownSymbols,
+    triggerCallbackIfExists
 } from '../helper'
 import {
+    defaultInputsProperties as defaultProperties,
     GenericEvent,
-    StaticFunctionInputComponent as StaticComponent
+    InputsAdapter as Adapter,
+    ModelState,
+    InputsAdapterWithReferences as AdapterWithReferences,
+    InputsProperties,
+    inputsPropertyTypes as propertyTypes,
+    InputsProps,
+    Properties,
+    StaticComponent
 } from '../type'
+// endregion
+// region helper
+const inputPropertiesToValues = function<P extends Properties>(
+    inputProperties:Array<P>
+):Array<P['value']> {
+    return inputProperties.map(({model, value}):P['value'] =>
+        typeof value === undefined ? model?.value : value
+    )
+}
+const getModelState = function<P extends Properties>(
+    inputProperties:Array<P>
+):ModelState {
+    const unpack = (name:keyof P, defaultValue:boolean = false) =>
+        (properties:P):boolean =>
+            properties[name] as unknown as boolean ?? defaultValue
+
+    return {
+        dirty: inputProperties.some(unpack('dirty')),
+        focused: inputProperties.some(unpack('focused')),
+        invalid: inputProperties.some(unpack('invalid', true)),
+        invalidRequired: inputProperties.some(unpack('invalidRequired')),
+        pristine: inputProperties.every(unpack('pristine', true)),
+        touched: inputProperties.some(unpack('touched')),
+        untouched: inputProperties.every(unpack('untouched', true)),
+        valid: inputProperties.every(unpack('valid')),
+        visited: inputProperties.some(unpack('visited'))
+    }
+}
+const getExternalProperties = function<P extends Properties>(
+    properties:InputsProperties<P>
+):InputsProperties<P> {
+    const modelState:ModelState = getModelState<P>(properties.inputProperties)
+
+    return {
+        ...properties,
+        ...modelState,
+        model: {
+            ...(properties.model || {}),
+            state: modelState,
+            value: properties.inputProperties.map(
+                ({model}):Properties['model'] => model || {}
+            )
+        },
+        value: inputPropertiesToValues<Properties>(properties.inputProperties)
+    }
+}
 // endregion
 /**
  * Generic inputs wrapper component.
@@ -48,21 +110,20 @@ import {
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const InputsInner = ((
-    props:Props, reference?:RefObject<Adapter>
-):ReactElement => {
+export const InputsInner = function<
+    P extends Properties = Properties, State = Mapping<any>
+>(props:InputsProps<P>, reference?:RefObject<Adapter<P>>):ReactElement {
     // region consolidate properties
-    const givenProps:Props = translateKnownSymbols(props) as Props
+    const givenProps:InputsProps<P> =
+        translateKnownSymbols(props) as InputsProps<P>
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
         instances.
     */
-    const properties:Props = Tools.extend(
+    const properties:InputsProps<P> = Tools.extend(
         true, Tools.copy(Inputs.defaultProperties), givenProps
     )
-
-    // TODO
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
@@ -70,247 +131,208 @@ export const InputsInner = ((
     const controlled:boolean =
         !properties.enforceUncontrolled &&
         (
-            givenProps.model?.end?.value !== undefined ||
-            givenProps.model?.start?.value !== undefined ||
-            givenProps.value !== undefined
+            Array.isArray(givenProps.model?.value) &&
+            givenProps.model!.value.every(({value}):boolean =>
+                value !== undefined
+            ) ||
+            Array.isArray(givenProps.value) &&
+            givenProps.value.every((value:P['value']):boolean =>
+                value !== undefined
+            )
         ) &&
-        Boolean(onChange || onChangeValue)
+        Boolean(properties.onChange || properties.onChangeValue)
 
-    let [value, setValue] = useState<Value>({
-        end:
-            endProperties.value ??
-            model?.end?.value ??
-            endProperties.default ??
-            model?.end?.default ??
-            null,
-        start:
-            startProperties.value ??
-            model?.end?.value ??
-            startProperties.default ??
-            model?.start?.default ??
-            null,
-    })
+    let [values, setValues] = useState<Array<P['value']>>(
+        determineInitialValue<Array<P['value']>>(
+            givenProps, Inputs.defaultProperties.model?.default
+        ) ||
+        []
+    )
     if (!properties.value)
-        properties.value = value
-    const propertiesToForward:InputProps<number> =
-        Tools.mask<InputProps<number>>(
-            properties as InputProps<number>,
-            {exclude: {
-                enforceUncontrolled: true,
-                end: true,
-                icon: true,
-                start: true,
-                model: true,
-                name: true,
-                onChange: true,
-                onChangeValue: true,
-                value: true
-            }}
+        properties.value = values
+    const references:Array<RefObject<WebComponentAdapter<P, State>>> = []
+    properties.inputProperties = properties.inputProperties || []
+
+    const triggerOnChange = (
+        values:Array<P['value']>,
+        event?:GenericEvent,
+        inputProperties?:Partial<P>,
+        index?:number
+    ):void => {
+        properties.inputProperties = values.map((
+            _:P['value'], index:number
+        ):P =>
+            references[index]?.current?.properties ||
+            properties.inputProperties![index]
         )
 
-    Tools.extend(
-        true,
-        endProperties,
-        model?.end ? {model: model.end} : {},
-        propertiesToForward)
-    Tools.extend(
-        true,
-        startProperties,
-        model?.start ? {model: model.start} : {},
-        propertiesToForward
-    )
+        if (inputProperties === undefined && typeof index === 'number')
+            properties.inputProperties.splice(index, 1)
+        else if (inputProperties)
+            if (typeof index === 'number')
+                properties.inputProperties![index] = inputProperties as P
+            else
+                properties.inputProperties!.push(inputProperties as P)
 
-    if (!endProperties.className)
-        endProperties.className = `${styles.interval}__end`
-    if (!iconProperties.className)
-        iconProperties.className = `${styles.interval}__icon`
-    if (!startProperties.className)
-        startProperties.className = `${styles.interval}__start`
+        triggerCallbackIfExists<InputsProperties<P>>(
+            properties as InputsProperties<P>,
+            'change',
+            controlled,
+            getExternalProperties<P>(properties as InputsProperties<P>),
+            event
+        )
+    }
+    const triggerOnChangeValue = (
+        values:Array<P['value']>,
+        event?:GenericEvent,
+        value?:P['value'],
+        index?:number
+    ):Array<P['value']> => {
+        if (typeof index === 'number')
+            if (value === undefined)
+                values.splice(index, 1)
+            else
+                values[index] = value
+        else
+            values.push(value)
 
-    const endConfiguration = {...endProperties.model, ...endProperties}
-    const startConfiguration = {...startProperties.model, ...startProperties}
+        values = [...values]
 
-    startProperties.maximum = Math.min(
-        typeof startConfiguration.maximum === 'number' ?
-            startConfiguration.maximum :
-            Infinity,
-        properties.value.end || Infinity,
-        typeof endConfiguration.maximum === 'number' ?
-            endConfiguration.maximum :
-            Infinity
-    )
-    startProperties.minimum = startConfiguration.minimum || -Infinity
-    startProperties.value = properties.value.start
+        triggerCallbackIfExists<InputsProperties<P>>(
+            properties as InputsProperties<P>,
+            'changeValue',
+            controlled,
+            values,
+            event
+        )
 
-    endProperties.maximum = typeof endConfiguration.maximum === 'number' ?
-        endConfiguration.maximum :
-        Infinity
-    endProperties.minimum = Math.max(
-        typeof endConfiguration.minimum === 'number' ?
-            endConfiguration.minimum :
-            -Infinity,
-        properties.value.start || -Infinity,
-        typeof startConfiguration.minimum === 'number' ?
-            startConfiguration.minimum :
-            -Infinity
-    )
-    endProperties.value = properties.value.end
+        return values
+    }
 
-    const endInputReference:RefObject<InputAdapterWithReferences<number>> =
-        createRef<InputAdapterWithReferences<number>>()
-    const startInputReference:RefObject<InputAdapterWithReferences<number>> =
-        createRef<InputAdapterWithReferences<number>>()
+    for (let index:number = 0; index < Math.max(
+        properties.inputProperties.length || 0,
+        properties.model?.value?.length || 0,
+        properties.value?.length || 0
+    ); index += 1) {
+        const reference:RefObject<WebComponentAdapter<P, State>> =
+            createRef<WebComponentAdapter<P, State>>()
+        references.push(reference)
 
+        if (index >= properties.inputProperties.length)
+            properties.inputProperties.push({} as P)
+
+        properties.inputProperties[index] = Tools.extend(
+            true,
+            {
+                ...properties.inputProperties[index],
+                className: styles.inputs__item__input,
+                onChange: (inputProperties:P, event?:GenericEvent):void =>
+                    triggerOnChange(
+                        properties.value!, event, inputProperties, index
+                    ),
+                onChangeValue: (
+                    value:null|P['value'], event?:GenericEvent
+                ):void =>
+                    setValues((values:Array<P['value']>):Array<P['value']> =>
+                        triggerOnChangeValue(values, event, value, index)
+                    ),
+                ref: reference
+            },
+            properties.model?.value && properties.model.value.length > index ?
+                {model: properties.model.value[index]} :
+                {},
+            properties.value && properties.value.length > index ?
+                {value: properties.value[index]} :
+                {}
+        )
+    }
+
+    properties.value = inputPropertiesToValues<P>(properties.inputProperties)
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValue = createDummyStateSetter<Value>(properties.value)
+        setValues = createDummyStateSetter<Array<P['value']>>(properties.value)
     // endregion
     useImperativeHandle(
         reference,
-        ():AdapterWithReferences => ({
-            properties: properties as Properties,
-            references: {end: endInputReference, start: startInputReference},
+        ():AdapterWithReferences<P> => ({
+            properties: properties as InputsProperties<P>,
+            references,
             state: controlled ? {} : {value: properties.value}
         })
     )
-    // region attach event handler
-    if (onChange) {
-        const getModelState = (
-            startProperties:InputProperties<number>,
-            endProperties:InputProperties<number>
-        ):ModelState => ({
-            dirty: startProperties.dirty || endProperties.dirty,
-            focused: startProperties.focused || endProperties.focused,
-            invalid: startProperties.invalid || endProperties.invalid,
-            invalidRequired:
-                startProperties.invalidRequired ||
-                endProperties.invalidRequired,
-            pristine: startProperties.pristine && endProperties.pristine,
-            touched: startProperties.touched || endProperties.touched,
-            untouched: startProperties.untouched && endProperties.untouched,
-            valid: startProperties.valid && endProperties.valid,
-            visited: startProperties.visited || endProperties.visited
-        })
-        const getExternalProperties = (
-            startProperties:InputProperties<number>,
-            endProperties:InputProperties<number>
-        ):Properties => {
-            const modelState = getModelState(startProperties, endProperties)
 
-            return {
-                ...properties as Properties,
-                ...modelState,
-                end: endProperties,
-                icon: iconProperties,
-                model: {
-                    end: endProperties.model,
-                    start: startProperties.model,
-                    state: modelState
-                },
-                start: startProperties,
-                value: {
-                    end: endProperties.value, start: startProperties.value
-                }
-            }
-        }
-
-        endProperties.onChange = (
-            inputProperties:InputProperties<number>, event?:GenericEvent
-        ):void => {
-            const start:InputProperties<number> =
-                startInputReference.current?.properties ||
-                startProperties as unknown as InputProperties<number>
-            start.value = Math.min(
-                endInputReference.current?.properties?.value ?? Infinity,
-                inputProperties.value ?? Infinity
-            )
-
-            triggerCallbackIfExists<Properties>(
-                properties as Properties,
-                'change',
-                controlled,
-                getExternalProperties(start, inputProperties),
-                event
-            )
-        }
-        startProperties.onChange = (
-            inputProperties:InputProperties<number>, event?:GenericEvent
-        ):void => {
-            const end:InputProperties<number> =
-                endInputReference.current?.properties ||
-                endProperties as unknown as InputProperties<number>
-            end.value = Math.max(
-                endInputReference.current?.properties?.value ?? -Infinity,
-                inputProperties.value ?? -Infinity
-            )
-
-            triggerCallbackIfExists<Properties>(
-                properties as Properties,
-                'change',
-                controlled,
-                getExternalProperties(inputProperties, end),
-                event
-            )
-        }
-    }
-
-    endProperties.onChangeValue = (
-        value:null|number, event?:GenericEvent
-    ):void => {
-        const startValue:number = Math.min(
-            startInputReference.current?.properties?.value ?? Infinity,
-            value ?? Infinity
+    const add = (event?:GenericEvent):void => setValues((
+        values:Array<P['value']>
+    ):Array<P['value']> => {
+        const newProperties:Partial<P> = properties.createPrototype!(values)
+        triggerOnChange(values, event, newProperties)
+        values = triggerOnChangeValue(
+            values,
+            event,
+            newProperties.value ?? newProperties.model?.value ?? null
         )
-        const newValue:Value = {
-            end: value, start: isFinite(startValue) ? startValue : value
-        }
-        triggerCallbackIfExists<Properties>(
-            properties as Properties,
-            'changeValue',
-            controlled,
-            newValue,
-            event
-        )
-        setValue(newValue)
-    }
-    startProperties.onChangeValue = (
-        value:null|number, event?:GenericEvent
-    ):void => {
-        const endValue:number = Math.max(
-            endInputReference.current?.properties?.value ?? -Infinity,
-            value ?? -Infinity
-        )
-        const newValue:Value = {
-            end: isFinite(endValue) ? endValue : value, start: value
-        }
-        triggerCallbackIfExists<Properties>(
-            properties as Properties,
-            'changeValue',
-            controlled,
-            newValue,
-            event
-        )
-        setValue(newValue)
-    }
-    // endregion
+        return values
+    })
+    const createRemove = (index:number) => (event?:GenericEvent):void => setValues((
+        values:Array<P['value']>
+    ):Array<P['value']> => {
+        values = triggerOnChangeValue(values, event, undefined, index)
+        triggerOnChange(values, event, undefined, index)
+        return values
+    })
+
     return <WrapConfigurations
-        strict={Interval.strict}
+        strict={Inputs.strict}
         themeConfiguration={properties.themeConfiguration}
     >
         <div
             className={
-                styles.interval +
+                styles.inputs +
                 (properties.className ? ` ${properties.className}` : '')
             }
             data-name={properties.name}
         >
-            {children}
+            {properties.inputProperties.map((
+                inputProperties:P, index:number
+            ):ReactElement =>
+                <div className={styles.inputs__item} key={index}>
+                    {properties.children ?
+                        properties.children(
+                            inputProperties,
+                            index,
+                            properties as InputsProperties<P>
+                        ) :
+                        <GenericInput
+                            {...inputProperties}
+                            name={`${properties.name}${index}`}
+                        />
+                    }
+
+                    {properties.writable ?
+                        <IconButton
+                            className={styles.inputs__item__remove}
+                            icon={properties.removeIcon}
+                            onClick={createRemove(index)}
+                        /> :
+                        ''
+                    }
+                </div>
+            )}
+
+            {properties.writable ?
+                <IconButton
+                    className={styles.inputs__add}
+                    icon={properties.addIcon}
+                    onClick={add}
+                /> :
+                ''
+            }
         </div>
     </WrapConfigurations>
-}) as ForwardRefRenderFunction<Adapter, Props>
+} as ForwardRefRenderFunction<Adapter, InputsProps>
 // NOTE: This is useful in react dev tools.
 InputsInner.displayName = 'Inputs'
 /**
@@ -325,16 +347,18 @@ InputsInner.displayName = 'Inputs'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Inputs:StaticComponent<Props> =
-    memorize(forwardRef(InputsInner)) as unknown as StaticComponent<Props>
-// region static  properties 
+export const Inputs:StaticComponent<InputsProps> =
+    memorize(forwardRef(InputsInner)) as
+        unknown as
+        StaticComponent<InputsProps>
+// region static properties
 // / region web-component hints
-Interval.wrapped = InputsInner
-Interval.webComponentAdapterWrapped = 'react'
+Inputs.wrapped = InputsInner
+Inputs.webComponentAdapterWrapped = 'react'
 // / endregion
-Interval.defaultProperties = defaultProperties
-Interval.propTypes = propertyTypes
-Interval.strict = false
+Inputs.defaultProperties = defaultProperties
+Inputs.propTypes = propertyTypes
+Inputs.strict = false
 // endregion
 export default Inputs
 // region vim modline

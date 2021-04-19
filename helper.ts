@@ -58,21 +58,25 @@ export const createDummyStateSetter = <Type = any>(
  * occur. Useful to dynamically convert a component from uncontrolled to
  * controlled while model state should be uncontrolled either.
  *
- * @param value - Parameter for state setter.
+ * @param setValueState - Value setter to wrap.
+ * @param currentValueState - Last known value state to provide to setter when
+ * called.
  *
- * @returns Nothing.
+ * @returns Wrapped given method.
  */
 export const wrapStateSetter = <Type = any>(
-    setValueState:ReturnType<typeof useState>[1], currentValueState:Type
+    setValueState:(value:Type|((value:Type) => Type)) => void,
+    currentValueState:Type
 ):ReturnType<typeof useState>[1] => (
     callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
 ) => {
-    const result = typeof callbackOrData === 'function' ?
+    const result:Type = typeof callbackOrData === 'function' ?
         callbackOrData(currentValueState) :
         callbackOrData
 
     if (!Tools.equals(
-        callbackOrData.modelState, currentValueState.modelState
+        (result as unknown as {modelState:unknown})?.modelState,
+        (currentValueState as unknown as {modelState:unknown})?.modelState
     ))
         setValueState(result)
 }

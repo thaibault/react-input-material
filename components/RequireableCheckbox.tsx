@@ -439,7 +439,7 @@ export const RequireableCheckboxInner = function(
     ))
         setValueState(currentValueState)
     if (controlled)
-        setValueState = wrapStateSetter<ValueState<Type, ModelState>>(
+        setValueState = wrapStateSetter<ValueState<boolean, ModelState>>(
             setValueState, currentValueState
         )
     // endregion

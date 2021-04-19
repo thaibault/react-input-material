@@ -19,9 +19,10 @@ import {Mapping} from 'clientnode/type'
 import React from 'react'
 import {SelectProps} from '@rmwc/select'
 
-import Interval from './components/Interval'
 import GenericAnimate from './components/GenericAnimate'
 import GenericInput, {normalizeSelection} from './components/GenericInput'
+import Inputs from './components/Inputs'
+import Interval from './components/Interval'
 import RequireableCheckbox from './components/RequireableCheckbox'
 import WrapConfigurations from './components/WrapConfigurations'
 import WrapStrict from './components/WrapStrict'
@@ -34,6 +35,38 @@ import {TestEnvironment} from './type'
 const testEnvironment:TestEnvironment =
     prepareTestEnvironment(beforeEach, afterEach)
 const {render} = testEnvironment
+// region Inputs
+describe('Inputs', ():void => {
+    test('render', ():void => {
+        expect(render(<Inputs/>)).toBeDefined()
+
+        let domNode:HTMLElement = render(<Inputs/>) as HTMLElement
+        expect(domNode.querySelector('input')).toStrictEqual(null)
+        expect(domNode.querySelector('.inputs__add')).not.toStrictEqual(null)
+        expect(domNode.querySelector('.inputs__item__remove')).toStrictEqual(null)
+
+        domNode = render(<Inputs value={['a']}/>) as HTMLElement
+        expect(Array.from(domNode.querySelectorAll('input'))).toHaveLength(1)
+        expect(Array.from(domNode.querySelectorAll('.inputs__add')))
+            .toHaveLength(1)
+        expect(Array.from(domNode.querySelectorAll('.inputs__item__remove')))
+            .toHaveLength(1)
+
+        domNode = render(<Inputs value={['a', ['b']]}/>) as HTMLElement
+        expect(Array.from(domNode.querySelectorAll('input'))).toHaveLength(2)
+        expect(Array.from(domNode.querySelectorAll('.inputs__add')))
+            .toHaveLength(1)
+        expect(Array.from(domNode.querySelectorAll('.inputs__item__remove')))
+            .toHaveLength(2)
+
+        expect(
+            (render(<Inputs value={['a']}/>) as HTMLElement)
+                .querySelector('input')
+                .value
+        ).toStrictEqual('a')
+    })
+})
+// endregion
 // region Interval
 describe('Interval', ():void => {
     test('render', ():void => {

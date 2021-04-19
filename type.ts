@@ -172,9 +172,8 @@ export type Props<
 export type DefaultProperties<Type = any> =
     Omit<Props<Type>, 'model'> & {model:Model<Type>}
 export type State<Type = any> = {
-    modelState:ModelState
-    showDeclaration:boolean
-    value:null|Type
+    modelState?:ModelState
+    value?:null|Type
 }
 export interface StaticWebComponent<P = Props> extends StaticBaseWebComponent {
     new (properties:P):Component<P>
@@ -331,7 +330,7 @@ export type CheckboxProps =
     {model?:Partial<CheckboxModel>}
 export type DefaultCheckboxProperties<Type = any> =
     Omit<CheckboxProps, 'model'> & {model:CheckboxModel}
-export type CheckboxState = State<boolean>
+export type CheckboxState = State<boolean> & {showDeclaration:boolean}
 export type CheckboxAdapter<Type = any> =
     WebComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
 // // region constants
@@ -433,6 +432,7 @@ export type InputState<Type = any> =
         modelState:InputModelState
         representation?:string
         selectionIsUnstable:boolean
+        showDeclaration:boolean
     }
 export type InputDataTransformation<Type = any> =
     Mapping<RecursivePartial<DataTransformSpecification<Type>>> &
@@ -468,7 +468,11 @@ export interface StaticWebInputComponent<
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
 export type InputAdapter<Type = any> = WebComponentAdapter<
     InputProperties<Type>,
-    Omit<InputState<Type>, 'representation'|'selectionIsUnstable'|'value'>
+    Omit<InputState<Type>, 'representation'|'selectionIsUnstable'|'value'> &
+    {
+        representation?:string
+        value?:null|Type
+    }
 >
 export type InputAdapterWithReferences<Type = any> = InputAdapter<Type> & {
     references:{
@@ -593,6 +597,82 @@ export const defaultInputProperties:DefaultInputProperties = {
 } as const
 // // endregion
 // / endregion
+// / region inputs
+export type InputsModel<M extends Model = Model> = Model<Array<M['value']>> & {
+    maximumLength:number
+    minimumLength:number
+    state:ModelState
+    value:Array<M>
+    writable:boolean
+}
+export type AdditionalInputsProperties<P extends Properties = Properties> =
+    ModelState &
+    {
+        addIcon:IconOptions
+        inputProperties:Array<P>
+        model:InputsModel<P['model']>
+        removeIcon:IconOptions
+        value:Array<P['value']>
+        writable:boolean
+    }
+export type InputsProperties<P extends Properties = Properties> =
+    Omit<
+        Properties<Array<P['value']>, AdditionalInputsProperties<P>>,
+        'model'|'onChangeValue'
+    > &
+    AdditionalInputsProperties<P> &
+    {
+        children:(
+            properties:P, index:number, parentProperties:InputsProperties<P>
+        ) => ReactElement
+        createPrototype:(values:Array<P['value']>) => Partial<P>
+        inputProperties:Array<P>
+        model:InputsModel<P['model']>
+        onChangeValue:(value:Array<P['value']>, event?:GenericEvent) => void
+    }
+export type InputsProps<P extends Properties = Properties> =
+    Partial<Omit<InputsProperties<P>, 'model'>> &
+    {model?:Partial<InputsModel<P['model']>>}
+export type DefaultInputsProperties<P extends Properties = Properties> =
+    Omit<InputsProps<P>, 'model'> &
+    {model:InputsModel<P['model']>}
+export type InputsPropertyTypes<P extends Properties = Properties> = {
+    [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
+}
+export type InputsState<Type = any> = State<Array<Type>>
+export type InputsAdapter<P extends Properties = Properties> =
+    WebComponentAdapter<InputsProperties<P>, InputsState<P['value']>>
+export type InputsAdapterWithReferences<
+    P extends Properties = Properties, RefType = unknown
+> =
+    InputsAdapter<P> &
+    {references:Array<RefObject<RefType>>}
+// // region constants
+export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+    ...propertyTypes
+} as const
+export const defaultInputsModel:InputModel = {
+    ...defaultModel,
+    default: [],
+    minimumLength: 0,
+    type: 'string[]',
+} as const
+/*
+    NOTE: Avoid setting any properties already defined in model here since they
+    would permanently shadow them.
+*/
+export const defaultInputsProperties:DefaultInputsProperties = {
+    ...defaultProperties,
+    ...defaultInputsModel,
+    addIcon: {icon: 'add'},
+    createPrototype: <P extends Properties = Properties>(
+        values:Array<P['value']>
+    ):Partial<P> => ({...defaultProperties} as Partial<P>),
+    model: defaultInputsModel,
+    removeIcon: {icon: 'clear'}
+} as const
+// // endregion
+// / endregion
 // / region interval
 export type IntervalValue = {
     end?:null|number
@@ -603,6 +683,7 @@ export type IntervalModel = {
     end:InputModel<number>
     start:InputModel<number>
     state:IntervalModelState
+    value:IntervalValue
 }
 export type AdditionalIntervalProperties = {
     end:InputProperties<number>
