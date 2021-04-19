@@ -96,7 +96,12 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-            <GenericInput name="input1" onChange={onChange} />
+            <GenericInput
+                declaration="This text can be seen initially."
+                name="input1"
+                onChange={onChange}
+                showDeclaration={true}
+            />
             <GenericInput
                 model={useMemorizedValue({name: 'input1Model'})}
                 onChange={onChange}
