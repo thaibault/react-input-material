@@ -3568,7 +3568,7 @@ browserslist@^3.2.6:
     caniuse-lite "^1.0.30000844"
     electron-to-chromium "^1.3.47"
 
-browserslist@^4.0.0, browserslist@^4.12.0, browserslist@^4.14.5, browserslist@^4.16.3, browserslist@^4.6.4:
+browserslist@^4.0.0, browserslist@^4.12.0, browserslist@^4.14.5, browserslist@^4.16.4, browserslist@^4.6.4:
   version "4.16.4"
   resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.16.4.tgz#7ebf913487f40caf4637b892b268069951c35d58"
   integrity sha512-d7rCxYV8I9kj41RH8UKYnvDYCRENUlHRgyXy/Rhr/1BaeLGfiCptEdFE8MIrvGfWbBFNjVYx76SQWvNX1j+/cQ==
@@ -3709,9 +3709,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000844, caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001208:
-  version "1.0.30001211"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001211.tgz#be40d528bb10272eba0037a88adc40054810f8e2"
-  integrity sha512-v3GXWKofIkN3PkSidLI5d1oqeKNsam9nQkqieoMhP87nxOY0RPDC8X2+jcv8pjV4dRozPLSoMqNii9sDViOlIg==
+  version "1.0.30001214"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001214.tgz#70f153c78223515c6d37a9fde6cd69250da9d872"
+  integrity sha512-O2/SCpuaU3eASWVaesQirZv1MSjUNOvmugaD8zNSJqw6Vv5SGwoOpA9LJs3pNPfM745nxqPvfZY3MQKY4AKHYg==
 
 capture-exit@^2.0.0:
   version "2.0.0"
@@ -4114,11 +4114,11 @@ copy-descriptor@^0.1.0:
   integrity sha1-Z29us8OZl8LuGsOpJP1hJHSPV40=
 
 core-js-compat@^3.9.0, core-js-compat@^3.9.1:
-  version "3.10.1"
-  resolved "https://registry.yarnpkg.com/core-js-compat/-/core-js-compat-3.10.1.tgz#62183a3a77ceeffcc420d907a3e6fc67d9b27f1c"
-  integrity sha512-ZHQTdTPkqvw2CeHiZC970NNJcnwzT6YIueDMASKt+p3WbZsLXOcoD392SkcWhkC0wBBHhlfhqGKKsNCQUozYtg==
+  version "3.10.2"
+  resolved "https://registry.yarnpkg.com/core-js-compat/-/core-js-compat-3.10.2.tgz#0a675b4e1cde599616322a72c8886bcf696f3ec3"
+  integrity sha512-IGHnpuaM1N++gLSPI1F1wu3WXICPxSyj/Q++clcwsIOnUVp5uKUIPl/+6h0TQ112KU3fMiSxqJuM+OrCyKj5+A==
   dependencies:
-    browserslist "^4.16.3"
+    browserslist "^4.16.4"
     semver "7.0.0"
 
 core-js@^2.4.0, core-js@^2.5.0:
@@ -4218,9 +4218,9 @@ css-has-pseudo@^0.10.0:
     postcss-selector-parser "^5.0.0-rc.4"
 
 css-loader@*:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-5.2.3.tgz#672074a8941e6704fe2d2114bb3b0b3f8a99247f"
-  integrity sha512-8IkpXDWwpRza3suLhmzrA2XXyz741iaDJAhiwhQUTLFoj2bZfh9RM8Mc/X2801IGEWOUIj+pShg7J3dEtd6A0A==
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-5.2.4.tgz#e985dcbce339812cb6104ef3670f08f9893a1536"
+  integrity sha512-OFYGyINCKkdQsTrSYxzGSFnGS4gNjcXkKkQgWxK138jgnPt+lepxdjSZNc8sHAl5vP3DhsJUxufWIjOwI8PMMw==
   dependencies:
     camelcase "^6.2.0"
     icss-utils "^5.1.0"
@@ -9876,9 +9876,9 @@ sane@^4.0.3:
     walker "~1.0.5"
 
 sass@^1.26.5:
-  version "1.32.10"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.32.10.tgz#d40da4e20031b450359ee1c7e69bc8cc89569241"
-  integrity sha512-Nx0pcWoonAkn7CRp0aE/hket1UP97GiR1IFw3kcjV3pnenhWgZEWUf0ZcfPOV2fK52fnOcK3JdC/YYZ9E47DTQ==
+  version "1.32.11"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.32.11.tgz#b236b3ea55c76602c2ef2bd0445f0db581baa218"
+  integrity sha512-O9tRcob/fegUVSIV1ihLLZcftIOh0AF1VpKgusUfLqnb2jQ0GLDwI5ivv1FYWivGv8eZ/AwntTyTzjcHu0c/qw==
   dependencies:
     chokidar ">=3.0.0 <4.0.0"
 
@@ -11259,9 +11259,9 @@ wbuf@^1.1.0, wbuf@^1.7.3:
     minimalistic-assert "^1.0.0"
 
 web-component-wrapper@*:
-  version "0.0.236"
-  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.236.tgz#f79dd1508a1b95249a8956445ed6ef675022fb13"
-  integrity sha512-K/PXEjGVCEcEozpLb/mNTZcMry2kzzCTP34/aN9Qyoz+ZsyCV4n/crR7Ut9MtYhRhRgFsLId7pPT28ZiyZA07g==
+  version "0.0.237"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.237.tgz#616a1751a76a7bbb50349fe4c78e68ca52564711"
+  integrity sha512-6eIScSb5GTNfofMVj32O2ac4FCOSIsYMlhkYuL4zWjzlXorqbzb5Z1nZKJtO5n4N8guXHlAEb+M7+U2VGwVhWQ==
   dependencies:
     "@types/webpack" "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.0.tgz"
 
