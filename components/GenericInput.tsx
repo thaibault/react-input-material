@@ -1519,33 +1519,35 @@ export const GenericInputInner = function<Type = any>(
     // endregion
     useImperativeHandle(
         reference,
-        ():AdapterWithReferences<Type> => ({
-            properties,
-            references: {
-                codeEditorReference,
-                codeEditorInputReference,
-                foundationRef,
-                inputReference,
-                richTextEditorInputReference,
-                richTextEditorInstance,
-                richTextEditorReference
-            },
-            state: {
-                cursor: properties.cursor,
-                editorIsActive: properties.editorIsActive,
-                hidden: properties.hidden,
-                modelState: properties.model.state,
-                showDeclaration: properties.showDeclaration,
-                ...(representationControlled ?
-                    {} :
-                    {representation: properties.representation}
-                ),
-                ...(controlled ?
-                    {} :
-                    {value: properties.value as null|Type}
-                )
+        ():AdapterWithReferences<Type> => {
+            const state:State<Type> =
+                {modelState: properties.model.state} as State<Type>
+
+            for (const name of [
+                'cursor', 'editorIsActive', 'hidden', 'showDeclaration'
+            ] as const)
+                if (!givenProps.hasOwnProperty(name))
+                    (state[name] as boolean|CursorState) = properties[name]
+
+            if (!representationControlled)
+                state.representation = properties.representation
+            if (!controlled)
+                state.value = properties.value as null|Type
+
+            return {
+                properties,
+                references: {
+                    codeEditorReference,
+                    codeEditorInputReference,
+                    foundationRef,
+                    inputReference,
+                    richTextEditorInputReference,
+                    richTextEditorInstance,
+                    richTextEditorReference
+                },
+                state
             }
-        })
+        }
     )
     // endregion
     // region render
