@@ -101,6 +101,9 @@ describe('helper', ():void => {
         expect(
             determineInitialValue({model: {default: true}}, false)
         ).toStrictEqual(true)
+        expect(
+            determineInitialValue({model: {default: true, value: null}}, false)
+        ).toStrictEqual(null)
     })
 })
 // endregion

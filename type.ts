@@ -302,7 +302,10 @@ export const defaultModel:Model = {
     state: {...defaultModelState},
     trim: true,
     type: 'string',
-    value: null,
+    /*
+        NOTE: We do not want to shadow "default" here:
+        value: null,
+    */
     writable: true
 } as const
 /*

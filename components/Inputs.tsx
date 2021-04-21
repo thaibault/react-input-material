@@ -301,7 +301,7 @@ export const InputsInner = function<
                 inputProperties:P, index:number
             ):ReactElement =>
                 <div className={styles.inputs__item} key={index}>
-                    {properties.children ?
+                    {Tools.isFunction(properties.children) ?
                         properties.children(
                             inputProperties,
                             index,
