@@ -1505,12 +1505,14 @@ export const GenericInputInner = function<Type = any>(
         NOTE: If value is controlled only trigger/save state changes when model
         state has changed.
     */
-    if (!(
+    if (
         !controlled &&
-        properties.value === valueState.value &&
-        properties.representation === valueState.representation ||
-        Tools.equals(properties.model.state, valueState.modelState)
-    ))
+        (
+            properties.value !== valueState.value ||
+            properties.representation !== valueState.representation
+        ) ||
+        !Tools.equals(properties.model.state, valueState.modelState)
+    )
         setValueState(currentValueState)
     if (controlled)
         setValueState = wrapStateSetter<ValueState<Type, ModelState>>(

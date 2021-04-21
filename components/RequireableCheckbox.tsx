@@ -432,11 +432,10 @@ export const RequireableCheckboxInner = function(
         NOTE: If value is controlled only trigger/save state changes when model
         state has changed.
     */
-    if (!(
-        !controlled &&
-        properties.value === valueState.value ||
-        Tools.equals(properties.model.state, valueState.modelState)
-    ))
+    if (
+        !controlled && properties.value !== valueState.value ||
+        !Tools.equals(properties.model.state, valueState.modelState)
+    )
         setValueState(currentValueState)
     if (controlled)
         setValueState = wrapStateSetter<ValueState<boolean, ModelState>>(

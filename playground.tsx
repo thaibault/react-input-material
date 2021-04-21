@@ -31,6 +31,7 @@ import {InputProperties, IntervalValue, Properties, Model} from './type'
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 
+import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<unknown>()
     const onChange:((properties:{model:unknown}) => void) = useMemorizedValue<
@@ -73,8 +74,14 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     // endregion
     return (<>
         <div className="playground__inputs">
-
             <GenericInput onChange={onChange} />
+            <GenericInput
+                name="UnControlled"
+                onChange={onChange}
+                onChangeValue={onChangeValue1}
+                enforceUncontrolled={true}
+                value={value1}
+            />
             <GenericInput
                 name="controlled"
                 onChange={onChange}
