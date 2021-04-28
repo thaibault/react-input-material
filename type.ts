@@ -660,7 +660,8 @@ export type InputsAdapterWithReferences<
     {references:Array<RefObject<RefType>>}
 // // region constants
 export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
-    ...propertyTypes
+    ...propertyTypes,
+    children: func
 } as const
 export const defaultInputsModel:Omit<
     InputsModel, 'value'
