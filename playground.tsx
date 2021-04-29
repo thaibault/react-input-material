@@ -637,12 +637,14 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <Inputs
-                createPrototype={useMemorizedValue(() => ({
-                    type: 'boolean', value: false
+                createPrototype={useMemorizedValue(({name}, values) => ({
+                    name: `${name}-${values.length}`,
+                    type: 'boolean',
+                    value: false
                 }))}
                 model={useMemorizedValue({
-                    default: [false],
-                    name: 'inputs1',
+                    default: [{value: false}],
+                    name: 'inputs1'
                 })}
                 onChange={onChange}
                 showInitialValidationState
@@ -650,9 +652,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 {useMemorizedValue((
                     properties:Properties<boolean>, index:number
                 ):ReactElement =>
-                    <RequireableCheckbox
-                        {...properties} name={`inputs1-${index}`}
-                    />
+                    <RequireableCheckbox {...properties} />
                 )}
             </Inputs>
             <Inputs

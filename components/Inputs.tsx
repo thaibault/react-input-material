@@ -51,6 +51,7 @@ import {
     inputsPropertyTypes as propertyTypes,
     InputsProps,
     Properties,
+    inputsRenderProperties as renderProperties,
     StaticComponent
 } from '../type'
 // endregion
@@ -136,43 +137,37 @@ export const InputsInner = function<
                 value !== undefined
             ) ||
             Array.isArray(givenProps.value) &&
-            givenProps.value.every((value:P['value']):boolean =>
-                value !== undefined
-            )
+            givenProps.value.every(({value}):boolean => value !== undefined)
         ) &&
         Boolean(properties.onChange || properties.onChangeValue)
 
     let [values, setValues] = useState<Array<P['value']>>(
-        determineInitialValue<Array<P['value']>>(
-            givenProps, Inputs.defaultProperties.model?.default
-        ) ||
-        []
+        inputPropertiesToValues<P>(
+            determineInitialValue<Array<P['value']>>(
+                givenProps, Inputs.defaultProperties.model?.default
+            ) ||
+            []
+        )
     )
-    if (!properties.value)
-        properties.value = values
     const references:Array<RefObject<WebComponentAdapter<P, State>>> = []
-    properties.inputProperties = properties.inputProperties || []
 
     const triggerOnChange = (
-        values:Array<P['value']>,
+        values:Array<P>,
         event?:GenericEvent,
         inputProperties?:Partial<P>,
         index?:number
     ):void => {
-        properties.inputProperties = values.map((
-            _:P['value'], index:number
-        ):P =>
-            references[index]?.current?.properties ||
-            properties.inputProperties![index]
+        properties.value = values.map((_:P, index:number):P =>
+            references[index]?.current?.properties || properties.value![index]
         )
 
         if (inputProperties === undefined && typeof index === 'number')
-            properties.inputProperties.splice(index, 1)
+            properties.value.splice(index, 1)
         else if (inputProperties)
             if (typeof index === 'number')
-                properties.inputProperties![index] = inputProperties as P
+                properties.value![index] = inputProperties as P
             else
-                properties.inputProperties!.push(inputProperties as P)
+                properties.value!.push(inputProperties as P)
 
         triggerCallbackIfExists<InputsProperties<P>>(
             properties as InputsProperties<P>,
@@ -210,21 +205,23 @@ export const InputsInner = function<
     }
 
     for (let index:number = 0; index < Math.max(
-        properties.inputProperties.length || 0,
         properties.model?.value?.length || 0,
-        properties.value?.length || 0
+        properties.value.length || 0,
+        values.length || 0
     ); index += 1) {
         const reference:RefObject<WebComponentAdapter<P, State>> =
             createRef<WebComponentAdapter<P, State>>()
         references.push(reference)
 
-        if (index >= properties.inputProperties.length)
-            properties.inputProperties.push({} as P)
+        if (!properties.value)
+            properties.value = []
+        if (index >= properties.value.length)
+            properties.value.push({} as P)
 
-        properties.inputProperties[index] = Tools.extend(
+        properties.value[index] = Tools.extend(
             true,
             {
-                ...properties.inputProperties[index],
+                ...properties.value[index],
                 className: styles.inputs__item__input,
                 onChange: (inputProperties:P, event?:GenericEvent):void =>
                     triggerOnChange(
@@ -242,18 +239,21 @@ export const InputsInner = function<
                 {model: properties.model.value[index]} :
                 {},
             properties.value && properties.value.length > index ?
-                {value: properties.value[index]} :
+                {value: properties.value[index].value} :
+                {},
+            values && values.length > index ?
+                {value: values[index]} :
                 {}
         )
     }
 
-    properties.value = inputPropertiesToValues<P>(properties.inputProperties)
+    values = inputPropertiesToValues<P>(properties.value)
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValues = createDummyStateSetter<Array<P['value']>>(properties.value)
+        setValues = createDummyStateSetter<Array<P['value']>>(values)
     // endregion
     useImperativeHandle(
         reference,
@@ -268,7 +268,11 @@ export const InputsInner = function<
         values:Array<P['value']>
     ):Array<P['value']> => {
         const newProperties:Partial<P> = properties.createPrototype!(
-            properties as InputsProperties<P>, values
+            defaultProperties.createPrototype(
+                {}, properties as InputsProperties<P>, values
+            ),
+            properties as InputsProperties<P>,
+            values
         )
         triggerOnChange(values, event, newProperties)
         values = triggerOnChangeValue(
@@ -309,7 +313,7 @@ export const InputsInner = function<
                         ) :
                         <GenericInput
                             {...inputProperties}
-                            name={`${properties.name}${index}`}
+                            name={`${properties.name}-${index}`}
                         />
                     }
 
@@ -360,6 +364,7 @@ Inputs.webComponentAdapterWrapped = 'react'
 // / endregion
 Inputs.defaultProperties = defaultProperties
 Inputs.propTypes = propertyTypes
+Inputs.renderProperties = renderProperties
 Inputs.strict = false
 // endregion
 export default Inputs
