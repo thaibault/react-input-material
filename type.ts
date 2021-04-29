@@ -634,8 +634,11 @@ export type InputsProperties<P extends Properties = Properties> =
         ) => Partial<P>
     }
 export type InputsProps<P extends Properties = Properties> =
-    Partial<Omit<InputsProperties<P>, 'model'>> &
-    {model?:Partial<InputsModel<P['model']>>}
+    Partial<Omit<InputsProperties<P>, 'model'|'value'>> &
+    {
+        model?:Partial<InputsModel<P['model']>>
+        value?:Array<P>|Array<P['value']>|null
+    }
 export type DefaultInputsProperties<P extends Properties = Properties> =
     Omit<InputsProps<P>, 'model'> &
     {model:InputsModel<P['model']>}
@@ -675,13 +678,7 @@ export const defaultInputsProperties:DefaultInputsProperties = {
     addIcon: {icon: 'add'},
     createPrototype: <P extends Properties = Properties>(
         prototype:Partial<P>, properties:InputProperties<P>
-    ):Partial<P> => ({
-        ...defaultProperties,
-        ...(properties.default?.length > 0 ?
-            {value: properties.default![0]} :
-            {}
-        )
-    } as Partial<P>),
+    ):Partial<P> => prototype,
     model: defaultInputsModel,
     removeIcon: {icon: 'clear'}
 } as const

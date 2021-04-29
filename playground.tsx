@@ -639,8 +639,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <Inputs
                 createPrototype={useMemorizedValue(({name}, values) => ({
                     name: `${name}-${values.length}`,
-                    type: 'boolean',
-                    value: false
+                    type: 'boolean'
                 }))}
                 model={useMemorizedValue({
                     default: [{value: false}],

@@ -115,8 +115,21 @@ export const InputsInner = function<
     P extends Properties = Properties, State = Mapping<any>
 >(props:InputsProps<P>, reference?:RefObject<Adapter<P>>):ReactElement {
     // region consolidate properties
-    const givenProps:InputsProps<P> =
+    let givenProps:InputsProps<P> =
         translateKnownSymbols(props) as InputsProps<P>
+
+    /*
+        Normalize value property (providing only value instead of props is
+        allowed also.
+    */
+    if (Array.isArray(givenProps.value))
+        for (let index = 0; index < givenProps.value.length; index += 1)
+            if (
+                givenProps.value[index] === null ||
+                typeof givenProps.value[index] !== 'object'
+            )
+                givenProps.value[index] = {value: givenProps.value[index]}
+
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
@@ -268,27 +281,33 @@ export const InputsInner = function<
         values:Array<P['value']>
     ):Array<P['value']> => {
         const newProperties:Partial<P> = properties.createPrototype!(
-            defaultProperties.createPrototype(
-                {}, properties as InputsProperties<P>, values
-            ),
+            ({
+                ...defaultProperties,
+                ...(properties.default?.length > 0 ?
+                    {value: properties.default![0]} :
+                    {}
+                )
+            } as Partial<P>),
             properties as InputsProperties<P>,
             values
         )
+
         triggerOnChange(values, event, newProperties)
+
         values = triggerOnChangeValue(
             values,
             event,
             newProperties.value ?? newProperties.model?.value ?? null
         )
+
         return values
     })
-    const createRemove = (index:number) => (event?:GenericEvent):void => setValues((
-        values:Array<P['value']>
-    ):Array<P['value']> => {
-        values = triggerOnChangeValue(values, event, undefined, index)
-        triggerOnChange(values, event, undefined, index)
-        return values
-    })
+    const createRemove = (index:number) => (event?:GenericEvent):void =>
+        setValues((values:Array<P['value']>):Array<P['value']> => {
+            values = triggerOnChangeValue(values, event, undefined, index)
+            triggerOnChange(values, event, undefined, index)
+            return values
+        })
 
     return <WrapConfigurations
         strict={Inputs.strict}
@@ -301,7 +320,7 @@ export const InputsInner = function<
             }
             data-name={properties.name}
         >
-            {properties.inputProperties.map((
+            {properties.value.map((
                 inputProperties:P, index:number
             ):ReactElement =>
                 <div className={styles.inputs__item} key={index}>
