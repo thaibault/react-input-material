@@ -176,6 +176,7 @@ export const InputsInner = function<
     )
     const references:Array<RefObject<WebComponentAdapter<P, State>>> = []
 
+    console.log('TODO', givenProperties.value, givenProperties.model.value, values)
     const properties:InputsProperties<P> =
         getConsolidatedProperties<InputsProps<P>, InputsProperties<P>>(
             mapPropertiesIntoModel<InputsProps<P>, Model<P['model']>>(
@@ -183,6 +184,7 @@ export const InputsInner = function<
                 Inputs.defaultProperties.model as Model<P['model']>
             )
         )
+    console.log('B', properties.value, values)
 
     const triggerOnChange = (
         values:Array<P>,
