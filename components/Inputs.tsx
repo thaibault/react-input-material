@@ -42,16 +42,17 @@ import {
     triggerCallbackIfExists
 } from '../helper'
 import {
-    defaultInputsProperties as defaultProperties,
+    defaultInputsProperties,
+    defaultProperties,
     GenericEvent,
     InputsAdapter as Adapter,
-    ModelState,
     InputsAdapterWithReferences as AdapterWithReferences,
     InputsProperties,
     inputsPropertyTypes as propertyTypes,
     InputsProps,
-    Properties,
     inputsRenderProperties as renderProperties,
+    ModelState,
+    Properties,
     StaticComponent
 } from '../type'
 // endregion
@@ -85,7 +86,7 @@ const getModelState = function<P extends Properties>(
 const getExternalProperties = function<P extends Properties>(
     properties:InputsProperties<P>
 ):InputsProperties<P> {
-    const modelState:ModelState = getModelState<P>(properties.inputProperties)
+    const modelState:ModelState = getModelState<P>(properties.value || [])
 
     return {
         ...properties,
@@ -93,11 +94,10 @@ const getExternalProperties = function<P extends Properties>(
         model: {
             ...(properties.model || {}),
             state: modelState,
-            value: properties.inputProperties.map(
+            value: properties.value?.map(
                 ({model}):Properties['model'] => model || {}
             )
-        },
-        value: inputPropertiesToValues<Properties>(properties.inputProperties)
+        }
     }
 }
 // endregion
@@ -120,8 +120,10 @@ export const InputsInner = function<
 
     /*
         Normalize value property (providing only value instead of props is
-        allowed also.
+        allowed also). If only values are provided values (without properties
+        will be given back via "onChangeValue" callback).
     */
+    let providePropertiesAsValues:boolean = true
     if (Array.isArray(givenProps.value))
         for (let index = 0; index < givenProps.value.length; index += 1)
             if (
@@ -150,7 +152,9 @@ export const InputsInner = function<
                 value !== undefined
             ) ||
             Array.isArray(givenProps.value) &&
-            givenProps.value.every(({value}):boolean => value !== undefined)
+            (givenProps.value as Array<P>).every(({value}):boolean =>
+                value !== undefined
+            )
         ) &&
         Boolean(properties.onChange || properties.onChangeValue)
 
@@ -171,7 +175,8 @@ export const InputsInner = function<
         index?:number
     ):void => {
         properties.value = values.map((_:P, index:number):P =>
-            references[index]?.current?.properties || properties.value![index]
+            references[index]?.current?.properties ||
+            (properties.value as Array<P>)[index]
         )
 
         if (inputProperties === undefined && typeof index === 'number')
@@ -219,7 +224,7 @@ export const InputsInner = function<
 
     for (let index:number = 0; index < Math.max(
         properties.model?.value?.length || 0,
-        properties.value.length || 0,
+        (properties.value || []).length || 0,
         values.length || 0
     ); index += 1) {
         const reference:RefObject<WebComponentAdapter<P, State>> =
@@ -238,7 +243,10 @@ export const InputsInner = function<
                 className: styles.inputs__item__input,
                 onChange: (inputProperties:P, event?:GenericEvent):void =>
                     triggerOnChange(
-                        properties.value!, event, inputProperties, index
+                        properties.value as Array<P>,
+                        event,
+                        inputProperties,
+                        index
                     ),
                 onChangeValue: (
                     value:null|P['value'], event?:GenericEvent
@@ -252,7 +260,7 @@ export const InputsInner = function<
                 {model: properties.model.value[index]} :
                 {},
             properties.value && properties.value.length > index ?
-                {value: properties.value[index].value} :
+                {value: (properties.value as Array<P>)[index].value} :
                 {},
             values && values.length > index ?
                 {value: values[index]} :
@@ -260,7 +268,7 @@ export const InputsInner = function<
         )
     }
 
-    values = inputPropertiesToValues<P>(properties.value)
+    values = inputPropertiesToValues<P>(properties.value as Array<P>)
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
@@ -283,7 +291,7 @@ export const InputsInner = function<
         const newProperties:Partial<P> = properties.createPrototype!(
             ({
                 ...defaultProperties,
-                ...(properties.default?.length > 0 ?
+                ...(properties.default && properties.default.length > 0 ?
                     {value: properties.default![0]} :
                     {}
                 )
@@ -320,7 +328,7 @@ export const InputsInner = function<
             }
             data-name={properties.name}
         >
-            {properties.value.map((
+            {((properties.value as Array<P>) || []).map((
                 inputProperties:P, index:number
             ):ReactElement =>
                 <div className={styles.inputs__item} key={index}>
@@ -381,7 +389,7 @@ export const Inputs:StaticComponent<InputsProps> =
 Inputs.wrapped = InputsInner
 Inputs.webComponentAdapterWrapped = 'react'
 // / endregion
-Inputs.defaultProperties = defaultProperties
+Inputs.defaultProperties = defaultInputsProperties
 Inputs.propTypes = propertyTypes
 Inputs.renderProperties = renderProperties
 Inputs.strict = false

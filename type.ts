@@ -601,7 +601,7 @@ export const defaultInputProperties:DefaultInputProperties = {
 // // endregion
 // / endregion
 // / region inputs
-export type InputsModel<M extends Model = Model> =
+export type InputsModel<M extends Partial<Model> = Partial<Model>> =
     Model<Array<M>> &
     {
         maximumLength:number
@@ -619,9 +619,9 @@ export type AdditionalInputsProperties<P extends Properties = Properties> =
         writable:boolean
     }
 export type InputsProperties<P extends Properties = Properties> =
-    Properties<
+    Omit<Properties<
         Array<P>, Properties<Array<P>> & AdditionalInputsProperties<P>
-    > &
+    >, 'model'|'onChangeValue'> &
     AdditionalInputsProperties<P> &
     {
         children:(
@@ -632,16 +632,19 @@ export type InputsProperties<P extends Properties = Properties> =
             properties:InputsProperties<P>,
             values:Array<P>
         ) => Partial<P>
+        onChangeValue:(
+            values:Array<P>|Array<P['value']>|null, event?:GenericEvent
+        ) => void
     }
 export type InputsProps<P extends Properties = Properties> =
     Partial<Omit<InputsProperties<P>, 'model'|'value'>> &
     {
-        model?:Partial<InputsModel<P['model']>>
-        value?:Array<P>|Array<P['value']>|null
+        model?:Partial<InputsModel<Partial<P['model']>>>
+        value?:Array<Partial<P>>|Array<P['value']>|null
     }
-export type DefaultInputsProperties<P extends Properties = Properties> =
-    Omit<InputsProps<P>, 'model'> &
-    {model:InputsModel<P['model']>}
+export type DefaultInputsProperties =
+    Partial<Omit<InputsProperties, 'default'|'model'|'value'>> &
+    {model:InputsModel}
 export type InputsPropertyTypes<P extends Properties = Properties> = {
     [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
 }
@@ -660,10 +663,9 @@ export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     children: func,
     createPrototype: func
 } as const
-export const inputsRenderProperties = ['children', 'createPrototype']
-export const defaultInputsModel:Omit<
-    InputsModel, 'value'
-> & {value?:InputsModel['value']} = {
+export const inputsRenderProperties:Array<string> =
+    ['children', 'createPrototype']
+export const defaultInputsModel:InputsModel = {
     ...defaultModel,
     minimumLength: 0,
     type: 'string[]'
@@ -676,9 +678,9 @@ export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties,
     ...defaultInputsModel,
     addIcon: {icon: 'add'},
-    createPrototype: <P extends Properties = Properties>(
-        prototype:Partial<P>, properties:InputProperties<P>
-    ):Partial<P> => prototype,
+    createPrototype: (
+        prototype:Partial<Properties>, properties:InputsProperties<Properties>
+    ):Partial<Properties> => prototype,
     model: defaultInputsModel,
     removeIcon: {icon: 'clear'}
 } as const

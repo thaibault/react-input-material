@@ -26,7 +26,9 @@ import {
     GenericAnimate, GenericInput, Inputs, Interval, RequireableCheckbox
 } from './index'
 import {useMemorizedValue} from './helper'
-import {InputProperties, IntervalValue, Properties, Model} from './type'
+import {
+    InputProperties, InputsProperties, IntervalValue, Properties, Props, Model
+} from './type'
 // endregion 
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
@@ -637,7 +639,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <Inputs
-                createPrototype={useMemorizedValue(({name}, values) => ({
+                createPrototype={useMemorizedValue((prototype, {name}, values) => ({
+                    ...prototype,
                     name: `${name}-${values.length}`,
                     type: 'boolean'
                 }))}
@@ -649,7 +652,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 showInitialValidationState
             >
                 {useMemorizedValue((
-                    properties:Properties<boolean>, index:number
+                    properties:Props<boolean>, index:number
                 ):ReactElement =>
                     <RequireableCheckbox {...properties} />
                 )}
@@ -657,7 +660,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <Inputs
                 name="inputs2"
                 onChange={onChange}
-                onChangeValue={onChangeValue5}
+                onChangeValue={
+                    onChangeValue5 as InputsProperties['onChangeValue']
+                }
                 showInitialValidationState
                 value={value5}
             />
