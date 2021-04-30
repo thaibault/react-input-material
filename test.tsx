@@ -46,14 +46,14 @@ describe('Inputs', ():void => {
         expect(domNode.querySelector('.inputs__item__remove'))
             .toStrictEqual(null)
 
-        domNode = render(<Inputs value={[{value: 'a'}]}/>) as HTMLElement
+        domNode = render(<Inputs value={['a']}/>) as HTMLElement
         expect(Array.from(domNode.querySelectorAll('input'))).toHaveLength(1)
         expect(Array.from(domNode.querySelectorAll('.inputs__add')))
             .toHaveLength(1)
         expect(Array.from(domNode.querySelectorAll('.inputs__item__remove')))
             .toHaveLength(1)
 
-        domNode = render(<Inputs value={[{value: 'a'}, {value: 'b'}]}/>) as
+        domNode = render(<Inputs value={[{value: 'a'}, 'b']}/>) as
             HTMLElement
         expect(Array.from(domNode.querySelectorAll('input'))).toHaveLength(2)
         expect(Array.from(domNode.querySelectorAll('.inputs__add')))
@@ -62,7 +62,7 @@ describe('Inputs', ():void => {
             .toHaveLength(2)
 
         expect(
-            (render(<Inputs value={[{value: 'a'}]}/>) as HTMLElement)
+            (render(<Inputs value={['a']}/>) as HTMLElement)
                 .querySelector('input')
         ).toHaveProperty('value', 'a')
     })

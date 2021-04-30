@@ -117,13 +117,10 @@ export const InputsInner = function<
     // region consolidate properties
     let givenProps:InputsProps<P> =
         translateKnownSymbols(props) as InputsProps<P>
-
     /*
         Normalize value property (providing only value instead of props is
-        allowed also). If only values are provided values (without properties
-        will be given back via "onChangeValue" callback).
+        allowed also).
     */
-    let providePropertiesAsValues:boolean = true
     if (Array.isArray(givenProps.value))
         for (let index = 0; index < givenProps.value.length; index += 1)
             if (
@@ -131,7 +128,6 @@ export const InputsInner = function<
                 typeof givenProps.value[index] !== 'object'
             )
                 givenProps.value[index] = {value: givenProps.value[index]}
-
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
@@ -268,7 +264,9 @@ export const InputsInner = function<
         )
     }
 
-    values = inputPropertiesToValues<P>(properties.value as Array<P>)
+    values = properties.value ?
+        inputPropertiesToValues<P>(properties.value as Array<P>) :
+        []
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal

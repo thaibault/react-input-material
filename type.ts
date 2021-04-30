@@ -632,9 +632,8 @@ export type InputsProperties<P extends Properties = Properties> =
             properties:InputsProperties<P>,
             values:Array<P>
         ) => Partial<P>
-        onChangeValue:(
-            values:Array<P>|Array<P['value']>|null, event?:GenericEvent
-        ) => void
+        onChangeValue:(values:Array<P['value']>|null, event?:GenericEvent) =>
+            void
     }
 export type InputsProps<P extends Properties = Properties> =
     Partial<Omit<InputsProperties<P>, 'model'|'value'>> &

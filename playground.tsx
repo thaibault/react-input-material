@@ -651,18 +651,14 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 showInitialValidationState
             >
-                {useMemorizedValue((
-                    properties:Props<boolean>, index:number
-                ):ReactElement =>
+                {useMemorizedValue((properties:Props<boolean>):ReactElement =>
                     <RequireableCheckbox {...properties} />
                 )}
             </Inputs>
             <Inputs
                 name="inputs2"
                 onChange={onChange}
-                onChangeValue={
-                    onChangeValue5 as InputsProperties['onChangeValue']
-                }
+                onChangeValue={onChangeValue5}
                 showInitialValidationState
                 value={value5}
             />
