@@ -148,11 +148,11 @@ export const determineInitialValue = <Type = any>(
     if (properties.model?.value !== undefined)
         return properties.model!.value as null|Type
     if (properties.initialValue !== undefined)
-        return properties.initialValue as null|Type
+        return Tools.copy(properties.initialValue as null|Type)
     if (properties.default !== undefined)
-        return properties.default as null|Type
+        return Tools.copy(properties.default as null|Type)
     if (properties.model?.default !== undefined)
-        return properties.model!.default as null|Type
+        return Tools.copy(properties.model!.default as null|Type)
     if (defaultValue !== undefined)
         return defaultValue
     return null
@@ -227,11 +227,7 @@ export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
     const result:P & {
         model:M
         pattern?:string
-    } = Tools.extend(
-        true,
-        {model: {...defaultModel, state: {...defaultModel.state}}},
-        properties
-    )
+    } = Tools.extend(true, {model: Tools.copy(defaultModel)}, properties)
     // region handle aliases
     if (result.disabled) {
         result.model.mutable = false
@@ -267,7 +263,7 @@ export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
                 result[name as keyof P] as unknown as ValueOf<ModelState>
 
     if (result.model.value === undefined)
-        result.model.value = result.model.default
+        result.model.value = Tools.copy(result.model.default)
     // else -> Controlled component via model's "value" property.
     // endregion
     return result
@@ -288,6 +284,7 @@ export const getConsolidatedProperties = <
         state?:null
         writable?:boolean
     }
+
     const result:Result = ({
         ...properties,
         ...(properties.model || {}),
@@ -305,7 +302,7 @@ export const getConsolidatedProperties = <
 
     if (result.regularExpressionPattern)
         result.pattern = result.regularExpressionPattern
-    // NOTE: Workaround since options configuration above is ignored.
+    // NOTE: Workaround since optional type configuration above is ignored.
     delete (result as {regularExpressionPattern?:RegExp|string})
         .regularExpressionPattern
     // endregion

@@ -38,6 +38,8 @@ import WrapConfigurations from './WrapConfigurations'
 import {
     createDummyStateSetter,
     determineInitialValue,
+    getConsolidatedProperties,
+    mapPropertiesIntoModel,
     translateKnownSymbols,
     triggerCallbackIfExists
 } from '../helper'
@@ -47,6 +49,7 @@ import {
     GenericEvent,
     InputsAdapter as Adapter,
     InputsAdapterWithReferences as AdapterWithReferences,
+    InputsModel as Model,
     InputsProperties,
     inputsPropertyTypes as propertyTypes,
     InputsProps,
@@ -133,7 +136,7 @@ export const InputsInner = function<
         default property object untouched for unchanged usage in other
         instances.
     */
-    const properties:InputsProps<P> = Tools.extend(
+    const givenProperties:InputsProps<P> = Tools.extend(
         true, Tools.copy(Inputs.defaultProperties), givenProps
     )
     /*
@@ -141,7 +144,7 @@ export const InputsInner = function<
         extended) "given" properties.
     */
     const controlled:boolean =
-        !properties.enforceUncontrolled &&
+        !givenProperties.enforceUncontrolled &&
         (
             Array.isArray(givenProps.model?.value) &&
             givenProps.model!.value.every(({value}):boolean =>
@@ -152,17 +155,27 @@ export const InputsInner = function<
                 value !== undefined
             )
         ) &&
-        Boolean(properties.onChange || properties.onChangeValue)
+        Boolean(givenProperties.onChange || givenProperties.onChangeValue)
 
     let [values, setValues] = useState<Array<P['value']>>(
         inputPropertiesToValues<P>(
             determineInitialValue<Array<P['value']>>(
-                givenProps, Inputs.defaultProperties.model?.default
+                givenProps, Tools.copy(Inputs.defaultProperties.model?.default)
             ) ||
             []
         )
     )
     const references:Array<RefObject<WebComponentAdapter<P, State>>> = []
+
+    const properties:InputsProperties<P> =
+        getConsolidatedProperties<InputsProps<P>, InputsProperties<P>>(
+            mapPropertiesIntoModel<InputsProps<P>, Model<P['model']>>(
+                givenProperties,
+                Inputs.defaultProperties.model as Model<P['model']>
+            )
+        )
+    // TODO state does not save properties!
+    console.log(properties.value, values)
 
     const triggerOnChange = (
         values:Array<P>,
@@ -290,7 +303,7 @@ export const InputsInner = function<
             ({
                 ...defaultProperties,
                 ...(properties.default && properties.default.length > 0 ?
-                    {value: properties.default![0]} :
+                    properties.default![0] :
                     {}
                 )
             } as Partial<P>),
@@ -342,24 +355,24 @@ export const InputsInner = function<
                         />
                     }
 
-                    {properties.writable ?
+                    {properties.disabled ?
+                        '' :
                         <IconButton
                             className={styles.inputs__item__remove}
                             icon={properties.removeIcon}
                             onClick={createRemove(index)}
-                        /> :
-                        ''
+                        />
                     }
                 </div>
             )}
 
-            {properties.writable ?
+            {properties.disabled ?
+                '' :
                 <IconButton
                     className={styles.inputs__add}
                     icon={properties.addIcon}
                     onClick={add}
-                /> :
-                ''
+                />
             }
         </div>
     </WrapConfigurations>

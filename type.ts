@@ -591,7 +591,7 @@ export const defaultInputProperties:DefaultInputProperties = {
     minimumLengthText:
         'Please type at least or equal ${minimumLength} symbols.',
     minimumText: 'Please type at least or equal ${formatValue(minimum)}.',
-    model: defaultInputModel,
+    model: {...defaultInputModel},
     patternText:
         'Your string have to match the regular expression: "${pattern}".',
     rows: 4,
@@ -675,12 +675,11 @@ export const defaultInputsModel:InputsModel = {
 */
 export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties,
-    ...defaultInputsModel,
     addIcon: {icon: 'add'},
     createPrototype: (
         prototype:Partial<Properties>, properties:InputsProperties<Properties>
     ):Partial<Properties> => prototype,
-    model: defaultInputsModel,
+    model: {...defaultInputsModel},
     removeIcon: {icon: 'clear'}
 } as const
 // // endregion
