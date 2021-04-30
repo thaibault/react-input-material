@@ -176,6 +176,7 @@ export const InputsInner = function<
     )
     const references:Array<RefObject<WebComponentAdapter<P, State>>> = []
 
+    // TODO durch das mergen wird der value nie null annehmen können!
     console.log('TODO', givenProperties.value, givenProperties.model.value, values)
     const properties:InputsProperties<P> =
         getConsolidatedProperties<InputsProps<P>, InputsProperties<P>>(
