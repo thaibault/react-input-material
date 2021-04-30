@@ -19,20 +19,19 @@ endregion */
 @import '@rmwc/tooltip/tooltip.css';
 /* endregion */
 .interval {
-    display: block;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .interval__end, .interval__start {
-    float: left;
-    width: 45%;
+    width: 100%;
 }
 
 .interval__icon {
     box-sizing: border-box;
-    float: left;
-    padding-top: 16px;
+    padding: 16px;
     text-align: center;
-    width: 10%;
 }
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:

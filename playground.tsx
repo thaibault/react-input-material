@@ -639,9 +639,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <Inputs
-                createPrototype={useMemorizedValue((prototype, {name}, values) => ({
-                    ...prototype, name: `${name}-${values.length}`
-                }))}
+                createPrototype={useMemorizedValue(
+                    (prototype, {name}, values) => ({
+                        ...prototype, name: `${name}-${values.length}`
+                    })
+                )}
                 model={useMemorizedValue({
                     default: [{
                         name: 'inputs1-1',
@@ -658,7 +660,27 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 )}
             </Inputs>
             <Inputs
-                name="inputs2"
+                createPrototype={useMemorizedValue(
+                    (prototype, {name}, values) => ({
+                        ...prototype, name: `${name}-${values.length}`
+                    })
+                )}
+                model={useMemorizedValue({
+                    default: [{
+                        name: 'inputs2-1',
+                        type: 'date'
+                    }],
+                    name: 'inputs2'
+                })}
+                onChange={onChange}
+                showInitialValidationState
+            >
+                {useMemorizedValue((properties:Props<boolean>):ReactElement =>
+                    <Interval {...properties} />
+                )}
+            </Inputs>
+            <Inputs
+                name="inputs3"
                 onChange={onChange}
                 onChangeValue={onChangeValue5}
                 showInitialValidationState

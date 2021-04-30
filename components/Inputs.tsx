@@ -60,6 +60,15 @@ import {
 } from '../type'
 // endregion
 // region helper
+const getPrototype = function<P extends Properties>(properties:P):Partial<P> {
+    return {
+        ...defaultProperties,
+        ...(properties.default && properties.default.length > 0 ?
+            properties.default![0] :
+            {}
+        )
+    } as Partial<P>
+}
 const inputPropertiesToValues = function<P extends Properties>(
     inputProperties:Array<P>
 ):Array<P['value']> {
@@ -174,8 +183,6 @@ export const InputsInner = function<
                 Inputs.defaultProperties.model as Model<P['model']>
             )
         )
-    // TODO state does not save properties!
-    console.log(properties.value, values)
 
     const triggerOnChange = (
         values:Array<P>,
@@ -248,6 +255,11 @@ export const InputsInner = function<
         properties.value[index] = Tools.extend(
             true,
             {
+                ...properties.createPrototype!(
+                    Tools.copy(getPrototype<P>(properties)),
+                    properties as InputsProperties<P>,
+                    values
+                ),
                 ...properties.value[index],
                 className: styles.inputs__item__input,
                 onChange: (inputProperties:P, event?:GenericEvent):void =>
@@ -271,7 +283,7 @@ export const InputsInner = function<
             properties.value && properties.value.length > index ?
                 {value: (properties.value as Array<P>)[index].value} :
                 {},
-            values && values.length > index ?
+            !controlled && values && values.length > index ?
                 {value: values[index]} :
                 {}
         )
@@ -300,13 +312,7 @@ export const InputsInner = function<
         values:Array<P['value']>
     ):Array<P['value']> => {
         const newProperties:Partial<P> = properties.createPrototype!(
-            ({
-                ...defaultProperties,
-                ...(properties.default && properties.default.length > 0 ?
-                    properties.default![0] :
-                    {}
-                )
-            } as Partial<P>),
+            getPrototype<P>(properties),
             properties as InputsProperties<P>,
             values
         )

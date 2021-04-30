@@ -246,7 +246,7 @@ export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
     // endregion
     // region map properties into model
     // Map first level properties
-    for (const [name, value] of Object.entries(result.model))
+    for (const name of Object.keys(result.model).concat('value'))
         if (
             Object.prototype.hasOwnProperty.call(result, name) &&
             result[name as keyof P] !== undefined
@@ -254,7 +254,7 @@ export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
             (result.model[name as keyof M] as ValueOf<M>) =
                 result[name as keyof P] as unknown as ValueOf<M>
     // Map property state into model state
-    for (const [name, value] of Object.entries(result.model.state))
+    for (const name in result.model.state)
         if (
             Object.prototype.hasOwnProperty.call(result, name) &&
             result[name as keyof ModelState] !== undefined
