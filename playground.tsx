@@ -26,7 +26,9 @@ import {
     GenericAnimate, GenericInput, Inputs, Interval, RequireableCheckbox
 } from './index'
 import {useMemorizedValue} from './helper'
-import {InputProperties, IntervalValue, Properties, Model} from './type'
+import {
+    InputProperties, IntervalProps, IntervalValue, Properties, Model
+} from './type'
 // endregion 
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
@@ -674,7 +676,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 showInitialValidationState
             >
                 {useMemorizedValue(({properties}):ReactElement =>
-                    <Interval {...properties} />
+                    <Interval {...properties as IntervalProps} />
                 )}
             </Inputs>
             <Inputs
