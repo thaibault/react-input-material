@@ -41,9 +41,11 @@ describe('Inputs', ():void => {
         expect(render(<Inputs/>)).toBeDefined()
 
         let domNode:HTMLElement = render(<Inputs/>) as HTMLElement
-        expect(domNode.querySelector('input')).toStrictEqual(null)
-        expect(domNode.querySelector('.inputs__add')).not.toStrictEqual(null)
-        expect(domNode.querySelector('.inputs__item__remove')).toStrictEqual(null)
+        expect(domNode.querySelector('input')).toHaveProperty('disabled', true)
+        expect(domNode.querySelector('.inputs__add__button'))
+            .not.toStrictEqual(null)
+        expect(domNode.querySelector('.inputs__item__remove'))
+            .toStrictEqual(null)
 
         domNode = render(<Inputs value={['a']}/>) as HTMLElement
         expect(Array.from(domNode.querySelectorAll('input'))).toHaveLength(1)
@@ -52,7 +54,8 @@ describe('Inputs', ():void => {
         expect(Array.from(domNode.querySelectorAll('.inputs__item__remove')))
             .toHaveLength(1)
 
-        domNode = render(<Inputs value={['a', ['b']]}/>) as HTMLElement
+        domNode = render(<Inputs value={[{value: 'a'}, 'b']}/>) as
+            HTMLElement
         expect(Array.from(domNode.querySelectorAll('input'))).toHaveLength(2)
         expect(Array.from(domNode.querySelectorAll('.inputs__add')))
             .toHaveLength(1)

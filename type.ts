@@ -591,7 +591,7 @@ export const defaultInputProperties:DefaultInputProperties = {
     minimumLengthText:
         'Please type at least or equal ${minimumLength} symbols.',
     minimumText: 'Please type at least or equal ${formatValue(minimum)}.',
-    model: defaultInputModel,
+    model: {...defaultInputModel},
     patternText:
         'Your string have to match the regular expression: "${pattern}".',
     rows: 4,
@@ -601,52 +601,52 @@ export const defaultInputProperties:DefaultInputProperties = {
 // // endregion
 // / endregion
 // / region inputs
-export type InputsModel<M extends Model = Model> =
-    Model<Array<M['value']>> &
+export type InputsModel<M extends Partial<Model> = Partial<Model>> =
+    Model<Array<M>> &
     {
         maximumLength:number
         minimumLength:number
         state:ModelState
-        value:Array<M>|null
         writable:boolean
     }
 export type AdditionalInputsProperties<P extends Properties = Properties> =
     ModelState &
     {
         addIcon:IconOptions
-        inputProperties:Array<P>
         model:InputsModel<P['model']>
         removeIcon:IconOptions
-        value:Array<P['value']>|null
+        value:Array<P>|null
         writable:boolean
     }
 export type InputsProperties<P extends Properties = Properties> =
-    Omit<
-        Properties<
-            Array<P['value']>,
-            Properties<Array<P['value']>> & AdditionalInputsProperties<P>
-        >,
-        'model'|'onChangeValue'
-    > &
+    Omit<Properties<
+        Array<P>, Properties<Array<P>> & AdditionalInputsProperties<P>
+    >, 'model'|'onChangeValue'> &
     AdditionalInputsProperties<P> &
     {
-        children:(
-            properties:P, index:number, parentProperties:InputsProperties<P>
-        ) => ReactElement
-        createPrototype:(
-            properties:InputsProperties<P>, values:Array<P['value']>
-        ) => Partial<P>
-        inputProperties:Array<P>
-        model:InputsModel<P['model']>
+        children:(options:{
+            index:number,
+            inputsProperties:InputsProperties<P>,
+            properties:Partial<P>
+        }) => ReactElement
+        createPrototype:(options:{
+            index:number
+            properties:InputsProperties<P>
+            prototype:Partial<P>
+            values:Array<P['value']>|null
+        }) => Partial<P>
         onChangeValue:(values:Array<P['value']>|null, event?:GenericEvent) =>
             void
     }
 export type InputsProps<P extends Properties = Properties> =
-    Partial<Omit<InputsProperties<P>, 'model'>> &
-    {model?:Partial<InputsModel<P['model']>>}
-export type DefaultInputsProperties<P extends Properties = Properties> =
-    Omit<InputsProps<P>, 'model'> &
-    {model:InputsModel<P['model']>}
+    Partial<Omit<InputsProperties<P>, 'model'|'value'>> &
+    {
+        model?:Partial<InputsModel<Partial<P['model']>>>
+        value?:Array<Partial<P>>|Array<P['value']>|null
+    }
+export type DefaultInputsProperties =
+    Partial<Omit<InputsProperties, 'default'|'model'|'value'>> &
+    {model:InputsModel}
 export type InputsPropertyTypes<P extends Properties = Properties> = {
     [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
 }
@@ -661,11 +661,13 @@ export type InputsAdapterWithReferences<
 // // region constants
 export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
-    children: func
+    // We use that function (render prop) to produce input component instances.
+    children: func,
+    createPrototype: func
 } as const
-export const defaultInputsModel:Omit<
-    InputsModel, 'value'
-> & {value?:InputsModel['value']} = {
+export const inputsRenderProperties:Array<string> =
+    ['children', 'createPrototype']
+export const defaultInputsModel:InputsModel = {
     ...defaultModel,
     minimumLength: 0,
     type: 'string[]'
@@ -676,18 +678,9 @@ export const defaultInputsModel:Omit<
 */
 export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties,
-    ...defaultInputsModel,
     addIcon: {icon: 'add'},
-    createPrototype: <P extends Properties = Properties>(
-        properties:InputProperties<P>
-    ):Partial<P> => ({
-        ...defaultProperties,
-        ...((properties.default as Array<P['value']>)?.length > 0 ?
-            {value: properties.default![0]} :
-            {}
-        )
-    } as Partial<P>),
-    model: defaultInputsModel,
+    createPrototype: ({prototype}):Partial<Properties> => prototype,
+    model: {...defaultInputsModel},
     removeIcon: {icon: 'clear'}
 } as const
 // // endregion
@@ -764,7 +757,6 @@ export const defaultIntervalProperties:IntervalProps = {
     start: {description: 'Start', name: 'start'},
     type: 'time'
 } as const
-// // endregion
 // // endregion
 // / endregion
 export type ConfigurationProperties = {

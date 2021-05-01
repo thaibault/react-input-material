@@ -26,7 +26,9 @@ import {
     GenericAnimate, GenericInput, Inputs, Interval, RequireableCheckbox
 } from './index'
 import {useMemorizedValue} from './helper'
-import {InputProperties, IntervalValue, Properties, Model} from './type'
+import {
+    InputProperties, IntervalProps, IntervalValue, Properties, Model
+} from './type'
 // endregion 
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
@@ -637,26 +639,48 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <Inputs
-                createPrototype={useMemorizedValue(() => ({
-                    type: 'boolean', value: false
-                }))}
+                createPrototype={useMemorizedValue(
+                    ({index, properties: {name}, prototype}) => ({
+                        ...prototype, name: `${name}-${index + 1}`
+                    })
+                )}
                 model={useMemorizedValue({
-                    default: [false],
-                    name: 'inputs1',
+                    default: [{
+                        name: 'inputs1-1',
+                        type: 'boolean',
+                        value: false
+                    }],
+                    name: 'inputs1'
                 })}
                 onChange={onChange}
                 showInitialValidationState
             >
-                {useMemorizedValue((
-                    properties:Properties<boolean>, index:number
-                ):ReactElement =>
-                    <RequireableCheckbox
-                        {...properties} name={`inputs1-${index}`}
-                    />
+                {useMemorizedValue(({properties}):ReactElement =>
+                    <RequireableCheckbox {...properties} />
                 )}
             </Inputs>
             <Inputs
-                name="inputs2"
+                createPrototype={useMemorizedValue(
+                    ({index, properties: {name}, prototype}) => ({
+                        ...prototype, name: `${name}-${index + 1}`
+                    })
+                )}
+                model={useMemorizedValue({
+                    default: [{
+                        name: 'inputs2-1',
+                        type: 'date'
+                    }],
+                    name: 'inputs2'
+                })}
+                onChange={onChange}
+                showInitialValidationState
+            >
+                {useMemorizedValue(({properties}):ReactElement =>
+                    <Interval {...properties as IntervalProps} />
+                )}
+            </Inputs>
+            <Inputs
+                name="inputs3"
                 onChange={onChange}
                 onChangeValue={onChangeValue5}
                 showInitialValidationState
