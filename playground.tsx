@@ -638,7 +638,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <Inputs
                 createPrototype={useMemorizedValue(
-                    ({index, inputsProperties: {name}, prototype) => ({
+                    ({index, properties: {name}, prototype}) => ({
                         ...prototype, name: `${name}-${index + 1}`
                     })
                 )}
@@ -659,7 +659,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             </Inputs>
             <Inputs
                 createPrototype={useMemorizedValue(
-                    ({index, inputsProperties: {name}, prototype}) => ({
+                    ({index, properties: {name}, prototype}) => ({
                         ...prototype, name: `${name}-${index + 1}`
                     })
                 )}

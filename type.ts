@@ -625,13 +625,15 @@ export type InputsProperties<P extends Properties = Properties> =
     AdditionalInputsProperties<P> &
     {
         children:(options:{
-            index:number, inputsProperties:InputsProperties<P>, properties:P
+            index:number,
+            inputsProperties:InputsProperties<P>,
+            properties:Partial<P>
         }) => ReactElement
         createPrototype:(options:{
             index:number
             properties:InputsProperties<P>
             prototype:Partial<P>
-            values:Array<P>
+            values:Array<P['value']>|null
         }) => Partial<P>
         onChangeValue:(values:Array<P['value']>|null, event?:GenericEvent) =>
             void

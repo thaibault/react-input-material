@@ -60,7 +60,9 @@ import {
 } from '../type'
 // endregion
 // region helper
-const getPrototype = function<P extends Properties>(properties:P):Partial<P> {
+const getPrototype = function<P extends Properties>(
+    properties:InputsProperties<P>
+):Partial<P> {
     return {
         ...defaultProperties,
         ...(properties.default && properties.default.length > 0 ?
@@ -70,11 +72,13 @@ const getPrototype = function<P extends Properties>(properties:P):Partial<P> {
     } as Partial<P>
 }
 const inputPropertiesToValues = function<P extends Properties>(
-    inputProperties:Array<P>
-):Array<P['value']> {
-    return inputProperties.map(({model, value}):P['value'] =>
-        typeof value === undefined ? model?.value : value
-    )
+    inputProperties:Array<P>|null
+):Array<P['value']>|null {
+    return Array.isArray(inputProperties) ?
+        inputProperties.map(({model, value}):P['value'] =>
+            typeof value === undefined ? model?.value : value
+        ) :
+        inputProperties
 }
 const getModelState = function<P extends Properties>(
     inputProperties:Array<P>
@@ -232,7 +236,7 @@ export const InputsInner = function<
         event?:GenericEvent,
         value?:P['value'],
         index?:number
-    ):Array<P['value']> => {
+    ):Array<P['value']>|null => {
         if (values === null)
             values = []
 
@@ -282,7 +286,7 @@ export const InputsInner = function<
                     properties,
                     prototype: Tools.copy(getPrototype<P>(properties)),
                     values
-                ),
+                }),
                 ...properties.value[index],
                 className: styles.inputs__item__input,
                 onChange: (inputProperties:P, event?:GenericEvent):void =>
@@ -314,18 +318,19 @@ export const InputsInner = function<
         )
     }
 
-    if (properties.emptyEqualsNull && properties.value.length === 0)
+    if (
+        properties.emptyEqualsNull &&
+        (!properties.value || properties.value.length === 0)
+    )
         properties.value = values = null
     else
-        values = properties.value ?
-            inputPropertiesToValues<P>(properties.value as Array<P>) :
-            null
+        values = inputPropertiesToValues<P>(properties.value)
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValues = createDummyStateSetter<Array<P['value']>>(values)
+        setValues = createDummyStateSetter<Array<P['value']>|null>(values)
     // endregion
     useImperativeHandle(
         reference,
@@ -340,11 +345,11 @@ export const InputsInner = function<
         values:Array<P['value']>|null
     ):Array<P['value']> => {
         const newProperties:Partial<P> = properties.createPrototype!({
-            index: values.length,
+            index: values?.length || 0,
             properties,
             prototype: getPrototype<P>(properties),
             values
-        )
+        })
 
         triggerOnChange(values, event, newProperties)
 
@@ -352,10 +357,10 @@ export const InputsInner = function<
             values,
             event,
             newProperties.value ?? newProperties.model?.value ?? null
-        )
+        ) as Array<P['value']>
     })
     const createRemove = (index:number) => (event?:GenericEvent):void =>
-        setValues((values:Array<P['value']>):Array<P['value']> => {
+        setValues((values:Array<P['value']>|null):Array<P['value']>|null => {
             values = triggerOnChangeValue(values, event, undefined, index)
             triggerOnChange(values, event, undefined, index)
             return values
@@ -404,7 +409,7 @@ export const InputsInner = function<
                     {Tools.isFunction(properties.children) ?
                         properties.children({
                             index: 0,
-                            inputsProperties,
+                            inputsProperties: properties,
                             properties: properties.createPrototype!({
                                 index: 0,
                                 properties,
@@ -421,9 +426,9 @@ export const InputsInner = function<
                                 properties,
                                 prototype: getPrototype<P>(properties),
                                 values
-                            )}
+                            })}
                             disabled
-                            name={`${properties.name}-${index + 1}`}
+                            name={`${properties.name}-1`}
                         />
                     }
 
