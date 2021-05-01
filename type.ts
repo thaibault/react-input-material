@@ -624,14 +624,15 @@ export type InputsProperties<P extends Properties = Properties> =
     >, 'model'|'onChangeValue'> &
     AdditionalInputsProperties<P> &
     {
-        children:(
-            properties:P, index:number, parentProperties:InputsProperties<P>
-        ) => ReactElement
-        createPrototype:(
-            prototype:Partial<P>,
-            properties:InputsProperties<P>,
+        children:(options:{
+            index:number, inputsProperties:InputsProperties<P>, properties:P
+        }) => ReactElement
+        createPrototype:(options:{
+            index:number
+            properties:InputsProperties<P>
+            prototype:Partial<P>
             values:Array<P>
-        ) => Partial<P>
+        }) => Partial<P>
         onChangeValue:(values:Array<P['value']>|null, event?:GenericEvent) =>
             void
     }
@@ -676,9 +677,7 @@ export const defaultInputsModel:InputsModel = {
 export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties,
     addIcon: {icon: 'add'},
-    createPrototype: (
-        prototype:Partial<Properties>, properties:InputsProperties<Properties>
-    ):Partial<Properties> => prototype,
+    createPrototype: ({prototype}):Partial<Properties> => prototype,
     model: {...defaultInputsModel},
     removeIcon: {icon: 'clear'}
 } as const

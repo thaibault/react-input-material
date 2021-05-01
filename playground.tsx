@@ -26,9 +26,7 @@ import {
     GenericAnimate, GenericInput, Inputs, Interval, RequireableCheckbox
 } from './index'
 import {useMemorizedValue} from './helper'
-import {
-    InputProperties, InputsProperties, IntervalValue, Properties, Props, Model
-} from './type'
+import {InputProperties, IntervalValue, Properties, Model} from './type'
 // endregion 
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
@@ -640,8 +638,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <Inputs
                 createPrototype={useMemorizedValue(
-                    (prototype, {name}, values) => ({
-                        ...prototype, name: `${name}-${values?.length || 1}`
+                    ({index, inputsProperties: {name}, prototype) => ({
+                        ...prototype, name: `${name}-${index + 1}`
                     })
                 )}
                 model={useMemorizedValue({
@@ -655,14 +653,14 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 showInitialValidationState
             >
-                {useMemorizedValue((properties:Props<boolean>):ReactElement =>
+                {useMemorizedValue(({properties}):ReactElement =>
                     <RequireableCheckbox {...properties} />
                 )}
             </Inputs>
             <Inputs
                 createPrototype={useMemorizedValue(
-                    (prototype, {name}, values) => ({
-                        ...prototype, name: `${name}-${values.length}`
+                    ({index, inputsProperties: {name}, prototype}) => ({
+                        ...prototype, name: `${name}-${index + 1}`
                     })
                 )}
                 model={useMemorizedValue({
@@ -675,7 +673,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 showInitialValidationState
             >
-                {useMemorizedValue((properties:Props<boolean>):ReactElement =>
+                {useMemorizedValue(({properties}):ReactElement =>
                     <Interval {...properties} />
                 )}
             </Inputs>

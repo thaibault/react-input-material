@@ -277,9 +277,10 @@ export const InputsInner = function<
         properties.value[index] = Tools.extend(
             true,
             {
-                ...properties.createPrototype!(
-                    Tools.copy(getPrototype<P>(properties)),
-                    properties as InputsProperties<P>,
+                ...properties.createPrototype!({
+                    index,
+                    properties,
+                    prototype: Tools.copy(getPrototype<P>(properties)),
                     values
                 ),
                 ...properties.value[index],
@@ -338,9 +339,10 @@ export const InputsInner = function<
     const add = (event?:GenericEvent):void => setValues((
         values:Array<P['value']>|null
     ):Array<P['value']> => {
-        const newProperties:Partial<P> = properties.createPrototype!(
-            getPrototype<P>(properties),
-            properties as InputsProperties<P>,
+        const newProperties:Partial<P> = properties.createPrototype!({
+            index: values.length,
+            properties,
+            prototype: getPrototype<P>(properties),
             values
         )
 
@@ -377,11 +379,11 @@ export const InputsInner = function<
                 ):ReactElement =>
                     <div className={styles.inputs__item} key={index}>
                         {Tools.isFunction(properties.children) ?
-                            properties.children(
-                                inputProperties,
+                            properties.children({
                                 index,
-                                properties as InputsProperties<P>
-                            ) :
+                                inputsProperties: properties,
+                                properties: inputProperties
+                            }) :
                             <GenericInput
                                 {...inputProperties}
                                 name={`${properties.name}-${index + 1}`}
@@ -400,19 +402,24 @@ export const InputsInner = function<
                 ) :
                 <div className={`${styles.inputs__item} ${styles['inputs__item--disabled']}`}>
                     {Tools.isFunction(properties.children) ?
-                        properties.children(
-                            properties.createPrototype!(
-                                {...getPrototype<P>(properties), disabled: true},
+                        properties.children({
+                            index: 0,
+                            inputsProperties,
+                            properties: properties.createPrototype!({
+                                index: 0,
                                 properties,
-                                values
-                            ),
-                            0,
-                            properties as InputsProperties<P>
-                        ) :
+                                prototype: {
+                                    ...getPrototype<P>(properties),
+                                    disabled: true
+                                },
+                                values,
+                            })
+                        }) :
                         <GenericInput
-                            {...properties.createPrototype!(
-                                getPrototype<P>(properties),
+                            {...properties.createPrototype!({
+                                index: 0,
                                 properties,
+                                prototype: getPrototype<P>(properties),
                                 values
                             )}
                             disabled
