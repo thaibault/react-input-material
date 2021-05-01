@@ -65,6 +65,7 @@ const getPrototype = function<P extends Properties>(
 ):Partial<P> {
     return {
         ...defaultProperties,
+        className: styles.inputs__item__input,
         ...(properties.default && properties.default.length > 0 ?
             properties.default![0] :
             {}
@@ -110,9 +111,11 @@ const getExternalProperties = function<P extends Properties>(
         model: {
             ...(properties.model || {}),
             state: modelState,
-            value: properties.value?.map(
-                ({model}):Properties['model'] => model || {}
-            )
+            value: Array.isArray(properties.value) ?
+                properties.value.map(
+                    ({model}):Properties['model'] => model || {}
+                ) :
+                properties.value
         }
     }
 }
@@ -208,20 +211,30 @@ export const InputsInner = function<
         inputProperties?:Partial<P>,
         index?:number
     ):void => {
-        if (values) {
+        if (values)
             properties.value = values.map((_:P, index:number):P =>
                 references[index]?.current?.properties ||
                 (properties.value as Array<P>)[index]
             )
 
-            if (inputProperties === undefined && typeof index === 'number')
-                properties.value.splice(index, 1)
-            else if (inputProperties)
-                if (typeof index === 'number')
-                    properties.value![index] = inputProperties as P
-                else
-                    properties.value!.push(inputProperties as P)
-        }
+        if (!properties.value)
+            properties.value = []
+
+        if (inputProperties === undefined && typeof index === 'number')
+            properties.value.splice(index, 1)
+        else if (inputProperties)
+            if (typeof index === 'number')
+                properties.value![index] = inputProperties as P
+            else
+                properties.value!.push(inputProperties as P)
+
+        if (
+            properties.emptyEqualsNull &&
+            (!properties.value || properties.value.length === 0)
+        )
+            properties.value = null
+
+        console.log(properties.value)
 
         triggerCallbackIfExists<InputsProperties<P>>(
             properties as InputsProperties<P>,
@@ -288,7 +301,6 @@ export const InputsInner = function<
                     values
                 }),
                 ...properties.value[index],
-                className: styles.inputs__item__input,
                 onChange: (inputProperties:P, event?:GenericEvent):void =>
                     triggerOnChange(
                         properties.value,

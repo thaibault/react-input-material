@@ -39,8 +39,8 @@ endregion */
     justify-content: space-between;
 }
 
-.inputs__item--disabled {
-    opacity: .5;
+.inputs__item--disabled .inputs__item__input {
+    opacity: .7;
 }
 
 .inputs__item__input {
