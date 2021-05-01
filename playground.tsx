@@ -641,7 +641,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <Inputs
                 createPrototype={useMemorizedValue(
                     (prototype, {name}, values) => ({
-                        ...prototype, name: `${name}-${values.length}`
+                        ...prototype, name: `${name}-${values?.length || 1}`
                     })
                 )}
                 model={useMemorizedValue({

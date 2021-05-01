@@ -30,7 +30,7 @@ endregion */
 
 .interval__icon {
     box-sizing: border-box;
-    padding: 16px;
+    margin: 16px;
     text-align: center;
 }
 /* region vim modline

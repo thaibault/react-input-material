@@ -21,6 +21,15 @@ endregion */
 }
 
 .inputs__add {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.inputs__add__button, .inputs__item__remove {
+    box-sizing: border-box;
+    margin: 6px;
+    text-align: center;
     visibility: visible;
 }
 
@@ -30,12 +39,12 @@ endregion */
     justify-content: space-between;
 }
 
-.inputs__item__input {
-    width: 100%;
+.inputs__item--disabled {
+    opacity: .5;
 }
 
-.inputs__item__remove {
-    visibility: visible;
+.inputs__item__input {
+    width: 100%;
 }
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:

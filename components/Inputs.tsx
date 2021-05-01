@@ -148,6 +148,15 @@ export const InputsInner = function<
     const givenProperties:InputsProps<P> = Tools.extend(
         true, Tools.copy(Inputs.defaultProperties), givenProps
     )
+
+    let [values, setValues] = useState<Array<P['value']>|null>(
+        inputPropertiesToValues<P>(
+            determineInitialValue<Array<P['value']>>(
+                givenProps, Tools.copy(Inputs.defaultProperties.model?.default)
+            ) ||
+            null
+        )
+    )
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
@@ -166,18 +175,21 @@ export const InputsInner = function<
         ) &&
         Boolean(givenProperties.onChange || givenProperties.onChangeValue)
 
-    let [values, setValues] = useState<Array<P['value']>>(
-        inputPropertiesToValues<P>(
-            determineInitialValue<Array<P['value']>>(
-                givenProps, Tools.copy(Inputs.defaultProperties.model?.default)
-            ) ||
-            []
-        )
+    /*
+        NOTE: Avoid writing into mutable model object properties. So project
+        value to properties directly.
+    */
+    if (
+        givenProperties.model!.value !== undefined &&
+        givenProperties.value === undefined
     )
+        givenProperties.value = givenProperties.model!.value
+    if (givenProperties.value === undefined)
+        // NOTE: Indicates to be filled later from state.
+        givenProperties.value = []
+
     const references:Array<RefObject<WebComponentAdapter<P, State>>> = []
 
-    // TODO durch das mergen wird der value nie null annehmen können!
-    console.log('TODO', givenProperties.value, givenProperties.model.value, values)
     const properties:InputsProperties<P> =
         getConsolidatedProperties<InputsProps<P>, InputsProperties<P>>(
             mapPropertiesIntoModel<InputsProps<P>, Model<P['model']>>(
@@ -185,26 +197,27 @@ export const InputsInner = function<
                 Inputs.defaultProperties.model as Model<P['model']>
             )
         )
-    console.log('B', properties.value, values)
 
     const triggerOnChange = (
-        values:Array<P>,
+        values:Array<P>|null,
         event?:GenericEvent,
         inputProperties?:Partial<P>,
         index?:number
     ):void => {
-        properties.value = values.map((_:P, index:number):P =>
-            references[index]?.current?.properties ||
-            (properties.value as Array<P>)[index]
-        )
+        if (values) {
+            properties.value = values.map((_:P, index:number):P =>
+                references[index]?.current?.properties ||
+                (properties.value as Array<P>)[index]
+            )
 
-        if (inputProperties === undefined && typeof index === 'number')
-            properties.value.splice(index, 1)
-        else if (inputProperties)
-            if (typeof index === 'number')
-                properties.value![index] = inputProperties as P
-            else
-                properties.value!.push(inputProperties as P)
+            if (inputProperties === undefined && typeof index === 'number')
+                properties.value.splice(index, 1)
+            else if (inputProperties)
+                if (typeof index === 'number')
+                    properties.value![index] = inputProperties as P
+                else
+                    properties.value!.push(inputProperties as P)
+        }
 
         triggerCallbackIfExists<InputsProperties<P>>(
             properties as InputsProperties<P>,
@@ -215,11 +228,14 @@ export const InputsInner = function<
         )
     }
     const triggerOnChangeValue = (
-        values:Array<P['value']>,
+        values:Array<P['value']>|null,
         event?:GenericEvent,
         value?:P['value'],
         index?:number
     ):Array<P['value']> => {
+        if (values === null)
+            values = []
+
         if (typeof index === 'number')
             if (value === undefined)
                 values.splice(index, 1)
@@ -238,13 +254,16 @@ export const InputsInner = function<
             event
         )
 
+        if (properties.emptyEqualsNull && values.length === 0)
+            return null
+
         return values
     }
 
     for (let index:number = 0; index < Math.max(
         properties.model?.value?.length || 0,
-        (properties.value || []).length || 0,
-        values.length || 0
+        properties.value?.length || 0,
+        values?.length || 0
     ); index += 1) {
         const reference:RefObject<WebComponentAdapter<P, State>> =
             createRef<WebComponentAdapter<P, State>>()
@@ -267,7 +286,7 @@ export const InputsInner = function<
                 className: styles.inputs__item__input,
                 onChange: (inputProperties:P, event?:GenericEvent):void =>
                     triggerOnChange(
-                        properties.value as Array<P>,
+                        properties.value,
                         event,
                         inputProperties,
                         index
@@ -275,7 +294,9 @@ export const InputsInner = function<
                 onChangeValue: (
                     value:null|P['value'], event?:GenericEvent
                 ):void =>
-                    setValues((values:Array<P['value']>):Array<P['value']> =>
+                    setValues((
+                        values:Array<P['value']>|null
+                    ):Array<P['value']>|null =>
                         triggerOnChangeValue(values, event, value, index)
                     ),
                 ref: reference
@@ -292,9 +313,12 @@ export const InputsInner = function<
         )
     }
 
-    values = properties.value ?
-        inputPropertiesToValues<P>(properties.value as Array<P>) :
-        []
+    if (properties.emptyEqualsNull && properties.value.length === 0)
+        properties.value = values = null
+    else
+        values = properties.value ?
+            inputPropertiesToValues<P>(properties.value as Array<P>) :
+            null
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
@@ -312,7 +336,7 @@ export const InputsInner = function<
     )
 
     const add = (event?:GenericEvent):void => setValues((
-        values:Array<P['value']>
+        values:Array<P['value']>|null
     ):Array<P['value']> => {
         const newProperties:Partial<P> = properties.createPrototype!(
             getPrototype<P>(properties),
@@ -322,13 +346,11 @@ export const InputsInner = function<
 
         triggerOnChange(values, event, newProperties)
 
-        values = triggerOnChangeValue(
+        return triggerOnChangeValue(
             values,
             event,
             newProperties.value ?? newProperties.model?.value ?? null
         )
-
-        return values
     })
     const createRemove = (index:number) => (event?:GenericEvent):void =>
         setValues((values:Array<P['value']>):Array<P['value']> => {
@@ -348,40 +370,75 @@ export const InputsInner = function<
             }
             data-name={properties.name}
         >
-            {((properties.value as Array<P>) || []).map((
-                inputProperties:P, index:number
-            ):ReactElement =>
-                <div className={styles.inputs__item} key={index}>
+            {properties.value ?
+                // TODO deduplicate!
+                (properties.value as Array<P>).map((
+                    inputProperties:P, index:number
+                ):ReactElement =>
+                    <div className={styles.inputs__item} key={index}>
+                        {Tools.isFunction(properties.children) ?
+                            properties.children(
+                                inputProperties,
+                                index,
+                                properties as InputsProperties<P>
+                            ) :
+                            <GenericInput
+                                {...inputProperties}
+                                name={`${properties.name}-${index + 1}`}
+                            />
+                        }
+
+                        {properties.disabled ?
+                            '' :
+                            <IconButton
+                                className={styles.inputs__item__remove}
+                                icon={properties.removeIcon}
+                                onClick={createRemove(index)}
+                            />
+                        }
+                    </div>
+                ) :
+                <div className={`${styles.inputs__item} ${styles['inputs__item--disabled']}`}>
                     {Tools.isFunction(properties.children) ?
                         properties.children(
-                            inputProperties,
-                            index,
+                            properties.createPrototype!(
+                                {...getPrototype<P>(properties), disabled: true},
+                                properties,
+                                values
+                            ),
+                            0,
                             properties as InputsProperties<P>
                         ) :
                         <GenericInput
-                            {...inputProperties}
-                            name={`${properties.name}-${index}`}
+                            {...properties.createPrototype!(
+                                getPrototype<P>(properties),
+                                properties,
+                                values
+                            )}
+                            disabled
+                            name={`${properties.name}-${index + 1}`}
                         />
                     }
 
-                    {properties.disabled ?
-                        '' :
+                    <div className={styles.inputs__add}>
                         <IconButton
-                            className={styles.inputs__item__remove}
-                            icon={properties.removeIcon}
-                            onClick={createRemove(index)}
+                            className={styles.inputs__add__button}
+                            icon={properties.addIcon}
+                            onClick={add}
                         />
-                    }
+                    </div>
                 </div>
-            )}
+            }
 
-            {properties.disabled ?
+            {properties.disabled || !properties.value ?
                 '' :
-                <IconButton
-                    className={styles.inputs__add}
-                    icon={properties.addIcon}
-                    onClick={add}
-                />
+                <div className={styles.inputs__add}>
+                    <IconButton
+                        className={styles.inputs__add__button}
+                        icon={properties.addIcon}
+                        onClick={add}
+                    />
+                </div>
             }
         </div>
     </WrapConfigurations>
