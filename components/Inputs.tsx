@@ -234,8 +234,6 @@ export const InputsInner = function<
         )
             properties.value = null
 
-        console.log(properties.value)
-
         triggerCallbackIfExists<InputsProperties<P>>(
             properties as InputsProperties<P>,
             'change',
@@ -377,6 +375,11 @@ export const InputsInner = function<
             triggerOnChange(values, event, undefined, index)
             return values
         })
+    const iconButton:ReactElement = <IconButton
+        className={styles.inputs__add__button}
+        icon={properties.addIcon}
+        onClick={add}
+    />
 
     return <WrapConfigurations
         strict={Inputs.strict}
@@ -390,7 +393,6 @@ export const InputsInner = function<
             data-name={properties.name}
         >
             {properties.value ?
-                // TODO deduplicate!
                 (properties.value as Array<P>).map((
                     inputProperties:P, index:number
                 ):ReactElement =>
@@ -444,25 +446,13 @@ export const InputsInner = function<
                         />
                     }
 
-                    <div className={styles.inputs__add}>
-                        <IconButton
-                            className={styles.inputs__add__button}
-                            icon={properties.addIcon}
-                            onClick={add}
-                        />
-                    </div>
+                    {iconButton}
                 </div>
             }
 
             {properties.disabled || !properties.value ?
                 '' :
-                <div className={styles.inputs__add}>
-                    <IconButton
-                        className={styles.inputs__add__button}
-                        icon={properties.addIcon}
-                        onClick={add}
-                    />
-                </div>
+                <div className={styles.inputs__add}>{iconButton}</div>
             }
         </div>
     </WrapConfigurations>
