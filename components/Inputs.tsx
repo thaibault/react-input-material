@@ -171,14 +171,11 @@ export const InputsInner = function<
     const controlled:boolean =
         !givenProperties.enforceUncontrolled &&
         (
-            Array.isArray(givenProps.model?.value) &&
-            givenProps.model!.value.every(({value}):boolean =>
-                value !== undefined
-            ) ||
-            Array.isArray(givenProps.value) &&
-            (givenProps.value as Array<P>).every(({value}):boolean =>
-                value !== undefined
-            )
+            (
+                Array.isArray(givenProps.model?.value) ||
+                givenProps.model?.value === null
+            ) &&
+            (Array.isArray(givenProps.value) || givenProps.value === null)
         ) &&
         Boolean(givenProperties.onChange || givenProperties.onChangeValue)
 
@@ -261,6 +258,9 @@ export const InputsInner = function<
 
         values = [...values]
 
+        if (properties.emptyEqualsNull && values.length === 0)
+            values = null
+
         triggerCallbackIfExists<InputsProperties<P>>(
             properties as InputsProperties<P>,
             'changeValue',
@@ -269,16 +269,13 @@ export const InputsInner = function<
             event
         )
 
-        if (properties.emptyEqualsNull && values.length === 0)
-            return null
-
         return values
     }
 
     for (let index:number = 0; index < Math.max(
         properties.model?.value?.length || 0,
         properties.value?.length || 0,
-        values?.length || 0
+        !controlled && values?.length || 0
     ); index += 1) {
         const reference:RefObject<WebComponentAdapter<P, State>> =
             createRef<WebComponentAdapter<P, State>>()
@@ -361,6 +358,8 @@ export const InputsInner = function<
             values
         })
 
+        // TODO new Properties are not yet consolidated by nested input
+        // component.
         triggerOnChange(values, event, newProperties)
 
         return triggerOnChangeValue(
@@ -375,11 +374,24 @@ export const InputsInner = function<
             triggerOnChange(values, event, undefined, index)
             return values
         })
-    const iconButton:ReactElement = <IconButton
+    const addButton:ReactElement = <IconButton
         className={styles.inputs__add__button}
         icon={properties.addIcon}
         onClick={add}
     />
+    const renderInput = (
+        inputProperties:Partial<P>, index:number
+    ):ReactElement =>
+        Tools.isFunction(properties.children) ?
+            properties.children({
+                index,
+                inputsProperties: properties,
+                properties: inputProperties
+            }) :
+            <GenericInput
+                {...inputProperties}
+                name={`${properties.name}-${index + 1}`}
+            />
 
     return <WrapConfigurations
         strict={Inputs.strict}
@@ -397,17 +409,7 @@ export const InputsInner = function<
                     inputProperties:P, index:number
                 ):ReactElement =>
                     <div className={styles.inputs__item} key={index}>
-                        {Tools.isFunction(properties.children) ?
-                            properties.children({
-                                index,
-                                inputsProperties: properties,
-                                properties: inputProperties
-                            }) :
-                            <GenericInput
-                                {...inputProperties}
-                                name={`${properties.name}-${index + 1}`}
-                            />
-                        }
+                        {renderInput(inputProperties, index)}
 
                         {properties.disabled ?
                             '' :
@@ -419,40 +421,29 @@ export const InputsInner = function<
                         }
                     </div>
                 ) :
-                <div className={`${styles.inputs__item} ${styles['inputs__item--disabled']}`}>
-                    {Tools.isFunction(properties.children) ?
-                        properties.children({
+                <div className={
+                    `${styles.inputs__item} ${styles['inputs__item--disabled']}`
+                }>
+                    {renderInput(
+                        properties.createPrototype!({
                             index: 0,
-                            inputsProperties: properties,
-                            properties: properties.createPrototype!({
-                                index: 0,
-                                properties,
-                                prototype: {
-                                    ...getPrototype<P>(properties),
-                                    disabled: true
-                                },
-                                values,
-                            })
-                        }) :
-                        <GenericInput
-                            {...properties.createPrototype!({
-                                index: 0,
-                                properties,
-                                prototype: getPrototype<P>(properties),
-                                values
-                            })}
-                            disabled
-                            name={`${properties.name}-1`}
-                        />
-                    }
+                            properties,
+                            prototype: {
+                                ...getPrototype<P>(properties),
+                                disabled: true
+                            },
+                            values
+                        }),
+                        0
+                    )}
 
-                    {iconButton}
+                    {addButton}
                 </div>
             }
 
             {properties.disabled || !properties.value ?
                 '' :
-                <div className={styles.inputs__add}>{iconButton}</div>
+                <div className={styles.inputs__add}>{addButton}</div>
             }
         </div>
     </WrapConfigurations>

@@ -42,7 +42,8 @@ describe('Inputs', ():void => {
 
         let domNode:HTMLElement = render(<Inputs/>) as HTMLElement
         expect(domNode.querySelector('input')).toHaveProperty('disabled', true)
-        expect(domNode.querySelector('.inputs__add')).not.toStrictEqual(null)
+        expect(domNode.querySelector('.inputs__add__button'))
+            .not.toStrictEqual(null)
         expect(domNode.querySelector('.inputs__item__remove'))
             .toStrictEqual(null)
 
