@@ -17,6 +17,7 @@
     endregion
 */
 // region imports
+import {boolean, number} from 'clientnode/property-types'
 import {FunctionComponent, ReactElement} from 'react'
 import {CSSTransition} from 'react-transition-group'
 import {TransitionProps} from 'react-transition-group/Transition'
@@ -26,7 +27,9 @@ import styles from './GenericAnimate.module'
 /**
  * Generic animation wrapper component.
  */
-export const GenericAnimate:FunctionComponent<Partial<TransitionProps<HTMLElement|undefined>>> =
+export const GenericAnimate:FunctionComponent<Partial<TransitionProps<
+    HTMLElement|undefined
+>>> =
     <Type extends HTMLElement|undefined = undefined>(
         properties:Partial<TransitionProps<Type>>
     ):ReactElement =>
@@ -48,6 +51,14 @@ export const GenericAnimate:FunctionComponent<Partial<TransitionProps<HTMLElemen
                     </div> :
                     properties.children
         }</CSSTransition>
+// region static properties
+GenericAnimate.propTypes = {
+    appear: boolean,
+    classNames: string,
+    in: boolean,
+    timeout: number
+}
+// endregion
 export default GenericAnimate
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
