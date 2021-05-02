@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import {boolean, number} from 'clientnode/property-types'
+import {boolean, number, string} from 'clientnode/property-types'
 import {FunctionComponent, ReactElement} from 'react'
 import {CSSTransition} from 'react-transition-group'
 import {TransitionProps} from 'react-transition-group/Transition'
