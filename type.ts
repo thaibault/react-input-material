@@ -692,17 +692,20 @@ export type IntervalValue = {
 }
 export type IntervalModelState = ModelState
 export type IntervalModel = {
-    end:InputModel<number>
-    start:InputModel<number>
+    name:string
     state:IntervalModelState
-    value:IntervalValue
+    value:{
+        end:InputModel<number>
+        start:InputModel<number>
+    }
 }
 export type AdditionalIntervalProperties = {
-    end:InputProperties<number>
     icon:IconOptions
     model:IntervalModel
-    start:InputProperties<number>
-    value:IntervalValue|null
+    value:{
+        end:InputProperties<number>
+        start:InputProperties<number>
+    }
 }
 export type IntervalProperties =
     Omit<

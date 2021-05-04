@@ -54,6 +54,54 @@ import {
     StaticFunctionInputComponent as StaticComponent
 } from '../type'
 // endregion
+// region helper
+const getModelState = (
+    startProperties:InputProperties<number>,
+    endProperties:InputProperties<number>
+):ModelState => ({
+    dirty: startProperties.dirty || endProperties.dirty,
+    focused: startProperties.focused || endProperties.focused,
+    invalid: startProperties.invalid || endProperties.invalid,
+    invalidRequired:
+        startProperties.invalidRequired ||
+        endProperties.invalidRequired,
+    pristine: startProperties.pristine && endProperties.pristine,
+    touched: startProperties.touched || endProperties.touched,
+    untouched: startProperties.untouched && endProperties.untouched,
+    valid: startProperties.valid && endProperties.valid,
+    visited: startProperties.visited || endProperties.visited
+})
+const getExternalProperties = (
+    properties:Properties,
+    iconProperties:IconOptions,
+    startProperties:InputProperties<number>,
+    endProperties:InputProperties<number>
+):Properties => {
+    const modelState:ModelState =
+        getModelState(startProperties, endProperties)
+    const value:Value = {
+        end: endProperties.value, start: startProperties.value
+    }
+
+    return {
+        ...properties,
+        ...modelState,
+        icon: iconProperties,
+        model: {
+            name: properties.name,
+            state: modelState,
+            value: {
+                end: endProperties.model,
+                start: startProperties.model
+            }
+        },
+        value: {
+            end: endProperties,
+            start: startProperties
+        }
+    }
+}
+// endregion
 /**
  * Generic interval start, end input wrapper component.
  *
@@ -91,8 +139,8 @@ export const IntervalInner = ((
     const controlled:boolean =
         !properties.enforceUncontrolled &&
         (
-            givenProps.model?.end?.value !== undefined ||
-            givenProps.model?.start?.value !== undefined ||
+            givenProps.model?.value?.end?.value !== undefined ||
+            givenProps.model?.value?.start?.value !== undefined ||
             givenProps.value !== undefined
         ) &&
         Boolean(properties.onChange || properties.onChangeValue)
@@ -100,15 +148,15 @@ export const IntervalInner = ((
     let [value, setValue] = useState<Value>({
         end:
             endProperties.value ??
-            properties.model?.end?.value ??
+            properties.model?.value?.end?.value ??
             endProperties.default ??
-            properties.model?.end?.default ??
+            properties.model?.value?.end?.default ??
             null,
         start:
             startProperties.value ??
-            properties.model?.end?.value ??
+            properties.model?.value?.end?.value ??
             startProperties.default ??
-            properties.model?.start?.default ??
+            properties.model?.value?.start?.default ??
             null,
     })
     if (!properties.value)
@@ -133,14 +181,16 @@ export const IntervalInner = ((
         true,
         {},
         propertiesToForward,
-        properties.model?.end ? {model: properties.model.end} : {},
+        properties.model?.value?.end ? {model: properties.model.value.end} : {},
         endProperties
     )
     startProperties = Tools.extend(
         true,
         {},
         propertiesToForward,
-        properties.model?.start ? {model: properties.model.start} : {},
+        properties.model?.value?.start ?
+            {model: properties.model.value.start} :
+            {},
         startProperties
     )
 
@@ -195,55 +245,20 @@ export const IntervalInner = ((
     useImperativeHandle(
         reference,
         ():AdapterWithReferences => ({
-            properties: properties as Properties,
+            properties: getExternalProperties(
+                properties as Properties,
+                iconProperties,
+                endInputReference.current?.properties || properties.end as
+                    InputProperties<number>,
+                startInputReference.current?.properties || properties.start as
+                    InputProperties<number>
+            ),
             references: {end: endInputReference, start: startInputReference},
             state: controlled ? {} : {value: properties.value}
         })
     )
     // region attach event handler
     if (properties.onChange) {
-        const getModelState = (
-            startProperties:InputProperties<number>,
-            endProperties:InputProperties<number>
-        ):ModelState => ({
-            dirty: startProperties.dirty || endProperties.dirty,
-            focused: startProperties.focused || endProperties.focused,
-            invalid: startProperties.invalid || endProperties.invalid,
-            invalidRequired:
-                startProperties.invalidRequired ||
-                endProperties.invalidRequired,
-            pristine: startProperties.pristine && endProperties.pristine,
-            touched: startProperties.touched || endProperties.touched,
-            untouched: startProperties.untouched && endProperties.untouched,
-            valid: startProperties.valid && endProperties.valid,
-            visited: startProperties.visited || endProperties.visited
-        })
-        const getExternalProperties = (
-            startProperties:InputProperties<number>,
-            endProperties:InputProperties<number>
-        ):Properties => {
-            const modelState:ModelState =
-                getModelState(startProperties, endProperties)
-            const value:Value = {
-                end: endProperties.value, start: startProperties.value
-            }
-
-            return {
-                ...properties as Properties,
-                ...modelState,
-                end: endProperties,
-                icon: iconProperties,
-                model: {
-                    end: endProperties.model,
-                    start: startProperties.model,
-                    state: modelState,
-                    value
-                },
-                start: startProperties,
-                value
-            }
-        }
-
         endProperties.onChange = (
             inputProperties:InputProperties<number>, event?:GenericEvent
         ):void => {
@@ -259,7 +274,12 @@ export const IntervalInner = ((
                 properties as Properties,
                 'change',
                 controlled,
-                getExternalProperties(start, inputProperties),
+                getExternalProperties(
+                    properties as Properties,
+                    iconProperties,
+                    start,
+                    inputProperties
+                ),
                 event
             )
         }
@@ -278,7 +298,12 @@ export const IntervalInner = ((
                 properties as Properties,
                 'change',
                 controlled,
-                getExternalProperties(inputProperties, end),
+                getExternalProperties(
+                    properties as Properties,
+                    iconProperties,
+                    inputProperties,
+                    end
+                ),
                 event
             )
         }
