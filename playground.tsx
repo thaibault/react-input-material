@@ -59,7 +59,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         useMemorizedValue<(value:FloatValueState) => void>(setValue2)
 
     const [value3, setValue3] =
-        useState<IntervalValue|null>({end: 120, start: 60})
+        useState<IntervalValue|null>({end: {value: 120}, start: {value: 60}})
     const onChangeValue3 =
         useMemorizedValue<(value:IntervalValue|null) => void>(setValue3)
 
@@ -545,17 +545,19 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <Interval
-                end={useMemorizedValue({
-                    default: 240,
-                    minimum: 120
-                })}
                 onChange={onChange}
                 required
-                start={useMemorizedValue({
-                    default: 120,
-                    maximum: 3600
-                })}
                 step={60}
+                value={useMemorizedValue({
+                    end: {
+                        default: 240,
+                        minimum: 120
+                    },
+                    start: {
+                        default: 120,
+                        maximum: 3600
+                    }
+                })}
             />
             <Interval
                 name="controlled"
