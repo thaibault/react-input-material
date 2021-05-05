@@ -545,17 +545,19 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <Interval
-                end={useMemorizedValue({
-                    default: 240,
-                    minimum: 120
-                })}
                 onChange={onChange}
                 required
-                start={useMemorizedValue({
-                    default: 120,
-                    maximum: 3600
-                })}
                 step={60}
+                value={useMemorizedValue({
+                    end: {
+                        default: 240,
+                        minimum: 120
+                    },
+                    start: {
+                        default: 120,
+                        maximum: 3600
+                    }
+                })}
             />
             <Interval
                 name="controlled"

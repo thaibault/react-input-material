@@ -24,6 +24,10 @@ endregion */
     justify-content: space-between;
 }
 
+.interval--disabled .interval__icon {
+    opacity: .5;
+}
+
 .interval__end, .interval__start {
     width: 100%;
 }

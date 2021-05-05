@@ -27,6 +27,7 @@ import {
     ReactElement,
     RefObject,
     useImperativeHandle,
+    useEffect,
     useState
 } from 'react'
 import {WebComponentAdapter} from 'web-component-wrapper/type'
@@ -155,6 +156,17 @@ export const InputsInner = function<
     const givenProperties:InputsProps<P> = Tools.extend(
         true, Tools.copy(Inputs.defaultProperties), givenProps
     )
+
+    let [newInputState, setNewInputState] =
+        useState<'added'|'rendered'|'stabilized'>('stabilized')
+    useEffect(():void => {
+        if (newInputState === 'added')
+            setNewInputState('rendered')
+        else if (newInputState === 'rendered') {
+            setNewInputState('stabilized')
+            triggerOnChange(properties.value)
+        }
+    })
 
     let [values, setValues] = useState<Array<P['value']>|null>(
         inputPropertiesToValues<P>(
@@ -358,15 +370,21 @@ export const InputsInner = function<
             values
         })
 
-        // TODO new Properties are not yet consolidated by nested input
-        // component.
         triggerOnChange(values, event, newProperties)
 
-        return triggerOnChangeValue(
+        const result:Array<P['value']> = triggerOnChangeValue(
             values,
             event,
             newProperties.value ?? newProperties.model?.value ?? null
         ) as Array<P['value']>
+
+        /**
+         * NOTE: new Properties are not yet consolidated by nested input
+         * component. So save that info for further rendering.
+         */
+        setNewInputState('added')
+
+        return result
     })
     const createRemove = (index:number) => (event?:GenericEvent):void =>
         setValues((values:Array<P['value']>|null):Array<P['value']>|null => {
