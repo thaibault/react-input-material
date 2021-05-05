@@ -59,7 +59,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         useMemorizedValue<(value:FloatValueState) => void>(setValue2)
 
     const [value3, setValue3] =
-        useState<IntervalValue|null>({end: {value: 120}, start: {value: 60}})
+        useState<IntervalValue|null>({end: 120, start: 60})
     const onChangeValue3 =
         useMemorizedValue<(value:IntervalValue|null) => void>(setValue3)
 

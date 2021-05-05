@@ -690,6 +690,10 @@ export type IntervalValue = {
     end?:null|number
     start?:null|number
 }
+export type IntervalConfiguration = {
+    end:InputProps<number>
+    start:InputProps<number>
+}
 export type IntervalModelState = ModelState
 export type IntervalModel = {
     name:string
@@ -702,10 +706,7 @@ export type IntervalModel = {
 export type AdditionalIntervalProperties = {
     icon:IconOptions
     model:IntervalModel
-    value:{
-        end:InputProperties<number>
-        start:InputProperties<number>
-    }
+    value:IntervalConfiguration
 }
 export type IntervalProperties =
     Omit<
@@ -730,7 +731,7 @@ export type IntervalProps =
         onChange:IntervalProperties['onChange']
         onChangeValue:IntervalProperties['onChangeValue']
         start:InputProps<number>
-        value:IntervalValue|null
+        value:IntervalConfiguration|IntervalValue|null
     }>
 export type IntervalPropertyTypes<Type = any> = {
     [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
@@ -746,19 +747,23 @@ export type IntervalAdapterWithReferences = IntervalAdapter & {
 // // region constants
 export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...inputPropertyTypes,
-    end: shape<any>(inputPropertyTypes),
-    start: shape<any>(inputPropertyTypes)
+    value: shape<any>({
+        end: oneOfType([number, shape<any>(inputPropertyTypes)]),
+        start: oneOfType([number, shape<any>(inputPropertyTypes)])
+    })
 } as const
 export const defaultIntervalProperties:IntervalProps = {
-    end: {description: 'End', name: 'end'},
     icon: {icon: 'timelapse'},
     maximumText:
         'Please provide somthing earlier than ${formatValue(maximum)}.',
     minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
     name: 'NO_NAME_DEFINED',
     requiredText: 'Please provide a range.',
-    start: {description: 'Start', name: 'start'},
-    type: 'time'
+    type: 'time',
+    value: {
+        end: {description: 'End', name: 'end'},
+        start: {description: 'Start', name: 'start'},
+    }
 } as const
 // // endregion
 // / endregion

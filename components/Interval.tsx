@@ -118,19 +118,32 @@ export const IntervalInner = ((
     // region consolidate properties
     const givenProps:Props = translateKnownSymbols(props) as Props
     /*
+        Normalize value property (providing only value instead of props is
+        allowed also).
+    */
+    if (!givenProps.value)
+        givenProps.value = {
+            end: {value: givenProps.value}, start: {value: givenProps.value}
+        }
+    if (typeof givenProps.value.end === 'number')
+        givenProps.value.end = {value: givenProps.value.end}
+    if (typeof givenProps.value.start === 'number')
+        givenProps.value.start = {value: givenProps.value.start}
+    /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
         instances.
     */
-    const properties:Props = Tools.extend(
-        true, Tools.copy(Interval.defaultProperties), givenProps
-    )
+    const properties:Omit<Props, 'value'> & {value: Properties['value']} =
+        Tools.extend(
+            true, Tools.copy(Interval.defaultProperties), givenProps
+        ) as Properties
 
-    let endProperties:InputProps<number> = properties.end!
+    let endProperties:InputProps<number> = properties.value?.end || {}
     const iconProperties:IconOptions = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
         properties.icon!
-    let startProperties:InputProps<number> = properties.start!
+    let startProperties:InputProps<number> = properties.value?.start || {}
 
     /*
         NOTE: Sometimes we need real given properties or derived (default
@@ -160,10 +173,11 @@ export const IntervalInner = ((
             null,
     })
     if (!properties.value)
-        properties.value = value
+        properties.value =
+            {end: {value: value.end}, start: {value: value.start}}
     const propertiesToForward:InputProps<number> =
         Tools.mask<InputProps<number>>(
-            properties as InputProps<number>,
+            properties as unknown as InputProps<number>,
             {exclude: {
                 enforceUncontrolled: true,
                 end: true,
@@ -208,13 +222,13 @@ export const IntervalInner = ((
         typeof startConfiguration.maximum === 'number' ?
             startConfiguration.maximum :
             Infinity,
-        properties.value.end || Infinity,
+        properties.value.end.value || Infinity,
         typeof endConfiguration.maximum === 'number' ?
             endConfiguration.maximum :
             Infinity
     )
     startProperties.minimum = startConfiguration.minimum || -Infinity
-    startProperties.value = properties.value.start
+    startProperties.value = properties.value.start.value
 
     endProperties.maximum = typeof endConfiguration.maximum === 'number' ?
         endConfiguration.maximum :
@@ -223,24 +237,28 @@ export const IntervalInner = ((
         typeof endConfiguration.minimum === 'number' ?
             endConfiguration.minimum :
             -Infinity,
-        properties.value.start || -Infinity,
+        properties.value.start.value || -Infinity,
         typeof startConfiguration.minimum === 'number' ?
             startConfiguration.minimum :
             -Infinity
     )
-    endProperties.value = properties.value.end
+    endProperties.value = properties.value.end.value
 
     const endInputReference:RefObject<InputAdapterWithReferences<number>> =
         createRef<InputAdapterWithReferences<number>>()
     const startInputReference:RefObject<InputAdapterWithReferences<number>> =
         createRef<InputAdapterWithReferences<number>>()
 
+    const valueState:Value = {
+        end: properties.value.end.value,
+        start: properties.value.start.value
+     }
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValue = createDummyStateSetter<Value>(properties.value)
+        setValue = createDummyStateSetter<Value>(valueState)
     // endregion
     useImperativeHandle(
         reference,
@@ -248,13 +266,13 @@ export const IntervalInner = ((
             properties: getExternalProperties(
                 properties as Properties,
                 iconProperties,
-                endInputReference.current?.properties || properties.end as
-                    InputProperties<number>,
-                startInputReference.current?.properties || properties.start as
-                    InputProperties<number>
+                endInputReference.current?.properties ||
+                properties.value.end as InputProperties<number>,
+                startInputReference.current?.properties ||
+                properties.value.start as InputProperties<number>
             ),
             references: {end: endInputReference, start: startInputReference},
-            state: controlled ? {} : {value: properties.value}
+            state: controlled ? {} : {value: valueState}
         })
     )
     // region attach event handler
@@ -359,7 +377,8 @@ export const IntervalInner = ((
         <div
             className={
                 styles.interval +
-                (properties.className ? ` ${properties.className}` : '')
+                (properties.className ? ` ${properties.className}` : '') +
+                (properties.disabled ? ` ${styles['interval--disabled']}` : '')
             }
             data-name={properties.name}
         >
