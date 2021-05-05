@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module interval */
+/** @module Interval */
 'use strict'
 /* !
     region header

@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module RequireableCheckbox */
+/** @module FileInput */
 'use strict'
 /* !
     region header
@@ -33,11 +33,10 @@ import {
     useImperativeHandle,
     useState
 } from 'react'
-import {MDCCheckboxFoundation} from '@material/checkbox'
-import {Checkbox} from '@rmwc/checkbox'
+import {Card} from '@rmwc/card'
 import {Theme} from '@rmwc/theme'
 
-import styles from './RequireableCheckbox.module'
+import styles from './FileInput.module'
 import {WrapConfigurations} from './WrapConfigurations'
 import {
     determineInitialValue,
@@ -49,32 +48,19 @@ import {
     wrapStateSetter
 } from '../helper'
 import {
-    CheckboxAdapter as Adapter,
-    CheckboxModel as Model,
-    CheckboxProperties as Properties,
-    CheckboxProps as Props,
-    CheckboxState as State,
+    FileInputAdapter as Adapter,
+    FileInputModel as Model,
+    FileInputProperties as Properties,
+    FileInputProps as Props,
+    FileInputState as State,
     defaultModelState,
-    DefaultCheckboxProperties as DefaultProperties,
-    defaultCheckboxProperties as defaultProperties,
-    CheckboxModelState as ModelState,
-    checkboxPropertyTypes as propertyTypes,
+    DefaultFileInputProperties as DefaultProperties,
+    defaultFileInpitProperties as defaultProperties,
+    FileInputModelState as ModelState,
+    fileInputPropertyTypes as propertyTypes,
     StaticFunctionComponent as StaticComponent,
     ValueState
 } from '../type'
-// endregion
-// region static helper
-export function determineValidationState(
-    properties:Properties, currentState:ModelState
-):boolean {
-    return determineBaseValidationState<Properties>(
-        properties,
-        currentState,
-        {invalidRequired: ():boolean =>
-            properties.model.nullable === false && !properties.model.value
-        }
-    )
-}
 // endregion
 /**
  * Validateable checkbox wrapper component.
@@ -102,9 +88,10 @@ export function determineValidationState(
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const RequireableCheckboxInner = function(
+export const FileInputInner = function(
     props:Props, reference?:RefObject<Adapter>
 ):ReactElement {
+    // TODO
     // region property aggregation
     const deriveMissingPropertiesFromState = () => {
         if (givenProperties.showDeclaration === undefined)
@@ -512,7 +499,7 @@ export const RequireableCheckboxInner = function(
     // endregion
 } as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
-RequireableCheckboxInner.displayName = 'RequireableCheckbox'
+FileInputInner.displayName = 'FileInput'
 /**
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
@@ -526,29 +513,27 @@ RequireableCheckboxInner.displayName = 'RequireableCheckbox'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const RequireableCheckbox:StaticComponent<Props> =
-    memorize(forwardRef(RequireableCheckboxInner)) as
-        unknown as
-        StaticComponent<Props>
+export const FileInput:StaticComponent<Props> =
+    memorize(forwardRef(FileInputInner)) as unknown as StaticComponent<Props>
 // region static properties
 // / region web-component hints
-RequireableCheckbox.wrapped = RequireableCheckboxInner
-RequireableCheckbox.webComponentAdapterWrapped = 'react'
+FileInput.wrapped = FileInputInner
+FileInput.webComponentAdapterWrapped = 'react'
 // / endregion
-RequireableCheckbox.defaultModelState = defaultModelState
+FileInput.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where
     provided via "props" and should shadow a state saved valued.
 */
-RequireableCheckbox.defaultProperties = {
+FileInput.defaultProperties = {
     ...defaultProperties,
     model: {...defaultProperties.model, state: undefined, value: undefined},
     value: undefined
 }
-RequireableCheckbox.propTypes = propertyTypes
-RequireableCheckbox.strict = false
+FileInput.propTypes = propertyTypes
+FileInput.strict = false
 // endregion
-export default RequireableCheckbox
+export default FileInput
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:

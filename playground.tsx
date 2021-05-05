@@ -76,6 +76,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     // endregion
     return (<>
         <div className="playground__inputs">
+            <FileInput onChange={onChange} />
+            {/*TODO*/}
+
             <GenericInput onChange={onChange} />
             <GenericInput
                 name="UnControlled"

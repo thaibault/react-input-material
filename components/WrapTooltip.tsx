@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module wrap-tooltip */
+/** @module WrapTooltip */
 'use strict'
 /* !
     region header

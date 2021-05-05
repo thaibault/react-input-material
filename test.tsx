@@ -20,6 +20,7 @@ import React from 'react'
 import {SelectProps} from '@rmwc/select'
 
 import GenericAnimate from './components/GenericAnimate'
+import FileInput from './components/FileInput'
 import GenericInput, {normalizeSelection} from './components/GenericInput'
 import Inputs from './components/Inputs'
 import Interval from './components/Interval'
@@ -35,6 +36,24 @@ import {TestEnvironment} from './type'
 const testEnvironment:TestEnvironment =
     prepareTestEnvironment(beforeEach, afterEach)
 const {render} = testEnvironment
+// region FileInput
+describe('FileInput', ():void => {
+    test('render', ():void => {
+        expect(render(<FileInput/>)).toBeDefined()
+
+        expect((render(<FileInput/>) as HTMLElement).querySelector('input'))
+            .toBeDefined()
+
+        expect((render(<FileInput/>) as HTMLElement).getAttribute('class'))
+            .toStrictEqual('file-input')
+
+        expect(
+            (render(<FileInput name="test"/>) as HTMLElement)
+                .querySelector('[name="test"]')
+        ).not.toStrictEqual(null)
+    })
+})
+// endregion
 // region Inputs
 describe('Inputs', ():void => {
     test('render', ():void => {

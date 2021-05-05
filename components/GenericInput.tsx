@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module generic-input */
+/** @module GenericInput */
 'use strict'
 /* !
     region header
