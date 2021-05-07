@@ -286,22 +286,36 @@ export const FileInputInner = function(
      * @param event - Event object or new value.
      * @returns Nothing.
      */
-    const onChangeValue = (event:SyntheticEvent):void => {
+    const onChangeValue = (eventOrName:null|string|SyntheticEvent):void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
 
-        properties.value =
-            (event.target as unknown as {files:FileList|null}).files &&
-            (event.target as unknown as {files:FileList}).files[0]
+        let event:null|SyntheticEvent = null
+        if (eventOrName.target === fileInputReference.current) {
+            event = eventOrName
+            properties.value =
+                (event.target as unknown as {files:FileList|null}).files &&
+                (event.target as unknown as {files:FileList}).files[0]
+            properties.fileName.value = properties.value?.name
+        } else {
+            event = null
+            properties.fileName.value = eventOrName
+        }
 
         setValueState((oldValueState:ValueState):ValueState => {
-            if (oldValueState.value === properties.value)
+            if (
+                oldValueState.fileName === properties.fileName.value &&
+                oldValueState.value === properties.value
+            )
                 return oldValueState
 
             let stateChanged:boolean = false
 
-            const result:ValueState =
-                {...oldValueState, value: properties.value as File|null}
+            const result:ValueState = {
+                ...oldValueState,
+                fileName: properties.fileName.value,
+                value: properties.value as File|null
+            }
 
             if (oldValueState.modelState.pristine) {
                 properties.dirty = true
@@ -402,8 +416,10 @@ export const FileInputInner = function(
     // endregion
     // region properties
     // / region references
-    const inputReference:RefObject<HTMLInputElement> =
+    const fileInputReference:RefObject<HTMLInputElement> =
         createRef<HTMLInputElement>()
+    const nameInputReference:RefObject<GenericInput> =
+        createRef<GenericInput>()
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
 
@@ -466,11 +482,12 @@ export const FileInputInner = function(
         reference,
         ():Adapter & {
             references:{
-                inputReference:RefObject<HTMLInputElement>
+                fileInputReference:RefObject<HTMLInputElement>,
+                nameInputReference:RefObject<GenericInput>
             }
         } => ({
             properties,
-            references: {inputReference},
+            references: {fileInputReference, nameInputReference},
             state: {
                 modelState: properties.model.state,
                 ...(controlled ?
@@ -482,12 +499,12 @@ export const FileInputInner = function(
     )
     // endregion
     useEffect(():(() => void) => {
-        if (inputReference.current?.file !== properties.value) {
-            if (inputReference.current?.file?.close)
-                inputReference.current?.file?.close()
+        if (fileInputReference.current?.file !== properties.value) {
+            if (fileInputReference.current?.file?.close)
+                fileInputReference.current?.file?.close()
 
-            if (properties.value && inputReference.current)
-                inputReference.current.file = properties.value
+            if (properties.value && fileInputReference.current)
+                fileInputReference.current.file = properties.value
         }
 
         return ():void => properties.value?.close && properties.value.close()
@@ -545,7 +562,18 @@ export const FileInputInner = function(
                     }</Typography> :
                     ''
                 }
-                <GenericInput {...properties.fileName} />
+                <GenericInput
+                    disabled={
+                        Boolean(properties.disabled || !properties.value)
+                    }
+                    {...properties.fileName}
+                    onChangeValue={onChangeValue}
+                    ref={nameInputReference as
+                        unknown as
+                        RefCallback<GenericInput>
+                    }
+                    required
+                />
                 <br />
                 Last modified date time: {Tools.dateTimeFormat(
                     '${mediumDay}.${mediumMonth}.${fullYear}',
@@ -563,8 +591,9 @@ export const FileInputInner = function(
                 id={properties.id || properties.name}
                 name={properties.name}
                 onChange={onChangeValue}
-                ref={
-                    inputReference as unknown as RefCallback<HTMLInputElement>
+                ref={fileInputReference as
+                    unknown as
+                    RefCallback<HTMLInputElement>
                 }
                 type="file"
             />
@@ -572,7 +601,7 @@ export const FileInputInner = function(
         <CardActions>
             <CardActionButtons>
                 <CardActionButton
-                    onClick={():void => inputReference.current?.click()}
+                    onClick={():void => fileInputReference.current?.click()}
                     ripple={properties.ripple}
                 >New</CardActionButton>
                 <CardActionButton ripple={properties.ripple}>

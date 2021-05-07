@@ -656,7 +656,10 @@ export type FileInputAdapter = WebComponentAdapter<
 >
 export type FileInputAdapterWithReferences =
     FileInputAdapter &
-    {references:{inputReference:RefObject<HTMLInputElement>}}
+    {references:{
+        fileInputReference:RefObject<HTMLInputElement>
+        nameInputReference:RefObject<GenericInput>
+    }}
 export type StaticFunctionFileInputComponent =
     Omit<FunctionComponent<FileInputProps>, 'propTypes'> &
     StaticWebInputComponent<FileInputProps>
