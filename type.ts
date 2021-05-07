@@ -615,16 +615,20 @@ export type FileInputModelState = ModelState &
 export type FileInputModel =
     Omit<Model<File>, 'state'> &
     {
+        fileName:InputModel
         maximumSize:number
         minimumSize:number
         regularExpressionMimeTypePattern:RegExp|string
         regularExpressionNamePattern:RegExp|string
         state:FileInputModelState
     }
-export type FileInputValueState = ValueState<File, FileInputModelState>
+export type FileInputValueState =
+    ValueState<File, FileInputModelState> &
+    {fileName?:null|string}
 export type AdditionalFileInputProperties =
     FileInputModelState &
     {
+        fileName:InputProperties
         maximumSizeText:string
         media:CardMediaProps
         minimumSizeText:string
@@ -670,6 +674,7 @@ export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
     ...modelPropertyTypes,
     ...fileInputModelStatePropertyTypes,
+    fileName: shape<any>(inputPropertyTypes),
     maximumSizeText: string,
     minimumSizeText: string,
     onBlur: func,
@@ -686,6 +691,12 @@ export const defaultFileInputModelState:FileInputModelState = {
 } as const
 export const defaultFileInputModel:FileInputModel = {
     ...defaultModel,
+    fileName: {
+        ...defaultInputModel,
+        maximumLength: 1024,
+        name: 'Name',
+        regularExpressionPattern: /^[^\/]+$/
+    },
     maximumSize: Infinity,
     minimumSize: 0,
     regularExpressionMimeTypePattern: /^.+\/.+$/,

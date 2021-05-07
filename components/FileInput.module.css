@@ -13,7 +13,11 @@ endregion */
 /*import '@rmwc/card/styles'*/
 @import '@material/card/dist/mdc.card.css';
 @import '@material/button/dist/mdc.button.css';
+/* Imported by GenericInput
 @import '@material/icon-button/dist/mdc.icon-button.css';
+*/
+
+@import './GenericInput.module';
 /* endregion */
 .file-input {
     display: block;

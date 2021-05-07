@@ -30,6 +30,7 @@ import {
     RefCallback,
     RefObject,
     SyntheticEvent,
+    useEffect,
     useImperativeHandle,
     useState
 } from 'react'
@@ -45,6 +46,7 @@ import {Theme} from '@rmwc/theme'
 import {Typography} from '@rmwc/typography'
 
 import styles from './FileInput.module'
+import GenericInput from './GenericInput'
 import {WrapConfigurations} from './WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
@@ -421,7 +423,9 @@ export const FileInputInner = function(
         be updated in one event loop (set state callback).
     */
     let [valueState, setValueState] = useState<ValueState>({
-        modelState: {...FileInput.defaultModelState}, value: initialValue
+        fileName: initialValue?.name,
+        modelState: {...FileInput.defaultModelState},
+        value: initialValue
     })
 
     const controlled:boolean =
@@ -438,6 +442,7 @@ export const FileInputInner = function(
     // region synchronize properties into state where values are not controlled
 
     const currentValueState:ValueState = {
+        fileName: properties.fileName.value,
         modelState: properties.model.state,
         value: properties.value as File|null
     }
@@ -446,7 +451,10 @@ export const FileInputInner = function(
         state has changed.
     */
     if (
-        !controlled && properties.value !== valueState.value ||
+        !controlled && (
+            properties.fileName.value !== valueState.fileName ||
+            properties.value !== valueState.value
+        ) ||
         !Tools.equals(properties.model.state, valueState.modelState)
     )
         setValueState(currentValueState)
@@ -473,7 +481,18 @@ export const FileInputInner = function(
         })
     )
     // endregion
-    // region render 
+    useEffect(():(() => void) => {
+        if (inputReference.current?.file !== properties.value) {
+            if (inputReference.current?.file?.close)
+                inputReference.current?.file?.close()
+
+            if (properties.value && inputReference.current)
+                inputReference.current.file = properties.value
+        }
+
+        return ():void => properties.value?.close && properties.value.close()
+    })
+    // region render
     const invalid:boolean = (
         properties.invalid &&
         (
@@ -526,9 +545,16 @@ export const FileInputInner = function(
                     }</Typography> :
                     ''
                 }
-                Mime-Typ: 
+                <GenericInput {...properties.fileName} />
                 <br />
-                Size: 
+                Last modified date time: {Tools.dateTimeFormat(
+                    '${mediumDay}.${mediumMonth}.${fullYear}',
+                    properties.value?.lastModifiedDate
+                )}
+                <br />
+                Mime-Typ: {properties.value?.type}
+                <br />
+                Size: {properties.value?.size}
             </div>
             {/*TODO use "accept" attribute*/}
             <input
@@ -541,7 +567,6 @@ export const FileInputInner = function(
                     inputReference as unknown as RefCallback<HTMLInputElement>
                 }
                 type="file"
-                value={properties.value ?? ''}
             />
         </CardPrimaryAction>
         <CardActions>
