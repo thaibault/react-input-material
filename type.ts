@@ -602,6 +602,89 @@ export const defaultInputProperties:DefaultInputProperties = {
 } as const
 // // endregion
 // / endregion
+// / region file-input
+export type FileInputModelState = ModelState &
+    {
+        invalidMaximumSize:boolean
+        invalidMinimumSize:boolean
+        invalidPattern:boolean
+    }
+export type FileInputModel =
+    Omit<Model<File>, 'state'> & {state:FileInputModelState}
+export type FileInputValueState = ValueState<File>
+export type AdditionalFileInputProperties =
+    FileInputModelState &
+    {
+        maximumSizeText:string
+        minimumSizeText:string
+        model:FileInputModel
+        outlined:boolean
+        pattern:RegExp|string
+        patternText:string
+    }
+export type FileInputProperties =
+    Properties<File, Properties<File> & AdditionalFileInputProperties> &
+    AdditionalFileInputProperties
+export type FileInputProps =
+    Partial<Omit<FileInputProperties, 'model'>> &
+    {model?:Partial<FileInputModel>}
+export type DefaultFileInputProperties =
+    Omit<FileInputProps, 'model'> & {model:FileInputModel}
+export type FileInputPropertyTypes = {
+    [key in keyof FileInputProperties]:ValueOf<typeof PropertyTypes>
+}
+export type FileInputState = State<File> & {modelState:FileInputModelState}
+export type FileInputAdapter = WebComponentAdapter<
+    FileInputProperties, Omit<FileInputState, 'value'> & {value?:File|null}
+>
+export type FileInputAdapterWithReferences =
+    FileInputAdapter &
+    {references:{inputReference:RefObject<HTMLInputElement>}}
+// // region constants
+export const fileInputModelStatePropertyTypes:{
+    [key in keyof FileInputModelState]:Requireable<boolean|symbol>
+} = {
+    ...modelStatePropertyTypes,
+    invalidMaximumSize: oneOfType([boolean, symbol]),
+    invalidMinimumSize: oneOfType([boolean, symbol]),
+    invalidPattern: oneOfType([boolean, symbol])
+} as const
+export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+    ...propertyTypes,
+    ...modelPropertyTypes,
+    ...fileInputModelStatePropertyTypes,
+    maximumSizeText: string,
+    minimumSizeText: string,
+    onBlur: func,
+    outlined: boolean,
+    patternText: string
+} as const
+export const defaultFileInputModelState:InputModelState = {
+    ...defaultModelState,
+    invalidMaximumSize: false,
+    invalidMinimumSize: false,
+    invalidPattern: false
+} as const
+export const defaultFileInputModel:InputModel = {
+    ...defaultModel,
+    state: defaultFileInputModelState
+} as const
+/*
+    NOTE: Avoid setting any properties already defined in model here since they
+    would permanently shadow them.
+*/
+export const defaultFileInputProperties:DefaultFileInputProperties = {
+    ...defaultProperties,
+    maximumSizeText:
+        'Please provide a file with less or equal size than ${maximumSize} byte.',
+    minimumSizeText:
+        'Please provide a file with more or equal size than ${maximumSize} byte.',
+    model: {...defaultFileInputModel},
+    patternText:
+        'Your file\'s mime-type hase to match the regular expression: "${pattern}".'
+} as const
+// // endregion
+// / endregion
 // / region inputs
 export type InputsModel<M extends Partial<Model> = Partial<Model>> =
     Model<Array<M>> &

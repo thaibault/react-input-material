@@ -64,7 +64,7 @@ import {
     FileInputState as State,
     defaultModelState,
     DefaultFileInputProperties as DefaultProperties,
-    defaultFileInpitProperties as defaultProperties,
+    defaultFileInputProperties as defaultProperties,
     FileInputModelState as ModelState,
     fileInputPropertyTypes as propertyTypes,
     StaticFunctionComponent as StaticComponent,
@@ -100,7 +100,6 @@ import {
 export const FileInputInner = function(
     props:Props, reference?:RefObject<Adapter>
 ):ReactElement {
-    // TODO
     // region property aggregation
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -327,9 +326,7 @@ export const FileInputInner = function(
     const givenProps:Props = translateKnownSymbols(props)
 
     const initialValue:boolean|null = determineInitialValue<boolean>(
-        givenProps,
-        FileInput.defaultProperties.model!.default,
-        givenProps.checked
+        givenProps, FileInput.defaultProperties.model!.default
     )
     /*
         NOTE: Extend default properties with given properties while letting
@@ -356,9 +353,7 @@ export const FileInputInner = function(
         ) &&
         Boolean(givenProps.onChange || givenProps.onChangeValue)
 
-    deriveMissingPropertiesFromState<Props, ValueState<boolean, ModelState>(
-        givenProperties, valueState
-    )
+    deriveMissingPropertiesFromState(givenProperties, valueState)
 
     const properties:Properties = getConsolidatedProperties(givenProperties)
     // region synchronize properties into state where values are not controlled
