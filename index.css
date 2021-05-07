@@ -9,6 +9,7 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
+@import './components/FileInput.module';
 @import './components/GenericAnimate.module';
 @import './components/GenericInput.module';
 @import './components/RequireableCheckbox.module';

@@ -53,6 +53,7 @@ import {
 } from 'web-component-wrapper/type'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
+import {CardMediaProps} from '@rmwc/card'
 import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
@@ -612,12 +613,20 @@ export type FileInputModelState = ModelState &
         invalidNamePattern:boolean
     }
 export type FileInputModel =
-    Omit<Model<File>, 'state'> & {state:FileInputModelState}
-export type FileInputValueState = ValueState<File>
+    Omit<Model<File>, 'state'> &
+    {
+        maximumSize:number
+        minimumSize:number
+        regularExpressionMimeTypePattern:RegExp|string
+        regularExpressionNamePattern:RegExp|string
+        state:FileInputModelState
+    }
+export type FileInputValueState = ValueState<File, FileInputModelState>
 export type AdditionalFileInputProperties =
     FileInputModelState &
     {
         maximumSizeText:string
+        media:CardMediaProps
         minimumSizeText:string
         model:FileInputModel
         outlined:boolean
@@ -644,14 +653,17 @@ export type FileInputAdapter = WebComponentAdapter<
 export type FileInputAdapterWithReferences =
     FileInputAdapter &
     {references:{inputReference:RefObject<HTMLInputElement>}}
-// // region constants 
+export type StaticFunctionFileInputComponent =
+    Omit<FunctionComponent<FileInputProps>, 'propTypes'> &
+    StaticWebInputComponent<FileInputProps>
+// // region constants
 export const fileInputModelStatePropertyTypes:{
     [key in keyof FileInputModelState]:Requireable<boolean|symbol>
 } = {
     ...modelStatePropertyTypes,
     invalidMaximumSize: oneOfType([boolean, symbol]),
     invalidMinimumSize: oneOfType([boolean, symbol]),
-    invalidMimeTypePattern: oneOfType([boolean, symbol])
+    invalidMimeTypePattern: oneOfType([boolean, symbol]),
     invalidNamePattern: oneOfType([boolean, symbol])
 } as const
 export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
@@ -662,18 +674,22 @@ export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     minimumSizeText: string,
     onBlur: func,
     outlined: boolean,
-    mimeTypePatternText: string
+    mimeTypePatternText: string,
     namePatternText: string
 } as const
-export const defaultFileInputModelState:InputModelState = {
+export const defaultFileInputModelState:FileInputModelState = {
     ...defaultModelState,
     invalidMaximumSize: false,
     invalidMinimumSize: false,
     invalidMimeTypePattern: false,
     invalidNamePattern: false
 } as const
-export const defaultFileInputModel:InputModel = {
+export const defaultFileInputModel:FileInputModel = {
     ...defaultModel,
+    maximumSize: Infinity,
+    minimumSize: 0,
+    regularExpressionMimeTypePattern: /^.+\/.+$/,
+    regularExpressionNamePattern: /^.+$/,
     state: defaultFileInputModelState
 } as const
 /*

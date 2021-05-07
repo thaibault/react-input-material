@@ -64,7 +64,7 @@ import {
     CheckboxValueState as ValueState
 } from '../type'
 // endregion
-// region static helper
+// region helper
 export function determineValidationState(
     properties:Properties, currentState:ModelState
 ):boolean {

@@ -307,7 +307,7 @@ export function determineValidationState<Type = any>(
                     properties.model.regularExpressionPattern !== null &&
                     typeof properties.model.regularExpressionPattern ===
                         'object' &&
-                    !typeof properties.model.regularExpressionPattern
+                    !properties.model.regularExpressionPattern
                         .test(properties.model.value)
                 )
             )

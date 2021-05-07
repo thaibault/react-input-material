@@ -49,7 +49,7 @@ import {WrapConfigurations} from './WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
     determineInitialValue,
-    determineValidationState,
+    determineValidationState as determineBaseValidationState,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
     translateKnownSymbols,
@@ -62,13 +62,13 @@ import {
     FileInputProperties as Properties,
     FileInputProps as Props,
     FileInputState as State,
-    defaultModelState,
+    defaultFileInputModelState as defaultModelState,
     DefaultFileInputProperties as DefaultProperties,
     defaultFileInputProperties as defaultProperties,
     FileInputModelState as ModelState,
     fileInputPropertyTypes as propertyTypes,
-    StaticFunctionComponent as StaticComponent,
-    ValueState
+    StaticFunctionFileInputComponent,
+    FileInputValueState as ValueState
 } from '../type'
 // endregion
 // region constants
@@ -80,12 +80,11 @@ const textMimeTypeRegularExpression:RegExp = new RegExp(
     '^(?:application/xml)|' +
     '(?:text/(?:plain|x-ndpb[wy]html|(?:x-)?csv|x?html?|xml))$'
 )
-const representableTextMimeTypeRegularExpression:RegExp = new RegExp(
+const representableTextMimeTypeRegularExpression:RegExp =
     // Plain version:
-    '^text/plain$'
+    /^text\/plain$/
     // Rendered version:
     // '^(?:application/xml)|(?:text/(?:plain|x?html?|xml))$'
-)
 const videoMimeTypeRegularExpression:RegExp = new RegExp(
     '^video/(?:(?:x-)?(?:x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|' +
     '(?:x-)?flv|(?:x-)?m4v|(?:x-)mng|x-ms-as|x-ms-wmv|x-msvideo)|' +
@@ -97,7 +96,7 @@ const videoMimeTypeRegularExpression:RegExp = new RegExp(
  * Determines which type of file we have to present.
  * @returns Nothing.
  */
-const determinePresentationType(contentType:string):string {
+export const determinePresentationType = (contentType:string):string => {
     contentType = contentType.replace(/; *charset=.+$/, '')
 
     if (textMimeTypeRegularExpression.test(contentType)) {
@@ -114,6 +113,57 @@ const determinePresentationType(contentType:string):string {
         return 'video'
 
     return 'binary'
+}
+export const determineValidationState = (
+    properties:Properties, currentState:ModelState
+):boolean => {
+    return determineBaseValidationState<Properties>(
+        properties,
+        currentState,
+        {
+            invalidMaximumSize: ():boolean => (
+                typeof properties.model.maximumSize === 'number' &&
+                properties.model.maximumSize <
+                    (properties.model.value?.size || 0)
+            ),
+            invalidMinimumSize: ():boolean => (
+                typeof properties.model.minimumSize === 'number' &&
+                properties.model.minimumSize >
+                    (properties.model.value?.size || 0)
+            ),
+            invalidNamePattern: ():boolean => (
+                typeof properties.model.value?.name === 'string' &&
+                (
+                    typeof properties.model.regularExpressionNamePattern ===
+                        'string' &&
+                    !(new RegExp(
+                        properties.model.regularExpressionNamePattern
+                    )).test(properties.model.value.name) ||
+                    properties.model.regularExpressionNamePattern !== null &&
+                    typeof properties.model.regularExpressionNamePattern ===
+                        'object' &&
+                    !properties.model.regularExpressionNamePattern
+                        .test(properties.model.value.name)
+                )
+            ),
+            invalidMimeTypePattern: ():boolean => (
+                typeof properties.model.value?.type === 'string' &&
+                (
+                    typeof properties.model.regularExpressionMimeTypePattern ===
+                        'string' &&
+                    !(new RegExp(
+                        properties.model.regularExpressionMimeTypePattern
+                    )).test(properties.model.value.type) ||
+                    properties.model.regularExpressionMimeTypePattern !==
+                        null &&
+                    typeof properties.model
+                        .regularExpressionMimeTypePattern === 'object' &&
+                    !properties.model.regularExpressionMimeTypePattern
+                        .test(properties.model.value.type)
+                )
+            )
+        }
+    )
 }
 // endregion
 /**
@@ -161,8 +211,6 @@ export const FileInputInner = function(
         )
 
         result = getBaseConsolidatedProperties<Props, Properties>(result)
-
-        result.checked = Boolean(result.value)
 
         return result as Properties
     }
@@ -241,7 +289,8 @@ export const FileInputInner = function(
             return
 
         properties.value =
-            (event.target as unknown as {files:FileList|null}).files[0]
+            (event.target as unknown as {files:FileList|null}).files &&
+            (event.target as unknown as {files:FileList}).files[0]
 
         setValueState((oldValueState:ValueState):ValueState => {
             if (oldValueState.value === properties.value)
@@ -356,7 +405,7 @@ export const FileInputInner = function(
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
 
-    const initialValue:boolean|null = determineInitialValue<boolean>(
+    const initialValue:File|null = determineInitialValue<File>(
         givenProps, FileInput.defaultProperties.model!.default
     )
     /*
@@ -371,10 +420,9 @@ export const FileInputInner = function(
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
     */
-    let [valueState, setValueState] =
-        useState<ValueState>({
-            modelState: {...FileInput.defaultModelState}, value: initialValue
-        })
+    let [valueState, setValueState] = useState<ValueState>({
+        modelState: {...FileInput.defaultModelState}, value: initialValue
+    })
 
     const controlled:boolean =
         !givenProperties.enforceUncontrolled &&
@@ -391,7 +439,7 @@ export const FileInputInner = function(
 
     const currentValueState:ValueState = {
         modelState: properties.model.state,
-        value: properties.value as boolean|null
+        value: properties.value as File|null
     }
     /*
         NOTE: If value is controlled only trigger/save state changes when model
@@ -419,7 +467,7 @@ export const FileInputInner = function(
                 modelState: properties.model.state,
                 ...(controlled ?
                     {} :
-                    {value: properties.value as boolean|null}
+                    {value: properties.value as File|null}
                 )
             }
         })
@@ -482,18 +530,18 @@ export const FileInputInner = function(
                 <br />
                 Size: 
             </div>
+            {/*TODO use "accept" attribute*/}
             <input
-                checked={Boolean(properties.value)}
                 disabled={properties.disabled}
                 className={styles['file-input__native']}
                 id={properties.id || properties.name}
-                inputRef={
-                    inputReference as unknown as RefCallback<HTMLInputElement>
-                }
                 name={properties.name}
                 onChange={onChangeValue}
+                ref={
+                    inputReference as unknown as RefCallback<HTMLInputElement>
+                }
                 type="file"
-                value={`${properties.value}`}
+                value={properties.value ?? ''}
             />
         </CardPrimaryAction>
         <CardActions>
@@ -528,8 +576,10 @@ FileInputInner.displayName = 'FileInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const FileInput:StaticComponent<Props> =
-    memorize(forwardRef(FileInputInner)) as unknown as StaticComponent<Props>
+export const FileInput:StaticFunctionFileInputComponent =
+    memorize(forwardRef(FileInputInner)) as
+        unknown as
+        StaticFunctionFileInputComponent
 // region static properties
 // / region web-component hints
 FileInput.wrapped = FileInputInner
