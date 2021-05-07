@@ -19,7 +19,7 @@ endregion */
     display: block;
 }
 
-.file-input__input {
+.file-input__native {
     display: none;
 }
 /* region vim modline

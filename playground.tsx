@@ -34,7 +34,7 @@ import {useMemorizedValue} from './helper'
 import {
     InputProperties, IntervalProps, IntervalValue, Properties, Model
 } from './type'
-// endregion 
+// endregion
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 
