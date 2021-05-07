@@ -327,6 +327,7 @@ export type CheckboxProperties =
     AdditionalCheckboxProperties
 export type CheckboxModel = Model<boolean>
 export type CheckboxModelState = ModelState
+export type CheckboxValueState = ValueState<boolean, CheckboxModelState>
 export type CheckboxProps =
     Partial<Omit<CheckboxProperties, 'model'>> &
     {model?:Partial<CheckboxModel>}
@@ -607,7 +608,8 @@ export type FileInputModelState = ModelState &
     {
         invalidMaximumSize:boolean
         invalidMinimumSize:boolean
-        invalidPattern:boolean
+        invalidMimeTypePattern:boolean
+        invalidNamePattern:boolean
     }
 export type FileInputModel =
     Omit<Model<File>, 'state'> & {state:FileInputModelState}
@@ -619,8 +621,10 @@ export type AdditionalFileInputProperties =
         minimumSizeText:string
         model:FileInputModel
         outlined:boolean
-        pattern:RegExp|string
-        patternText:string
+        mimeTypePattern:RegExp|string
+        mimeTypePatternText:string
+        namePattern:RegExp|string
+        namePatternText:string
     }
 export type FileInputProperties =
     Properties<File, Properties<File> & AdditionalFileInputProperties> &
@@ -640,14 +644,15 @@ export type FileInputAdapter = WebComponentAdapter<
 export type FileInputAdapterWithReferences =
     FileInputAdapter &
     {references:{inputReference:RefObject<HTMLInputElement>}}
-// // region constants
+// // region constants 
 export const fileInputModelStatePropertyTypes:{
     [key in keyof FileInputModelState]:Requireable<boolean|symbol>
 } = {
     ...modelStatePropertyTypes,
     invalidMaximumSize: oneOfType([boolean, symbol]),
     invalidMinimumSize: oneOfType([boolean, symbol]),
-    invalidPattern: oneOfType([boolean, symbol])
+    invalidMimeTypePattern: oneOfType([boolean, symbol])
+    invalidNamePattern: oneOfType([boolean, symbol])
 } as const
 export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -657,13 +662,15 @@ export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     minimumSizeText: string,
     onBlur: func,
     outlined: boolean,
-    patternText: string
+    mimeTypePatternText: string
+    namePatternText: string
 } as const
 export const defaultFileInputModelState:InputModelState = {
     ...defaultModelState,
     invalidMaximumSize: false,
     invalidMinimumSize: false,
-    invalidPattern: false
+    invalidMimeTypePattern: false,
+    invalidNamePattern: false
 } as const
 export const defaultFileInputModel:InputModel = {
     ...defaultModel,
@@ -677,11 +684,13 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
     ...defaultProperties,
     maximumSizeText:
         'Please provide a file with less or equal size than ${maximumSize} byte.',
+    mimeTypePatternText:
+        'Your file\'s mime-type has to match the regular expression: "${pattern}".',
     minimumSizeText:
         'Please provide a file with more or equal size than ${maximumSize} byte.',
     model: {...defaultFileInputModel},
-    patternText:
-        'Your file\'s mime-type hase to match the regular expression: "${pattern}".'
+    namePatternText:
+        'Your file\'s name has to match the regular expression: "${pattern}".'
 } as const
 // // endregion
 // / endregion

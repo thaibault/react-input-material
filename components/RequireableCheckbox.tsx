@@ -61,7 +61,7 @@ import {
     CheckboxModelState as ModelState,
     checkboxPropertyTypes as propertyTypes,
     StaticFunctionComponent as StaticComponent,
-    ValueState
+    CheckboxValueState as ValueState
 } from '../type'
 // endregion
 // region static helper
@@ -135,8 +135,8 @@ export const RequireableCheckboxInner = function(
      * @returns Nothing.
      */
     const onBlur = (event:SyntheticEvent):void => setValueState((
-        oldValueState:ValueState<boolean, ModelState>
-    ):ValueState<boolean, ModelState> => {
+        oldValueState:ValueState
+    ):ValueState => {
         let changed:boolean = false
 
         if (oldValueState.modelState.focused) {
@@ -194,35 +194,24 @@ export const RequireableCheckboxInner = function(
     }
     /**
      * Triggered when ever the value changes.
-     * @param eventOrValue - Event object or new value.
+     * @param event - Event object.
      * @returns Nothing.
      */
-    const onChangeValue = (eventOrValue:boolean|null|SyntheticEvent):void => {
+    const onChangeValue = (event:SyntheticEvent):void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
 
-        let event:SyntheticEvent|undefined
-        if (
-            eventOrValue !== null &&
-            typeof eventOrValue === 'object' &&
-            (eventOrValue as SyntheticEvent).target
-        ) {
-            event = eventOrValue as SyntheticEvent
-            properties.value = Boolean(
-                (event.target as unknown as {checked:boolean|null}).checked
-            )
-        } else
-            properties.value = eventOrValue as boolean|null
+        properties.value = Boolean(
+            (event.target as unknown as {checked:boolean|null}).checked
+        )
 
-        setValueState((
-            oldValueState:ValueState<boolean, ModelState>
-        ):ValueState<boolean, ModelState> => {
+        setValueState((oldValueState:ValueState):ValueState => {
             if (oldValueState.value === properties.value)
                 return oldValueState
 
             let stateChanged:boolean = false
 
-            const result:ValueState<boolean, ModelState> =
+            const result:ValueState =
                 {...oldValueState, value: properties.value as boolean|null}
 
             if (oldValueState.modelState.pristine) {
@@ -285,9 +274,7 @@ export const RequireableCheckboxInner = function(
      * @returns Nothing.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
-        setValueState((
-            oldValueState:ValueState<boolean, ModelState>
-        ):ValueState<boolean, ModelState> => {
+        setValueState((oldValueState:ValueState):ValueState => {
             let changedState:boolean = false
 
             if (!oldValueState.modelState.focused) {
@@ -301,7 +288,7 @@ export const RequireableCheckboxInner = function(
                 changedState = true
             }
 
-            let result:ValueState<boolean, ModelState> = oldValueState
+            let result:ValueState = oldValueState
 
             if (changedState) {
                 onChange(event)
@@ -350,11 +337,10 @@ export const RequireableCheckboxInner = function(
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
     */
-    let [valueState, setValueState] =
-        useState<ValueState<boolean, ModelState>>({
-            modelState: {...RequireableCheckbox.defaultModelState},
-            value: initialValue
-        })
+    let [valueState, setValueState] = useState<ValueState>({
+        modelState: {...RequireableCheckbox.defaultModelState},
+        value: initialValue
+    })
 
     const controlled:boolean =
         !givenProperties.enforceUncontrolled &&
@@ -364,13 +350,13 @@ export const RequireableCheckboxInner = function(
         ) &&
         Boolean(givenProps.onChange || givenProps.onChangeValue)
 
-    deriveMissingPropertiesFromState<Props, ValueState<boolean, ModelState>>(
+    deriveMissingPropertiesFromState<Props, ValueState>(
         givenProperties, valueState
     )
 
     const properties:Properties = getConsolidatedProperties(givenProperties)
 
-    const currentValueState:ValueState<boolean, ModelState> = {
+    const currentValueState:ValueState = {
         modelState: properties.model.state,
         value: properties.value as boolean|null
     }
@@ -384,9 +370,8 @@ export const RequireableCheckboxInner = function(
     )
         setValueState(currentValueState)
     if (controlled)
-        setValueState = wrapStateSetter<ValueState<boolean, ModelState>>(
-            setValueState, currentValueState
-        )
+        setValueState =
+            wrapStateSetter<ValueState>(setValueState, currentValueState)
     // endregion
     useImperativeHandle(
         reference,

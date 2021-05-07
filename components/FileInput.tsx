@@ -71,6 +71,51 @@ import {
     ValueState
 } from '../type'
 // endregion
+// region constants
+const imageMimeTypeRegularExpression:RegExp = new RegExp(
+    '^image/(?:p?jpe?g|png|svg(?:\\+xml)?|vnd\\.microsoft\\.icon|gif|' +
+    'tiff|webp|vnd\\.wap\\.wbmp|x-(?:icon|jng|ms-bmp))$'
+)
+const textMimeTypeRegularExpression:RegExp = new RegExp(
+    '^(?:application/xml)|' +
+    '(?:text/(?:plain|x-ndpb[wy]html|(?:x-)?csv|x?html?|xml))$'
+)
+const representableTextMimeTypeRegularExpression:RegExp = new RegExp(
+    // Plain version:
+    '^text/plain$'
+    // Rendered version:
+    // '^(?:application/xml)|(?:text/(?:plain|x?html?|xml))$'
+)
+const videoMimeTypeRegularExpression:RegExp = new RegExp(
+    '^video/(?:(?:x-)?(?:x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|' +
+    '(?:x-)?flv|(?:x-)?m4v|(?:x-)mng|x-ms-as|x-ms-wmv|x-msvideo)|' +
+    '(?:application/(?:x-)?shockwave-flash)$'
+)
+// endregion
+// region helper
+/**
+ * Determines which type of file we have to present.
+ * @returns Nothing.
+ */
+const determinePresentationType(contentType:string):string {
+    contentType = contentType.replace(/; *charset=.+$/, '')
+
+    if (textMimeTypeRegularExpression.test(contentType)) {
+        if (representableTextMimeTypeRegularExpression.test(contentType))
+            return 'renderableText'
+
+        return 'text'
+    }
+
+    if (imageMimeTypeRegularExpression.test(contentType))
+        return 'image'
+
+    if (videoMimeTypeRegularExpression.test(contentType))
+        return 'video'
+
+    return 'binary'
+}
+// endregion
 /**
  * Validateable checkbox wrapper component.
  *
@@ -129,8 +174,8 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onBlur = (event:SyntheticEvent):void => setValueState((
-        oldValueState:ValueState<boolean, ModelState>
-    ):ValueState<boolean, ModelState> => {
+        oldValueState:ValueState
+    ):ValueState => {
         let changed:boolean = false
 
         if (oldValueState.modelState.focused) {
@@ -188,36 +233,24 @@ export const FileInputInner = function(
     }
     /**
      * Triggered when ever the value changes.
-     * @param eventOrValue - Event object or new value.
+     * @param event - Event object or new value.
      * @returns Nothing.
      */
-    const onChangeValue = (eventOrValue:boolean|null|SyntheticEvent):void => {
+    const onChangeValue = (event:SyntheticEvent):void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
 
-        let event:SyntheticEvent|undefined
-        if (
-            eventOrValue !== null &&
-            typeof eventOrValue === 'object' &&
-            (eventOrValue as SyntheticEvent).target
-        ) {
-            event = eventOrValue as SyntheticEvent
-            properties.value = Boolean(
-                (event.target as unknown as {checked:boolean|null}).checked
-            )
-        } else
-            properties.value = eventOrValue as boolean|null
+        properties.value =
+            (event.target as unknown as {files:FileList|null}).files[0]
 
-        setValueState((
-            oldValueState:ValueState<boolean, ModelState>
-        ):ValueState<boolean, ModelState> => {
+        setValueState((oldValueState:ValueState):ValueState => {
             if (oldValueState.value === properties.value)
                 return oldValueState
 
             let stateChanged:boolean = false
 
-            const result:ValueState<boolean, ModelState> =
-                {...oldValueState, value: properties.value as boolean|null}
+            const result:ValueState =
+                {...oldValueState, value: properties.value as File|null}
 
             if (oldValueState.modelState.pristine) {
                 properties.dirty = true
@@ -279,9 +312,7 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
-        setValueState((
-            oldValueState:ValueState<boolean, ModelState>
-        ):ValueState<boolean, ModelState> => {
+        setValueState((oldValueState:ValueState):ValueState => {
             let changedState:boolean = false
 
             if (!oldValueState.modelState.focused) {
@@ -295,7 +326,7 @@ export const FileInputInner = function(
                 changedState = true
             }
 
-            let result:ValueState<boolean, ModelState> = oldValueState
+            let result:ValueState = oldValueState
 
             if (changedState) {
                 onChange(event)
@@ -341,7 +372,7 @@ export const FileInputInner = function(
         be updated in one event loop (set state callback).
     */
     let [valueState, setValueState] =
-        useState<ValueState<boolean, ModelState>>({
+        useState<ValueState>({
             modelState: {...FileInput.defaultModelState}, value: initialValue
         })
 
@@ -358,7 +389,7 @@ export const FileInputInner = function(
     const properties:Properties = getConsolidatedProperties(givenProperties)
     // region synchronize properties into state where values are not controlled
 
-    const currentValueState:ValueState<boolean, ModelState> = {
+    const currentValueState:ValueState = {
         modelState: properties.model.state,
         value: properties.value as boolean|null
     }
@@ -372,9 +403,8 @@ export const FileInputInner = function(
     )
         setValueState(currentValueState)
     if (controlled)
-        setValueState = wrapStateSetter<ValueState<boolean, ModelState>>(
-            setValueState, currentValueState
-        )
+        setValueState =
+            wrapStateSetter<ValueState>(setValueState, currentValueState)
     // endregion
     useImperativeHandle(
         reference,
@@ -395,7 +425,7 @@ export const FileInputInner = function(
         })
     )
     // endregion
-    // region render
+    // region render 
     const invalid:boolean = (
         properties.invalid &&
         (
@@ -462,6 +492,7 @@ export const FileInputInner = function(
                 }
                 name={properties.name}
                 onChange={onChangeValue}
+                type="file"
                 value={`${properties.value}`}
             />
         </CardPrimaryAction>
