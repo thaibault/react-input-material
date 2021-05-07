@@ -34,7 +34,8 @@ import {
     InputDataTransformation,
     InputProperties,
     Model,
-    ModelState
+    ModelState,
+    ValueState
 } from './type'
 // endregion
 /**
@@ -45,13 +46,50 @@ import {
  *
  * @returns Nothing.
  */
-export const createDummyStateSetter = <Type = any>(
-    value:Type
-):ReturnType<typeof useState>[1] => (
+export const createDummyStateSetter = <
+    Type = unknown
+>(value:Type):ReturnType<typeof useState>[1] => (
     callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
 ):void => {
     if (typeof callbackOrData === 'function')
         callbackOrData(value)
+}
+/**
+ * Consolidates properties not found in properties but in state into
+ * properties.
+ * @param properties - To consolidate.
+ * @param state - To search values in.
+ * @returns Consolidated properties.
+ */
+export const deriveMissingPropertiesFromState = <
+    Properties extends BaseProps = BaseProps,
+    State extends ValueState = ValueState
+>(properties:Properties, state:State):Properties => {
+    /*
+        NOTE: Avoid writing into mutable model object properties. So project
+        value to properties directly.
+    */
+    if (
+        properties.model!.value !== undefined && properties.value === undefined
+    )
+        properties.value = properties.model!.value
+    if (properties.value === undefined)
+        properties.value = state.value
+
+    if (properties.model!.state)
+        properties.model!.state = {...properties.model!.state}
+    else
+        properties.model!.state = {} as ModelState
+    for (const key in state.modelState)
+        if (
+            Object.prototype.hasOwnProperty.call(state.modelState, key) &&
+            (
+                properties.model!.state as Partial<ModelState>
+            )[key as keyof ModelState] === undefined
+        )
+            properties.model!.state[key as keyof ModelState] =
+                state.modelState[key as keyof ModelState]
+    return properties
 }
 /**
  * Creates a hybrid a state setter wich only triggers when model state changes

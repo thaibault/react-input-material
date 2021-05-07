@@ -68,6 +68,7 @@ import styles from './GenericInput.module'
 import WrapConfigurations from './WrapConfigurations'
 import WrapTooltip from './WrapTooltip'
 import {
+    deriveMissingPropertiesFromState as deriveMissingBasePropertiesFromState,
     determineInitialValue,
     determineInitialRepresentation,
     determineValidationState as determineBaseValidationState,
@@ -101,7 +102,7 @@ import {
     NativeInputType,
     Renderable,
     StaticFunctionInputComponent as StaticComponent,
-    ValueState
+    InputValueState as ValueState
 } from '../type'
 
 declare var TARGET_TECHNOLOGY:string
@@ -857,26 +858,21 @@ export const GenericInputInner = function<Type = any>(
         if (givenProperties.hidden === undefined)
             givenProperties.hidden = hidden
 
-        if (givenProperties.showDeclaration === undefined)
-            givenProperties.showDeclaration = showDeclaration
-        // region value state
         /*
             NOTE: This logic is important to re-determine representation when a
             new value is provided via properties.
         */
         if (givenProperties.representation === undefined)
             givenProperties.representation = valueState.representation
-        /*
-            NOTE: Avoid writing into mutable model object properties. So
-            project value to properties directly.
-        */
-        if (
-            givenProperties.model!.value !== undefined &&
-            givenProperties.value === undefined
+
+        if (givenProperties.showDeclaration === undefined)
+            givenProperties.showDeclaration = showDeclaration
+
+        deriveMissingBasePropertiesFromState<Props<Type>, ValueState<Type>>(
+            givenProperties, valueState
         )
-            givenProperties.value = givenProperties.model!.value
+
         if (givenProperties.value === undefined) {
-            givenProperties.value = valueState.value
             if (
                 givenProperties.representation === undefined &&
                 givenProperties.model!.value === undefined
@@ -891,23 +887,6 @@ export const GenericInputInner = function<Type = any>(
                 current representation from current value.
             */
             givenProperties.representation = undefined
-
-        if (givenProperties.model!.state)
-            givenProperties.model!.state = {...givenProperties.model!.state}
-        else
-            givenProperties.model!.state = {} as ModelState
-        for (const key in valueState.modelState)
-            if (
-                Object.prototype.hasOwnProperty.call(
-                    valueState.modelState, key
-                ) &&
-                (
-                    givenProperties.model!.state as Partial<ModelState>
-                )[key as keyof ModelState] === undefined
-            )
-                givenProperties.model!.state[key as keyof ModelState] =
-                    valueState.modelState[key as keyof ModelState]
-        // endregion
     }
     /**
      * Synchronizes property, state and model configuration:

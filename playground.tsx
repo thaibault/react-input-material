@@ -23,7 +23,12 @@ import {ReactElement} from 'react'
 import {render} from 'react-dom'
 
 import {
-    GenericAnimate, GenericInput, Inputs, Interval, RequireableCheckbox
+    FileInput,
+    GenericAnimate,
+    GenericInput,
+    Inputs,
+    Interval,
+    RequireableCheckbox
 } from './index'
 import {useMemorizedValue} from './helper'
 import {

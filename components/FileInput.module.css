@@ -18,6 +18,10 @@ endregion */
 .file-input {
     display: block;
 }
+
+.file-input__input {
+    display: none;
+}
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:
 vim: foldmethod=marker foldmarker=region,endregion:

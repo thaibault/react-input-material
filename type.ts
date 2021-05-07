@@ -187,7 +187,6 @@ export type StaticFunctionComponent<P = Props> =
     Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P>
 export type ValueState<Type = any, MS = ModelState> = {
     modelState:MS
-    representation?:string
     value:null|Type
 }
 export type EditorState = {
@@ -333,7 +332,7 @@ export type CheckboxProps =
     {model?:Partial<CheckboxModel>}
 export type DefaultCheckboxProperties<Type = any> =
     Omit<CheckboxProps, 'model'> & {model:CheckboxModel}
-export type CheckboxState = State<boolean> & {showDeclaration:boolean}
+export type CheckboxState = State<boolean>
 export type CheckboxAdapter<Type = any> =
     WebComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
 // // region constants
@@ -373,6 +372,9 @@ export type InputModelState =
 export type InputModel<Type = any> =
     Omit<Model<Type>, 'state'> &
     {state:InputModelState}
+export type InputValueState<Type = any, MS = ModelState> =
+    ValueState<Type, MS> &
+    {representation?:string}
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
 export type AdditionalInputProperties<Type> =

@@ -33,14 +33,23 @@ import {
     useImperativeHandle,
     useState
 } from 'react'
-import {Card} from '@rmwc/card'
+import {
+    Card,
+    CardActionButton,
+    CardActionButtons,
+    CardActions,
+    CardMedia,
+    CardPrimaryAction
+} from '@rmwc/card'
 import {Theme} from '@rmwc/theme'
+import {Typography} from '@rmwc/typography'
 
 import styles from './FileInput.module'
 import {WrapConfigurations} from './WrapConfigurations'
 import {
+    deriveMissingPropertiesFromState,
     determineInitialValue,
-    determineValidationState as determineBaseValidationState,
+    determineValidationState,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
     translateKnownSymbols,
@@ -93,37 +102,6 @@ export const FileInputInner = function(
 ):ReactElement {
     // TODO
     // region property aggregation
-    const deriveMissingPropertiesFromState = () => {
-        if (givenProperties.showDeclaration === undefined)
-            givenProperties.showDeclaration = showDeclaration
-        // region value state
-        /*
-            NOTE: Avoid writing into mutable model object properties. So project
-            value to properties directly.
-        */
-        if (
-            givenProperties.model!.value !== undefined &&
-            givenProperties.value === undefined
-        )
-            givenProperties.value = givenProperties.model!.value
-         if (givenProperties.value === undefined)
-            givenProperties.value = valueState.value
-
-        if (givenProperties.model!.state)
-            givenProperties.model!.state = {...givenProperties.model!.state}
-        else
-            givenProperties.model!.state = {} as ModelState
-        for (const key in valueState.modelState)
-            if (
-                Object.prototype.hasOwnProperty.call(valueState.modelState, key) &&
-                (
-                    givenProperties.model!.state as Partial<ModelState>
-                )[key as keyof ModelState] === undefined
-            )
-                givenProperties.model!.state[key as keyof ModelState] =
-                    valueState.modelState[key as keyof ModelState]
-        // endregion
-    }
     /**
      * Calculate external properties (a set of all configurable properties).
      * @param properties - Properties to merge.
@@ -131,7 +109,7 @@ export const FileInputInner = function(
      */
     const getConsolidatedProperties = (properties:Props):Properties => {
         let result:Props = mapPropertiesIntoModel<Props, Model>(
-            properties, RequireableCheckbox.defaultProperties.model as Model
+            properties, FileInput.defaultProperties.model as Model
         )
 
         determineValidationState(
@@ -209,27 +187,6 @@ export const FileInputInner = function(
             properties, 'change', controlled, properties, event
         )
     }
-    /**
-     * Triggered when show declaration indicator should be changed.
-     * @param event - Potential event object.
-     * @returns Nothing.
-     */
-    const onChangeShowDeclaration = (event?:ReactMouseEvent):void =>
-        setShowDeclaration((value:boolean):boolean => {
-            properties.showDeclaration = !value
-
-            onChange(event)
-
-            triggerCallbackIfExists<Properties>(
-                properties,
-                'changeShowDeclaration',
-                controlled,
-                properties.showDeclaration,
-                event
-            )
-
-            return properties.showDeclaration
-        })
     /**
      * Triggered when ever the value changes.
      * @param eventOrValue - Event object or new value.
@@ -366,16 +323,12 @@ export const FileInputInner = function(
     // / region references
     const inputReference:RefObject<HTMLInputElement> =
         createRef<HTMLInputElement>()
-    const foundationRef:RefObject<MDCCheckboxFoundation> =
-        createRef<MDCCheckboxFoundation>()
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
 
-    let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
-
     const initialValue:boolean|null = determineInitialValue<boolean>(
         givenProps,
-        RequireableCheckbox.defaultProperties.model!.default,
+        FileInput.defaultProperties.model!.default,
         givenProps.checked
     )
     /*
@@ -384,7 +337,7 @@ export const FileInputInner = function(
         instances.
     */
     const givenProperties:Props = Tools.extend(
-        true, Tools.copy(RequireableCheckbox.defaultProperties), givenProps
+        true, Tools.copy(FileInput.defaultProperties), givenProps
     )
     /*
         NOTE: This values have to share the same state item since they have to
@@ -392,8 +345,7 @@ export const FileInputInner = function(
     */
     let [valueState, setValueState] =
         useState<ValueState<boolean, ModelState>>({
-            modelState: {...RequireableCheckbox.defaultModelState},
-            value: initialValue
+            modelState: {...FileInput.defaultModelState}, value: initialValue
         })
 
     const controlled:boolean =
@@ -404,12 +356,12 @@ export const FileInputInner = function(
         ) &&
         Boolean(givenProps.onChange || givenProps.onChangeValue)
 
-    deriveMissingPropertiesFromState()
+    deriveMissingPropertiesFromState<Props, ValueState<boolean, ModelState>(
+        givenProperties, valueState
+    )
 
     const properties:Properties = getConsolidatedProperties(givenProperties)
     // region synchronize properties into state where values are not controlled
-    if (properties.showDeclaration !== showDeclaration)
-        setShowDeclaration(properties.showDeclaration)
 
     const currentValueState:ValueState<boolean, ModelState> = {
         modelState: properties.model.state,
@@ -433,15 +385,13 @@ export const FileInputInner = function(
         reference,
         ():Adapter & {
             references:{
-                foundationRef:RefObject<MDCCheckboxFoundation>
                 inputReference:RefObject<HTMLInputElement>
             }
         } => ({
             properties,
-            references: {foundationRef, inputReference},
+            references: {inputReference},
             state: {
                 modelState: properties.model.state,
-                showDeclaration: properties.showDeclaration,
                 ...(controlled ?
                     {} :
                     {value: properties.value as boolean|null}
@@ -451,51 +401,90 @@ export const FileInputInner = function(
     )
     // endregion
     // region render
-    // TODO Helptext
+    const invalid:boolean = (
+        properties.invalid &&
+        (
+            properties.showInitialValidationState ||
+            /*
+                Material inputs show their validation state at least after a
+                blur event so we synchronize error appearances.
+            */
+            properties.visited
+        )
+    )
+
     return <WrapConfigurations
-        strict={RequireableCheckbox.strict}
+        strict={FileInput.strict}
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
-    ><div className={
-        styles['requireable-checkbox'] +
-        (properties.className ? ` ${properties.className}` : '')
-    }>
-        <Checkbox
-            checked={Boolean(properties.value)}
-            disabled={properties.disabled}
-            foundationRef={
-                foundationRef as unknown as RefCallback<MDCCheckboxFoundation>
-            }
-            id={properties.id || properties.name}
-            indeterminate={properties.value === null}
-            inputRef={
-                inputReference as unknown as RefCallback<HTMLInputElement>
-            }
-            label={(
-                properties.invalid &&
-                (
-                    properties.showInitialValidationState ||
-                    /*
-                        Material inputs show their validation state at least
-                        after a blur event so we synchronize error appearances.
-                    */
-                    properties.visited
-                )
-            ) ?
-                <Theme use="error">
-                    {properties.description || properties.name}
-                </Theme> :
-                properties.description || properties.name
-            }
-            name={properties.name}
-            onBlur={onBlur}
-            onChange={onChangeValue}
-            onClick={onClick}
-            onFocus={onFocus}
-            ripple={properties.ripple}
-            value={`${properties.value}`}
-        />
-    </div></WrapConfigurations>
+    ><Card
+        className={
+            styles['file-input'] +
+            (properties.className ? ` ${properties.className}` : '')
+        }
+        onBlur={onBlur}
+        onClick={onClick}
+        onFocus={onFocus}
+    >
+        <CardPrimaryAction>
+            <CardMedia
+                {...properties.media}
+            />
+            <div>
+                {properties.description ?
+                    <Typography use="headline6" tag="h2">
+                        {invalid ?
+                            <Theme use="error">
+                                {properties.description}
+                            </Theme> :
+                            ''
+                        }
+                    </Typography> :
+                    ''
+                }
+                {properties.declaration ?
+                    <Typography
+                        tag="div"
+                        theme="textSecondaryOnBackground"
+                        use="body1"
+                    >{invalid ?
+                        <Theme use="error">{properties.declaration}</Theme> :
+                        properties.declaration
+                    }</Typography> :
+                    ''
+                }
+                Mime-Typ: 
+                <br />
+                Size: 
+            </div>
+            <input
+                checked={Boolean(properties.value)}
+                disabled={properties.disabled}
+                className={styles['file-input__native']}
+                id={properties.id || properties.name}
+                inputRef={
+                    inputReference as unknown as RefCallback<HTMLInputElement>
+                }
+                name={properties.name}
+                onChange={onChangeValue}
+                value={`${properties.value}`}
+            />
+        </CardPrimaryAction>
+        <CardActions>
+            <CardActionButtons>
+                <CardActionButton
+                    onClick={():void => inputReference.current?.click()}
+                    ripple={properties.ripple}
+                >New</CardActionButton>
+                <CardActionButton ripple={properties.ripple}>
+                    Delete
+                </CardActionButton>
+                <CardActionButton ripple={properties.ripple}>
+                    Download
+                </CardActionButton>
+            </CardActionButtons>
+        </CardActions>
+    </Card></WrapConfigurations>
     // endregion
 } as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
