@@ -82,7 +82,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     return (<>
         <div className="playground__inputs">
             <FileInput onChange={onChange} />
-            {/*TODO*/}
+            {/*TODO
 
             <GenericInput onChange={onChange} />
             <GenericInput
@@ -695,7 +695,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChangeValue={onChangeValue5}
                 value={value5}
             />
-
+*/}
         </div>
 
         {selectedState ?

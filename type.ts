@@ -59,6 +59,8 @@ import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
 import {IconOptions, RipplePropT} from '@rmwc/types'
 import {Editor as RichTextEditorComponent} from '@tinymce/tinymce-react'
+
+import GenericInput from './components/GenericInput'
 // endregion
 // region exports
 // / region generic
@@ -605,6 +607,10 @@ export const defaultInputProperties:DefaultInputProperties = {
 // // endregion
 // / endregion
 // / region file-input
+export type FileValue = {
+    blob:Blob
+    name?:null|string
+}
 export type FileInputModelState = ModelState &
     {
         invalidMaximumSize:boolean
@@ -613,9 +619,8 @@ export type FileInputModelState = ModelState &
         invalidNamePattern:boolean
     }
 export type FileInputModel =
-    Omit<Model<File>, 'state'> &
+    Omit<Model<FileValue>, 'state'> &
     {
-        fileName:InputModel
         maximumSize:number
         minimumSize:number
         regularExpressionMimeTypePattern:RegExp|string
@@ -623,8 +628,7 @@ export type FileInputModel =
         state:FileInputModelState
     }
 export type FileInputValueState =
-    ValueState<File, FileInputModelState> &
-    {fileName?:null|string}
+    ValueState<FileValue, FileInputModelState>
 export type AdditionalFileInputProperties =
     FileInputModelState &
     {
@@ -640,7 +644,7 @@ export type AdditionalFileInputProperties =
         namePatternText:string
     }
 export type FileInputProperties =
-    Properties<File, Properties<File> & AdditionalFileInputProperties> &
+    Properties<FileValue, Properties<FileValue> & AdditionalFileInputProperties> &
     AdditionalFileInputProperties
 export type FileInputProps =
     Partial<Omit<FileInputProperties, 'model'>> &
@@ -650,9 +654,11 @@ export type DefaultFileInputProperties =
 export type FileInputPropertyTypes = {
     [key in keyof FileInputProperties]:ValueOf<typeof PropertyTypes>
 }
-export type FileInputState = State<File> & {modelState:FileInputModelState}
+export type FileInputState =
+    State<FileValue> & {modelState:FileInputModelState}
 export type FileInputAdapter = WebComponentAdapter<
-    FileInputProperties, Omit<FileInputState, 'value'> & {value?:File|null}
+    FileInputProperties, Omit<FileInputState, 'value'> &
+    {value?:FileValue|null}
 >
 export type FileInputAdapterWithReferences =
     FileInputAdapter &
@@ -694,12 +700,6 @@ export const defaultFileInputModelState:FileInputModelState = {
 } as const
 export const defaultFileInputModel:FileInputModel = {
     ...defaultModel,
-    fileName: {
-        ...defaultInputModel,
-        maximumLength: 1024,
-        name: 'Name',
-        regularExpressionPattern: /^[^\/]+$/
-    },
     maximumSize: Infinity,
     minimumSize: 0,
     regularExpressionMimeTypePattern: /^.+\/.+$/,
@@ -712,6 +712,12 @@ export const defaultFileInputModel:FileInputModel = {
 */
 export const defaultFileInputProperties:DefaultFileInputProperties = {
     ...defaultProperties,
+    fileName: {
+        model: {...defaultInputModel},
+        maximumLength: 1024,
+        name: 'Name',
+        pattern: /^[^\/]+$/
+    },
     maximumSizeText:
         'Please provide a file with less or equal size than ${maximumSize} byte.',
     mimeTypePatternText:

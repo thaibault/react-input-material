@@ -30,7 +30,6 @@ import {
     RefCallback,
     RefObject,
     SyntheticEvent,
-    useEffect,
     useImperativeHandle,
     useState
 } from 'react'
@@ -59,18 +58,20 @@ import {
     wrapStateSetter
 } from '../helper'
 import {
-    FileInputAdapter as Adapter,
-    FileInputModel as Model,
-    FileInputProperties as Properties,
-    FileInputProps as Props,
-    FileInputState as State,
     defaultFileInputModelState as defaultModelState,
     DefaultFileInputProperties as DefaultProperties,
     defaultFileInputProperties as defaultProperties,
+    FileInputAdapter as Adapter,
+    FileInputModel as Model,
     FileInputModelState as ModelState,
+    FileInputProperties as Properties,
+    FileInputProps as Props,
+    FileInputState as State,
+    FileValue,
+    FileInputValueState as ValueState,
     fileInputPropertyTypes as propertyTypes,
-    StaticFunctionFileInputComponent,
-    FileInputValueState as ValueState
+    InputProps,
+    StaticFunctionFileInputComponent
 } from '../type'
 // endregion
 // region constants
@@ -126,12 +127,12 @@ export const determineValidationState = (
             invalidMaximumSize: ():boolean => (
                 typeof properties.model.maximumSize === 'number' &&
                 properties.model.maximumSize <
-                    (properties.model.value?.size || 0)
+                    (properties.model.value?.blob.size || 0)
             ),
             invalidMinimumSize: ():boolean => (
                 typeof properties.model.minimumSize === 'number' &&
                 properties.model.minimumSize >
-                    (properties.model.value?.size || 0)
+                    (properties.model.value?.blob.size || 0)
             ),
             invalidNamePattern: ():boolean => (
                 typeof properties.model.value?.name === 'string' &&
@@ -149,19 +150,19 @@ export const determineValidationState = (
                 )
             ),
             invalidMimeTypePattern: ():boolean => (
-                typeof properties.model.value?.type === 'string' &&
+                typeof properties.model.value?.blob.type === 'string' &&
                 (
-                    typeof properties.model.regularExpressionMimeTypePattern ===
-                        'string' &&
+                    typeof properties.model
+                        .regularExpressionMimeTypePattern === 'string' &&
                     !(new RegExp(
                         properties.model.regularExpressionMimeTypePattern
-                    )).test(properties.model.value.type) ||
+                    )).test(properties.model.value.blob.type) ||
                     properties.model.regularExpressionMimeTypePattern !==
                         null &&
                     typeof properties.model
                         .regularExpressionMimeTypePattern === 'object' &&
                     !properties.model.regularExpressionMimeTypePattern
-                        .test(properties.model.value.type)
+                        .test(properties.model.value.blob.type)
                 )
             )
         }
@@ -290,31 +291,32 @@ export const FileInputInner = function(
         if (!(properties.model.mutable && properties.model.writable))
             return
 
-        let event:null|SyntheticEvent = null
-        if (eventOrName.target === fileInputReference.current) {
-            event = eventOrName
-            properties.value =
-                (event.target as unknown as {files:FileList|null}).files &&
+        let event:SyntheticEvent|undefined
+        if (
+            fileInputReference.current &&
+            (eventOrName as SyntheticEvent)?.target ===
+                fileInputReference.current
+        ) {
+            event = eventOrName as SyntheticEvent
+            const blob:File =
+                (event.target as unknown as {files:FileList}).files &&
                 (event.target as unknown as {files:FileList}).files[0]
-            properties.fileName.value = properties.value?.name
-        } else {
-            event = null
-            properties.fileName.value = eventOrName
-        }
+            properties.value = {blob, name: blob.name}
+        } else
+            /*
+                NOTE: A name can only be changed if a blob is available
+                beforehand.
+            */
+            properties.value!.name = eventOrName as string
 
         setValueState((oldValueState:ValueState):ValueState => {
-            if (
-                oldValueState.fileName === properties.fileName.value &&
-                oldValueState.value === properties.value
-            )
+            if (Tools.equals(oldValueState.value, properties.value))
                 return oldValueState
 
             let stateChanged:boolean = false
 
             const result:ValueState = {
-                ...oldValueState,
-                fileName: properties.fileName.value,
-                value: properties.value as File|null
+                ...oldValueState, value: properties.value as FileValue|null
             }
 
             if (oldValueState.modelState.pristine) {
@@ -423,7 +425,7 @@ export const FileInputInner = function(
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
 
-    const initialValue:File|null = determineInitialValue<File>(
+    const initialValue:FileValue|null = determineInitialValue<FileValue>(
         givenProps, FileInput.defaultProperties.model!.default
     )
     /*
@@ -439,7 +441,6 @@ export const FileInputInner = function(
         be updated in one event loop (set state callback).
     */
     let [valueState, setValueState] = useState<ValueState>({
-        fileName: initialValue?.name,
         modelState: {...FileInput.defaultModelState},
         value: initialValue
     })
@@ -455,22 +456,17 @@ export const FileInputInner = function(
     deriveMissingPropertiesFromState(givenProperties, valueState)
 
     const properties:Properties = getConsolidatedProperties(givenProperties)
-    // region synchronize properties into state where values are not controlled
-
+    // region synchronize properties i nto state where values are not controlled
     const currentValueState:ValueState = {
-        fileName: properties.fileName.value,
         modelState: properties.model.state,
-        value: properties.value as File|null
+        value: properties.value as FileValue|null
     }
     /*
         NOTE: If value is controlled only trigger/save state changes when model
         state has changed.
     */
     if (
-        !controlled && (
-            properties.fileName.value !== valueState.fileName ||
-            properties.value !== valueState.value
-        ) ||
+        !(controlled || Tools.equals(properties.value, valueState.value)) ||
         !Tools.equals(properties.model.state, valueState.modelState)
     )
         setValueState(currentValueState)
@@ -490,25 +486,11 @@ export const FileInputInner = function(
             references: {fileInputReference, nameInputReference},
             state: {
                 modelState: properties.model.state,
-                ...(controlled ?
-                    {} :
-                    {value: properties.value as File|null}
-                )
+                ...(controlled ? {} : {value: properties.value})
             }
         })
     )
     // endregion
-    useEffect(():(() => void) => {
-        if (fileInputReference.current?.file !== properties.value) {
-            if (fileInputReference.current?.file?.close)
-                fileInputReference.current?.file?.close()
-
-            if (properties.value && fileInputReference.current)
-                fileInputReference.current.file = properties.value
-        }
-
-        return ():void => properties.value?.close && properties.value.close()
-    })
     // region render
     const invalid:boolean = (
         properties.invalid &&
@@ -536,19 +518,40 @@ export const FileInputInner = function(
         onFocus={onFocus}
     >
         <CardPrimaryAction>
-            <CardMedia
-                {...properties.media}
-            />
+            <CardMedia {...properties.media} />
             <div>
-                {properties.description ?
+                {properties.name ?
                     <Typography use="headline6" tag="h2">
                         {invalid ?
-                            <Theme use="error">
-                                {properties.description}
-                            </Theme> :
-                            ''
+                            <Theme use="error">{properties.name}</Theme> :
+                            properties.name
                         }
                     </Typography> :
+                    ''
+                }
+                {properties.description ?
+                    <Typography
+                        style={{marginTop: '-1rem'}}
+                        tag="h3"
+                        theme="textSecondaryOnBackground"
+                        use="subtitle2"
+                    >
+                        {properties.description}
+                    </Typography> :
+                    ''
+                }
+                {properties.value ?
+                    <GenericInput
+                        disabled={properties.disabled}
+                        {...properties.fileName as InputProps<string>}
+                        onChangeValue={onChangeValue}
+                        ref={nameInputReference as
+                            unknown as
+                            RefCallback<GenericInput>
+                        }
+                        required
+                        value={properties.value?.name}
+                    /> :
                     ''
                 }
                 {properties.declaration ?
@@ -562,27 +565,16 @@ export const FileInputInner = function(
                     }</Typography> :
                     ''
                 }
-                <GenericInput
-                    disabled={
-                        Boolean(properties.disabled || !properties.value)
-                    }
-                    {...properties.fileName}
-                    onChangeValue={onChangeValue}
-                    ref={nameInputReference as
-                        unknown as
-                        RefCallback<GenericInput>
-                    }
-                    required
-                />
+                {/*TODO use template messages via declaration*/}
                 <br />
                 Last modified date time: {Tools.dateTimeFormat(
                     '${mediumDay}.${mediumMonth}.${fullYear}',
-                    properties.value?.lastModifiedDate
+                    new Date((properties.value?.blob as File)?.lastModified)
                 )}
                 <br />
-                Mime-Typ: {properties.value?.type}
+                Mime-Typ: {properties.value?.blob.type}
                 <br />
-                Size: {properties.value?.size}
+                Size: {properties.value?.blob.size}
             </div>
             {/*TODO use "accept" attribute*/}
             <input
