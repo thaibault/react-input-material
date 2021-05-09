@@ -49,7 +49,7 @@ import CodeEditorType from 'react-ace'
 
 import {Editor as RichTextEditor} from 'tinymce'
 import {
-    StaticWebComponent as StaticBaseWebComponent, WebComponentAdapter
+    ComponentAdapter, StaticWebComponent as StaticBaseWebComponent
 } from 'web-component-wrapper/type'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
@@ -59,8 +59,6 @@ import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
 import {IconOptions, RipplePropT} from '@rmwc/types'
 import {Editor as RichTextEditorComponent} from '@tinymce/tinymce-react'
-
-import GenericInput from './components/GenericInput'
 // endregion
 // region exports
 // / region generic
@@ -178,9 +176,11 @@ export type State<Type = any> = {
     modelState?:ModelState
     value?:null|Type
 }
-export interface StaticWebComponent<P = Props> extends StaticBaseWebComponent {
+export interface StaticWebComponent<
+    P extends BaseProps = Props, M extends ModelState = ModelState
+> extends StaticBaseWebComponent {
     new (properties:P):Component<P>
-    defaultModelState:ModelState
+    defaultModelState:M
     defaultProperties:P
     strict:boolean
 }
@@ -338,7 +338,7 @@ export type DefaultCheckboxProperties<Type = any> =
     Omit<CheckboxProps, 'model'> & {model:CheckboxModel}
 export type CheckboxState = State<boolean>
 export type CheckboxAdapter<Type = any> =
-    WebComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
+    ComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
 // // region constants
 export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -468,14 +468,14 @@ export type InputDataTransformation<Type = any> =
         time:DataTransformSpecification<Type>
     }
 export interface StaticWebInputComponent<
-    P extends InputProps = InputProps
-> extends StaticWebComponent<P> {
-    defaultModelState:InputModelState
+    P extends InputProps = InputProps,
+    M extends InputModelState = InputModelState
+> extends StaticWebComponent<P, M> {
     locales:Array<string>
     transformer:InputDataTransformation<P['value']>
 }
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
-export type InputAdapter<Type = any> = WebComponentAdapter<
+export type InputAdapter<Type = any> = ComponentAdapter<
     InputProperties<Type>,
     Omit<InputState<Type>, 'representation'|'selectionIsUnstable'|'value'> &
     {
@@ -611,7 +611,8 @@ export type FileValue = {
     blob:Blob
     name?:null|string
 }
-export type FileInputModelState = ModelState &
+export type FileInputModelState =
+    ModelState &
     {
         invalidMaximumSize:boolean
         invalidMinimumSize:boolean
@@ -632,7 +633,7 @@ export type FileInputValueState =
 export type AdditionalFileInputProperties =
     FileInputModelState &
     {
-        fileName:InputProperties
+        fileName:InputProperties<string>
         maximumSizeText:string
         media:CardMediaProps
         minimumSizeText:string
@@ -644,7 +645,9 @@ export type AdditionalFileInputProperties =
         namePatternText:string
     }
 export type FileInputProperties =
-    Properties<FileValue, Properties<FileValue> & AdditionalFileInputProperties> &
+    Properties<
+        FileValue, Properties<FileValue> & AdditionalFileInputProperties
+    > &
     AdditionalFileInputProperties
 export type FileInputProps =
     Partial<Omit<FileInputProperties, 'model'>> &
@@ -656,7 +659,7 @@ export type FileInputPropertyTypes = {
 }
 export type FileInputState =
     State<FileValue> & {modelState:FileInputModelState}
-export type FileInputAdapter = WebComponentAdapter<
+export type FileInputAdapter = ComponentAdapter<
     FileInputProperties, Omit<FileInputState, 'value'> &
     {value?:FileValue|null}
 >
@@ -664,11 +667,11 @@ export type FileInputAdapterWithReferences =
     FileInputAdapter &
     {references:{
         fileInputReference:RefObject<HTMLInputElement>
-        nameInputReference:RefObject<GenericInput>
+        nameInputReference:RefObject<InputAdapter<string>>
     }}
 export type StaticFunctionFileInputComponent =
     Omit<FunctionComponent<FileInputProps>, 'propTypes'> &
-    StaticWebInputComponent<FileInputProps>
+    StaticWebComponent<FileInputProps, FileInputModelState>
 // // region constants
 export const fileInputModelStatePropertyTypes:{
     [key in keyof FileInputModelState]:Requireable<boolean|symbol>
@@ -713,7 +716,7 @@ export const defaultFileInputModel:FileInputModel = {
 export const defaultFileInputProperties:DefaultFileInputProperties = {
     ...defaultProperties,
     fileName: {
-        model: {...defaultInputModel},
+        ...defaultInputProperties as InputProperties<string>,
         maximumLength: 1024,
         name: 'Name',
         pattern: /^[^\/]+$/
@@ -782,7 +785,7 @@ export type InputsPropertyTypes<P extends Properties = Properties> = {
 }
 export type InputsState<Type = any> = State<Array<Type>>
 export type InputsAdapter<P extends Properties = Properties> =
-    WebComponentAdapter<InputsProperties<P>, InputsState<P['value']>>
+    ComponentAdapter<InputsProperties<P>, InputsState<P['value']>>
 export type InputsAdapterWithReferences<
     P extends Properties = Properties, RefType = unknown
 > =
@@ -867,7 +870,7 @@ export type IntervalPropertyTypes<Type = any> = {
     [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
 }
 export type IntervalAdapter =
-    WebComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
+    ComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
 export type IntervalAdapterWithReferences = IntervalAdapter & {
     references:{
         end:RefObject<InputAdapterWithReferences<number>>

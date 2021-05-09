@@ -43,6 +43,7 @@ import {
 } from '@rmwc/card'
 import {Theme} from '@rmwc/theme'
 import {Typography} from '@rmwc/typography'
+import {ComponentAdapter} from 'web-component-wrapper/type'
 
 import styles from './FileInput.module'
 import GenericInput from './GenericInput'
@@ -70,6 +71,8 @@ import {
     FileValue,
     FileInputValueState as ValueState,
     fileInputPropertyTypes as propertyTypes,
+    InputAdapter,
+    InputProperties,
     InputProps,
     StaticFunctionFileInputComponent
 } from '../type'
@@ -420,8 +423,8 @@ export const FileInputInner = function(
     // / region references
     const fileInputReference:RefObject<HTMLInputElement> =
         createRef<HTMLInputElement>()
-    const nameInputReference:RefObject<GenericInput> =
-        createRef<GenericInput>()
+    const nameInputReference:RefObject<InputAdapter<string>> =
+        createRef<InputAdapter<string>>()
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
 
@@ -479,7 +482,7 @@ export const FileInputInner = function(
         ():Adapter & {
             references:{
                 fileInputReference:RefObject<HTMLInputElement>,
-                nameInputReference:RefObject<GenericInput>
+                nameInputReference:RefObject<InputAdapter<string>>
             }
         } => ({
             properties,
@@ -545,10 +548,7 @@ export const FileInputInner = function(
                         disabled={properties.disabled}
                         {...properties.fileName as InputProps<string>}
                         onChangeValue={onChangeValue}
-                        ref={nameInputReference as
-                            unknown as
-                            RefCallback<GenericInput>
-                        }
+                        ref={nameInputReference as any}
                         required
                         value={properties.value?.name}
                     /> :
@@ -566,15 +566,19 @@ export const FileInputInner = function(
                     ''
                 }
                 {/*TODO use template messages via declaration*/}
-                <br />
-                Last modified date time: {Tools.dateTimeFormat(
-                    '${mediumDay}.${mediumMonth}.${fullYear}',
-                    new Date((properties.value?.blob as File)?.lastModified)
-                )}
-                <br />
-                Mime-Typ: {properties.value?.blob.type}
-                <br />
-                Size: {properties.value?.blob.size}
+                {properties.value?.blob ?
+                    <>
+                        Last modified date time: {Tools.dateTimeFormat(
+                            '${mediumDay}.${mediumMonth}.${fullYear}',
+                            new Date((properties.value?.blob as File)?.lastModified)
+                        )}
+                        <br />
+                        Mime-Typ: {properties.value?.blob.type}
+                        <br />
+                        Size: {properties.value?.blob.size}
+                    </> :
+                    ''
+                }
             </div>
             {/*TODO use "accept" attribute*/}
             <input

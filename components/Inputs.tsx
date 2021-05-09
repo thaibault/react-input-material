@@ -30,7 +30,7 @@ import {
     useEffect,
     useState
 } from 'react'
-import {WebComponentAdapter} from 'web-component-wrapper/type'
+import {ComponentAdapter} from 'web-component-wrapper/type'
 import {IconButton} from '@rmwc/icon-button'
 
 import GenericInput from './GenericInput'
@@ -206,7 +206,7 @@ export const InputsInner = function<
         // NOTE: Indicates to be filled later from state.
         givenProperties.value = []
 
-    const references:Array<RefObject<WebComponentAdapter<P, State>>> = []
+    const references:Array<RefObject<ComponentAdapter<P, State>>> = []
 
     const properties:InputsProperties<P> =
         getConsolidatedProperties<InputsProps<P>, InputsProperties<P>>(
@@ -291,8 +291,8 @@ export const InputsInner = function<
         properties.value?.length || 0,
         !controlled && values?.length || 0
     ); index += 1) {
-        const reference:RefObject<WebComponentAdapter<P, State>> =
-            createRef<WebComponentAdapter<P, State>>()
+        const reference:RefObject<ComponentAdapter<P, State>> =
+            createRef<ComponentAdapter<P, State>>()
         references.push(reference)
 
         if (!properties.value)
