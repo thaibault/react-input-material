@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module wrap-configurations */
+/** @module WrapConfigurations */
 'use strict'
 /* !
     region header

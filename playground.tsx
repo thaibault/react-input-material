@@ -23,13 +23,18 @@ import {ReactElement} from 'react'
 import {render} from 'react-dom'
 
 import {
-    GenericAnimate, GenericInput, Inputs, Interval, RequireableCheckbox
+    FileInput,
+    GenericAnimate,
+    GenericInput,
+    Inputs,
+    Interval,
+    RequireableCheckbox
 } from './index'
 import {useMemorizedValue} from './helper'
 import {
     InputProperties, IntervalProps, IntervalValue, Properties, Model
 } from './type'
-// endregion 
+// endregion
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
 
@@ -76,6 +81,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     // endregion
     return (<>
         <div className="playground__inputs">
+            <FileInput onChange={onChange} />
+            {/*TODO
+
             <GenericInput onChange={onChange} />
             <GenericInput
                 name="UnControlled"
@@ -687,7 +695,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChangeValue={onChangeValue5}
                 value={value5}
             />
-
+*/}
         </div>
 
         {selectedState ?

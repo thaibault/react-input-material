@@ -49,10 +49,11 @@ import CodeEditorType from 'react-ace'
 
 import {Editor as RichTextEditor} from 'tinymce'
 import {
-    StaticWebComponent as StaticBaseWebComponent, WebComponentAdapter
+    ComponentAdapter, StaticWebComponent as StaticBaseWebComponent
 } from 'web-component-wrapper/type'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
+import {CardMediaProps} from '@rmwc/card'
 import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
@@ -175,9 +176,11 @@ export type State<Type = any> = {
     modelState?:ModelState
     value?:null|Type
 }
-export interface StaticWebComponent<P = Props> extends StaticBaseWebComponent {
+export interface StaticWebComponent<
+    P extends BaseProps = Props, M extends ModelState = ModelState
+> extends StaticBaseWebComponent {
     new (properties:P):Component<P>
-    defaultModelState:ModelState
+    defaultModelState:M
     defaultProperties:P
     strict:boolean
 }
@@ -187,7 +190,6 @@ export type StaticFunctionComponent<P = Props> =
     Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P>
 export type ValueState<Type = any, MS = ModelState> = {
     modelState:MS
-    representation?:string
     value:null|Type
 }
 export type EditorState = {
@@ -328,14 +330,15 @@ export type CheckboxProperties =
     AdditionalCheckboxProperties
 export type CheckboxModel = Model<boolean>
 export type CheckboxModelState = ModelState
+export type CheckboxValueState = ValueState<boolean, CheckboxModelState>
 export type CheckboxProps =
     Partial<Omit<CheckboxProperties, 'model'>> &
     {model?:Partial<CheckboxModel>}
 export type DefaultCheckboxProperties<Type = any> =
     Omit<CheckboxProps, 'model'> & {model:CheckboxModel}
-export type CheckboxState = State<boolean> & {showDeclaration:boolean}
+export type CheckboxState = State<boolean>
 export type CheckboxAdapter<Type = any> =
-    WebComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
+    ComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
 // // region constants
 export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -373,6 +376,9 @@ export type InputModelState =
 export type InputModel<Type = any> =
     Omit<Model<Type>, 'state'> &
     {state:InputModelState}
+export type InputValueState<Type = any, MS = ModelState> =
+    ValueState<Type, MS> &
+    {representation?:string}
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
 export type AdditionalInputProperties<Type> =
@@ -462,14 +468,14 @@ export type InputDataTransformation<Type = any> =
         time:DataTransformSpecification<Type>
     }
 export interface StaticWebInputComponent<
-    P extends InputProps = InputProps
-> extends StaticWebComponent<P> {
-    defaultModelState:InputModelState
+    P extends InputProps = InputProps,
+    M extends InputModelState = InputModelState
+> extends StaticWebComponent<P, M> {
     locales:Array<string>
     transformer:InputDataTransformation<P['value']>
 }
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
-export type InputAdapter<Type = any> = WebComponentAdapter<
+export type InputAdapter<Type = any> = ComponentAdapter<
     InputProperties<Type>,
     Omit<InputState<Type>, 'representation'|'selectionIsUnstable'|'value'> &
     {
@@ -600,6 +606,133 @@ export const defaultInputProperties:DefaultInputProperties = {
 } as const
 // // endregion
 // / endregion
+// / region file-input
+export type FileValue = {
+    blob:Blob
+    name?:null|string
+}
+export type FileInputModelState =
+    ModelState &
+    {
+        invalidMaximumSize:boolean
+        invalidMinimumSize:boolean
+        invalidMimeTypePattern:boolean
+        invalidNamePattern:boolean
+    }
+export type FileInputModel =
+    Omit<Model<FileValue>, 'state'> &
+    {
+        maximumSize:number
+        minimumSize:number
+        regularExpressionMimeTypePattern:RegExp|string
+        regularExpressionNamePattern:RegExp|string
+        state:FileInputModelState
+    }
+export type FileInputValueState =
+    ValueState<FileValue, FileInputModelState>
+export type AdditionalFileInputProperties =
+    FileInputModelState &
+    {
+        fileName:InputProperties<string>
+        maximumSizeText:string
+        media:CardMediaProps
+        minimumSizeText:string
+        model:FileInputModel
+        outlined:boolean
+        mimeTypePattern:RegExp|string
+        mimeTypePatternText:string
+        namePattern:RegExp|string
+        namePatternText:string
+    }
+export type FileInputProperties =
+    Properties<
+        FileValue, Properties<FileValue> & AdditionalFileInputProperties
+    > &
+    AdditionalFileInputProperties
+export type FileInputProps =
+    Partial<Omit<FileInputProperties, 'model'>> &
+    {model?:Partial<FileInputModel>}
+export type DefaultFileInputProperties =
+    Omit<FileInputProps, 'model'> & {model:FileInputModel}
+export type FileInputPropertyTypes = {
+    [key in keyof FileInputProperties]:ValueOf<typeof PropertyTypes>
+}
+export type FileInputState =
+    State<FileValue> & {modelState:FileInputModelState}
+export type FileInputAdapter = ComponentAdapter<
+    FileInputProperties, Omit<FileInputState, 'value'> &
+    {value?:FileValue|null}
+>
+export type FileInputAdapterWithReferences =
+    FileInputAdapter &
+    {references:{
+        fileInputReference:RefObject<HTMLInputElement>
+        nameInputReference:RefObject<InputAdapter<string>>
+    }}
+export type StaticFunctionFileInputComponent =
+    Omit<FunctionComponent<FileInputProps>, 'propTypes'> &
+    StaticWebComponent<FileInputProps, FileInputModelState>
+// // region constants
+export const fileInputModelStatePropertyTypes:{
+    [key in keyof FileInputModelState]:Requireable<boolean|symbol>
+} = {
+    ...modelStatePropertyTypes,
+    invalidMaximumSize: oneOfType([boolean, symbol]),
+    invalidMinimumSize: oneOfType([boolean, symbol]),
+    invalidMimeTypePattern: oneOfType([boolean, symbol]),
+    invalidNamePattern: oneOfType([boolean, symbol])
+} as const
+export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+    ...propertyTypes,
+    ...modelPropertyTypes,
+    ...fileInputModelStatePropertyTypes,
+    fileName: shape<any>(inputPropertyTypes),
+    maximumSizeText: string,
+    minimumSizeText: string,
+    onBlur: func,
+    outlined: boolean,
+    mimeTypePatternText: string,
+    namePatternText: string
+} as const
+export const defaultFileInputModelState:FileInputModelState = {
+    ...defaultModelState,
+    invalidMaximumSize: false,
+    invalidMinimumSize: false,
+    invalidMimeTypePattern: false,
+    invalidNamePattern: false
+} as const
+export const defaultFileInputModel:FileInputModel = {
+    ...defaultModel,
+    maximumSize: Infinity,
+    minimumSize: 0,
+    regularExpressionMimeTypePattern: /^.+\/.+$/,
+    regularExpressionNamePattern: /^.+$/,
+    state: defaultFileInputModelState
+} as const
+/*
+    NOTE: Avoid setting any properties already defined in model here since they
+    would permanently shadow them.
+*/
+export const defaultFileInputProperties:DefaultFileInputProperties = {
+    ...defaultProperties,
+    fileName: {
+        ...defaultInputProperties as InputProperties<string>,
+        maximumLength: 1024,
+        name: 'Name',
+        pattern: /^[^\/]+$/
+    },
+    maximumSizeText:
+        'Please provide a file with less or equal size than ${maximumSize} byte.',
+    mimeTypePatternText:
+        'Your file\'s mime-type has to match the regular expression: "${pattern}".',
+    minimumSizeText:
+        'Please provide a file with more or equal size than ${maximumSize} byte.',
+    model: {...defaultFileInputModel},
+    namePatternText:
+        'Your file\'s name has to match the regular expression: "${pattern}".'
+} as const
+// // endregion
+// / endregion
 // / region inputs
 export type InputsModel<M extends Partial<Model> = Partial<Model>> =
     Model<Array<M>> &
@@ -652,7 +785,7 @@ export type InputsPropertyTypes<P extends Properties = Properties> = {
 }
 export type InputsState<Type = any> = State<Array<Type>>
 export type InputsAdapter<P extends Properties = Properties> =
-    WebComponentAdapter<InputsProperties<P>, InputsState<P['value']>>
+    ComponentAdapter<InputsProperties<P>, InputsState<P['value']>>
 export type InputsAdapterWithReferences<
     P extends Properties = Properties, RefType = unknown
 > =
@@ -737,7 +870,7 @@ export type IntervalPropertyTypes<Type = any> = {
     [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
 }
 export type IntervalAdapter =
-    WebComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
+    ComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
 export type IntervalAdapterWithReferences = IntervalAdapter & {
     references:{
         end:RefObject<InputAdapterWithReferences<number>>

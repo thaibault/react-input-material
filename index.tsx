@@ -17,6 +17,7 @@
     endregion
 */
 export {Dummy} from './components/Dummy'
+export {FileInput} from './components/FileInput'
 export {GenericAnimate} from './components/GenericAnimate'
 export {GenericInput} from './components/GenericInput'
 export {Inputs} from './components/Inputs'

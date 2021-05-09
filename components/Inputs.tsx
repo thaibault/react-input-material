@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module inputs */
+/** @module Inputs */
 'use strict'
 /* !
     region header
@@ -30,7 +30,7 @@ import {
     useEffect,
     useState
 } from 'react'
-import {WebComponentAdapter} from 'web-component-wrapper/type'
+import {ComponentAdapter} from 'web-component-wrapper/type'
 import {IconButton} from '@rmwc/icon-button'
 
 import GenericInput from './GenericInput'
@@ -156,7 +156,8 @@ export const InputsInner = function<
     const givenProperties:InputsProps<P> = Tools.extend(
         true, Tools.copy(Inputs.defaultProperties), givenProps
     )
-
+    // endregion
+    // region consolidate state
     let [newInputState, setNewInputState] =
         useState<'added'|'rendered'|'stabilized'>('stabilized')
     useEffect(():void => {
@@ -190,7 +191,8 @@ export const InputsInner = function<
             (Array.isArray(givenProps.value) || givenProps.value === null)
         ) &&
         Boolean(givenProperties.onChange || givenProperties.onChangeValue)
-
+    // endregion
+    // region prepare environment
     /*
         NOTE: Avoid writing into mutable model object properties. So project
         value to properties directly.
@@ -204,7 +206,7 @@ export const InputsInner = function<
         // NOTE: Indicates to be filled later from state.
         givenProperties.value = []
 
-    const references:Array<RefObject<WebComponentAdapter<P, State>>> = []
+    const references:Array<RefObject<ComponentAdapter<P, State>>> = []
 
     const properties:InputsProperties<P> =
         getConsolidatedProperties<InputsProps<P>, InputsProperties<P>>(
@@ -289,8 +291,8 @@ export const InputsInner = function<
         properties.value?.length || 0,
         !controlled && values?.length || 0
     ); index += 1) {
-        const reference:RefObject<WebComponentAdapter<P, State>> =
-            createRef<WebComponentAdapter<P, State>>()
+        const reference:RefObject<ComponentAdapter<P, State>> =
+            createRef<ComponentAdapter<P, State>>()
         references.push(reference)
 
         if (!properties.value)
@@ -350,7 +352,6 @@ export const InputsInner = function<
             state setter.
         */
         setValues = createDummyStateSetter<Array<P['value']>|null>(values)
-    // endregion
     useImperativeHandle(
         reference,
         ():AdapterWithReferences<P> => ({
@@ -392,6 +393,8 @@ export const InputsInner = function<
             triggerOnChange(values, event, undefined, index)
             return values
         })
+    // endregion
+    // region render
     const addButton:ReactElement = <IconButton
         className={styles.inputs__add__button}
         icon={properties.addIcon}
@@ -465,6 +468,7 @@ export const InputsInner = function<
             }
         </div>
     </WrapConfigurations>
+    // endregion
 } as ForwardRefRenderFunction<Adapter, InputsProps>
 // NOTE: This is useful in react dev tools.
 InputsInner.displayName = 'Inputs'
