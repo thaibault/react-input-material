@@ -45,7 +45,7 @@ describe('FileInput', ():void => {
             .toBeDefined()
 
         expect((render(<FileInput/>) as HTMLElement).getAttribute('class'))
-            .toStrictEqual('file-input')
+            .toStrictEqual('file-input mdc-card')
 
         expect(
             (render(<FileInput name="test"/>) as HTMLElement)
