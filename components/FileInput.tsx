@@ -30,6 +30,7 @@ import {
     RefCallback,
     RefObject,
     SyntheticEvent,
+    useEffect,
     useImperativeHandle,
     useState
 } from 'react'
@@ -47,7 +48,6 @@ import {ComponentAdapter} from 'web-component-wrapper/type'
 
 import styles from './FileInput.module'
 import GenericInput from './GenericInput'
-import RepresentTextFile from './RepresentTextFile'
 import {WrapConfigurations} from './WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
@@ -176,6 +176,36 @@ export const determineValidationState = (
         }
     )
 }
+export const readBinaryDataIntoText = (
+    blob:Blob, encoding:string = 'utf-8'
+):Promise<string> =>
+    new Promise<string>((resolve:Function, reject:Function):void => {
+        const fileReader:FileReader = new FileReader()
+
+        fileReader.onload = (event:Event):void => {
+            let content:string = event.target.result
+            // Remove preceding BOM.
+            if (
+                encoding.endsWith('-sig') &&
+                content.length &&
+                content.charCodeAt(0) === 0xFEFF
+            )
+                content = content.slice(1)
+            // Normalize line endings to unix format.
+            content = content.replace(/\r\n/g, '\n')
+            resolve(content)
+        }
+
+        fileReader.onabort = reject
+        fileReader.onerror = reject
+
+        fileReader.readAsText(
+            blob,
+            encoding.endsWith('-sig') ?
+                encoding.substring(0, encoding.length - '-sig'.length) :
+                encoding
+        )
+    }
 // endregion
 /**
  * Validateable checkbox wrapper component.
@@ -499,9 +529,26 @@ export const FileInputInner = function(
         })
     )
     // endregion
-    const source:null|string = properties.value ?
-        `data:${properties.value.blob.type};base64,${properties.value.blob}` :
-        null
+    useEffect(async ():Promise<void> => {
+        if (properties.value.blob && !properties.value.source) {
+            let source:string
+
+            if (textMimeTypeRegularExpression.test(
+                properties.value.blob.type
+            ))
+                source = await readBinaryDataIntoText(properties.value.blob)
+            else {
+                source = `data:${properties.value.blob.type};base64,`
+                source += typeof Blob === 'undefined' ?
+                    properties.value.toString('base64') :
+                    await blobToBase64String(properties.value.blob)
+            }
+
+            setValueState((oldValueState:ValueState):ValueState => ({
+                ...oldValueState, source
+            }))
+        }
+    })
     // region render
     const representationType:RepresentationType =
         determineRepresentationType(properties.value.blob?.type)
@@ -531,17 +578,19 @@ export const FileInputInner = function(
         onFocus={onFocus}
     >
         <CardPrimaryAction>
-            {source ?
+            {properties.value?.source ?
                 representationType === 'image' ?
                 <CardMedia
                     {...properties.media}
-                    style={{backgroundImage: `url(${source})`}}
+                    style={{
+                        backgroundImage: `url(${properties.value.source})`
+                    }}
                 /> :
                 <CardMedia {...properties.media}>
                     {representationType === 'video' ?
                         <video autoplay loop muted>
                             <source
-                                src={source}
+                                src={properties.value.source}
                                 type={properties.value.blob.type}
                             />
                         </video> :
@@ -556,7 +605,7 @@ export const FileInputInner = function(
                             )
                         }>
                             <iframe
-                                src={source}
+                                src={properties.value.source}
                                 style={{
                                     border: 'none',
                                     height: '125%',
@@ -568,10 +617,7 @@ export const FileInputInner = function(
                             ></iframe>
                         </div> :
                     representationType === 'text' ?
-                        <RepresentTextFile
-                            content={source}
-                            encoding={properties.encoding}
-                        /> :
+                        properties.value.source :
                         ''
                     }
                 </CardMedia>
