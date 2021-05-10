@@ -608,9 +608,9 @@ export const defaultInputProperties:DefaultInputProperties = {
 // / endregion
 // / region file-input
 export type FileRepresentationType =
-    'binary'|'image'|'rendereableText'|'text'|'video'
+    'binary'|'image'|'renderableText'|'text'|'video'
 export type FileValue = {
-    blob:Blob
+    blob?:Blob|null
     name?:null|string
     source?:null|string
 }
@@ -647,6 +647,10 @@ export type AdditionalFileInputProperties =
         mimeTypePatternText:string
         namePattern:RegExp|string
         namePatternText:string
+        sourceToBlobOptions:{
+            endings?:'native'|'transparent'
+            type?:string
+        }
     }
 export type FileInputProperties =
     Properties<
@@ -658,8 +662,8 @@ export type FileInputProperties =
             declaration:string
             invalid:boolean
             properties:FileInputProperties
-            value?:FileValue
-        }) => ReactElement
+            value?:FileValue|null
+        }) => null|ReactElement
     }
 export type FileInputProps =
     Partial<Omit<FileInputProperties, 'model'>> &
@@ -747,7 +751,8 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
         'Please provide a file with more or equal size than ${maximumSize} byte.',
     model: {...defaultFileInputModel},
     namePatternText:
-        'Your file\'s name has to match the regular expression: "${pattern}".'
+        'Your file\'s name has to match the regular expression: "${pattern}".',
+    sourceToBlobOptions: {endings: 'transparent', type: 'text/plain'}
 } as const
 // // endregion
 // / endregion

@@ -17,6 +17,7 @@
     endregion
 */
 // region imports
+import {blobToBase64String, dataURLToBlob} from 'blob-util'
 import Tools from 'clientnode'
 import {FirstParameter} from 'clientnode/type'
 import {
@@ -42,6 +43,7 @@ import {
     CardMedia,
     CardPrimaryAction
 } from '@rmwc/card'
+import {CircularProgress} from '@rmwc/circular-progress'
 import {Theme} from '@rmwc/theme'
 import {Typography} from '@rmwc/typography'
 import {ComponentAdapter} from 'web-component-wrapper/type'
@@ -127,55 +129,53 @@ export const determineRepresentationType = (
 }
 export const determineValidationState = (
     properties:Properties, currentState:ModelState
-):boolean => {
-    return determineBaseValidationState<Properties>(
-        properties,
-        currentState,
-        {
-            invalidMaximumSize: ():boolean => (
-                typeof properties.model.maximumSize === 'number' &&
-                properties.model.maximumSize <
-                    (properties.model.value?.blob.size || 0)
-            ),
-            invalidMinimumSize: ():boolean => (
-                typeof properties.model.minimumSize === 'number' &&
-                properties.model.minimumSize >
-                    (properties.model.value?.blob.size || 0)
-            ),
-            invalidNamePattern: ():boolean => (
-                typeof properties.model.value?.name === 'string' &&
-                (
-                    typeof properties.model.regularExpressionNamePattern ===
-                        'string' &&
-                    !(new RegExp(
-                        properties.model.regularExpressionNamePattern
-                    )).test(properties.model.value.name) ||
-                    properties.model.regularExpressionNamePattern !== null &&
-                    typeof properties.model.regularExpressionNamePattern ===
-                        'object' &&
-                    !properties.model.regularExpressionNamePattern
-                        .test(properties.model.value.name)
-                )
-            ),
-            invalidMimeTypePattern: ():boolean => (
-                typeof properties.model.value?.blob.type === 'string' &&
-                (
-                    typeof properties.model
-                        .regularExpressionMimeTypePattern === 'string' &&
-                    !(new RegExp(
-                        properties.model.regularExpressionMimeTypePattern
-                    )).test(properties.model.value.blob.type) ||
-                    properties.model.regularExpressionMimeTypePattern !==
-                        null &&
-                    typeof properties.model
-                        .regularExpressionMimeTypePattern === 'object' &&
-                    !properties.model.regularExpressionMimeTypePattern
-                        .test(properties.model.value.blob.type)
-                )
+):boolean => determineBaseValidationState<Properties>(
+    properties,
+    currentState,
+    {
+        invalidMaximumSize: ():boolean => (
+            typeof properties.model.maximumSize === 'number' &&
+            properties.model.maximumSize <
+                (properties.model.value?.blob?.size || 0)
+        ),
+        invalidMinimumSize: ():boolean => (
+            typeof properties.model.minimumSize === 'number' &&
+            properties.model.minimumSize >
+                (properties.model.value?.blob?.size || 0)
+        ),
+        invalidNamePattern: ():boolean => (
+            typeof properties.model.value?.name === 'string' &&
+            (
+                typeof properties.model.regularExpressionNamePattern ===
+                    'string' &&
+                !(new RegExp(
+                    properties.model.regularExpressionNamePattern
+                )).test(properties.model.value.name) ||
+                properties.model.regularExpressionNamePattern !== null &&
+                typeof properties.model.regularExpressionNamePattern ===
+                    'object' &&
+                !properties.model.regularExpressionNamePattern
+                    .test(properties.model.value.name)
             )
-        }
-    )
-}
+        ),
+        invalidMimeTypePattern: ():boolean => (
+            typeof properties.model.value?.blob?.type === 'string' &&
+            (
+                typeof properties.model
+                    .regularExpressionMimeTypePattern === 'string' &&
+                !(new RegExp(
+                    properties.model.regularExpressionMimeTypePattern
+                )).test(properties.model.value.blob.type) ||
+                properties.model.regularExpressionMimeTypePattern !==
+                    null &&
+                typeof properties.model
+                    .regularExpressionMimeTypePattern === 'object' &&
+                !properties.model.regularExpressionMimeTypePattern
+                    .test(properties.model.value.blob.type)
+            )
+        )
+    }
+)
 export const readBinaryDataIntoText = (
     blob:Blob, encoding:string = 'utf-8'
 ):Promise<string> =>
@@ -183,11 +183,12 @@ export const readBinaryDataIntoText = (
         const fileReader:FileReader = new FileReader()
 
         fileReader.onload = (event:Event):void => {
-            let content:string = event.target.result
+            let content:string =
+                (event.target as unknown as {result:string}).result
             // Remove preceding BOM.
             if (
-                encoding.endsWith('-sig') &&
                 content.length &&
+                encoding.endsWith('-sig') &&
                 content.charCodeAt(0) === 0xFEFF
             )
                 content = content.slice(1)
@@ -196,8 +197,8 @@ export const readBinaryDataIntoText = (
             resolve(content)
         }
 
-        fileReader.onabort = reject
-        fileReader.onerror = reject
+        fileReader.onabort = ():void => reject('abort')
+        fileReader.onerror = ():void => reject('error')
 
         fileReader.readAsText(
             blob,
@@ -205,7 +206,7 @@ export const readBinaryDataIntoText = (
                 encoding.substring(0, encoding.length - '-sig'.length) :
                 encoding
         )
-    }
+    })
 // endregion
 /**
  * Validateable checkbox wrapper component.
@@ -322,30 +323,38 @@ export const FileInputInner = function(
     }
     /**
      * Triggered when ever the value changes.
-     * @param event - Event object or new value.
+     * @param eventSourceOrName - Event object or new value.
      * @returns Nothing.
      */
-    const onChangeValue = (eventOrName:null|string|SyntheticEvent):void => {
+    const onChangeValue = (
+        eventSourceOrName:FileValue|null|string|SyntheticEvent
+    ):void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
 
         let event:SyntheticEvent|undefined
-        if (
+        if (eventSourceOrName === null)
+            properties.value = eventSourceOrName
+        else if (
             fileInputReference.current &&
-            (eventOrName as SyntheticEvent)?.target ===
+            (eventSourceOrName as SyntheticEvent).target ===
                 fileInputReference.current
         ) {
-            event = eventOrName as SyntheticEvent
-            const blob:File =
-                (event.target as unknown as {files:FileList}).files &&
-                (event.target as unknown as {files:FileList}).files[0]
-            properties.value = {blob, name: blob.name}
-        } else
+            event = eventSourceOrName as SyntheticEvent
+            if (eventSourceOrName.target.files?.length) {
+                const blob:File =
+                    (event.target as unknown as {files:FileList}).files[0]
+                properties.value = {blob, name: blob.name}
+            } else
+                return
+        } else if (typeof eventSourceOrName === 'string')
             /*
                 NOTE: A name can only be changed if a blob is available
                 beforehand.
             */
-            properties.value!.name = eventOrName as string
+            properties.value!.name = eventSourceOrName
+        else if (typeof (eventSourceOrName as FileValue).source === 'string')
+            properties.value = eventSourceOrName as FileValue
 
         setValueState((oldValueState:ValueState):ValueState => {
             if (Tools.equals(oldValueState.value, properties.value))
@@ -456,6 +465,7 @@ export const FileInputInner = function(
     // endregion
     // region properties
     // / region references
+    const downloadLinkReference:RefObject<AElement> = createRef<AElement>()
     const fileInputReference:RefObject<HTMLInputElement> =
         createRef<HTMLInputElement>()
     const nameInputReference:RefObject<InputAdapter<string>> =
@@ -529,29 +539,45 @@ export const FileInputInner = function(
         })
     )
     // endregion
-    useEffect(async ():Promise<void> => {
-        if (properties.value.blob && !properties.value.source) {
-            let source:string
+    useEffect(():void => {
+        (async ():Promise<void> => {
+            if (properties.value?.blob && !properties.value.source) {
+                if (textMimeTypeRegularExpression.test(
+                    properties.value.blob.type
+                ))
+                    properties.value.source =
+                        await readBinaryDataIntoText(properties.value.blob)
+                else {
+                    const source:string = typeof Blob === 'undefined' ?
+                        (properties.value.toString as
+                            unknown as
+                            (encoding:string) => string
+                        )('base64') :
+                        await blobToBase64String(properties.value.blob)
+                    properties.value.source =
+                        `data:${properties.value.blob.type};base64,${source}`
+                }
 
-            if (textMimeTypeRegularExpression.test(
-                properties.value.blob.type
-            ))
-                source = await readBinaryDataIntoText(properties.value.blob)
-            else {
-                source = `data:${properties.value.blob.type};base64,`
-                source += typeof Blob === 'undefined' ?
-                    properties.value.toString('base64') :
-                    await blobToBase64String(properties.value.blob)
+                onChangeValue(properties.value)
+            } else if (properties.value?.source && !properties.value.blob) {
+                if (properties.value.source.startsWith('data:'))
+                    properties.value.blob =
+                        dataURLToBlob(properties.value.source)
+                else
+                    properties.value.blob = new Blob(
+                        [properties.value.source],
+                        properties.sourceToBlobOptions
+                    )
+
+                onChangeValue(properties.value)
             }
-
-            setValueState((oldValueState:ValueState):ValueState => ({
-                ...oldValueState, source
-            }))
-        }
+        })()
     })
     // region render
     const representationType:RepresentationType =
-        determineRepresentationType(properties.value.blob?.type)
+        properties.value?.blob?.type ?
+            determineRepresentationType(properties.value.blob.type) :
+            'binary'
     const invalid:boolean = (
         properties.invalid &&
         (
@@ -578,7 +604,7 @@ export const FileInputInner = function(
         onFocus={onFocus}
     >
         <CardPrimaryAction>
-            {properties.value?.source ?
+            {properties.value?.blob && properties.value?.source ?
                 representationType === 'image' ?
                 <CardMedia
                     {...properties.media}
@@ -586,41 +612,39 @@ export const FileInputInner = function(
                         backgroundImage: `url(${properties.value.source})`
                     }}
                 /> :
-                <CardMedia {...properties.media}>
-                    {representationType === 'video' ?
-                        <video autoplay loop muted>
-                            <source
-                                src={properties.value.source}
-                                type={properties.value.blob.type}
-                            />
-                        </video> :
-                    representationType === 'rendereableText' ?
-                        <div class={
-                            'iframe-wrapper' +
-                            ([
-                                'text/html', 'text/plain'
-                            ].includes(properties.value.blob.type) ?
-                                ' wrapped' :
-                                ''
-                            )
-                        }>
-                            <iframe
-                                src={properties.value.source}
-                                style={{
-                                    border: 'none',
-                                    height: '125%',
-                                    overflow: 'hidden',
-                                    transform: 'scale(.75)',
-                                    transformOrigin: '0 0',
-                                    width: '125%'
-                                }}
-                            ></iframe>
-                        </div> :
-                    representationType === 'text' ?
-                        properties.value.source :
-                        ''
-                    }
-                </CardMedia>
+                representationType === 'video' ?
+                    <video autoPlay loop muted>
+                        <source
+                            src={properties.value.source}
+                            type={properties.value.blob.type}
+                        />
+                    </video> :
+                representationType === 'renderableText' ?
+                    <div className={
+                        styles['file-input__iframe-wrapper'] +
+                        ([
+                            'text/html', 'text/plain'
+                        ].includes(properties.value.blob.type) ?
+                            ` ${styles['file-input__iframe-wrapper--padding']}` :
+                            ''
+                        )
+                    }>
+                        <iframe
+                            src={properties.value.source}
+                            style={{
+                                border: 'none',
+                                height: '125%',
+                                overflow: 'hidden',
+                                transform: 'scale(.75)',
+                                transformOrigin: '0 0',
+                                width: '125%'
+                            }}
+                        ></iframe>
+                    </div> :
+                representationType === 'text' ? properties.value.source : '' :
+                properties.value?.blob || properties.value?.source ?
+                    <CircularProgress size="large" /> :
+                    ''
             }
             <div>
                 {properties.name ?
@@ -691,16 +715,44 @@ export const FileInputInner = function(
         </CardPrimaryAction>
         <CardActions>
             <CardActionButtons>
-                <CardActionButton
-                    onClick={():void => fileInputReference.current?.click()}
-                    ripple={properties.ripple}
-                >New</CardActionButton>
-                <CardActionButton ripple={properties.ripple}>
-                    Delete
-                </CardActionButton>
-                <CardActionButton ripple={properties.ripple}>
-                    Download
-                </CardActionButton>
+                {!properties.disabled ?
+                    <CardActionButton
+                        onClick={():void =>
+                            fileInputReference.current?.click()
+                        }
+                        ripple={properties.ripple}
+                    >{properties.value ? 'Edit' : 'New'}</CardActionButton> :
+                    ''
+                }
+                {properties.value ?
+                    <>
+                        <CardActionButton
+                            onClick={():void => onChangeValue(null)}
+                            ripple={properties.ripple}
+                        >
+                            Delete
+                        </CardActionButton>
+                        {properties.value.source ?
+                            <CardActionButton
+                                onClick={():void =>
+                                    downloadLinkReference.current?.click()
+                                }
+                                ripple={properties.ripple}
+                            >
+                                <a
+                                    className={styles['file-input__download']}
+                                    download={properties.value.name}
+                                    href={properties.value.source}
+                                    ref={downloadLinkReference}
+                                    target="_blank"
+                                    type={properties.value.blob?.type}
+                                >Download</a>
+                            </CardActionButton> :
+                            ''
+                        }
+                    </> :
+                    ''
+                }
             </CardActionButtons>
         </CardActions>
     </Card></WrapConfigurations>

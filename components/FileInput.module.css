@@ -12,6 +12,10 @@ endregion */
 /* region imports */
 /*import '@rmwc/card/styles'*/
 @import '@material/card/dist/mdc.card.css';
+/*import '@rmwc/circular-progress/styles'*/
+/* Imported by GenericInput
+@import '@rmwc/circular-progress/circular-progress.css';
+*/
 @import '@material/button/dist/mdc.button.css';
 /* Imported by GenericInput
 @import '@material/icon-button/dist/mdc.icon-button.css';
@@ -20,7 +24,35 @@ endregion */
 @import './GenericInput.module';
 /* endregion */
 .file-input {
-    display: block;
+    /*
+        Dummy value to avoid removing this class name during static
+        optimisation.
+    */
+    visibility: visible;
+}
+
+.file-input__download {
+    text-decoration: none;
+}
+
+.file-input__iframe-wrapper {
+    border-left: 1px dashed black;
+    height: 200px;
+    opacity: .5;
+    overflow: hidden;
+    width: 125%;
+
+    &:not(.file-input__iframe--wrapped) {
+        padding: 5px;
+    }
+}
+
+.file-input__iframe-wrapper--padding {
+    /*
+        Dummy value to avoid removing this class name during static
+        optimisation.
+    */
+    visibility: visible;
 }
 
 .file-input__native {

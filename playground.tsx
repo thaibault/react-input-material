@@ -83,7 +83,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         <div className="playground__inputs">
             <FileInput onChange={onChange} />
             <FileInput onChange={onChange}>
-                {({value}):ReactElement =>
+                {({value}):null|ReactElement =>
                     value?.blob ?
                         <>
                             Last modified date time: {Tools.dateTimeFormat(
@@ -95,7 +95,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                             <br />
                             Size: {value.blob.size}
                         </> :
-                        ''
+                        null
                 }
             </FileInput>
             {/*TODO
