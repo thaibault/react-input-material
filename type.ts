@@ -612,6 +612,7 @@ export type FileRepresentationType =
 export type FileValue = {
     blob:Blob
     name?:null|string
+    source?:null|string
 }
 export type FileInputModelState =
     ModelState &
