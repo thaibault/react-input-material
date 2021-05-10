@@ -50,42 +50,48 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         ():void => setFadeState((value:boolean):boolean => !value), 2 * 1000
     ).clear)
     // region controlled state
-    const [value1, setValue1] = useState<string>('')
+    const [value1, setValue1] = useState<string>({value: {
+        blob: new Blob(['test'], {type: 'text/plain'}),
+        name: 'test.txt'
+    }})
     const onChangeValue1 = useMemorizedValue<(value:string) => void>(setValue1)
+
+    const [value2, setValue2] = useState<string>('')
+    const onChangeValue2 = useMemorizedValue<(value:string) => void>(setValue2)
 
     type FloatValueState = {
         value?:null|number
         representation:string
     }
-    const [value2, setValue2] = useState<FloatValueState>({
+    const [value3, setValue3] = useState<FloatValueState>({
         value: 1234.34, representation: '1.234,34'
     })
-    const onChangeValue2 =
-        useMemorizedValue<(value:FloatValueState) => void>(setValue2)
-
-    const [value3, setValue3] =
-        useState<IntervalValue|null>({end: 120, start: 60})
     const onChangeValue3 =
-        useMemorizedValue<(value:IntervalValue|null) => void>(setValue3)
+        useMemorizedValue<(value:FloatValueState) => void>(setValue3)
 
-    const [value4, setValue4] = useState<boolean|null>(false)
+    const [value4, setValue4] =
+        useState<IntervalValue|null>({end: 120, start: 60})
     const onChangeValue4 =
-        useMemorizedValue<(value:boolean|null) => void>(setValue4)
+        useMemorizedValue<(value:IntervalValue|null) => void>(setValue4)
 
-    const [value5, setValue5] =
-        useState<Array<boolean|null|string>|null>(['first item'])
+    const [value5, setValue5] = useState<boolean|null>(false)
     const onChangeValue5 =
+        useMemorizedValue<(value:boolean|null) => void>(setValue5)
+
+    const [value6, setValue6] =
+        useState<Array<boolean|null|string>|null>(['first item'])
+    const onChangeValue6 =
         useMemorizedValue<(values:Array<boolean|null|string>|null) => void>(
-            setValue5
+            setValue6
         )
     // endregion
     return (<>
         <div className="playground__inputs">
             <FileInput onChange={onChange} />
-            <FileInput onChange={onChange}>
+            <FileInput name="UnControlled" onChange={onChange}>
                 {({value}):null|ReactElement =>
                     value?.blob ?
-                        <>
+                        <div style={{marginLeft: '10px'}}>
                             Last modified date time: {Tools.dateTimeFormat(
                                 '${mediumDay}.${mediumMonth}.${fullYear}',
                                 new Date((value.blob as File).lastModified)
@@ -94,25 +100,31 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                             Mime-Typ: {value.blob.type}
                             <br />
                             Size: {value.blob.size}
-                        </> :
+                        </div> :
                         null
                 }
             </FileInput>
+            <FileInput
+                name="Controlled"
+                onChange={onChange}
+                onChangeValue={onChangeValue1}
+                value={value1}
+            />
             {/*TODO
 
             <GenericInput onChange={onChange} />
             <GenericInput
                 name="UnControlled"
                 onChange={onChange}
-                onChangeValue={onChangeValue1}
+                onChangeValue={onChangeValue2}
                 enforceUncontrolled={true}
-                value={value1}
+                value={value2}
             />
             <GenericInput
                 name="controlled"
                 onChange={onChange}
-                onChangeValue={onChangeValue1}
-                value={value1}
+                onChangeValue={onChangeValue2}
+                value={value2}
             />
             <GenericInput
                 name="controlled"
@@ -120,14 +132,14 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     properties:InputProperties<number>
                 ) => {
                     onChange(properties)
-                    onChangeValue2({
+                    onChangeValue3({
                         representation: properties.representation,
                         value: properties.value
                     })
                 })}
-                representation={value2.representation}
+                representation={value3.representation}
                 type="float"
-                value={value2.value}
+                value={value3.value}
             />
 
             <hr/>
@@ -587,9 +599,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 name="controlled"
                 default={120}
                 onChange={onChange}
-                onChangeValue={onChangeValue3}
+                onChangeValue={onChangeValue4}
                 step={60}
-                value={value3}
+                value={value4}
             />
 
             <hr/>
@@ -613,8 +625,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <RequireableCheckbox
                 name="controlled"
                 onChange={onChange}
-                onChangeValue={onChangeValue4}
-                value={value4}
+                onChangeValue={onChangeValue5}
+                value={value5}
             />
 
             <hr/>
@@ -708,8 +720,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <Inputs
                 name="inputs3"
                 onChange={onChange}
-                onChangeValue={onChangeValue5}
-                value={value5}
+                onChangeValue={onChangeValue6}
+                value={value6}
             />
 */}
         </div>

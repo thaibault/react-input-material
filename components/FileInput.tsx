@@ -542,9 +542,12 @@ export const FileInputInner = function(
     useEffect(():void => {
         (async ():Promise<void> => {
             if (properties.value?.blob && !properties.value.source) {
-                if (textMimeTypeRegularExpression.test(
-                    properties.value.blob.type
-                ))
+                if (
+                    textMimeTypeRegularExpression.test(
+                        properties.value.blob.type
+                    ) &&
+                    representationType !== 'renderableText'
+                )
                     properties.value.source =
                         await readBinaryDataIntoText(properties.value.blob)
                 else {
@@ -630,25 +633,23 @@ export const FileInputInner = function(
                         )
                     }>
                         <iframe
+                            frameborder="no"
+                            scrolling="no"
                             src={properties.value.source}
-                            style={{
-                                border: 'none',
-                                height: '125%',
-                                overflow: 'hidden',
-                                transform: 'scale(.75)',
-                                transformOrigin: '0 0',
-                                width: '125%'
-                            }}
-                        ></iframe>
+                        />
                     </div> :
-                representationType === 'text' ? properties.value.source : '' :
+                representationType === 'text' ?
+                    <pre className={styles['file-input__text-representation']}>
+                        {properties.value.source}
+                    </pre> :
+                    '' :
                 properties.value?.blob || properties.value?.source ?
                     <CircularProgress size="large" /> :
                     ''
             }
             <div>
                 {properties.name ?
-                    <Typography use="headline6" tag="h2">
+                    <Typography tag="h2" use="headline6">
                         {invalid ?
                             <Theme use="error">{properties.name}</Theme> :
                             properties.name
