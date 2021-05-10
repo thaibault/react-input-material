@@ -650,7 +650,15 @@ export type FileInputProperties =
     Properties<
         FileValue, Properties<FileValue> & AdditionalFileInputProperties
     > &
-    AdditionalFileInputProperties
+    AdditionalFileInputProperties &
+    {
+        children:(options:{
+            declaration:string
+            invalid:boolean
+            properties:FileInputProperties
+            value?:FileValue
+        }) => ReactElement
+    }
 export type FileInputProps =
     Partial<Omit<FileInputProperties, 'model'>> &
     {model?:Partial<FileInputModel>}
@@ -688,6 +696,7 @@ export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
     ...modelPropertyTypes,
     ...fileInputModelStatePropertyTypes,
+    children: func,
     fileName: shape<any>(inputPropertyTypes),
     maximumSizeText: string,
     minimumSizeText: string,

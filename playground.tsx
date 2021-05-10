@@ -82,6 +82,22 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     return (<>
         <div className="playground__inputs">
             <FileInput onChange={onChange} />
+            <FileInput onChange={onChange}>
+                {({value}):ReactElement =>
+                    value?.blob ?
+                        <>
+                            Last modified date time: {Tools.dateTimeFormat(
+                                '${mediumDay}.${mediumMonth}.${fullYear}',
+                                new Date((value.blob as File).lastModified)
+                            )}
+                            <br />
+                            Mime-Typ: {value.blob.type}
+                            <br />
+                            Size: {value.blob.size}
+                        </> :
+                        ''
+                }
+            </FileInput>
             {/*TODO
 
             <GenericInput onChange={onChange} />

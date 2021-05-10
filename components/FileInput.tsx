@@ -498,6 +498,7 @@ export const FileInputInner = function(
         })
     )
     // endregion
+    const source:string = 
     // region render
     const representationType:RepresentationType =
         determineRepresentationType(properties.value.blob?.type)
@@ -589,7 +590,12 @@ export const FileInputInner = function(
                         theme="textSecondaryOnBackground"
                         use="subtitle2"
                     >
-                        {properties.description}
+                        {invalid ?
+                            <Theme use="error">
+                                {properties.description}
+                            </Theme> :
+                            properties.description
+                        }
                     </Typography> :
                     ''
                 }
@@ -604,30 +610,20 @@ export const FileInputInner = function(
                     /> :
                     ''
                 }
-                {properties.declaration ?
-                    <Typography
-                        tag="div"
-                        theme="textSecondaryOnBackground"
-                        use="body1"
-                    >{invalid ?
-                        <Theme use="error">{properties.declaration}</Theme> :
-                        properties.declaration
-                    }</Typography> :
-                    ''
-                }
-                {/*TODO use template messages via declaration*/}
-                {properties.value?.blob ?
-                    <>
-                        Last modified date time: {Tools.dateTimeFormat(
-                            '${mediumDay}.${mediumMonth}.${fullYear}',
-                            new Date((properties.value?.blob as File)?.lastModified)
-                        )}
-                        <br />
-                        Mime-Typ: {properties.value?.blob.type}
-                        <br />
-                        Size: {properties.value?.blob.size}
-                    </> :
-                    ''
+                {properties.children ?
+                    properties.children({
+                        declaration: properties.declaration,
+                        invalid,
+                        properties,
+                        value: properties.value
+                    }) :
+                    properties.declaration ?
+                        <Typography
+                            tag="div"
+                            theme="textSecondaryOnBackground"
+                            use="body1"
+                        >{properties.declaration}</Typography> :
+                        ''
                 }
             </div>
             {/*TODO use "accept" attribute*/}
