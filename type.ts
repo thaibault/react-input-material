@@ -607,6 +607,8 @@ export const defaultInputProperties:DefaultInputProperties = {
 // // endregion
 // / endregion
 // / region file-input
+export type FileRepresentationType =
+    'binary'|'image'|'rendereableText'|'text'|'video'
 export type FileValue = {
     blob:Blob
     name?:null|string
@@ -723,6 +725,9 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
     },
     maximumSizeText:
         'Please provide a file with less or equal size than ${maximumSize} byte.',
+    media: {
+        sixteenByNine: true
+    },
     mimeTypePatternText:
         'Your file\'s mime-type has to match the regular expression: "${pattern}".',
     minimumSizeText:

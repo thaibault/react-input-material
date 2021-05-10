@@ -74,6 +74,7 @@ import {
     InputAdapter,
     InputProperties,
     InputProps,
+    FileRepresentationType as RepresentationType,
     StaticFunctionFileInputComponent
 } from '../type'
 // endregion
@@ -100,9 +101,12 @@ const videoMimeTypeRegularExpression:RegExp = new RegExp(
 // region helper
 /**
  * Determines which type of file we have to present.
+ * @param contentType - File type to derive representation type from.
  * @returns Nothing.
  */
-export const determinePresentationType = (contentType:string):string => {
+export const determineRepresentationType = (
+    contentType:string
+):RepresentationType => {
     contentType = contentType.replace(/; *charset=.+$/, '')
 
     if (textMimeTypeRegularExpression.test(contentType)) {
@@ -495,6 +499,8 @@ export const FileInputInner = function(
     )
     // endregion
     // region render
+    const representationType:RepresentationType =
+        determineRepresentationType(properties.value.blob?.type)
     const invalid:boolean = (
         properties.invalid &&
         (
@@ -521,7 +527,51 @@ export const FileInputInner = function(
         onFocus={onFocus}
     >
         <CardPrimaryAction>
-            <CardMedia {...properties.media} />
+            {source ?
+                representationType === 'image' ?
+                <CardMedia
+                    {...properties.media}
+                    style={{backgroundImage: `url(${source})`}}
+                /> :
+                <CardMedia {...properties.media}>
+                    {representationType === 'video' ?
+                        <video autoplay loop muted>
+                            <source
+                                src={source}
+                                type={properties.value.blob.type}
+                            />
+                        </video> :
+                    representationType === 'rendereableText' ?
+                        <div class={
+                            'iframe-wrapper' +
+                            ([
+                                'text/html', 'text/plain'
+                            ].includes(properties.value.blob.type) ?
+                                ' wrapped' :
+                                ''
+                            )
+                        }>
+                            <iframe
+                                src={source}
+                                style={{
+                                    border: 'none',
+                                    height: '125%',
+                                    overflow: 'hidden',
+                                    transform: 'scale(.75)',
+                                    transformOrigin: '0 0',
+                                    width: '125%'
+                                }}
+                            ></iframe>
+                        </div> :
+                    representationType === 'text' ?
+                        <RepresentTextFile
+                            content={source}
+                            encoding="utf-8"
+                        /> :
+                        ''
+                    }
+                </CardMedia>
+            }
             <div>
                 {properties.name ?
                     <Typography use="headline6" tag="h2">
