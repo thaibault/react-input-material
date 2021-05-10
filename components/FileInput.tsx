@@ -47,6 +47,7 @@ import {ComponentAdapter} from 'web-component-wrapper/type'
 
 import styles from './FileInput.module'
 import GenericInput from './GenericInput'
+import RepresentTextFile from './RepresentTextFile'
 import {WrapConfigurations} from './WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
@@ -498,7 +499,9 @@ export const FileInputInner = function(
         })
     )
     // endregion
-    const source:string = 
+    const source:null|string = properties.value ?
+        `data:${properties.value.blob.type};base64,${properties.value.blob}` :
+        null
     // region render
     const representationType:RepresentationType =
         determineRepresentationType(properties.value.blob?.type)
@@ -567,7 +570,7 @@ export const FileInputInner = function(
                     representationType === 'text' ?
                         <RepresentTextFile
                             content={source}
-                            encoding="utf-8"
+                            encoding={properties.encoding}
                         /> :
                         ''
                     }

@@ -635,6 +635,7 @@ export type FileInputValueState =
 export type AdditionalFileInputProperties =
     FileInputModelState &
     {
+        encoding:string
         fileName:InputProperties<string>
         maximumSizeText:string
         media:CardMediaProps
@@ -697,6 +698,7 @@ export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...modelPropertyTypes,
     ...fileInputModelStatePropertyTypes,
     children: func,
+    encoding: string,
     fileName: shape<any>(inputPropertyTypes),
     maximumSizeText: string,
     minimumSizeText: string,
@@ -726,6 +728,7 @@ export const defaultFileInputModel:FileInputModel = {
 */
 export const defaultFileInputProperties:DefaultFileInputProperties = {
     ...defaultProperties,
+    encoding: 'utf-8',
     fileName: {
         ...defaultInputProperties as InputProperties<string>,
         maximumLength: 1024,
