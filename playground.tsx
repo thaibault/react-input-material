@@ -50,10 +50,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         ():void => setFadeState((value:boolean):boolean => !value), 2 * 1000
     ).clear)
     // region controlled state
-    const [value1, setValue1] = useState<string>({value: {
+    const [value1, setValue1] = useState<string>({
         blob: new Blob(['test'], {type: 'text/plain'}),
         name: 'test.txt'
-    }})
+    })
     const onChangeValue1 = useMemorizedValue<(value:string) => void>(setValue1)
 
     const [value2, setValue2] = useState<string>('')
@@ -89,7 +89,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         <div className="playground__inputs">
             <FileInput onChange={onChange} />
             <FileInput name="UnControlled" onChange={onChange}>
-                {({value}):null|ReactElement =>
+                {useMemorizedValue(({value}):null|ReactElement =>
                     value?.blob ?
                         <div style={{marginLeft: '10px'}}>
                             Last modified date time: {Tools.dateTimeFormat(
@@ -102,7 +102,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                             Size: {value.blob.size}
                         </div> :
                         null
-                }
+                )}
             </FileInput>
             <FileInput
                 name="Controlled"

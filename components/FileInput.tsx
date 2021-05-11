@@ -504,7 +504,7 @@ export const FileInputInner = function(
     deriveMissingPropertiesFromState(givenProperties, valueState)
 
     const properties:Properties = getConsolidatedProperties(givenProperties)
-    // region synchronize properties i nto state where values are not controlled
+    // region synchronize properties into state where values are not controlled
     const currentValueState:ValueState = {
         modelState: properties.model.state,
         value: properties.value as FileValue|null
@@ -576,6 +576,7 @@ export const FileInputInner = function(
             }
         })()
     })
+    console.log('TODO', properties.value)
     // region render
     const representationType:RepresentationType =
         properties.value?.blob?.type ?
