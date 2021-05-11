@@ -342,6 +342,7 @@ export type CheckboxAdapter<Type = any> =
 // // region constants
 export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
+    ...modelStatePropertyTypes,
     checked: boolean,
     id: string,
 } as const
@@ -511,7 +512,6 @@ export const inputModelStatePropertyTypes:{
 } as const
 export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
-    ...modelPropertyTypes,
     ...inputModelStatePropertyTypes,
     /*
         NOTE: Not yet working:
@@ -700,7 +700,6 @@ export const fileInputModelStatePropertyTypes:{
 } as const
 export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
-    ...modelPropertyTypes,
     ...fileInputModelStatePropertyTypes,
     children: func,
     encoding: string,
@@ -817,6 +816,7 @@ export type InputsAdapterWithReferences<
 // // region constants
 export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
+    ...inputModelStatePropertyTypes,
     // We use that function (render prop) to produce input component instances.
     children: func,
     createPrototype: func

@@ -702,10 +702,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     })
                 )}
                 model={useMemorizedValue({
-                    default: [{
-                        name: 'inputs1-1'
-                    }],
-                    name: 'inputs1'
+                    default: [{name: 'inputs1-1'}], name: 'inputs1'
                 })}
                 onChange={onChange}
                 showInitialValidationState
