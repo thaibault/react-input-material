@@ -607,9 +607,12 @@ export const defaultInputProperties:DefaultInputProperties = {
 // // endregion
 // / endregion
 // / region file-input
+export type FileRepresentationType =
+    'binary'|'image'|'renderableText'|'text'|'video'
 export type FileValue = {
-    blob:Blob
+    blob?:Blob|null
     name?:null|string
+    source?:null|string
 }
 export type FileInputModelState =
     ModelState &
@@ -633,6 +636,7 @@ export type FileInputValueState =
 export type AdditionalFileInputProperties =
     FileInputModelState &
     {
+        encoding:string
         fileName:InputProperties<string>
         maximumSizeText:string
         media:CardMediaProps
@@ -643,12 +647,24 @@ export type AdditionalFileInputProperties =
         mimeTypePatternText:string
         namePattern:RegExp|string
         namePatternText:string
+        sourceToBlobOptions:{
+            endings?:'native'|'transparent'
+            type?:string
+        }
     }
 export type FileInputProperties =
     Properties<
         FileValue, Properties<FileValue> & AdditionalFileInputProperties
     > &
-    AdditionalFileInputProperties
+    AdditionalFileInputProperties &
+    {
+        children:(options:{
+            declaration:string
+            invalid:boolean
+            properties:FileInputProperties
+            value?:FileValue|null
+        }) => null|ReactElement
+    }
 export type FileInputProps =
     Partial<Omit<FileInputProperties, 'model'>> &
     {model?:Partial<FileInputModel>}
@@ -686,6 +702,8 @@ export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
     ...modelPropertyTypes,
     ...fileInputModelStatePropertyTypes,
+    children: func,
+    encoding: string,
     fileName: shape<any>(inputPropertyTypes),
     maximumSizeText: string,
     minimumSizeText: string,
@@ -715,6 +733,7 @@ export const defaultFileInputModel:FileInputModel = {
 */
 export const defaultFileInputProperties:DefaultFileInputProperties = {
     ...defaultProperties,
+    encoding: 'utf-8',
     fileName: {
         ...defaultInputProperties as InputProperties<string>,
         maximumLength: 1024,
@@ -723,13 +742,17 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
     },
     maximumSizeText:
         'Please provide a file with less or equal size than ${maximumSize} byte.',
+    media: {
+        sixteenByNine: true
+    },
     mimeTypePatternText:
         'Your file\'s mime-type has to match the regular expression: "${pattern}".',
     minimumSizeText:
         'Please provide a file with more or equal size than ${maximumSize} byte.',
     model: {...defaultFileInputModel},
     namePatternText:
-        'Your file\'s name has to match the regular expression: "${pattern}".'
+        'Your file\'s name has to match the regular expression: "${pattern}".',
+    sourceToBlobOptions: {endings: 'transparent', type: 'text/plain'}
 } as const
 // // endregion
 // / endregion

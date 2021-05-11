@@ -85,6 +85,7 @@
     "@typescript-eslint/eslint-plugin": "*",
     "@typescript-eslint/parser": "*",
     "babel-eslint": "*",
+    "blob-util": "*",
     "clientnode": "*",
     "css-loader": "*",
     "cssnano": "<=4",

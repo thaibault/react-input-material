@@ -17,6 +17,7 @@
     endregion
 */
 // region imports
+import {blobToBase64String, dataURLToBlob} from 'blob-util'
 import Tools from 'clientnode'
 import {FirstParameter} from 'clientnode/type'
 import {
@@ -30,6 +31,7 @@ import {
     RefCallback,
     RefObject,
     SyntheticEvent,
+    useEffect,
     useImperativeHandle,
     useState
 } from 'react'
@@ -41,6 +43,7 @@ import {
     CardMedia,
     CardPrimaryAction
 } from '@rmwc/card'
+import {CircularProgress} from '@rmwc/circular-progress'
 import {Theme} from '@rmwc/theme'
 import {Typography} from '@rmwc/typography'
 import {ComponentAdapter} from 'web-component-wrapper/type'
@@ -74,6 +77,7 @@ import {
     InputAdapter,
     InputProperties,
     InputProps,
+    FileRepresentationType as RepresentationType,
     StaticFunctionFileInputComponent
 } from '../type'
 // endregion
@@ -100,9 +104,12 @@ const videoMimeTypeRegularExpression:RegExp = new RegExp(
 // region helper
 /**
  * Determines which type of file we have to present.
+ * @param contentType - File type to derive representation type from.
  * @returns Nothing.
  */
-export const determinePresentationType = (contentType:string):string => {
+export const determineRepresentationType = (
+    contentType:string
+):RepresentationType => {
     contentType = contentType.replace(/; *charset=.+$/, '')
 
     if (textMimeTypeRegularExpression.test(contentType)) {
@@ -122,55 +129,84 @@ export const determinePresentationType = (contentType:string):string => {
 }
 export const determineValidationState = (
     properties:Properties, currentState:ModelState
-):boolean => {
-    return determineBaseValidationState<Properties>(
-        properties,
-        currentState,
-        {
-            invalidMaximumSize: ():boolean => (
-                typeof properties.model.maximumSize === 'number' &&
-                properties.model.maximumSize <
-                    (properties.model.value?.blob.size || 0)
-            ),
-            invalidMinimumSize: ():boolean => (
-                typeof properties.model.minimumSize === 'number' &&
-                properties.model.minimumSize >
-                    (properties.model.value?.blob.size || 0)
-            ),
-            invalidNamePattern: ():boolean => (
-                typeof properties.model.value?.name === 'string' &&
-                (
-                    typeof properties.model.regularExpressionNamePattern ===
-                        'string' &&
-                    !(new RegExp(
-                        properties.model.regularExpressionNamePattern
-                    )).test(properties.model.value.name) ||
-                    properties.model.regularExpressionNamePattern !== null &&
-                    typeof properties.model.regularExpressionNamePattern ===
-                        'object' &&
-                    !properties.model.regularExpressionNamePattern
-                        .test(properties.model.value.name)
-                )
-            ),
-            invalidMimeTypePattern: ():boolean => (
-                typeof properties.model.value?.blob.type === 'string' &&
-                (
-                    typeof properties.model
-                        .regularExpressionMimeTypePattern === 'string' &&
-                    !(new RegExp(
-                        properties.model.regularExpressionMimeTypePattern
-                    )).test(properties.model.value.blob.type) ||
-                    properties.model.regularExpressionMimeTypePattern !==
-                        null &&
-                    typeof properties.model
-                        .regularExpressionMimeTypePattern === 'object' &&
-                    !properties.model.regularExpressionMimeTypePattern
-                        .test(properties.model.value.blob.type)
-                )
+):boolean => determineBaseValidationState<Properties>(
+    properties,
+    currentState,
+    {
+        invalidMaximumSize: ():boolean => (
+            typeof properties.model.maximumSize === 'number' &&
+            properties.model.maximumSize <
+                (properties.model.value?.blob?.size || 0)
+        ),
+        invalidMinimumSize: ():boolean => (
+            typeof properties.model.minimumSize === 'number' &&
+            properties.model.minimumSize >
+                (properties.model.value?.blob?.size || 0)
+        ),
+        invalidNamePattern: ():boolean => (
+            typeof properties.model.value?.name === 'string' &&
+            (
+                typeof properties.model.regularExpressionNamePattern ===
+                    'string' &&
+                !(new RegExp(
+                    properties.model.regularExpressionNamePattern
+                )).test(properties.model.value.name) ||
+                properties.model.regularExpressionNamePattern !== null &&
+                typeof properties.model.regularExpressionNamePattern ===
+                    'object' &&
+                !properties.model.regularExpressionNamePattern
+                    .test(properties.model.value.name)
             )
+        ),
+        invalidMimeTypePattern: ():boolean => (
+            typeof properties.model.value?.blob?.type === 'string' &&
+            (
+                typeof properties.model
+                    .regularExpressionMimeTypePattern === 'string' &&
+                !(new RegExp(
+                    properties.model.regularExpressionMimeTypePattern
+                )).test(properties.model.value.blob.type) ||
+                properties.model.regularExpressionMimeTypePattern !==
+                    null &&
+                typeof properties.model
+                    .regularExpressionMimeTypePattern === 'object' &&
+                !properties.model.regularExpressionMimeTypePattern
+                    .test(properties.model.value.blob.type)
+            )
+        )
+    }
+)
+export const readBinaryDataIntoText = (
+    blob:Blob, encoding:string = 'utf-8'
+):Promise<string> =>
+    new Promise<string>((resolve:Function, reject:Function):void => {
+        const fileReader:FileReader = new FileReader()
+
+        fileReader.onload = (event:Event):void => {
+            let content:string =
+                (event.target as unknown as {result:string}).result
+            // Remove preceding BOM.
+            if (
+                content.length &&
+                encoding.endsWith('-sig') &&
+                content.charCodeAt(0) === 0xFEFF
+            )
+                content = content.slice(1)
+            // Normalize line endings to unix format.
+            content = content.replace(/\r\n/g, '\n')
+            resolve(content)
         }
-    )
-}
+
+        fileReader.onabort = ():void => reject('abort')
+        fileReader.onerror = ():void => reject('error')
+
+        fileReader.readAsText(
+            blob,
+            encoding.endsWith('-sig') ?
+                encoding.substring(0, encoding.length - '-sig'.length) :
+                encoding
+        )
+    })
 // endregion
 /**
  * Validateable checkbox wrapper component.
@@ -287,30 +323,38 @@ export const FileInputInner = function(
     }
     /**
      * Triggered when ever the value changes.
-     * @param event - Event object or new value.
+     * @param eventSourceOrName - Event object or new value.
      * @returns Nothing.
      */
-    const onChangeValue = (eventOrName:null|string|SyntheticEvent):void => {
+    const onChangeValue = (
+        eventSourceOrName:FileValue|null|string|SyntheticEvent
+    ):void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
 
         let event:SyntheticEvent|undefined
-        if (
+        if (eventSourceOrName === null)
+            properties.value = eventSourceOrName
+        else if (
             fileInputReference.current &&
-            (eventOrName as SyntheticEvent)?.target ===
+            (eventSourceOrName as SyntheticEvent).target ===
                 fileInputReference.current
         ) {
-            event = eventOrName as SyntheticEvent
-            const blob:File =
-                (event.target as unknown as {files:FileList}).files &&
-                (event.target as unknown as {files:FileList}).files[0]
-            properties.value = {blob, name: blob.name}
-        } else
+            event = eventSourceOrName as SyntheticEvent
+            if ((event.target as unknown as {files:FileList}).files?.length) {
+                const blob:File =
+                    (event.target as unknown as {files:FileList}).files[0]
+                properties.value = {blob, name: blob.name}
+            } else
+                return
+        } else if (typeof eventSourceOrName === 'string')
             /*
                 NOTE: A name can only be changed if a blob is available
                 beforehand.
             */
-            properties.value!.name = eventOrName as string
+            properties.value = {...properties.value, name: eventSourceOrName}
+        else if (typeof (eventSourceOrName as FileValue).source === 'string')
+            properties.value = eventSourceOrName as FileValue
 
         setValueState((oldValueState:ValueState):ValueState => {
             if (Tools.equals(oldValueState.value, properties.value))
@@ -421,6 +465,8 @@ export const FileInputInner = function(
     // endregion
     // region properties
     // / region references
+    const downloadLinkReference:RefObject<HTMLAnchorElement> =
+        createRef<HTMLAnchorElement>()
     const fileInputReference:RefObject<HTMLInputElement> =
         createRef<HTMLInputElement>()
     const nameInputReference:RefObject<InputAdapter<string>> =
@@ -459,7 +505,7 @@ export const FileInputInner = function(
     deriveMissingPropertiesFromState(givenProperties, valueState)
 
     const properties:Properties = getConsolidatedProperties(givenProperties)
-    // region synchronize properties i nto state where values are not controlled
+    // region synchronize properties into state where values are not controlled
     const currentValueState:ValueState = {
         modelState: properties.model.state,
         value: properties.value as FileValue|null
@@ -494,7 +540,48 @@ export const FileInputInner = function(
         })
     )
     // endregion
+    useEffect(():void => {
+        (async ():Promise<void> => {
+            if (properties.value?.blob && !properties.value.source) {
+                if (
+                    textMimeTypeRegularExpression.test(
+                        properties.value.blob.type
+                    ) &&
+                    representationType !== 'renderableText'
+                )
+                    properties.value.source =
+                        await readBinaryDataIntoText(properties.value.blob)
+                else {
+                    const source:string = typeof Blob === 'undefined' ?
+                        (properties.value.toString as
+                            unknown as
+                            (encoding:string) => string
+                        )('base64') :
+                        await blobToBase64String(properties.value.blob)
+                    properties.value.source =
+                        `data:${properties.value.blob.type};base64,${source}`
+                }
+
+                onChangeValue(Tools.copy(properties.value))
+            } else if (properties.value?.source && !properties.value.blob) {
+                if (properties.value.source.startsWith('data:'))
+                    properties.value.blob =
+                        dataURLToBlob(properties.value.source)
+                else
+                    properties.value.blob = new Blob(
+                        [properties.value.source],
+                        properties.sourceToBlobOptions
+                    )
+
+                onChangeValue(Tools.copy(properties.value))
+            }
+        })()
+    })
     // region render
+    const representationType:RepresentationType =
+        properties.value?.blob?.type ?
+            determineRepresentationType(properties.value.blob.type) :
+            'binary'
     const invalid:boolean = (
         properties.invalid &&
         (
@@ -521,10 +608,49 @@ export const FileInputInner = function(
         onFocus={onFocus}
     >
         <CardPrimaryAction>
-            <CardMedia {...properties.media} />
+            {properties.value?.blob && properties.value?.source ?
+                representationType === 'image' ?
+                <CardMedia
+                    {...properties.media}
+                    style={{
+                        backgroundImage: `url(${properties.value.source})`
+                    }}
+                /> :
+                representationType === 'video' ?
+                    <video autoPlay loop muted>
+                        <source
+                            src={properties.value.source}
+                            type={properties.value.blob.type}
+                        />
+                    </video> :
+                representationType === 'renderableText' ?
+                    <div className={
+                        styles['file-input__iframe-wrapper'] +
+                        ([
+                            'text/html', 'text/plain'
+                        ].includes(properties.value.blob.type) ?
+                            ` ${styles['file-input__iframe-wrapper--padding']}` :
+                            ''
+                        )
+                    }>
+                        <iframe
+                            frameBorder="no"
+                            scrolling="no"
+                            src={properties.value.source}
+                        />
+                    </div> :
+                representationType === 'text' ?
+                    <pre className={styles['file-input__text-representation']}>
+                        {properties.value.source}
+                    </pre> :
+                    '' :
+            properties.value?.blob || properties.value?.source ?
+                <CircularProgress size="large" /> :
+                ''
+            }
             <div>
                 {properties.name ?
-                    <Typography use="headline6" tag="h2">
+                    <Typography tag="h2" use="headline6">
                         {invalid ?
                             <Theme use="error">{properties.name}</Theme> :
                             properties.name
@@ -539,7 +665,12 @@ export const FileInputInner = function(
                         theme="textSecondaryOnBackground"
                         use="subtitle2"
                     >
-                        {properties.description}
+                        {invalid ?
+                            <Theme use="error">
+                                {properties.description}
+                            </Theme> :
+                            properties.description
+                        }
                     </Typography> :
                     ''
                 }
@@ -554,30 +685,20 @@ export const FileInputInner = function(
                     /> :
                     ''
                 }
-                {properties.declaration ?
-                    <Typography
-                        tag="div"
-                        theme="textSecondaryOnBackground"
-                        use="body1"
-                    >{invalid ?
-                        <Theme use="error">{properties.declaration}</Theme> :
-                        properties.declaration
-                    }</Typography> :
-                    ''
-                }
-                {/*TODO use template messages via declaration*/}
-                {properties.value?.blob ?
-                    <>
-                        Last modified date time: {Tools.dateTimeFormat(
-                            '${mediumDay}.${mediumMonth}.${fullYear}',
-                            new Date((properties.value?.blob as File)?.lastModified)
-                        )}
-                        <br />
-                        Mime-Typ: {properties.value?.blob.type}
-                        <br />
-                        Size: {properties.value?.blob.size}
-                    </> :
-                    ''
+                {properties.children ?
+                    properties.children({
+                        declaration: properties.declaration,
+                        invalid,
+                        properties,
+                        value: properties.value
+                    }) :
+                    properties.declaration ?
+                        <Typography
+                            tag="div"
+                            theme="textSecondaryOnBackground"
+                            use="body1"
+                        >{properties.declaration}</Typography> :
+                        ''
                 }
             </div>
             {/*TODO use "accept" attribute*/}
@@ -596,16 +717,44 @@ export const FileInputInner = function(
         </CardPrimaryAction>
         <CardActions>
             <CardActionButtons>
-                <CardActionButton
-                    onClick={():void => fileInputReference.current?.click()}
-                    ripple={properties.ripple}
-                >New</CardActionButton>
-                <CardActionButton ripple={properties.ripple}>
-                    Delete
-                </CardActionButton>
-                <CardActionButton ripple={properties.ripple}>
-                    Download
-                </CardActionButton>
+                {!properties.disabled ?
+                    <CardActionButton
+                        onClick={():void =>
+                            fileInputReference.current?.click()
+                        }
+                        ripple={properties.ripple}
+                    >{properties.value ? 'Edit' : 'New'}</CardActionButton> :
+                    ''
+                }
+                {properties.value ?
+                    <>
+                        <CardActionButton
+                            onClick={():void => onChangeValue(null)}
+                            ripple={properties.ripple}
+                        >
+                            Delete
+                        </CardActionButton>
+                        {properties.value.source ?
+                            <CardActionButton
+                                onClick={():void =>
+                                    downloadLinkReference.current?.click()
+                                }
+                                ripple={properties.ripple}
+                            >
+                                <a
+                                    className={styles['file-input__download']}
+                                    download={properties.value.name}
+                                    href={properties.value.source}
+                                    ref={downloadLinkReference}
+                                    target="_blank"
+                                    type={properties.value.blob?.type}
+                                >Download</a>
+                            </CardActionButton> :
+                            ''
+                        }
+                    </> :
+                    ''
+                }
             </CardActionButtons>
         </CardActions>
     </Card></WrapConfigurations>
