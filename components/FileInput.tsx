@@ -715,48 +715,55 @@ export const FileInputInner = function(
                 type="file"
             />
         </CardPrimaryAction>
-        <CardActions>
-            <CardActionButtons>
-                {!properties.disabled ?
-                    <CardActionButton
-                        onClick={():void =>
-                            fileInputReference.current?.click()
-                        }
-                        ripple={properties.ripple}
-                    >{properties.value ? 'Edit' : 'New'}</CardActionButton> :
-                    ''
-                }
-                {properties.value ?
-                    <>
+        {!properties.disabled || properties.value ?
+            <CardActions>
+                <CardActionButtons>
+                    {!properties.disabled ?
                         <CardActionButton
-                            onClick={():void => onChangeValue(null)}
+                            onClick={():void =>
+                                fileInputReference.current?.click()
+                            }
                             ripple={properties.ripple}
                         >
-                            Delete
-                        </CardActionButton>
-                        {properties.value.source ?
+                            {properties.value ? 'Edit' : 'New'}
+                        </CardActionButton> :
+                        ''
+                    }
+                    {properties.value ?
+                        <>
                             <CardActionButton
-                                onClick={():void =>
-                                    downloadLinkReference.current?.click()
-                                }
+                                onClick={():void => onChangeValue(null)}
                                 ripple={properties.ripple}
                             >
-                                <a
-                                    className={styles['file-input__download']}
-                                    download={properties.value.name}
-                                    href={properties.value.source}
-                                    ref={downloadLinkReference}
-                                    target="_blank"
-                                    type={properties.value.blob?.type}
-                                >Download</a>
-                            </CardActionButton> :
-                            ''
-                        }
-                    </> :
-                    ''
-                }
-            </CardActionButtons>
-        </CardActions>
+                                Delete
+                            </CardActionButton>
+                            {properties.value.source ?
+                                <CardActionButton
+                                    onClick={():void =>
+                                        downloadLinkReference.current?.click()
+                                    }
+                                    ripple={properties.ripple}
+                                >
+                                    <a
+                                        className={
+                                            styles['file-input__download']
+                                        }
+                                        download={properties.value.name}
+                                        href={properties.value.source}
+                                        ref={downloadLinkReference}
+                                        target="_blank"
+                                        type={properties.value.blob?.type}
+                                    >Download</a>
+                                </CardActionButton> :
+                                ''
+                            }
+                        </> :
+                        ''
+                    }
+                </CardActionButtons>
+            </CardActions> :
+            ''
+        }
     </Card></WrapConfigurations>
     // endregion
 } as ForwardRefRenderFunction<Adapter, Props>
