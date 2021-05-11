@@ -600,8 +600,7 @@ export const FileInputInner = function(
         tooltip={properties.tooltip}
     ><Card
         className={
-            styles['file-input'] +
-            (properties.className ? ` ${properties.className}` : '')
+            [styles['file-input']].concat(properties.className ?? []).join(' ')
         }
         onBlur={onBlur}
         onClick={onClick}
@@ -625,13 +624,14 @@ export const FileInputInner = function(
                     </video> :
                 representationType === 'renderableText' ?
                     <div className={
-                        styles['file-input__iframe-wrapper'] +
-                        ([
-                            'text/html', 'text/plain'
-                        ].includes(properties.value.blob.type) ?
-                            ` ${styles['file-input__iframe-wrapper--padding']}` :
-                            ''
+                        [styles['file-input__iframe-wrapper']].concat(
+                            ['text/html', 'text/plain'].includes(
+                                properties.value.blob.type
+                            ) ?
+                                styles['file-input__iframe-wrapper--padding'] :
+                                []
                         )
+                        .join(' ')
                     }>
                         <iframe
                             frameBorder="no"

@@ -1610,10 +1610,12 @@ export const GenericInputInner = function<Type = any>(
         strict={GenericInput.strict}
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
-    ><div className={
-        styles['generic-input'] +
-        (isAdvancedEditor ? ` ${styles['generic-input--custom']}` : '') +
-        (properties.className ? ` ${properties.className}` : '')
+    ><div className={[styles['generic-input']]
+        .concat(
+            isAdvancedEditor ? styles['generic-input--custom'] : [],
+            properties.className ?? []
+        )
+        .join(' ')
     }>
         <GenericAnimate
             in={Boolean(properties.selection) || Boolean(properties.labels)}
@@ -1642,21 +1644,25 @@ export const GenericInputInner = function<Type = any>(
         {wrapAnimationConditionally(
             [
                 <FormField
-                    className={
-                        'mdc-text-field' +
-                        (properties.disabled ?
-                            ' mdc-text-field--disabled' :
-                            ''
-                        ) +
-                        ' mdc-text-field--textarea'
+                    className={['mdc-text-field']
+                        .concat(
+                            properties.disabled ?
+                                'mdc-text-field--disabled' :
+                                [],
+                            'mdc-text-field--textarea'
+                        )
+                        .join(' ')
                     }
                     key="advanced-editor-form-field"
                 >
                     <label>
                         <span className={
-                            styles['generic-input__editor__label'] +
-                            ' mdc-floating-label' +
-                            ' mdc-floating-label--float-above'
+                            [styles['generic-input__editor__label']]
+                                .concat(
+                                    'mdc-floating-label',
+                                    'mdc-floating-label--float-above'
+                                )
+                                .join(' ')
                         }>
                             <Theme use={
                                 properties.invalid &&
@@ -1735,9 +1741,10 @@ export const GenericInputInner = function<Type = any>(
                     className="mdc-text-field-helper-line"
                     key="advanced-editor-helper-line"
                 >
-                    <p
-                        className="mdc-text-field-helper-text mdc-text-field-helper-text--persistent"
-                    >{(
+                    <p className={
+                        'mdc-text-field-helper-text' +
+                        ' mdc-text-field-helper-text--persistent'
+                    }>{(
                         materialProperties.helpText as {children:ReactElement}
                     ).children}</p>
                 </div>

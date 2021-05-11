@@ -420,8 +420,7 @@ export const InputsInner = function<
     >
         <div
             className={
-                styles.inputs +
-                (properties.className ? ` ${properties.className}` : '')
+                [styles.inputs].concat(properties.className ?? []).join(' ')
             }
             data-name={properties.name}
         >
@@ -442,9 +441,9 @@ export const InputsInner = function<
                         }
                     </div>
                 ) :
-                <div className={
-                    `${styles.inputs__item} ${styles['inputs__item--disabled']}`
-                }>
+                <div className={[
+                    styles.inputs__item, styles['inputs__item--disabled']
+                ].join(' ')}>
                     {renderInput(
                         properties.createPrototype!({
                             index: 0,

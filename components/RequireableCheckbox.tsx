@@ -398,9 +398,9 @@ export const RequireableCheckboxInner = function(
         strict={RequireableCheckbox.strict}
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
-    ><div className={
-        styles['requireable-checkbox'] +
-        (properties.className ? ` ${properties.className}` : '')
+    ><div className={[styles['requireable-checkbox']]
+        .concat(properties.className ?? [])
+        .join(' ')
     }>
         <Checkbox
             checked={Boolean(properties.value)}

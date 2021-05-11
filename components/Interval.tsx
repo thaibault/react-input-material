@@ -375,10 +375,12 @@ export const IntervalInner = ((
         themeConfiguration={properties.themeConfiguration}
     >
         <div
-            className={
-                styles.interval +
-                (properties.className ? ` ${properties.className}` : '') +
-                (properties.disabled ? ` ${styles['interval--disabled']}` : '')
+            className={[styles.interval]
+                .concat(
+                    properties.className ?? [],
+                    properties.disabled ? styles['interval--disabled'] : []
+                )
+                .join(' ')
             }
             data-name={properties.name}
         >
