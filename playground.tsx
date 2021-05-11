@@ -32,7 +32,13 @@ import {
 } from './index'
 import {useMemorizedValue} from './helper'
 import {
-    FileValue, InputProperties, IntervalProps, IntervalValue, Properties, Model
+    FileInputProps,
+    FileValue,
+    InputProperties,
+    IntervalProps,
+    IntervalValue,
+    Properties,
+    Model
 } from './type'
 // endregion
 Tools.locales.push('de-DE')
@@ -97,24 +103,24 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 {useMemorizedValue(({value}):null|ReactElement =>
                     value?.blob ?
                     <div style={{marginLeft: '10px'}}>
-                            {(value.blob as File).lastModified ?
-                                <>
-                                    Last modified date time:
-                                    {Tools.dateTimeFormat(
-                                        '${mediumDay}.${mediumMonth}.${fullYear}',
-                                        new Date(
-                                            (value.blob as File).lastModified
-                                        )
-                                    )}
-                                    <br />
-                                </> :
-                                ''
-                            }
-                            Mime-Typ: {value.blob.type}
-                            <br />
-                            Size: {value.blob.size}
-                        </div> :
-                        null
+                        {(value.blob as File).lastModified ?
+                            <>
+                                Last modified date time:
+                                {Tools.dateTimeFormat(
+                                    '${mediumDay}.${mediumMonth}.${fullYear}',
+                                    new Date(
+                                        (value.blob as File).lastModified
+                                    )
+                                )}
+                                <br />
+                            </> :
+                            ''
+                        }
+                        Mime-Typ: {value.blob.type}
+                        <br />
+                        Size: {value.blob.size}
+                    </div> :
+                    null
                 )}
             </FileInput>
             <FileInput
@@ -123,7 +129,6 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChangeValue={onChangeValue1}
                 value={value1}
             />
-            {/*TODO
 
             <GenericInput onChange={onChange} />
             <GenericInput
@@ -689,6 +694,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
+
             <Inputs
                 createPrototype={useMemorizedValue(
                     ({index, properties: {name}, prototype}) => ({
@@ -697,11 +703,30 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 )}
                 model={useMemorizedValue({
                     default: [{
-                        name: 'inputs1-1',
+                        name: 'inputs1-1'
+                    }],
+                    name: 'inputs1'
+                })}
+                onChange={onChange}
+                showInitialValidationState
+            >
+                {useMemorizedValue(({properties}):ReactElement =>
+                    <FileInput {...properties as FileInputProps} />
+                )}
+            </Inputs>
+            <Inputs
+                createPrototype={useMemorizedValue(
+                    ({index, properties: {name}, prototype}) => ({
+                        ...prototype, name: `${name}-${index + 1}`
+                    })
+                )}
+                model={useMemorizedValue({
+                    default: [{
+                        name: 'inputs2-1',
                         type: 'boolean',
                         value: false
                     }],
-                    name: 'inputs1'
+                    name: 'inputs2'
                 })}
                 onChange={onChange}
                 showInitialValidationState
@@ -718,10 +743,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 )}
                 model={useMemorizedValue({
                     default: [{
-                        name: 'inputs2-1',
+                        name: 'inputs3-1',
                         type: 'date'
                     }],
-                    name: 'inputs2'
+                    name: 'inputs3'
                 })}
                 onChange={onChange}
                 showInitialValidationState
@@ -731,12 +756,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 )}
             </Inputs>
             <Inputs
-                name="inputs3"
+                name="inputs4"
                 onChange={onChange}
                 onChangeValue={onChangeValue6}
                 value={value6}
             />
-*/}
         </div>
 
         {selectedState ?
