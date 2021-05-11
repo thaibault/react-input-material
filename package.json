@@ -134,6 +134,7 @@
     "@types/react": "*",
     "@types/react-dom": "*",
     "@types/react-transition-group": "*",
+    "blob-util": "*",
     "clientnode": "*",
     "material-icons": "*",
     "react": "*",
