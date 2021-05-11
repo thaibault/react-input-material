@@ -341,7 +341,7 @@ export const FileInputInner = function(
                 fileInputReference.current
         ) {
             event = eventSourceOrName as SyntheticEvent
-            if (eventSourceOrName.target.files?.length) {
+            if ((event.target as unknown as {files:FileList}).files?.length) {
                 const blob:File =
                     (event.target as unknown as {files:FileList}).files[0]
                 properties.value = {blob, name: blob.name}
@@ -352,7 +352,7 @@ export const FileInputInner = function(
                 NOTE: A name can only be changed if a blob is available
                 beforehand.
             */
-            properties.value!.name = eventSourceOrName
+            properties.value = {...properties.value, name: eventSourceOrName}
         else if (typeof (eventSourceOrName as FileValue).source === 'string')
             properties.value = eventSourceOrName as FileValue
 
@@ -465,7 +465,8 @@ export const FileInputInner = function(
     // endregion
     // region properties
     // / region references
-    const downloadLinkReference:RefObject<AElement> = createRef<AElement>()
+    const downloadLinkReference:RefObject<HTMLAnchorElement> =
+        createRef<HTMLAnchorElement>()
     const fileInputReference:RefObject<HTMLInputElement> =
         createRef<HTMLInputElement>()
     const nameInputReference:RefObject<InputAdapter<string>> =
@@ -561,7 +562,7 @@ export const FileInputInner = function(
                         `data:${properties.value.blob.type};base64,${source}`
                 }
 
-                onChangeValue(properties.value)
+                onChangeValue(Tools.copy(properties.value))
             } else if (properties.value?.source && !properties.value.blob) {
                 if (properties.value.source.startsWith('data:'))
                     properties.value.blob =
@@ -572,11 +573,10 @@ export const FileInputInner = function(
                         properties.sourceToBlobOptions
                     )
 
-                onChangeValue(properties.value)
+                onChangeValue(Tools.copy(properties.value))
             }
         })()
     })
-    console.log('TODO', properties.value)
     // region render
     const representationType:RepresentationType =
         properties.value?.blob?.type ?
@@ -634,7 +634,7 @@ export const FileInputInner = function(
                         )
                     }>
                         <iframe
-                            frameborder="no"
+                            frameBorder="no"
                             scrolling="no"
                             src={properties.value.source}
                         />
@@ -644,9 +644,9 @@ export const FileInputInner = function(
                         {properties.value.source}
                     </pre> :
                     '' :
-                properties.value?.blob || properties.value?.source ?
-                    <CircularProgress size="large" /> :
-                    ''
+            properties.value?.blob || properties.value?.source ?
+                <CircularProgress size="large" /> :
+                ''
             }
             <div>
                 {properties.name ?

@@ -32,7 +32,7 @@ import {
 } from './index'
 import {useMemorizedValue} from './helper'
 import {
-    InputProperties, IntervalProps, IntervalValue, Properties, Model
+    FileValue, InputProperties, IntervalProps, IntervalValue, Properties, Model
 } from './type'
 // endregion
 Tools.locales.push('de-DE')
@@ -50,11 +50,12 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         ():void => setFadeState((value:boolean):boolean => !value), 2 * 1000
     ).clear)
     // region controlled state
-    const [value1, setValue1] = useState<string>({
+    const [value1, setValue1] = useState<FileValue|null>({
         blob: new Blob(['test'], {type: 'text/plain'}),
         name: 'test.txt'
     })
-    const onChangeValue1 = useMemorizedValue<(value:string) => void>(setValue1)
+    const onChangeValue1 = useMemorizedValue<(value:FileValue|null) =>
+        void>(setValue1)
 
     const [value2, setValue2] = useState<string>('')
     const onChangeValue2 = useMemorizedValue<(value:string) => void>(setValue2)
@@ -88,15 +89,27 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     return (<>
         <div className="playground__inputs">
             <FileInput onChange={onChange} />
-            <FileInput name="UnControlled" onChange={onChange}>
+            <FileInput
+                default={value1}
+                name="UnControlled"
+                onChange={onChange}
+            >
                 {useMemorizedValue(({value}):null|ReactElement =>
                     value?.blob ?
-                        <div style={{marginLeft: '10px'}}>
-                            Last modified date time: {Tools.dateTimeFormat(
-                                '${mediumDay}.${mediumMonth}.${fullYear}',
-                                new Date((value.blob as File).lastModified)
-                            )}
-                            <br />
+                    <div style={{marginLeft: '10px'}}>
+                            {(value.blob as File).lastModified ?
+                                <>
+                                    Last modified date time:
+                                    {Tools.dateTimeFormat(
+                                        '${mediumDay}.${mediumMonth}.${fullYear}',
+                                        new Date(
+                                            (value.blob as File).lastModified
+                                        )
+                                    )}
+                                    <br />
+                                </> :
+                                ''
+                            }
                             Mime-Typ: {value.blob.type}
                             <br />
                             Size: {value.blob.size}
