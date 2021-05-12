@@ -542,7 +542,11 @@ export const FileInputInner = function(
     // endregion
     useEffect(():void => {
         (async ():Promise<void> => {
-            if (properties.value?.blob && !properties.value.source) {
+            if (
+                properties.value?.blob &&
+                properties.value.blob instanceof Blob &&
+                !properties.value.source
+            ) {
                 if (
                     textMimeTypeRegularExpression.test(
                         properties.value.blob.type
@@ -635,7 +639,7 @@ export const FileInputInner = function(
                     <div className={
                         [styles['file-input__iframe-wrapper']].concat(
                             ['text/html', 'text/plain'].includes(
-                                properties.value.blob!.type
+                                properties.value.blob!.type!
                             ) ?
                                 styles['file-input__iframe-wrapper--padding'] :
                                 []

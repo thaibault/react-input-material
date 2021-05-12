@@ -368,6 +368,14 @@ export const InputsInner = function<
             state setter.
         */
         setValues = createDummyStateSetter<Array<P['value']>|null>(values)
+
+    properties.invalidMaximumNumber =
+        properties.model.state.invalidMaximumNumber =
+        properties.maximumNumber < (properties.value?.length || 0)
+    properties.invalidMinimumNumber =
+        properties.model.state.invalidMinimumNumber =
+        properties.minimumNumber > (properties.value?.length || 0)
+
     useImperativeHandle(
         reference,
         ():AdapterWithReferences<P> => ({
