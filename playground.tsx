@@ -96,31 +96,40 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         <div className="playground__inputs">
             <FileInput onChange={onChange} />
             <FileInput
-                default={value1}
+                default={useMemorizedValue(
+                    {
+                        blob: {type: 'image/png'},
+                        source: 'https://via.placeholder.com/150'
+                    }
+                )}
                 name="UnControlled"
                 onChange={onChange}
             >
                 {useMemorizedValue(({value}):null|ReactElement =>
                     value?.blob ?
-                    <div style={{marginLeft: '10px'}}>
-                        {(value.blob as File).lastModified ?
-                            <>
-                                Last modified date time:
-                                {Tools.dateTimeFormat(
-                                    '${mediumDay}.${mediumMonth}.${fullYear}',
-                                    new Date(
-                                        (value.blob as File).lastModified
-                                    )
-                                )}
-                                <br />
-                            </> :
-                            ''
-                        }
-                        Mime-Typ: {value.blob.type}
-                        <br />
-                        Size: {value.blob.size}
-                    </div> :
-                    null
+                        <ul>
+                            {(value.blob as File).lastModified ?
+                                <li>
+                                    Last modified date time:
+                                    {Tools.dateTimeFormat(
+                                        '${mediumDay}.${mediumMonth}.${fullYear}',
+                                        new Date(
+                                            (value.blob as File).lastModified
+                                        )
+                                    )}
+                                </li> :
+                                ''
+                            }
+                            {(value.blob as File).type ?
+                                <li>Mime-Typ: {value.blob.type}</li> :
+                                ''
+                            }
+                            {typeof (value.blob as File).size === 'number' ?
+                                <li>Size: {value.blob.size}</li> :
+                                ''
+                            }
+                        </ul> :
+                        null
                 )}
             </FileInput>
             <FileInput
@@ -717,6 +726,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                         ...prototype, name: `${name}-${index + 1}`
                     })
                 )}
+                maximumNumber={2}
+                minimumNumber={2}
                 model={useMemorizedValue({
                     default: [{
                         name: 'inputs2-1',

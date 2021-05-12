@@ -227,6 +227,11 @@ export const InputsInner = function<
             )
         )
 
+    /*TODO
+    const modelState:ModelState = getModelState<P>(properties)
+    console.log('TODO', properties.invalidMinimumNumber)
+     */
+
     const triggerOnChange = (
         values:Array<P>|null,
         event?:GenericEvent,
@@ -363,6 +368,14 @@ export const InputsInner = function<
             state setter.
         */
         setValues = createDummyStateSetter<Array<P['value']>|null>(values)
+
+    properties.invalidMaximumNumber =
+        properties.model.state.invalidMaximumNumber =
+        properties.maximumNumber < (properties.value?.length || 0)
+    properties.invalidMinimumNumber =
+        properties.model.state.invalidMinimumNumber =
+        properties.minimumNumber > (properties.value?.length || 0)
+
     useImperativeHandle(
         reference,
         ():AdapterWithReferences<P> => ({
@@ -472,9 +485,14 @@ export const InputsInner = function<
                 </div>
             }
 
-            {
-                (properties.disabled || !properties.value) &&
-                !properties.invalidMaximumNumber ?
+            {(
+                properties.disabled ||
+                !properties.value ||
+                properties.invalidMaximumNumber ||
+                properties.value.some(({value}):boolean =>
+                    [null, undefined].includes(value)
+                )
+            ) ?
                 '' :
                 <div className={styles.inputs__add}>{addButton}</div>
             }
