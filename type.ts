@@ -756,18 +756,26 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 // // endregion
 // / endregion
 // / region inputs
+export type InputsModelState =
+    ModelState &
+    {
+        invalidMaximumNumber:boolean
+        invalidMinimumNumber:boolean
+    }
 export type InputsModel<M extends Partial<Model> = Partial<Model>> =
     Model<Array<M>> &
     {
-        maximumLength:number
-        minimumLength:number
-        state:ModelState
+        maximumNumber:number
+        minimumNumber:number
+        state:InputsModelState
         writable:boolean
     }
 export type AdditionalInputsProperties<P extends Properties = Properties> =
-    ModelState &
+    InputsModelState &
     {
         addIcon:IconOptions
+        maximumNumber:number
+        minimumNumber:number
         model:InputsModel<P['model']>
         removeIcon:IconOptions
         value:Array<P>|null
@@ -819,13 +827,16 @@ export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...inputModelStatePropertyTypes,
     // We use that function (render prop) to produce input component instances.
     children: func,
-    createPrototype: func
+    createPrototype: func,
+    maximumNumber: number,
+    minimumNumber: number
 } as const
 export const inputsRenderProperties:Array<string> =
     ['children', 'createPrototype']
 export const defaultInputsModel:InputsModel = {
     ...defaultModel,
-    minimumLength: 0,
+    maximumNumber: Infinity,
+    minimumNumber: 0,
     type: 'string[]'
 } as const
 /*
