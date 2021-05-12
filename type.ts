@@ -610,7 +610,7 @@ export const defaultInputProperties:DefaultInputProperties = {
 export type FileRepresentationType =
     'binary'|'image'|'renderableText'|'text'|'video'
 export type FileValue = {
-    blob?:Blob|null
+    blob?:Partial<Blob>|null
     name?:null|string
     source?:null|string
 }
@@ -835,6 +835,11 @@ export const inputsRenderProperties:Array<string> =
     ['children', 'createPrototype']
 export const defaultInputsModel:InputsModel = {
     ...defaultModel,
+    state: {
+        ...defaultModel.state,
+        invalidMaximumNumber: false,
+        invalidMinimumNumber: false
+    },
     maximumNumber: Infinity,
     minimumNumber: 0,
     type: 'string[]'

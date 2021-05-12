@@ -564,16 +564,25 @@ export const FileInputInner = function(
 
                 onChangeValue(Tools.copy(properties.value))
             } else if (properties.value?.source && !properties.value.blob) {
-                if (properties.value.source.startsWith('data:'))
+                if (properties.value.source.startsWith('data:')) {
                     properties.value.blob =
                         dataURLToBlob(properties.value.source)
-                else
+
+                    onChangeValue(Tools.copy(properties.value))
+                } else if (
+                    properties.sourceToBlobOptions &&
+                    !['/', 'file://', 'http://', 'https://'].some(
+                        (prefix:string):boolean =>
+                            properties.value!.source!.startsWith(prefix)
+                    )
+                ) {
                     properties.value.blob = new Blob(
                         [properties.value.source],
                         properties.sourceToBlobOptions
                     )
 
-                onChangeValue(Tools.copy(properties.value))
+                    onChangeValue(Tools.copy(properties.value))
+                }
             }
         })()
     })
@@ -607,7 +616,7 @@ export const FileInputInner = function(
         onFocus={onFocus}
     >
         <CardPrimaryAction>
-            {properties.value?.blob && properties.value?.source ?
+            {properties.value?.source ?
                 representationType === 'image' ?
                 <CardMedia
                     {...properties.media}
@@ -619,14 +628,14 @@ export const FileInputInner = function(
                     <video autoPlay loop muted>
                         <source
                             src={properties.value.source}
-                            type={properties.value.blob.type}
+                            type={properties.value.blob!.type}
                         />
                     </video> :
                 representationType === 'renderableText' ?
                     <div className={
                         [styles['file-input__iframe-wrapper']].concat(
                             ['text/html', 'text/plain'].includes(
-                                properties.value.blob.type
+                                properties.value.blob!.type
                             ) ?
                                 styles['file-input__iframe-wrapper--padding'] :
                                 []
@@ -644,7 +653,7 @@ export const FileInputInner = function(
                         {properties.value.source}
                     </pre> :
                     '' :
-            properties.value?.blob || properties.value?.source ?
+            properties.value?.blob ?
                 <CircularProgress size="large" /> :
                 ''
             }
@@ -678,6 +687,7 @@ export const FileInputInner = function(
                     <GenericInput
                         disabled={properties.disabled}
                         {...properties.fileName as InputProps<string>}
+                        emptyEqualsNull={false}
                         onChangeValue={onChangeValue}
                         ref={nameInputReference as any}
                         required
@@ -752,7 +762,12 @@ export const FileInputInner = function(
                                         href={properties.value.source}
                                         ref={downloadLinkReference}
                                         target="_blank"
-                                        type={properties.value.blob?.type}
+                                        {...(properties.value.blob?.type ?
+                                            {type:
+                                                properties.value.blob.type
+                                            } :
+                                            {}
+                                        )}
                                     >Download</a>
                                 </CardActionButton> :
                                 ''
