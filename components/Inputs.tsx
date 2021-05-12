@@ -16,7 +16,7 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports
+// region imports 
 import Tools from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import {
@@ -51,11 +51,11 @@ import {
     InputsAdapter as Adapter,
     InputsAdapterWithReferences as AdapterWithReferences,
     InputsModel as Model,
+    InputsModelState as ModelState,
     InputsProperties,
     inputsPropertyTypes as propertyTypes,
     InputsProps,
     inputsRenderProperties as renderProperties,
-    ModelState,
     Properties,
     StaticComponent
 } from '../type'
@@ -83,28 +83,39 @@ const inputPropertiesToValues = function<P extends Properties>(
         inputProperties
 }
 const getModelState = function<P extends Properties>(
-    inputProperties:Array<P>
+    inputsProperties:InputsProperties<P>
 ):ModelState {
+    const properties:Array<P> = inputsProperties.value || []
+
     const unpack = (name:keyof P, defaultValue:boolean = false) =>
         (properties:P):boolean =>
             properties[name] as unknown as boolean ?? defaultValue
 
+    const validMaximumNumber:boolean =
+        inputsProperties.maximumNumber >= properties.length
+    const validMinimumNumber:boolean =
+        inputsProperties.minimumNumber <= properties.length
+
+    const valid:boolean = validMaximumNumber && validMinimumNumber
+
     return {
-        dirty: inputProperties.some(unpack('dirty')),
-        focused: inputProperties.some(unpack('focused')),
-        invalid: inputProperties.some(unpack('invalid', true)),
-        invalidRequired: inputProperties.some(unpack('invalidRequired')),
-        pristine: inputProperties.every(unpack('pristine', true)),
-        touched: inputProperties.some(unpack('touched')),
-        untouched: inputProperties.every(unpack('untouched', true)),
-        valid: inputProperties.every(unpack('valid')),
-        visited: inputProperties.some(unpack('visited'))
+        dirty: properties.some(unpack('dirty')),
+        focused: properties.some(unpack('focused')),
+        invalid: !valid || properties.some(unpack('invalid', true)),
+        invalidMaximumNumber: !validMaximumNumber,
+        invalidMinimumNumber: !validMinimumNumber,
+        invalidRequired: properties.some(unpack('invalidRequired')),
+        pristine: properties.every(unpack('pristine', true)),
+        touched: properties.some(unpack('touched')),
+        untouched: properties.every(unpack('untouched', true)),
+        valid: valid && properties.every(unpack('valid')),
+        visited: properties.some(unpack('visited'))
     }
 }
 const getExternalProperties = function<P extends Properties>(
     properties:InputsProperties<P>
 ):InputsProperties<P> {
-    const modelState:ModelState = getModelState<P>(properties.value || [])
+    const modelState:ModelState = getModelState<P>(properties)
 
     return {
         ...properties,
@@ -457,11 +468,13 @@ export const InputsInner = function<
                         0
                     )}
 
-                    {addButton}
+                    {properties.invalidMaximumNumber ? null : addButton}
                 </div>
             }
 
-            {properties.disabled || !properties.value ?
+            {
+                (properties.disabled || !properties.value) &&
+                !properties.invalidMaximumNumber ?
                 '' :
                 <div className={styles.inputs__add}>{addButton}</div>
             }
