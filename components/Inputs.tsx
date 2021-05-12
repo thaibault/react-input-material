@@ -227,11 +227,6 @@ export const InputsInner = function<
             )
         )
 
-    /*TODO
-    const modelState:ModelState = getModelState<P>(properties)
-    console.log('TODO', properties.invalidMinimumNumber)
-     */
-
     const triggerOnChange = (
         values:Array<P>|null,
         event?:GenericEvent,
@@ -481,13 +476,14 @@ export const InputsInner = function<
                         0
                     )}
 
-                    {properties.invalidMaximumNumber ? null : addButton}
+                    {0 < properties.maximumNumber ? addButton : null}
                 </div>
             }
 
             {(
                 properties.disabled ||
                 !properties.value ||
+                properties.maximumNumber <= properties.value.length ||
                 properties.invalidMaximumNumber ||
                 properties.value.some(({value}):boolean =>
                     [null, undefined].includes(value)
