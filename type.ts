@@ -636,17 +636,21 @@ export type FileInputValueState =
 export type AdditionalFileInputProperties =
     FileInputModelState &
     {
+        deleteButton:ReactElement|string
+        downloadButton:ReactElement|string
+        editButton:ReactElement|string
         encoding:string
         fileName:InputProperties<string>
         maximumSizeText:string
         media:CardMediaProps
         minimumSizeText:string
-        model:FileInputModel
-        outlined:boolean
         mimeTypePattern:RegExp|string
         mimeTypePatternText:string
+        model:FileInputModel
         namePattern:RegExp|string
         namePatternText:string
+        newButton:ReactElement|string
+        outlined:boolean
         sourceToBlobOptions:{
             endings?:'native'|'transparent'
             type?:string
@@ -702,10 +706,14 @@ export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
     ...fileInputModelStatePropertyTypes,
     children: func,
+    deleteButton: oneOfType([object, string]),
+    downloadButton: oneOfType([object, string]),
+    editButton: oneOfType([object, string]),
     encoding: string,
     fileName: shape<any>(inputPropertyTypes),
     maximumSizeText: string,
     minimumSizeText: string,
+    newButton: oneOfType([object, string]),
     onBlur: func,
     outlined: boolean,
     mimeTypePatternText: string,
@@ -732,6 +740,9 @@ export const defaultFileInputModel:FileInputModel = {
 */
 export const defaultFileInputProperties:DefaultFileInputProperties = {
     ...defaultProperties,
+    deleteButton: 'delete',
+    downloadButton: 'download',
+    editButton: 'edit',
     encoding: 'utf-8',
     fileName: {
         ...defaultInputProperties as InputProperties<string>,
@@ -751,6 +762,7 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
     model: {...defaultFileInputModel},
     namePatternText:
         'Your file\'s name has to match the regular expression: "${pattern}".',
+    newButton: 'new',
     sourceToBlobOptions: {endings: 'transparent', type: 'text/plain'}
 } as const
 // // endregion

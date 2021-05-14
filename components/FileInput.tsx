@@ -739,7 +739,10 @@ export const FileInputInner = function(
                             }
                             ripple={properties.ripple}
                         >
-                            {properties.value ? 'Edit' : 'New'}
+                            {properties.value ?
+                                properties.editButton :
+                                properties.newButton
+                            }
                         </CardActionButton> :
                         ''
                     }
@@ -748,9 +751,7 @@ export const FileInputInner = function(
                             <CardActionButton
                                 onClick={():void => onChangeValue(null)}
                                 ripple={properties.ripple}
-                            >
-                                Delete
-                            </CardActionButton>
+                            >{properties.deleteButton}</CardActionButton>
                             {properties.value.source ?
                                 <CardActionButton
                                     onClick={():void =>
@@ -772,7 +773,7 @@ export const FileInputInner = function(
                                             } :
                                             {}
                                         )}
-                                    >Download</a>
+                                    >{properties.downloadButton}</a>
                                 </CardActionButton> :
                                 ''
                             }
