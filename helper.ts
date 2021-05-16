@@ -259,10 +259,11 @@ export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
     properties:P, defaultModel:M
 ):P => {
     /*
-        NOTE: Default props seems not to respect nested layers to merge so
-        we have to manage this for nested model structure.
+        NOTE: Default props seems not to respect nested layers to merge so we
+        have to manage this for nested model structure.
     */
     const result:P & {
+        invertedPattern?:string
         model:M
         pattern?:string
     } = Tools.extend(true, {model: Tools.copy(defaultModel)}, properties)
@@ -319,10 +320,11 @@ export const getConsolidatedProperties = <
     P extends BaseProps, R extends BaseProperties
 >(properties:P):R => {
     type Result = R & {
+        invertedPattern?:null|RegExp|string
         invertedRegularExpressionPattern?:null|RegExp|string
         mutable?:boolean
-        pattern?:RegExp|string
         nullable?:boolean
+        pattern?:RegExp|string
         regularExpressionPattern?:null|RegExp|string
         state?:null
         writable?:boolean

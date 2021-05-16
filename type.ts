@@ -742,7 +742,7 @@ export const defaultFileInputModel:FileInputModel = {
     ...defaultModel,
     contentTypeRegularExpressionPattern: /^.+\/.+$/,
     fileName: {
-        ...defaultModel,
+        ...defaultInputModel,
         maximumLength: 1024,
         name: 'Name',
         regularExpressionPattern: /^[^\/]+$/

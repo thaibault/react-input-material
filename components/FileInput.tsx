@@ -147,7 +147,7 @@ export const determineValidationState = (
             typeof properties.model.value?.name === 'string' &&
             (
                 typeof properties.model
-                    .fileName?.regularExpressionNamePattern === 'string' &&
+                    .fileName?.regularExpressionPattern === 'string' &&
                 !(new RegExp(
                     properties.model.fileName.regularExpressionPattern
                 )).test(properties.model.value.name) ||

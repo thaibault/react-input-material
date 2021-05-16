@@ -545,7 +545,7 @@ export const GenericInputInner = function<Type = any>(
                 properties.minimumText ||
                 properties.invalidMinimumLength &&
                 properties.minimumLengthText ||
-                properties.invertedInvalidPattern &&
+                properties.invalidInvertedPattern &&
                 properties.invertedPatternText ||
                 properties.invalidPattern &&
                 properties.patternText ||
