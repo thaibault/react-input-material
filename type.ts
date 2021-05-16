@@ -72,6 +72,7 @@ export type BaseModel<Type = any> = {
     default:null|Type
     description:string
     emptyEqualsNull:boolean
+    invertedRegularExpressionPattern:null|RegExp|string
     maximum:number|string
     maximumLength:number
     minimum:number|string
@@ -238,6 +239,7 @@ export const modelStatePropertyTypes:{
 export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...baseModelPropertyTypes,
     emptyEqualsNull: boolean,
+    invertedRegularExpressionPattern: oneOfType([object, string]),
     maximum: oneOfType([number, string]),
     maximumLength: number,
     minimum: oneOfType([number, string]),
@@ -293,6 +295,7 @@ export const defaultModel:Model = {
     default: null,
     description: '',
     emptyEqualsNull: true,
+    invertedRegularExpressionPattern: null,
     maximum: Infinity,
     maximumLength: -1,
     minimum: -Infinity,
@@ -373,6 +376,7 @@ export type InputModelState =
         invalidMinimum:boolean
         invalidMinimumLength:boolean
         invalidPattern:boolean
+        invalidInvertedPattern:boolean
     }
 export type InputModel<Type = any> =
     Omit<Model<Type>, 'state'> &
@@ -400,6 +404,7 @@ export type AdditionalInputProperties<Type> =
         fullWidth:boolean
         hidden:boolean
         icon:string|(IconOptions & {tooltip?:string|TooltipProps})
+        invertedPatternText:string
         labels:Array<string>|Mapping
         maximumLengthText:string
         maximumText:string
@@ -504,6 +509,7 @@ export const inputModelStatePropertyTypes:{
     [key in keyof InputModelState]:Requireable<boolean|symbol>
 } = {
     ...modelStatePropertyTypes,
+    invalidInvertedPattern: oneOfType([boolean, symbol]),
     invalidMaximum: oneOfType([boolean, symbol]),
     invalidMaximumLength: oneOfType([boolean, symbol]),
     invalidMinimum: oneOfType([boolean, symbol]),
@@ -548,6 +554,7 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
         icon?:string|(IconOptions & {tooltip?:string|TooltipProps})
     */
     icon: oneOfType([string, object]),
+    invertedPatternText: string,
     labels: oneOfType([arrayOf(string), object]),
     maximumLengthText: string,
     maximumText: string,
@@ -570,6 +577,7 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
 } as const
 export const defaultInputModelState:InputModelState = {
     ...defaultModelState,
+    invalidInvertedPattern: false,
     invalidMaximum: false,
     invalidMaximumLength: false,
     invalidMinimum: false,
@@ -591,6 +599,8 @@ export const defaultInputProperties:DefaultInputProperties = {
         start: 0
     },
     editor: 'plain',
+    invertedPatternText:
+        'Your string should not match the regular expression: "${invertedPattern}".',
     maximumLengthText:
         'Please type less or equal than ${maximumLength} symbols.',
     maximumText: 'Please type less or equal than ${formatValue(maximum)}.',
@@ -620,16 +630,17 @@ export type FileInputModelState =
     {
         invalidMaximumSize:boolean
         invalidMinimumSize:boolean
-        invalidMimeTypePattern:boolean
+        invalidContentTypePattern:boolean
         invalidNamePattern:boolean
     }
 export type FileInputModel =
     Omit<Model<FileValue>, 'state'> &
     {
+        contentTypeRegularExpressionPattern:null|RegExp|string
+        invertedContentTypeRegularExpressionPattern:null|RegExp|string
         maximumSize:number
         minimumSize:number
-        regularExpressionMimeTypePattern:RegExp|string
-        regularExpressionNamePattern:RegExp|string
+        fileName:InputModel
         state:FileInputModelState
     }
 export type FileInputValueState =
@@ -637,19 +648,19 @@ export type FileInputValueState =
 export type AdditionalFileInputProperties =
     FileInputModelState &
     {
+        contentTypePattern:null|RegExp|string
+        contentTypePatternText:string
         deleteButton:ReactElement|string
         downloadButton:ReactElement|string
         editButton:ReactElement|string
         encoding:string
         fileName:InputProperties<string>
+        invertedContentTypePattern:null|RegExp|string
+        invertedContentTypePatternText:string
         maximumSizeText:string
         media:CardMediaProps
         minimumSizeText:string
-        mimeTypePattern:RegExp|string
-        mimeTypePatternText:string
         model:FileInputModel
-        namePattern:RegExp|string
-        namePatternText:string
         newButton:ReactElement|string
         outlined:boolean
         sourceToBlobOptions:{
@@ -700,39 +711,45 @@ export const fileInputModelStatePropertyTypes:{
     ...modelStatePropertyTypes,
     invalidMaximumSize: oneOfType([boolean, symbol]),
     invalidMinimumSize: oneOfType([boolean, symbol]),
-    invalidMimeTypePattern: oneOfType([boolean, symbol]),
+    invalidContentTypePattern: oneOfType([boolean, symbol]),
     invalidNamePattern: oneOfType([boolean, symbol])
 } as const
 export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
     ...fileInputModelStatePropertyTypes,
     children: func,
+    contentTypePatternText: string,
     deleteButton: oneOfType([object, string]),
     downloadButton: oneOfType([object, string]),
     editButton: oneOfType([object, string]),
     encoding: string,
     fileName: shape<any>(inputPropertyTypes),
+    invertedContentTypePatternText: string,
     maximumSizeText: string,
     minimumSizeText: string,
     newButton: oneOfType([object, string]),
     onBlur: func,
-    outlined: boolean,
-    mimeTypePatternText: string,
-    namePatternText: string
+    outlined: boolean
 } as const
 export const defaultFileInputModelState:FileInputModelState = {
     ...defaultModelState,
     invalidMaximumSize: false,
     invalidMinimumSize: false,
-    invalidMimeTypePattern: false,
+    invalidContentTypePattern: false,
     invalidNamePattern: false
 } as const
 export const defaultFileInputModel:FileInputModel = {
     ...defaultModel,
+    contentTypeRegularExpressionPattern: /^.+\/.+$/,
+    fileName: {
+        ...defaultModel,
+        maximumLength: 1024,
+        name: 'Name',
+        regularExpressionPattern: /^[^\/]+$/
+    },
+    invertedContentTypeRegularExpressionPattern: null,
     maximumSize: Infinity,
     minimumSize: 0,
-    regularExpressionMimeTypePattern: /^.+\/.+$/,
-    regularExpressionNamePattern: /^.+$/,
     state: defaultFileInputModelState
 } as const
 /*
@@ -741,28 +758,32 @@ export const defaultFileInputModel:FileInputModel = {
 */
 export const defaultFileInputProperties:DefaultFileInputProperties = {
     ...defaultProperties,
+    contentTypePatternText:
+        'Your file\'s mime-type has to match the regular expression: "' +
+        '${contentTypePattern}".',
     deleteButton: 'delete',
     downloadButton: 'download',
     editButton: 'edit',
     encoding: 'utf-8',
     fileName: {
         ...defaultInputProperties as InputProperties<string>,
-        maximumLength: 1024,
-        name: 'Name',
-        pattern: /^[^\/]+$/
+        patternText:
+            'Your file\'s name has to match the regular expression: "' +
+            '${fileName.pattern}".'
     },
+    invertedContentTypePatternText:
+        'Your file\'s mime-type should not match the regular expression: "' +
+        '${invertedContentTypePattern}".',
     maximumSizeText:
-        'Please provide a file with less or equal size than ${maximumSize} byte.',
+        'Please provide a file with less or equal size than ${maximumSize} ' +
+        'byte.',
     media: {
         sixteenByNine: true
     },
-    mimeTypePatternText:
-        'Your file\'s mime-type has to match the regular expression: "${pattern}".',
     minimumSizeText:
-        'Please provide a file with more or equal size than ${maximumSize} byte.',
+        'Please provide a file with more or equal size than ${maximumSize} ' +
+        'byte.',
     model: {...defaultFileInputModel},
-    namePatternText:
-        'Your file\'s name has to match the regular expression: "${pattern}".',
     newButton: 'new',
     sourceToBlobOptions: {endings: 'transparent', type: 'text/plain'}
 } as const

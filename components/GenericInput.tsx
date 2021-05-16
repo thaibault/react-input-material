@@ -297,6 +297,22 @@ export function determineValidationState<Type = any>(
                 typeof properties.model.value === 'string' &&
                 properties.model.value.length < properties.model.minimumLength
             ),
+            invalidInvertedPattern: ():boolean => (
+                typeof properties.model.value === 'string' &&
+                (
+                    typeof properties.model
+                        .invertedRegularExpressionPattern === 'string' &&
+                    (new RegExp(
+                        properties.model.invertedRegularExpressionPattern
+                    )).test(properties.model.value) ||
+                    properties.model
+                        .invertedRegularExpressionPattern !== null &&
+                    typeof properties.model
+                        .invertedRegularExpressionPattern === 'object' &&
+                    properties.model.invertedRegularExpressionPattern
+                        .test(properties.model.value)
+                )
+            ),
             invalidPattern: ():boolean => (
                 typeof properties.model.value === 'string' &&
                 (
@@ -529,6 +545,8 @@ export const GenericInputInner = function<Type = any>(
                 properties.minimumText ||
                 properties.invalidMinimumLength &&
                 properties.minimumLengthText ||
+                properties.invertedInvalidPattern &&
+                properties.invertedPatternText ||
                 properties.invalidPattern &&
                 properties.patternText ||
                 properties.invalidRequired &&

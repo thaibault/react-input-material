@@ -271,6 +271,10 @@ export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
         result.model.mutable = false
         delete result.disabled
     }
+    if (result.invertedPattern) {
+        result.model.invertedRegularExpressionPattern = result.invertedPattern
+        delete result.invertedPattern
+    }
     if (result.pattern) {
         result.model.regularExpressionPattern = result.pattern
         delete result.pattern
@@ -315,6 +319,7 @@ export const getConsolidatedProperties = <
     P extends BaseProps, R extends BaseProperties
 >(properties:P):R => {
     type Result = R & {
+        invertedRegularExpressionPattern?:null|RegExp|string
         mutable?:boolean
         pattern?:RegExp|string
         nullable?:boolean
@@ -338,6 +343,11 @@ export const getConsolidatedProperties = <
     result.required = !result.nullable
     delete result.nullable
 
+    if (result.invertedRegularExpressionPattern)
+        result.invertedPattern = result.invertedRegularExpressionPattern
+    // NOTE: Workaround since optional type configuration above is ignored.
+    delete (result as {invertedRegularExpressionPattern?:RegExp|string})
+        .invertedRegularExpressionPattern
     if (result.regularExpressionPattern)
         result.pattern = result.regularExpressionPattern
     // NOTE: Workaround since optional type configuration above is ignored.

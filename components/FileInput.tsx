@@ -82,20 +82,20 @@ import {
 } from '../type'
 // endregion
 // region constants
-const imageMimeTypeRegularExpression:RegExp = new RegExp(
+const imageContentTypeRegularExpression:RegExp = new RegExp(
     '^image/(?:p?jpe?g|png|svg(?:\\+xml)?|vnd\\.microsoft\\.icon|gif|' +
     'tiff|webp|vnd\\.wap\\.wbmp|x-(?:icon|jng|ms-bmp))$'
 )
-const textMimeTypeRegularExpression:RegExp = new RegExp(
+const textContentTypeRegularExpression:RegExp = new RegExp(
     '^(?:application/xml)|' +
     '(?:text/(?:plain|x-ndpb[wy]html|(?:x-)?csv|x?html?|xml))$'
 )
-const representableTextMimeTypeRegularExpression:RegExp =
+const representableTextContentTypeRegularExpression:RegExp =
     // Plain version:
     /^text\/plain$/
     // Rendered version:
     // '^(?:application/xml)|(?:text/(?:plain|x?html?|xml))$'
-const videoMimeTypeRegularExpression:RegExp = new RegExp(
+const videoContentTypeRegularExpression:RegExp = new RegExp(
     '^video/(?:(?:x-)?(?:x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|' +
     '(?:x-)?flv|(?:x-)?m4v|(?:x-)mng|x-ms-as|x-ms-wmv|x-msvideo)|' +
     '(?:application/(?:x-)?shockwave-flash)$'
@@ -112,17 +112,17 @@ export const determineRepresentationType = (
 ):RepresentationType => {
     contentType = contentType.replace(/; *charset=.+$/, '')
 
-    if (textMimeTypeRegularExpression.test(contentType)) {
-        if (representableTextMimeTypeRegularExpression.test(contentType))
+    if (textContentTypeRegularExpression.test(contentType)) {
+        if (representableTextContentTypeRegularExpression.test(contentType))
             return 'renderableText'
 
         return 'text'
     }
 
-    if (imageMimeTypeRegularExpression.test(contentType))
+    if (imageContentTypeRegularExpression.test(contentType))
         return 'image'
 
-    if (videoMimeTypeRegularExpression.test(contentType))
+    if (videoContentTypeRegularExpression.test(contentType))
         return 'video'
 
     return 'binary'
@@ -146,31 +146,50 @@ export const determineValidationState = (
         invalidNamePattern: ():boolean => (
             typeof properties.model.value?.name === 'string' &&
             (
-                typeof properties.model.regularExpressionNamePattern ===
-                    'string' &&
+                typeof properties.model
+                    .fileName?.regularExpressionNamePattern === 'string' &&
                 !(new RegExp(
-                    properties.model.regularExpressionNamePattern
+                    properties.model.fileName.regularExpressionPattern
                 )).test(properties.model.value.name) ||
-                properties.model.regularExpressionNamePattern !== null &&
-                typeof properties.model.regularExpressionNamePattern ===
+                properties.model.fileName.regularExpressionPattern !== null &&
+                typeof properties.model.fileName.regularExpressionPattern ===
                     'object' &&
-                !properties.model.regularExpressionNamePattern
+                !properties.model.fileName.regularExpressionPattern
                     .test(properties.model.value.name)
             )
         ),
-        invalidMimeTypePattern: ():boolean => (
+        invalidContentTypePattern: ():boolean => (
             typeof properties.model.value?.blob?.type === 'string' &&
             (
                 typeof properties.model
-                    .regularExpressionMimeTypePattern === 'string' &&
+                    .contentTypeRegularExpressionPattern === 'string' &&
                 !(new RegExp(
-                    properties.model.regularExpressionMimeTypePattern
+                    properties.model.contentTypeRegularExpressionPattern
                 )).test(properties.model.value.blob.type) ||
-                properties.model.regularExpressionMimeTypePattern !==
+                properties.model.contentTypeRegularExpressionPattern !==
                     null &&
                 typeof properties.model
-                    .regularExpressionMimeTypePattern === 'object' &&
-                !properties.model.regularExpressionMimeTypePattern
+                    .contentTypeRegularExpressionPattern === 'object' &&
+                !properties.model.contentTypeRegularExpressionPattern
+                    .test(properties.model.value.blob.type)
+            )
+        ),
+        invalidInvertedContentTypePattern: ():boolean => (
+            typeof properties.model.value?.blob?.type === 'string' &&
+            (
+                typeof properties.model
+                    .invertedContentTypeRegularExpressionPattern ===
+                        'string' &&
+                (new RegExp(
+                    properties.model
+                        .invertedContentTypeRegularExpressionPattern
+                )).test(properties.model.value.blob.type) ||
+                properties.model.invertedContentTypeRegularExpressionPattern
+                    !== null &&
+                typeof properties.model
+                    .invertedContentTypeRegularExpressionPattern ===
+                        'object' &&
+                properties.model.invertedContentTypeRegularExpressionPattern
                     .test(properties.model.value.blob.type)
             )
         )
@@ -548,7 +567,7 @@ export const FileInputInner = function(
                 !properties.value.source
             ) {
                 if (
-                    textMimeTypeRegularExpression.test(
+                    textContentTypeRegularExpression.test(
                         properties.value.blob.type
                     ) &&
                     representationType !== 'renderableText'
