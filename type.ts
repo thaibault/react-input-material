@@ -631,7 +631,7 @@ export type FileInputModelState =
         invalidMaximumSize:boolean
         invalidMinimumSize:boolean
         invalidContentTypePattern:boolean
-        invalidNamePattern:boolean
+        invalidName:boolean
     }
 export type FileInputModel =
     Omit<Model<FileValue>, 'state'> &
@@ -654,7 +654,11 @@ export type AdditionalFileInputProperties =
         downloadButton:ReactElement|string
         editButton:ReactElement|string
         encoding:string
-        fileName:InputProperties<string>
+        /*
+            NOTE: We cannot name this property "fileName" since this would
+            shadow its model key name pendant.
+        */
+        fileNameInputProperties:InputProperties<string>
         invertedContentTypePattern:null|RegExp|string
         invertedContentTypePatternText:string
         maximumSizeText:string
@@ -712,7 +716,7 @@ export const fileInputModelStatePropertyTypes:{
     invalidMaximumSize: oneOfType([boolean, symbol]),
     invalidMinimumSize: oneOfType([boolean, symbol]),
     invalidContentTypePattern: oneOfType([boolean, symbol]),
-    invalidNamePattern: oneOfType([boolean, symbol])
+    invalidName: oneOfType([boolean, symbol])
 } as const
 export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -723,7 +727,7 @@ export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     downloadButton: oneOfType([object, string]),
     editButton: oneOfType([object, string]),
     encoding: string,
-    fileName: shape<any>(inputPropertyTypes),
+    fileNameInputProperties: shape<any>(inputPropertyTypes),
     invertedContentTypePatternText: string,
     maximumSizeText: string,
     minimumSizeText: string,
@@ -736,7 +740,7 @@ export const defaultFileInputModelState:FileInputModelState = {
     invalidMaximumSize: false,
     invalidMinimumSize: false,
     invalidContentTypePattern: false,
-    invalidNamePattern: false
+    invalidName: false
 } as const
 export const defaultFileInputModel:FileInputModel = {
     ...defaultModel,
@@ -756,6 +760,16 @@ export const defaultFileInputModel:FileInputModel = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
+export const defaultFileNameInputProperties:InputProperties<string> = {
+    ...defaultInputProperties,
+    invertedPatternText:
+        'Your file\'s name should not match the regular expression: "' +
+        '${invertedPattern}".',
+    patternText:
+        'Your file\'s name has to match the regular expression: "' +
+        '${pattern}".'
+} as InputProperties<string>
+delete (defaultFileNameInputProperties as {model?:InputModel}).model
 export const defaultFileInputProperties:DefaultFileInputProperties = {
     ...defaultProperties,
     contentTypePatternText:
@@ -765,15 +779,7 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
     downloadButton: 'download',
     editButton: 'edit',
     encoding: 'utf-8',
-    fileName: {
-        // NOTE: We have to avoid overwriting "model.fileName.model" path here.
-        ...{...defaultInputProperties, model: undefined} as
-            unknown as
-            InputProperties<string>,
-        patternText:
-            'Your file\'s name has to match the regular expression: "' +
-            '${fileName.pattern}".'
-    },
+    fileNameInputProperties: defaultFileNameInputProperties,
     invertedContentTypePatternText:
         'Your file\'s mime-type should not match the regular expression: "' +
         '${invertedContentTypePattern}".',

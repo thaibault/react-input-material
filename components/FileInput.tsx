@@ -128,7 +128,7 @@ export const determineRepresentationType = (
     return 'binary'
 }
 export const determineValidationState = (
-    properties:Properties, currentState:ModelState
+    properties:Properties, invalidName:boolean, currentState:ModelState
 ):boolean => determineBaseValidationState<Properties>(
     properties,
     currentState,
@@ -143,21 +143,7 @@ export const determineValidationState = (
             properties.model.minimumSize >
                 (properties.model.value?.blob?.size || 0)
         ),
-        invalidNamePattern: ():boolean => (
-            typeof properties.model.value?.name === 'string' &&
-            (
-                typeof properties.model
-                    .fileName?.regularExpressionPattern === 'string' &&
-                !(new RegExp(
-                    properties.model.fileName.regularExpressionPattern
-                )).test(properties.model.value.name) ||
-                properties.model.fileName.regularExpressionPattern !== null &&
-                typeof properties.model.fileName.regularExpressionPattern ===
-                    'object' &&
-                !properties.model.fileName.regularExpressionPattern
-                    .test(properties.model.value.name)
-            )
-        ),
+        invalidName: ():boolean => invalidName,
         invalidContentTypePattern: ():boolean => (
             typeof properties.model.value?.blob?.type === 'string' &&
             (
@@ -268,7 +254,14 @@ export const FileInputInner = function(
         )
 
         determineValidationState(
-            result as Properties, result.model!.state as ModelState
+            result as Properties,
+            // TODO not available
+            false
+            /*nameInputReference.current?.properties.invalid ??
+                result.fileNameInputProperties.invalid ??
+                result.model.fileName.invalid ??
+                result.model!.state.invalidName*/,
+            result.model!.state as ModelState
         )
 
         result = getBaseConsolidatedProperties<Props, Properties>(result)
@@ -324,6 +317,13 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onChange = (event?:SyntheticEvent):void => {
+        if (nameInputReference.current?.properties) {
+            properties.fileNameInputProperties =
+                nameInputReference.current.properties
+            properties.model.fileName =
+                nameInputReference.current.properties.model
+        }
+
         Tools.extend(
             true,
             properties,
@@ -393,7 +393,11 @@ export const FileInputInner = function(
 
             onChange(event)
 
-            if (determineValidationState(properties, oldValueState.modelState))
+            if (determineValidationState(
+                properties,
+                nameInputReference.current?.properties?.invalid || false,
+                oldValueState.modelState
+            ))
                 stateChanged = true
 
             triggerCallbackIfExists<Properties>(
@@ -708,12 +712,10 @@ export const FileInputInner = function(
                 }
                 {properties.value ?
                     <GenericInput
+                        {...properties.fileNameInputProperties}
                         disabled={properties.disabled}
-                        {...Tools.extend(
-                            {model: properties.model.fileName},
-                            properties.fileName
-                        )}
                         emptyEqualsNull={false}
+                        model={properties.model.fileName}
                         onChangeValue={onChangeValue}
                         ref={nameInputReference as any}
                         required
