@@ -709,7 +709,10 @@ export const FileInputInner = function(
                 {properties.value ?
                     <GenericInput
                         disabled={properties.disabled}
-                        {...properties.fileName as InputProps<string>}
+                        {...Tools.extend(
+                            {model: properties.model.fileName},
+                            properties.fileName
+                        )}
                         emptyEqualsNull={false}
                         onChangeValue={onChangeValue}
                         ref={nameInputReference as any}

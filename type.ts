@@ -766,7 +766,10 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
     editButton: 'edit',
     encoding: 'utf-8',
     fileName: {
-        ...defaultInputProperties as InputProperties<string>,
+        // NOTE: We have to avoid overwriting "model.fileName.model" path here.
+        ...{...defaultInputProperties, model: undefined} as
+            unknown as
+            InputProperties<string>,
         patternText:
             'Your file\'s name has to match the regular expression: "' +
             '${fileName.pattern}".'
