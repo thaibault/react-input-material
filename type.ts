@@ -611,6 +611,7 @@ export type FileRepresentationType =
     'binary'|'image'|'renderableText'|'text'|'video'
 export type FileValue = {
     blob?:Partial<Blob>|null
+    hash?:null|string
     name?:null|string
     source?:null|string
 }
