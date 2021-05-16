@@ -680,21 +680,22 @@ export const FileInputInner = function(
                         {properties.value.source}
                     </pre> :
                     '' :
-            properties.value?.blob ?
+            properties.value?.blob && properties.value.blob instanceof Blob ?
                 <CircularProgress size="large" /> :
                 ''
             }
             <div>
-                {properties.name ?
-                    <Typography tag="h2" use="headline6">
-                        {invalid ?
-                            <Theme use="error">{properties.name}</Theme> :
+                <Typography tag="h2" use="headline6">
+                    {invalid ?
+                        <Theme use="error">{
+                            properties.description ??
                             properties.name
-                        }
-                    </Typography> :
-                    ''
-                }
-                {properties.description ?
+                        }</Theme> :
+                        properties.description ??
+                        properties.name
+                    }
+                </Typography>
+                {properties.declaration ?
                     <Typography
                         style={{marginTop: '-1rem'}}
                         tag="h3"
@@ -703,9 +704,9 @@ export const FileInputInner = function(
                     >
                         {invalid ?
                             <Theme use="error">
-                                {properties.description}
+                                {properties.declaration}
                             </Theme> :
-                            properties.description
+                            properties.declaration
                         }
                     </Typography> :
                     ''
