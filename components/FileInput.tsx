@@ -82,20 +82,20 @@ import {
 } from '../type'
 // endregion
 // region constants
-const imageMimeTypeRegularExpression:RegExp = new RegExp(
+const imageContentTypeRegularExpression:RegExp = new RegExp(
     '^image/(?:p?jpe?g|png|svg(?:\\+xml)?|vnd\\.microsoft\\.icon|gif|' +
     'tiff|webp|vnd\\.wap\\.wbmp|x-(?:icon|jng|ms-bmp))$'
 )
-const textMimeTypeRegularExpression:RegExp = new RegExp(
+const textContentTypeRegularExpression:RegExp = new RegExp(
     '^(?:application/xml)|' +
     '(?:text/(?:plain|x-ndpb[wy]html|(?:x-)?csv|x?html?|xml))$'
 )
-const representableTextMimeTypeRegularExpression:RegExp =
+const representableTextContentTypeRegularExpression:RegExp =
     // Plain version:
     /^text\/plain$/
     // Rendered version:
     // '^(?:application/xml)|(?:text/(?:plain|x?html?|xml))$'
-const videoMimeTypeRegularExpression:RegExp = new RegExp(
+const videoContentTypeRegularExpression:RegExp = new RegExp(
     '^video/(?:(?:x-)?(?:x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|' +
     '(?:x-)?flv|(?:x-)?m4v|(?:x-)mng|x-ms-as|x-ms-wmv|x-msvideo)|' +
     '(?:application/(?:x-)?shockwave-flash)$'
@@ -112,23 +112,23 @@ export const determineRepresentationType = (
 ):RepresentationType => {
     contentType = contentType.replace(/; *charset=.+$/, '')
 
-    if (textMimeTypeRegularExpression.test(contentType)) {
-        if (representableTextMimeTypeRegularExpression.test(contentType))
+    if (textContentTypeRegularExpression.test(contentType)) {
+        if (representableTextContentTypeRegularExpression.test(contentType))
             return 'renderableText'
 
         return 'text'
     }
 
-    if (imageMimeTypeRegularExpression.test(contentType))
+    if (imageContentTypeRegularExpression.test(contentType))
         return 'image'
 
-    if (videoMimeTypeRegularExpression.test(contentType))
+    if (videoContentTypeRegularExpression.test(contentType))
         return 'video'
 
     return 'binary'
 }
 export const determineValidationState = (
-    properties:Properties, currentState:ModelState
+    properties:Properties, invalidName:boolean, currentState:ModelState
 ):boolean => determineBaseValidationState<Properties>(
     properties,
     currentState,
@@ -143,34 +143,39 @@ export const determineValidationState = (
             properties.model.minimumSize >
                 (properties.model.value?.blob?.size || 0)
         ),
-        invalidNamePattern: ():boolean => (
-            typeof properties.model.value?.name === 'string' &&
-            (
-                typeof properties.model.regularExpressionNamePattern ===
-                    'string' &&
-                !(new RegExp(
-                    properties.model.regularExpressionNamePattern
-                )).test(properties.model.value.name) ||
-                properties.model.regularExpressionNamePattern !== null &&
-                typeof properties.model.regularExpressionNamePattern ===
-                    'object' &&
-                !properties.model.regularExpressionNamePattern
-                    .test(properties.model.value.name)
-            )
-        ),
-        invalidMimeTypePattern: ():boolean => (
+        invalidName: ():boolean => invalidName,
+        invalidContentTypePattern: ():boolean => (
             typeof properties.model.value?.blob?.type === 'string' &&
             (
                 typeof properties.model
-                    .regularExpressionMimeTypePattern === 'string' &&
+                    .contentTypeRegularExpressionPattern === 'string' &&
                 !(new RegExp(
-                    properties.model.regularExpressionMimeTypePattern
+                    properties.model.contentTypeRegularExpressionPattern
                 )).test(properties.model.value.blob.type) ||
-                properties.model.regularExpressionMimeTypePattern !==
+                properties.model.contentTypeRegularExpressionPattern !==
                     null &&
                 typeof properties.model
-                    .regularExpressionMimeTypePattern === 'object' &&
-                !properties.model.regularExpressionMimeTypePattern
+                    .contentTypeRegularExpressionPattern === 'object' &&
+                !properties.model.contentTypeRegularExpressionPattern
+                    .test(properties.model.value.blob.type)
+            )
+        ),
+        invalidInvertedContentTypePattern: ():boolean => (
+            typeof properties.model.value?.blob?.type === 'string' &&
+            (
+                typeof properties.model
+                    .invertedContentTypeRegularExpressionPattern ===
+                        'string' &&
+                (new RegExp(
+                    properties.model
+                        .invertedContentTypeRegularExpressionPattern
+                )).test(properties.model.value.blob.type) ||
+                properties.model.invertedContentTypeRegularExpressionPattern
+                    !== null &&
+                typeof properties.model
+                    .invertedContentTypeRegularExpressionPattern ===
+                        'object' &&
+                properties.model.invertedContentTypeRegularExpressionPattern
                     .test(properties.model.value.blob.type)
             )
         )
@@ -249,7 +254,14 @@ export const FileInputInner = function(
         )
 
         determineValidationState(
-            result as Properties, result.model!.state as ModelState
+            result as Properties,
+            // TODO not available
+            false
+            /*nameInputReference.current?.properties.invalid ??
+                result.fileNameInputProperties.invalid ??
+                result.model.fileName.invalid ??
+                result.model!.state.invalidName*/,
+            result.model!.state as ModelState
         )
 
         result = getBaseConsolidatedProperties<Props, Properties>(result)
@@ -305,6 +317,13 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onChange = (event?:SyntheticEvent):void => {
+        if (nameInputReference.current?.properties) {
+            properties.fileNameInputProperties =
+                nameInputReference.current.properties
+            properties.model.fileName =
+                nameInputReference.current.properties.model
+        }
+
         Tools.extend(
             true,
             properties,
@@ -374,7 +393,11 @@ export const FileInputInner = function(
 
             onChange(event)
 
-            if (determineValidationState(properties, oldValueState.modelState))
+            if (determineValidationState(
+                properties,
+                nameInputReference.current?.properties?.invalid || false,
+                oldValueState.modelState
+            ))
                 stateChanged = true
 
             triggerCallbackIfExists<Properties>(
@@ -548,7 +571,7 @@ export const FileInputInner = function(
                 !properties.value.source
             ) {
                 if (
-                    textMimeTypeRegularExpression.test(
+                    textContentTypeRegularExpression.test(
                         properties.value.blob.type
                     ) &&
                     representationType !== 'renderableText'
@@ -689,9 +712,10 @@ export const FileInputInner = function(
                 }
                 {properties.value ?
                     <GenericInput
+                        {...properties.fileNameInputProperties}
                         disabled={properties.disabled}
-                        {...properties.fileName as InputProps<string>}
                         emptyEqualsNull={false}
+                        model={properties.model.fileName}
                         onChangeValue={onChangeValue}
                         ref={nameInputReference as any}
                         required
