@@ -624,6 +624,7 @@ export type FileValue = {
     hash?:null|string
     name?:null|string
     source?:null|string
+    url?:null|string
 }
 export type FileInputModelState =
     ModelState &
