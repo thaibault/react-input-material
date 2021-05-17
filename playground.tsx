@@ -99,7 +99,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 default={useMemorizedValue(
                     {
                         blob: {type: 'image/png'},
-                        source: 'https://via.placeholder.com/150'
+                        url: 'https://via.placeholder.com/150'
                     }
                 )}
                 name="UnControlled"

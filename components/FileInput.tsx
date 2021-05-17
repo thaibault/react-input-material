@@ -372,7 +372,10 @@ export const FileInputInner = function(
                 beforehand.
             */
             properties.value = {...properties.value, name: eventSourceOrName}
-        else if (typeof (eventSourceOrName as FileValue).source === 'string')
+        else if (
+            typeof (eventSourceOrName as FileValue).source === 'string' ||
+            typeof (eventSourceOrName as FileValue).url === 'string'
+        )
             properties.value = eventSourceOrName as FileValue
 
         setValueState((oldValueState:ValueState):ValueState => {
@@ -565,51 +568,59 @@ export const FileInputInner = function(
     // endregion
     useEffect(():void => {
         (async ():Promise<void> => {
+            let valueChanged:boolean = false
             if (
                 properties.value?.blob &&
                 properties.value.blob instanceof Blob &&
                 !properties.value.source
             ) {
-                if (
-                    textContentTypeRegularExpression.test(
-                        properties.value.blob.type
-                    ) &&
-                    representationType !== 'renderableText'
-                )
+                if (textContentTypeRegularExpression.test(
+                    properties.value.blob.type
+                ))
                     properties.value.source =
                         await readBinaryDataIntoText(properties.value.blob)
-                else {
-                    const source:string = typeof Blob === 'undefined' ?
+                else
+                    properties.value.source = typeof Blob === 'undefined' ?
                         (properties.value.toString as
                             unknown as
                             (encoding:string) => string
                         )('base64') :
                         await blobToBase64String(properties.value.blob)
-                    properties.value.source =
+
+                valueChanged = true
+            }
+
+            if (properties.value?.source) {
+                if (!properties.value.blob)
+                    if (properties.value.url?.startsWith('data:')) {
+                        properties.value.blob =
+                            dataURLToBlob(properties.value.source)
+
+                        valueChanged = true
+                    } else if (properties.sourceToBlobOptions) {
+                        properties.value.blob = new Blob(
+                            [properties.value.source],
+                            properties.sourceToBlobOptions
+                        )
+
+                        valueChanged = true
+                    }
+
+                if (!properties.value.url && properties.value.blob?.type) {
+                    const source = textContentTypeRegularExpression.test(
+                        properties.value.blob.type
+                    ) ?
+                        btoa(properties.value.source) :
+                        properties.value.source
+
+                    properties.value.url =
                         `data:${properties.value.blob.type};base64,${source}`
+
+                    valueChanged = true
                 }
 
-                onChangeValue(Tools.copy(properties.value))
-            } else if (properties.value?.source && !properties.value.blob) {
-                if (properties.value.source.startsWith('data:')) {
-                    properties.value.blob =
-                        dataURLToBlob(properties.value.source)
-
+                if (valueChanged)
                     onChangeValue(Tools.copy(properties.value))
-                } else if (
-                    properties.sourceToBlobOptions &&
-                    !['/', 'file://', 'http://', 'https://'].some(
-                        (prefix:string):boolean =>
-                            properties.value!.source!.startsWith(prefix)
-                    )
-                ) {
-                    properties.value.blob = new Blob(
-                        [properties.value.source],
-                        properties.sourceToBlobOptions
-                    )
-
-                    onChangeValue(Tools.copy(properties.value))
-                }
             }
         })()
     })
@@ -643,18 +654,16 @@ export const FileInputInner = function(
         onFocus={onFocus}
     >
         <CardPrimaryAction>
-            {properties.value?.source ?
+            {properties.value?.url ?
                 representationType === 'image' ?
                 <CardMedia
                     {...properties.media}
-                    style={{
-                        backgroundImage: `url(${properties.value.source})`
-                    }}
+                    style={{backgroundImage: `url(${properties.value.url})`}}
                 /> :
                 representationType === 'video' ?
                     <video autoPlay loop muted>
                         <source
-                            src={properties.value.source}
+                            src={properties.value.url}
                             type={properties.value.blob!.type}
                         />
                     </video> :
@@ -672,15 +681,16 @@ export const FileInputInner = function(
                         <iframe
                             frameBorder="no"
                             scrolling="no"
-                            src={properties.value.source}
+                            src={properties.value.url}
                         />
                     </div> :
-                representationType === 'text' ?
+                properties.value?.source && representationType === 'text' ?
                     <pre className={styles['file-input__text-representation']}>
                         {properties.value.source}
                     </pre> :
                     '' :
             properties.value?.blob && properties.value.blob instanceof Blob ?
+                // NOTE: Only blobs have to red asynchronously.
                 <CircularProgress size="large" /> :
                 ''
             }
@@ -777,7 +787,7 @@ export const FileInputInner = function(
                                 onClick={():void => onChangeValue(null)}
                                 ripple={properties.ripple}
                             >{properties.deleteButton}</CardActionButton>
-                            {properties.value.source ?
+                            {properties.value.url ?
                                 <CardActionButton
                                     onClick={():void =>
                                         downloadLinkReference.current?.click()
@@ -789,7 +799,7 @@ export const FileInputInner = function(
                                             styles['file-input__download']
                                         }
                                         download={properties.value.name}
-                                        href={properties.value.source}
+                                        href={properties.value.url}
                                         ref={downloadLinkReference}
                                         target="_blank"
                                         {...(properties.value.blob?.type ?
