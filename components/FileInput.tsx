@@ -531,7 +531,17 @@ export const FileInputInner = function(
     deriveMissingPropertiesFromState(givenProperties, valueState)
 
     const properties:Properties = getConsolidatedProperties(givenProperties)
-    // region synchronize properties into state where values are not controlled
+
+    /*
+        NOTE: We have to merge asynchronous determined missing value properties
+        to avoid endless rendering loops when a value is provided via
+        properties.
+    */
+    if (properties.value && valueState.value)
+        properties.value =
+            Tools.extend(true, valueState.value, givenProperties.value)
+
+    // / region synchronize properties into state where values are not controlled
     const currentValueState:ValueState = {
         modelState: properties.model.state,
         value: properties.value as FileValue|null
@@ -548,7 +558,7 @@ export const FileInputInner = function(
     if (controlled)
         setValueState =
             wrapStateSetter<ValueState>(setValueState, currentValueState)
-    // endregion
+    // / endregion
     useImperativeHandle(
         reference,
         ():Adapter & {
@@ -618,10 +628,10 @@ export const FileInputInner = function(
 
                     valueChanged = true
                 }
-
-                if (valueChanged)
-                    onChangeValue(Tools.copy(properties.value))
             }
+
+            if (valueChanged)
+                onChangeValue(Tools.copy(properties.value))
         })()
     })
     // region render
@@ -723,14 +733,14 @@ export const FileInputInner = function(
                 }
                 {properties.value ?
                     <GenericInput
-                        {...properties.fileNameInputProperties}
                         disabled={properties.disabled}
+                        value={properties.value?.name}
+                        {...properties.fileNameInputProperties}
                         emptyEqualsNull={false}
                         model={properties.model.fileName}
                         onChangeValue={onChangeValue}
                         ref={nameInputReference as any}
                         required
-                        value={properties.value?.name}
                     /> :
                     ''
                 }
