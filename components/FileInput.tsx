@@ -324,19 +324,18 @@ export const FileInputInner = function(
                 nameInputReference.current.properties.model
         }
 
-        console.log('TODO onChange', properties.value)
-
-        Tools.extend(
-            true,
-            properties,
-            getConsolidatedProperties(
-                /*
-                    Workaround since "Type" isn't identified as subset of
-                    "RecursivePartial<Type>" yet.
-                */
-                properties as unknown as Props
-            )
+        const consolidatedProperties:Properties = getConsolidatedProperties(
+            /*
+                Workaround since "Type" isn't identified as subset of
+                "RecursivePartial<Type>" yet.
+            */
+            properties as unknown as Props
         )
+        // NOTE: Avoid recursive merging of deprecated value properties.
+        delete properties.model.value
+        delete properties.value
+
+        Tools.extend(true, properties, consolidatedProperties)
 
         triggerCallbackIfExists<Properties>(
             properties, 'change', controlled, properties, event
@@ -353,7 +352,6 @@ export const FileInputInner = function(
         if (!(properties.model.mutable && properties.model.writable))
             return
 
-        console.log('TODO change', eventSourceOrName)
         let event:SyntheticEvent|undefined
         if (eventSourceOrName === null)
             properties.value = eventSourceOrName
@@ -397,7 +395,6 @@ export const FileInputInner = function(
                 stateChanged = true
             }
 
-            console.log('TODO trigger on change', properties.value)
             onChange(event)
 
             if (determineValidationState(
@@ -423,7 +420,6 @@ export const FileInputInner = function(
                 )
             }
 
-            console.log('TODO changed', result)
             return result
         })
     }
@@ -635,10 +631,8 @@ export const FileInputInner = function(
                 }
             }
 
-            if (valueChanged) {
-                console.log('TODO consolidate asset')
+            if (valueChanged)
                 onChangeValue(Tools.copy(properties.value))
-            }
         })()
     })
     // region render
@@ -658,7 +652,6 @@ export const FileInputInner = function(
         )
     )
 
-    console.log('TODO render', properties.value)
     return <WrapConfigurations
         strict={FileInput.strict}
         themeConfiguration={properties.themeConfiguration}

@@ -80,6 +80,7 @@ export const deriveMissingPropertiesFromState = <
         properties.model!.state = {...properties.model!.state}
     else
         properties.model!.state = {} as ModelState
+
     for (const key in state.modelState)
         if (
             Object.prototype.hasOwnProperty.call(state.modelState, key) &&
@@ -89,6 +90,7 @@ export const deriveMissingPropertiesFromState = <
         )
             properties.model!.state[key as keyof ModelState] =
                 state.modelState[key as keyof ModelState]
+
     return properties
 }
 /**
