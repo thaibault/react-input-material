@@ -275,7 +275,7 @@ export const FileInputInner = function(
      * @param event - Event object.
      * @returns Nothing.
      */
-    const onBlur = (event:SyntheticEvent):void => setValueState((
+    const onBlur = (event:SyntheticEvent):void => 'TODO' || setValueState((
         oldValueState:ValueState
     ):ValueState => {
         let changed:boolean = false
@@ -352,34 +352,38 @@ export const FileInputInner = function(
         if (!(properties.model.mutable && properties.model.writable))
             return
 
-        let event:SyntheticEvent|undefined
-        if (eventSourceOrName === null)
-            properties.value = eventSourceOrName
-        else if (
-            fileInputReference.current &&
-            (eventSourceOrName as SyntheticEvent).target ===
-                fileInputReference.current
-        ) {
-            event = eventSourceOrName as SyntheticEvent
-            if ((event.target as unknown as {files:FileList}).files?.length) {
-                const blob:File =
-                    (event.target as unknown as {files:FileList}).files[0]
-                properties.value = {blob, name: blob.name}
-            } else
-                return
-        } else if (typeof eventSourceOrName === 'string')
-            /*
-                NOTE: A name can only be changed if a blob is available
-                beforehand.
-            */
-            properties.value = {...properties.value, name: eventSourceOrName}
-        else if (
-            typeof (eventSourceOrName as FileValue).source === 'string' ||
-            typeof (eventSourceOrName as FileValue).url === 'string'
-        )
-            properties.value = eventSourceOrName as FileValue
-
         setValueState((oldValueState:ValueState):ValueState => {
+            let event:SyntheticEvent|undefined
+            if (eventSourceOrName === null)
+                properties.value = eventSourceOrName
+            else if (
+                fileInputReference.current &&
+                (eventSourceOrName as SyntheticEvent).target ===
+                    fileInputReference.current
+            ) {
+                event = eventSourceOrName as SyntheticEvent
+                if ((event.target as unknown as {files:FileList}).files?.length) {
+                    const blob:File =
+                        (event.target as unknown as {files:FileList}).files[0]
+                    properties.value = {blob, name: blob.name}
+                } else
+                    return
+            } else if (typeof eventSourceOrName === 'string')
+                /*
+                    NOTE: A name can only be changed if a blob is available
+                    beforehand.
+                */
+                properties.value = {
+                    ...oldValueState.value, name: eventSourceOrName
+                }
+            else if (
+                typeof (eventSourceOrName as FileValue).source === 'string' ||
+                typeof (eventSourceOrName as FileValue).url === 'string'
+            )
+                properties.value = {
+                    ...oldValueState.value, ...eventSourceOrName
+                }
+
             if (Tools.equals(oldValueState.value, properties.value))
                 return oldValueState
 
@@ -420,6 +424,7 @@ export const FileInputInner = function(
                 )
             }
 
+            console.log(Tools.copy(result))
             return result
         })
     }
@@ -453,7 +458,7 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
-        setValueState((oldValueState:ValueState):ValueState => {
+        'TODO' || setValueState((oldValueState:ValueState):ValueState => {
             let changedState:boolean = false
 
             if (!oldValueState.modelState.focused) {
@@ -555,7 +560,7 @@ export const FileInputInner = function(
         !(controlled || Tools.equals(properties.value, valueState.value)) ||
         !Tools.equals(properties.model.state, valueState.modelState)
     )
-        setValueState(currentValueState)
+        'TODO' || setValueState(currentValueState)
     if (controlled)
         setValueState =
             wrapStateSetter<ValueState>(setValueState, currentValueState)
@@ -579,43 +584,40 @@ export const FileInputInner = function(
     // endregion
     useEffect(():void => {
         (async ():Promise<void> => {
-            let valueChanged:boolean = false
+            let valueChanged:null|Partial<FileValue> = null
             if (
                 properties.value?.blob &&
                 properties.value.blob instanceof Blob &&
                 !properties.value.source
-            ) {
-                if (textContentTypeRegularExpression.test(
-                    properties.value.blob.type
-                ))
-                    properties.value.source =
-                        await readBinaryDataIntoText(properties.value.blob)
-                else
-                    properties.value.source = typeof Blob === 'undefined' ?
-                        (properties.value.toString as
-                            unknown as
-                            (encoding:string) => string
-                        )('base64') :
-                        await blobToBase64String(properties.value.blob)
-
-                valueChanged = true
-            }
+            )
+                valueChanged = {
+                    source: textContentTypeRegularExpression.test(
+                        properties.value.blob.type
+                    ) ?
+                        await readBinaryDataIntoText(
+                            properties.value.blob
+                        ) :
+                        typeof Blob === 'undefined' ?
+                            (properties.value.toString as
+                                unknown as
+                                (encoding:string) => string
+                            )('base64') :
+                            await blobToBase64String(properties.value.blob)
+                }
 
             if (properties.value?.source) {
                 if (!properties.value.blob)
-                    if (properties.value.url?.startsWith('data:')) {
-                        properties.value.blob =
-                            dataURLToBlob(properties.value.source)
-
-                        valueChanged = true
-                    } else if (properties.sourceToBlobOptions) {
-                        properties.value.blob = new Blob(
-                            [properties.value.source],
-                            properties.sourceToBlobOptions
-                        )
-
-                        valueChanged = true
-                    }
+                    if (properties.value.url?.startsWith('data:'))
+                        valueChanged = {
+                            blob: dataURLToBlob(properties.value.source)
+                        }
+                    else if (properties.sourceToBlobOptions)
+                        valueChanged = {
+                            blob: new Blob(
+                                [properties.value.source],
+                                properties.sourceToBlobOptions
+                            )
+                        }
 
                 if (!properties.value.url && properties.value.blob?.type) {
                     const source = textContentTypeRegularExpression.test(
@@ -624,15 +626,16 @@ export const FileInputInner = function(
                         btoa(properties.value.source) :
                         properties.value.source
 
-                    properties.value.url =
-                        `data:${properties.value.blob.type};base64,${source}`
-
-                    valueChanged = true
+                    valueChanged = {
+                        url:
+                            `data:${properties.value.blob.type};base64,` +
+                            source
+                    }
                 }
             }
 
             if (valueChanged)
-                onChangeValue(Tools.copy(properties.value))
+                onChangeValue(valueChanged)
         })()
     })
     // region render
