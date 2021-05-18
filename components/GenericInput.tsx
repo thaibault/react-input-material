@@ -1129,6 +1129,7 @@ export const GenericInputInner = function<Type = any>(
             event.preventDefault()
             event.stopPropagation()
         }
+
         setEditorState(({editorIsActive}):EditorState => {
             properties.editorIsActive = !editorIsActive
 

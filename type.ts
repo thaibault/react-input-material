@@ -623,6 +623,7 @@ export type FileValue = {
     blob?:Partial<Blob>|null
     hash?:null|string
     name?:null|string
+    reference?:null|string
     source?:null|string
     url?:null|string
 }

@@ -291,7 +291,7 @@ export const FileInputInner = function(
         }
 
         if (changed) {
-            onChange(event)
+            // TODO has old value! onChange(event)
 
             triggerCallbackIfExists<Properties>(
                 properties,
@@ -324,6 +324,8 @@ export const FileInputInner = function(
                 nameInputReference.current.properties.model
         }
 
+        console.log('TODO onChange', properties.value)
+
         Tools.extend(
             true,
             properties,
@@ -351,6 +353,7 @@ export const FileInputInner = function(
         if (!(properties.model.mutable && properties.model.writable))
             return
 
+        console.log('TODO change', eventSourceOrName)
         let event:SyntheticEvent|undefined
         if (eventSourceOrName === null)
             properties.value = eventSourceOrName
@@ -394,6 +397,7 @@ export const FileInputInner = function(
                 stateChanged = true
             }
 
+            console.log('TODO trigger on change', properties.value)
             onChange(event)
 
             if (determineValidationState(
@@ -419,6 +423,7 @@ export const FileInputInner = function(
                 )
             }
 
+            console.log('TODO changed', result)
             return result
         })
     }
@@ -469,7 +474,7 @@ export const FileInputInner = function(
             let result:ValueState = oldValueState
 
             if (changedState) {
-                onChange(event)
+                // TODO has old value onChange(event)
 
                 result = {...oldValueState, modelState: properties.model.state}
 
@@ -539,7 +544,7 @@ export const FileInputInner = function(
     */
     if (properties.value && valueState.value)
         properties.value =
-            Tools.extend(true, valueState.value, givenProperties.value)
+            Tools.extend(true, valueState.value, properties.value)
 
     // / region synchronize properties into state where values are not controlled
     const currentValueState:ValueState = {
@@ -630,8 +635,10 @@ export const FileInputInner = function(
                 }
             }
 
-            if (valueChanged)
+            if (valueChanged) {
+                console.log('TODO consolidate asset')
                 onChangeValue(Tools.copy(properties.value))
+            }
         })()
     })
     // region render
@@ -651,6 +658,7 @@ export const FileInputInner = function(
         )
     )
 
+    console.log('TODO render', properties.value)
     return <WrapConfigurations
         strict={FileInput.strict}
         themeConfiguration={properties.themeConfiguration}
