@@ -103,7 +103,7 @@ const videoContentTypeRegularExpression:RegExp = new RegExp(
 )
 // endregion
 // region helper
-export const preserveStaticBaseNameFileNameInputGenerator = (
+export const preserveStaticFileBaseNameInputGenerator = (
     prototype:InputProps<string>, {name, value: {name: fileName}}
 ) => ({
     ...prototype,
