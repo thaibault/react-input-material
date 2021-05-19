@@ -757,7 +757,6 @@ export const FileInputInner = function(
                     <GenericInput
                         ref={nameInputReference as any}
                         {...properties.generateFileNameInputProperties(
-                            properties.value,
                             {
                                 disabled: properties.disabled,
                                 value: properties.value?.name,
@@ -765,7 +764,8 @@ export const FileInputInner = function(
                                 model: properties.model.fileName,
                                 onChangeValue: onChangeValue,
                                 default: properties.value.name
-                            }
+                            },
+                            properties
                         )}
                     /> :
                     ''
