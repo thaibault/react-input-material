@@ -65,6 +65,7 @@ import {
     defaultFileInputModelState as defaultModelState,
     DefaultFileInputProperties as DefaultProperties,
     defaultFileInputProperties as defaultProperties,
+    defaultFileNameInputProperties,
     FileInputAdapter as Adapter,
     FileInputModel as Model,
     FileInputModelState as ModelState,
@@ -317,12 +318,9 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onChange = (event?:SyntheticEvent):void => {
-        if (nameInputReference.current?.properties) {
-            properties.fileNameInputProperties =
-                nameInputReference.current.properties
+        if (nameInputReference.current?.properties)
             properties.model.fileName =
                 nameInputReference.current.properties.model
-        }
 
         const consolidatedProperties:Properties = getConsolidatedProperties(
             /*
@@ -757,14 +755,18 @@ export const FileInputInner = function(
                 }
                 {properties.value ?
                     <GenericInput
-                        disabled={properties.disabled}
-                        value={properties.value?.name}
-                        {...properties.fileNameInputProperties}
-                        emptyEqualsNull={false}
-                        model={properties.model.fileName}
-                        onChangeValue={onChangeValue}
                         ref={nameInputReference as any}
-                        required
+                        {...properties.generateFileNameInputProperties(
+                            properties.value,
+                            {
+                                disabled: properties.disabled,
+                                value: properties.value?.name,
+                                ...defaultFileNameInputProperties,
+                                model: properties.model.fileName,
+                                onChangeValue: onChangeValue,
+                                default: properties.value.name
+                            }
+                        )}
                     /> :
                     ''
                 }

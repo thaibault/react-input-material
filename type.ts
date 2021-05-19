@@ -655,11 +655,6 @@ export type AdditionalFileInputProperties =
         downloadButton:ReactElement|string
         editButton:ReactElement|string
         encoding:string
-        /*
-            NOTE: We cannot name this property "fileName" since this would
-            shadow its model key name pendant.
-        */
-        fileNameInputProperties:InputProps<string>
         invertedContentTypePattern:null|RegExp|string
         invertedContentTypePatternText:string
         maximumSizeText:string
@@ -684,7 +679,10 @@ export type FileInputProperties =
             invalid:boolean
             properties:FileInputProperties
             value?:FileValue|null
-        }) => null|ReactElement
+        }) => null|ReactElement,
+        generateFileNameInputProperties:(
+            value:FileValue, prototype:InputProps<string>
+        ) => InputProps<string>
     }
 export type FileInputProps =
     Partial<Omit<FileInputProperties, 'model'>> &
@@ -728,7 +726,7 @@ export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     downloadButton: oneOfType([object, string]),
     editButton: oneOfType([object, string]),
     encoding: string,
-    fileNameInputProperties: shape<any>(inputPropertyTypes),
+    generateFileNameInputProperties: func,
     invertedContentTypePatternText: string,
     maximumSizeText: string,
     minimumSizeText: string,
@@ -761,14 +759,16 @@ export const defaultFileInputModel:FileInputModel = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultFileNameInputProperties:InputProperties<string> = {
+export const defaultFileNameInputProperties:InputProps<string> = {
     ...defaultInputProperties,
+    emptyEqualsNull: false,
     invertedPatternText:
         'Your file\'s name should not match the regular expression: "' +
         '${invertedPattern}".',
     patternText:
         'Your file\'s name has to match the regular expression: "' +
-        '${pattern}".'
+        '${pattern}".',
+    required: true
 } as InputProperties<string>
 delete (defaultFileNameInputProperties as {model?:InputModel}).model
 export const defaultFileInputProperties:DefaultFileInputProperties = {
@@ -780,7 +780,9 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
     downloadButton: 'download',
     editButton: 'edit',
     encoding: 'utf-8',
-    fileNameInputProperties: defaultFileNameInputProperties,
+    generateFileNameInputProperties: (
+        value:FileValue, prototype:InputProps<string>
+    ):InputProps<string> => prototype,
     invertedContentTypePatternText:
         'Your file\'s mime-type should not match the regular expression: "' +
         '${invertedContentTypePattern}".',
