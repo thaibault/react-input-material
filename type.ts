@@ -645,7 +645,7 @@ export type FileInputModel =
         state:FileInputModelState
     }
 export type FileInputValueState =
-    ValueState<FileValue, FileInputModelState>
+    ValueState<FileValue, FileInputModelState> & {attachBlobProperty:boolean}
 export type AdditionalFileInputProperties =
     FileInputModelState &
     {
@@ -659,7 +659,7 @@ export type AdditionalFileInputProperties =
             NOTE: We cannot name this property "fileName" since this would
             shadow its model key name pendant.
         */
-        fileNameInputProperties:InputProperties<string>
+        fileNameInputProperties:InputProps<string>
         invertedContentTypePattern:null|RegExp|string
         invertedContentTypePatternText:string
         maximumSizeText:string

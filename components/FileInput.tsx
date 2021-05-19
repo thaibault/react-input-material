@@ -275,7 +275,7 @@ export const FileInputInner = function(
      * @param event - Event object.
      * @returns Nothing.
      */
-    const onBlur = (event:SyntheticEvent):void => 'TODO' || setValueState((
+    const onBlur = (event:SyntheticEvent):void => setValueState((
         oldValueState:ValueState
     ):ValueState => {
         let changed:boolean = false
@@ -291,7 +291,7 @@ export const FileInputInner = function(
         }
 
         if (changed) {
-            // TODO has old value! onChange(event)
+            onChange(event)
 
             triggerCallbackIfExists<Properties>(
                 properties,
@@ -344,31 +344,40 @@ export const FileInputInner = function(
     /**
      * Triggered when ever the value changes.
      * @param eventSourceOrName - Event object or new value.
+     * @param event - Optional event object (if not provided as first
+     * argument).
+     * @param attachBlobProperty - Indicates whether additional data is added
+     * through post processed data properties.
      * @returns Nothing.
      */
     const onChangeValue = (
-        eventSourceOrName:FileValue|null|string|SyntheticEvent
+        eventSourceOrName:FileValue|null|string|SyntheticEvent,
+        event?:SyntheticEvent,
+        attachBlobProperty:boolean = false
     ):void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
 
+        if (
+            eventSourceOrName &&
+            fileInputReference.current &&
+            (eventSourceOrName as SyntheticEvent).target ===
+                fileInputReference.current
+        ) {
+            event = eventSourceOrName as SyntheticEvent
+
+            if ((event.target as unknown as {files:FileList}).files?.length) {
+                const blob:File =
+                    (event.target as unknown as {files:FileList}).files[0]
+                properties.value = {blob, name: blob.name}
+            } else
+                return
+        }
+
         setValueState((oldValueState:ValueState):ValueState => {
-            let event:SyntheticEvent|undefined
             if (eventSourceOrName === null)
                 properties.value = eventSourceOrName
-            else if (
-                fileInputReference.current &&
-                (eventSourceOrName as SyntheticEvent).target ===
-                    fileInputReference.current
-            ) {
-                event = eventSourceOrName as SyntheticEvent
-                if ((event.target as unknown as {files:FileList}).files?.length) {
-                    const blob:File =
-                        (event.target as unknown as {files:FileList}).files[0]
-                    properties.value = {blob, name: blob.name}
-                } else
-                    return
-            } else if (typeof eventSourceOrName === 'string')
+            else if (typeof eventSourceOrName === 'string')
                 /*
                     NOTE: A name can only be changed if a blob is available
                     beforehand.
@@ -380,9 +389,12 @@ export const FileInputInner = function(
                 typeof (eventSourceOrName as FileValue).source === 'string' ||
                 typeof (eventSourceOrName as FileValue).url === 'string'
             )
-                properties.value = {
-                    ...oldValueState.value, ...eventSourceOrName
-                }
+                if (attachBlobProperty)
+                    properties.value = {
+                        ...oldValueState.value, ...eventSourceOrName
+                    }
+                else
+                    properties.value = eventSourceOrName as FileValue
 
             if (Tools.equals(oldValueState.value, properties.value))
                 return oldValueState
@@ -424,7 +436,10 @@ export const FileInputInner = function(
                 )
             }
 
-            console.log(Tools.copy(result))
+
+            if (attachBlobProperty)
+                result.attachBlobProperty = true
+
             return result
         })
     }
@@ -458,7 +473,7 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
-        'TODO' || setValueState((oldValueState:ValueState):ValueState => {
+        setValueState((oldValueState:ValueState):ValueState => {
             let changedState:boolean = false
 
             if (!oldValueState.modelState.focused) {
@@ -475,7 +490,7 @@ export const FileInputInner = function(
             let result:ValueState = oldValueState
 
             if (changedState) {
-                // TODO has old value onChange(event)
+                onChange(event)
 
                 result = {...oldValueState, modelState: properties.model.state}
 
@@ -522,6 +537,7 @@ export const FileInputInner = function(
         be updated in one event loop (set state callback).
     */
     let [valueState, setValueState] = useState<ValueState>({
+        attachBlobProperty: false,
         modelState: {...FileInput.defaultModelState},
         value: initialValue
     })
@@ -543,12 +559,13 @@ export const FileInputInner = function(
         to avoid endless rendering loops when a value is provided via
         properties.
     */
-    if (properties.value && valueState.value)
+    if (valueState.attachBlobProperty)
         properties.value =
             Tools.extend(true, valueState.value, properties.value)
 
     // / region synchronize properties into state where values are not controlled
     const currentValueState:ValueState = {
+        attachBlobProperty: false,
         modelState: properties.model.state,
         value: properties.value as FileValue|null
     }
@@ -557,10 +574,11 @@ export const FileInputInner = function(
         state has changed.
     */
     if (
+        valueState.attachBlobProperty ||
         !(controlled || Tools.equals(properties.value, valueState.value)) ||
         !Tools.equals(properties.model.state, valueState.modelState)
     )
-        'TODO' || setValueState(currentValueState)
+        setValueState(currentValueState)
     if (controlled)
         setValueState =
             wrapStateSetter<ValueState>(setValueState, currentValueState)
@@ -635,7 +653,7 @@ export const FileInputInner = function(
             }
 
             if (valueChanged)
-                onChangeValue(valueChanged)
+                onChangeValue(valueChanged, undefined, true)
         })()
     })
     // region render
@@ -712,11 +730,13 @@ export const FileInputInner = function(
                 <Typography tag="h2" use="headline6">
                     {invalid ?
                         <Theme use="error">{
-                            properties.description ??
-                            properties.name
+                            properties.description ?
+                                properties.description :
+                                properties.name
                         }</Theme> :
-                        properties.description ??
-                        properties.name
+                        properties.description ?
+                            properties.description :
+                            properties.name
                     }
                 </Typography>
                 {properties.declaration ?
@@ -755,13 +775,7 @@ export const FileInputInner = function(
                         properties,
                         value: properties.value
                     }) :
-                    properties.declaration ?
-                        <Typography
-                            tag="div"
-                            theme="textSecondaryOnBackground"
-                            use="body1"
-                        >{properties.declaration}</Typography> :
-                        ''
+                    ''
                 }
             </div>
             {/*TODO use "accept" attribute*/}

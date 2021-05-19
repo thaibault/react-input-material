@@ -147,7 +147,9 @@ export const triggerCallbackIfExists = <
             (properties[name as keyof P] as unknown as Function)(...parameters)
         else
             Tools.timeout(() =>
-                (properties[name as keyof P] as unknown as Function)(...parameters)
+                (properties[name as keyof P] as unknown as Function)(
+                    ...parameters
+                )
             )
 }
 // region consolidation state
