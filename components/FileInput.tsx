@@ -103,6 +103,18 @@ const videoContentTypeRegularExpression:RegExp = new RegExp(
 )
 // endregion
 // region helper
+export const preserveStaticBaseNameFileNameInputGenerator = (
+    prototype:InputProps<string>, {name, value: {name: fileName}}
+) => ({
+    ...prototype,
+    disabled: true,
+    value:
+        name +
+        (fileName.includes('.') ?
+            `${fileName.substring(fileName.lastIndexOf('.'))}` :
+            ''
+        )
+})
 /**
  * Determines which type of file we have to present.
  * @param contentType - File type to derive representation type from.
