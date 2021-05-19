@@ -31,7 +31,8 @@ endregion */
     visibility: visible;
 }
 
-.file-input .mdc-typography--headline6 {
+.file-input .mdc-typography--headline6,
+.file-input .mdc-typography--subtitle2 {
     margin-left: 10px;
 }
 

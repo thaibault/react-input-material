@@ -324,17 +324,18 @@ export const FileInputInner = function(
                 nameInputReference.current.properties.model
         }
 
-        Tools.extend(
-            true,
-            properties,
-            getConsolidatedProperties(
-                /*
-                    Workaround since "Type" isn't identified as subset of
-                    "RecursivePartial<Type>" yet.
-                */
-                properties as unknown as Props
-            )
+        const consolidatedProperties:Properties = getConsolidatedProperties(
+            /*
+                Workaround since "Type" isn't identified as subset of
+                "RecursivePartial<Type>" yet.
+            */
+            properties as unknown as Props
         )
+        // NOTE: Avoid recursive merging of deprecated value properties.
+        delete properties.model.value
+        delete properties.value
+
+        Tools.extend(true, properties, consolidatedProperties)
 
         triggerCallbackIfExists<Properties>(
             properties, 'change', controlled, properties, event
@@ -343,42 +344,58 @@ export const FileInputInner = function(
     /**
      * Triggered when ever the value changes.
      * @param eventSourceOrName - Event object or new value.
+     * @param event - Optional event object (if not provided as first
+     * argument).
+     * @param attachBlobProperty - Indicates whether additional data is added
+     * through post processed data properties.
      * @returns Nothing.
      */
     const onChangeValue = (
-        eventSourceOrName:FileValue|null|string|SyntheticEvent
+        eventSourceOrName:FileValue|null|string|SyntheticEvent,
+        event?:SyntheticEvent,
+        attachBlobProperty:boolean = false
     ):void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
 
-        let event:SyntheticEvent|undefined
-        if (eventSourceOrName === null)
-            properties.value = eventSourceOrName
-        else if (
+        if (
+            eventSourceOrName &&
             fileInputReference.current &&
             (eventSourceOrName as SyntheticEvent).target ===
                 fileInputReference.current
         ) {
             event = eventSourceOrName as SyntheticEvent
+
             if ((event.target as unknown as {files:FileList}).files?.length) {
                 const blob:File =
                     (event.target as unknown as {files:FileList}).files[0]
                 properties.value = {blob, name: blob.name}
             } else
                 return
-        } else if (typeof eventSourceOrName === 'string')
-            /*
-                NOTE: A name can only be changed if a blob is available
-                beforehand.
-            */
-            properties.value = {...properties.value, name: eventSourceOrName}
-        else if (
-            typeof (eventSourceOrName as FileValue).source === 'string' ||
-            typeof (eventSourceOrName as FileValue).url === 'string'
-        )
-            properties.value = eventSourceOrName as FileValue
+        }
 
         setValueState((oldValueState:ValueState):ValueState => {
+            if (eventSourceOrName === null)
+                properties.value = eventSourceOrName
+            else if (typeof eventSourceOrName === 'string')
+                /*
+                    NOTE: A name can only be changed if a blob is available
+                    beforehand.
+                */
+                properties.value = {
+                    ...oldValueState.value, name: eventSourceOrName
+                }
+            else if (
+                typeof (eventSourceOrName as FileValue).source === 'string' ||
+                typeof (eventSourceOrName as FileValue).url === 'string'
+            )
+                if (attachBlobProperty)
+                    properties.value = {
+                        ...oldValueState.value, ...eventSourceOrName
+                    }
+                else
+                    properties.value = eventSourceOrName as FileValue
+
             if (Tools.equals(oldValueState.value, properties.value))
                 return oldValueState
 
@@ -418,6 +435,10 @@ export const FileInputInner = function(
                     event
                 )
             }
+
+
+            if (attachBlobProperty)
+                result.attachBlobProperty = true
 
             return result
         })
@@ -516,6 +537,7 @@ export const FileInputInner = function(
         be updated in one event loop (set state callback).
     */
     let [valueState, setValueState] = useState<ValueState>({
+        attachBlobProperty: false,
         modelState: {...FileInput.defaultModelState},
         value: initialValue
     })
@@ -531,8 +553,19 @@ export const FileInputInner = function(
     deriveMissingPropertiesFromState(givenProperties, valueState)
 
     const properties:Properties = getConsolidatedProperties(givenProperties)
-    // region synchronize properties into state where values are not controlled
+
+    /*
+        NOTE: We have to merge asynchronous determined missing value properties
+        to avoid endless rendering loops when a value is provided via
+        properties.
+    */
+    if (valueState.attachBlobProperty)
+        properties.value =
+            Tools.extend(true, valueState.value, properties.value)
+
+    // / region synchronize properties into state where values are not controlled
     const currentValueState:ValueState = {
+        attachBlobProperty: false,
         modelState: properties.model.state,
         value: properties.value as FileValue|null
     }
@@ -541,6 +574,7 @@ export const FileInputInner = function(
         state has changed.
     */
     if (
+        valueState.attachBlobProperty ||
         !(controlled || Tools.equals(properties.value, valueState.value)) ||
         !Tools.equals(properties.model.state, valueState.modelState)
     )
@@ -548,7 +582,7 @@ export const FileInputInner = function(
     if (controlled)
         setValueState =
             wrapStateSetter<ValueState>(setValueState, currentValueState)
-    // endregion
+    // / endregion
     useImperativeHandle(
         reference,
         ():Adapter & {
@@ -568,43 +602,40 @@ export const FileInputInner = function(
     // endregion
     useEffect(():void => {
         (async ():Promise<void> => {
-            let valueChanged:boolean = false
+            let valueChanged:null|Partial<FileValue> = null
             if (
                 properties.value?.blob &&
                 properties.value.blob instanceof Blob &&
                 !properties.value.source
-            ) {
-                if (textContentTypeRegularExpression.test(
-                    properties.value.blob.type
-                ))
-                    properties.value.source =
-                        await readBinaryDataIntoText(properties.value.blob)
-                else
-                    properties.value.source = typeof Blob === 'undefined' ?
-                        (properties.value.toString as
-                            unknown as
-                            (encoding:string) => string
-                        )('base64') :
-                        await blobToBase64String(properties.value.blob)
-
-                valueChanged = true
-            }
+            )
+                valueChanged = {
+                    source: textContentTypeRegularExpression.test(
+                        properties.value.blob.type
+                    ) ?
+                        await readBinaryDataIntoText(
+                            properties.value.blob
+                        ) :
+                        typeof Blob === 'undefined' ?
+                            (properties.value.toString as
+                                unknown as
+                                (encoding:string) => string
+                            )('base64') :
+                            await blobToBase64String(properties.value.blob)
+                }
 
             if (properties.value?.source) {
                 if (!properties.value.blob)
-                    if (properties.value.url?.startsWith('data:')) {
-                        properties.value.blob =
-                            dataURLToBlob(properties.value.source)
-
-                        valueChanged = true
-                    } else if (properties.sourceToBlobOptions) {
-                        properties.value.blob = new Blob(
-                            [properties.value.source],
-                            properties.sourceToBlobOptions
-                        )
-
-                        valueChanged = true
-                    }
+                    if (properties.value.url?.startsWith('data:'))
+                        valueChanged = {
+                            blob: dataURLToBlob(properties.value.source)
+                        }
+                    else if (properties.sourceToBlobOptions)
+                        valueChanged = {
+                            blob: new Blob(
+                                [properties.value.source],
+                                properties.sourceToBlobOptions
+                            )
+                        }
 
                 if (!properties.value.url && properties.value.blob?.type) {
                     const source = textContentTypeRegularExpression.test(
@@ -613,15 +644,16 @@ export const FileInputInner = function(
                         btoa(properties.value.source) :
                         properties.value.source
 
-                    properties.value.url =
-                        `data:${properties.value.blob.type};base64,${source}`
-
-                    valueChanged = true
+                    valueChanged = {
+                        url:
+                            `data:${properties.value.blob.type};base64,` +
+                            source
+                    }
                 }
-
-                if (valueChanged)
-                    onChangeValue(Tools.copy(properties.value))
             }
+
+            if (valueChanged)
+                onChangeValue(valueChanged, undefined, true)
         })()
     })
     // region render
@@ -698,11 +730,13 @@ export const FileInputInner = function(
                 <Typography tag="h2" use="headline6">
                     {invalid ?
                         <Theme use="error">{
-                            properties.description ??
-                            properties.name
+                            properties.description ?
+                                properties.description :
+                                properties.name
                         }</Theme> :
-                        properties.description ??
-                        properties.name
+                        properties.description ?
+                            properties.description :
+                            properties.name
                     }
                 </Typography>
                 {properties.declaration ?
@@ -723,14 +757,14 @@ export const FileInputInner = function(
                 }
                 {properties.value ?
                     <GenericInput
-                        {...properties.fileNameInputProperties}
                         disabled={properties.disabled}
+                        value={properties.value?.name}
+                        {...properties.fileNameInputProperties}
                         emptyEqualsNull={false}
                         model={properties.model.fileName}
                         onChangeValue={onChangeValue}
                         ref={nameInputReference as any}
                         required
-                        value={properties.value?.name}
                     /> :
                     ''
                 }
@@ -741,13 +775,7 @@ export const FileInputInner = function(
                         properties,
                         value: properties.value
                     }) :
-                    properties.declaration ?
-                        <Typography
-                            tag="div"
-                            theme="textSecondaryOnBackground"
-                            use="body1"
-                        >{properties.declaration}</Typography> :
-                        ''
+                    ''
                 }
             </div>
             {/*TODO use "accept" attribute*/}
