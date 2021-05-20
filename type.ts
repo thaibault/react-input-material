@@ -682,7 +682,10 @@ export type FileInputProperties =
             value?:FileValue|null
         }) => null|ReactElement,
         generateFileNameInputProperties:(
-            prototype:InputProps<string>, properties:FileInputProperties
+            prototype:InputProps<string>,
+            properties:FileInputProperties & {
+                value:FileValue & {name:string}
+            }
         ) => InputProps<string>
     }
 export type FileInputProps =
@@ -702,8 +705,11 @@ export type FileInputAdapter = ComponentAdapter<
 export type FileInputAdapterWithReferences =
     FileInputAdapter &
     {references:{
+        deleteButtonReference:RefObject<HTMLButtonElement>
+        downloadLinkReference:RefObject<HTMLAnchorElement>
         fileInputReference:RefObject<HTMLInputElement>
         nameInputReference:RefObject<InputAdapter<string>>
+        uploadButtonReference:RefObject<HTMLButtonElement>
     }}
 export type StaticFunctionFileInputComponent =
     Omit<FunctionComponent<FileInputProps>, 'propTypes'> &
