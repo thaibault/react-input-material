@@ -707,6 +707,7 @@ export const FileInputInner = function(
         onBlur={onBlur}
         onClick={onClick}
         onFocus={onFocus}
+        style={properties.style}
     >
         <CardPrimaryAction>
             {properties.value?.url ?

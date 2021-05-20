@@ -179,6 +179,7 @@ export const IntervalInner = ((
         Tools.mask<InputProps<number>>(
             properties as unknown as InputProps<number>,
             {exclude: {
+                className: true,
                 enforceUncontrolled: true,
                 end: true,
                 icon: true,
@@ -187,6 +188,7 @@ export const IntervalInner = ((
                 name: true,
                 onChange: true,
                 onChangeValue: true,
+                style: true,
                 value: true
             }}
         )
@@ -383,6 +385,7 @@ export const IntervalInner = ((
                 .join(' ')
             }
             data-name={properties.name}
+            style={properties.style}
         >
             <GenericInput
                 {...startProperties} ref={startInputReference as any}

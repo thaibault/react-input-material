@@ -154,6 +154,7 @@ export type BaseProperties<Type = any> =
         rootProps:HTMLProps<any>
         showDeclaration:boolean
         showInitialValidationState:boolean
+        style:Mapping
         themeConfiguration:ThemeProviderProps['options']
         tooltip:string|TooltipProps
     }
@@ -272,6 +273,7 @@ export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ripple: oneOfType([boolean, object]),
     showDeclaration: oneOfType([boolean, symbol]),
     showInitialValidationState: boolean,
+    style: object,
     themeConfiguration: object,
     /*
         NOTE: Not yet working:
