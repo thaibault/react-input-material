@@ -1629,13 +1629,16 @@ export const GenericInputInner = function<Type = any>(
         strict={GenericInput.strict}
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
-    ><div className={[styles['generic-input']]
-        .concat(
-            isAdvancedEditor ? styles['generic-input--custom'] : [],
-            properties.className ?? []
-        )
-        .join(' ')
-    }>
+    ><div
+        className={[styles['generic-input']]
+            .concat(
+                isAdvancedEditor ? styles['generic-input--custom'] : [],
+                properties.className ?? []
+            )
+            .join(' ')
+        }
+        style={properties.style}
+    >
         <GenericAnimate
             in={Boolean(properties.selection) || Boolean(properties.labels)}
         >

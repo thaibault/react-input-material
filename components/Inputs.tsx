@@ -442,6 +442,7 @@ export const InputsInner = function<
                 [styles.inputs].concat(properties.className ?? []).join(' ')
             }
             data-name={properties.name}
+            style={properties.style}
         >
             {properties.value ?
                 (properties.value as Array<P>).map((
