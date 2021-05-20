@@ -16,6 +16,7 @@
     endregion
 */
 // region imports
+import Tools from 'clientnode'
 import PropertyTypes, {
     any,
     arrayOf,
@@ -681,7 +682,10 @@ export type FileInputProperties =
             value?:FileValue|null
         }) => null|ReactElement,
         generateFileNameInputProperties:(
-            value:FileValue, prototype:InputProps<string>
+            prototype:InputProps<string>,
+            properties:FileInputProperties & {
+                value:FileValue & {name:string}
+            }
         ) => InputProps<string>
     }
 export type FileInputProps =
@@ -701,8 +705,11 @@ export type FileInputAdapter = ComponentAdapter<
 export type FileInputAdapterWithReferences =
     FileInputAdapter &
     {references:{
+        deleteButtonReference:RefObject<HTMLButtonElement>
+        downloadLinkReference:RefObject<HTMLAnchorElement>
         fileInputReference:RefObject<HTMLInputElement>
         nameInputReference:RefObject<InputAdapter<string>>
+        uploadButtonReference:RefObject<HTMLButtonElement>
     }}
 export type StaticFunctionFileInputComponent =
     Omit<FunctionComponent<FileInputProps>, 'propTypes'> &
@@ -780,9 +787,7 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
     downloadButton: 'download',
     editButton: 'edit',
     encoding: 'utf-8',
-    generateFileNameInputProperties: (
-        value:FileValue, prototype:InputProps<string>
-    ):InputProps<string> => prototype,
+    generateFileNameInputProperties: Tools.identity,
     invertedContentTypePatternText:
         'Your file\'s mime-type should not match the regular expression: "' +
         '${invertedContentTypePattern}".',

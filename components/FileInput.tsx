@@ -103,6 +103,18 @@ const videoContentTypeRegularExpression:RegExp = new RegExp(
 )
 // endregion
 // region helper
+export const preserveStaticFileBaseNameInputGenerator:Properties['generateFileNameInputProperties'] = (
+    prototype:InputProps<string>, {name, value: {name: fileName}}
+) => ({
+    ...prototype,
+    disabled: true,
+    value:
+        name +
+        (fileName.includes('.') ?
+            `${fileName.substring(fileName.lastIndexOf('.'))}` :
+            ''
+        )
+})
 /**
  * Determines which type of file we have to present.
  * @param contentType - File type to derive representation type from.
@@ -510,12 +522,16 @@ export const FileInputInner = function(
     // endregion
     // region properties
     // / region references
+    const deleteButtonReference:RefObject<HTMLButtonElement> =
+        createRef<HTMLButtonElement>()
     const downloadLinkReference:RefObject<HTMLAnchorElement> =
         createRef<HTMLAnchorElement>()
     const fileInputReference:RefObject<HTMLInputElement> =
         createRef<HTMLInputElement>()
     const nameInputReference:RefObject<InputAdapter<string>> =
         createRef<InputAdapter<string>>()
+    const uploadButtonReference:RefObject<HTMLButtonElement> =
+        createRef<HTMLButtonElement>()
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
 
@@ -585,12 +601,21 @@ export const FileInputInner = function(
         reference,
         ():Adapter & {
             references:{
+                deleteButtonReference:RefObject<HTMLButtonElement>,
+                downloadLinkReference:RefObject<HTMLAnchorElement>,
                 fileInputReference:RefObject<HTMLInputElement>,
-                nameInputReference:RefObject<InputAdapter<string>>
+                nameInputReference:RefObject<InputAdapter<string>>,
+                uploadButtonReference:RefObject<HTMLButtonElement>
             }
         } => ({
             properties,
-            references: {fileInputReference, nameInputReference},
+            references: {
+                deleteButtonReference,
+                downloadLinkReference,
+                fileInputReference,
+                nameInputReference,
+                uploadButtonReference
+            },
             state: {
                 modelState: properties.model.state,
                 ...(controlled ? {} : {value: properties.value})
@@ -757,7 +782,6 @@ export const FileInputInner = function(
                     <GenericInput
                         ref={nameInputReference as any}
                         {...properties.generateFileNameInputProperties(
-                            properties.value,
                             {
                                 disabled: properties.disabled,
                                 value: properties.value?.name,
@@ -765,6 +789,9 @@ export const FileInputInner = function(
                                 model: properties.model.fileName,
                                 onChangeValue: onChangeValue,
                                 default: properties.value.name
+                            },
+                            properties as Properties & {
+                                value:FileValue & {name:string}
                             }
                         )}
                     /> :
@@ -802,6 +829,7 @@ export const FileInputInner = function(
                             onClick={():void =>
                                 fileInputReference.current?.click()
                             }
+                            ref={uploadButtonReference}
                             ripple={properties.ripple}
                         >
                             {properties.value ?
@@ -815,6 +843,7 @@ export const FileInputInner = function(
                         <>
                             <CardActionButton
                                 onClick={():void => onChangeValue(null)}
+                                ref={deleteButtonReference}
                                 ripple={properties.ripple}
                             >{properties.deleteButton}</CardActionButton>
                             {properties.value.url ?
