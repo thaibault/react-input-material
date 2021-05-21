@@ -345,10 +345,12 @@ export const FileInputInner = function(
         delete properties.model.value
         delete properties.value
 
-        Tools.extend(true, properties, consolidatedProperties)
+        // NOTE: We have to avoid writing in readonly properties.
+        const currentProperties:Properties =
+            Tools.extend(true, {}, properties, consolidatedProperties)
 
         triggerCallbackIfExists<Properties>(
-            properties, 'change', controlled, properties, event
+            currentProperties, 'change', controlled, currentProperties, event
         )
     }
     /**
