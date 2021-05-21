@@ -344,13 +344,13 @@ export const FileInputInner = function(
         // NOTE: Avoid recursive merging of deprecated value properties.
         delete properties.model.value
         delete properties.value
+        // NOTE: Avoid trying to write into a readonly object.
+        properties.style = Tools.copy(properties.style)
 
-        // NOTE: We have to avoid writing in readonly properties.
-        const currentProperties:Properties =
-            Tools.extend(true, {}, properties, consolidatedProperties)
+        Tools.extend(true, properties, consolidatedProperties)
 
         triggerCallbackIfExists<Properties>(
-            currentProperties, 'change', controlled, currentProperties, event
+            properties, 'change', controlled, properties, event
         )
     }
     /**
