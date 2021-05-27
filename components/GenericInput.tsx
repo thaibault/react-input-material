@@ -1072,7 +1072,12 @@ export const GenericInputInner = function<Type = any>(
 
         if (oldValueState.value !== properties.value)
             triggerCallbackIfExists<Properties<Type>>(
-                properties, 'changeValue', controlled, properties.value, event
+                properties,
+                'changeValue',
+                controlled,
+                properties.value,
+                event,
+                properties
             )
 
         if (stateChanged)
@@ -1081,11 +1086,12 @@ export const GenericInputInner = function<Type = any>(
                 'changeState',
                 controlled,
                 properties.model.state,
-                event
+                event,
+                properties
             )
 
         triggerCallbackIfExists<Properties<Type>>(
-            properties, 'blur', controlled, event
+            properties, 'blur', controlled, event, properties
         )
 
         return changed ?
@@ -1140,7 +1146,8 @@ export const GenericInputInner = function<Type = any>(
                 'changeEditorIsActive',
                 controlled,
                 properties.editorIsActive,
-                event
+                event,
+                properties
             )
 
             return {
@@ -1169,7 +1176,8 @@ export const GenericInputInner = function<Type = any>(
                 'changeShowDeclaration',
                 controlled,
                 properties.showDeclaration,
-                event
+                event,
+                properties
             )
 
             return properties.showDeclaration
@@ -1257,7 +1265,12 @@ export const GenericInputInner = function<Type = any>(
                 stateChanged = true
 
             triggerCallbackIfExists<Properties<Type>>(
-                properties, 'changeValue', controlled, properties.value, event
+                properties,
+                'changeValue',
+                controlled,
+                properties.value,
+                event,
+                properties
             )
 
             if (stateChanged) {
@@ -1268,7 +1281,8 @@ export const GenericInputInner = function<Type = any>(
                     'changeState',
                     controlled,
                     properties.model.state,
-                    event
+                    event,
+                    properties
                 )
             }
 
@@ -1284,7 +1298,7 @@ export const GenericInputInner = function<Type = any>(
         onSelectionChange(event)
 
         triggerCallbackIfExists<Properties<Type>>(
-            properties, 'click', controlled, event
+            properties, 'click', controlled, event, properties
         )
 
         onTouch(event)
@@ -1296,7 +1310,7 @@ export const GenericInputInner = function<Type = any>(
      */
     const onFocus = (event:ReactFocusEvent):void => {
         triggerCallbackIfExists<Properties<Type>>(
-            properties, 'focus', controlled, event
+            properties, 'focus', controlled, event, properties
         )
 
         onTouch(event)
@@ -1319,7 +1333,7 @@ export const GenericInputInner = function<Type = any>(
             event.stopPropagation()
 
         triggerCallbackIfExists<Properties<Type>>(
-            properties, 'keyDown', controlled, event
+            properties, 'keyDown', controlled, event, properties
         )
     }
     /**
@@ -1333,7 +1347,7 @@ export const GenericInputInner = function<Type = any>(
             onSelectionChange(event)
 
             triggerCallbackIfExists<Properties<Type>>(
-                properties, 'keyUp', controlled, event
+                properties, 'keyUp', controlled, event, properties
             )
         }
     }
@@ -1346,7 +1360,7 @@ export const GenericInputInner = function<Type = any>(
         saveSelectionState(event)
 
         triggerCallbackIfExists<Properties<Type>>(
-            properties, 'selectionChange', controlled, event
+            properties, 'selectionChange', controlled, event, properties
         )
     }
     /**
@@ -1383,12 +1397,13 @@ export const GenericInputInner = function<Type = any>(
                     'changeState',
                     controlled,
                     properties.model.state,
-                    event
+                    event,
+                    properties
                 )
             }
 
             triggerCallbackIfExists<Properties<Type>>(
-                properties, 'touch', controlled, event
+                properties, 'touch', controlled, event, properties
             )
 
             return result

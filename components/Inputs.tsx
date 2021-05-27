@@ -261,7 +261,8 @@ export const InputsInner = function<
             'change',
             controlled,
             getExternalProperties<P>(properties as InputsProperties<P>),
-            event
+            event,
+            properties
         )
     }
     const triggerOnChangeValue = (
@@ -291,7 +292,8 @@ export const InputsInner = function<
             'changeValue',
             controlled,
             values,
-            event
+            event,
+            properties
         )
 
         return values
