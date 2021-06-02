@@ -300,7 +300,8 @@ export const IntervalInner = ((
                     start,
                     inputProperties
                 ),
-                event
+                event,
+                properties
             )
         }
         startProperties.onChange = (
@@ -324,7 +325,8 @@ export const IntervalInner = ((
                     inputProperties,
                     end
                 ),
-                event
+                event,
+                properties
             )
         }
     }
@@ -345,7 +347,8 @@ export const IntervalInner = ((
             'changeValue',
             controlled,
             newValue,
-            event
+            event,
+            properties
         )
 
         setValue(newValue)
@@ -366,7 +369,8 @@ export const IntervalInner = ((
             'changeValue',
             controlled,
             newValue,
-            event
+            event,
+            properties
         )
 
         setValue(newValue)

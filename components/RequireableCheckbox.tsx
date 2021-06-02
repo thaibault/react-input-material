@@ -157,12 +157,13 @@ export const RequireableCheckboxInner = function(
                 'changeState',
                 controlled,
                 properties.model.state,
-                event
+                event,
+                properties
             )
         }
 
         triggerCallbackIfExists<Properties>(
-            properties, 'blur', controlled, event
+            properties, 'blur', controlled, event, properties
         )
 
         return changed ?
@@ -226,7 +227,12 @@ export const RequireableCheckboxInner = function(
                 stateChanged = true
 
             triggerCallbackIfExists<Properties>(
-                properties, 'changeValue', controlled, properties.value, event
+                properties,
+                'changeValue',
+                controlled,
+                properties.value,
+                event,
+                properties
             )
 
             if (stateChanged) {
@@ -237,7 +243,8 @@ export const RequireableCheckboxInner = function(
                     'changeState',
                     controlled,
                     properties.model.state,
-                    event
+                    event,
+                    properties
                 )
             }
 
@@ -251,7 +258,7 @@ export const RequireableCheckboxInner = function(
      */
     const onClick = (event:ReactMouseEvent):void => {
         triggerCallbackIfExists<Properties>(
-            properties, 'click', controlled, event
+            properties, 'click', controlled, event, properties
         )
 
         onTouch(event)
@@ -263,7 +270,7 @@ export const RequireableCheckboxInner = function(
      */
     const onFocus = (event:ReactFocusEvent):void => {
         triggerCallbackIfExists<Properties>(
-            properties, 'focus', controlled, event
+            properties, 'focus', controlled, event, properties
         )
 
         onTouch(event)
@@ -300,12 +307,13 @@ export const RequireableCheckboxInner = function(
                     'changeState',
                     controlled,
                     properties.model.state,
-                    event
+                    event,
+                    properties
                 )
             }
 
             triggerCallbackIfExists<Properties>(
-                properties, 'touch', controlled, event
+                properties, 'touch', controlled, event, properties
             )
 
             return result
