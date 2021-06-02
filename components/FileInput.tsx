@@ -852,11 +852,14 @@ export const FileInputInner = function(
                     }
                     {properties.value ?
                         <>
-                            <CardActionButton
-                                onClick={():void => onChangeValue(null)}
-                                ref={deleteButtonReference}
-                                ripple={properties.ripple}
-                            >{properties.deleteButton}</CardActionButton>
+                            {!properties.disabled ?
+                                <CardActionButton
+                                    onClick={():void => onChangeValue(null)}
+                                    ref={deleteButtonReference}
+                                    ripple={properties.ripple}
+                                >{properties.deleteButton}</CardActionButton> :
+                                ''
+                            }
                             {properties.value.url ?
                                 <CardActionButton
                                     onClick={():void =>
