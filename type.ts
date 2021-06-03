@@ -129,7 +129,7 @@ export type DataTransformSpecification<T = unknown> = {
     ) => null|T
     type?:NativeInputType
 }
-export type Properties<T = unknown, ExternalProperties = unknown> =
+export type BaseProperties<T = unknown, ExternalProperties = unknown> =
     BaseModel<T> &
     ModelState &
     {
@@ -172,6 +172,9 @@ export type Properties<T = unknown, ExternalProperties = unknown> =
         themeConfiguration:ThemeProviderProps['options']
         tooltip:string|TooltipProps
     }
+export type Properties<
+    T = unknown, ExternalProperties = BaseProperties<T, BaseProperties<T>>
+> = BaseProperties<T, ExternalProperties>
 export type Props<
     T = unknown, ExternalProperties = Properties<T, Properties<T>>
 > =
@@ -185,15 +188,15 @@ export type State<T = unknown> = {
     value?:null|T
 }
 export interface StaticWebComponent<
-    P extends Props = Props, M extends ModelState = ModelState
+    P = Props, MS = ModelState
 > extends StaticBaseWebComponent {
     new (properties:P):Component<P>
-    defaultModelState:M
+    defaultModelState:MS
     defaultProperties:P
     strict:boolean
 }
-export type StaticComponent<P = Props> =
-    Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<P>
+export type StaticComponent<P = Props, MS = ModelState> =
+    Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<P, MS>
 export type StaticFunctionComponent<P = Props> =
     Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P>
 export type ValueState<T = unknown, MS = ModelState> = {
@@ -447,7 +450,7 @@ export type InputProps<T = unknown> =
     Partial<Omit<InputProperties<T>, 'model'>> &
     {model?:Partial<InputModel<T>>}
 export type DefaultInputProperties =
-    Omit<InputProps, 'model'> & {model:InputModel}
+    Omit<InputProps<string>, 'model'> & {model:InputModel<string>}
 export type InputPropertyTypes<T = unknown> = {
     [key in keyof InputProperties<T>]:ValueOf<typeof PropertyTypes>
 }
@@ -487,11 +490,10 @@ export type InputDataTransformation<T = unknown> =
         time:DataTransformSpecification<T>
     }
 export interface StaticWebInputComponent<
-    P extends InputProps = InputProps,
-    M extends InputModelState = InputModelState
-> extends StaticWebComponent<P, M> {
+    T = unknown, P = InputProps<T>, MS = InputModelState
+> extends StaticWebComponent<P, MS> {
     locales:Array<string>
-    transformer:InputDataTransformation<P['value']>
+    transformer:InputDataTransformation<T>
 }
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
 export type InputAdapter<T = unknown> = ComponentAdapter<
@@ -515,9 +517,9 @@ export type InputAdapterWithReferences<T = unknown> = InputAdapter<T> & {
         richTextEditorReference?:RichTextEditorComponent
     }
 }
-export type StaticFunctionInputComponent<P = Props> =
-    Omit<FunctionComponent<P>, 'propTypes'> & StaticWebInputComponent<P>
-// // region constants
+export type StaticFunctionInputComponent<T = unknown, P = InputProps<T>> =
+    Omit<FunctionComponent<P>, 'propTypes'> & StaticWebInputComponent<T, P>
+// // region constants 
 export const inputModelStatePropertyTypes:{
     [key in keyof InputModelState]:Requireable<boolean|symbol>
 } = {
@@ -597,8 +599,8 @@ export const defaultInputModelState:InputModelState = {
     invalidMinimumLength: false,
     invalidPattern: false
 } as const
-export const defaultInputModel:InputModel = {
-    ...defaultModel,
+export const defaultInputModel:InputModel<string> = {
+    ...defaultModel as InputModel<string>,
     state: defaultInputModelState
 } as const
 /*
@@ -606,7 +608,7 @@ export const defaultInputModel:InputModel = {
     would permanently shadow them.
 */
 export const defaultInputProperties:DefaultInputProperties = {
-    ...defaultProperties,
+    ...defaultProperties as DefaultInputProperties,
     cursor: {
         end: 0,
         start: 0
@@ -761,7 +763,7 @@ export const defaultFileInputModelState:FileInputModelState = {
     invalidName: false
 } as const
 export const defaultFileInputModel:FileInputModel = {
-    ...defaultModel,
+    ...defaultModel as Model<FileValue>,
     contentTypeRegularExpressionPattern: /^.+\/.+$/,
     fileName: {
         ...defaultInputModel,
@@ -791,7 +793,7 @@ export const defaultFileNameInputProperties:InputProps<string> = {
 } as InputProperties<string>
 delete (defaultFileNameInputProperties as {model?:InputModel}).model
 export const defaultFileInputProperties:DefaultFileInputProperties = {
-    ...defaultProperties,
+    ...defaultProperties as DefaultProperties<FileValue>,
     contentTypePatternText:
         'Your file\'s mime-type has to match the regular expression: "' +
         '${contentTypePattern}".',
@@ -863,7 +865,7 @@ export type InputsProperties<P extends Properties = Properties> =
         }) => Partial<P>
         onChangeValue:(
             values:Array<P['value']>|null,
-            event?:GenericEvent,
+            event:GenericEvent|unknown,
             properties:InputsProperties<P>
         ) => void
     }
@@ -898,7 +900,7 @@ export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
 export const inputsRenderProperties:Array<string> =
     ['children', 'createPrototype']
 export const defaultInputsModel:InputsModel = {
-    ...defaultModel,
+    ...defaultModel as InputsModel,
     state: {
         ...defaultModel.state,
         invalidMaximumNumber: false,
@@ -913,7 +915,7 @@ export const defaultInputsModel:InputsModel = {
     would permanently shadow them.
 */
 export const defaultInputsProperties:DefaultInputsProperties = {
-    ...defaultProperties,
+    ...defaultProperties as DefaultInputsProperties,
     addIcon: {icon: 'add'},
     createPrototype: ({prototype}):Partial<Properties> => prototype,
     model: {...defaultInputsModel},

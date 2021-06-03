@@ -207,7 +207,7 @@ export const determineInitialValue = <Type = any>(
  * validator function.
  * @returns A boolean indicating if validation state has changed.
  */
-export const determineValidationState = <P extends BaseProperties>(
+export const determineValidationState = <P = BaseProperties>(
     properties:P,
     currentState:P['model']['state'],
     validators:Mapping<() => boolean> = {}
