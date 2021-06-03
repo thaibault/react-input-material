@@ -105,7 +105,7 @@ const videoContentTypeRegularExpression:RegExp = new RegExp(
 // region helper
 export const preserveStaticFileBaseNameInputGenerator:Properties['generateFileNameInputProperties'] = (
     prototype:InputProps<string>, {name, value: {name: fileName}}
-) => ({
+):InputProps<string> => ({
     ...prototype,
     disabled: true,
     value:
@@ -359,14 +359,15 @@ export const FileInputInner = function(
      * @param eventSourceOrName - Event object or new value.
      * @param event - Optional event object (if not provided as first
      * argument).
+     * @param properties - Current properties state.
      * @param attachBlobProperty - Indicates whether additional data is added
      * through post processed data properties.
      * @returns Nothing.
      */
     const onChangeValue = (
         eventSourceOrName:FileValue|null|string|SyntheticEvent,
-        event?:SyntheticEvent,
-        properties:InputProperties<string>,
+        event:SyntheticEvent|undefined,
+        properties:Properties,
         attachBlobProperty:boolean = false
     ):void => {
         if (!(properties.model.mutable && properties.model.writable))
@@ -687,7 +688,7 @@ export const FileInputInner = function(
             }
 
             if (valueChanged)
-                onChangeValue(valueChanged, undefined, true)
+                onChangeValue(valueChanged, undefined, properties, true)
         })()
     })
     // region render
