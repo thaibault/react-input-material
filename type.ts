@@ -68,9 +68,8 @@ export type TestEnvironment = {
     container:HTMLDivElement|null
     render:(component:ReactElement) => ChildNode|null
 }
-export type BaseModel<T = unknown> = {
+export type BaseModel = {
     declaration:string
-    default:null|T
     description:string
     emptyEqualsNull:boolean
     invertedRegularExpressionPattern:null|RegExp|string
@@ -83,8 +82,13 @@ export type BaseModel<T = unknown> = {
     selection?:SelectProps['options']
     trim:boolean
     type:string
-    value?:null|T
 }
+export type TypedBaseModel<T = unknown> =
+    BaseModel &
+    {
+        default:null|T
+        value?:null|T
+    }
 export type CursorState = {
     end:number
     start:number
@@ -102,7 +106,7 @@ export type ModelState = {
     visited:boolean
 }
 export type Model<T = unknown> =
-    BaseModel<T> &
+    TypedBaseModel<T> &
     {
         mutable:boolean
         nullable:boolean
@@ -129,39 +133,17 @@ export type DataTransformSpecification<T = unknown> = {
     ) => null|T
     type?:NativeInputType
 }
-export type BaseProperties<T = unknown, ExternalProperties = unknown> =
-    BaseModel<T> &
+export type BaseProperties =
+    BaseModel &
     ModelState &
     {
         className:string
         disabled:boolean
         enforceUncontrolled:boolean
         id:string
-        initialValue:null|T
         label:string
-        model:Model<T>
+        model:BaseModel
         name:string
-        onBlur:(event:GenericEvent|undefined, properties:ExternalProperties) =>
-            void
-        onChangeShowDeclaration:(
-            show:boolean,
-            event:GenericEvent|undefined,
-            properties:ExternalProperties
-        ) => void
-        onChangeState:(
-            state:ModelState,
-            event:GenericEvent|undefined,
-            properties:ExternalProperties
-        ) => void
-        onChange:(properties:ExternalProperties, event?:GenericEvent) => void
-        onChangeValue:(
-            value:null|T,
-            event:GenericEvent|undefined,
-            properties:ExternalProperties
-        ) => void
-        onClick:(event:MouseEvent, properties:ExternalProperties) => void
-        onFocus:(event:FocusEvent, properties:ExternalProperties) => void
-        onTouch:(event:GenericEvent, properties:ExternalProperties) => void
         required:boolean
         requiredText:string
         ripple:RipplePropT
@@ -172,9 +154,34 @@ export type BaseProperties<T = unknown, ExternalProperties = unknown> =
         themeConfiguration:ThemeProviderProps['options']
         tooltip:string|TooltipProps
     }
-export type Properties<
-    T = unknown, ExternalProperties = BaseProperties<T, BaseProperties<T>>
-> = BaseProperties<T, ExternalProperties>
+export type Properties<T = unknown, ExternalProperties = BaseProperties> =
+    BaseProperties &
+    TypedBaseModel<T> &
+    {
+        initialValue:null|T
+        model:Model<T>
+        onBlur:(event:GenericEvent|undefined, properties:ExternalProperties) =>
+            void
+        onChange:(properties:ExternalProperties, event?:GenericEvent) => void
+        onChangeShowDeclaration:(
+            show:boolean,
+            event:GenericEvent|undefined,
+            properties:ExternalProperties
+        ) => void
+        onChangeState:(
+            state:ModelState,
+            event:GenericEvent|undefined,
+            properties:ExternalProperties
+        ) => void
+        onChangeValue:(
+            value:null|T,
+            event:GenericEvent|undefined,
+            properties:ExternalProperties
+        ) => void
+        onClick:(event:MouseEvent, properties:ExternalProperties) => void
+        onFocus:(event:FocusEvent, properties:ExternalProperties) => void
+        onTouch:(event:GenericEvent, properties:ExternalProperties) => void
+    }
 export type Props<
     T = unknown, ExternalProperties = Properties<T, Properties<T>>
 > =

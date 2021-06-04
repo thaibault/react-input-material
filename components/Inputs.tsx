@@ -16,7 +16,7 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports 
+// region imports  
 import Tools from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import {
@@ -48,6 +48,7 @@ import {
     defaultInputsProperties,
     defaultProperties,
     GenericEvent,
+    InputProperties,
     InputsAdapter as Adapter,
     InputsAdapterWithReferences as AdapterWithReferences,
     InputsModel as Model,
@@ -56,7 +57,6 @@ import {
     inputsPropertyTypes as propertyTypes,
     InputsProps,
     inputsRenderProperties as renderProperties,
-    Properties,
     StaticComponent
 } from '../type'
 // endregion
@@ -143,7 +143,7 @@ const getExternalProperties = function<P extends Properties>(
  * @returns React elements.
  */
 export const InputsInner = function<
-    P extends Properties = Properties, State = Mapping<any>
+    P = InputProperties<string>, State = Mapping<any>
 >(props:InputsProps<P>, reference?:RefObject<Adapter<P>>):ReactElement {
     // region consolidate properties
     let givenProps:InputsProps<P> =

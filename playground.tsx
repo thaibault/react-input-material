@@ -63,8 +63,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     const onChangeValue1 = useMemorizedValue<(value:FileValue|null) =>
         void>(setValue1)
 
-    const [value2, setValue2] = useState<string>('')
-    const onChangeValue2 = useMemorizedValue<(value:string) => void>(setValue2)
+    const [value2, setValue2] = useState<null|string>('')
+    const onChangeValue2 =
+        useMemorizedValue<(value:null|string) => void>(setValue2)
 
     type FloatValueState = {
         value?:null|number
@@ -86,11 +87,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         useMemorizedValue<(value:boolean|null) => void>(setValue5)
 
     const [value6, setValue6] =
-        useState<Array<boolean|null|string>|null>(['first item'])
+        useState<Array<null|string>|null>(['first item'])
     const onChangeValue6 =
-        useMemorizedValue<(values:Array<boolean|null|string>|null) => void>(
-            setValue6
-        )
+        useMemorizedValue<(values:Array<null|string>|null) => void>(setValue6)
     // endregion
     return (<>
         <div className="playground__inputs">

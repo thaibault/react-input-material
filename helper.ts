@@ -27,7 +27,6 @@ import {render as renderReact, unmountComponentAtNode} from 'react-dom'
 
 import {
     BaseProperties,
-    BaseProps,
     DataTransformSpecification,
     DefaultProperties,
     FormatSpecification,
@@ -35,6 +34,7 @@ import {
     InputProperties,
     Model,
     ModelState,
+    Props,
     ValueState
 } from './type'
 // endregion
@@ -62,7 +62,7 @@ export const createDummyStateSetter = <
  * @returns Consolidated properties.
  */
 export const deriveMissingPropertiesFromState = <
-    Properties extends BaseProps = BaseProps,
+    Properties extends Props = Props,
     State extends ValueState = ValueState
 >(properties:Properties, state:State):Properties => {
     /*
@@ -133,7 +133,7 @@ export const wrapStateSetter = <Type = any>(
  * @returns Nothing.
  */
 export const triggerCallbackIfExists = <
-    P extends Omit<BaseProperties, 'model'> & {model:unknown}
+    P extends Omit<Properties, 'model'> & {model:unknown}
 >(
     properties:P,
     name:string,
@@ -179,7 +179,7 @@ export const translateKnownSymbols = <Type = any>(
  * @returns Determined value.
  */
 export const determineInitialValue = <Type = any>(
-    properties:BaseProps<Type>,
+    properties:Props<Type>,
     defaultValue?:null|Type,
     alternateValue?:null|Type
 ):null|Type => {
@@ -207,7 +207,9 @@ export const determineInitialValue = <Type = any>(
  * validator function.
  * @returns A boolean indicating if validation state has changed.
  */
-export const determineValidationState = <P = BaseProperties>(
+export const determineValidationState = <
+    P extends BaseProperties = BaseProperties
+>(
     properties:P,
     currentState:P['model']['state'],
     validators:Mapping<() => boolean> = {}
@@ -225,7 +227,9 @@ export const determineValidationState = <P = BaseProperties>(
                 properties.model.type === 'boolean' &&
                 !(
                     typeof properties.model.value === 'boolean' ||
-                    ['false', 'true'].includes(properties.model.value)
+                    ['false', 'true'].includes(
+                        properties.model.value as unknown as string
+                    )
                 )
             )
         ),
@@ -259,7 +263,7 @@ export const determineValidationState = <P = BaseProperties>(
  * @param defaultModel - Default model to merge.
  * @returns Merged properties.
 */
-export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
+export const mapPropertiesIntoModel = <P extends Props, M extends Model>(
     properties:P, defaultModel:M
 ):P => {
     /*
@@ -321,7 +325,7 @@ export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
  * @returns External properties object.
  */
 export const getConsolidatedProperties = <
-    P extends BaseProps, R extends BaseProperties
+    P extends Props, R extends Properties
 >(properties:P):R => {
     type Result = R & {
         invertedPattern?:null|RegExp|string
