@@ -407,13 +407,13 @@ export const transformValue = <
     P extends {
         emptyEqualsNull:boolean
         model:{trim:boolean}
-        transformer?:RecursivePartial<DataTransformSpecification<Type>>
+        transformer?:RecursivePartial<DataTransformSpecification<T>>
         type:string
     },
     T = unknown
 >(configuration:P, value:T, transformer:InputDataTransformation<T>):null|T => {
     if (configuration.model.trim && typeof value === 'string')
-        value = value.trim().replace(/ +\n/g, '\\n')
+        (value as string) = value.trim().replace(/ +\n/g, '\\n')
 
     return parseValue<P, T>(configuration, value, transformer)
 }

@@ -916,11 +916,11 @@ export const GenericInputInner = function<Type = unknown>(
     */
     const mapPropertiesAndValidationStateIntoModel = (
         properties:Props<Type>
-    ):DefaultProperties<Type> => {
-        const result:DefaultProperties<Type> =
+    ):DefaultProperties => {
+        const result:DefaultProperties =
             mapPropertiesIntoModel<Props<Type>, Model<Type>>(
                 properties, GenericInput.defaultProperties.model as Model<Type>
-            ) as DefaultProperties<Type>
+            )
 
         result.model.value = parseValue<Properties<Type>, Type>(
             result as unknown as Properties<Type>,
