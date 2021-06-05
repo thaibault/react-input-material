@@ -68,8 +68,15 @@ export type TestEnvironment = {
     container:HTMLDivElement|null
     render:(component:ReactElement) => ChildNode|null
 }
-export type BaseModel = {
+export type CursorState = {
+    end:number
+    start:number
+}
+export type Renderable = Array<ReactElement|string>|ReactElement|string
+// // region model
+export type CommonBaseModel = {
     declaration:string
+    default:unknown
     description:string
     emptyEqualsNull:boolean
     invertedRegularExpressionPattern:null|RegExp|string
@@ -82,18 +89,15 @@ export type BaseModel = {
     selection?:SelectProps['options']
     trim:boolean
     type:string
+    value?:unknown
 }
-export type TypedBaseModel<T = unknown> =
-    BaseModel &
-    {
-        default:null|T
-        value?:null|T
-    }
-export type CursorState = {
-    end:number
-    start:number
+export type ModelExtension = {
+    invertedRegularExpressionPattern:null|RegExp|string
+    mutable:boolean
+    nullable:boolean
+    regularExpressionPattern:null|RegExp|string
+    writable:boolean
 }
-export type Renderable = Array<ReactElement|string>|ReactElement|string
 export type ModelState = {
     dirty:boolean
     focused:boolean
@@ -105,14 +109,14 @@ export type ModelState = {
     valid:boolean
     visited:boolean
 }
-export type Model<T = unknown> =
-    TypedBaseModel<T> &
-    {
-        mutable:boolean
-        nullable:boolean
-        state:ModelState
-        writable:boolean
-    }
+export type BaseModel = CommonBaseModel & ModelExtension & {state:ModelState}
+export type ModelGenerics<T = unknown> = {
+    default:null|T
+    value?:null|T
+}
+export type CommonModel<T = unknown> = CommonBaseModel & ModelGenerics<T>
+export type Model<T = unknown> = BaseModel & ModelGenerics<T>
+// // endregion
 export type FormatSpecification<T = unknown> = {
     options?:PlainObject
     transform:(
@@ -134,16 +138,19 @@ export type DataTransformSpecification<T = unknown> = {
     type?:NativeInputType
 }
 export type BaseProperties =
-    BaseModel &
+    CommonBaseModel &
     ModelState &
     {
         className:string
         disabled:boolean
         enforceUncontrolled:boolean
         id:string
+        initialValue:unknown
+        invertedPattern:null|RegExp|string
         label:string
         model:BaseModel
         name:string
+        pattern:null|RegExp|string
         required:boolean
         requiredText:string
         ripple:RipplePropT
@@ -154,9 +161,13 @@ export type BaseProperties =
         themeConfiguration:ThemeProviderProps['options']
         tooltip:string|TooltipProps
     }
+export type BaseProps =
+    Partial<Omit<BaseProperties, 'model'>> & {model?:Partial<BaseModel>}
+export type DefaultBaseProperties =
+    Omit<BaseProps, 'model'> & {model:BaseModel}
 export type Properties<T = unknown, ExternalProperties = BaseProperties> =
     BaseProperties &
-    TypedBaseModel<T> &
+    CommonModel<T> &
     {
         initialValue:null|T
         model:Model<T>
@@ -308,7 +319,7 @@ export const defaultModelState:ModelState = {
     valid: true,
     visited: false
 } as const
-export const defaultModel:Model = {
+export const defaultModel:Model<string> = {
     declaration: '',
     default: null,
     description: '',
@@ -335,7 +346,7 @@ export const defaultModel:Model = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultProperties:DefaultProperties = {
+export const defaultProperties:DefaultProperties<string> = {
     enforceUncontrolled: false,
     model: {...defaultModel},
     showDeclaration: undefined,
@@ -690,10 +701,7 @@ export type AdditionalFileInputProperties =
             type?:string
         }
     }
-export type FileInputProperties =
-    Properties<
-        FileValue, Properties<FileValue> & AdditionalFileInputProperties
-    > &
+export type FileInputPropertiesExtension =
     AdditionalFileInputProperties &
     {
         children:(options:{
@@ -709,8 +717,14 @@ export type FileInputProperties =
             }
         ) => InputProps<string>
     }
+export type FileInputProperties =
+    Properties<
+        FileValue, Properties<FileValue> & AdditionalFileInputProperties
+    > &
+    FileInputPropertiesExtension
 export type FileInputProps =
-    Partial<Omit<FileInputProperties, 'model'>> &
+    Props<FileValue, FileInputProperties> &
+    Partial<Omit<FileInputPropertiesExtension, 'model'>> &
     {model?:Partial<FileInputModel>}
 export type DefaultFileInputProperties =
     Omit<FileInputProps, 'model'> & {model:FileInputModel}
@@ -797,10 +811,10 @@ export const defaultFileNameInputProperties:InputProps<string> = {
         'Your file\'s name has to match the regular expression: "' +
         '${pattern}".',
     required: true
-} as InputProperties<string>
+} as const
 delete (defaultFileNameInputProperties as {model?:InputModel}).model
 export const defaultFileInputProperties:DefaultFileInputProperties = {
-    ...defaultProperties as DefaultProperties<FileValue>,
+    ...defaultProperties as unknown as Partial<DefaultFileInputProperties>,
     contentTypePatternText:
         'Your file\'s mime-type has to match the regular expression: "' +
         '${contentTypePattern}".',

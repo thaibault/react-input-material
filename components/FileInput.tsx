@@ -140,9 +140,9 @@ export const determineRepresentationType = (
 
     return 'binary'
 }
-export const determineValidationState = (
-    properties:Properties, invalidName:boolean, currentState:ModelState
-):boolean => determineBaseValidationState<Properties>(
+export const determineValidationState = <P extends DefaultProperties>(
+    properties:P, invalidName:boolean, currentState:ModelState
+):boolean => determineBaseValidationState<P>(
     properties,
     currentState,
     {
@@ -262,12 +262,13 @@ export const FileInputInner = function(
      * @returns External properties object.
      */
     const getConsolidatedProperties = (properties:Props):Properties => {
-        let result:Props = mapPropertiesIntoModel<Props, Model>(
-            properties, FileInput.defaultProperties.model as Model
-        )
+        let result:DefaultProperties =
+            mapPropertiesIntoModel<Props, DefaultProperties>(
+                properties, FileInput.defaultProperties.model as Model
+            )
 
         determineValidationState(
-            result as Properties,
+            result,
             // TODO not available
             false
             /*nameInputReference.current?.properties.invalid ??
@@ -277,9 +278,7 @@ export const FileInputInner = function(
             result.model!.state as ModelState
         )
 
-        result = getBaseConsolidatedProperties<Props, Properties>(result)
-
-        return result as Properties
+        return getBaseConsolidatedProperties<Props, Properties>(result)
     }
     // endregion
     // region event handler
@@ -359,15 +358,15 @@ export const FileInputInner = function(
      * @param eventSourceOrName - Event object or new value.
      * @param event - Optional event object (if not provided as first
      * argument).
-     * @param properties - Current properties state.
+     * @param inputProperties - Current properties state.
      * @param attachBlobProperty - Indicates whether additional data is added
      * through post processed data properties.
      * @returns Nothing.
      */
     const onChangeValue = (
         eventSourceOrName:FileValue|null|string|SyntheticEvent,
-        event:SyntheticEvent|undefined,
-        properties:Properties,
+        event?:SyntheticEvent|undefined,
+        inputProperties?:InputProperties|undefined,
         attachBlobProperty:boolean = false
     ):void => {
         if (!(properties.model.mutable && properties.model.writable))
@@ -429,7 +428,7 @@ export const FileInputInner = function(
             onChange(event)
 
             if (determineValidationState(
-                properties,
+                properties as unknown as DefaultProperties,
                 nameInputReference.current?.properties?.invalid || false,
                 oldValueState.modelState
             ))
@@ -688,7 +687,7 @@ export const FileInputInner = function(
             }
 
             if (valueChanged)
-                onChangeValue(valueChanged, undefined, properties, true)
+                onChangeValue(valueChanged, undefined, undefined, true)
         })()
     })
     // region render
@@ -803,9 +802,8 @@ export const FileInputInner = function(
                                 onChangeValue: onChangeValue,
                                 default: properties.value.name
                             },
-                            properties as Properties & {
-                                value:FileValue & {name:string}
-                            }
+                            properties as
+                                Properties & {value:FileValue & {name:string}}
                         )}
                     /> :
                     ''

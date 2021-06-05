@@ -355,7 +355,7 @@ export function determineValidationState<Type = any>(
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInputInner = function<Type = any>(
+export const GenericInputInner = function<Type = unknown>(
     props:Props<Type>, reference?:RefObject<Adapter<Type>>
 ):ReactElement {
     // region live-cycle
@@ -433,8 +433,9 @@ export const GenericInputInner = function<Type = any>(
 
                     onChangeValue(transformValue<Properties<Type>, Type>(
                         properties,
-                        properties.default,
-                        GenericInput.transformer
+                        properties.default as Type,
+                        GenericInput.transformer as
+                            InputDataTransformation<Type>
                     ))
                 },
                 strategy: 'component',
