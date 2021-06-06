@@ -535,8 +535,9 @@ export type InputAdapterWithReferences<T = unknown> = InputAdapter<T> & {
         richTextEditorReference?:RichTextEditorComponent
     }
 }
-export type StaticFunctionInputComponent<T = unknown, P = InputProps<T>> =
-    Omit<FunctionComponent<P>, 'propTypes'> & StaticWebInputComponent<T, P>
+export type StaticFunctionInputComponent<
+    T = unknown, P = InputProps<T>, MS = InputModelState
+> = Omit<FunctionComponent<P>, 'propTypes'> & StaticWebInputComponent<T, P, MS>
 // // region constants 
 export const inputModelStatePropertyTypes:{
     [key in keyof InputModelState]:Requireable<boolean|symbol>

@@ -266,10 +266,10 @@ export function normalizeSelection(
     }
     return selection as SelectProps['options']
 }
-export function determineValidationState<Type = any>(
-    properties:Properties<Type>, currentState:ModelState
+export function determineValidationState(
+    properties:DefaultProperties, currentState:ModelState
 ):boolean {
-    return determineBaseValidationState<Properties<Type>>(
+    return determineBaseValidationState<DefaultProperties, ModelState>(
         properties,
         currentState,
         {
@@ -431,7 +431,7 @@ export const GenericInputInner = function<Type = unknown>(
                     event.preventDefault()
                     event.stopPropagation()
 
-                    onChangeValue(transformValue<Properties<Type>, Type>(
+                    onChangeValue(transformValue<Type, Properties<Type>>(
                         properties,
                         properties.default as Type,
                         GenericInput.transformer as
@@ -567,7 +567,7 @@ export const GenericInputInner = function<Type = unknown>(
                 `\`${template}\``,
                  {
                      formatValue: (value:Type):string =>
-                         formatValue<Properties<Type>, Type>(
+                         formatValue<null|Type, Properties<Type>>(
                              properties, value, transformer
                          ),
                      ...properties
@@ -918,19 +918,19 @@ export const GenericInputInner = function<Type = unknown>(
         properties:Props<Type>
     ):DefaultProperties => {
         const result:DefaultProperties =
-            mapPropertiesIntoModel<Props<Type>, Model<Type>>(
-                properties, GenericInput.defaultProperties.model as Model<Type>
+            mapPropertiesIntoModel<Props<Type>, DefaultProperties>(
+                properties,
+                GenericInput.defaultProperties.model as Model<string>
             )
 
-        result.model.value = parseValue<Properties<Type>, Type>(
-            result as unknown as Properties<Type>,
-            result.model.value,
-            transformer
-        )
+        ;(result.model.value as null|Type) =
+            parseValue<null|Type, DefaultProperties>(
+                result,
+                result.model.value,
+                transformer
+            )
 
-        determineValidationState<Type>(
-            result as unknown as Properties<Type>, result.model.state
-        )
+        determineValidationState(result, result.model.state)
 
         return result
     }
@@ -944,7 +944,8 @@ export const GenericInputInner = function<Type = unknown>(
     ):Properties<Type> => {
         const result:Properties<Type> =
             getBaseConsolidatedProperties<Props<Type>, Properties<Type>>(
-                mapPropertiesAndValidationStateIntoModel(properties)
+                mapPropertiesAndValidationStateIntoModel(properties) as
+                    Props<Type>
             )
 
         if (!result.selection && result.type === 'boolean')
@@ -955,11 +956,11 @@ export const GenericInputInner = function<Type = unknown>(
             ]
 
         // NOTE: If only an editor is specified it should be displayed.
-        if (!(result.editor === 'plain' || result.selectableEditor))
+        if (!(result.selectableEditor || result.editor === 'plain'))
             result.editorIsActive = true
 
         if (typeof result.representation !== 'string') {
-            result.representation = formatValue<Properties<Type>, Type>(
+            result.representation = formatValue<null|Type, Properties<Type>>(
                 result,
                 result.value as null|Type,
                 transformer,
@@ -1055,10 +1056,10 @@ export const GenericInputInner = function<Type = unknown>(
             stateChanged = true
         }
 
-        properties.value = transformValue<Properties<Type>, Type>(
-            properties, properties.value, transformer
+        properties.value = transformValue<null|Type, Properties<Type>>(
+            properties, properties.value as null|Type, transformer
         )
-        properties.representation = formatValue<Properties<Type>, Type>(
+        properties.representation = formatValue<null|Type, Properties<Type>>(
             properties, properties.value as null|Type, transformer
         )
 
@@ -1214,10 +1215,10 @@ export const GenericInputInner = function<Type = unknown>(
         ):ValueState<Type, ModelState> => {
             properties.representation = typeof properties.value === 'string' ?
                 properties.value :
-                formatValue<Properties<Type>, Type>(
+                formatValue<null|Type, Properties<Type>>(
                     properties, properties.value as null|Type, transformer
                 )
-            properties.value = parseValue<Properties<Type>, Type>(
+            properties.value = parseValue<null|Type, Properties<Type>>(
                 properties, properties.value, transformer
             )
 
@@ -1260,8 +1261,8 @@ export const GenericInputInner = function<Type = unknown>(
 
             onChange(event)
 
-            if (determineValidationState<Type>(
-                properties, oldValueState.modelState
+            if (determineValidationState(
+                properties as DefaultProperties, oldValueState.modelState
             ))
                 stateChanged = true
 
@@ -1447,7 +1448,7 @@ export const GenericInputInner = function<Type = unknown>(
 
     const type:string|undefined =
         givenProperties.type || givenProperties.model?.type
-    const transformer:InputDataTransformation<Type> =
+    const transformer:InputDataTransformation<null|Type> =
         type && givenProperties.transformer ?
             {
                 ...GenericInput.transformer,
@@ -1817,12 +1818,12 @@ export const GenericInputInner = function<Type = unknown>(
                             properties.type
                         ) ?
                             {
-                                max: formatValue<Properties<Type>, Type>(
+                                max: formatValue<Type, Properties<Type>>(
                                     properties,
                                     properties.maximum as unknown as Type,
                                     transformer
                                 ),
-                                min: formatValue<Properties<Type>, Type>(
+                                min: formatValue<Type, Properties<Type>>(
                                     properties,
                                     properties.minimum as unknown as Type,
                                     transformer
@@ -1883,10 +1884,10 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput:StaticComponent<Props> =
+export const GenericInput:StaticComponent<unknown, Props> =
     memorize(forwardRef(GenericInputInner)) as
         unknown as
-        StaticComponent<Props>
+        StaticComponent<unknown, Props>
 // region static properties
 // / region web-component hints
 GenericInput.wrapped = GenericInputInner

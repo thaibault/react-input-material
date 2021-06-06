@@ -363,28 +363,29 @@ export const getConsolidatedProperties = <
  * @returns Transformed value.
  */
 export const parseValue = <
+    T = unknown,
     P extends {
-        emptyEqualsNull:boolean
-        transformer?:RecursivePartial<DataTransformSpecification<Type>>
-        type:string
-    },
-    Type = any
+        model:{
+            emptyEqualsNull:boolean
+            type:string
+        }
+    } = DefaultBaseProperties
 >(
-    configuration:P, value:any, transformer:InputDataTransformation<Type>
-):null|Type => {
-    if (configuration.emptyEqualsNull && value === '')
+    configuration:P, value:any, transformer:InputDataTransformation<T>
+):null|T => {
+    if (configuration.model.emptyEqualsNull && value === '')
         return null
 
     if (
         ![null, undefined].includes(value) &&
-        transformer[configuration.type]?.parse
+        transformer[configuration.model.type]?.parse
     )
         value = (
-            transformer[configuration.type]!.parse as
-                DataTransformSpecification<Type>['parse']
+            transformer[configuration.model.type]!.parse as
+                DataTransformSpecification<T>['parse']
         )(
             value,
-            configuration as unknown as InputProperties<Type>,
+            configuration as unknown as InputProperties<T>,
             transformer
         )
 
@@ -404,18 +405,19 @@ export const parseValue = <
  * @returns Transformed value.
  */
 export const transformValue = <
+    T = unknown,
     P extends {
-        emptyEqualsNull:boolean
-        model:{trim:boolean}
-        transformer?:RecursivePartial<DataTransformSpecification<T>>
-        type:string
-    },
-    T = unknown
+        model:{
+            emptyEqualsNull:boolean
+            trim:boolean
+            type:string
+        }
+    } = DefaultBaseProperties
 >(configuration:P, value:T, transformer:InputDataTransformation<T>):null|T => {
     if (configuration.model.trim && typeof value === 'string')
         (value as string) = value.trim().replace(/ +\n/g, '\\n')
 
-    return parseValue<P, T>(configuration, value, transformer)
+    return parseValue<T, P>(configuration, value, transformer)
 }
 /**
  * Represents configured value as string.
@@ -428,15 +430,11 @@ export const transformValue = <
  * @returns Transformed value.
  */
 export function formatValue<
-    P extends {
-        transformer?:RecursivePartial<DataTransformSpecification<Type>>
-        type:string
-    },
-    Type = any
+    T = unknown, P extends {type:string} = BaseProperties
 >(
     configuration:P,
-    value:null|Type,
-    transformer:InputDataTransformation<Type>,
+    value:null|T,
+    transformer:InputDataTransformation<T>,
     final:boolean = true
 ):string {
     const methodName:'final'|'intermediate' = final ? 'final' : 'intermediate'
@@ -453,12 +451,8 @@ export function formatValue<
     )
         return (
             transformer[configuration.type]!.format![methodName]!.transform as
-                FormatSpecification<Type>['transform']
-        )(
-            value,
-            configuration as unknown as InputProperties<Type>,
-            transformer
-        )
+                FormatSpecification<T>['transform']
+        )(value, configuration as unknown as InputProperties<T>, transformer)
 
     return String(value)
 }
@@ -472,13 +466,12 @@ export function formatValue<
  * @returns Determined initial representation.
  */
 export function determineInitialRepresentation<
+    Type = unknown,
     P extends {
         model?:{type?:string}
         representation?:string
-        transformer?:RecursivePartial<DataTransformSpecification<Type>>
         type?:string
-    },
-    Type = any
+    } = BaseProps
 >(
     properties:P,
     defaultProperties:Partial<P>,
@@ -489,7 +482,7 @@ export function determineInitialRepresentation<
         return properties.representation
 
     if (value !== null)
-        return formatValue<P & {type:string}, Type>(
+        return formatValue<Type, P & {type:string}>(
             {
                 ...properties,
                 type: (
