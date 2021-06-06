@@ -791,7 +791,7 @@ export const FileInputInner = function(
                     ''
                 }
                 {properties.value ?
-                    <GenericInput
+                    <GenericInput<string>
                         ref={nameInputReference as any}
                         {...properties.generateFileNameInputProperties(
                             {
@@ -926,7 +926,12 @@ FileInput.defaultModelState = defaultModelState
 */
 FileInput.defaultProperties = {
     ...defaultProperties,
-    model: {...defaultProperties.model, state: undefined, value: undefined},
+    model: {
+        ...defaultProperties.model,
+        // Trigger initial determination.
+        state: undefined as unknown as ModelState,
+        value: undefined
+    },
     value: undefined
 }
 FileInput.propTypes = propertyTypes

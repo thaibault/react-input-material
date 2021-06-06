@@ -131,10 +131,11 @@ export type DataTransformSpecification<T = unknown> = {
         intermediate?:FormatSpecification
     }
     parse:(
-        value:any,
+        // NOTE: Every non null or undefined value coming from an input field.
+        value:number|string,
         configuration:InputProperties<T>,
         transformer:InputDataTransformation<T>
-    ) => null|T
+    ) => T
     type?:NativeInputType
 }
 export type BaseProperties =
@@ -206,17 +207,19 @@ export type State<T = unknown> = {
     value?:null|T
 }
 export interface StaticWebComponent<
-    P = Props, MS = ModelState
+    P = Props, MS = ModelState, DP = DefaultProperties
 > extends StaticBaseWebComponent {
     new (properties:P):Component<P>
     defaultModelState:MS
-    defaultProperties:P
+    defaultProperties:DP
     strict:boolean
 }
-export type StaticComponent<P = Props, MS = ModelState> =
-    Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<P, MS>
-export type StaticFunctionComponent<P = Props> =
-    Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P>
+export type StaticComponent<
+    P = Props, MS = ModelState, DP = DefaultProperties
+> = Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<P, MS, DP>
+export type StaticFunctionComponent<
+    P = Props, MS = ModelState, DP = DefaultProperties
+> = Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P, MS, DP>
 export type ValueState<T = unknown, MS = ModelState> = {
     modelState:MS
     value:null|T
@@ -508,8 +511,11 @@ export type InputDataTransformation<T = unknown> =
         time:DataTransformSpecification<T>
     }
 export interface StaticWebInputComponent<
-    T = unknown, P = InputProps<T>, MS = InputModelState
-> extends StaticWebComponent<P, MS> {
+    T = unknown,
+    P = InputProps<T>,
+    MS = InputModelState,
+    DP = DefaultInputProperties
+> extends StaticWebComponent<P, MS, DP> {
     locales:Array<string>
     transformer:InputDataTransformation<T>
 }
@@ -536,8 +542,13 @@ export type InputAdapterWithReferences<T = unknown> = InputAdapter<T> & {
     }
 }
 export type StaticFunctionInputComponent<
-    T = unknown, P = InputProps<T>, MS = InputModelState
-> = Omit<FunctionComponent<P>, 'propTypes'> & StaticWebInputComponent<T, P, MS>
+    T = unknown,
+    P = InputProps<T>,
+    MS = InputModelState,
+    DP = DefaultInputProperties
+> =
+    Omit<FunctionComponent<P>, 'propTypes'> &
+    StaticWebInputComponent<T, P, MS, DP>
 // // region constants 
 export const inputModelStatePropertyTypes:{
     [key in keyof InputModelState]:Requireable<boolean|symbol>
@@ -749,7 +760,9 @@ export type FileInputAdapterWithReferences =
     }}
 export type StaticFunctionFileInputComponent =
     Omit<FunctionComponent<FileInputProps>, 'propTypes'> &
-    StaticWebComponent<FileInputProps, FileInputModelState>
+    StaticWebComponent<
+        FileInputProps, FileInputModelState, DefaultFileInputProperties
+    >
 // // region constants
 export const fileInputModelStatePropertyTypes:{
     [key in keyof FileInputModelState]:Requireable<boolean|symbol>

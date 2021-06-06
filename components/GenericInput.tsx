@@ -267,9 +267,11 @@ export function normalizeSelection(
     return selection as SelectProps['options']
 }
 export function determineValidationState(
-    properties:DefaultProperties, currentState:ModelState
+    properties:DefaultProperties, currentState:Partial<ModelState>
 ):boolean {
-    return determineBaseValidationState<DefaultProperties, ModelState>(
+    return determineBaseValidationState<
+        DefaultProperties, Partial<ModelState>
+    >(
         properties,
         currentState,
         {
@@ -355,7 +357,7 @@ export function determineValidationState(
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInputInner = function<Type = unknown>(
+export function GenericInputInner<Type = unknown,>(
     props:Props<Type>, reference?:RefObject<Adapter<Type>>
 ):ReactElement {
     // region live-cycle
@@ -1435,7 +1437,8 @@ export const GenericInputInner = function<Type = unknown>(
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
 
     const initialValue:null|Type = determineInitialValue<Type>(
-        givenProps, GenericInput.defaultProperties.model?.default
+        givenProps,
+        GenericInput.defaultProperties.model?.default as unknown as null|Type
     )
     /*
         NOTE: Extend default properties with given properties while letting
@@ -1446,10 +1449,10 @@ export const GenericInputInner = function<Type = unknown>(
         true, Tools.copy(GenericInput.defaultProperties), givenProps
     )
 
-    const type:string|undefined =
-        givenProperties.type || givenProperties.model?.type
+    const type:string =
+        givenProperties.type || givenProperties.model?.type || 'string'
     const transformer:InputDataTransformation<null|Type> =
-        type && givenProperties.transformer ?
+        givenProperties.transformer ?
             {
                 ...GenericInput.transformer,
                 [type]: Tools.extend(
@@ -1457,8 +1460,8 @@ export const GenericInputInner = function<Type = unknown>(
                     Tools.copy(GenericInput.transformer[type]) || {},
                     givenProperties.transformer
                 )
-            } :
-            GenericInput.transformer
+            } as InputDataTransformation<null|Type> :
+            GenericInput.transformer as InputDataTransformation<null|Type>
 
     /*
         NOTE: This values have to share the same state item since they have to
@@ -1467,9 +1470,9 @@ export const GenericInputInner = function<Type = unknown>(
     let [valueState, setValueState] = useState<ValueState<Type, ModelState>>(
         () => ({
             modelState: {...GenericInput.defaultModelState},
-            representation: determineInitialRepresentation<Props<Type>, Type>(
+            representation: determineInitialRepresentation<Type, Props<Type>>(
                 givenProperties,
-                GenericInput.defaultProperties,
+                GenericInput.defaultProperties as Props<Type>,
                 initialValue,
                 transformer
             ),
@@ -1818,12 +1821,12 @@ export const GenericInputInner = function<Type = unknown>(
                             properties.type
                         ) ?
                             {
-                                max: formatValue<Type, Properties<Type>>(
+                                max: formatValue<null|Type, Properties<Type>>(
                                     properties,
                                     properties.maximum as unknown as Type,
                                     transformer
                                 ),
-                                min: formatValue<Type, Properties<Type>>(
+                                min: formatValue<null|Type, Properties<Type>>(
                                     properties,
                                     properties.minimum as unknown as Type,
                                     transformer
@@ -1865,7 +1868,7 @@ export const GenericInputInner = function<Type = unknown>(
     </div></WrapConfigurations>
     // / endregion
     // endregion
-} as ForwardRefRenderFunction<Adapter, Props>
+} // TODO as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
 GenericInputInner.displayName = 'GenericInput'
 /**
@@ -1884,10 +1887,11 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput:StaticComponent<unknown, Props> =
-    memorize(forwardRef(GenericInputInner)) as
-        unknown as
-        StaticComponent<unknown, Props>
+export const GenericInput:StaticComponent<
+    unknown, Props, ModelState, DefaultProperties
+> = memorize(forwardRef(GenericInputInner)) as
+    unknown as
+    StaticComponent<unknown, Props, ModelState, DefaultProperties>
 // region static properties
 // / region web-component hints
 GenericInput.wrapped = GenericInputInner
@@ -1901,7 +1905,12 @@ GenericInput.defaultModelState = defaultModelState
 GenericInput.defaultProperties = {
     ...defaultProperties,
     cursor: undefined,
-    model: {...defaultProperties.model, state: undefined, value: undefined},
+    model: {
+        ...defaultProperties.model,
+        // Trigger initial determination.
+        state: undefined as unknown as ModelState,
+        value: undefined
+    },
     representation: undefined,
     value: undefined
 }
@@ -2013,8 +2022,8 @@ GenericInput.transformer = {
         },
         parse: (
             value:number|string,
-            configuration:Properties,
-            transformer:InputDataTransformation
+            configuration:Properties<number>,
+            transformer:InputDataTransformation<number>
         ):number =>
             transformer.date.parse(value, configuration, transformer)
     },

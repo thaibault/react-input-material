@@ -209,7 +209,7 @@ export const determineInitialValue = <Type = any>(
  */
 export const determineValidationState = <
     P extends DefaultBaseProperties = DefaultBaseProperties,
-    MS extends ModelState = ModelState
+    MS extends Partial<ModelState> = Partial<ModelState>
 >(
     properties:P, currentState:MS, validators:Mapping<() => boolean> = {}
 ):boolean => {
@@ -237,7 +237,8 @@ export const determineValidationState = <
 
     properties.model.state = properties.model.state || {} as MS
     for (const [name, validator] of Object.entries(validators)) {
-        const oldValue:boolean = currentState[name as keyof ModelState]
+        const oldValue:boolean|undefined =
+            currentState[name as keyof ModelState]
         properties.model.state[name as keyof ModelState] = validator()
         changed =
             changed || oldValue !== currentState[name as keyof ModelState]
@@ -476,7 +477,7 @@ export function determineInitialRepresentation<
     properties:P,
     defaultProperties:Partial<P>,
     value:null|Type,
-    transformer:InputDataTransformation<Type>
+    transformer:InputDataTransformation<null|Type>
 ):string {
     if (typeof properties.representation === 'string')
         return properties.representation
@@ -492,7 +493,7 @@ export function determineInitialRepresentation<
                 )
             },
             value,
-            transformer
+            transformer as InputDataTransformation<Type>
         )
 
     return ''
