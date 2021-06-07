@@ -117,27 +117,6 @@ export type ModelGenerics<T = unknown> = {
 export type CommonModel<T = unknown> = CommonBaseModel & ModelGenerics<T>
 export type Model<T = unknown> = BaseModel & ModelGenerics<T>
 // // endregion
-export type FormatSpecification<T = unknown> = {
-    options?:PlainObject
-    transform:(
-        value:null|T,
-        configuration:InputProperties<T>,
-        transformer:InputDataTransformation
-    ) => string
-}
-export type DataTransformSpecification<T = unknown> = {
-    format:{
-        final:FormatSpecification<T>
-        intermediate?:FormatSpecification<T>
-    }
-    parse:(
-        // NOTE: Every non null or undefined value coming from an input field.
-        value:number|string,
-        configuration:InputProperties<T>,
-        transformer:InputDataTransformation
-    ) => T
-    type?:NativeInputType
-}
 export type BaseProperties =
     CommonBaseModel &
     ModelState &
@@ -400,6 +379,47 @@ export const defaultCheckboxProperties:CheckboxProps = {
 // // endregion
 // / endregion
 // / region input
+// // region data transformation
+export type FormatSpecification<T = unknown> = {
+    options?:PlainObject
+    transform:(
+        value:T,
+        configuration:InputProperties<T>,
+        transformer:InputDataTransformation
+    ) => string
+}
+export type DataTransformSpecification<
+    T = unknown, InputType = number|string
+> = {
+    format?:{
+        final:FormatSpecification<T>
+        intermediate?:FormatSpecification<T>
+    }
+    parse:(
+        value:InputType,
+        configuration:InputProperties<T>,
+        transformer:InputDataTransformation
+    ) => T
+    type?:NativeInputType
+}
+export type InputDataTransformation =
+    {
+        boolean:DataTransformSpecification<boolean, number|string>
+
+        currency:DataTransformSpecification<number, string>
+
+        date:DataTransformSpecification<number, number|string>
+        'datetime-local':DataTransformSpecification<number, number|string>
+        time:DataTransformSpecification<number, number|string>
+
+        float:DataTransformSpecification<number, string>
+        integer:DataTransformSpecification<number, string>
+        number:DataTransformSpecification<number, number>
+    } &
+    {[key in Exclude<
+        NativeInputType, 'date'|'datetime-local'|'time'|'number'
+    >]?:DataTransformSpecification<unknown>}
+// // endregion
 export type InputModelState =
     ModelState &
     {
@@ -485,30 +505,6 @@ export type InputState<T = unknown> =
         representation?:string
         selectionIsUnstable:boolean
         showDeclaration:boolean
-    }
-export type InputDataTransformation =
-    Mapping<RecursivePartial<DataTransformSpecification<unknown>>> &
-    {
-        boolean:{
-            format?:DataTransformSpecification<boolean>['format']
-            parse:DataTransformSpecification<boolean>['parse']
-            type:NativeInputType
-        }
-        currency:DataTransformSpecification<number>
-        date:DataTransformSpecification<number>
-        'datetime-local':DataTransformSpecification<number>
-        float:DataTransformSpecification<number>
-        integer:{
-            format:DataTransformSpecification<number>['format']
-            parse:DataTransformSpecification<number>['parse']
-            type:NativeInputType
-        }
-        number:{
-            format?:DataTransformSpecification<number>['format']
-            parse:DataTransformSpecification<number>['parse']
-            type?:DataTransformSpecification<number>['type']
-        }
-        time:DataTransformSpecification<number>
     }
 // TODO check if state can be provided everywhere.
 export interface StaticWebInputComponent extends StaticWebComponent<
@@ -698,7 +694,7 @@ export type FileInputModel =
         invertedContentTypeRegularExpressionPattern:null|RegExp|string
         maximumSize:number
         minimumSize:number
-        fileName:InputModel
+        fileName:InputModel<string>
         state:FileInputModelState
     }
 export type FileInputValueState =

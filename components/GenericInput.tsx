@@ -489,7 +489,9 @@ export const GenericInputInner = function<Type = unknown>(
                 properties.hidden ?
                     'password' :
                     'text' :
-                    transformer[properties.type]?.type ?? properties.type
+                    transformer[
+                        properties.type as keyof InputDataTransformation
+                    ]?.type ?? properties.type
         ) as NativeInputType
     /**
      * Render help or error texts with current validation state color.
@@ -1456,10 +1458,12 @@ export const GenericInputInner = function<Type = unknown>(
                 ...GenericInput.transformer,
                 [type]: Tools.extend(
                     true,
-                    Tools.copy(GenericInput.transformer[type]) || {},
+                    Tools.copy(GenericInput.transformer[
+                        type as keyof InputDataTransformation
+                    ]) || {},
                     givenProperties.transformer
                 )
-            } as InputDataTransformation :
+            } :
             GenericInput.transformer
 
     /*
@@ -1915,9 +1919,13 @@ GenericInput.propTypes = propertyTypes
 GenericInput.strict = false
 GenericInput.transformer = {
     boolean: {
-        parse: (value:string):boolean => (
-            value === 'true' ? true : value === 'false' ? false : value
-        ),
+        parse: (value:number|string):boolean =>
+            new Map<number|string, boolean>([
+                ['false', false],
+                ['true', true],
+                [0, false],
+                [1, true]
+            ]).get(value) ?? true,
         type: 'text'
     },
     currency: {
@@ -1925,37 +1933,39 @@ GenericInput.transformer = {
             options: {currency: 'USD'},
             transform: (
                 value:number,
-                configuration:Properties,
+                configuration:Properties<number>,
                 transformer:InputDataTransformation
             ):string => {
                 const currency:string =
-                    transformer.currency.format.final.options!.currency as
+                    transformer.currency.format!.final.options!.currency as
                         string
 
-                return value === Infinity ?
-                    `Infinity ${currency}` :
-                    value === -Infinity ?
-                        `- Infinity ${currency}` :
-                        (new Intl.NumberFormat(
-                            GenericInput.locales,
-                            {
-                                style: 'currency',
-                                ...transformer.currency.format.final.options
-                            }
-                        )).format(value)
+                if (value === Infinity)
+                    return `Infinity ${currency}`
+
+                if (value === -Infinity)
+                    return `- Infinity ${currency}`
+
+                return (new Intl.NumberFormat(
+                    GenericInput.locales,
+                    {
+                        style: 'currency',
+                        ...transformer.currency.format!.final.options
+                    }
+                )).format(value)
             }
         }},
         parse: (
             value:string,
-            configuration:Properties,
+            configuration:Properties<number>,
             transformer:InputDataTransformation
-        ):any =>
+        ):number =>
             transformer.float.parse(value, configuration, transformer),
         type: 'text'
     },
     date: {
         format: {
-            final: {transform: (value:number|string):string => {
+            final: {transform: (value:number):string => {
                 value = typeof value === 'number' ? value : parseFloat(value)
 
                 if (value === Infinity)
@@ -1972,11 +1982,11 @@ GenericInput.transformer = {
                 return formattedValue.substring(0, formattedValue.indexOf('T'))
             }},
             intermediate: {transform: (
-                value:number|string,
-                configuration:Properties,
+                value:number,
+                configuration:Properties<number>,
                 transformer:InputDataTransformation
             ):string =>
-                transformer.date.format.final.transform(
+                transformer.date.format!.final.transform(
                     value, configuration, transformer
                 )
             }
@@ -2007,11 +2017,11 @@ GenericInput.transformer = {
                 return formattedValue.substring(0, formattedValue.length - 1)
             }},
             intermediate: {transform: (
-                value:number|string,
-                configuration:Properties,
+                value:number,
+                configuration:Properties<number>,
                 transformer:InputDataTransformation
             ):string =>
-                transformer['datetime-local'].format.final.transform(
+                transformer['datetime-local'].format!.final.transform(
                     value, configuration, transformer
                 )
             }
@@ -2023,20 +2033,59 @@ GenericInput.transformer = {
         ):number =>
             transformer.date.parse(value, configuration, transformer)
     },
+    time: {
+        format: {
+            final: {transform: (value:number):string => {
+                value = typeof value === 'number' ? value : parseFloat(value)
+
+                if (value === Infinity)
+                    return 'infinitely far in the future'
+                if (value === -Infinity)
+                    return 'infinitely early in the past'
+                if (!isFinite(value))
+                    return ''
+
+                const formattedValue:string =
+                    (new Date(Math.round((value as number) * 1000)))
+                        .toISOString()
+
+                return formattedValue.substring(
+                    formattedValue.indexOf('T') + 1, formattedValue.length - 1
+                )
+            }},
+            intermediate: {transform: (
+                value:number,
+                configuration:Properties<number>,
+                transformer:InputDataTransformation
+            ):string => transformer.time.format!.final.transform(
+                value, configuration, transformer
+            )}
+        },
+        parse: (value:number|string):number => typeof value === 'number' ?
+            value :
+            parseInt(value.replace(
+                /^([0-9]{2}):([0-9]{2})$/,
+                (_:string, hour:string, minute:string):string =>
+                    String(parseInt(hour) * 60 ** 2 + parseInt(minute) * 60)
+            ))
+    },
+
     float: {
         format: {final: {transform: (
             value:number,
-            configuration:Properties,
+            configuration:Properties<number>,
             transformer:InputDataTransformation
         ):string =>
             value === Infinity ? 'Infinity' : value === -Infinity ?
                 '- Infinity' :
                 (new Intl.NumberFormat(
                     GenericInput.locales,
-                    transformer.float.format.final.options || {}
+                    transformer.float.format!.final.options || {}
                 )).format(value)
         }},
-        parse: (value:number|string, configuration:Properties):number => {
+        parse: (
+            value:number|string, configuration:Properties<number>
+        ):number => {
             if (typeof value === 'string')
                 value = parseFloat(
                     GenericInput.locales[0] === 'de-DE' ?
@@ -2065,18 +2114,20 @@ GenericInput.transformer = {
     integer: {
         format: {final: {transform: (
             value:number,
-            configuration:Properties,
+            configuration:Properties<number>,
             transformer:InputDataTransformation
         ):string => (
             new Intl.NumberFormat(
                 GenericInput.locales,
                 {
                     maximumFractionDigits: 0,
-                    ...(transformer.integer.format.final.options || {})
+                    ...(transformer.integer.format!.final.options || {})
                 }
             )).format(value)
         }},
-        parse: (value:number|string, configuration:Properties):any => {
+        parse: (
+            value:number|string, configuration:Properties<number>
+        ):number => {
             if (typeof value === 'string')
                 value = parseInt(
                     GenericInput.locales[0] === 'de-DE' ?
@@ -2104,43 +2155,7 @@ GenericInput.transformer = {
     },
     number: {parse: (value:number|string):number =>
         typeof value === 'number' ? value : parseInt(value)
-    },
-    time: {
-        format: {
-            final: {transform: (value:number):string => {
-                value = typeof value === 'number' ? value : parseFloat(value)
-
-                if (value === Infinity)
-                    return 'infinitely far in the future'
-                if (value === -Infinity)
-                    return 'infinitely early in the past'
-                if (!isFinite(value))
-                    return ''
-
-                const formattedValue:string =
-                    (new Date(Math.round((value as number) * 1000)))
-                        .toISOString()
-
-                return formattedValue.substring(
-                    formattedValue.indexOf('T') + 1, formattedValue.length - 1
-                )
-            }},
-            intermediate: {transform: (
-                value:number|string,
-                configuration:Properties,
-                transformer:InputDataTransformation
-            ):string => transformer.time.format.final.transform(
-                value, configuration, transformer
-            )}
-        },
-        parse: (value:number|string):number => typeof value === 'number' ?
-            value :
-            parseInt(value.replace(
-                /^([0-9]{2}):([0-9]{2})$/,
-                (_:string, hour:string, minute:string):string =>
-                    String(parseInt(hour) * 60 ** 2 + parseInt(minute) * 60)
-            ))
-    },
+    }
 }
 // endregion
 export default GenericInput

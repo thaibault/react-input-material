@@ -366,7 +366,7 @@ export const FileInputInner = function(
     const onChangeValue = (
         eventSourceOrName:FileValue|null|string|SyntheticEvent,
         event?:SyntheticEvent|undefined,
-        inputProperties?:InputProperties|undefined,
+        inputProperties?:InputProperties<string>|undefined,
         attachBlobProperty:boolean = false
     ):void => {
         if (!(properties.model.mutable && properties.model.writable))
