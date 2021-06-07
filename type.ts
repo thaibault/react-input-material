@@ -487,7 +487,7 @@ export type InputState<T = unknown> =
         showDeclaration:boolean
     }
 export type InputDataTransformation =
-    Mapping<RecursivePartial<DataTransformSpecification<T>>> &
+    Mapping<RecursivePartial<DataTransformSpecification<unknown>>> &
     {
         boolean:{
             format?:DataTransformSpecification<boolean>['format']
@@ -543,25 +543,22 @@ export type InputAdapterWithReferences<T = unknown> = InputAdapter<T> & {
 }
 // TODO
 export type StaticFunctionInputComponentBase =
-    ForwardRefRenderFunction &
+    ForwardRefRenderFunction<InputAdapter, InputProps> &
     StaticWebInputComponent
 
 export interface StaticFunctionInputComponent
-  extends ForwardRefRenderFunction {
+    extends ForwardRefRenderFunction<InputAdapter, InputProps> {
 
-  <T>(props: Props<T>): ReactElement;
-  <T>(props: Props<T>, ref: RefObject<InputAdapter<T>>): ReactElement;
+    <T>(props:InputProps<T>):ReactElement
+    <T>(props:InputProps<T>, reference?:RefObject<InputAdapter<T>>):ReactElement
 }
 
-export interface StaticFunctionInputComponentExtended<
-    T = unknown,
-    P = InputProps<T>,
-    MS = InputModelState,
-    DP = DefaultInputProperties
-> extends StaticFunctionInputComponentBase<T, P, MS, DP> {
-    <T = unknown>(props:Props<T>):ReactElement
+export interface StaticFunctionInputComponentExtended extends
+    StaticFunctionInputComponentBase {
+
+    <T = unknown>(props:InputProps<T>):ReactElement
     <T = unknown>(
-        props:Props<T>, reference?:RefObject<InputAdapter<T>>
+        props:InputProps<T>, reference?:RefObject<InputAdapter<T>>
     ):ReactElement
 }
 // // region constants 
