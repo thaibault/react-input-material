@@ -436,8 +436,7 @@ export const GenericInputInner = function<Type = unknown>(
                     onChangeValue(transformValue<Type, Properties<Type>>(
                         properties,
                         properties.default as Type,
-                        GenericInput.transformer as
-                            InputDataTransformation<Type>
+                        GenericInput.transformer
                     ))
                 },
                 strategy: 'component',
@@ -1451,7 +1450,7 @@ export const GenericInputInner = function<Type = unknown>(
 
     const type:string =
         givenProperties.type || givenProperties.model?.type || 'string'
-    const transformer:InputDataTransformation<null|Type> =
+    const transformer:InputDataTransformation =
         givenProperties.transformer ?
             {
                 ...GenericInput.transformer,
@@ -1460,8 +1459,8 @@ export const GenericInputInner = function<Type = unknown>(
                     Tools.copy(GenericInput.transformer[type]) || {},
                     givenProperties.transformer
                 )
-            } as InputDataTransformation<null|Type> :
-            GenericInput.transformer as InputDataTransformation<null|Type>
+            } as InputDataTransformation :
+            GenericInput.transformer
 
     /*
         NOTE: This values have to share the same state item since they have to
@@ -1887,11 +1886,8 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput:StaticComponent/*<
-    unknown, Props, ModelState, DefaultProperties
->*/ = memorize(forwardRef(GenericInputInner))/* as
-    unknown as
-    StaticComponent<unknown, Props, ModelState, DefaultProperties>*/
+export const GenericInput:StaticComponent =
+    memorize(forwardRef(GenericInputInner)) as unknown as StaticComponent
 // region static properties
 // / region web-component hints
 GenericInput.wrapped = GenericInputInner
@@ -1919,7 +1915,7 @@ GenericInput.propTypes = propertyTypes
 GenericInput.strict = false
 GenericInput.transformer = {
     boolean: {
-        parse: (value:string):any => (
+        parse: (value:string):boolean => (
             value === 'true' ? true : value === 'false' ? false : value
         ),
         type: 'text'
@@ -2023,7 +2019,7 @@ GenericInput.transformer = {
         parse: (
             value:number|string,
             configuration:Properties<number>,
-            transformer:InputDataTransformation<number>
+            transformer:InputDataTransformation
         ):number =>
             transformer.date.parse(value, configuration, transformer)
     },

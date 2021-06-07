@@ -543,17 +543,17 @@ export type InputAdapterWithReferences<T = unknown> = InputAdapter<T> & {
 }
 // TODO
 export type StaticFunctionInputComponentBase =
-    ForwardRefRenderFunction<InputAdapter, InputProps> &
+    Omit<ForwardRefRenderFunction<InputAdapter, InputProps>, 'propTypes'> &
     StaticWebInputComponent
 
-export interface StaticFunctionInputComponent
+export interface StaticFunctionInputComponentTEST
     extends ForwardRefRenderFunction<InputAdapter, InputProps> {
 
     <T>(props:InputProps<T>):ReactElement
     <T>(props:InputProps<T>, reference?:RefObject<InputAdapter<T>>):ReactElement
 }
 
-export interface StaticFunctionInputComponentExtended extends
+export interface StaticFunctionInputComponent extends
     StaticFunctionInputComponentBase {
 
     <T = unknown>(props:InputProps<T>):ReactElement
