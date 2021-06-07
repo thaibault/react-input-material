@@ -24,7 +24,7 @@ import {
     createRef,
     FocusEvent as ReactFocusEvent,
     forwardRef,
-    ForwardRefRenderFunction,
+    ForwardedRef,
     KeyboardEvent as ReactKeyboardEvent,
     lazy,
     memo as memorize,
@@ -357,8 +357,8 @@ export function determineValidationState(
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export function GenericInputInner<Type = unknown,>(
-    props:Props<Type>, reference?:RefObject<Adapter<Type>>
+export const GenericInputInner = function<Type = unknown>(
+    props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
 ):ReactElement {
     // region live-cycle
     /**
@@ -1868,7 +1868,7 @@ export function GenericInputInner<Type = unknown,>(
     </div></WrapConfigurations>
     // / endregion
     // endregion
-} // TODO as ForwardRefRenderFunction<Adapter, Props>
+}
 // NOTE: This is useful in react dev tools.
 GenericInputInner.displayName = 'GenericInput'
 /**
@@ -1887,11 +1887,11 @@ GenericInputInner.displayName = 'GenericInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInput:StaticComponent<
+export const GenericInput:StaticComponent/*<
     unknown, Props, ModelState, DefaultProperties
-> = memorize(forwardRef(GenericInputInner)) as
+>*/ = memorize(forwardRef(GenericInputInner))/* as
     unknown as
-    StaticComponent<unknown, Props, ModelState, DefaultProperties>
+    StaticComponent<unknown, Props, ModelState, DefaultProperties>*/
 // region static properties
 // / region web-component hints
 GenericInput.wrapped = GenericInputInner
@@ -2145,7 +2145,7 @@ GenericInput.transformer = {
                     String(parseInt(hour) * 60 ** 2 + parseInt(minute) * 60)
             ))
     },
-} as InputDataTransformation
+}
 // endregion
 export default GenericInput
 // region vim modline

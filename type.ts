@@ -35,7 +35,7 @@ import {
     Component,
     ComponentClass,
     FocusEvent,
-    ForwardRefExoticComponent,
+    ForwardRefRenderFunction,
     FunctionComponent,
     HTMLProps,
     KeyboardEvent,
@@ -122,19 +122,19 @@ export type FormatSpecification<T = unknown> = {
     transform:(
         value:null|T,
         configuration:InputProperties<T>,
-        transformer:InputDataTransformation<T>
+        transformer:InputDataTransformation
     ) => string
 }
 export type DataTransformSpecification<T = unknown> = {
     format:{
-        final:FormatSpecification
-        intermediate?:FormatSpecification
+        final:FormatSpecification<T>
+        intermediate?:FormatSpecification<T>
     }
     parse:(
         // NOTE: Every non null or undefined value coming from an input field.
         value:number|string,
         configuration:InputProperties<T>,
-        transformer:InputDataTransformation<T>
+        transformer:InputDataTransformation
     ) => T
     type?:NativeInputType
 }
@@ -486,38 +486,38 @@ export type InputState<T = unknown> =
         selectionIsUnstable:boolean
         showDeclaration:boolean
     }
-export type InputDataTransformation<T = unknown> =
+export type InputDataTransformation =
     Mapping<RecursivePartial<DataTransformSpecification<T>>> &
     {
         boolean:{
-            format?:DataTransformSpecification<T>['format']
-            parse:DataTransformSpecification<T>['parse']
+            format?:DataTransformSpecification<boolean>['format']
+            parse:DataTransformSpecification<boolean>['parse']
             type:NativeInputType
         }
-        currency:DataTransformSpecification<T>
-        date:DataTransformSpecification<T>
-        'datetime-local':DataTransformSpecification<T>
-        float:DataTransformSpecification<T>
+        currency:DataTransformSpecification<number>
+        date:DataTransformSpecification<number>
+        'datetime-local':DataTransformSpecification<number>
+        float:DataTransformSpecification<number>
         integer:{
-            format:DataTransformSpecification<T>['format']
-            parse:DataTransformSpecification<T>['parse']
+            format:DataTransformSpecification<number>['format']
+            parse:DataTransformSpecification<number>['parse']
             type:NativeInputType
         }
         number:{
-            format?:DataTransformSpecification<T>['format']
-            parse:DataTransformSpecification<T>['parse']
-            type?:DataTransformSpecification<T>['type']
+            format?:DataTransformSpecification<number>['format']
+            parse:DataTransformSpecification<number>['parse']
+            type?:DataTransformSpecification<number>['type']
         }
-        time:DataTransformSpecification<T>
+        time:DataTransformSpecification<number>
     }
-export interface StaticWebInputComponent<
-    T = unknown,
-    P = InputProps<T>,
-    MS = InputModelState,
-    DP = DefaultInputProperties
-> extends StaticWebComponent<P, MS, DP> {
+// TODO check if state can be provided everywhere.
+export interface StaticWebInputComponent extends StaticWebComponent<
+    InputProps, InputModelState, DefaultInputProperties
+> {
+    new <T = unknown>(properties:InputProps<T>):Component<InputProps<T>>
+
     locales:Array<string>
-    transformer:InputDataTransformation<T>
+    transformer:InputDataTransformation
 }
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
 export type InputAdapter<T = unknown> = ComponentAdapter<
@@ -541,14 +541,29 @@ export type InputAdapterWithReferences<T = unknown> = InputAdapter<T> & {
         richTextEditorReference?:RichTextEditorComponent
     }
 }
-export type StaticFunctionInputComponent<
+// TODO
+export type StaticFunctionInputComponentBase =
+    ForwardRefRenderFunction &
+    StaticWebInputComponent
+
+export interface StaticFunctionInputComponent
+  extends ForwardRefRenderFunction {
+
+  <T>(props: Props<T>): ReactElement;
+  <T>(props: Props<T>, ref: RefObject<InputAdapter<T>>): ReactElement;
+}
+
+export interface StaticFunctionInputComponentExtended<
     T = unknown,
     P = InputProps<T>,
     MS = InputModelState,
     DP = DefaultInputProperties
-> =
-    Omit<FunctionComponent<P>, 'propTypes'> &
-    StaticWebInputComponent<T, P, MS, DP>
+> extends StaticFunctionInputComponentBase<T, P, MS, DP> {
+    <T = unknown>(props:Props<T>):ReactElement
+    <T = unknown>(
+        props:Props<T>, reference?:RefObject<InputAdapter<T>>
+    ):ReactElement
+}
 // // region constants 
 export const inputModelStatePropertyTypes:{
     [key in keyof InputModelState]:Requireable<boolean|symbol>
