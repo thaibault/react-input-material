@@ -145,42 +145,30 @@ export type BaseProps =
     Partial<Omit<BaseProperties, 'model'>> & {model?:Partial<BaseModel>}
 export type DefaultBaseProperties =
     Omit<BaseProps, 'model'> & {model:BaseModel}
-export type Properties<T = unknown, ExternalProperties = BaseProperties> =
-    BaseProperties &
-    CommonModel<T> &
-    {
-        initialValue:null|T
-        model:Model<T>
-        onBlur:(event:GenericEvent|undefined, properties:ExternalProperties) =>
-            void
-        onChange:(properties:ExternalProperties, event?:GenericEvent) => void
-        onChangeShowDeclaration:(
-            show:boolean,
-            event:GenericEvent|undefined,
-            properties:ExternalProperties
-        ) => void
-        onChangeState:(
-            state:ModelState,
-            event:GenericEvent|undefined,
-            properties:ExternalProperties
-        ) => void
-        onChangeValue:(
-            value:null|T,
-            event:GenericEvent|undefined,
-            properties:ExternalProperties
-        ) => void
-        onClick:(event:MouseEvent, properties:ExternalProperties) => void
-        onFocus:(event:FocusEvent, properties:ExternalProperties) => void
-        onTouch:(event:GenericEvent, properties:ExternalProperties) => void
-    }
-export type Props<
-    T = unknown, ExternalProperties = Properties<T, Properties<T>>
-> =
-    Partial<Omit<Properties<T, ExternalProperties>, 'model'>> &
-    {model?:Partial<Model<T>>}
-export type DefaultProperties<
-    T = unknown, ExternalProperties = Properties<T, Properties<T>>
-> = Omit<Props<T, ExternalProperties>, 'model'> & {model:Model<T>}
+
+export interface TypedProperties<T = unknown> extends BaseProperties {
+    initialValue:null|T
+    model:Model<T>
+    onBlur:(event:GenericEvent|undefined, properties:this) => void
+    onChange:(properties:this, event?:GenericEvent) => void
+    onChangeShowDeclaration:(
+        show:boolean, event:GenericEvent|undefined, properties:this
+    ) => void
+    onChangeState:(
+        state:ModelState, event:GenericEvent|undefined, properties:this
+    ) => void
+    onChangeValue:(
+        value:null|T, event:GenericEvent|undefined, properties:this
+    ) => void
+    onClick:(event:MouseEvent, properties:this) => void
+    onFocus:(event:FocusEvent, properties:this) => void
+    onTouch:(event:GenericEvent, properties:this) => void
+}
+export type Properties<T = unknown> = TypedProperties<T> & CommonModel<T>
+export type Props<T = unknown> =
+    Partial<Omit<Properties<T>, 'model'>> & {model?:Partial<Model<T>>}
+export type DefaultProperties<T = unknown> =
+    Omit<Props<T>, 'model'> & {model:Model<T>}
 export type State<T = unknown> = {
     modelState?:ModelState
     value?:null|T
@@ -340,8 +328,7 @@ export const defaultProperties:DefaultProperties<string> = {
 // / region checkbox
 export type AdditionalCheckboxProperties = {checked:boolean;id:string}
 export type CheckboxProperties =
-    Properties<boolean, Properties<boolean> & AdditionalCheckboxProperties> &
-    AdditionalCheckboxProperties
+    Properties<boolean> & AdditionalCheckboxProperties
 export type CheckboxModel = Model<boolean>
 export type CheckboxModelState = ModelState
 export type CheckboxValueState = ValueState<boolean, CheckboxModelState>
@@ -371,7 +358,7 @@ export const defaultCheckboxModel:Model<boolean> = {
     would permanently shadow them.
 */
 export const defaultCheckboxProperties:CheckboxProps = {
-    ...defaultProperties as DefaultProperties<boolean, CheckboxProperties>,
+    ...defaultProperties as DefaultProperties<boolean>,
     default: false,
     model: {...defaultCheckboxModel},
     requiredText: 'Please check this field.'
@@ -473,19 +460,15 @@ export type AdditionalInputProperties<T> =
         transformer:RecursivePartial<DataTransformSpecification<T>>
     }
 export type InputProperties<T = unknown> =
-    Properties<T, Properties<T> & AdditionalInputProperties<T>> &
+    Properties<T> &
     AdditionalInputProperties<T> &
     {
         onChangeEditorIsActive:(
-            isActive:boolean,
-            event:MouseEvent|undefined,
-            properties:InputProperties<T>
+            isActive:boolean, event:MouseEvent|undefined, properties:this
         ) => void
-        onKeyDown:(event:KeyboardEvent, properties:InputProperties<T>) => void
-        onKeyUp:(event:KeyboardEvent, properties:InputProperties<T>) => void
-        onSelectionChange:(
-            event:GenericEvent, properties:InputProperties<T>
-        ) => void
+        onKeyDown:(event:KeyboardEvent, properties:this) => void
+        onKeyUp:(event:KeyboardEvent, properties:this) => void
+        onSelectionChange:(event:GenericEvent, properties:this) => void
     }
 export type InputProps<T = unknown> =
     Partial<Omit<InputProperties<T>, 'model'>> &
@@ -550,8 +533,8 @@ export interface StaticFunctionInputComponentTEST
 }
 
 export interface StaticFunctionInputComponent extends
-    StaticFunctionInputComponentBase {
-
+    StaticFunctionInputComponentBase
+{
     <T = unknown>(props:InputProps<T>):ReactElement
     <T = unknown>(
         props:InputProps<T>, reference?:RefObject<InputAdapter<T>>
@@ -727,23 +710,18 @@ export type FileInputPropertiesExtension =
         children:(options:{
             declaration:string
             invalid:boolean
-            properties:FileInputProperties
+            properties:this
             value?:FileValue|null
         }) => null|ReactElement
         generateFileNameInputProperties:(
             prototype:InputProps<string>,
-            properties:FileInputProperties & {
-                value:FileValue & {name:string}
-            }
+            properties:this & {value:FileValue & {name:string}}
         ) => InputProps<string>
     }
 export type FileInputProperties =
-    Properties<
-        FileValue, Properties<FileValue> & AdditionalFileInputProperties
-    > &
-    FileInputPropertiesExtension
+    Properties<FileValue> & FileInputPropertiesExtension
 export type FileInputProps =
-    Props<FileValue, FileInputProperties> &
+    Props<FileValue> &
     Partial<Omit<FileInputPropertiesExtension, 'model'>> &
     {model?:Partial<FileInputModel>}
 export type DefaultFileInputProperties =
@@ -890,26 +868,24 @@ export type AdditionalInputsProperties<P extends Properties = Properties> =
         writable:boolean
     }
 export type InputsProperties<P extends Properties = Properties> =
-    Omit<Properties<
-        Array<P>, Properties<Array<P>> & AdditionalInputsProperties<P>
-    >, 'model'|'onChangeValue'> &
+    Omit<Properties<Array<P>>, 'model'|'onChangeValue'> &
     AdditionalInputsProperties<P> &
     {
         children:(options:{
             index:number,
-            inputsProperties:InputsProperties<P>,
+            inputsProperties:this,
             properties:Partial<P>
         }) => ReactElement
         createPrototype:(options:{
             index:number
-            properties:InputsProperties<P>
+            properties:this
             prototype:Partial<P>
             values:Array<P['value']>|null
         }) => Partial<P>
         onChangeValue:(
             values:Array<P['value']>|null,
             event:GenericEvent|unknown,
-            properties:InputsProperties<P>
+            properties:this
         ) => void
     }
 export type InputsProps<P extends Properties = Properties> =
@@ -996,9 +972,7 @@ export type IntervalProperties =
     > &
     AdditionalIntervalProperties &
     {
-        onChange:(
-            properties:AdditionalIntervalProperties, event?:GenericEvent
-        ) => void
+        onChange:(properties:this, event?:GenericEvent) => void
         onChangeValue:(value:null|IntervalValue, event?:GenericEvent) => void
     }
 export type IntervalProps =
