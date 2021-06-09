@@ -63,18 +63,20 @@ import {Editor as RichTextEditorComponent} from '@tinymce/tinymce-react'
 // endregion
 // region exports
 // / region generic
-export type GenericEvent = SyntheticEvent & {detail?:any}
-export type TestEnvironment = {
+export interface GenericEvent<T = unknown> extends SyntheticEvent {
+    detail?:T
+}
+export interface TestEnvironment {
     container:HTMLDivElement|null
     render:(component:ReactElement) => ChildNode|null
 }
-export type CursorState = {
+export interface CursorState {
     end:number
     start:number
 }
 export type Renderable = Array<ReactElement|string>|ReactElement|string
 // // region model
-export type CommonBaseModel = {
+export interface CommonBaseModel {
     declaration:string
     default:unknown
     description:string
@@ -91,14 +93,7 @@ export type CommonBaseModel = {
     type:string
     value?:unknown
 }
-export type ModelExtension = {
-    invertedRegularExpressionPattern:null|RegExp|string
-    mutable:boolean
-    nullable:boolean
-    regularExpressionPattern:null|RegExp|string
-    writable:boolean
-}
-export type ModelState = {
+export interface ModelState = {
     dirty:boolean
     focused:boolean
     invalid:boolean
@@ -109,10 +104,17 @@ export type ModelState = {
     valid:boolean
     visited:boolean
 }
-export type BaseModel = CommonBaseModel & ModelExtension & {state:ModelState}
-export type ModelGenerics<T = unknown> = {
+export interface BaseModel extends CommonBaseModel {
+    state:ModelState
+}
+export interface ModelGenerics<T = unknown> {
     default:null|T
+    invertedRegularExpressionPattern:null|RegExp|string
+    mutable:boolean
+    nullable:boolean
+    regularExpressionPattern:null|RegExp|string
     value?:null|T
+    writable:boolean
 }
 export type CommonModel<T = unknown> = CommonBaseModel & ModelGenerics<T>
 export type Model<T = unknown> = BaseModel & ModelGenerics<T>
@@ -143,6 +145,7 @@ export type BaseProperties =
     }
 export type BaseProps =
     Partial<Omit<BaseProperties, 'model'>> & {model?:Partial<BaseModel>}
+
 export type DefaultBaseProperties =
     Omit<BaseProps, 'model'> & {model:BaseModel}
 
@@ -169,7 +172,7 @@ export type Props<T = unknown> =
     Partial<Omit<Properties<T>, 'model'>> & {model?:Partial<Model<T>>}
 export type DefaultProperties<T = unknown> =
     Omit<Props<T>, 'model'> & {model:Model<T>}
-export type State<T = unknown> = {
+export interface State<T = unknown> {
     modelState?:ModelState
     value?:null|T
 }
@@ -187,11 +190,11 @@ export type StaticComponent<
 export type StaticFunctionComponent<
     P = Props, MS = ModelState, DP = DefaultProperties
 > = Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P, MS, DP>
-export type ValueState<T = unknown, MS = ModelState> = {
+export interface ValueState<T = unknown, MS = ModelState> {
     modelState:MS
     value:null|T
 }
-export type EditorState = {
+export interface EditorState {
     editorIsActive:boolean
     selectionIsUnstable:boolean
 }
@@ -326,9 +329,10 @@ export const defaultProperties:DefaultProperties<string> = {
 // // endregion
 // / endregion
 // / region checkbox
-export type AdditionalCheckboxProperties = {checked:boolean;id:string}
-export type CheckboxProperties =
-    Properties<boolean> & AdditionalCheckboxProperties
+export interface CheckboxProperties extends Properties<boolean> {
+    checked:boolean
+    id:string
+}
 export type CheckboxModel = Model<boolean>
 export type CheckboxModelState = ModelState
 export type CheckboxValueState = ValueState<boolean, CheckboxModelState>
@@ -358,7 +362,7 @@ export const defaultCheckboxModel:Model<boolean> = {
     would permanently shadow them.
 */
 export const defaultCheckboxProperties:CheckboxProps = {
-    ...defaultProperties as DefaultProperties<boolean>,
+    ...defaultProperties as CheckboxProps,
     default: false,
     model: {...defaultCheckboxModel},
     requiredText: 'Please check this field.'
@@ -367,7 +371,7 @@ export const defaultCheckboxProperties:CheckboxProps = {
 // / endregion
 // / region input
 // // region data transformation
-export type FormatSpecification<T = unknown> = {
+export interface FormatSpecification<T = unknown> {
     options?:PlainObject
     transform:(
         value:T,
@@ -375,9 +379,9 @@ export type FormatSpecification<T = unknown> = {
         transformer:InputDataTransformation
     ) => string
 }
-export type DataTransformSpecification<
+export interface DataTransformSpecification<
     T = unknown, InputType = number|string
-> = {
+> {
     format?:{
         final:FormatSpecification<T>
         intermediate?:FormatSpecification<T>
@@ -407,58 +411,57 @@ export type InputDataTransformation =
         NativeInputType, 'date'|'datetime-local'|'time'|'number'
     >]?:DataTransformSpecification<unknown>}
 // // endregion
-export type InputModelState =
-    ModelState &
-    {
-        invalidMaximum:boolean
-        invalidMaximumLength:boolean
-        invalidMinimum:boolean
-        invalidMinimumLength:boolean
-        invalidPattern:boolean
-        invalidInvertedPattern:boolean
-    }
+export interface InputModelState extends ModelState {
+    invalidMaximum:boolean
+    invalidMaximumLength:boolean
+    invalidMinimum:boolean
+    invalidMinimumLength:boolean
+    invalidPattern:boolean
+    invalidInvertedPattern:boolean
+}
 export type InputModel<T = unknown> =
     Omit<Model<T>, 'state'> & {state:InputModelState}
-export type InputValueState<T = unknown, MS = ModelState> =
-    ValueState<T, MS> & {representation?:string}
+export interface InputValueState<T = unknown, MS = ModelState> extends
+    ValueState<T, MS>
+{
+    representation?:string
+}
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export type AdditionalInputProperties<T> =
-    InputModelState &
-    {
-        align:'end'|'start'
-        cursor:CursorState
-        /*
-            plain -> input field
-            text -> textarea
-            richtext(raw) -> texteditor without formatting
-            richtext(simple) -> texteditor with semantic text modifications
-            richtext(normal) -> texteditor with additional text formatting
-            richtext(advanced) -> texteditor with advanced text formatting
-         */
-        editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)'
-        editorIsActive:boolean
-        fullWidth:boolean
-        hidden:boolean
-        icon:string|(IconOptions & {tooltip?:string|TooltipProps})
-        invertedPatternText:string
-        labels:Array<string>|Mapping
-        maximumLengthText:string
-        maximumText:string
-        minimumLengthText:string
-        minimumText:string
-        model:InputModel<T>
-        outlined:boolean
-        pattern:RegExp|string
-        patternText:string
-        placeholder:string
-        representation:string
-        rows:number
-        selectableEditor:boolean
-        step:number
-        trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
-        transformer:RecursivePartial<DataTransformSpecification<T>>
-    }
+export interface AdditionalInputProperties<T> extends InputModelState {
+    align:'end'|'start'
+    cursor:CursorState
+    /*
+        plain -> input field
+        text -> textarea
+        richtext(raw) -> texteditor without formatting
+        richtext(simple) -> texteditor with semantic text modifications
+        richtext(normal) -> texteditor with additional text formatting
+        richtext(advanced) -> texteditor with advanced text formatting
+     */
+    editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)'
+    editorIsActive:boolean
+    fullWidth:boolean
+    hidden:boolean
+    icon:string|(IconOptions & {tooltip?:string|TooltipProps})
+    invertedPatternText:string
+    labels:Array<string>|Mapping
+    maximumLengthText:string
+    maximumText:string
+    minimumLengthText:string
+    minimumText:string
+    model:InputModel<T>
+    outlined:boolean
+    pattern:RegExp|string
+    patternText:string
+    placeholder:string
+    representation:string
+    rows:number
+    selectableEditor:boolean
+    step:number
+    trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
+    transformer:RecursivePartial<DataTransformSpecification<T>>
+}
 export type InputProperties<T = unknown> =
     Properties<T> &
     AdditionalInputProperties<T> &
