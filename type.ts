@@ -81,19 +81,17 @@ export interface CommonBaseModel {
     default:unknown
     description:string
     emptyEqualsNull:boolean
-    invertedRegularExpressionPattern:null|RegExp|string
     maximum:number|string
     maximumLength:number
     minimum:number|string
     minimumLength:number
     name:string
-    regularExpressionPattern:null|RegExp|string
     selection?:SelectProps['options']
     trim:boolean
     type:string
     value?:unknown
 }
-export interface ModelState = {
+export interface ModelState {
     dirty:boolean
     focused:boolean
     invalid:boolean
@@ -105,44 +103,43 @@ export interface ModelState = {
     visited:boolean
 }
 export interface BaseModel extends CommonBaseModel {
-    state:ModelState
-}
-export interface ModelGenerics<T = unknown> {
-    default:null|T
     invertedRegularExpressionPattern:null|RegExp|string
     mutable:boolean
     nullable:boolean
     regularExpressionPattern:null|RegExp|string
-    value?:null|T
+    state:ModelState
     writable:boolean
 }
-export type CommonModel<T = unknown> = CommonBaseModel & ModelGenerics<T>
-export type Model<T = unknown> = BaseModel & ModelGenerics<T>
+export interface CommonModel<T = unknown> extends CommonBaseModel {
+    default:null|T
+    value?:null|T
+}
+export interface Model<T = unknown> extends BaseModel {
+    default:null|T
+    value?:null|T
+}
 // // endregion
-export type BaseProperties =
-    CommonBaseModel &
-    ModelState &
-    {
-        className:string
-        disabled:boolean
-        enforceUncontrolled:boolean
-        id:string
-        initialValue:unknown
-        invertedPattern:null|RegExp|string
-        label:string
-        model:BaseModel
-        name:string
-        pattern:null|RegExp|string
-        required:boolean
-        requiredText:string
-        ripple:RipplePropT
-        rootProps:HTMLProps<any>
-        showDeclaration:boolean
-        showInitialValidationState:boolean
-        style:Mapping
-        themeConfiguration:ThemeProviderProps['options']
-        tooltip:string|TooltipProps
-    }
+export interface BaseProperties extends CommonBaseModel, ModelState {
+    className:string
+    disabled:boolean
+    enforceUncontrolled:boolean
+    id:string
+    initialValue:unknown
+    invertedPattern:null|RegExp|string
+    label:string
+    model:BaseModel
+    name:string
+    pattern:null|RegExp|string
+    required:boolean
+    requiredText:string
+    ripple:RipplePropT
+    rootProps:HTMLProps<any>
+    showDeclaration:boolean
+    showInitialValidationState:boolean
+    style:Mapping
+    themeConfiguration:ThemeProviderProps['options']
+    tooltip:string|TooltipProps
+}
 export type BaseProps =
     Partial<Omit<BaseProperties, 'model'>> & {model?:Partial<BaseModel>}
 
@@ -428,7 +425,7 @@ export interface InputValueState<T = unknown, MS = ModelState> extends
 }
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export interface AdditionalInputProperties<T> extends InputModelState {
+export interface InputProperties<T = unknown> extends InputModelState, Properties<T> {
     align:'end'|'start'
     cursor:CursorState
     /*
@@ -451,6 +448,12 @@ export interface AdditionalInputProperties<T> extends InputModelState {
     minimumLengthText:string
     minimumText:string
     model:InputModel<T>
+    onChangeEditorIsActive:(
+        isActive:boolean, event:MouseEvent|undefined, properties:this
+    ) => void
+    onKeyDown:(event:KeyboardEvent, properties:this) => void
+    onKeyUp:(event:KeyboardEvent, properties:this) => void
+    onSelectionChange:(event:GenericEvent, properties:this) => void
     outlined:boolean
     pattern:RegExp|string
     patternText:string
@@ -462,17 +465,6 @@ export interface AdditionalInputProperties<T> extends InputModelState {
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
     transformer:RecursivePartial<DataTransformSpecification<T>>
 }
-export type InputProperties<T = unknown> =
-    Properties<T> &
-    AdditionalInputProperties<T> &
-    {
-        onChangeEditorIsActive:(
-            isActive:boolean, event:MouseEvent|undefined, properties:this
-        ) => void
-        onKeyDown:(event:KeyboardEvent, properties:this) => void
-        onKeyUp:(event:KeyboardEvent, properties:this) => void
-        onSelectionChange:(event:GenericEvent, properties:this) => void
-    }
 export type InputProps<T = unknown> =
     Partial<Omit<InputProperties<T>, 'model'>> &
     {model?:Partial<InputModel<T>>}
@@ -481,17 +473,15 @@ export type DefaultInputProperties =
 export type InputPropertyTypes<T = unknown> = {
     [key in keyof InputProperties<T>]:ValueOf<typeof PropertyTypes>
 }
-export type InputState<T = unknown> =
-    State<T> &
-    {
-        cursor:CursorState
-        editorIsActive:boolean
-        hidden?:boolean
-        modelState:InputModelState
-        representation?:string
-        selectionIsUnstable:boolean
-        showDeclaration:boolean
-    }
+export interface InputState<T = unknown> extends State<T> {
+    cursor:CursorState
+    editorIsActive:boolean
+    hidden?:boolean
+    modelState:InputModelState
+    representation?:string
+    selectionIsUnstable:boolean
+    showDeclaration:boolean
+}
 // TODO check if state can be provided everywhere.
 export interface StaticWebInputComponent extends StaticWebComponent<
     InputProps, InputModelState, DefaultInputProperties
@@ -510,7 +500,7 @@ export type InputAdapter<T = unknown> = ComponentAdapter<
         value?:null|T
     }
 >
-export type InputAdapterWithReferences<T = unknown> = InputAdapter<T> & {
+export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T> {
     references:{
         codeEditorReference?:CodeEditorType
         codeEditorInputReference:RefObject<HTMLTextAreaElement>
@@ -529,8 +519,8 @@ export type StaticFunctionInputComponentBase =
     StaticWebInputComponent
 
 export interface StaticFunctionInputComponentTEST
-    extends ForwardRefRenderFunction<InputAdapter, InputProps> {
-
+    extends ForwardRefRenderFunction<InputAdapter, InputProps>
+{
     <T>(props:InputProps<T>):ReactElement
     <T>(props:InputProps<T>, reference?:RefObject<InputAdapter<T>>):ReactElement
 }
@@ -658,69 +648,59 @@ export const defaultInputProperties:DefaultInputProperties = {
 // / region file-input
 export type FileRepresentationType =
     'binary'|'image'|'renderableText'|'text'|'video'
-export type FileValue = {
+export interface FileValue {
     blob?:Partial<Blob>|null
     hash?:null|string
     name?:null|string
     source?:null|string
     url?:null|string
 }
-export type FileInputModelState =
-    ModelState &
-    {
-        invalidMaximumSize:boolean
-        invalidMinimumSize:boolean
-        invalidContentTypePattern:boolean
-        invalidName:boolean
-    }
-export type FileInputModel =
-    Omit<Model<FileValue>, 'state'> &
-    {
-        contentTypeRegularExpressionPattern:null|RegExp|string
-        invertedContentTypeRegularExpressionPattern:null|RegExp|string
-        maximumSize:number
-        minimumSize:number
-        fileName:InputModel<string>
-        state:FileInputModelState
-    }
+export interface FileInputModelState extends ModelState {
+    invalidMaximumSize:boolean
+    invalidMinimumSize:boolean
+    invalidContentTypePattern:boolean
+    invalidName:boolean
+}
+export interface FileInputModel extends Model<FileValue> {
+    contentTypeRegularExpressionPattern:null|RegExp|string
+    invertedContentTypeRegularExpressionPattern:null|RegExp|string
+    maximumSize:number
+    minimumSize:number
+    fileName:InputModel<string>
+    state:FileInputModelState
+}
 export type FileInputValueState =
     ValueState<FileValue, FileInputModelState> & {attachBlobProperty:boolean}
-export type AdditionalFileInputProperties =
-    FileInputModelState &
-    {
-        contentTypePattern:null|RegExp|string
-        contentTypePatternText:string
-        deleteButton:ReactElement|string
-        downloadButton:ReactElement|string
-        editButton:ReactElement|string
-        encoding:string
-        invertedContentTypePattern:null|RegExp|string
-        invertedContentTypePatternText:string
-        maximumSizeText:string
-        media:CardMediaProps
-        minimumSizeText:string
-        model:FileInputModel
-        newButton:ReactElement|string
-        outlined:boolean
-        sourceToBlobOptions:{
-            endings?:'native'|'transparent'
-            type?:string
-        }
+export interface FileInputPropertiesExtension extends FileInputModelState {
+    children:(options:{
+        declaration:string
+        invalid:boolean
+        properties:this
+        value?:FileValue|null
+    }) => null|ReactElement
+    contentTypePattern:null|RegExp|string
+    contentTypePatternText:string
+    deleteButton:ReactElement|string
+    downloadButton:ReactElement|string
+    editButton:ReactElement|string
+    encoding:string
+    generateFileNameInputProperties:(
+        prototype:InputProps<string>,
+        properties:this & {value:FileValue & {name:string}}
+    ) => InputProps<string>
+    invertedContentTypePattern:null|RegExp|string
+    invertedContentTypePatternText:string
+    maximumSizeText:string
+    media:CardMediaProps
+    minimumSizeText:string
+    model:FileInputModel
+    newButton:ReactElement|string
+    outlined:boolean
+    sourceToBlobOptions:{
+        endings?:'native'|'transparent'
+        type?:string
     }
-export type FileInputPropertiesExtension =
-    AdditionalFileInputProperties &
-    {
-        children:(options:{
-            declaration:string
-            invalid:boolean
-            properties:this
-            value?:FileValue|null
-        }) => null|ReactElement
-        generateFileNameInputProperties:(
-            prototype:InputProps<string>,
-            properties:this & {value:FileValue & {name:string}}
-        ) => InputProps<string>
-    }
+}
 export type FileInputProperties =
     Properties<FileValue> & FileInputPropertiesExtension
 export type FileInputProps =
