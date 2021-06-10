@@ -35,7 +35,7 @@ import {
     Component,
     ComponentClass,
     FocusEvent,
-    ForwardRefRenderFunction,
+    ForwardRefExoticComponent,
     FunctionComponent,
     HTMLProps,
     KeyboardEvent,
@@ -521,24 +521,13 @@ export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T>
         richTextEditorReference?:RichTextEditorComponent
     }
 }
-// TODO
-export type StaticFunctionInputComponentBase =
-    Omit<ForwardRefRenderFunction<InputAdapter, InputProps>, 'propTypes'> &
-    StaticWebInputComponent
-
-export interface StaticFunctionInputComponentTEST
-    extends ForwardRefRenderFunction<InputAdapter, InputProps>
-{
-    <T>(props:InputProps<T>):ReactElement
-    <T>(props:InputProps<T>, reference?:RefObject<InputAdapter<T>>):ReactElement
-}
 
 export interface StaticFunctionInputComponent extends
-    StaticFunctionInputComponentBase
+    Omit<ForwardRefExoticComponent<InputProps>, 'propTypes'>,
+    StaticWebInputComponent
 {
-    <T = unknown>(props:InputProps<T>):ReactElement
     <T = unknown>(
-        props:InputProps<T>, reference?:RefObject<InputAdapter<T>>
+        props:InputProps<T> & RefAttributes<InputAdapter<T>>
     ):ReactElement
 }
 // // region constants 
@@ -746,11 +735,14 @@ export interface FileInputAdapterWithReferences extends FileInputAdapter {
     }
 }
 
-export type StaticFunctionFileInputComponent =
-    Omit<FunctionComponent<FileInputProps>, 'propTypes'> &
-    StaticWebComponent<
-        FileInputProps, FileInputModelState, DefaultFileInputProperties
-    >
+export interface StaticFunctionFileInputComponent extends
+    Omit<ForwardRefExoticComponent<FileInputProps>, 'propTypes'>,
+    StaticWebInputComponent
+{
+    <T = unknown>(
+        props:FileInputProps & RefAttributes<FileInputAdapter>
+    ):ReactElement
+}
 // // region constants
 export const fileInputModelStatePropertyTypes:{
     [key in keyof FileInputModelState]:Requireable<boolean|symbol>

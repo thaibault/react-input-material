@@ -16,7 +16,7 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports  
+// region imports
 import Tools from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import {
@@ -57,6 +57,7 @@ import {
     inputsPropertyTypes as propertyTypes,
     InputsProps,
     inputsRenderProperties as renderProperties,
+    Properties,
     StaticComponent
 } from '../type'
 // endregion
@@ -123,11 +124,7 @@ const getExternalProperties = function<P extends Properties>(
         model: {
             ...(properties.model || {}),
             state: modelState,
-            value: Array.isArray(properties.value) ?
-                properties.value.map(
-                    ({model}):Properties['model'] => model || {}
-                ) :
-                properties.value
+            value: properties.value
         }
     }
 }
@@ -143,7 +140,7 @@ const getExternalProperties = function<P extends Properties>(
  * @returns React elements.
  */
 export const InputsInner = function<
-    P = InputProperties<string>, State = Mapping<any>
+    P = InputProperties<string>, State = Mapping<unknown>
 >(props:InputsProps<P>, reference?:RefObject<Adapter<P>>):ReactElement {
     // region consolidate properties
     let givenProps:InputsProps<P> =
@@ -498,7 +495,7 @@ export const InputsInner = function<
         </div>
     </WrapConfigurations>
     // endregion
-} as ForwardRefRenderFunction<Adapter, InputsProps>
+}
 // NOTE: This is useful in react dev tools.
 InputsInner.displayName = 'Inputs'
 /**
@@ -513,10 +510,8 @@ InputsInner.displayName = 'Inputs'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Inputs:StaticComponent<InputsProps> =
-    memorize(forwardRef(InputsInner)) as
-        unknown as
-        StaticComponent<InputsProps>
+export const Inputs:StaticComponent =
+    memorize(forwardRef(InputsInner)) as unknown as StaticComponent
 // region static properties
 // / region web-component hints
 Inputs.wrapped = InputsInner

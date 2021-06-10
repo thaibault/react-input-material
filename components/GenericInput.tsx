@@ -1265,7 +1265,8 @@ export const GenericInputInner = function<Type = unknown>(
             onChange(event)
 
             if (determineValidationState(
-                properties as DefaultProperties, oldValueState.modelState
+                properties as unknown as DefaultProperties,
+                oldValueState.modelState
             ))
                 stateChanged = true
 

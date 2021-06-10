@@ -79,7 +79,7 @@ import {
     InputProperties,
     InputProps,
     FileRepresentationType as RepresentationType,
-    StaticFunctionFileInputComponent
+    StaticFunctionFileInputComponent as StaticComponent
 } from '../type'
 // endregion
 // region constants
@@ -264,7 +264,7 @@ export const FileInputInner = function(
     const getConsolidatedProperties = (properties:Props):Properties => {
         let result:DefaultProperties =
             mapPropertiesIntoModel<Props, DefaultProperties>(
-                properties, FileInput.defaultProperties.model as Model
+                properties, FileInput.defaultProperties.model
             )
 
         determineValidationState(
@@ -803,7 +803,8 @@ export const FileInputInner = function(
                                 default: properties.value.name
                             },
                             properties as
-                                Properties & {value:FileValue & {name:string}}
+                                Omit<Properties, 'value'> &
+                                {value:FileValue & {name:string}}
                         )}
                     /> :
                     ''
@@ -894,7 +895,7 @@ export const FileInputInner = function(
         }
     </Card></WrapConfigurations>
     // endregion
-} as ForwardRefRenderFunction<Adapter, Props>
+}
 // NOTE: This is useful in react dev tools.
 FileInputInner.displayName = 'FileInput'
 /**
@@ -910,10 +911,8 @@ FileInputInner.displayName = 'FileInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const FileInput:StaticFunctionFileInputComponent =
-    memorize(forwardRef(FileInputInner)) as
-        unknown as
-        StaticFunctionFileInputComponent
+export const FileInput:StaticComponent =
+    memorize(forwardRef(FileInputInner)) as unknown as StaticComponent
 // region static properties
 // / region web-component hints
 FileInput.wrapped = FileInputInner
