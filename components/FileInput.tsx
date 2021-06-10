@@ -23,8 +23,8 @@ import {FirstParameter} from 'clientnode/type'
 import {
     createRef,
     FocusEvent as ReactFocusEvent,
+    ForwardedRef,
     forwardRef,
-    ForwardRefRenderFunction,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
@@ -253,7 +253,7 @@ export const readBinaryDataIntoText = (
  * @returns React elements.
  */
 export const FileInputInner = function(
-    props:Props, reference?:RefObject<Adapter>
+    props:Props, reference?:ForwardedRef<Adapter>
 ):ReactElement {
     // region property aggregation
     /**

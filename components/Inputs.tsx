@@ -16,13 +16,13 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports
+// region imports 
 import Tools from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import {
     createRef,
+    ForwardedRef,
     forwardRef,
-    ForwardRefRenderFunction,
     memo as memorize,
     ReactElement,
     RefObject,
@@ -45,6 +45,7 @@ import {
     triggerCallbackIfExists
 } from '../helper'
 import {
+    BaseProperties,
     defaultInputsProperties,
     defaultProperties,
     GenericEvent,
@@ -57,14 +58,11 @@ import {
     inputsPropertyTypes as propertyTypes,
     InputsProps,
     inputsRenderProperties as renderProperties,
-    Properties,
     StaticComponent
 } from '../type'
 // endregion
 // region helper
-const getPrototype = function<P extends Properties>(
-    properties:InputsProperties<P>
-):Partial<P> {
+const getPrototype = function<P>(properties:InputsProperties<P>):Partial<P> {
     return {
         ...defaultProperties,
         className: styles.inputs__item__input,
@@ -74,7 +72,7 @@ const getPrototype = function<P extends Properties>(
         )
     } as Partial<P>
 }
-const inputPropertiesToValues = function<P extends Properties>(
+const inputPropertiesToValues = function<P extends BaseProperties>(
     inputProperties:Array<P>|null
 ):Array<P['value']>|null {
     return Array.isArray(inputProperties) ?
@@ -83,7 +81,7 @@ const inputPropertiesToValues = function<P extends Properties>(
         ) :
         inputProperties
 }
-const getModelState = function<P extends Properties>(
+const getModelState = function<P extends BaseProperties>(
     inputsProperties:InputsProperties<P>
 ):ModelState {
     const properties:Array<P> = inputsProperties.value || []
@@ -113,7 +111,7 @@ const getModelState = function<P extends Properties>(
         visited: properties.some(unpack('visited'))
     }
 }
-const getExternalProperties = function<P extends Properties>(
+const getExternalProperties = function<P extends BaseProperties>(
     properties:InputsProperties<P>
 ):InputsProperties<P> {
     const modelState:ModelState = getModelState<P>(properties)
@@ -140,8 +138,8 @@ const getExternalProperties = function<P extends Properties>(
  * @returns React elements.
  */
 export const InputsInner = function<
-    P = InputProperties<string>, State = Mapping<unknown>
->(props:InputsProps<P>, reference?:RefObject<Adapter<P>>):ReactElement {
+    P extends BaseProperties = InputProperties<string>, State = Mapping<unknown>
+>(props:InputsProps<P>, reference?:ForwardedRef<Adapter<P>>):ReactElement {
     // region consolidate properties
     let givenProps:InputsProps<P> =
         translateKnownSymbols(props) as InputsProps<P>

@@ -266,11 +266,11 @@ export function normalizeSelection(
     }
     return selection as SelectProps['options']
 }
-export function determineValidationState(
-    properties:DefaultProperties, currentState:Partial<ModelState>
+export function determineValidationState<T>(
+    properties:DefaultProperties<T>, currentState:Partial<ModelState>
 ):boolean {
     return determineBaseValidationState<
-        DefaultProperties, Partial<ModelState>
+        DefaultProperties<T>, Partial<ModelState>
     >(
         properties,
         currentState,
@@ -919,21 +919,18 @@ export const GenericInputInner = function<Type = unknown>(
     */
     const mapPropertiesAndValidationStateIntoModel = (
         properties:Props<Type>
-    ):DefaultProperties => {
-        const result:DefaultProperties =
-            mapPropertiesIntoModel<Props<Type>, DefaultProperties>(
+    ):DefaultProperties<Type> => {
+        const result:DefaultProperties<Type> =
+            mapPropertiesIntoModel<Props<Type>, DefaultProperties<Type>>(
                 properties,
-                GenericInput.defaultProperties.model as Model<string>
+                GenericInput.defaultProperties.model as unknown as Model<Type>
             )
 
-        ;(result.model.value as null|Type) =
-            parseValue<null|Type, DefaultProperties>(
-                result,
-                result.model.value,
-                transformer
-            )
+        result.model.value = parseValue<null|Type, DefaultProperties<Type>>(
+            result, result.model.value, transformer
+        )
 
-        determineValidationState(result, result.model.state)
+        determineValidationState<Type>(result, result.model.state)
 
         return result
     }
@@ -1264,9 +1261,8 @@ export const GenericInputInner = function<Type = unknown>(
 
             onChange(event)
 
-            if (determineValidationState(
-                properties as unknown as DefaultProperties,
-                oldValueState.modelState
+            if (determineValidationState<Type>(
+                properties as DefaultProperties<Type>, oldValueState.modelState
             ))
                 stateChanged = true
 
