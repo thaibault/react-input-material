@@ -684,15 +684,16 @@ export interface FileInputModel extends Model<FileValue> {
     state:FileInputModelState
 }
 
+export interface FileInputChildrenOptions<P> {
+    declaration:string
+    invalid:boolean
+    properties:P
+    value?:FileValue|null
+}
 export interface FileInputProperties extends
     Properties<FileValue>, FileInputModelState
 {
-    children:(options:{
-        declaration:string
-        invalid:boolean
-        properties:this
-        value?:FileValue|null
-    }) => null|ReactElement
+    children:(options:FileInputChildrenOptions<this>) => null|ReactElement
     contentTypePattern:null|RegExp|string
     contentTypePatternText:string
     deleteButton:ReactElement|string
@@ -847,8 +848,8 @@ export interface InputsModelState extends ModelState {
     invalidMaximumNumber:boolean
     invalidMinimumNumber:boolean
 }
-export type InputsModel<M extends Partial<Model> = Partial<Model>> =
-    Model<Array<M>> &
+export type InputsModel<P extends Props = Props> =
+    Model<Array<P>> &
     {
         maximumNumber:number
         minimumNumber:number
@@ -856,24 +857,27 @@ export type InputsModel<M extends Partial<Model> = Partial<Model>> =
         writable:boolean
     }
 
+export interface InputsChildrenOptions<P extends Properties, IP> {
+    index:number,
+    inputsProperties:IP,
+    properties:Partial<P>
+}
+export interface InputsCreatePrototypeOptions<P extends Properties, IP> {
+    index:number
+    properties:IP
+    prototype:Partial<P>
+    values:Array<P['value']>|null
+}
 export interface InputsProperties<P extends Properties = Properties> extends
     InputsModelState, Properties<Array<P>>
 {
     addIcon:IconOptions
-    children:(options:{
-        index:number,
-        inputsProperties:this,
-        properties:Partial<P>
-    }) => ReactElement
-    createPrototype:(options:{
-        index:number
-        properties:this
-        prototype:Partial<P>
-        values:Array<P['value']>|null
-    }) => Partial<P>
+    children:(options:InputsChildrenOptions<P, this>) => ReactElement
+    createPrototype:(options:InputsCreatePrototypeOptions<P, this>) =>
+        Partial<P>
     maximumNumber:number
     minimumNumber:number
-    model:InputsModel<P['model']>
+    model:InputsModel<P>
     onChangeValue:(
         values:Array<P['value']>|null,
         event:GenericEvent|unknown,
@@ -942,18 +946,18 @@ export const defaultInputsProperties:DefaultInputsProperties = {
 // // endregion
 // / endregion
 // / region interval
-export interface IntervalValue = {
+export interface IntervalValue {
     end?:null|number
     start?:null|number
 }
 
-export interface IntervalConfiguration = {
+export interface IntervalConfiguration {
     end:InputProps<number>
     start:InputProps<number>
 }
 
 export type IntervalModelState = ModelState
-export interface IntervalModel = {
+export interface IntervalModel {
     name:string
     state:IntervalModelState
     value:{
@@ -962,18 +966,16 @@ export interface IntervalModel = {
     }
 }
 
-export type IntervalProperties =
-    Omit<
-        InputProperties<number>,
-        'icon'|'model'|'onChange'|'onChangeValue'|'value'
-    > &
-    {
-        icon:IconOptions
-        model:IntervalModel
-        onChange:(properties:this, event?:GenericEvent) => void
-        onChangeValue:(value:null|IntervalValue, event?:GenericEvent) => void
-        value:IntervalConfiguration
-    }
+export interface IntervalProperties extends Omit<
+    InputProperties<number>,
+    'icon'|'model'|'onChange'|'onChangeValue'|'value'
+> {
+    icon:IconOptions
+    model:IntervalModel
+    onChange:(properties:this, event?:GenericEvent) => void
+    onChangeValue:(value:null|IntervalValue, event?:GenericEvent) => void
+    value:IntervalConfiguration
+}
 export type IntervalProps =
     Omit<
         InputProps<number>, 'icon'|'model'|'onChange'|'onChangeValue'|'value'
@@ -1023,7 +1025,7 @@ export const defaultIntervalProperties:IntervalProps = {
 } as const
 // // endregion
 // / endregion
-export interface ConfigurationProperties = {
+export interface ConfigurationProperties {
     strict?:boolean
     themeConfiguration?:ThemeProviderProps['options']
     tooltip?:Properties['tooltip']
