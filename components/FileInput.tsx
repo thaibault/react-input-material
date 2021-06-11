@@ -23,8 +23,8 @@ import {FirstParameter} from 'clientnode/type'
 import {
     createRef,
     FocusEvent as ReactFocusEvent,
+    ForwardedRef,
     forwardRef,
-    ForwardRefRenderFunction,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
@@ -79,7 +79,7 @@ import {
     InputProperties,
     InputProps,
     FileRepresentationType as RepresentationType,
-    StaticFunctionFileInputComponent
+    StaticFunctionFileInputComponent as StaticComponent
 } from '../type'
 // endregion
 // region constants
@@ -105,7 +105,7 @@ const videoContentTypeRegularExpression:RegExp = new RegExp(
 // region helper
 export const preserveStaticFileBaseNameInputGenerator:Properties['generateFileNameInputProperties'] = (
     prototype:InputProps<string>, {name, value: {name: fileName}}
-) => ({
+):InputProps<string> => ({
     ...prototype,
     disabled: true,
     value:
@@ -140,9 +140,9 @@ export const determineRepresentationType = (
 
     return 'binary'
 }
-export const determineValidationState = (
-    properties:Properties, invalidName:boolean, currentState:ModelState
-):boolean => determineBaseValidationState<Properties>(
+export const determineValidationState = <P extends DefaultProperties>(
+    properties:P, invalidName:boolean, currentState:ModelState
+):boolean => determineBaseValidationState<P>(
     properties,
     currentState,
     {
@@ -253,7 +253,7 @@ export const readBinaryDataIntoText = (
  * @returns React elements.
  */
 export const FileInputInner = function(
-    props:Props, reference?:RefObject<Adapter>
+    props:Props, reference?:ForwardedRef<Adapter>
 ):ReactElement {
     // region property aggregation
     /**
@@ -262,12 +262,13 @@ export const FileInputInner = function(
      * @returns External properties object.
      */
     const getConsolidatedProperties = (properties:Props):Properties => {
-        let result:Props = mapPropertiesIntoModel<Props, Model>(
-            properties, FileInput.defaultProperties.model as Model
-        )
+        let result:DefaultProperties =
+            mapPropertiesIntoModel<Props, DefaultProperties>(
+                properties, FileInput.defaultProperties.model
+            )
 
         determineValidationState(
-            result as Properties,
+            result,
             // TODO not available
             false
             /*nameInputReference.current?.properties.invalid ??
@@ -277,9 +278,7 @@ export const FileInputInner = function(
             result.model!.state as ModelState
         )
 
-        result = getBaseConsolidatedProperties<Props, Properties>(result)
-
-        return result as Properties
+        return getBaseConsolidatedProperties<Props, Properties>(result)
     }
     // endregion
     // region event handler
@@ -359,13 +358,15 @@ export const FileInputInner = function(
      * @param eventSourceOrName - Event object or new value.
      * @param event - Optional event object (if not provided as first
      * argument).
+     * @param inputProperties - Current properties state.
      * @param attachBlobProperty - Indicates whether additional data is added
      * through post processed data properties.
      * @returns Nothing.
      */
     const onChangeValue = (
         eventSourceOrName:FileValue|null|string|SyntheticEvent,
-        event?:SyntheticEvent,
+        event?:SyntheticEvent|undefined,
+        inputProperties?:InputProperties<string>|undefined,
         attachBlobProperty:boolean = false
     ):void => {
         if (!(properties.model.mutable && properties.model.writable))
@@ -427,7 +428,7 @@ export const FileInputInner = function(
             onChange(event)
 
             if (determineValidationState(
-                properties,
+                properties as unknown as DefaultProperties,
                 nameInputReference.current?.properties?.invalid || false,
                 oldValueState.modelState
             ))
@@ -686,7 +687,7 @@ export const FileInputInner = function(
             }
 
             if (valueChanged)
-                onChangeValue(valueChanged, undefined, true)
+                onChangeValue(valueChanged, undefined, undefined, true)
         })()
     })
     // region render
@@ -790,7 +791,7 @@ export const FileInputInner = function(
                     ''
                 }
                 {properties.value ?
-                    <GenericInput
+                    <GenericInput<string>
                         ref={nameInputReference as any}
                         {...properties.generateFileNameInputProperties(
                             {
@@ -801,9 +802,9 @@ export const FileInputInner = function(
                                 onChangeValue: onChangeValue,
                                 default: properties.value.name
                             },
-                            properties as Properties & {
-                                value:FileValue & {name:string}
-                            }
+                            properties as
+                                Omit<Properties, 'value'> &
+                                {value:FileValue & {name:string}}
                         )}
                     /> :
                     ''
@@ -894,7 +895,7 @@ export const FileInputInner = function(
         }
     </Card></WrapConfigurations>
     // endregion
-} as ForwardRefRenderFunction<Adapter, Props>
+}
 // NOTE: This is useful in react dev tools.
 FileInputInner.displayName = 'FileInput'
 /**
@@ -910,10 +911,8 @@ FileInputInner.displayName = 'FileInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const FileInput:StaticFunctionFileInputComponent =
-    memorize(forwardRef(FileInputInner)) as
-        unknown as
-        StaticFunctionFileInputComponent
+export const FileInput:StaticComponent =
+    memorize(forwardRef(FileInputInner)) as unknown as StaticComponent
 // region static properties
 // / region web-component hints
 FileInput.wrapped = FileInputInner
@@ -926,7 +925,12 @@ FileInput.defaultModelState = defaultModelState
 */
 FileInput.defaultProperties = {
     ...defaultProperties,
-    model: {...defaultProperties.model, state: undefined, value: undefined},
+    model: {
+        ...defaultProperties.model,
+        // Trigger initial determination.
+        state: undefined as unknown as ModelState,
+        value: undefined
+    },
     value: undefined
 }
 FileInput.propTypes = propertyTypes

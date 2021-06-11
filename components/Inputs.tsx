@@ -16,13 +16,13 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports 
+// region imports
 import Tools from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import {
     createRef,
+    ForwardedRef,
     forwardRef,
-    ForwardRefRenderFunction,
     memo as memorize,
     ReactElement,
     RefObject,
@@ -45,27 +45,26 @@ import {
     triggerCallbackIfExists
 } from '../helper'
 import {
+    BaseProperties,
     defaultInputsProperties,
     defaultProperties,
     GenericEvent,
+    InputProperties,
     InputsAdapter as Adapter,
     InputsAdapterWithReferences as AdapterWithReferences,
     InputsModel as Model,
     InputsModelState as ModelState,
     InputsProperties,
-    inputsPropertyTypes as propertyTypes,
     InputsProps,
+    inputsPropertyTypes as propertyTypes,
     inputsRenderProperties as renderProperties,
-    Properties,
-    StaticComponent
+    StaticFunctionInputsComponent as StaticComponent
 } from '../type'
 // endregion
 // region helper
-const getPrototype = function<P extends Properties>(
-    properties:InputsProperties<P>
-):Partial<P> {
+const getPrototype = function<P>(properties:InputsProperties<P>):Partial<P> {
     return {
-        ...defaultProperties,
+        ...defaultProperties as unknown as Partial<P>,
         className: styles.inputs__item__input,
         ...(properties.default && properties.default.length > 0 ?
             properties.default![0] :
@@ -73,7 +72,7 @@ const getPrototype = function<P extends Properties>(
         )
     } as Partial<P>
 }
-const inputPropertiesToValues = function<P extends Properties>(
+const inputPropertiesToValues = function<P extends InputsPropertiesItem>(
     inputProperties:Array<P>|null
 ):Array<P['value']>|null {
     return Array.isArray(inputProperties) ?
@@ -82,7 +81,7 @@ const inputPropertiesToValues = function<P extends Properties>(
         ) :
         inputProperties
 }
-const getModelState = function<P extends Properties>(
+const getModelState = function<P extends BaseProperties>(
     inputsProperties:InputsProperties<P>
 ):ModelState {
     const properties:Array<P> = inputsProperties.value || []
@@ -112,7 +111,7 @@ const getModelState = function<P extends Properties>(
         visited: properties.some(unpack('visited'))
     }
 }
-const getExternalProperties = function<P extends Properties>(
+const getExternalProperties = function<P extends BaseProperties>(
     properties:InputsProperties<P>
 ):InputsProperties<P> {
     const modelState:ModelState = getModelState<P>(properties)
@@ -123,11 +122,7 @@ const getExternalProperties = function<P extends Properties>(
         model: {
             ...(properties.model || {}),
             state: modelState,
-            value: Array.isArray(properties.value) ?
-                properties.value.map(
-                    ({model}):Properties['model'] => model || {}
-                ) :
-                properties.value
+            value: properties.value
         }
     }
 }
@@ -143,8 +138,12 @@ const getExternalProperties = function<P extends Properties>(
  * @returns React elements.
  */
 export const InputsInner = function<
-    P extends Properties = Properties, State = Mapping<any>
->(props:InputsProps<P>, reference?:RefObject<Adapter<P>>):ReactElement {
+    T = unknown,
+    P extends InputsPropertiesItem<T> = Properties<T>,
+    State = Mapping<unknown>
+>(
+    props:InputsProps<T, P>, reference?:ForwardedRef<Adapter<T, P>>
+):ReactElement {
     // region consolidate properties
     let givenProps:InputsProps<P> =
         translateKnownSymbols(props) as InputsProps<P>
@@ -498,7 +497,7 @@ export const InputsInner = function<
         </div>
     </WrapConfigurations>
     // endregion
-} as ForwardRefRenderFunction<Adapter, InputsProps>
+}
 // NOTE: This is useful in react dev tools.
 InputsInner.displayName = 'Inputs'
 /**
@@ -513,10 +512,8 @@ InputsInner.displayName = 'Inputs'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Inputs:StaticComponent<InputsProps> =
-    memorize(forwardRef(InputsInner)) as
-        unknown as
-        StaticComponent<InputsProps>
+export const Inputs:StaticComponent =
+    memorize(forwardRef(InputsInner)) as unknown as StaticComponent
 // region static properties
 // / region web-component hints
 Inputs.wrapped = InputsInner

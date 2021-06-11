@@ -26,14 +26,14 @@ import {ReactElement, useMemo, useState} from 'react'
 import {render as renderReact, unmountComponentAtNode} from 'react-dom'
 
 import {
+    BaseModel,
     BaseProperties,
     BaseProps,
     DataTransformSpecification,
-    DefaultProperties,
+    DefaultBaseProperties,
+    DefaultInputProperties,
     FormatSpecification,
     InputDataTransformation,
-    InputProperties,
-    Model,
     ModelState,
     ValueState
 } from './type'
@@ -179,7 +179,7 @@ export const translateKnownSymbols = <Type = any>(
  * @returns Determined value.
  */
 export const determineInitialValue = <Type = any>(
-    properties:BaseProps<Type>,
+    properties:BaseProps,
     defaultValue?:null|Type,
     alternateValue?:null|Type
 ):null|Type => {
@@ -207,10 +207,11 @@ export const determineInitialValue = <Type = any>(
  * validator function.
  * @returns A boolean indicating if validation state has changed.
  */
-export const determineValidationState = <P extends BaseProperties>(
-    properties:P,
-    currentState:P['model']['state'],
-    validators:Mapping<() => boolean> = {}
+export const determineValidationState = <
+    P extends DefaultBaseProperties = DefaultBaseProperties,
+    MS extends Partial<ModelState> = Partial<ModelState>
+>(
+    properties:P, currentState:MS, validators:Mapping<() => boolean> = {}
 ):boolean => {
     let changed:boolean = false
 
@@ -225,20 +226,22 @@ export const determineValidationState = <P extends BaseProperties>(
                 properties.model.type === 'boolean' &&
                 !(
                     typeof properties.model.value === 'boolean' ||
-                    ['false', 'true'].includes(properties.model.value)
+                    ['false', 'true'].includes(
+                        properties.model.value as unknown as string
+                    )
                 )
             )
         ),
         ...validators
     }
 
-    properties.model.state = properties.model.state || {}
+    properties.model.state = properties.model.state || {} as MS
     for (const [name, validator] of Object.entries(validators)) {
-        const oldValue:boolean = currentState[name as keyof ModelState]
+        const oldValue:boolean|undefined =
+            currentState[name as keyof ModelState]
         properties.model.state[name as keyof ModelState] = validator()
         changed =
-            changed ||
-            oldValue !== currentState[name as keyof ModelState]
+            changed || oldValue !== currentState[name as keyof ModelState]
     }
 
     if (changed) {
@@ -259,18 +262,16 @@ export const determineValidationState = <P extends BaseProperties>(
  * @param defaultModel - Default model to merge.
  * @returns Merged properties.
 */
-export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
-    properties:P, defaultModel:M
-):P => {
+export const mapPropertiesIntoModel = <
+    P extends BaseProps = BaseProps,
+    DP extends DefaultBaseProperties = DefaultBaseProperties
+>(properties:P, defaultModel:DP['model']):DP => {
     /*
         NOTE: Default props seems not to respect nested layers to merge so we
         have to manage this for nested model structure.
     */
-    const result:P & {
-        invertedPattern?:string
-        model:M
-        pattern?:string
-    } = Tools.extend(true, {model: Tools.copy(defaultModel)}, properties)
+    const result:DP =
+        Tools.extend(true, {model: Tools.copy(defaultModel)}, properties)
     // region handle aliases
     if (result.disabled) {
         result.model.mutable = false
@@ -296,10 +297,10 @@ export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
     for (const name of Object.keys(result.model).concat('value'))
         if (
             Object.prototype.hasOwnProperty.call(result, name) &&
-            result[name as keyof P] !== undefined
+            result[name as keyof DP] !== undefined
         )
-            (result.model[name as keyof M] as ValueOf<M>) =
-                result[name as keyof P] as unknown as ValueOf<M>
+            (result.model[name as keyof BaseModel] as ValueOf<DP['model']>) =
+                result[name as keyof DP] as unknown as ValueOf<DP['model']>
     // Map property state into model state
     for (const name in result.model.state)
         if (
@@ -307,7 +308,7 @@ export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
             result[name as keyof ModelState] !== undefined
         )
             result.model.state[name as keyof ModelState] =
-                result[name as keyof P] as unknown as ValueOf<ModelState>
+                result[name as keyof DP] as unknown as ValueOf<ModelState>
 
     if (result.model.value === undefined)
         result.model.value = Tools.copy(result.model.default)
@@ -323,22 +324,11 @@ export const mapPropertiesIntoModel = <P extends BaseProps, M extends Model>(
 export const getConsolidatedProperties = <
     P extends BaseProps, R extends BaseProperties
 >(properties:P):R => {
-    type Result = R & {
-        invertedPattern?:null|RegExp|string
-        invertedRegularExpressionPattern?:null|RegExp|string
-        mutable?:boolean
-        nullable?:boolean
-        pattern?:RegExp|string
-        regularExpressionPattern?:null|RegExp|string
-        state?:null
-        writable?:boolean
-    }
-
-    const result:Result = ({
+    const result:R & Partial<R['model']> = ({
         ...properties,
         ...(properties.model || {}),
         ...((properties.model || {}).state || {})
-    }) as unknown as Result
+    }) as unknown as R & Partial<R['model']>
     // region handle aliases
     result.disabled = !(result.mutable && result.writable)
     delete result.mutable
@@ -360,7 +350,7 @@ export const getConsolidatedProperties = <
     delete (result as {regularExpressionPattern?:RegExp|string})
         .regularExpressionPattern
     // endregion
-    return result as R
+    return result
 }
 // endregion
 // region value transformer
@@ -374,61 +364,42 @@ export const getConsolidatedProperties = <
  * @returns Transformed value.
  */
 export const parseValue = <
-    P extends {
-        emptyEqualsNull:boolean
-        transformer?:RecursivePartial<DataTransformSpecification<Type>>
-        type:string
-    },
-    Type = any
+    T = unknown,
+    P extends DefaultInputProperties<T> = DefaultInputProperties<T>,
+    InputType = T
 >(
-    configuration:P, value:any, transformer:InputDataTransformation<Type>
-):null|Type => {
-    if (configuration.emptyEqualsNull && value === '')
-        return null
+    configuration:P,
+    value:null|InputType,
+    transformer:InputDataTransformation
+):null|T => {
+    if (configuration.model.trim && typeof value === 'string')
+        (value as string) = value.trim().replace(/ +\n/g, '\\n')
 
     if (
-        ![null, undefined].includes(value) &&
-        transformer[configuration.type]?.parse
+        configuration.model.emptyEqualsNull &&
+        value as unknown as string === ''
     )
-        value = (
-            transformer[configuration.type]!.parse as
-                DataTransformSpecification<Type>['parse']
-        )(
-            value,
-            configuration as unknown as InputProperties<Type>,
-            transformer
-        )
-
-    if (typeof value === 'number' && isNaN(value))
         return null
 
-    return value
-}
-/**
- * Applies configured value transformation when editing the input has been
- * ended (element is not focused anymore).
- *
- * @param configuration - Current configuration.
- * @param value - Current value to transform.
- * @param transformer - To apply to given value.
- *
- * @returns Transformed value.
- */
-export const transformValue = <
-    P extends {
-        emptyEqualsNull:boolean
-        model:{trim:boolean}
-        transformer?:RecursivePartial<DataTransformSpecification<Type>>
-        type:string
-    },
-    Type = any
->(
-    configuration:P, value:any, transformer:InputDataTransformation<Type>
-):null|Type => {
-    if (configuration.model.trim && typeof value === 'string')
-        value = value.trim().replace(/ +\n/g, '\\n')
+    let result:null|T = value as unknown as null|T
+    if (
+        ![null, undefined].includes(value as null) &&
+        transformer[
+            configuration.model.type as keyof InputDataTransformation
+        ]?.parse
+    )
+        result = (
+            transformer[
+                configuration.model.type as keyof InputDataTransformation
+            ]!.parse as
+                unknown as
+                DataTransformSpecification<T, InputType>['parse']
+        )(value as InputType, configuration, transformer)
 
-    return parseValue<P, Type>(configuration, value, transformer)
+    if (typeof result === 'number' && isNaN(result))
+        return null
+
+    return result
 }
 /**
  * Represents configured value as string.
@@ -441,15 +412,12 @@ export const transformValue = <
  * @returns Transformed value.
  */
 export function formatValue<
-    P extends {
-        transformer?:RecursivePartial<DataTransformSpecification<Type>>
-        type:string
-    },
-    Type = any
+    T = unknown,
+    P extends DefaultInputProperties<T> = DefaultInputProperties<T>
 >(
     configuration:P,
-    value:null|Type,
-    transformer:InputDataTransformation<Type>,
+    value:null|T,
+    transformer:InputDataTransformation,
     final:boolean = true
 ):string {
     const methodName:'final'|'intermediate' = final ? 'final' : 'intermediate'
@@ -461,17 +429,19 @@ export function formatValue<
         return ''
 
     if (
-        transformer[configuration.type]?.format &&
-        transformer[configuration.type]!.format![methodName]?.transform
+        transformer[
+            configuration.model.type as keyof InputDataTransformation
+        ]?.format &&
+        transformer[
+            configuration.model.type as keyof InputDataTransformation
+        ]!.format![methodName]?.transform
     )
         return (
-            transformer[configuration.type]!.format![methodName]!.transform as
-                FormatSpecification<Type>['transform']
-        )(
-            value,
-            configuration as unknown as InputProperties<Type>,
-            transformer
-        )
+            transformer[
+                configuration.model.type as keyof InputDataTransformation
+            ]!.format![methodName]!.transform as
+                FormatSpecification<T>['transform']
+        )(value as T, configuration, transformer)
 
     return String(value)
 }
@@ -479,36 +449,32 @@ export function formatValue<
  * Determines initial value representation as string.
  *
  * @param properties - Components properties.
+ * @param defaultProperties - Components default properties.
  * @param value - Current value to represent.
  * @param transformer - To apply to given value.
  *
  * @returns Determined initial representation.
  */
 export function determineInitialRepresentation<
-    P extends {
-        model?:{type?:string}
-        representation?:string
-        transformer?:RecursivePartial<DataTransformSpecification<Type>>
-        type?:string
-    },
-    Type = any
+    T = unknown,
+    P extends DefaultInputProperties<T> = DefaultInputProperties<T>
 >(
     properties:P,
-    defaultProperties:Partial<P>,
-    value:null|Type,
-    transformer:InputDataTransformation<Type>
+    defaultProperties:P,
+    value:null|T,
+    transformer:InputDataTransformation
 ):string {
     if (typeof properties.representation === 'string')
         return properties.representation
 
     if (value !== null)
-        return formatValue<P & {type:string}, Type>(
+        return formatValue<T, P & {type:string}>(
             {
                 ...properties,
                 type: (
                     properties.type ||
                     properties.model?.type ||
-                    defaultProperties.model!.type as string
+                    defaultProperties.model.type
                 )
             },
             value,
@@ -526,9 +492,9 @@ export function determineInitialRepresentation<
  * @param dependencies - Optional dependencies when to update given value.
  * @returns Given cached value.
  */
-export const useMemorizedValue = <Type = any>(
-    value:Type, ...dependencies:Array<any>
-):Type => useMemo(():Type => value, dependencies)
+export const useMemorizedValue = <T = unknown>(
+    value:T, ...dependencies:Array<unknown>
+):T => useMemo(():T => value, dependencies)
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

@@ -22,8 +22,8 @@ import {Icon} from '@rmwc/icon'
 import {IconOptions} from '@rmwc/types'
 import {
     createRef,
+    ForwardedRef,
     forwardRef,
-    ForwardRefRenderFunction,
     memo as memorize,
     ReactElement,
     RefObject,
@@ -113,7 +113,7 @@ const getExternalProperties = (
  * @returns React elements.
  */
 export const IntervalInner = ((
-    props:Props, reference?:RefObject<Adapter>
+    props:Props, reference?:ForwardedRef<Adapter>
 ):ReactElement => {
     // region consolidate properties
     const givenProps:Props = translateKnownSymbols(props) as Props
@@ -398,7 +398,7 @@ export const IntervalInner = ((
             <GenericInput {...endProperties} ref={endInputReference as any} />
         </div>
     </WrapConfigurations>
-}) as ForwardRefRenderFunction<Adapter, Props>
+})
 // NOTE: This is useful in react dev tools.
 IntervalInner.displayName = 'Interval'
 /**

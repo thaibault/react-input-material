@@ -63,34 +63,35 @@ import {Editor as RichTextEditorComponent} from '@tinymce/tinymce-react'
 // endregion
 // region exports
 // / region generic
-export type GenericEvent = SyntheticEvent & {detail?:any}
-export type TestEnvironment = {
+export interface GenericEvent<T = unknown> extends SyntheticEvent {
+    detail?:T
+}
+export interface TestEnvironment {
     container:HTMLDivElement|null
     render:(component:ReactElement) => ChildNode|null
 }
-export type BaseModel<Type = any> = {
+export interface CursorState {
+    end:number
+    start:number
+}
+export type Renderable = Array<ReactElement|string>|ReactElement|string
+// // region model
+export interface CommonBaseModel {
     declaration:string
-    default:null|Type
+    default:unknown
     description:string
     emptyEqualsNull:boolean
-    invertedRegularExpressionPattern:null|RegExp|string
     maximum:number|string
     maximumLength:number
     minimum:number|string
     minimumLength:number
     name:string
-    regularExpressionPattern:null|RegExp|string
     selection?:SelectProps['options']
     trim:boolean
     type:string
-    value?:null|Type
+    value?:unknown
 }
-export type CursorState = {
-    end:number
-    start:number
-}
-export type Renderable = Array<ReactElement|string>|ReactElement|string
-export type ModelState = {
+export interface ModelState {
     dirty:boolean
     focused:boolean
     invalid:boolean
@@ -101,104 +102,102 @@ export type ModelState = {
     valid:boolean
     visited:boolean
 }
-export type Model<Type = any> =
-    BaseModel<Type> &
-    {
-        mutable:boolean
-        nullable:boolean
-        state:ModelState
-        writable:boolean
-    }
-export type FormatSpecification<Type = any> = {
-    options?:PlainObject
-    transform:(
-        value:null|Type,
-        configuration:InputProperties<Type>,
-        transformer:InputDataTransformation<Type>
-    ) => string
+export interface BaseModel extends CommonBaseModel {
+    invertedRegularExpressionPattern:null|RegExp|string
+    mutable:boolean
+    nullable:boolean
+    regularExpressionPattern:null|RegExp|string
+    state:ModelState
+    writable:boolean
 }
-export type DataTransformSpecification<Type = any> = {
-    format:{
-        final:FormatSpecification
-        intermediate?:FormatSpecification
-    }
-    parse:(
-        value:any,
-        configuration:InputProperties<Type>,
-        transformer:InputDataTransformation<Type>
-    ) => null|Type
-    type?:NativeInputType
+export interface CommonModel<T = unknown> extends CommonBaseModel {
+    default:null|T
+    value?:null|T
 }
-export type BaseProperties<Type = any> =
-    BaseModel<Type> &
-    ModelState &
-    {
-        className:string
-        disabled:boolean
-        enforceUncontrolled:boolean
-        id:string
-        initialValue:null|Type
-        label:string
-        model:Model<Type>
-        name:string
-        onBlur:(event:GenericEvent) => void
-        onChangeShowDeclaration:(show:boolean, event?:GenericEvent) => void
-        onChangeState:(state:ModelState, event?:GenericEvent) => void
-        onChangeValue:(value:null|Type, event?:GenericEvent) => void
-        onClick:(event:MouseEvent) => void
-        onFocus:(event:FocusEvent) => void
-        onTouch:(event:GenericEvent) => void
-        required:boolean
-        requiredText:string
-        ripple:RipplePropT
-        rootProps:HTMLProps<any>
-        showDeclaration:boolean
-        showInitialValidationState:boolean
-        style:Mapping
-        themeConfiguration:ThemeProviderProps['options']
-        tooltip:string|TooltipProps
-    }
-export type Properties<
-    Type = any,
-    ExternalProperties extends BaseProperties<Type> = BaseProperties<Type>
-> =
-    BaseProperties<Type> &
-    {onChange:(properties:ExternalProperties, event?:GenericEvent) => void}
-export type BaseProps<Type = any> =
-    Partial<Omit<BaseProperties<Type>, 'model'>> &
-    {model?:Partial<Model<Type>>}
-export type Props<
-    Type = any,
-    ExternalProperties extends BaseProperties<Type> = BaseProperties<Type>
-> =
-    Partial<Omit<Properties<Type, ExternalProperties>, 'model'>> &
-    {model?:Partial<Model<Type>>}
-export type DefaultProperties<Type = any> =
-    Omit<Props<Type>, 'model'> & {model:Model<Type>}
-export type State<Type = any> = {
+export interface Model<T = unknown> extends BaseModel {
+    default:null|T
+    value?:null|T
+}
+// // endregion
+export interface BaseProperties extends CommonBaseModel, ModelState {
+    className:string
+    disabled:boolean
+    enforceUncontrolled:boolean
+    id:string
+    initialValue:unknown
+    invertedPattern:null|RegExp|string
+    label:string
+    model:BaseModel
+    name:string
+    pattern:null|RegExp|string
+    required:boolean
+    requiredText:string
+    ripple:RipplePropT
+    rootProps:HTMLProps<any>
+    showDeclaration:boolean
+    showInitialValidationState:boolean
+    style:Mapping
+    themeConfiguration:ThemeProviderProps['options']
+    tooltip:string|TooltipProps
+}
+export type BaseProps =
+    Partial<Omit<BaseProperties, 'model'>> & {model?:Partial<BaseModel>}
+
+export type DefaultBaseProperties =
+    Omit<BaseProps, 'model'> & {model:BaseModel}
+
+export interface TypedProperties<T = unknown> extends BaseProperties {
+    initialValue:null|T
+    model:Model<T>
+    onBlur:(event:GenericEvent|undefined, properties:this) => void
+    onChange:(properties:this, event?:GenericEvent) => void
+    onChangeShowDeclaration:(
+        show:boolean, event:GenericEvent|undefined, properties:this
+    ) => void
+    onChangeState:(
+        state:ModelState, event:GenericEvent|undefined, properties:this
+    ) => void
+    onChangeValue:(
+        value:null|T, event:GenericEvent|undefined, properties:this
+    ) => void
+    onClick:(event:MouseEvent, properties:this) => void
+    onFocus:(event:FocusEvent, properties:this) => void
+    onTouch:(event:GenericEvent, properties:this) => void
+}
+export type Properties<T = unknown> = TypedProperties<T> & CommonModel<T>
+export type Props<T = unknown> =
+    Partial<Omit<Properties<T>, 'model'>> & {model?:Partial<Model<T>>}
+
+export type DefaultProperties<T = unknown> =
+    Omit<Props<T>, 'model'> & {model:Model<T>}
+// // region state
+export interface State<T = unknown> {
     modelState?:ModelState
-    value?:null|Type
+    value?:null|T
 }
-export interface StaticWebComponent<
-    P extends BaseProps = Props, M extends ModelState = ModelState
-> extends StaticBaseWebComponent {
-    new (properties:P):Component<P>
-    defaultModelState:M
-    defaultProperties:P
-    strict:boolean
-}
-export type StaticComponent<P = Props> =
-    Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<P>
-export type StaticFunctionComponent<P = Props> =
-    Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P>
-export type ValueState<Type = any, MS = ModelState> = {
+export interface ValueState<T = unknown, MS = ModelState> {
     modelState:MS
-    value:null|Type
+    value:null|T
 }
-export type EditorState = {
+export interface EditorState {
     editorIsActive:boolean
     selectionIsUnstable:boolean
 }
+// // endregion
+export interface StaticWebComponent<
+    P = Props, MS = ModelState, DP = DefaultProperties
+> extends StaticBaseWebComponent {
+    new (properties:P):Component<P>
+    defaultModelState:MS
+    defaultProperties:DP
+    strict:boolean
+}
+export type StaticComponent<
+    P = Props, MS = ModelState, DP = DefaultProperties
+> = Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<P, MS, DP>
+export type StaticFunctionComponent<
+    P = Props, MS = ModelState, DP = DefaultProperties
+> = Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P, MS, DP>
 // // region constants
 export const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     declaration: string,
@@ -293,7 +292,7 @@ export const defaultModelState:ModelState = {
     valid: true,
     visited: false
 } as const
-export const defaultModel:Model = {
+export const defaultModel:Model<string> = {
     declaration: '',
     default: null,
     description: '',
@@ -320,7 +319,7 @@ export const defaultModel:Model = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultProperties:DefaultProperties = {
+export const defaultProperties:DefaultProperties<string> = {
     enforceUncontrolled: false,
     model: {...defaultModel},
     showDeclaration: undefined,
@@ -330,27 +329,27 @@ export const defaultProperties:DefaultProperties = {
 // // endregion
 // / endregion
 // / region checkbox
-export type AdditionalCheckboxProperties = {checked:boolean;id:string}
-export type CheckboxProperties =
-    Properties<boolean, Properties<boolean> & AdditionalCheckboxProperties> &
-    AdditionalCheckboxProperties
+export interface CheckboxProperties extends Properties<boolean> {
+    checked:boolean
+    id:string
+}
 export type CheckboxModel = Model<boolean>
 export type CheckboxModelState = ModelState
 export type CheckboxValueState = ValueState<boolean, CheckboxModelState>
 export type CheckboxProps =
     Partial<Omit<CheckboxProperties, 'model'>> &
     {model?:Partial<CheckboxModel>}
-export type DefaultCheckboxProperties<Type = any> =
+export type DefaultCheckboxProperties =
     Omit<CheckboxProps, 'model'> & {model:CheckboxModel}
 export type CheckboxState = State<boolean>
-export type CheckboxAdapter<Type = any> =
+export type CheckboxAdapter =
     ComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
 // // region constants
 export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
     ...modelStatePropertyTypes,
     checked: boolean,
-    id: string,
+    id: string
 } as const
 export const defaultCheckboxModel:Model<boolean> = {
     ...defaultModel,
@@ -363,136 +362,144 @@ export const defaultCheckboxModel:Model<boolean> = {
     would permanently shadow them.
 */
 export const defaultCheckboxProperties:CheckboxProps = {
-    ...defaultProperties,
+    ...defaultProperties as CheckboxProps,
     default: false,
     model: {...defaultCheckboxModel},
-    requiredText: 'Please check this field.',
+    requiredText: 'Please check this field.'
 } as const
 // // endregion
 // / endregion
 // / region input
-export type InputModelState =
-    ModelState &
-    {
-        invalidMaximum:boolean
-        invalidMaximumLength:boolean
-        invalidMinimum:boolean
-        invalidMinimumLength:boolean
-        invalidPattern:boolean
-        invalidInvertedPattern:boolean
+// // region data transformation
+export interface FormatSpecification<T = unknown> {
+    options?:PlainObject
+    transform:(
+        value:T,
+        configuration:DefaultInputProperties<T>,
+        transformer:InputDataTransformation
+    ) => string
+}
+export interface DataTransformSpecification<
+    T = unknown, InputType = number|string
+> {
+    format?:{
+        final:FormatSpecification<T>
+        intermediate?:FormatSpecification<T>
     }
-export type InputModel<Type = any> =
-    Omit<Model<Type>, 'state'> &
-    {state:InputModelState}
-export type InputValueState<Type = any, MS = ModelState> =
-    ValueState<Type, MS> &
-    {representation?:string}
+    parse:(
+        value:InputType,
+        configuration:DefaultInputProperties<T>,
+        transformer:InputDataTransformation
+    ) => T
+    type?:NativeInputType
+}
+export type InputDataTransformation =
+    {
+        boolean:DataTransformSpecification<boolean, number|string>
+
+        currency:DataTransformSpecification<number, string>
+
+        date:DataTransformSpecification<number, number|string>
+        'datetime-local':DataTransformSpecification<number, number|string>
+        time:DataTransformSpecification<number, number|string>
+
+        float:DataTransformSpecification<number, string>
+        integer:DataTransformSpecification<number, string>
+        number:DataTransformSpecification<number, number>
+    } &
+    {[key in Exclude<
+        NativeInputType, 'date'|'datetime-local'|'time'|'number'
+    >]?:DataTransformSpecification<unknown>}
+// // endregion
+export interface InputModelState extends ModelState {
+    invalidMaximum:boolean
+    invalidMaximumLength:boolean
+    invalidMinimum:boolean
+    invalidMinimumLength:boolean
+    invalidPattern:boolean
+    invalidInvertedPattern:boolean
+}
+export interface InputModel<T = unknown> extends Model<T> {
+    state:InputModelState
+}
+export interface InputValueState<T = unknown, MS = ModelState> extends
+    ValueState<T, MS>
+{
+    representation?:string
+}
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export type AdditionalInputProperties<Type> =
-    InputModelState &
-    {
-        align:'end'|'start'
-        cursor:CursorState
-        /*
-            plain -> input field
-            text -> textarea
-            richtext(raw) -> texteditor without formatting
-            richtext(simple) -> texteditor with semantic text modifications
-            richtext(normal) -> texteditor with additional text formatting
-            richtext(advanced) -> texteditor with advanced text formatting
-         */
-        editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)'
-        editorIsActive:boolean
-        fullWidth:boolean
-        hidden:boolean
-        icon:string|(IconOptions & {tooltip?:string|TooltipProps})
-        invertedPatternText:string
-        labels:Array<string>|Mapping
-        maximumLengthText:string
-        maximumText:string
-        minimumLengthText:string
-        minimumText:string
-        model:InputModel<Type>
-        onChangeEditorIsActive:(isActive:boolean, event?:MouseEvent) => void
-        onKeyDown:(event:KeyboardEvent) => void
-        onKeyUp:(event:KeyboardEvent) => void
-        onSelectionChange:(event:GenericEvent) => void
-        outlined:boolean
-        pattern:RegExp|string
-        patternText:string
-        placeholder:string
-        representation:string
-        rows:number
-        selectableEditor:boolean
-        step:number
-        trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
-        transformer:RecursivePartial<DataTransformSpecification<Type>>
-    }
-export type InputProperties<Type = any> =
-    Properties<Type, Properties<Type> & AdditionalInputProperties<Type>> &
-    AdditionalInputProperties<Type>
-export type InputProps<Type = any> =
-    Partial<Omit<InputProperties<Type>, 'model'>> &
-    {model?:Partial<InputModel<Type>>}
-export type DefaultInputProperties<Type = any> =
-    Omit<InputProps, 'model'> &
-    {model:InputModel}
-export type InputPropertyTypes<Type = any> = {
-    [key in keyof InputProperties<Type>]:ValueOf<typeof PropertyTypes>
+export interface InputProperties<T = unknown> extends InputModelState, Properties<T> {
+    align:'end'|'start'
+    cursor:CursorState
+    /*
+        plain -> input field
+        text -> textarea
+        richtext(raw) -> texteditor without formatting
+        richtext(simple) -> texteditor with semantic text modifications
+        richtext(normal) -> texteditor with additional text formatting
+        richtext(advanced) -> texteditor with advanced text formatting
+     */
+    editor:'code'|'code(css)'|'code(script)'|'plain'|'text'|'richtext(raw)'|'richtext(simple)'|'richtext(normal)'|'richtext(advanced)'
+    editorIsActive:boolean
+    fullWidth:boolean
+    hidden:boolean
+    icon:string|(IconOptions & {tooltip?:string|TooltipProps})
+    invertedPatternText:string
+    labels:Array<string>|Mapping
+    maximumLengthText:string
+    maximumText:string
+    minimumLengthText:string
+    minimumText:string
+    model:InputModel<T>
+    onChangeEditorIsActive:(
+        isActive:boolean, event:MouseEvent|undefined, properties:this
+    ) => void
+    onKeyDown:(event:KeyboardEvent, properties:this) => void
+    onKeyUp:(event:KeyboardEvent, properties:this) => void
+    onSelectionChange:(event:GenericEvent, properties:this) => void
+    outlined:boolean
+    pattern:RegExp|string
+    patternText:string
+    placeholder:string
+    representation:string
+    rows:number
+    selectableEditor:boolean
+    step:number
+    trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
+    transformer:RecursivePartial<DataTransformSpecification<T>>
 }
-export type InputState<Type = any> =
-    State<Type> &
-    {
-        cursor:CursorState
-        editorIsActive:boolean
-        hidden?:boolean
-        modelState:InputModelState
-        representation?:string
-        selectionIsUnstable:boolean
-        showDeclaration:boolean
-    }
-export type InputDataTransformation<Type = any> =
-    Mapping<RecursivePartial<DataTransformSpecification<Type>>> &
-    {
-        boolean:{
-            format?:DataTransformSpecification<Type>['format']
-            parse:DataTransformSpecification<Type>['parse']
-            type:NativeInputType
-        }
-        currency:DataTransformSpecification<Type>
-        date:DataTransformSpecification<Type>
-        'datetime-local':DataTransformSpecification<Type>
-        float:DataTransformSpecification<Type>
-        integer:{
-            format:DataTransformSpecification<Type>['format']
-            parse:DataTransformSpecification<Type>['parse']
-            type:NativeInputType
-        }
-        number:{
-            format?:DataTransformSpecification<Type>['format']
-            parse:DataTransformSpecification<Type>['parse']
-            type?:DataTransformSpecification<Type>['type']
-        }
-        time:DataTransformSpecification<Type>
-    }
-export interface StaticWebInputComponent<
-    P extends InputProps = InputProps,
-    M extends InputModelState = InputModelState
-> extends StaticWebComponent<P, M> {
-    locales:Array<string>
-    transformer:InputDataTransformation<P['value']>
+export type InputProps<T = unknown> =
+    Partial<Omit<InputProperties<T>, 'model'>> &
+    {model?:Partial<InputModel<T>>}
+
+export type DefaultInputProperties<T = string> =
+    Omit<InputProps<T>, 'model'> & {model:InputModel<T>}
+
+export type InputPropertyTypes<T = unknown> = {
+    [key in keyof InputProperties<T>]:ValueOf<typeof PropertyTypes>
 }
+
+export interface InputState<T = unknown> extends State<T> {
+    cursor:CursorState
+    editorIsActive:boolean
+    hidden?:boolean
+    modelState:InputModelState
+    representation?:string
+    selectionIsUnstable:boolean
+    showDeclaration:boolean
+}
+
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
-export type InputAdapter<Type = any> = ComponentAdapter<
-    InputProperties<Type>,
-    Omit<InputState<Type>, 'representation'|'selectionIsUnstable'|'value'> &
+export type InputAdapter<T = unknown> = ComponentAdapter<
+    InputProperties<T>,
+    Omit<InputState<T>, 'representation'|'selectionIsUnstable'|'value'> &
     {
         representation?:string
-        value?:null|Type
+        value?:null|T
     }
 >
-export type InputAdapterWithReferences<Type = any> = InputAdapter<Type> & {
+export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T> {
     references:{
         codeEditorReference?:CodeEditorType
         codeEditorInputReference:RefObject<HTMLTextAreaElement>
@@ -505,9 +512,21 @@ export type InputAdapterWithReferences<Type = any> = InputAdapter<Type> & {
         richTextEditorReference?:RichTextEditorComponent
     }
 }
-export type StaticFunctionInputComponent<P = Props> =
-    Omit<FunctionComponent<P>, 'propTypes'> & StaticWebInputComponent<P>
-// // region constants
+
+export interface StaticFunctionInputComponent extends
+    Omit<ForwardRefExoticComponent<InputProps>, 'propTypes'>,
+    StaticWebComponent<
+        InputProps, InputModelState, DefaultInputProperties
+    >
+{
+    <T = unknown>(
+        props:InputProps<T> & RefAttributes<InputAdapter<T>>
+    ):ReactElement
+
+    locales:Array<string>
+    transformer:InputDataTransformation
+}
+// // region constants 
 export const inputModelStatePropertyTypes:{
     [key in keyof InputModelState]:Requireable<boolean|symbol>
 } = {
@@ -587,8 +606,8 @@ export const defaultInputModelState:InputModelState = {
     invalidMinimumLength: false,
     invalidPattern: false
 } as const
-export const defaultInputModel:InputModel = {
-    ...defaultModel,
+export const defaultInputModel:InputModel<string> = {
+    ...defaultModel as InputModel<string>,
     state: defaultInputModelState
 } as const
 /*
@@ -596,7 +615,7 @@ export const defaultInputModel:InputModel = {
     would permanently shadow them.
 */
 export const defaultInputProperties:DefaultInputProperties = {
-    ...defaultProperties,
+    ...defaultProperties as DefaultInputProperties,
     cursor: {
         end: 0,
         start: 0
@@ -622,100 +641,104 @@ export const defaultInputProperties:DefaultInputProperties = {
 // / region file-input
 export type FileRepresentationType =
     'binary'|'image'|'renderableText'|'text'|'video'
-export type FileValue = {
+export interface FileValue {
     blob?:Partial<Blob>|null
     hash?:null|string
     name?:null|string
     source?:null|string
     url?:null|string
 }
-export type FileInputModelState =
-    ModelState &
-    {
-        invalidMaximumSize:boolean
-        invalidMinimumSize:boolean
-        invalidContentTypePattern:boolean
-        invalidName:boolean
+export interface FileInputValueState extends
+    ValueState<FileValue, FileInputModelState>
+{
+    attachBlobProperty:boolean
+}
+
+export interface FileInputModelState extends ModelState {
+    invalidMaximumSize:boolean
+    invalidMinimumSize:boolean
+    invalidContentTypePattern:boolean
+    invalidName:boolean
+}
+export interface FileInputModel extends Model<FileValue> {
+    contentTypeRegularExpressionPattern:null|RegExp|string
+    invertedContentTypeRegularExpressionPattern:null|RegExp|string
+    maximumSize:number
+    minimumSize:number
+    fileName:InputModel<string>
+    state:FileInputModelState
+}
+
+export interface FileInputChildrenOptions<P> {
+    declaration:string
+    invalid:boolean
+    properties:P
+    value?:FileValue|null
+}
+export interface FileInputProperties extends
+    Properties<FileValue>, FileInputModelState
+{
+    children:(options:FileInputChildrenOptions<this>) => null|ReactElement
+    contentTypePattern:null|RegExp|string
+    contentTypePatternText:string
+    deleteButton:ReactElement|string
+    downloadButton:ReactElement|string
+    editButton:ReactElement|string
+    encoding:string
+    generateFileNameInputProperties:(
+        prototype:InputProps<string>,
+        properties:this & {value:FileValue & {name:string}}
+    ) => InputProps<string>
+    invertedContentTypePattern:null|RegExp|string
+    invertedContentTypePatternText:string
+    maximumSizeText:string
+    media:CardMediaProps
+    minimumSizeText:string
+    model:FileInputModel
+    newButton:ReactElement|string
+    outlined:boolean
+    sourceToBlobOptions:{
+        endings?:'native'|'transparent'
+        type?:string
     }
-export type FileInputModel =
-    Omit<Model<FileValue>, 'state'> &
-    {
-        contentTypeRegularExpressionPattern:null|RegExp|string
-        invertedContentTypeRegularExpressionPattern:null|RegExp|string
-        maximumSize:number
-        minimumSize:number
-        fileName:InputModel
-        state:FileInputModelState
-    }
-export type FileInputValueState =
-    ValueState<FileValue, FileInputModelState> & {attachBlobProperty:boolean}
-export type AdditionalFileInputProperties =
-    FileInputModelState &
-    {
-        contentTypePattern:null|RegExp|string
-        contentTypePatternText:string
-        deleteButton:ReactElement|string
-        downloadButton:ReactElement|string
-        editButton:ReactElement|string
-        encoding:string
-        invertedContentTypePattern:null|RegExp|string
-        invertedContentTypePatternText:string
-        maximumSizeText:string
-        media:CardMediaProps
-        minimumSizeText:string
-        model:FileInputModel
-        newButton:ReactElement|string
-        outlined:boolean
-        sourceToBlobOptions:{
-            endings?:'native'|'transparent'
-            type?:string
-        }
-    }
-export type FileInputProperties =
-    Properties<
-        FileValue, Properties<FileValue> & AdditionalFileInputProperties
-    > &
-    AdditionalFileInputProperties &
-    {
-        children:(options:{
-            declaration:string
-            invalid:boolean
-            properties:FileInputProperties
-            value?:FileValue|null
-        }) => null|ReactElement,
-        generateFileNameInputProperties:(
-            prototype:InputProps<string>,
-            properties:FileInputProperties & {
-                value:FileValue & {name:string}
-            }
-        ) => InputProps<string>
-    }
+}
 export type FileInputProps =
     Partial<Omit<FileInputProperties, 'model'>> &
     {model?:Partial<FileInputModel>}
+
 export type DefaultFileInputProperties =
     Omit<FileInputProps, 'model'> & {model:FileInputModel}
+
 export type FileInputPropertyTypes = {
     [key in keyof FileInputProperties]:ValueOf<typeof PropertyTypes>
 }
-export type FileInputState =
-    State<FileValue> & {modelState:FileInputModelState}
+
+export interface FileInputState extends State<FileValue> {
+    modelState:FileInputModelState
+}
+
 export type FileInputAdapter = ComponentAdapter<
     FileInputProperties, Omit<FileInputState, 'value'> &
     {value?:FileValue|null}
 >
-export type FileInputAdapterWithReferences =
-    FileInputAdapter &
-    {references:{
+export interface FileInputAdapterWithReferences extends FileInputAdapter {
+    references:{
         deleteButtonReference:RefObject<HTMLButtonElement>
         downloadLinkReference:RefObject<HTMLAnchorElement>
         fileInputReference:RefObject<HTMLInputElement>
         nameInputReference:RefObject<InputAdapter<string>>
         uploadButtonReference:RefObject<HTMLButtonElement>
-    }}
-export type StaticFunctionFileInputComponent =
-    Omit<FunctionComponent<FileInputProps>, 'propTypes'> &
-    StaticWebComponent<FileInputProps, FileInputModelState>
+    }
+}
+
+export interface StaticFunctionFileInputComponent extends
+    Omit<ForwardRefExoticComponent<FileInputProps>, 'propTypes'>,
+    StaticWebComponent<
+        FileInputProps, FileInputModelState, DefaultFileInputProperties
+    >
+{
+    (props:FileInputProps & RefAttributes<FileInputAdapter>):ReactElement
+}
 // // region constants
 export const fileInputModelStatePropertyTypes:{
     [key in keyof FileInputModelState]:Requireable<boolean|symbol>
@@ -751,7 +774,7 @@ export const defaultFileInputModelState:FileInputModelState = {
     invalidName: false
 } as const
 export const defaultFileInputModel:FileInputModel = {
-    ...defaultModel,
+    ...defaultModel as Model<FileValue>,
     contentTypeRegularExpressionPattern: /^.+\/.+$/,
     fileName: {
         ...defaultInputModel,
@@ -778,10 +801,10 @@ export const defaultFileNameInputProperties:InputProps<string> = {
         'Your file\'s name has to match the regular expression: "' +
         '${pattern}".',
     required: true
-} as InputProperties<string>
+} as const
 delete (defaultFileNameInputProperties as {model?:InputModel}).model
 export const defaultFileInputProperties:DefaultFileInputProperties = {
-    ...defaultProperties,
+    ...defaultProperties as unknown as Partial<DefaultFileInputProperties>,
     contentTypePatternText:
         'Your file\'s mime-type has to match the regular expression: "' +
         '${contentTypePattern}".',
@@ -809,74 +832,87 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 // // endregion
 // / endregion
 // / region inputs
-export type InputsModelState =
-    ModelState &
+export interface InputsPropertiesItem<T> {
+    model?:{state?:{}}
+    value?:null|T
+}
+export interface InputsModelState extends ModelState {
+    invalidMaximumNumber:boolean
+    invalidMinimumNumber:boolean
+}
+export interface InputsModel<T, P extends InputsPropertiesItem<T>> extends
+    Model<Array<P>>
+{
+    maximumNumber:number
+    minimumNumber:number
+    state:InputsModelState
+    writable:boolean
+}
+
+export interface InputsChildrenOptions<
+    T, P extends InputsPropertiesItem<T>, IP
+> {
+    index:number
+    inputsProperties:IP
+    properties:P
+}
+export interface InputsCreatePrototypeOptions<
+    T, P extends InputsPropertiesItem<T>, IP
+> {
+    index:number
+    properties:IP
+    prototype:P
+    values:Array<T>|null
+}
+export interface InputsProperties<
+    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
+> extends InputsModelState, Properties<Array<P>> {
+    addIcon:IconOptions
+    children:(options:InputsChildrenOptions<T, P, this>) => ReactElement
+    createPrototype:(options:InputsCreatePrototypeOptions<T, P, this>) => P
+    maximumNumber:number
+    minimumNumber:number
+    model:InputsModel<T, P>
+    onChangeValue:(
+        values:Array<P>|null,
+        event:GenericEvent|unknown,
+        properties:this
+    ) => void
+    removeIcon:IconOptions
+    value:Array<P>|null
+    writable:boolean
+}
+export type InputsProps<
+    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
+> =
+    Partial<Omit<InputsProperties<T, P>, 'model'|'value'>> &
     {
-        invalidMaximumNumber:boolean
-        invalidMinimumNumber:boolean
+        model?:Partial<InputsModel<T, P>>
+        value?:Array<Partial<P>>|Array<T>|null
     }
-export type InputsModel<M extends Partial<Model> = Partial<Model>> =
-    Model<Array<M>> &
-    {
-        maximumNumber:number
-        minimumNumber:number
-        state:InputsModelState
-        writable:boolean
-    }
-export type AdditionalInputsProperties<P extends Properties = Properties> =
-    InputsModelState &
-    {
-        addIcon:IconOptions
-        maximumNumber:number
-        minimumNumber:number
-        model:InputsModel<P['model']>
-        removeIcon:IconOptions
-        value:Array<P>|null
-        writable:boolean
-    }
-export type InputsProperties<P extends Properties = Properties> =
-    Omit<Properties<
-        Array<P>, Properties<Array<P>> & AdditionalInputsProperties<P>
-    >, 'model'|'onChangeValue'> &
-    AdditionalInputsProperties<P> &
-    {
-        children:(options:{
-            index:number,
-            inputsProperties:InputsProperties<P>,
-            properties:Partial<P>
-        }) => ReactElement
-        createPrototype:(options:{
-            index:number
-            properties:InputsProperties<P>
-            prototype:Partial<P>
-            values:Array<P['value']>|null
-        }) => Partial<P>
-        onChangeValue:(
-            values:Array<P['value']>|null,
-            event?:GenericEvent,
-            properties:InputsProperties<P>
-        ) => void
-    }
-export type InputsProps<P extends Properties = Properties> =
-    Partial<Omit<InputsProperties<P>, 'model'|'value'>> &
-    {
-        model?:Partial<InputsModel<Partial<P['model']>>>
-        value?:Array<Partial<P>>|Array<P['value']>|null
-    }
-export type DefaultInputsProperties =
-    Partial<Omit<InputsProperties, 'default'|'model'|'value'>> &
-    {model:InputsModel}
-export type InputsPropertyTypes<P extends Properties = Properties> = {
+
+export type DefaultInputsProperties<
+    T = string, P extends InputsPropertiesItem<T> = InputProperties<T>
+> =
+    Partial<Omit<InputsProperties<T, P>, 'default'|'model'|'value'>> &
+    {model:InputsModel<T, P>}
+
+export type InputsPropertyTypes<
+    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
+> = {
     [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
 }
-export type InputsState<Type = any> = State<Array<Type>>
-export type InputsAdapter<P extends Properties = Properties> =
-    ComponentAdapter<InputsProperties<P>, InputsState<P['value']>>
+
+export type InputsState<T = unknown> = State<Array<T>>
+
+export type InputsAdapter<
+    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
+> = ComponentAdapter<InputsProperties<T, P>, InputsState<T>>
 export type InputsAdapterWithReferences<
-    P extends Properties = Properties, RefType = unknown
-> =
-    InputsAdapter<P> &
-    {references:Array<RefObject<RefType>>}
+    T = unknown,
+    P extends InputsPropertiesItem<T> = Properties<T>,
+    RefType = unknown
+> = InputsAdapter<T, P> & {references:Array<RefObject<RefType>>}
 // // region constants
 export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -889,8 +925,8 @@ export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
 } as const
 export const inputsRenderProperties:Array<string> =
     ['children', 'createPrototype']
-export const defaultInputsModel:InputsModel = {
-    ...defaultModel,
+export const defaultInputsModel:InputsModel<string, InputProperties<string>> = {
+    ...defaultModel as InputsModel<string, InputProperties<string>>,
     state: {
         ...defaultModel.state,
         invalidMaximumNumber: false,
@@ -905,25 +941,38 @@ export const defaultInputsModel:InputsModel = {
     would permanently shadow them.
 */
 export const defaultInputsProperties:DefaultInputsProperties = {
-    ...defaultProperties,
+    ...defaultProperties as DefaultInputsProperties,
     addIcon: {icon: 'add'},
-    createPrototype: ({prototype}):Partial<Properties> => prototype,
+    createPrototype: ({prototype}):InputProperties<string> => prototype,
     model: {...defaultInputsModel},
     removeIcon: {icon: 'clear'}
 } as const
+
+export interface StaticFunctionInputsComponent extends
+    Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
+    StaticWebComponent<
+        InputsProps, InputsModelState, DefaultInputsProperties
+    >
+{
+    <T = unknown, P extends InputsPropertiesItem<T> = Properties<T>>(
+        props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
+    ):ReactElement
+}
 // // endregion
 // / endregion
 // / region interval
-export type IntervalValue = {
+export interface IntervalValue {
     end?:null|number
     start?:null|number
 }
-export type IntervalConfiguration = {
+
+export interface IntervalConfiguration {
     end:InputProps<number>
     start:InputProps<number>
 }
+
 export type IntervalModelState = ModelState
-export type IntervalModel = {
+export interface IntervalModel {
     name:string
     state:IntervalModelState
     value:{
@@ -931,23 +980,17 @@ export type IntervalModel = {
         start:InputModel<number>
     }
 }
-export type AdditionalIntervalProperties = {
+
+export interface IntervalProperties extends Omit<
+    InputProperties<number>,
+    'icon'|'model'|'onChange'|'onChangeValue'|'value'
+> {
     icon:IconOptions
     model:IntervalModel
+    onChange:(properties:this, event?:GenericEvent) => void
+    onChangeValue:(value:null|IntervalValue, event?:GenericEvent) => void
     value:IntervalConfiguration
 }
-export type IntervalProperties =
-    Omit<
-        InputProperties<number>,
-        'icon'|'model'|'onChange'|'onChangeValue'|'value'
-    > &
-    AdditionalIntervalProperties &
-    {
-        onChange:(
-            properties:AdditionalIntervalProperties, event?:GenericEvent
-        ) => void
-        onChangeValue:(value:null|IntervalValue, event?:GenericEvent) => void
-    }
 export type IntervalProps =
     Omit<
         InputProps<number>, 'icon'|'model'|'onChange'|'onChangeValue'|'value'
@@ -961,12 +1004,14 @@ export type IntervalProps =
         start:InputProps<number>
         value:IntervalConfiguration|IntervalValue|null
     }>
-export type IntervalPropertyTypes<Type = any> = {
+
+export type IntervalPropertyTypes = {
     [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
 }
+
 export type IntervalAdapter =
     ComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
-export type IntervalAdapterWithReferences = IntervalAdapter & {
+export interface IntervalAdapterWithReferences extends IntervalAdapter {
     references:{
         end:RefObject<InputAdapterWithReferences<number>>
         start:RefObject<InputAdapterWithReferences<number>>
@@ -995,7 +1040,7 @@ export const defaultIntervalProperties:IntervalProps = {
 } as const
 // // endregion
 // / endregion
-export type ConfigurationProperties = {
+export interface ConfigurationProperties {
     strict?:boolean
     themeConfiguration?:ThemeProviderProps['options']
     tooltip?:Properties['tooltip']
