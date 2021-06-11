@@ -16,7 +16,7 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports 
+// region imports
 import Tools from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import {
@@ -55,10 +55,10 @@ import {
     InputsModel as Model,
     InputsModelState as ModelState,
     InputsProperties,
-    inputsPropertyTypes as propertyTypes,
     InputsProps,
+    inputsPropertyTypes as propertyTypes,
     inputsRenderProperties as renderProperties,
-    StaticComponent
+    StaticFunctionInputsComponent as StaticComponent
 } from '../type'
 // endregion
 // region helper
@@ -72,7 +72,7 @@ const getPrototype = function<P>(properties:InputsProperties<P>):Partial<P> {
         )
     } as Partial<P>
 }
-const inputPropertiesToValues = function<P extends BaseProperties>(
+const inputPropertiesToValues = function<P extends InputsPropertiesItem>(
     inputProperties:Array<P>|null
 ):Array<P['value']>|null {
     return Array.isArray(inputProperties) ?
@@ -138,8 +138,12 @@ const getExternalProperties = function<P extends BaseProperties>(
  * @returns React elements.
  */
 export const InputsInner = function<
-    P extends BaseProperties = InputProperties<string>, State = Mapping<unknown>
->(props:InputsProps<P>, reference?:ForwardedRef<Adapter<P>>):ReactElement {
+    T = unknown,
+    P extends InputsPropertiesItem<T> = Properties<T>,
+    State = Mapping<unknown>
+>(
+    props:InputsProps<T, P>, reference?:ForwardedRef<Adapter<T, P>>
+):ReactElement {
     // region consolidate properties
     let givenProps:InputsProps<P> =
         translateKnownSymbols(props) as InputsProps<P>

@@ -490,15 +490,6 @@ export interface InputState<T = unknown> extends State<T> {
     showDeclaration:boolean
 }
 
-// TODO check if component state type can be provided here and somewhere else
-export interface StaticWebInputComponent extends StaticWebComponent<
-    InputProps, InputModelState, DefaultInputProperties
-> {
-    new <T = unknown>(properties:InputProps<T>):Component<InputProps<T>>
-
-    locales:Array<string>
-    transformer:InputDataTransformation
-}
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
 export type InputAdapter<T = unknown> = ComponentAdapter<
     InputProperties<T>,
@@ -524,11 +515,16 @@ export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T>
 
 export interface StaticFunctionInputComponent extends
     Omit<ForwardRefExoticComponent<InputProps>, 'propTypes'>,
-    StaticWebInputComponent
+    StaticWebComponent<
+        InputProps, InputModelState, DefaultInputProperties
+    >
 {
     <T = unknown>(
         props:InputProps<T> & RefAttributes<InputAdapter<T>>
     ):ReactElement
+
+    locales:Array<string>
+    transformer:InputDataTransformation
 }
 // // region constants 
 export const inputModelStatePropertyTypes:{
@@ -951,6 +947,17 @@ export const defaultInputsProperties:DefaultInputsProperties = {
     model: {...defaultInputsModel},
     removeIcon: {icon: 'clear'}
 } as const
+
+export interface StaticFunctionInputsComponent extends
+    Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
+    StaticWebComponent<
+        InputsProps, InputsModelState, DefaultInputsProperties
+    >
+{
+    <T = unknown, P extends InputsPropertiesItem<T> = Properties<T>>(
+        props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
+    ):ReactElement
+}
 // // endregion
 // / endregion
 // / region interval
