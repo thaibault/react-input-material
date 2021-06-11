@@ -31,9 +31,9 @@ import {
     BaseProps,
     DataTransformSpecification,
     DefaultBaseProperties,
+    DefaultInputProperties,
     FormatSpecification,
     InputDataTransformation,
-    InputProperties,
     ModelState,
     ValueState
 } from './type'
@@ -365,60 +365,41 @@ export const getConsolidatedProperties = <
  */
 export const parseValue = <
     T = unknown,
-    P extends {
-        model:{
-            emptyEqualsNull:boolean
-            type:string
-        }
-    } = DefaultBaseProperties
+    P extends DefaultInputProperties<T> = DefaultInputProperties<T>,
+    InputType = T
 >(
-    configuration:P, value:any, transformer:InputDataTransformation<T>
+    configuration:P,
+    value:null|InputType,
+    transformer:InputDataTransformation
 ):null|T => {
-    if (configuration.model.emptyEqualsNull && value === '')
-        return null
-
-    if (
-        ![null, undefined].includes(value) &&
-        transformer[configuration.model.type]?.parse
-    )
-        value = (
-            transformer[configuration.model.type]!.parse as
-                DataTransformSpecification<T>['parse']
-        )(
-            value,
-            configuration as unknown as InputProperties<T>,
-            transformer
-        )
-
-    if (typeof value === 'number' && isNaN(value))
-        return null
-
-    return value
-}
-/**
- * Applies configured value transformation when editing the input has been
- * ended (element is not focused anymore).
- *
- * @param configuration - Current configuration.
- * @param value - Current value to transform.
- * @param transformer - To apply to given value.
- *
- * @returns Transformed value.
- */
-export const transformValue = <
-    T = unknown,
-    P extends {
-        model:{
-            emptyEqualsNull:boolean
-            trim:boolean
-            type:string
-        }
-    } = DefaultBaseProperties
->(configuration:P, value:T, transformer:InputDataTransformation<T>):null|T => {
     if (configuration.model.trim && typeof value === 'string')
         (value as string) = value.trim().replace(/ +\n/g, '\\n')
 
-    return parseValue<T, P>(configuration, value, transformer)
+    if (
+        configuration.model.emptyEqualsNull &&
+        value as unknown as string === ''
+    )
+        return null
+
+    let result:null|T = value as unknown as null|T
+    if (
+        ![null, undefined].includes(value as null) &&
+        transformer[
+            configuration.model.type as keyof InputDataTransformation
+        ]?.parse
+    )
+        result = (
+            transformer[
+                configuration.model.type as keyof InputDataTransformation
+            ]!.parse as
+                unknown as
+                DataTransformSpecification<T, InputType>['parse']
+        )(value as InputType, configuration, transformer)
+
+    if (typeof result === 'number' && isNaN(result))
+        return null
+
+    return result
 }
 /**
  * Represents configured value as string.
@@ -431,11 +412,12 @@ export const transformValue = <
  * @returns Transformed value.
  */
 export function formatValue<
-    T = unknown, P extends {type:string} = BaseProperties
+    T = unknown,
+    P extends DefaultInputProperties<T> = DefaultInputProperties<T>
 >(
     configuration:P,
     value:null|T,
-    transformer:InputDataTransformation<T>,
+    transformer:InputDataTransformation,
     final:boolean = true
 ):string {
     const methodName:'final'|'intermediate' = final ? 'final' : 'intermediate'
@@ -447,13 +429,19 @@ export function formatValue<
         return ''
 
     if (
-        transformer[configuration.type]?.format &&
-        transformer[configuration.type]!.format![methodName]?.transform
+        transformer[
+            configuration.model.type as keyof InputDataTransformation
+        ]?.format &&
+        transformer[
+            configuration.model.type as keyof InputDataTransformation
+        ]!.format![methodName]?.transform
     )
         return (
-            transformer[configuration.type]!.format![methodName]!.transform as
+            transformer[
+                configuration.model.type as keyof InputDataTransformation
+            ]!.format![methodName]!.transform as
                 FormatSpecification<T>['transform']
-        )(value, configuration as unknown as InputProperties<T>, transformer)
+        )(value as T, configuration, transformer)
 
     return String(value)
 }
@@ -461,39 +449,36 @@ export function formatValue<
  * Determines initial value representation as string.
  *
  * @param properties - Components properties.
+ * @param defaultProperties - Components default properties.
  * @param value - Current value to represent.
  * @param transformer - To apply to given value.
  *
  * @returns Determined initial representation.
  */
 export function determineInitialRepresentation<
-    Type = unknown,
-    P extends {
-        model?:{type?:string}
-        representation?:string
-        type?:string
-    } = BaseProps
+    T = unknown,
+    P extends DefaultInputProperties<T> = DefaultInputProperties<T>
 >(
     properties:P,
-    defaultProperties:Partial<P>,
-    value:null|Type,
-    transformer:InputDataTransformation<null|Type>
+    defaultProperties:P,
+    value:null|T,
+    transformer:InputDataTransformation
 ):string {
     if (typeof properties.representation === 'string')
         return properties.representation
 
     if (value !== null)
-        return formatValue<Type, P & {type:string}>(
+        return formatValue<T, P & {type:string}>(
             {
                 ...properties,
                 type: (
                     properties.type ||
                     properties.model?.type ||
-                    defaultProperties.model!.type as string
+                    defaultProperties.model.type
                 )
             },
             value,
-            transformer as InputDataTransformation<Type>
+            transformer
         )
 
     return ''
@@ -507,9 +492,9 @@ export function determineInitialRepresentation<
  * @param dependencies - Optional dependencies when to update given value.
  * @returns Given cached value.
  */
-export const useMemorizedValue = <Type = any>(
-    value:Type, ...dependencies:Array<any>
-):Type => useMemo(():Type => value, dependencies)
+export const useMemorizedValue = <T = unknown>(
+    value:T, ...dependencies:Array<unknown>
+):T => useMemo(():T => value, dependencies)
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

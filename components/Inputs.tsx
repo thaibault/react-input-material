@@ -64,7 +64,7 @@ import {
 // region helper
 const getPrototype = function<P>(properties:InputsProperties<P>):Partial<P> {
     return {
-        ...defaultProperties,
+        ...defaultProperties as unknown as Partial<P>,
         className: styles.inputs__item__input,
         ...(properties.default && properties.default.length > 0 ?
             properties.default![0] :

@@ -375,7 +375,7 @@ export interface FormatSpecification<T = unknown> {
     options?:PlainObject
     transform:(
         value:T,
-        configuration:InputProperties<T>,
+        configuration:DefaultInputProperties<T>,
         transformer:InputDataTransformation
     ) => string
 }
@@ -388,7 +388,7 @@ export interface DataTransformSpecification<
     }
     parse:(
         value:InputType,
-        configuration:InputProperties<T>,
+        configuration:DefaultInputProperties<T>,
         transformer:InputDataTransformation
     ) => T
     type?:NativeInputType
@@ -836,42 +836,49 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 // // endregion
 // / endregion
 // / region inputs
+export interface InputsPropertiesItem<T> {
+    model?:{state?:{}}
+    value?:null|T
+}
 export interface InputsModelState extends ModelState {
     invalidMaximumNumber:boolean
     invalidMinimumNumber:boolean
 }
-export type InputsModel<M = BaseModel> =
-    Model<Array<M>> &
-    {
-        maximumNumber:number
-        minimumNumber:number
-        state:InputsModelState
-        writable:boolean
-    }
-
-export interface InputsChildrenOptions<P, IP> {
-    index:number,
-    inputsProperties:IP,
-    properties:Partial<P>
+export interface InputsModel<T, P extends InputsPropertiesItem<T>> extends
+    Model<Array<P>>
+{
+    maximumNumber:number
+    minimumNumber:number
+    state:InputsModelState
+    writable:boolean
 }
-export interface InputsCreatePrototypeOptions<T, P extends {value:T}, IP> {
+
+export interface InputsChildrenOptions<
+    T, P extends InputsPropertiesItem<T>, IP
+> {
+    index:number
+    inputsProperties:IP
+    properties:P
+}
+export interface InputsCreatePrototypeOptions<
+    T, P extends InputsPropertiesItem<T>, IP
+> {
     index:number
     properties:IP
-    prototype:Partial<P>
+    prototype:P
     values:Array<T>|null
 }
 export interface InputsProperties<
-    T, P extends {value:T} = Properties<T>
+    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
 > extends InputsModelState, Properties<Array<P>> {
     addIcon:IconOptions
     children:(options:InputsChildrenOptions<T, P, this>) => ReactElement
-    createPrototype:(options:InputsCreatePrototypeOptions<T, P, this>) =>
-        Partial<P>
+    createPrototype:(options:InputsCreatePrototypeOptions<T, P, this>) => P
     maximumNumber:number
     minimumNumber:number
-    model:InputsModel<P>
+    model:InputsModel<T, P>
     onChangeValue:(
-        values:Array<T>|null,
+        values:Array<P>|null,
         event:GenericEvent|unknown,
         properties:this
     ) => void
@@ -879,30 +886,37 @@ export interface InputsProperties<
     value:Array<P>|null
     writable:boolean
 }
-export type InputsProps<T, P extends {value:T} = Properties<T>> =
+export type InputsProps<
+    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
+> =
     Partial<Omit<InputsProperties<T, P>, 'model'|'value'>> &
     {
-        model?:Partial<InputsModel<Partial<P>>>
-        value?:Array<Partial<P>>|Array<P['value']>|null
+        model?:Partial<InputsModel<T, P>>
+        value?:Array<Partial<P>>|Array<T>|null
     }
 
 export type DefaultInputsProperties<
-    T, M extends {value:T}, P extends {model:M} = Properties
+    T = string, P extends InputsPropertiesItem<T> = InputProperties<T>
 > =
     Partial<Omit<InputsProperties<T, P>, 'default'|'model'|'value'>> &
-    {model:InputsModel<M>}
+    {model:InputsModel<T, P>}
 
-export type InputsPropertyTypes<P = BaseProperties> = {
+export type InputsPropertyTypes<
+    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
+> = {
     [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
 }
 
 export type InputsState<T = unknown> = State<Array<T>>
 
-export type InputsAdapter<P = BaseProperties> =
-    ComponentAdapter<InputsProperties<P>, InputsState<P['value']>>
+export type InputsAdapter<
+    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
+> = ComponentAdapter<InputsProperties<T, P>, InputsState<T>>
 export type InputsAdapterWithReferences<
-    P = BaseProperties, RefType = unknown
-> = InputsAdapter<P> & {references:Array<RefObject<RefType>>}
+    T = unknown,
+    P extends InputsPropertiesItem<T> = Properties<T>,
+    RefType = unknown
+> = InputsAdapter<T, P> & {references:Array<RefObject<RefType>>}
 // // region constants
 export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -915,8 +929,8 @@ export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
 } as const
 export const inputsRenderProperties:Array<string> =
     ['children', 'createPrototype']
-export const defaultInputsModel:InputsModel = {
-    ...defaultModel as InputsModel,
+export const defaultInputsModel:InputsModel<string, InputProperties<string>> = {
+    ...defaultModel as InputsModel<string, InputProperties<string>>,
     state: {
         ...defaultModel.state,
         invalidMaximumNumber: false,
@@ -930,12 +944,10 @@ export const defaultInputsModel:InputsModel = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultInputsProperties:DefaultInputsProperties<
-    DefaultProperties
-> = {
-    ...defaultProperties,
+export const defaultInputsProperties:DefaultInputsProperties = {
+    ...defaultProperties as DefaultInputsProperties,
     addIcon: {icon: 'add'},
-    createPrototype: ({prototype}):DefaultProperties => prototype,
+    createPrototype: ({prototype}):InputProperties<string> => prototype,
     model: {...defaultInputsModel},
     removeIcon: {icon: 'clear'}
 } as const

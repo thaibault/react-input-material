@@ -76,7 +76,6 @@ import {
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
     parseValue,
-    transformValue,
     translateKnownSymbols,
     triggerCallbackIfExists,
     useMemorizedValue,
@@ -433,7 +432,7 @@ export const GenericInputInner = function<Type = unknown>(
                     event.preventDefault()
                     event.stopPropagation()
 
-                    onChangeValue(transformValue<Type, Properties<Type>>(
+                    onChangeValue(parseValue<Type>(
                         properties,
                         properties.default as Type,
                         GenericInput.transformer
@@ -570,9 +569,7 @@ export const GenericInputInner = function<Type = unknown>(
                 `\`${template}\``,
                  {
                      formatValue: (value:Type):string =>
-                         formatValue<null|Type, Properties<Type>>(
-                             properties, value, transformer
-                         ),
+                         formatValue<Type>(properties, value, transformer),
                      ...properties
                 }
             )
@@ -926,8 +923,8 @@ export const GenericInputInner = function<Type = unknown>(
                 GenericInput.defaultProperties.model as unknown as Model<Type>
             )
 
-        result.model.value = parseValue<null|Type, DefaultProperties<Type>>(
-            result, result.model.value, transformer
+        result.model.value = parseValue<Type>(
+            result, result.model.value as null|Type, transformer
         )
 
         determineValidationState<Type>(result, result.model.state)
@@ -960,7 +957,7 @@ export const GenericInputInner = function<Type = unknown>(
             result.editorIsActive = true
 
         if (typeof result.representation !== 'string') {
-            result.representation = formatValue<null|Type, Properties<Type>>(
+            result.representation = formatValue<Type>(
                 result,
                 result.value as null|Type,
                 transformer,
@@ -1056,10 +1053,10 @@ export const GenericInputInner = function<Type = unknown>(
             stateChanged = true
         }
 
-        properties.value = transformValue<null|Type, Properties<Type>>(
+        properties.value = parseValue<Type>(
             properties, properties.value as null|Type, transformer
         )
-        properties.representation = formatValue<null|Type, Properties<Type>>(
+        properties.representation = formatValue<Type>(
             properties, properties.value as null|Type, transformer
         )
 
@@ -1215,11 +1212,11 @@ export const GenericInputInner = function<Type = unknown>(
         ):ValueState<Type, ModelState> => {
             properties.representation = typeof properties.value === 'string' ?
                 properties.value :
-                formatValue<null|Type, Properties<Type>>(
+                formatValue<Type>(
                     properties, properties.value as null|Type, transformer
                 )
-            properties.value = parseValue<null|Type, Properties<Type>>(
-                properties, properties.value, transformer
+            properties.value = parseValue<Type>(
+                properties, properties.value as null|Type, transformer
             )
 
             if (
@@ -1470,9 +1467,11 @@ export const GenericInputInner = function<Type = unknown>(
     let [valueState, setValueState] = useState<ValueState<Type, ModelState>>(
         () => ({
             modelState: {...GenericInput.defaultModelState},
-            representation: determineInitialRepresentation<Type, Props<Type>>(
-                givenProperties,
-                GenericInput.defaultProperties as Props<Type>,
+            representation: determineInitialRepresentation<Type>(
+                givenProperties as DefaultProperties<Type>,
+                GenericInput.defaultProperties as
+                    unknown as
+                    DefaultProperties<Type>,
                 initialValue,
                 transformer
             ),
@@ -1821,12 +1820,12 @@ export const GenericInputInner = function<Type = unknown>(
                             properties.type
                         ) ?
                             {
-                                max: formatValue<null|Type, Properties<Type>>(
+                                max: formatValue<Type>(
                                     properties,
                                     properties.maximum as unknown as Type,
                                     transformer
                                 ),
-                                min: formatValue<null|Type, Properties<Type>>(
+                                min: formatValue<Type>(
                                     properties,
                                     properties.minimum as unknown as Type,
                                     transformer
@@ -1930,7 +1929,7 @@ GenericInput.transformer = {
             options: {currency: 'USD'},
             transform: (
                 value:number,
-                configuration:Properties<number>,
+                configuration:DefaultProperties<number>,
                 transformer:InputDataTransformation
             ):string => {
                 const currency:string =
@@ -1954,7 +1953,7 @@ GenericInput.transformer = {
         }},
         parse: (
             value:string,
-            configuration:Properties<number>,
+            configuration:DefaultProperties<number>,
             transformer:InputDataTransformation
         ):number =>
             transformer.float.parse(value, configuration, transformer),
@@ -1980,7 +1979,7 @@ GenericInput.transformer = {
             }},
             intermediate: {transform: (
                 value:number,
-                configuration:Properties<number>,
+                configuration:DefaultProperties<number>,
                 transformer:InputDataTransformation
             ):string =>
                 transformer.date.format!.final.transform(
@@ -2015,7 +2014,7 @@ GenericInput.transformer = {
             }},
             intermediate: {transform: (
                 value:number,
-                configuration:Properties<number>,
+                configuration:DefaultProperties<number>,
                 transformer:InputDataTransformation
             ):string =>
                 transformer['datetime-local'].format!.final.transform(
@@ -2025,7 +2024,7 @@ GenericInput.transformer = {
         },
         parse: (
             value:number|string,
-            configuration:Properties<number>,
+            configuration:DefaultProperties<number>,
             transformer:InputDataTransformation
         ):number =>
             transformer.date.parse(value, configuration, transformer)
@@ -2052,7 +2051,7 @@ GenericInput.transformer = {
             }},
             intermediate: {transform: (
                 value:number,
-                configuration:Properties<number>,
+                configuration:DefaultProperties<number>,
                 transformer:InputDataTransformation
             ):string => transformer.time.format!.final.transform(
                 value, configuration, transformer
@@ -2070,7 +2069,7 @@ GenericInput.transformer = {
     float: {
         format: {final: {transform: (
             value:number,
-            configuration:Properties<number>,
+            configuration:DefaultProperties<number>,
             transformer:InputDataTransformation
         ):string =>
             value === Infinity ? 'Infinity' : value === -Infinity ?
@@ -2081,7 +2080,7 @@ GenericInput.transformer = {
                 )).format(value)
         }},
         parse: (
-            value:number|string, configuration:Properties<number>
+            value:number|string, configuration:DefaultProperties<number>
         ):number => {
             if (typeof value === 'string')
                 value = parseFloat(
@@ -2111,7 +2110,7 @@ GenericInput.transformer = {
     integer: {
         format: {final: {transform: (
             value:number,
-            configuration:Properties<number>,
+            configuration:DefaultProperties<number>,
             transformer:InputDataTransformation
         ):string => (
             new Intl.NumberFormat(
@@ -2123,7 +2122,7 @@ GenericInput.transformer = {
             )).format(value)
         }},
         parse: (
-            value:number|string, configuration:Properties<number>
+            value:number|string, configuration:DefaultProperties<number>
         ):number => {
             if (typeof value === 'string')
                 value = parseInt(
