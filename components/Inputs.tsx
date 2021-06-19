@@ -49,16 +49,17 @@ import {
     defaultInputsProperties,
     defaultProperties,
     GenericEvent,
+    inputsPropertyTypes as propertyTypes,
+    inputsRenderProperties as renderProperties,
     InputProperties,
     InputsAdapter as Adapter,
     InputsAdapterWithReferences as AdapterWithReferences,
+    InputsComponent,
     InputsModel as Model,
     InputsModelState as ModelState,
     InputsProperties,
-    InputsProps,
-    inputsPropertyTypes as propertyTypes,
-    inputsRenderProperties as renderProperties,
-    StaticFunctionInputsComponent as StaticComponent
+    InputsPropertiesItem,
+    InputsProps
 } from '../type'
 // endregion
 // region helper
@@ -512,8 +513,8 @@ InputsInner.displayName = 'Inputs'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Inputs:StaticComponent =
-    memorize(forwardRef(InputsInner)) as unknown as StaticComponent
+export const Inputs:InputsComponent =
+    memorize(forwardRef(InputsInner)) as unknown as InputsComponent
 // region static properties
 // / region web-component hints
 Inputs.wrapped = InputsInner

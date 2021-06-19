@@ -185,19 +185,31 @@ export interface EditorState {
 }
 // // endregion
 export interface StaticWebComponent<
-    P = Props, MS = ModelState, DP = DefaultProperties
+    MS = ModelState, DP = DefaultProperties
 > extends StaticBaseWebComponent {
-    new (properties:P):Component<P>
     defaultModelState:MS
     defaultProperties:DP
     strict:boolean
 }
+
 export type StaticComponent<
     P = Props, MS = ModelState, DP = DefaultProperties
-> = Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<P, MS, DP>
+> = Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<MS, DP>
 export type StaticFunctionComponent<
     P = Props, MS = ModelState, DP = DefaultProperties
 > = Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P, MS, DP>
+
+export interface InputComponent<
+    P = Props,
+    MS = ModelState,
+    DP = DefaultProperties,
+    A = ComponentAdapter<P>
+> extends
+    Omit<ForwardRefExoticComponent<P>, 'propTypes'>,
+    StaticWebComponent<MS, DP>
+{
+    (props:P & RefAttributes<A>):ReactElement
+}
 // // region constants
 export const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     declaration: string,
@@ -344,6 +356,13 @@ export type DefaultCheckboxProperties =
 export type CheckboxState = State<boolean>
 export type CheckboxAdapter =
     ComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
+
+export type CheckboxComponent = InputComponent<
+    CheckboxProps,
+    CheckboxModelState,
+    DefaultCheckboxProperties,
+    CheckboxAdapter
+>
 // // region constants
 export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -513,11 +532,9 @@ export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T>
     }
 }
 
-export interface StaticFunctionInputComponent extends
+export interface GenericInputComponent extends
     Omit<ForwardRefExoticComponent<InputProps>, 'propTypes'>,
-    StaticWebComponent<
-        InputProps, InputModelState, DefaultInputProperties
-    >
+    StaticWebComponent<InputModelState, DefaultInputProperties>
 {
     <T = unknown>(
         props:InputProps<T> & RefAttributes<InputAdapter<T>>
@@ -731,14 +748,12 @@ export interface FileInputAdapterWithReferences extends FileInputAdapter {
     }
 }
 
-export interface StaticFunctionFileInputComponent extends
-    Omit<ForwardRefExoticComponent<FileInputProps>, 'propTypes'>,
-    StaticWebComponent<
-        FileInputProps, FileInputModelState, DefaultFileInputProperties
-    >
-{
-    (props:FileInputProps & RefAttributes<FileInputAdapter>):ReactElement
-}
+export type FileInputComponent = InputComponent<
+    FileInputProps,
+    FileInputModelState,
+    DefaultFileInputProperties,
+    FileInputAdapter
+>
 // // region constants
 export const fileInputModelStatePropertyTypes:{
     [key in keyof FileInputModelState]:Requireable<boolean|symbol>
@@ -913,6 +928,15 @@ export type InputsAdapterWithReferences<
     P extends InputsPropertiesItem<T> = Properties<T>,
     RefType = unknown
 > = InputsAdapter<T, P> & {references:Array<RefObject<RefType>>}
+
+export interface InputsComponent extends
+    Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
+    StaticWebComponent<InputsModelState, DefaultInputsProperties>
+{
+    <T = unknown, P extends InputsPropertiesItem<T> = Properties<T>>(
+        props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
+    ):ReactElement
+}
 // // region constants
 export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -947,17 +971,6 @@ export const defaultInputsProperties:DefaultInputsProperties = {
     model: {...defaultInputsModel},
     removeIcon: {icon: 'clear'}
 } as const
-
-export interface StaticFunctionInputsComponent extends
-    Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
-    StaticWebComponent<
-        InputsProps, InputsModelState, DefaultInputsProperties
-    >
-{
-    <T = unknown, P extends InputsPropertiesItem<T> = Properties<T>>(
-        props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
-    ):ReactElement
-}
 // // endregion
 // / endregion
 // / region interval
@@ -1017,6 +1030,10 @@ export interface IntervalAdapterWithReferences extends IntervalAdapter {
         start:RefObject<InputAdapterWithReferences<number>>
     }
 }
+
+export type IntervalComponent = InputComponent<
+    IntervalProps, IntervalModelState, DefaultInputProperties, IntervalAdapter
+>
 // // region constants
 export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...inputPropertyTypes,

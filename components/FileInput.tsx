@@ -79,7 +79,7 @@ import {
     InputProperties,
     InputProps,
     FileRepresentationType as RepresentationType,
-    StaticFunctionFileInputComponent as StaticComponent
+    FileInputComponent
 } from '../type'
 // endregion
 // region constants
@@ -911,8 +911,8 @@ FileInputInner.displayName = 'FileInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const FileInput:StaticComponent =
-    memorize(forwardRef(FileInputInner)) as unknown as StaticComponent
+export const FileInput:FileInputComponent =
+    memorize(forwardRef(FileInputInner)) as unknown as FileInputComponent
 // region static properties
 // / region web-component hints
 FileInput.wrapped = FileInputInner

@@ -60,7 +60,7 @@ import {
     defaultCheckboxProperties as defaultProperties,
     CheckboxModelState as ModelState,
     checkboxPropertyTypes as propertyTypes,
-    StaticFunctionComponent as StaticComponent,
+    CheckboxComponent,
     CheckboxValueState as ValueState
 } from '../type'
 // endregion
@@ -466,10 +466,10 @@ RequireableCheckboxInner.displayName = 'RequireableCheckbox'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const RequireableCheckbox:StaticComponent<Props> =
+export const RequireableCheckbox:CheckboxComponent =
     memorize(forwardRef(RequireableCheckboxInner)) as
         unknown as
-        StaticComponent<Props>
+        CheckboxComponent
 // region static properties
 // / region web-component hints
 RequireableCheckbox.wrapped = RequireableCheckboxInner
