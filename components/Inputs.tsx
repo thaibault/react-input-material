@@ -73,16 +73,16 @@ const getPrototype = function<P>(properties:InputsProperties<P>):Partial<P> {
         )
     } as Partial<P>
 }
-const inputPropertiesToValues = function<P extends InputsPropertiesItem>(
-    inputProperties:Array<P>|null
-):Array<P['value']>|null {
+const inputPropertiesToValues = function<
+    P extends InputsPropertiesItem<unknown>
+>(inputProperties:Array<P>|null):Array<P['value']>|null {
     return Array.isArray(inputProperties) ?
         inputProperties.map(({model, value}):P['value'] =>
             typeof value === undefined ? model?.value : value
         ) :
         inputProperties
 }
-const getModelState = function<P extends BaseProperties>(
+const getModelState = function<P extends InputsPropertiesItem<unknown>>(
     inputsProperties:InputsProperties<P>
 ):ModelState {
     const properties:Array<P> = inputsProperties.value || []
@@ -140,7 +140,7 @@ const getExternalProperties = function<P extends BaseProperties>(
  */
 export const InputsInner = function<
     T = unknown,
-    P extends InputsPropertiesItem<T> = Properties<T>,
+    P extends InputsPropertiesItem<T> = InputProperties<T>,
     State = Mapping<unknown>
 >(
     props:InputsProps<T, P>, reference?:ForwardedRef<Adapter<T, P>>

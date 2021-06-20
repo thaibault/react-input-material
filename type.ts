@@ -848,7 +848,10 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 // / endregion
 // / region inputs
 export interface InputsPropertiesItem<T> {
-    model?:{state?:{}}
+    model?:{
+        state?:{}
+        value?:null|T
+    }
     value?:null|T
 }
 export interface InputsModelState extends ModelState {
