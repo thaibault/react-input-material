@@ -47,6 +47,7 @@ import {
 import {
     BaseProperties,
     defaultInputsProperties,
+    DefaultInputsProperties,
     defaultProperties,
     GenericEvent,
     inputsPropertyTypes as propertyTypes,
@@ -76,10 +77,10 @@ const getPrototype = function<T, P>(
     } as Partial<P>
 }
 const inputPropertiesToValues = function<
-    P extends InputsPropertiesItem<unknown>
->(inputProperties:Array<P>|null):Array<P['value']>|null {
+    T, P extends InputsPropertiesItem<T>
+>(inputProperties:Array<P>|null):Array<T|null|undefined>|null {
     return Array.isArray(inputProperties) ?
-        inputProperties.map(({model, value}):P['value'] =>
+        inputProperties.map(({model, value}):null|T|undefined =>
             typeof value === undefined ? model?.value : value
         ) :
         inputProperties
@@ -160,7 +161,8 @@ export const InputsInner = function<
                 givenProps.value[index] === null ||
                 typeof givenProps.value[index] !== 'object'
             )
-                givenProps.value[index] = {value: givenProps.value[index] as T}
+                givenProps.value[index] =
+                    {value: givenProps.value[index] as T} as Partial<P>
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
@@ -182,10 +184,12 @@ export const InputsInner = function<
         }
     })
 
-    let [values, setValues] = useState<Array<P['value']>|null>(
-        inputPropertiesToValues<P>(
-            determineInitialValue<Array<P['value']>>(
-                givenProps, Tools.copy(Inputs.defaultProperties.model?.default)
+    let [values, setValues] = useState<Array<null|T|undefined>|null>(
+        inputPropertiesToValues<T, P>(
+            determineInitialValue<Array<P>>(
+                givenProps,
+                Tools.copy(Inputs.defaultProperties.model?.default) as
+                    Array<P>|null|undefined
             ) ||
             null
         )
@@ -223,9 +227,12 @@ export const InputsInner = function<
 
     const properties:InputsProperties<T, P> =
         getConsolidatedProperties<InputsProps<T, P>, InputsProperties<T, P>>(
-            mapPropertiesIntoModel<InputsProps<T, P>, Model<T, P>>(
+            mapPropertiesIntoModel<
+                InputsProps<T, P>,
+                DefaultInputsProperties<T, P>
+            >(
                 givenProperties,
-                Inputs.defaultProperties.model as Model<T, P>
+                Inputs.defaultProperties.model as unknown as Model<T, P>
             )
         )
 
@@ -268,11 +275,11 @@ export const InputsInner = function<
         )
     }
     const triggerOnChangeValue = (
-        values:Array<P['value']>|null,
+        values:Array<null|T|undefined>|null,
         event?:GenericEvent,
-        value?:P['value'],
+        value?:null|T,
         index?:number
-    ):Array<P['value']>|null => {
+    ):Array<null|T|undefined>|null => {
         if (values === null)
             values = []
 
@@ -332,12 +339,10 @@ export const InputsInner = function<
                         inputProperties,
                         index
                     ),
-                onChangeValue: (
-                    value:null|P['value'], event?:GenericEvent
-                ):void =>
+                onChangeValue: (value:null|T, event?:GenericEvent):void =>
                     setValues((
-                        values:Array<P['value']>|null
-                    ):Array<P['value']>|null =>
+                        values:Array<null|T|undefined>|null
+                    ):Array<null|T|undefined>|null =>
                         triggerOnChangeValue(values, event, value, index)
                     ),
                 ref: reference
@@ -360,13 +365,14 @@ export const InputsInner = function<
     )
         properties.value = values = null
     else
-        values = inputPropertiesToValues<P>(properties.value)
+        values = inputPropertiesToValues<T, P>(properties.value)
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValues = createDummyStateSetter<Array<P['value']>|null>(values)
+        setValues =
+            createDummyStateSetter<Array<null|T|undefined>|null>(values)
 
     properties.invalidMaximumNumber =
         properties.model.state.invalidMaximumNumber =
@@ -385,8 +391,8 @@ export const InputsInner = function<
     )
 
     const add = (event?:GenericEvent):void => setValues((
-        values:Array<P['value']>|null
-    ):Array<P['value']> => {
+        values:Array<null|T|undefined>|null
+    ):Array<null|T|undefined> => {
         const newProperties:Partial<P> = properties.createPrototype!({
             index: values?.length || 0,
             properties,
@@ -396,11 +402,11 @@ export const InputsInner = function<
 
         triggerOnChange(values, event, newProperties)
 
-        const result:Array<P['value']> = triggerOnChangeValue(
+        const result:Array<null|T|undefined> = triggerOnChangeValue(
             values,
             event,
             newProperties.value ?? newProperties.model?.value ?? null
-        ) as Array<P['value']>
+        ) as Array<null|T|undefined>
 
         /**
          * NOTE: new Properties are not yet consolidated by nested input
@@ -411,7 +417,9 @@ export const InputsInner = function<
         return result
     })
     const createRemove = (index:number) => (event?:GenericEvent):void =>
-        setValues((values:Array<P['value']>|null):Array<P['value']>|null => {
+        setValues((
+            values:Array<null|T|undefined>|null
+        ):Array<null|T|undefined>|null => {
             values = triggerOnChangeValue(values, event, undefined, index)
             triggerOnChange(values, event, undefined, index)
             return values

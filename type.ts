@@ -879,8 +879,8 @@ export interface InputsCreatePrototypeOptions<
 > {
     index:number
     properties:IP
-    prototype:P
-    values:Array<T>|null
+    prototype:Partial<P>
+    values:Array<null|T|undefined>|null
 }
 export interface InputsProperties<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
@@ -970,7 +970,8 @@ export const defaultInputsModel:InputsModel<string, InputProperties<string>> = {
 export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties as DefaultInputsProperties,
     addIcon: {icon: 'add'},
-    createPrototype: ({prototype}):InputProperties<string> => prototype,
+    createPrototype: ({prototype}):Partial<InputProperties<string>> =>
+        prototype,
     model: {...defaultInputsModel},
     removeIcon: {icon: 'clear'}
 } as const
