@@ -791,7 +791,7 @@ export const FileInputInner = function(
                     ''
                 }
                 {properties.value ?
-                    <GenericInput<string>
+                    <GenericInput
                         ref={nameInputReference as any}
                         {...properties.generateFileNameInputProperties(
                             {

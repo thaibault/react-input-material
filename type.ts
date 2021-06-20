@@ -370,17 +370,17 @@ export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     checked: boolean,
     id: string
 } as const
-export const defaultCheckboxModel:Model<boolean> = {
-    ...defaultModel,
+export const defaultCheckboxModel:CheckboxModel = {
+    ...defaultModel as unknown as CheckboxModel,
     default: false,
     type: 'boolean',
     value: false
-}
+} as const
 /*
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultCheckboxProperties:CheckboxProps = {
+export const defaultCheckboxProperties:DefaultCheckboxProperties = {
     ...defaultProperties as CheckboxProps,
     default: false,
     model: {...defaultCheckboxModel},
@@ -536,7 +536,7 @@ export interface GenericInputComponent extends
     Omit<ForwardRefExoticComponent<InputProps>, 'propTypes'>,
     StaticWebComponent<InputModelState, DefaultInputProperties>
 {
-    <T = unknown>(
+    <T = string>(
         props:InputProps<T> & RefAttributes<InputAdapter<T>>
     ):ReactElement
 
@@ -933,7 +933,7 @@ export interface InputsComponent extends
     Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
     StaticWebComponent<InputsModelState, DefaultInputsProperties>
 {
-    <T = unknown, P extends InputsPropertiesItem<T> = Properties<T>>(
+    <T = unknown, P extends InputsPropertiesItem<T> = InputProperties<T>>(
         props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
     ):ReactElement
 }
@@ -1018,6 +1018,9 @@ export type IntervalProps =
         value:IntervalConfiguration|IntervalValue|null
     }>
 
+export type DefaultIntervalProperties =
+    Omit<IntervalProps, 'model'> & {model:IntervalModel}
+
 export type IntervalPropertyTypes = {
     [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
 }
@@ -1032,7 +1035,10 @@ export interface IntervalAdapterWithReferences extends IntervalAdapter {
 }
 
 export type IntervalComponent = InputComponent<
-    IntervalProps, IntervalModelState, DefaultInputProperties, IntervalAdapter
+    IntervalProps,
+    IntervalModelState,
+    DefaultIntervalProperties,
+    IntervalAdapter
 >
 // // region constants
 export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
@@ -1042,18 +1048,29 @@ export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
         start: oneOfType([number, shape<any>(inputPropertyTypes)])
     })
 } as const
-export const defaultIntervalProperties:IntervalProps = {
+export const defaultIntervalProperties:DefaultIntervalProperties = {
     icon: {icon: 'timelapse'},
     maximumText:
         'Please provide somthing earlier than ${formatValue(maximum)}.',
     minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
-    name: 'NO_NAME_DEFINED',
+    model: {
+        name: 'NO_NAME_DEFINED',
+        state: {...defaultModelState},
+        value: {
+            end: {
+                ...defaultInputModel as unknown as InputModel<number>,
+                description: 'End',
+                name: 'end'
+            },
+            start: {
+                ...defaultInputModel as unknown as InputModel<number>,
+                description: 'Start',
+                name: 'start'
+            }
+        }
+    },
     requiredText: 'Please provide a range.',
     type: 'time',
-    value: {
-        end: {description: 'End', name: 'end'},
-        start: {description: 'Start', name: 'start'},
-    }
 } as const
 // // endregion
 // / endregion
