@@ -185,19 +185,31 @@ export interface EditorState {
 }
 // // endregion
 export interface StaticWebComponent<
-    P = Props, MS = ModelState, DP = DefaultProperties
+    MS = ModelState, DP = DefaultProperties
 > extends StaticBaseWebComponent {
-    new (properties:P):Component<P>
     defaultModelState:MS
     defaultProperties:DP
     strict:boolean
 }
+
 export type StaticComponent<
     P = Props, MS = ModelState, DP = DefaultProperties
-> = Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<P, MS, DP>
+> = Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<MS, DP>
 export type StaticFunctionComponent<
     P = Props, MS = ModelState, DP = DefaultProperties
 > = Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P, MS, DP>
+
+export interface InputComponent<
+    P = Props,
+    MS = ModelState,
+    DP = DefaultProperties,
+    A = ComponentAdapter<P>
+> extends
+    Omit<ForwardRefExoticComponent<P>, 'propTypes'>,
+    StaticWebComponent<MS, DP>
+{
+    (props:P & RefAttributes<A>):ReactElement
+}
 // // region constants
 export const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     declaration: string,
@@ -344,6 +356,13 @@ export type DefaultCheckboxProperties =
 export type CheckboxState = State<boolean>
 export type CheckboxAdapter =
     ComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
+
+export type CheckboxComponent = InputComponent<
+    CheckboxProps,
+    CheckboxModelState,
+    DefaultCheckboxProperties,
+    CheckboxAdapter
+>
 // // region constants
 export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -351,17 +370,17 @@ export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     checked: boolean,
     id: string
 } as const
-export const defaultCheckboxModel:Model<boolean> = {
-    ...defaultModel,
+export const defaultCheckboxModel:CheckboxModel = {
+    ...defaultModel as unknown as CheckboxModel,
     default: false,
     type: 'boolean',
     value: false
-}
+} as const
 /*
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultCheckboxProperties:CheckboxProps = {
+export const defaultCheckboxProperties:DefaultCheckboxProperties = {
     ...defaultProperties as CheckboxProps,
     default: false,
     model: {...defaultCheckboxModel},
@@ -373,7 +392,7 @@ export const defaultCheckboxProperties:CheckboxProps = {
 // // region data transformation
 export interface FormatSpecification<T = unknown> {
     options?:PlainObject
-    transform:(
+    transform?:(
         value:T,
         configuration:DefaultInputProperties<T>,
         transformer:InputDataTransformation
@@ -386,7 +405,7 @@ export interface DataTransformSpecification<
         final:FormatSpecification<T>
         intermediate?:FormatSpecification<T>
     }
-    parse:(
+    parse?:(
         value:InputType,
         configuration:DefaultInputProperties<T>,
         transformer:InputDataTransformation
@@ -513,13 +532,11 @@ export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T>
     }
 }
 
-export interface StaticFunctionInputComponent extends
+export interface GenericInputComponent extends
     Omit<ForwardRefExoticComponent<InputProps>, 'propTypes'>,
-    StaticWebComponent<
-        InputProps, InputModelState, DefaultInputProperties
-    >
+    StaticWebComponent<InputModelState, DefaultInputProperties>
 {
-    <T = unknown>(
+    <T = string>(
         props:InputProps<T> & RefAttributes<InputAdapter<T>>
     ):ReactElement
 
@@ -731,14 +748,12 @@ export interface FileInputAdapterWithReferences extends FileInputAdapter {
     }
 }
 
-export interface StaticFunctionFileInputComponent extends
-    Omit<ForwardRefExoticComponent<FileInputProps>, 'propTypes'>,
-    StaticWebComponent<
-        FileInputProps, FileInputModelState, DefaultFileInputProperties
-    >
-{
-    (props:FileInputProps & RefAttributes<FileInputAdapter>):ReactElement
-}
+export type FileInputComponent = InputComponent<
+    FileInputProps,
+    FileInputModelState,
+    DefaultFileInputProperties,
+    FileInputAdapter
+>
 // // region constants
 export const fileInputModelStatePropertyTypes:{
     [key in keyof FileInputModelState]:Requireable<boolean|symbol>
@@ -833,7 +848,10 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 // / endregion
 // / region inputs
 export interface InputsPropertiesItem<T> {
-    model?:{state?:{}}
+    model?:{
+        state?:{}
+        value?:null|T
+    }
     value?:null|T
 }
 export interface InputsModelState extends ModelState {
@@ -854,19 +872,19 @@ export interface InputsChildrenOptions<
 > {
     index:number
     inputsProperties:IP
-    properties:P
+    properties:Partial<P>
 }
 export interface InputsCreatePrototypeOptions<
     T, P extends InputsPropertiesItem<T>, IP
 > {
     index:number
     properties:IP
-    prototype:P
-    values:Array<T>|null
+    prototype:Partial<P>
+    values:Array<null|T|undefined>|null
 }
 export interface InputsProperties<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
-> extends InputsModelState, Properties<Array<P>> {
+> extends InputsModelState, Omit<Properties<Array<P>>, 'onChangeValue'> {
     addIcon:IconOptions
     children:(options:InputsChildrenOptions<T, P, this>) => ReactElement
     createPrototype:(options:InputsCreatePrototypeOptions<T, P, this>) => P
@@ -874,7 +892,7 @@ export interface InputsProperties<
     minimumNumber:number
     model:InputsModel<T, P>
     onChangeValue:(
-        values:Array<P>|null,
+        values:Array<null|T>|null,
         event:GenericEvent|unknown,
         properties:this
     ) => void
@@ -888,11 +906,11 @@ export type InputsProps<
     Partial<Omit<InputsProperties<T, P>, 'model'|'value'>> &
     {
         model?:Partial<InputsModel<T, P>>
-        value?:Array<Partial<P>>|Array<T>|null
+        value?:Array<Partial<P>>|Array<null|T|undefined>|null
     }
 
 export type DefaultInputsProperties<
-    T = string, P extends InputsPropertiesItem<T> = InputProperties<T>
+    T = string, P extends InputsPropertiesItem<T> = InputProps<T>
 > =
     Partial<Omit<InputsProperties<T, P>, 'default'|'model'|'value'>> &
     {model:InputsModel<T, P>}
@@ -903,7 +921,7 @@ export type InputsPropertyTypes<
     [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
 }
 
-export type InputsState<T = unknown> = State<Array<T>>
+export type InputsState<T = unknown> = State<Array<null|T|undefined>>
 
 export type InputsAdapter<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
@@ -913,6 +931,15 @@ export type InputsAdapterWithReferences<
     P extends InputsPropertiesItem<T> = Properties<T>,
     RefType = unknown
 > = InputsAdapter<T, P> & {references:Array<RefObject<RefType>>}
+
+export interface InputsComponent extends
+    Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
+    StaticWebComponent<InputsModelState, DefaultInputsProperties>
+{
+    <T = string, P extends InputsPropertiesItem<T> = InputProperties<T>>(
+        props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
+    ):ReactElement
+}
 // // region constants
 export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -943,21 +970,10 @@ export const defaultInputsModel:InputsModel<string, InputProperties<string>> = {
 export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties as DefaultInputsProperties,
     addIcon: {icon: 'add'},
-    createPrototype: ({prototype}):InputProperties<string> => prototype,
+    createPrototype: ({prototype}):InputProps<string> => prototype,
     model: {...defaultInputsModel},
     removeIcon: {icon: 'clear'}
 } as const
-
-export interface StaticFunctionInputsComponent extends
-    Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
-    StaticWebComponent<
-        InputsProps, InputsModelState, DefaultInputsProperties
-    >
-{
-    <T = unknown, P extends InputsPropertiesItem<T> = Properties<T>>(
-        props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
-    ):ReactElement
-}
 // // endregion
 // / endregion
 // / region interval
@@ -1005,6 +1021,9 @@ export type IntervalProps =
         value:IntervalConfiguration|IntervalValue|null
     }>
 
+export type DefaultIntervalProperties =
+    Omit<IntervalProps, 'model'> & {model:IntervalModel}
+
 export type IntervalPropertyTypes = {
     [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
 }
@@ -1017,6 +1036,13 @@ export interface IntervalAdapterWithReferences extends IntervalAdapter {
         start:RefObject<InputAdapterWithReferences<number>>
     }
 }
+
+export type IntervalComponent = InputComponent<
+    IntervalProps,
+    IntervalModelState,
+    DefaultIntervalProperties,
+    IntervalAdapter
+>
 // // region constants
 export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...inputPropertyTypes,
@@ -1025,18 +1051,29 @@ export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
         start: oneOfType([number, shape<any>(inputPropertyTypes)])
     })
 } as const
-export const defaultIntervalProperties:IntervalProps = {
+export const defaultIntervalProperties:DefaultIntervalProperties = {
     icon: {icon: 'timelapse'},
     maximumText:
         'Please provide somthing earlier than ${formatValue(maximum)}.',
     minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
-    name: 'NO_NAME_DEFINED',
+    model: {
+        name: 'NO_NAME_DEFINED',
+        state: {...defaultModelState},
+        value: {
+            end: {
+                ...defaultInputModel as unknown as InputModel<number>,
+                description: 'End',
+                name: 'end'
+            },
+            start: {
+                ...defaultInputModel as unknown as InputModel<number>,
+                description: 'Start',
+                name: 'start'
+            }
+        }
+    },
     requiredText: 'Please provide a range.',
     type: 'time',
-    value: {
-        end: {description: 'End', name: 'end'},
-        start: {description: 'Start', name: 'start'},
-    }
 } as const
 // // endregion
 // / endregion

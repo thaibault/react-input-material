@@ -32,17 +32,18 @@ import {
 } from './index'
 import {useMemorizedValue} from './helper'
 import {
+    CheckboxProps,
     FileInputProps,
     FileValue,
     InputProperties,
+    IntervalConfiguration,
     IntervalProps,
     IntervalValue,
-    Properties,
     Model
 } from './type'
 // endregion
 Tools.locales.push('de-DE')
-GenericInput.transformer.currency.format.final.options = {currency: 'EUR'}
+GenericInput.transformer.currency.format!.final.options = {currency: 'EUR'}
 
 import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 const Application:FunctionComponent<{}> = ():ReactElement => {
@@ -152,7 +153,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChangeValue={onChangeValue2}
                 value={value2}
             />
-            <GenericInput
+            <GenericInput<number>
                 name="controlled"
                 onChange={useMemorizedValue((
                     properties:InputProperties<number>
@@ -183,27 +184,27 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-            <GenericInput
+            <GenericInput<number>
                 default={1526165029}
                 name="input2"
                 onChange={onChange}
                 type="date"
             />
-            <GenericInput
-                initialValue="value2Model"
+            <GenericInput<number>
+                initialValue={1}
                 model={useMemorizedValue({name: 'input2Model', type: 'time'})}
                 onChange={onChange}
             />
 
             <hr/>
 
-            <GenericInput
+            <GenericInput<number>
                 default={120}
                 name="input3"
                 onChange={onChange}
                 type="datetime-local"
             />
-            <GenericInput
+            <GenericInput<number>
                 model={useMemorizedValue({
                     default: 60,
                     maximum: 3600,
@@ -338,18 +339,18 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-            <GenericInput
+            <GenericInput<boolean>
                 declaration="selection"
                 description="input9Description"
-                initialValue="true"
+                initialValue={true}
                 name="input9"
                 onChange={onChange}
                 placeholder="input9Placeholder"
                 type="boolean"
                 required
             />
-            <GenericInput
-                initialValue="false"
+            <GenericInput<boolean>
+                initialValue={false}
                 labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
                 model={useMemorizedValue({
                     declaration: 'selection',
@@ -521,7 +522,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-            <GenericInput
+            <GenericInput<number>
                 declaration="Number"
                 description="input16Description"
                 maximum={200000}
@@ -532,7 +533,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 required
                 type="number"
             />
-            <GenericInput
+            <GenericInput<number>
                 initialValue={100000}
                 model={useMemorizedValue({
                     declaration: 'Number',
@@ -548,7 +549,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-            <GenericInput
+            <GenericInput<number>
                 declaration="Number"
                 description="input17Description"
                 maximum={200000}
@@ -559,7 +560,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 required
                 type="integer"
             />
-            <GenericInput
+            <GenericInput<number>
                 initialValue={100000.01}
                 model={useMemorizedValue({
                     declaration: 'Number',
@@ -578,7 +579,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-            <GenericInput
+            <GenericInput<number>
                 declaration="Number"
                 description="input18Description"
                 maximum={200000}
@@ -590,7 +591,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 required
                 type="currency"
             />
-            <GenericInput
+            <GenericInput<number>
                 initialValue={100000.01}
                 model={useMemorizedValue({
                     declaration: 'Number',
@@ -702,12 +703,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-
-            <Inputs
+            <Inputs<FileValue, FileInputProps>
                 createPrototype={useMemorizedValue(
-                    ({index, properties: {name}, prototype}) => ({
-                        ...prototype, name: `${name}-${index + 1}`
-                    })
+                    ({index, properties: {name}, prototype}):FileInputProps =>
+                        ({...prototype, name: `${name}-${index + 1}`})
                 )}
                 model={useMemorizedValue({
                     default: [{name: 'inputs1-1'}], name: 'inputs1'
@@ -719,11 +718,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     <FileInput {...properties as FileInputProps} />
                 )}
             </Inputs>
-            <Inputs
+            <Inputs<boolean, CheckboxProps>
                 createPrototype={useMemorizedValue(
-                    ({index, properties: {name}, prototype}) => ({
-                        ...prototype, name: `${name}-${index + 1}`
-                    })
+                    ({index, properties: {name}, prototype}):CheckboxProps =>
+                        ({...prototype, name: `${name}-${index + 1}`})
                 )}
                 maximumNumber={2}
                 minimumNumber={2}
@@ -742,11 +740,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     <RequireableCheckbox {...properties} />
                 )}
             </Inputs>
-            <Inputs
+            <Inputs<IntervalConfiguration|IntervalValue, IntervalProps>
                 createPrototype={useMemorizedValue(
-                    ({index, properties: {name}, prototype}) => ({
-                        ...prototype, name: `${name}-${index + 1}`
-                    })
+                    ({index, properties: {name}, prototype}):IntervalProps =>
+                        ({...prototype, name: `${name}-${index + 1}`})
                 )}
                 model={useMemorizedValue({
                     default: [{

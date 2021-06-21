@@ -47,22 +47,26 @@ import {
 import {
     BaseProperties,
     defaultInputsProperties,
+    DefaultInputsProperties,
     defaultProperties,
     GenericEvent,
-    InputProperties,
+    inputsPropertyTypes as propertyTypes,
+    inputsRenderProperties as renderProperties,
+    InputProps,
     InputsAdapter as Adapter,
     InputsAdapterWithReferences as AdapterWithReferences,
+    InputsComponent,
     InputsModel as Model,
     InputsModelState as ModelState,
     InputsProperties,
-    InputsProps,
-    inputsPropertyTypes as propertyTypes,
-    inputsRenderProperties as renderProperties,
-    StaticFunctionInputsComponent as StaticComponent
+    InputsPropertiesItem,
+    InputsProps
 } from '../type'
 // endregion
 // region helper
-const getPrototype = function<P>(properties:InputsProperties<P>):Partial<P> {
+const getPrototype = function<T, P>(
+    properties:InputsProperties<T, P>
+):Partial<P> {
     return {
         ...defaultProperties as unknown as Partial<P>,
         className: styles.inputs__item__input,
@@ -72,23 +76,23 @@ const getPrototype = function<P>(properties:InputsProperties<P>):Partial<P> {
         )
     } as Partial<P>
 }
-const inputPropertiesToValues = function<P extends InputsPropertiesItem>(
-    inputProperties:Array<P>|null
-):Array<P['value']>|null {
+const inputPropertiesToValues = function<
+    T, P extends InputsPropertiesItem<T>
+>(inputProperties:Array<P>|null):Array<T|null|undefined>|null {
     return Array.isArray(inputProperties) ?
-        inputProperties.map(({model, value}):P['value'] =>
+        inputProperties.map(({model, value}):null|T|undefined =>
             typeof value === undefined ? model?.value : value
         ) :
         inputProperties
 }
-const getModelState = function<P extends BaseProperties>(
-    inputsProperties:InputsProperties<P>
+const getModelState = function<T, P extends InputsPropertiesItem<T>>(
+    inputsProperties:InputsProperties<T, P>
 ):ModelState {
     const properties:Array<P> = inputsProperties.value || []
 
-    const unpack = (name:keyof P, defaultValue:boolean = false) =>
+    const unpack = (name:string, defaultValue:boolean = false) =>
         (properties:P):boolean =>
-            properties[name] as unknown as boolean ?? defaultValue
+            properties[name as keyof P] as unknown as boolean ?? defaultValue
 
     const validMaximumNumber:boolean =
         inputsProperties.maximumNumber >= properties.length
@@ -111,10 +115,10 @@ const getModelState = function<P extends BaseProperties>(
         visited: properties.some(unpack('visited'))
     }
 }
-const getExternalProperties = function<P extends BaseProperties>(
-    properties:InputsProperties<P>
-):InputsProperties<P> {
-    const modelState:ModelState = getModelState<P>(properties)
+const getExternalProperties = function<T, P extends InputsPropertiesItem<T>>(
+    properties:InputsProperties<T, P>
+):InputsProperties<T, P> {
+    const modelState:ModelState = getModelState<T, P>(properties)
 
     return {
         ...properties,
@@ -139,14 +143,14 @@ const getExternalProperties = function<P extends BaseProperties>(
  */
 export const InputsInner = function<
     T = unknown,
-    P extends InputsPropertiesItem<T> = Properties<T>,
+    P extends InputsPropertiesItem<T> = InputProps<T>,
     State = Mapping<unknown>
 >(
     props:InputsProps<T, P>, reference?:ForwardedRef<Adapter<T, P>>
 ):ReactElement {
     // region consolidate properties
-    let givenProps:InputsProps<P> =
-        translateKnownSymbols(props) as InputsProps<P>
+    let givenProps:InputsProps<T, P> =
+        translateKnownSymbols(props) as InputsProps<T, P>
     /*
         Normalize value property (providing only value instead of props is
         allowed also).
@@ -157,13 +161,14 @@ export const InputsInner = function<
                 givenProps.value[index] === null ||
                 typeof givenProps.value[index] !== 'object'
             )
-                givenProps.value[index] = {value: givenProps.value[index]}
+                givenProps.value[index] =
+                    {value: givenProps.value[index] as T} as Partial<P>
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:InputsProps<P> = Tools.extend(
+    const givenProperties:InputsProps<T, P> = Tools.extend(
         true, Tools.copy(Inputs.defaultProperties), givenProps
     )
     // endregion
@@ -175,14 +180,16 @@ export const InputsInner = function<
             setNewInputState('rendered')
         else if (newInputState === 'rendered') {
             setNewInputState('stabilized')
-            triggerOnChange(properties.value)
+            triggerOnChange(inputPropertiesToValues<T, P>(properties.value))
         }
     })
 
-    let [values, setValues] = useState<Array<P['value']>|null>(
-        inputPropertiesToValues<P>(
-            determineInitialValue<Array<P['value']>>(
-                givenProps, Tools.copy(Inputs.defaultProperties.model?.default)
+    let [values, setValues] = useState<Array<null|T|undefined>|null>(
+        inputPropertiesToValues<T, P>(
+            determineInitialValue<Array<P>>(
+                givenProps,
+                Tools.copy(Inputs.defaultProperties.model?.default) as
+                    Array<P>|null|undefined
             ) ||
             null
         )
@@ -218,22 +225,27 @@ export const InputsInner = function<
 
     const references:Array<RefObject<ComponentAdapter<P, State>>> = []
 
-    const properties:InputsProperties<P> =
-        getConsolidatedProperties<InputsProps<P>, InputsProperties<P>>(
-            mapPropertiesIntoModel<InputsProps<P>, Model<P['model']>>(
+    const properties:InputsProperties<T, P> =
+        getConsolidatedProperties<InputsProps<T, P>, InputsProperties<T, P>>(
+            mapPropertiesIntoModel<
+                InputsProps<T, P>,
+                DefaultInputsProperties<T, P>
+            >(
                 givenProperties,
-                Inputs.defaultProperties.model as Model<P['model']>
+                Inputs.defaultProperties.model as unknown as Model<T, P>
             )
         )
 
     const triggerOnChange = (
-        values:Array<P>|null,
+        values:Array<null|T|undefined>|null,
         event?:GenericEvent,
         inputProperties?:Partial<P>,
         index?:number
     ):void => {
         if (values)
-            properties.value = values.map((_:P, index:number):P =>
+            properties.value = values.map((
+                _:null|T|undefined, index:number
+            ):P =>
                 references[index]?.current?.properties ||
                 (properties.value as Array<P>)[index]
             )
@@ -255,21 +267,21 @@ export const InputsInner = function<
         )
             properties.value = null
 
-        triggerCallbackIfExists<InputsProperties<P>>(
-            properties as InputsProperties<P>,
+        triggerCallbackIfExists<InputsProperties<T, P>>(
+            properties as InputsProperties<T, P>,
             'change',
             controlled,
-            getExternalProperties<P>(properties as InputsProperties<P>),
+            getExternalProperties<T, P>(properties as InputsProperties<T, P>),
             event,
             properties
         )
     }
     const triggerOnChangeValue = (
-        values:Array<P['value']>|null,
+        values:Array<null|T|undefined>|null,
         event?:GenericEvent,
-        value?:P['value'],
+        value?:null|T,
         index?:number
-    ):Array<P['value']>|null => {
+    ):Array<null|T|undefined>|null => {
         if (values === null)
             values = []
 
@@ -286,8 +298,8 @@ export const InputsInner = function<
         if (properties.emptyEqualsNull && values.length === 0)
             values = null
 
-        triggerCallbackIfExists<InputsProperties<P>>(
-            properties as InputsProperties<P>,
+        triggerCallbackIfExists<InputsProperties<T, P>>(
+            properties as InputsProperties<T, P>,
             'changeValue',
             controlled,
             values,
@@ -318,23 +330,21 @@ export const InputsInner = function<
                 ...properties.createPrototype!({
                     index,
                     properties,
-                    prototype: Tools.copy(getPrototype<P>(properties)),
+                    prototype: Tools.copy(getPrototype<T, P>(properties)),
                     values
                 }),
                 ...properties.value[index],
                 onChange: (inputProperties:P, event?:GenericEvent):void =>
                     triggerOnChange(
-                        properties.value,
+                        inputPropertiesToValues<T, P>(properties.value),
                         event,
                         inputProperties,
                         index
                     ),
-                onChangeValue: (
-                    value:null|P['value'], event?:GenericEvent
-                ):void =>
+                onChangeValue: (value:null|T, event?:GenericEvent):void =>
                     setValues((
-                        values:Array<P['value']>|null
-                    ):Array<P['value']>|null =>
+                        values:Array<null|T|undefined>|null
+                    ):Array<null|T|undefined>|null =>
                         triggerOnChangeValue(values, event, value, index)
                     ),
                 ref: reference
@@ -357,13 +367,14 @@ export const InputsInner = function<
     )
         properties.value = values = null
     else
-        values = inputPropertiesToValues<P>(properties.value)
+        values = inputPropertiesToValues<T, P>(properties.value)
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValues = createDummyStateSetter<Array<P['value']>|null>(values)
+        setValues =
+            createDummyStateSetter<Array<null|T|undefined>|null>(values)
 
     properties.invalidMaximumNumber =
         properties.model.state.invalidMaximumNumber =
@@ -374,30 +385,32 @@ export const InputsInner = function<
 
     useImperativeHandle(
         reference,
-        ():AdapterWithReferences<P> => ({
-            properties: properties as InputsProperties<P>,
+        ():AdapterWithReferences<T, P> => ({
+            properties: properties as InputsProperties<T, P>,
             references,
-            state: controlled ? {} : {value: properties.value}
+            state: controlled ?
+                {} :
+                {value: inputPropertiesToValues(properties.value)}
         })
     )
 
     const add = (event?:GenericEvent):void => setValues((
-        values:Array<P['value']>|null
-    ):Array<P['value']> => {
+        values:Array<null|T|undefined>|null
+    ):Array<null|T|undefined> => {
         const newProperties:Partial<P> = properties.createPrototype!({
             index: values?.length || 0,
             properties,
-            prototype: getPrototype<P>(properties),
+            prototype: getPrototype<T, P>(properties),
             values
         })
 
         triggerOnChange(values, event, newProperties)
 
-        const result:Array<P['value']> = triggerOnChangeValue(
+        const result:Array<null|T|undefined> = triggerOnChangeValue(
             values,
             event,
             newProperties.value ?? newProperties.model?.value ?? null
-        ) as Array<P['value']>
+        ) as Array<null|T|undefined>
 
         /**
          * NOTE: new Properties are not yet consolidated by nested input
@@ -408,7 +421,9 @@ export const InputsInner = function<
         return result
     })
     const createRemove = (index:number) => (event?:GenericEvent):void =>
-        setValues((values:Array<P['value']>|null):Array<P['value']>|null => {
+        setValues((
+            values:Array<null|T|undefined>|null
+        ):Array<null|T|undefined>|null => {
             values = triggerOnChangeValue(values, event, undefined, index)
             triggerOnChange(values, event, undefined, index)
             return values
@@ -430,7 +445,7 @@ export const InputsInner = function<
                 properties: inputProperties
             }) :
             <GenericInput
-                {...inputProperties}
+                {...inputProperties as InputProps<T>}
                 name={`${properties.name}-${index + 1}`}
             />
 
@@ -470,7 +485,7 @@ export const InputsInner = function<
                             index: 0,
                             properties,
                             prototype: {
-                                ...getPrototype<P>(properties),
+                                ...getPrototype<T, P>(properties),
                                 disabled: true
                             },
                             values
@@ -488,7 +503,7 @@ export const InputsInner = function<
                 properties.maximumNumber <= properties.value.length ||
                 properties.invalidMaximumNumber ||
                 properties.value.some(({value}):boolean =>
-                    [null, undefined].includes(value)
+                    [null, undefined].includes(value as null)
                 )
             ) ?
                 '' :
@@ -512,8 +527,8 @@ InputsInner.displayName = 'Inputs'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Inputs:StaticComponent =
-    memorize(forwardRef(InputsInner)) as unknown as StaticComponent
+export const Inputs:InputsComponent =
+    memorize(forwardRef(InputsInner)) as unknown as InputsComponent
 // region static properties
 // / region web-component hints
 Inputs.wrapped = InputsInner

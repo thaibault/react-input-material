@@ -60,15 +60,17 @@ import {
     defaultCheckboxProperties as defaultProperties,
     CheckboxModelState as ModelState,
     checkboxPropertyTypes as propertyTypes,
-    StaticFunctionComponent as StaticComponent,
+    CheckboxComponent,
     CheckboxValueState as ValueState
 } from '../type'
 // endregion
 // region helper
 export function determineValidationState(
-    properties:Properties, currentState:ModelState
+    properties:DefaultProperties, currentState:Partial<ModelState>
 ):boolean {
-    return determineBaseValidationState<Properties>(
+    return determineBaseValidationState<
+        DefaultProperties, Partial<ModelState>
+    >(
         properties,
         currentState,
         {invalidRequired: ():boolean =>
@@ -113,13 +115,11 @@ export const RequireableCheckboxInner = function(
      * @returns External properties object.
      */
     const getConsolidatedProperties = (properties:Props):Properties => {
-        let result:Props = mapPropertiesIntoModel<Props, Model>(
+        let result:DefaultProperties = mapPropertiesIntoModel<Props, DefaultProperties>(
             properties, RequireableCheckbox.defaultProperties.model as Model
         )
 
-        determineValidationState(
-            result as Properties, result.model!.state as ModelState
-        )
+        determineValidationState(result, result.model.state)
 
         result = getBaseConsolidatedProperties<Props, Properties>(result)
 
@@ -466,10 +466,10 @@ RequireableCheckboxInner.displayName = 'RequireableCheckbox'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const RequireableCheckbox:StaticComponent<Props> =
+export const RequireableCheckbox:CheckboxComponent =
     memorize(forwardRef(RequireableCheckboxInner)) as
         unknown as
-        StaticComponent<Props>
+        CheckboxComponent
 // region static properties
 // / region web-component hints
 RequireableCheckbox.wrapped = RequireableCheckboxInner
@@ -482,7 +482,12 @@ RequireableCheckbox.defaultModelState = defaultModelState
 */
 RequireableCheckbox.defaultProperties = {
     ...defaultProperties,
-    model: {...defaultProperties.model, state: undefined, value: undefined},
+    model: {
+        ...defaultProperties.model,
+        // Trigger initial determination.
+        state: undefined as unknown as ModelState,
+        value: undefined
+    },
     value: undefined
 }
 RequireableCheckbox.propTypes = propertyTypes

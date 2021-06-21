@@ -46,12 +46,12 @@ import {
     InputAdapterWithReferences,
     IntervalAdapter as Adapter,
     IntervalAdapterWithReferences as AdapterWithReferences,
+    IntervalComponent,
     IntervalModelState as ModelState,
     IntervalProperties as Properties,
     intervalPropertyTypes as propertyTypes,
     IntervalProps as Props,
-    IntervalValue as Value,
-    StaticFunctionInputComponent as StaticComponent
+    IntervalValue as Value
 } from '../type'
 // endregion
 // region helper
@@ -112,9 +112,9 @@ const getExternalProperties = (
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const IntervalInner = ((
+export const IntervalInner = function(
     props:Props, reference?:ForwardedRef<Adapter>
-):ReactElement => {
+):ReactElement {
     // region consolidate properties
     const givenProps:Props = translateKnownSymbols(props) as Props
     /*
@@ -398,7 +398,7 @@ export const IntervalInner = ((
             <GenericInput {...endProperties} ref={endInputReference as any} />
         </div>
     </WrapConfigurations>
-})
+}
 // NOTE: This is useful in react dev tools.
 IntervalInner.displayName = 'Interval'
 /**
@@ -413,8 +413,8 @@ IntervalInner.displayName = 'Interval'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Interval:StaticComponent<Props> =
-    memorize(forwardRef(IntervalInner)) as unknown as StaticComponent<Props>
+export const Interval:IntervalComponent =
+    memorize(forwardRef(IntervalInner)) as unknown as IntervalComponent
 // region static properties
 // / region web-component hints
 Interval.wrapped = IntervalInner

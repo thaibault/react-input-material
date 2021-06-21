@@ -394,7 +394,7 @@ export const parseValue = <
             ]!.parse as
                 unknown as
                 DataTransformSpecification<T, InputType>['parse']
-        )(value as InputType, configuration, transformer)
+        )!(value as InputType, configuration, transformer)
 
     if (typeof result === 'number' && isNaN(result))
         return null
@@ -441,7 +441,7 @@ export function formatValue<
                 configuration.model.type as keyof InputDataTransformation
             ]!.format![methodName]!.transform as
                 FormatSpecification<T>['transform']
-        )(value as T, configuration, transformer)
+        )!(value as T, configuration, transformer)
 
     return String(value)
 }
