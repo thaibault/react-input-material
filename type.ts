@@ -872,7 +872,7 @@ export interface InputsChildrenOptions<
 > {
     index:number
     inputsProperties:IP
-    properties:P
+    properties:Partial<P>
 }
 export interface InputsCreatePrototypeOptions<
     T, P extends InputsPropertiesItem<T>, IP
@@ -884,7 +884,7 @@ export interface InputsCreatePrototypeOptions<
 }
 export interface InputsProperties<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
-> extends InputsModelState, Properties<Array<P>> {
+> extends InputsModelState, Omit<Properties<Array<P>>, 'onChangeValue'> {
     addIcon:IconOptions
     children:(options:InputsChildrenOptions<T, P, this>) => ReactElement
     createPrototype:(options:InputsCreatePrototypeOptions<T, P, this>) => P
@@ -892,7 +892,7 @@ export interface InputsProperties<
     minimumNumber:number
     model:InputsModel<T, P>
     onChangeValue:(
-        values:Array<P>|null,
+        values:Array<null|T>|null,
         event:GenericEvent|unknown,
         properties:this
     ) => void
@@ -906,11 +906,11 @@ export type InputsProps<
     Partial<Omit<InputsProperties<T, P>, 'model'|'value'>> &
     {
         model?:Partial<InputsModel<T, P>>
-        value?:Array<Partial<P>>|Array<T>|null
+        value?:Array<Partial<P>>|Array<null|T|undefined>|null
     }
 
 export type DefaultInputsProperties<
-    T = string, P extends InputsPropertiesItem<T> = InputProperties<T>
+    T = string, P extends InputsPropertiesItem<T> = InputProps<T>
 > =
     Partial<Omit<InputsProperties<T, P>, 'default'|'model'|'value'>> &
     {model:InputsModel<T, P>}
@@ -921,7 +921,7 @@ export type InputsPropertyTypes<
     [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
 }
 
-export type InputsState<T = unknown> = State<Array<T>>
+export type InputsState<T = unknown> = State<Array<null|T|undefined>>
 
 export type InputsAdapter<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
@@ -936,7 +936,7 @@ export interface InputsComponent extends
     Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
     StaticWebComponent<InputsModelState, DefaultInputsProperties>
 {
-    <T = unknown, P extends InputsPropertiesItem<T> = InputProperties<T>>(
+    <T = string, P extends InputsPropertiesItem<T> = InputProperties<T>>(
         props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
     ):ReactElement
 }
@@ -970,8 +970,7 @@ export const defaultInputsModel:InputsModel<string, InputProperties<string>> = {
 export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties as DefaultInputsProperties,
     addIcon: {icon: 'add'},
-    createPrototype: ({prototype}):Partial<InputProperties<string>> =>
-        prototype,
+    createPrototype: ({prototype}):InputProps<string> => prototype,
     model: {...defaultInputsModel},
     removeIcon: {icon: 'clear'}
 } as const

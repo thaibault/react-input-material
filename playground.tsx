@@ -32,12 +32,11 @@ import {
 } from './index'
 import {useMemorizedValue} from './helper'
 import {
-    CheckboxProperties,
-    FileInputProperties,
+    CheckboxProps,
     FileInputProps,
     FileValue,
     InputProperties,
-    IntervalProperties,
+    IntervalConfiguration,
     IntervalProps,
     IntervalValue,
     Model
@@ -704,11 +703,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
-            <Inputs<FileValue, FileInputProperties>
+            <Inputs<FileValue, FileInputProps>
                 createPrototype={useMemorizedValue(
-                    ({index, properties: {name}, prototype}) => ({
-                        ...prototype, name: `${name}-${index + 1}`
-                    })
+                    ({index, properties: {name}, prototype}):FileInputProps =>
+                        ({...prototype, name: `${name}-${index + 1}`})
                 )}
                 model={useMemorizedValue({
                     default: [{name: 'inputs1-1'}], name: 'inputs1'
@@ -720,11 +718,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     <FileInput {...properties as FileInputProps} />
                 )}
             </Inputs>
-            <Inputs<boolean, CheckboxProperties>
+            <Inputs<boolean, CheckboxProps>
                 createPrototype={useMemorizedValue(
-                    ({index, properties: {name}, prototype}) => ({
-                        ...prototype, name: `${name}-${index + 1}`
-                    })
+                    ({index, properties: {name}, prototype}):CheckboxProps =>
+                        ({...prototype, name: `${name}-${index + 1}`})
                 )}
                 maximumNumber={2}
                 minimumNumber={2}
@@ -743,11 +740,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     <RequireableCheckbox {...properties} />
                 )}
             </Inputs>
-            <Inputs<IntervalValue, IntervalProperties>
+            <Inputs<IntervalConfiguration|IntervalValue, IntervalProps>
                 createPrototype={useMemorizedValue(
-                    ({index, properties: {name}, prototype}) => ({
-                        ...prototype, name: `${name}-${index + 1}`
-                    })
+                    ({index, properties: {name}, prototype}):IntervalProps =>
+                        ({...prototype, name: `${name}-${index + 1}`})
                 )}
                 model={useMemorizedValue({
                     default: [{

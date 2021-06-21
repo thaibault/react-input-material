@@ -52,7 +52,7 @@ import {
     GenericEvent,
     inputsPropertyTypes as propertyTypes,
     inputsRenderProperties as renderProperties,
-    InputProperties,
+    InputProps,
     InputsAdapter as Adapter,
     InputsAdapterWithReferences as AdapterWithReferences,
     InputsComponent,
@@ -143,7 +143,7 @@ const getExternalProperties = function<T, P extends InputsPropertiesItem<T>>(
  */
 export const InputsInner = function<
     T = unknown,
-    P extends InputsPropertiesItem<T> = InputProperties<T>,
+    P extends InputsPropertiesItem<T> = InputProps<T>,
     State = Mapping<unknown>
 >(
     props:InputsProps<T, P>, reference?:ForwardedRef<Adapter<T, P>>
@@ -180,7 +180,7 @@ export const InputsInner = function<
             setNewInputState('rendered')
         else if (newInputState === 'rendered') {
             setNewInputState('stabilized')
-            triggerOnChange(properties.value)
+            triggerOnChange(inputPropertiesToValues<T, P>(properties.value))
         }
     })
 
@@ -237,13 +237,15 @@ export const InputsInner = function<
         )
 
     const triggerOnChange = (
-        values:Array<P>|null,
+        values:Array<null|T|undefined>|null,
         event?:GenericEvent,
         inputProperties?:Partial<P>,
         index?:number
     ):void => {
         if (values)
-            properties.value = values.map((_:P, index:number):P =>
+            properties.value = values.map((
+                _:null|T|undefined, index:number
+            ):P =>
                 references[index]?.current?.properties ||
                 (properties.value as Array<P>)[index]
             )
@@ -334,7 +336,7 @@ export const InputsInner = function<
                 ...properties.value[index],
                 onChange: (inputProperties:P, event?:GenericEvent):void =>
                     triggerOnChange(
-                        properties.value,
+                        inputPropertiesToValues<T, P>(properties.value),
                         event,
                         inputProperties,
                         index
@@ -386,7 +388,9 @@ export const InputsInner = function<
         ():AdapterWithReferences<T, P> => ({
             properties: properties as InputsProperties<T, P>,
             references,
-            state: controlled ? {} : {value: properties.value}
+            state: controlled ?
+                {} :
+                {value: inputPropertiesToValues(properties.value)}
         })
     )
 
@@ -441,7 +445,7 @@ export const InputsInner = function<
                 properties: inputProperties
             }) :
             <GenericInput
-                {...inputProperties as InputProperties<T>}
+                {...inputProperties as InputProps<T>}
                 name={`${properties.name}-${index + 1}`}
             />
 
