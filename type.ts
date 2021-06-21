@@ -392,7 +392,7 @@ export const defaultCheckboxProperties:DefaultCheckboxProperties = {
 // // region data transformation
 export interface FormatSpecification<T = unknown> {
     options?:PlainObject
-    transform:(
+    transform?:(
         value:T,
         configuration:DefaultInputProperties<T>,
         transformer:InputDataTransformation
@@ -405,7 +405,7 @@ export interface DataTransformSpecification<
         final:FormatSpecification<T>
         intermediate?:FormatSpecification<T>
     }
-    parse:(
+    parse?:(
         value:InputType,
         configuration:DefaultInputProperties<T>,
         transformer:InputDataTransformation

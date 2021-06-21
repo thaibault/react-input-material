@@ -1933,8 +1933,9 @@ GenericInput.transformer = {
                 transformer:InputDataTransformation
             ):string => {
                 const currency:string =
-                    transformer.currency.format!.final.options!.currency as
-                        string
+                    transformer.currency.format?.final.options?.currency as
+                        string ??
+                    'USD'
 
                 if (value === Infinity)
                     return `Infinity ${currency}`
@@ -1942,11 +1943,14 @@ GenericInput.transformer = {
                 if (value === -Infinity)
                     return `- Infinity ${currency}`
 
+                if (isNaN(value))
+                    return 'unknown'
+
                 return (new Intl.NumberFormat(
                     GenericInput.locales,
                     {
                         style: 'currency',
-                        ...transformer.currency.format!.final.options
+                        ...transformer.currency.format?.final.options ?? {}
                     }
                 )).format(value)
             }
@@ -1956,7 +1960,9 @@ GenericInput.transformer = {
             configuration:DefaultProperties<number>,
             transformer:InputDataTransformation
         ):number =>
-            transformer.float.parse(value, configuration, transformer),
+            transformer.float.parse ?
+                transformer.float.parse(value, configuration, transformer) :
+                NaN,
         type: 'text'
     },
     date: {
@@ -1982,9 +1988,11 @@ GenericInput.transformer = {
                 configuration:DefaultProperties<number>,
                 transformer:InputDataTransformation
             ):string =>
-                transformer.date.format!.final.transform(
-                    value, configuration, transformer
-                )
+                transformer.date.format?.final.transform ?
+                    transformer.date.format.final.transform(
+                        value, configuration, transformer
+                    ) :
+                    `${value}`
             }
         },
         parse: (value:number|string):number => typeof value === 'number' ?
@@ -2017,9 +2025,11 @@ GenericInput.transformer = {
                 configuration:DefaultProperties<number>,
                 transformer:InputDataTransformation
             ):string =>
-                transformer['datetime-local'].format!.final.transform(
-                    value, configuration, transformer
-                )
+                transformer['datetime-local'].format?.final.transform ?
+                    transformer['datetime-local'].format.final.transform(
+                        value, configuration, transformer
+                    ) :
+                    `${value}`
             }
         },
         parse: (
@@ -2027,7 +2037,9 @@ GenericInput.transformer = {
             configuration:DefaultProperties<number>,
             transformer:InputDataTransformation
         ):number =>
-            transformer.date.parse(value, configuration, transformer)
+            transformer.date.parse ?
+                transformer.date.parse(value, configuration, transformer) :
+                Date.parse(value as string) / 1000
     },
     time: {
         format: {
@@ -2053,9 +2065,13 @@ GenericInput.transformer = {
                 value:number,
                 configuration:DefaultProperties<number>,
                 transformer:InputDataTransformation
-            ):string => transformer.time.format!.final.transform(
-                value, configuration, transformer
-            )}
+            ):string =>
+                transformer.time.format?.final.transform ?
+                    transformer.time.format.final.transform(
+                        value, configuration, transformer
+                    ) :
+                    `${value}`
+            }
         },
         parse: (value:number|string):number => typeof value === 'number' ?
             value :
@@ -2072,12 +2088,14 @@ GenericInput.transformer = {
             configuration:DefaultProperties<number>,
             transformer:InputDataTransformation
         ):string =>
-            value === Infinity ? 'Infinity' : value === -Infinity ?
-                '- Infinity' :
-                (new Intl.NumberFormat(
-                    GenericInput.locales,
-                    transformer.float.format!.final.options || {}
-                )).format(value)
+            transformer.float.format ?
+                value === Infinity ? 'Infinity' : value === -Infinity ?
+                    '- Infinity' :
+                    (new Intl.NumberFormat(
+                        GenericInput.locales,
+                        transformer.float.format.final.options || {}
+                    )).format(value) :
+                `${value}`
         }},
         parse: (
             value:number|string, configuration:DefaultProperties<number>
@@ -2117,7 +2135,7 @@ GenericInput.transformer = {
                 GenericInput.locales,
                 {
                     maximumFractionDigits: 0,
-                    ...(transformer.integer.format!.final.options || {})
+                    ...(transformer.integer.format?.final.options ?? {})
                 }
             )).format(value)
         }},
