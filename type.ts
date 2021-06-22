@@ -528,7 +528,7 @@ export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T>
         >
         richTextEditorInputReference:RefObject<HTMLTextAreaElement>
         richTextEditorInstance?:RichTextEditor
-        richTextEditorReference?:RichTextEditorComponent
+        richTextEditorReference?:typeof RichTextEditorComponent
     }
 }
 
