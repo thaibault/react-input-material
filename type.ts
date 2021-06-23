@@ -136,7 +136,8 @@ export interface BaseProperties extends CommonBaseModel, ModelState {
     rootProps:HTMLProps<any>
     showDeclaration:boolean
     showInitialValidationState:boolean
-    style:Mapping
+    // NOTE: We want to avoid a collision with html's native "style" property.
+    styles:Mapping
     themeConfiguration:ThemeProviderProps['options']
     tooltip:string|TooltipProps
 }
@@ -284,7 +285,7 @@ export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ripple: oneOfType([boolean, object]),
     showDeclaration: oneOfType([boolean, symbol]),
     showInitialValidationState: boolean,
-    style: object,
+    styles: object,
     themeConfiguration: object,
     /*
         NOTE: Not yet working:
@@ -528,7 +529,7 @@ export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T>
         >
         richTextEditorInputReference:RefObject<HTMLTextAreaElement>
         richTextEditorInstance?:RichTextEditor
-        richTextEditorReference?:typeof RichTextEditorComponent
+        richTextEditorReference?:RichTextEditorComponent
     }
 }
 

@@ -345,7 +345,7 @@ export const FileInputInner = function(
         delete properties.model.value
         delete properties.value
         // NOTE: Avoid trying to write into a readonly object.
-        properties.style = Tools.copy(properties.style)
+        properties.styles = Tools.copy(properties.styles)
 
         Tools.extend(true, properties, consolidatedProperties)
 
@@ -718,7 +718,7 @@ export const FileInputInner = function(
         onBlur={onBlur}
         onClick={onClick}
         onFocus={onFocus}
-        style={properties.style}
+        style={properties.styles}
     >
         <CardPrimaryAction>
             {properties.value?.url ?

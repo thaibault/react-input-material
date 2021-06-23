@@ -389,7 +389,7 @@ export const IntervalInner = function(
                 .join(' ')
             }
             data-name={properties.name}
-            style={properties.style}
+            style={properties.styles}
         >
             <GenericInput
                 {...startProperties} ref={startInputReference as any}

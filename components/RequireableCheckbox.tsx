@@ -411,7 +411,7 @@ export const RequireableCheckboxInner = function(
             .concat(properties.className ?? [])
             .join(' ')
         }
-        style={properties.style}
+        style={properties.styles}
     >
         <Checkbox
             checked={Boolean(properties.value)}
