@@ -1656,7 +1656,7 @@ export const GenericInputInner = function<Type = unknown>(
             )
             .join(' ')
         }
-        style={properties.style}
+        style={properties.styles}
     >
         <GenericAnimate
             in={Boolean(properties.selection) || Boolean(properties.labels)}
