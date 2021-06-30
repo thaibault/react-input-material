@@ -430,15 +430,18 @@ export function formatValue<
 
     if (
         transformer[
-            configuration.model.type as keyof InputDataTransformation
+            (configuration.type || configuration.model.type) as
+                keyof InputDataTransformation
         ]?.format &&
         transformer[
-            configuration.model.type as keyof InputDataTransformation
+            (configuration.type || configuration.model.type) as
+                keyof InputDataTransformation
         ]!.format![methodName]?.transform
     )
         return (
             transformer[
-                configuration.model.type as keyof InputDataTransformation
+                (configuration.type || configuration.model.type) as
+                    keyof InputDataTransformation
             ]!.format![methodName]!.transform as
                 FormatSpecification<T>['transform']
         )!(value as T, configuration, transformer)
@@ -462,7 +465,7 @@ export function determineInitialRepresentation<
     properties:P,
     defaultProperties:P,
     value:null|T,
-    transformer:InputDataTransformation
+    transformer:InputDataTransformation,
 ):string {
     if (typeof properties.representation === 'string')
         return properties.representation
