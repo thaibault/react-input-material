@@ -92,6 +92,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     const onChangeValue6 =
         useMemorizedValue<(values:Array<null|string>|null) => void>(setValue6)
     // endregion
+
     return (<>
         <div className="playground__inputs">
             <FileInput onChange={onChange} />
