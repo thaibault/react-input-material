@@ -349,8 +349,10 @@ export const InputsInner = function<
                     ),
                 ref: reference
             },
-            properties.model?.value && properties.model.value.length > index ?
-                {model: properties.model.value[index]} :
+            properties.model?.value &&
+            properties.model.value.length > index &&
+            properties.model.value[index].model ?
+                {model: properties.model.value[index].model} :
                 {},
             properties.value && properties.value.length > index ?
                 {value: (properties.value as Array<P>)[index].value} :
@@ -499,11 +501,12 @@ export const InputsInner = function<
 
             {(
                 properties.disabled ||
+                properties.invalidMaximumNumber ||
                 !properties.value ||
                 properties.maximumNumber <= properties.value.length ||
-                properties.invalidMaximumNumber ||
-                properties.value.some(({value}):boolean =>
-                    [null, undefined].includes(value as null)
+                properties.value.some(({model, value}):boolean =>
+                    [null, undefined].includes(value as null) &&
+                    [null, undefined].includes(model?.value as null)
                 )
             ) ?
                 '' :
