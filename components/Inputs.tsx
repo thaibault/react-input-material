@@ -242,6 +242,8 @@ export const InputsInner = function<
         inputProperties?:Partial<P>,
         index?:number
     ):void => {
+        console.log('TODO internal see 1', properties.value[1].model.value.end.declaration)
+
         if (values)
             properties.value = values.map((
                 _:null|T|undefined, index:number
@@ -249,17 +251,18 @@ export const InputsInner = function<
                 references[index]?.current?.properties ||
                 (properties.value as Array<P>)[index]
             )
+        console.log('TODO internal see 2', properties.value[1].model.value.end.declaration)
 
         if (!properties.value)
             properties.value = []
 
-        if (inputProperties === undefined && typeof index === 'number')
-            properties.value.splice(index, 1)
-        else if (inputProperties)
+        if (inputProperties)
             if (typeof index === 'number')
                 properties.value![index] = inputProperties as P
             else
                 properties.value!.push(inputProperties as P)
+        else if (inputProperties === undefined && typeof index === 'number')
+            properties.value.splice(index, 1)
 
         if (
             properties.emptyEqualsNull &&
