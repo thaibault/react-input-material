@@ -268,10 +268,10 @@ export const IntervalInner = function(
             properties: getExternalProperties(
                 properties as Properties,
                 iconProperties,
-                endInputReference.current?.properties ||
-                properties.value.end as InputProperties<number>,
                 startInputReference.current?.properties ||
-                properties.value.start as InputProperties<number>
+                properties.value.start as InputProperties<number>,
+                endInputReference.current?.properties ||
+                properties.value.end as InputProperties<number>
             ),
             references: {end: endInputReference, start: startInputReference},
             state: controlled ? {} : {value: valueState}
