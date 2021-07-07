@@ -195,15 +195,15 @@ export const IntervalInner = function(
 
     endProperties = Tools.extend(
         true,
-        {},
-        propertiesToForward,
-        properties.model?.value?.end ? {model: properties.model.value.end} : {},
+        Tools.copy(propertiesToForward),
+        properties.model?.value?.end ?
+            {model: properties.model.value.end} :
+            {},
         endProperties
     )
     startProperties = Tools.extend(
         true,
-        {},
-        propertiesToForward,
+        Tools.copy(propertiesToForward),
         properties.model?.value?.start ?
             {model: properties.model.value.start} :
             {},
