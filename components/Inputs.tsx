@@ -242,7 +242,7 @@ export const InputsInner = function<
         inputProperties?:Partial<P>,
         index?:number
     ):void => {
-        console.log('TODO internal see 1', properties.value[1].model.value.end.declaration)
+        // console.log('TODO internal see 1', properties.value[1].model.value.end.declaration)
 
         if (values)
             properties.value = values.map((
@@ -251,7 +251,8 @@ export const InputsInner = function<
                 references[index]?.current?.properties ||
                 (properties.value as Array<P>)[index]
             )
-        console.log('TODO internal see 2', properties.value[1].model.value.end.declaration)
+
+        //console.log('TODO internal see 2', properties.value[1].model.value.end.declaration)
 
         if (!properties.value)
             properties.value = []

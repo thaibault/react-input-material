@@ -96,7 +96,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     return (<>
         <div className="playground__inputs">
 
-            {/*TODO*/}
+            {/*TODO
 <Inputs<IntervalValue, IntervalProps>
     model={useMemorizedValue({
         value: [{model: {value: {end: {value: 120}, start: {value: 0}}}}]
@@ -115,9 +115,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 </Inputs>
 
         </div></>)
-
     return (<>
         <div className="playground__inputs">
+*/}
             <FileInput onChange={onChange} />
             <FileInput
                 default={useMemorizedValue(
@@ -595,10 +595,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     type: 'float'
                 })}
                 onChange={onChange}
-                transformer={{format: {final: {options: {
+                transformer={useMemorizedValue({format: {final: {options: {
                     maximumFractionDigits: 20,
                     minimumFractionDigits: 2
-                }}}}}
+                }}}})}
             />
 
             <hr/>

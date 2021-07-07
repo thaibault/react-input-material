@@ -1916,12 +1916,15 @@ GenericInput.strict = false
 GenericInput.transformer = {
     boolean: {
         parse: (value:number|string):boolean =>
-            new Map<number|string, boolean>([
-                ['false', false],
-                ['true', true],
-                [0, false],
-                [1, true]
-            ]).get(value) ?? true,
+            typeof value === 'boolean' ?
+                value :
+                new Map<number|string, boolean>([
+                    ['false', false],
+                    ['true', true],
+                    [0, false],
+                    [1, true]
+                ]).get(value) ??
+                    true,
         type: 'text'
     },
     currency: {
