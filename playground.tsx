@@ -95,29 +95,6 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
     return (<>
         <div className="playground__inputs">
-
-            {/*TODO
-<Inputs<IntervalValue, IntervalProps>
-    model={useMemorizedValue({
-        value: [{model: {value: {end: {value: 120}, start: {value: 0}}}}]
-    })}
-    onChange={useMemorizedValue(({model}) =>
-        console.log('TODO', model.value)
-    )}
->
-    {useMemorizedValue(({properties}):ReactElement =>
-        <Interval
-            {...properties}
-            step={60}
-            type="time"
-        />
-    )}
-</Inputs>
-
-        </div></>)
-    return (<>
-        <div className="playground__inputs">
-*/}
             <FileInput onChange={onChange} />
             <FileInput
                 default={useMemorizedValue(
