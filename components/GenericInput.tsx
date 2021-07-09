@@ -49,6 +49,7 @@ import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
+import {List, ListItem} from '@rmwc/list'
 import {
     FormattedOption as FormattedSelectionOption, Select, SelectProps
 } from '@rmwc/select'
@@ -356,8 +357,8 @@ export function determineValidationState<T>(
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInputInner = function<Type = unknown>(
-    props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
+export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
+    props:Props<Type, Suggestion>, reference?:ForwardedRef<Adapter<Type, Suggestion>>
 ):ReactElement {
     // region live-cycle
     /**
@@ -481,7 +482,7 @@ export const GenericInputInner = function<Type = unknown>(
      * @returns Determined input type.
      */
     const determineNativeType = (
-        properties:Properties<Type>
+        properties:Properties<Type, Suggestion>
     ):NativeInputType =>
         (
             properties.type === 'string' ?
@@ -887,7 +888,7 @@ export const GenericInputInner = function<Type = unknown>(
         if (givenProperties.showDeclaration === undefined)
             givenProperties.showDeclaration = showDeclaration
 
-        deriveMissingBasePropertiesFromState<Props<Type>, ValueState<Type>>(
+        deriveMissingBasePropertiesFromState<Props<Type, Suggestion>, ValueState<Type>>(
             givenProperties, valueState
         )
 
@@ -915,10 +916,10 @@ export const GenericInputInner = function<Type = unknown>(
      * @returns Nothing.
     */
     const mapPropertiesAndValidationStateIntoModel = (
-        properties:Props<Type>
-    ):DefaultProperties<Type> => {
-        const result:DefaultProperties<Type> =
-            mapPropertiesIntoModel<Props<Type>, DefaultProperties<Type>>(
+        properties:Props<Type, Suggestion>
+    ):DefaultProperties<Type, Suggestion> => {
+        const result:DefaultProperties<Type, Suggestion> =
+            mapPropertiesIntoModel<Props<Type, Suggestion>, DefaultProperties<Type, Suggestion>>(
                 properties,
                 GenericInput.defaultProperties.model as unknown as Model<Type>
             )
@@ -937,12 +938,12 @@ export const GenericInputInner = function<Type = unknown>(
      * @returns External properties object.
      */
     const getConsolidatedProperties = (
-        properties:Props<Type>
-    ):Properties<Type> => {
-        const result:Properties<Type> =
-            getBaseConsolidatedProperties<Props<Type>, Properties<Type>>(
+        properties:Props<Type, Suggestion>
+    ):Properties<Type, Suggestion> => {
+        const result:Properties<Type, Suggestion> =
+            getBaseConsolidatedProperties<Props<Type, Suggestion>, Properties<Type, Suggestion>>(
                 mapPropertiesAndValidationStateIntoModel(properties) as
-                    Props<Type>
+                    Props<Type, Suggestion>
             )
 
         if (!result.selection && result.type === 'boolean')
@@ -1070,7 +1071,7 @@ export const GenericInputInner = function<Type = unknown>(
             onChange(event)
 
         if (oldValueState.value !== properties.value)
-            triggerCallbackIfExists<Properties<Type>>(
+            triggerCallbackIfExists<Properties<Type, Suggestion>>(
                 properties,
                 'changeValue',
                 controlled,
@@ -1080,7 +1081,7 @@ export const GenericInputInner = function<Type = unknown>(
             )
 
         if (stateChanged)
-            triggerCallbackIfExists<Properties<Type>>(
+            triggerCallbackIfExists<Properties<Type, Suggestion>>(
                 properties,
                 'changeState',
                 controlled,
@@ -1089,7 +1090,7 @@ export const GenericInputInner = function<Type = unknown>(
                 properties
             )
 
-        triggerCallbackIfExists<Properties<Type>>(
+        triggerCallbackIfExists<Properties<Type, Suggestion>>(
             properties, 'blur', controlled, event, properties
         )
 
@@ -1116,11 +1117,11 @@ export const GenericInputInner = function<Type = unknown>(
                     Workaround since "Type" isn't identified as subset of
                     "RecursivePartial<Type>" yet.
                 */
-                properties as unknown as Props<Type>
+                properties as unknown as Props<Type, Suggestion>
             )
         )
 
-        triggerCallbackIfExists<Properties<Type>>(
+        triggerCallbackIfExists<Properties<Type, Suggestion>>(
             properties, 'change', controlled, properties, event
         )
     }
@@ -1140,7 +1141,7 @@ export const GenericInputInner = function<Type = unknown>(
 
             onChange(event)
 
-            triggerCallbackIfExists<Properties<Type>>(
+            triggerCallbackIfExists<Properties<Type, Suggestion>>(
                 properties,
                 'changeEditorIsActive',
                 controlled,
@@ -1170,7 +1171,7 @@ export const GenericInputInner = function<Type = unknown>(
 
             onChange(event)
 
-            triggerCallbackIfExists<Properties<Type>>(
+            triggerCallbackIfExists<Properties<Type, Suggestion>>(
                 properties,
                 'changeShowDeclaration',
                 controlled,
@@ -1259,11 +1260,11 @@ export const GenericInputInner = function<Type = unknown>(
             onChange(event)
 
             if (determineValidationState<Type>(
-                properties as DefaultProperties<Type>, oldValueState.modelState
+                properties as DefaultProperties<Type, Suggestion>, oldValueState.modelState
             ))
                 stateChanged = true
 
-            triggerCallbackIfExists<Properties<Type>>(
+            triggerCallbackIfExists<Properties<Type, Suggestion>>(
                 properties,
                 'changeValue',
                 controlled,
@@ -1275,7 +1276,7 @@ export const GenericInputInner = function<Type = unknown>(
             if (stateChanged) {
                 result.modelState = properties.model.state
 
-                triggerCallbackIfExists<Properties<Type>>(
+                triggerCallbackIfExists<Properties<Type, Suggestion>>(
                     properties,
                     'changeState',
                     controlled,
@@ -1296,7 +1297,7 @@ export const GenericInputInner = function<Type = unknown>(
     const onClick = (event:ReactMouseEvent):void => {
         onSelectionChange(event)
 
-        triggerCallbackIfExists<Properties<Type>>(
+        triggerCallbackIfExists<Properties<Type, Suggestion>>(
             properties, 'click', controlled, event, properties
         )
 
@@ -1308,7 +1309,7 @@ export const GenericInputInner = function<Type = unknown>(
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
-        triggerCallbackIfExists<Properties<Type>>(
+        triggerCallbackIfExists<Properties<Type, Suggestion>>(
             properties, 'focus', controlled, event, properties
         )
 
@@ -1331,7 +1332,7 @@ export const GenericInputInner = function<Type = unknown>(
         )
             event.stopPropagation()
 
-        triggerCallbackIfExists<Properties<Type>>(
+        triggerCallbackIfExists<Properties<Type, Suggestion>>(
             properties, 'keyDown', controlled, event, properties
         )
     }
@@ -1345,7 +1346,7 @@ export const GenericInputInner = function<Type = unknown>(
         if (event.keyCode) {
             onSelectionChange(event)
 
-            triggerCallbackIfExists<Properties<Type>>(
+            triggerCallbackIfExists<Properties<Type, Suggestion>>(
                 properties, 'keyUp', controlled, event, properties
             )
         }
@@ -1358,7 +1359,7 @@ export const GenericInputInner = function<Type = unknown>(
     const onSelectionChange = (event:GenericEvent):void => {
         saveSelectionState(event)
 
-        triggerCallbackIfExists<Properties<Type>>(
+        triggerCallbackIfExists<Properties<Type, Suggestion>>(
             properties, 'selectionChange', controlled, event, properties
         )
     }
@@ -1391,7 +1392,7 @@ export const GenericInputInner = function<Type = unknown>(
 
                 result = {...oldValueState, modelState: properties.model.state}
 
-                triggerCallbackIfExists<Properties<Type>>(
+                triggerCallbackIfExists<Properties<Type, Suggestion>>(
                     properties,
                     'changeState',
                     controlled,
@@ -1401,7 +1402,7 @@ export const GenericInputInner = function<Type = unknown>(
                 )
             }
 
-            triggerCallbackIfExists<Properties<Type>>(
+            triggerCallbackIfExists<Properties<Type, Suggestion>>(
                 properties, 'touch', controlled, event, properties
             )
 
@@ -1422,7 +1423,7 @@ export const GenericInputInner = function<Type = unknown>(
     let richTextEditorInstance:RichTextEditor|undefined
     let richTextEditorReference:RichTextEditorComponent|undefined
     // / endregion
-    const givenProps:Props<Type> = translateKnownSymbols(props)
+    const givenProps:Props<Type, Suggestion> = translateKnownSymbols(props)
 
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
     let [hidden, setHidden] = useState<boolean|undefined>()
@@ -1440,7 +1441,7 @@ export const GenericInputInner = function<Type = unknown>(
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:Props<Type> = Tools.extend(
+    const givenProperties:Props<Type, Suggestion> = Tools.extend(
         true, Tools.copy(GenericInput.defaultProperties), givenProps
     )
 
@@ -1468,10 +1469,10 @@ export const GenericInputInner = function<Type = unknown>(
         () => ({
             modelState: {...GenericInput.defaultModelState},
             representation: determineInitialRepresentation<Type>(
-                givenProperties as DefaultProperties<Type>,
+                givenProperties as DefaultProperties<Type, Suggestion>,
                 GenericInput.defaultProperties as
                     unknown as
-                    DefaultProperties<Type>,
+                    DefaultProperties<Type, Suggestion>,
                 initialValue,
                 transformer
             ),
@@ -1496,7 +1497,7 @@ export const GenericInputInner = function<Type = unknown>(
 
     deriveMissingPropertiesFromState()
 
-    const properties:Properties<Type> =
+    const properties:Properties<Type, Suggestion> =
         getConsolidatedProperties(givenProperties)
 
     if (properties.hidden === undefined)
@@ -1538,7 +1539,7 @@ export const GenericInputInner = function<Type = unknown>(
     // endregion
     useImperativeHandle(
         reference,
-        ():AdapterWithReferences<Type> => {
+        ():AdapterWithReferences<Type, Suggestion> => {
             const state:State<Type> =
                 {modelState: properties.model.state} as State<Type>
 
@@ -1794,73 +1795,97 @@ export const GenericInputInner = function<Type = unknown>(
             richTextEditorLoadedOnce || properties.editor.startsWith('code')
         )}
         {wrapAnimationConditionally(
-            <TextField
-                {...genericProperties as TextFieldProps}
-                {...materialProperties as TextFieldProps}
-                {...(properties.type === 'number' ?
-                    {
-                        max: properties.maximum,
-                        min: properties.minimum,
-                        step: properties.step
-                    } :
-                    properties.type === 'string' ?
+            <div>
+                <TextField
+                    {...genericProperties as TextFieldProps}
+                    {...materialProperties as TextFieldProps}
+                    {...(properties.type === 'number' ?
                         {
-                            maxLength: properties.maximumLength >= 0 ?
-                                properties.maximumLength :
-                                Infinity,
-                            minLength: properties.minimumLength >= 0 ?
-                                properties.minimumLength :
-                                0,
-                            ...(properties.editor === 'plain' ?
-                                {} :
-                                {rows: properties.rows}
-                            )
+                            max: properties.maximum,
+                            min: properties.minimum,
+                            step: properties.step
                         } :
-                        ['date', 'datetime-local', 'time'].includes(
-                            properties.type
-                        ) ?
+                        properties.type === 'string' ?
                             {
-                                max: formatValue<Type>(
-                                    properties,
-                                    properties.maximum as unknown as Type,
-                                    transformer
-                                ),
-                                min: formatValue<Type>(
-                                    properties,
-                                    properties.minimum as unknown as Type,
-                                    transformer
-                                ),
-                                step: properties.step
+                                maxLength: properties.maximumLength >= 0 ?
+                                    properties.maximumLength :
+                                    Infinity,
+                                minLength: properties.minimumLength >= 0 ?
+                                    properties.minimumLength :
+                                    0,
+                                ...(properties.editor === 'plain' ?
+                                    {} :
+                                    {rows: properties.rows}
+                                )
                             } :
-                            {}
-                )}
-                align={properties.align}
-                characterCount
-                foundationRef={foundationRef as unknown as
-                    RefCallback<MDCTextFieldFoundation>
+                            ['date', 'datetime-local', 'time'].includes(
+                                properties.type
+                            ) ?
+                                {
+                                    max: formatValue<Type>(
+                                        properties,
+                                        properties.maximum as unknown as Type,
+                                        transformer
+                                    ),
+                                    min: formatValue<Type>(
+                                        properties,
+                                        properties.minimum as unknown as Type,
+                                        transformer
+                                    ),
+                                    step: properties.step
+                                } :
+                                {}
+                    )}
+                    align={properties.align}
+                    characterCount
+                    foundationRef={foundationRef as unknown as
+                        RefCallback<MDCTextFieldFoundation>
+                    }
+                    fullwidth={properties.fullWidth}
+                    inputRef={inputReference as unknown as
+                        RefCallback<HTMLInputElement|HTMLTextAreaElement>
+                    }
+                    onChange={onChangeValue}
+                    ripple={properties.ripple}
+                    rootProps={{
+                        name: properties.name,
+                        onClick: onClick,
+                        onKeyDown: onKeyDown,
+                        onKeyUp: onKeyUp,
+                        ...properties.rootProps
+                    }}
+                    textarea={
+                        properties.type === 'string' &&
+                        properties.editor !== 'plain'
+                    }
+                    trailingIcon={wrapIconWithTooltip(applyIconPreset(
+                        properties.trailingIcon
+                    ))}
+                    type={determineNativeType(properties)}
+                />
+                {properties.suggestions ?
+                    <List>{
+                        properties.suggestions.map((
+                            suggestion:Suggestion, index:number
+                        ):ReactElement => {
+                            if (Tools.isFunction(properties.children)) {
+                                const result:ReactElement =
+                                    properties.children({index, properties, suggestion})
+
+                                if (result)
+                                    return <ListItem key={index}>{result}</ListItem>
+
+                                return null
+                            }
+
+                            return suggestion.includes(properties.value) ?
+                                <ListItem key={index}>{suggestion}</ListItem> :
+                                null
+                        })
+                    }</List> :
+                    ''
                 }
-                fullwidth={properties.fullWidth}
-                inputRef={inputReference as unknown as
-                    RefCallback<HTMLInputElement|HTMLTextAreaElement>
-                }
-                onChange={onChangeValue}
-                ripple={properties.ripple}
-                rootProps={{
-                    name: properties.name,
-                    onClick: onClick,
-                    onKeyDown: onKeyDown,
-                    onKeyUp: onKeyUp,
-                    ...properties.rootProps
-                }}
-                textarea={
-                    properties.type === 'string' &&
-                    properties.editor !== 'plain'
-                }
-                trailingIcon={wrapIconWithTooltip(applyIconPreset(
-                    properties.trailingIcon
-                ))}
-                type={determineNativeType(properties)}
-            />,
+            </div>,
             !(isAdvancedEditor || properties.selection || properties.labels),
             richTextEditorLoadedOnce || properties.editor.startsWith('code')
         )}

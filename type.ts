@@ -449,8 +449,13 @@ export interface InputValueState<T = unknown, MS = ModelState> extends
 }
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export interface InputProperties<T = unknown> extends InputModelState, Properties<T> {
+export interface InputProperties<T = unknown, S = unknown> extends InputModelState, Properties<T> {
     align:'end'|'start'
+    children:(options:{
+        index:number
+        properties:this
+        suggesion:S
+    }) => null|ReactElement
     cursor:CursorState
     /*
         plain -> input field
@@ -484,20 +489,22 @@ export interface InputProperties<T = unknown> extends InputModelState, Propertie
     placeholder:string
     representation:string
     rows:number
+    suggestions:Array<S>
     selectableEditor:boolean
     step:number
+    strictSuggestions:boolean
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
     transformer:RecursivePartial<DataTransformSpecification<T>>
 }
-export type InputProps<T = unknown> =
-    Partial<Omit<InputProperties<T>, 'model'>> &
+export type InputProps<T = unknown, S = unknown> =
+    Partial<Omit<InputProperties<T, S>, 'model'>> &
     {model?:Partial<InputModel<T>>}
 
-export type DefaultInputProperties<T = string> =
-    Omit<InputProps<T>, 'model'> & {model:InputModel<T>}
+export type DefaultInputProperties<T = string, S = string> =
+    Omit<InputProps<T, S>, 'model'> & {model:InputModel<T>}
 
-export type InputPropertyTypes<T = unknown> = {
-    [key in keyof InputProperties<T>]:ValueOf<typeof PropertyTypes>
+export type InputPropertyTypes<T = unknown, S = unknown> = {
+    [key in keyof InputProperties<T, S>]:ValueOf<typeof PropertyTypes>
 }
 
 export interface InputState<T = unknown> extends State<T> {
@@ -511,15 +518,15 @@ export interface InputState<T = unknown> extends State<T> {
 }
 
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
-export type InputAdapter<T = unknown> = ComponentAdapter<
-    InputProperties<T>,
+export type InputAdapter<T = unknown, S = unknown> = ComponentAdapter<
+    InputProperties<T, S>,
     Omit<InputState<T>, 'representation'|'selectionIsUnstable'|'value'> &
     {
         representation?:string
         value?:null|T
     }
 >
-export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T> {
+export interface InputAdapterWithReferences<T = unknown, S = unknown> extends InputAdapter<T, S> {
     references:{
         codeEditorReference?:CodeEditorType
         codeEditorInputReference:RefObject<HTMLTextAreaElement>
@@ -537,8 +544,8 @@ export interface GenericInputComponent extends
     Omit<ForwardRefExoticComponent<InputProps>, 'propTypes'>,
     StaticWebComponent<InputModelState, DefaultInputProperties>
 {
-    <T = string>(
-        props:InputProps<T> & RefAttributes<InputAdapter<T>>
+    <T = string, S = string>(
+        props:InputProps<T, S> & RefAttributes<InputAdapter<T, S>>
     ):ReactElement
 
     locales:Array<string>
