@@ -1883,7 +1883,10 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
                     type={determineNativeType(properties)}
                 />
                 {suggestions.length ?
-                    <CollapsibleList className={styles['generic-input__suggestions']}>
+                    <CollapsibleList
+                        className={styles['generic-input__suggestions']}
+                        open={true}
+                    >
                         {suggestions}
                     </CollapsibleList> :
                     ''
