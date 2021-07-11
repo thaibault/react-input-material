@@ -413,6 +413,81 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <hr/>
 
+            {/*TODO*/}
+            <GenericInput<boolean>
+                declaration="suggestion"
+                description="input12Description"
+                name="input12"
+                onChange={onChange}
+                placeholder="input12Placeholder"
+                required
+                suggestions={useMemorizedValue(['hans', 'peter', 'klaus'])}
+            />
+{/*
+            <GenericInput<boolean>
+                initialValue={false}
+                labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
+                model={useMemorizedValue({
+                    declaration: 'selection',
+                    description: 'input9ModelDescription',
+                    name: 'input9Model',
+                    nullable: false,
+                    type: 'boolean'
+                })}
+                onChange={onChange}
+                placeholder="input9ModelPlaceholder"
+            />
+
+            <hr/>
+
+            <GenericInput
+                declaration="selection"
+                description="input10Description"
+                initialValue="true"
+                labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
+                name="input10"
+                onChange={onChange}
+                required
+            />
+            <GenericInput
+                initialValue="false"
+                labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
+                model={useMemorizedValue({
+                    declaration: 'selection',
+                    description: 'input10ModelDescription',
+                    name: 'input10Model',
+                    nullable: false,
+                    type: 'string'
+                })}
+                onChange={onChange}
+            />
+
+            <hr/>
+
+            <GenericInput
+                declaration="selection"
+                description="input11Description"
+                initialValue="b"
+                name="input11"
+                onChange={onChange}
+                selection={useMemorizedValue({a: 'A', b: 'B', c: 'C'})}
+                required
+            />
+            <GenericInput
+                initialValue="b"
+                model={useMemorizedValue({
+                    declaration: 'selection',
+                    description: 'input11ModelDescription',
+                    name: 'input11Model',
+                    nullable: false,
+                    selection: {a: 'A', b: 'B', c: 'C'},
+                })}
+                onChange={onChange}
+            />
+  */}
+
+            <hr/>
+
             <GenericInput
                 declaration="text"
                 description="input12Description"

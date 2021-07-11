@@ -49,7 +49,7 @@ import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
-import {List, ListItem} from '@rmwc/list'
+import {CollapsibleList, ListItem} from '@rmwc/list'
 import {
     FormattedOption as FormattedSelectionOption, Select, SelectProps
 } from '@rmwc/select'
@@ -917,9 +917,9 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
     */
     const mapPropertiesAndValidationStateIntoModel = (
         properties:Props<Type, Suggestion>
-    ):DefaultProperties<Type, Suggestion> => {
-        const result:DefaultProperties<Type, Suggestion> =
-            mapPropertiesIntoModel<Props<Type, Suggestion>, DefaultProperties<Type, Suggestion>>(
+    ):DefaultProperties<Type> => {
+        const result:DefaultProperties<Type> =
+            mapPropertiesIntoModel<Props<Type, Suggestion>, DefaultProperties<Type>>(
                 properties,
                 GenericInput.defaultProperties.model as unknown as Model<Type>
             )
@@ -1260,7 +1260,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
             onChange(event)
 
             if (determineValidationState<Type>(
-                properties as DefaultProperties<Type, Suggestion>, oldValueState.modelState
+                properties as DefaultProperties<Type>, oldValueState.modelState
             ))
                 stateChanged = true
 
@@ -1469,10 +1469,10 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
         () => ({
             modelState: {...GenericInput.defaultModelState},
             representation: determineInitialRepresentation<Type>(
-                givenProperties as DefaultProperties<Type, Suggestion>,
+                givenProperties as DefaultProperties<Type>,
                 GenericInput.defaultProperties as
                     unknown as
-                    DefaultProperties<Type, Suggestion>,
+                    DefaultProperties<Type>,
                 initialValue,
                 transformer
             ),
@@ -1643,6 +1643,25 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
             properties.editor.startsWith('richtext(')
         )
     )
+
+    const suggestions:Array<ReactElement> = []
+    if (properties.suggestions) {
+        let index:number = 0
+        for (const suggestion of properties.suggestions) {
+            if (Tools.isFunction(properties.children)) {
+                const result:null|ReactElement =
+                    properties.children({index, properties, suggestion})
+
+                if (result)
+                    suggestions.push(<ListItem key={index}>{result}</ListItem>)
+            } else if ((suggestion as unknown as string).includes(
+                properties.value as unknown as string
+            ))
+                suggestions.push(<ListItem key={index}>{suggestion}</ListItem>)
+
+            index += 1
+        }
+    }
     // / endregion
     // / region main markup
     return <WrapConfigurations
@@ -1863,26 +1882,10 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
                     ))}
                     type={determineNativeType(properties)}
                 />
-                {properties.suggestions ?
-                    <List>{
-                        properties.suggestions.map((
-                            suggestion:Suggestion, index:number
-                        ):ReactElement => {
-                            if (Tools.isFunction(properties.children)) {
-                                const result:ReactElement =
-                                    properties.children({index, properties, suggestion})
-
-                                if (result)
-                                    return <ListItem key={index}>{result}</ListItem>
-
-                                return null
-                            }
-
-                            return suggestion.includes(properties.value) ?
-                                <ListItem key={index}>{suggestion}</ListItem> :
-                                null
-                        })
-                    }</List> :
+                {suggestions.length ?
+                    <CollapsibleList className={styles['generic-input__suggestions']}>
+                        {suggestions}
+                    </CollapsibleList> :
                     ''
                 }
             </div>,

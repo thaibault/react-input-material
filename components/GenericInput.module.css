@@ -27,6 +27,7 @@ endregion */
 @import '@material/notched-outline/dist/mdc.notched-outline.css';
 /* redundant: @import '@material/ripple/dist/mdc.ripple.css';*/
 @import '@material/select/dist/mdc.select.css';
+@import '@rmwc/list/collapsible-list.css';
 @import '@rmwc/select/select.css';
 /*import '@rmwc/textfield/styles'*/
 /* redundant: @import '@material/floating-label/dist/mdc.floating-label.css';*/
@@ -53,6 +54,17 @@ endregion */
 
 .generic-input__editor__label {
     top: 9px !important;
+}
+
+.generic-input__suggestions {
+    background-color: var(--mdc-theme-surface);
+    display: flex;
+    flex-direction: column;
+    margin-top: -30px;
+    opacity: .8;
+    overflow: hidden;
+    position: absolute;
+    z-index: 2;
 }
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:

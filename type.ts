@@ -449,13 +449,16 @@ export interface InputValueState<T = unknown, MS = ModelState> extends
 }
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export interface InputProperties<T = unknown, S = unknown> extends InputModelState, Properties<T> {
+export type InputChildrenOptions<P, S> = {
+    index:number
+    properties:P
+    suggestion:S
+}
+export interface InputProperties<T = unknown, S = unknown> extends
+    InputModelState, Properties<T>
+{
     align:'end'|'start'
-    children:(options:{
-        index:number
-        properties:this
-        suggesion:S
-    }) => null|ReactElement
+    children:(options:InputChildrenOptions<this, S>) => null|ReactElement
     cursor:CursorState
     /*
         plain -> input field
@@ -500,8 +503,8 @@ export type InputProps<T = unknown, S = unknown> =
     Partial<Omit<InputProperties<T, S>, 'model'>> &
     {model?:Partial<InputModel<T>>}
 
-export type DefaultInputProperties<T = string, S = string> =
-    Omit<InputProps<T, S>, 'model'> & {model:InputModel<T>}
+export type DefaultInputProperties<T = string> =
+    Omit<InputProps<T, any>, 'model'> & {model:InputModel<T>}
 
 export type InputPropertyTypes<T = unknown, S = unknown> = {
     [key in keyof InputProperties<T, S>]:ValueOf<typeof PropertyTypes>
