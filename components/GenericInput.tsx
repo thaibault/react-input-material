@@ -1429,25 +1429,24 @@ export const GenericInputInner = function<Type = unknown>(
     // region properties
     // / region references
     let codeEditorReference:CodeEditorType|undefined
-    let codeEditorInputReference:MutableRefObject<
-        HTMLTextAreaElement|undefined
-    > = useRef<HTMLTextAreaElement>()
+    let codeEditorInputReference:MutableRefObject<HTMLTextAreaElement|null> =
+        useRef<HTMLTextAreaElement>(null)
     const foundationReference:MutableRefObject<
-        MDCSelectFoundation|MDCTextFieldFoundation|undefined
-    > = useRef<MDCSelectFoundation|MDCTextFieldFoundation>()
+        MDCSelectFoundation|MDCTextFieldFoundation|null
+    > = useRef<MDCSelectFoundation|MDCTextFieldFoundation>(null)
     const inputReference:MutableRefObject<
-        HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement|undefined
-    > = useRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>()
+        HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement|null
+    > = useRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>(null)
     let richTextEditorInputReference:MutableRefObject<
-        HTMLTextAreaElement|undefined
-    > = useRef<HTMLTextAreaElement>()
+        HTMLTextAreaElement|null
+    > = useRef<HTMLTextAreaElement>(null)
     let richTextEditorInstance:RichTextEditor|undefined
     let richTextEditorReference:RichTextEditorComponent|undefined
-    const suggestionListAPIReference:MutableRefObject<ListApi|undefined> =
-        useRef<ListApi>()
+    const suggestionListAPIReference:MutableRefObject<ListApi|null> =
+        useRef<ListApi>(null)
     const suggestionListFoundationReference:MutableRefObject<
-        MDCListFoundation|undefined
-    > = useRef<MDCListFoundation>()
+        MDCListFoundation|null
+    > = useRef<MDCListFoundation>(null)
     // / endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
 
@@ -1747,12 +1746,8 @@ export const GenericInputInner = function<Type = unknown>(
                 {...genericProperties as SelectProps}
                 {...materialProperties as SelectProps}
                 enhanced
-                foundationRef={foundationReference as unknown as
-                    RefCallback<MDCSelectFoundation>
-                }
-                inputRef={inputReference as unknown as
-                    RefCallback<HTMLSelectElement|HTMLTextAreaElement>
-                }
+                foundationRef={foundationReference}
+                inputRef={inputReference}
                 rootProps={{
                     name: properties.name,
                     onClick: onClick,
@@ -1852,9 +1847,7 @@ export const GenericInputInner = function<Type = unknown>(
                                         unknown as
                                         RichTextEventHandler<KeyboardEvent>
                                     }
-                                    ref={setRichTextEditorReference as
-                                        RefCallback<RichTextEditorComponent>
-                                    }
+                                    ref={setRichTextEditorReference}
                                     textareaName={properties.name}
                                     tinymceScriptSrc={`${TINYMCE_DEFAULT_OPTIONS.base_url}tinymce.min.js`}
                                 />
@@ -1920,14 +1913,9 @@ export const GenericInputInner = function<Type = unknown>(
                     )}
                     align={properties.align}
                     characterCount
-                    foundationRef={foundationReference as unknown as
-                        RefCallback<MDCTextFieldFoundation>
-                    }
+                    foundationRef={foundationReference}
                     fullwidth={properties.fullWidth}
-                    inputRef={inputReference as
-                        unknown as
-                        RefCallback<HTMLInputElement|HTMLTextAreaElement>
-                    }
+                    inputRef={inputReference}
                     onChange={onChangeValue}
                     ripple={properties.ripple}
                     rootProps={{

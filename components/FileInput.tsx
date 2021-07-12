@@ -533,16 +533,16 @@ export const FileInputInner = function(
     // endregion
     // region properties
     // / region references
-    const deleteButtonReference:MutableRefObject<HTMLButtonElement> =
-        useRef<HTMLButtonElement>()
-    const downloadLinkReference:MutableRefObject<HTMLAnchorElement> =
-        useRef<HTMLAnchorElement>()
-    const fileInputReference:MutableRefObject<HTMLInputElement> =
-        useRef<HTMLInputElement>()
-    const nameInputReference:MutableRefObject<InputAdapter<string>> =
-        useRef<InputAdapter<string>>()
-    const uploadButtonReference:MutableRefObject<HTMLButtonElement> =
-        useRef<HTMLButtonElement>()
+    const deleteButtonReference:MutableRefObject<HTMLButtonElement|null> =
+        useRef<HTMLButtonElement>(null)
+    const downloadLinkReference:MutableRefObject<HTMLAnchorElement|null> =
+        useRef<HTMLAnchorElement>(null)
+    const fileInputReference:MutableRefObject<HTMLInputElement|null> =
+        useRef<HTMLInputElement>(null)
+    const nameInputReference:MutableRefObject<InputAdapter<string>|null> =
+        useRef<InputAdapter<string>>(null)
+    const uploadButtonReference:MutableRefObject<HTMLDivElement|null> =
+        useRef<HTMLDivElement>(null)
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
 
@@ -612,11 +612,11 @@ export const FileInputInner = function(
         reference,
         ():Adapter & {
             references:{
-                deleteButtonReference:MutableRefObject<HTMLButtonElement>,
-                downloadLinkReference:MutableRefObject<HTMLAnchorElement>,
-                fileInputReference:MutableRefObject<HTMLInputElement>,
-                nameInputReference:MutableRefObject<InputAdapter<string>>,
-                uploadButtonReference:MutableRefObject<HTMLButtonElement>
+                deleteButtonReference:MutableRefObject<HTMLButtonElement|null>,
+                downloadLinkReference:MutableRefObject<HTMLAnchorElement|null>,
+                fileInputReference:MutableRefObject<HTMLInputElement|null>,
+                nameInputReference:MutableRefObject<InputAdapter<string>|null>,
+                uploadButtonReference:MutableRefObject<HTMLDivElement|null>
             }
         } => ({
             properties,
@@ -792,7 +792,7 @@ export const FileInputInner = function(
                 }
                 {properties.value ?
                     <GenericInput
-                        ref={nameInputReference as any}
+                        ref={nameInputReference}
                         {...properties.generateFileNameInputProperties(
                             {
                                 disabled: properties.disabled,
@@ -826,10 +826,7 @@ export const FileInputInner = function(
                 id={properties.id || properties.name}
                 name={properties.name}
                 onChange={onChangeValue}
-                ref={fileInputReference as
-                    unknown as
-                    RefCallback<HTMLInputElement>
-                }
+                ref={fileInputReference}
                 type="file"
             />
         </CardPrimaryAction>

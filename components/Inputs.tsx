@@ -315,8 +315,8 @@ export const InputsInner = function<
         properties.value?.length || 0,
         !controlled && values?.length || 0
     ); index += 1) {
-        const reference:MutableRefObject<ComponentAdapter<P, State>> =
-            useRef<ComponentAdapter<P, State>>()
+        const reference:MutableRefObject<ComponentAdapter<P, State>|null> =
+            useRef<ComponentAdapter<P, State>>(null)
         references.push(reference)
 
         if (!properties.value)

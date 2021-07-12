@@ -538,16 +538,20 @@ export type InputAdapter<T = unknown> = ComponentAdapter<
 export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T> {
     references:{
         codeEditorReference?:CodeEditorType
-        codeEditorInputReference:MutableRefObject<HTMLTextAreaElement>
-        foundationRef:MutableRefObject<MDCSelectFoundation|MDCTextFieldFoundation>
-        inputReference:MutableRefObject<
-            HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement
+        codeEditorInputReference:MutableRefObject<HTMLTextAreaElement|null>
+        foundationRef:MutableRefObject<
+            MDCSelectFoundation|MDCTextFieldFoundation|null
         >
-        richTextEditorInputReference:MutableRefObject<HTMLTextAreaElement>
+        inputReference:MutableRefObject<
+            HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement|null
+        >
+        richTextEditorInputReference:MutableRefObject<HTMLTextAreaElement|null>
         richTextEditorInstance?:RichTextEditor
         richTextEditorReference?:RichTextEditorComponent
-        suggestionListAPIReference?:MutableRefObject<ListApi>
-        suggestionListFoundationReference?:MutableRefObject<MDCListFoundation>
+        suggestionListAPIReference?:MutableRefObject<ListApi|null>
+        suggestionListFoundationReference?:MutableRefObject<
+            MDCListFoundation|null
+        >
     }
 }
 
@@ -769,11 +773,11 @@ export type FileInputAdapter = ComponentAdapter<
 >
 export interface FileInputAdapterWithReferences extends FileInputAdapter {
     references:{
-        deleteButtonReference:MutableRefObject<HTMLButtonElement>
-        downloadLinkReference:MutableRefObject<HTMLAnchorElement>
-        fileInputReference:MutableRefObject<HTMLInputElement>
-        nameInputReference:MutableRefObject<InputAdapter<string>>
-        uploadButtonReference:MutableRefObject<HTMLButtonElement>
+        deleteButtonReference:MutableRefObject<HTMLButtonElement|null>
+        downloadLinkReference:MutableRefObject<HTMLAnchorElement|null>
+        fileInputReference:MutableRefObject<HTMLInputElement|null>
+        nameInputReference:MutableRefObject<InputAdapter<string>|null>
+        uploadButtonReference:MutableRefObject<HTMLButtonElement|null>
     }
 }
 
@@ -1061,8 +1065,8 @@ export type IntervalAdapter =
     ComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
 export interface IntervalAdapterWithReferences extends IntervalAdapter {
     references:{
-        end:MutableRefObject<InputAdapterWithReferences<number>>
-        start:MutableRefObject<InputAdapterWithReferences<number>>
+        end:MutableRefObject<InputAdapterWithReferences<number>|null>
+        start:MutableRefObject<InputAdapterWithReferences<number>|null>
     }
 }
 

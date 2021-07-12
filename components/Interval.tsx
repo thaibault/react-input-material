@@ -246,12 +246,12 @@ export const IntervalInner = function(
     )
     endProperties.value = properties.value.end.value
 
-    const endInputReference:MutableRefObject<InputAdapterWithReferences<
-        number
-    >> = useRef<InputAdapterWithReferences<number>>()
+    const endInputReference:MutableRefObject<
+        InputAdapterWithReferences<number>|null
+    > = useRef<InputAdapterWithReferences<number>>(null)
     const startInputReference:MutableRefObject<
-        InputAdapterWithReferences<number>
-    > = useRef<InputAdapterWithReferences<number>>()
+        InputAdapterWithReferences<number>|null
+    > = useRef<InputAdapterWithReferences<number>>(null)
 
     const valueState:Value = {
         end: properties.value.end.value,
@@ -394,10 +394,10 @@ export const IntervalInner = function(
             style={properties.styles}
         >
             <GenericInput
-                {...startProperties} ref={startInputReference as any}
+                {...startProperties} ref={startInputReference}
             />
             <Icon icon={iconProperties} />
-            <GenericInput {...endProperties} ref={endInputReference as any} />
+            <GenericInput {...endProperties} ref={endInputReference} />
         </div>
     </WrapConfigurations>
 }

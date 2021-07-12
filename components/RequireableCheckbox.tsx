@@ -321,10 +321,10 @@ export const RequireableCheckboxInner = function(
     // endregion
     // region properties
     // / region references
-    const inputReference:MutableRefObject<HTMLInputElement> =
-        useRef<HTMLInputElement>()
-    const foundationRef:MutableRefObject<MDCCheckboxFoundation> =
-        useRef<MDCCheckboxFoundation>()
+    const inputReference:MutableRefObject<HTMLInputElement|null> =
+        useRef<HTMLInputElement>(null)
+    const foundationRef:MutableRefObject<MDCCheckboxFoundation|null> =
+        useRef<MDCCheckboxFoundation>(null)
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
 
@@ -416,14 +416,10 @@ export const RequireableCheckboxInner = function(
         <Checkbox
             checked={Boolean(properties.value)}
             disabled={properties.disabled}
-            foundationRef={
-                foundationRef as unknown as RefCallback<MDCCheckboxFoundation>
-            }
+            foundationRef={foundationRef}
             id={properties.id || properties.name}
             indeterminate={properties.value === null}
-            inputRef={
-                inputReference as unknown as RefCallback<HTMLInputElement>
-            }
+            inputRef={inputReference}
             label={(
                 properties.invalid &&
                 (
