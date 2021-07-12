@@ -56,6 +56,7 @@ import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
 import {CardMediaProps} from '@rmwc/card'
+import {MenuApi} from '@rmwc/menu'
 import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
@@ -547,6 +548,7 @@ export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T>
         richTextEditorInputReference:MutableRefObject<HTMLTextAreaElement|null>
         richTextEditorInstance:MutableRefObject<RichTextEditor|null>
         richTextEditorReference:MutableRefObject<RichTextEditorComponent|null>
+        suggestionMenuAPIReference:MutableRefObject<MenuApi|null>
         suggestionMenuFoundationReference:MutableRefObject<
             MDCMenuFoundation|null
         >
