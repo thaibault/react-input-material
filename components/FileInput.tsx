@@ -21,18 +21,18 @@ import {blobToBase64String, dataURLToBlob} from 'blob-util'
 import Tools from 'clientnode'
 import {FirstParameter} from 'clientnode/type'
 import {
-    createRef,
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
     forwardRef,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
+    MutableRefObject,
     ReactElement,
     RefCallback,
-    RefObject,
     SyntheticEvent,
     useEffect,
     useImperativeHandle,
+    useRef,
     useState
 } from 'react'
 import {
@@ -533,16 +533,16 @@ export const FileInputInner = function(
     // endregion
     // region properties
     // / region references
-    const deleteButtonReference:RefObject<HTMLButtonElement> =
-        createRef<HTMLButtonElement>()
-    const downloadLinkReference:RefObject<HTMLAnchorElement> =
-        createRef<HTMLAnchorElement>()
-    const fileInputReference:RefObject<HTMLInputElement> =
-        createRef<HTMLInputElement>()
-    const nameInputReference:RefObject<InputAdapter<string>> =
-        createRef<InputAdapter<string>>()
-    const uploadButtonReference:RefObject<HTMLButtonElement> =
-        createRef<HTMLButtonElement>()
+    const deleteButtonReference:MutableRefObject<HTMLButtonElement> =
+        useRef<HTMLButtonElement>()
+    const downloadLinkReference:MutableRefObject<HTMLAnchorElement> =
+        useRef<HTMLAnchorElement>()
+    const fileInputReference:MutableRefObject<HTMLInputElement> =
+        useRef<HTMLInputElement>()
+    const nameInputReference:MutableRefObject<InputAdapter<string>> =
+        useRef<InputAdapter<string>>()
+    const uploadButtonReference:MutableRefObject<HTMLButtonElement> =
+        useRef<HTMLButtonElement>()
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
 
@@ -612,11 +612,11 @@ export const FileInputInner = function(
         reference,
         ():Adapter & {
             references:{
-                deleteButtonReference:RefObject<HTMLButtonElement>,
-                downloadLinkReference:RefObject<HTMLAnchorElement>,
-                fileInputReference:RefObject<HTMLInputElement>,
-                nameInputReference:RefObject<InputAdapter<string>>,
-                uploadButtonReference:RefObject<HTMLButtonElement>
+                deleteButtonReference:MutableRefObject<HTMLButtonElement>,
+                downloadLinkReference:MutableRefObject<HTMLAnchorElement>,
+                fileInputReference:MutableRefObject<HTMLInputElement>,
+                nameInputReference:MutableRefObject<InputAdapter<string>>,
+                uploadButtonReference:MutableRefObject<HTMLButtonElement>
             }
         } => ({
             properties,

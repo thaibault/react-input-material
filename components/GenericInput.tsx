@@ -28,9 +28,9 @@ import {
     lazy,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
+    MutableRefObject,
     ReactElement,
     RefCallback,
-    RefObject,
     Suspense,
     useEffect,
     useImperativeHandle,
@@ -50,7 +50,7 @@ import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
-import {List, ListItem} from '@rmwc/list'
+import {List, ListApi, ListItem} from '@rmwc/list'
 import {
     FormattedOption as FormattedSelectionOption, Select, SelectProps
 } from '@rmwc/select'
@@ -336,7 +336,9 @@ export function determineValidationState<T>(
 
             invalidSelection: ():boolean => (
                 Boolean(properties.searchSelection) &&
-                !(properties.selection?.includes(properties.value))
+                !((properties.selection as Array<string>)?.includes(
+                    properties.representation as string
+                ))
             )
         }
     )
@@ -1006,9 +1008,8 @@ export const GenericInputInner = function<Type = unknown>(
 
         if (codeEditorReference?.editor?.container?.querySelector('textarea'))
             codeEditorInputReference = {
-                current: codeEditorReference.editor.container.querySelector(
-                    'textarea'
-                )
+                current: codeEditorReference.editor.container
+                    .querySelector('textarea') || undefined
             }
 
         if (
@@ -1428,19 +1429,25 @@ export const GenericInputInner = function<Type = unknown>(
     // region properties
     // / region references
     let codeEditorReference:CodeEditorType|undefined
-    let codeEditorInputReference:RefObject<HTMLTextAreaElement> =
-        useRef<HTMLTextAreaElement>()
-    const foundationReference:RefObject<MDCSelectFoundation|MDCTextFieldFoundation> =
-        useRef<MDCSelectFoundation|MDCTextFieldFoundation>()
-    const inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement> =
-        useRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>()
-    let richTextEditorInputReference:RefObject<HTMLTextAreaElement> =
-        useRef<HTMLTextAreaElement>()
+    let codeEditorInputReference:MutableRefObject<
+        HTMLTextAreaElement|undefined
+    > = useRef<HTMLTextAreaElement>()
+    const foundationReference:MutableRefObject<
+        MDCSelectFoundation|MDCTextFieldFoundation|undefined
+    > = useRef<MDCSelectFoundation|MDCTextFieldFoundation>()
+    const inputReference:MutableRefObject<
+        HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement|undefined
+    > = useRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>()
+    let richTextEditorInputReference:MutableRefObject<
+        HTMLTextAreaElement|undefined
+    > = useRef<HTMLTextAreaElement>()
     let richTextEditorInstance:RichTextEditor|undefined
     let richTextEditorReference:RichTextEditorComponent|undefined
-    const suggestionListAPIReference:RefObject<ListApi> = useRef<ListApi>()
-    const suggestionListFoundationReference:RefObject<MDCListFoundation> =
-        useRef<MDCListFoundaction>()
+    const suggestionListAPIReference:MutableRefObject<ListApi|undefined> =
+        useRef<ListApi>()
+    const suggestionListFoundationReference:MutableRefObject<
+        MDCListFoundation|undefined
+    > = useRef<MDCListFoundation>()
     // / endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
 

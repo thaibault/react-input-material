@@ -23,8 +23,8 @@ import {
     forwardRef,
     ForwardRefRenderFunction,
     FunctionComponent,
-    ReactElement,
-    RefObject
+    MutableRefObject,
+    ReactElement
 } from 'react'
 import {Theme, ThemeProviderProps} from '@rmwc/theme'
 import {ThemePropT} from '@rmwc/types'
@@ -71,7 +71,7 @@ export function createWrapConfigurationsComponent<
         {theme?:ThemePropT}
     > = (
         {strict, theme, themeConfiguration, tooltip, wrap, ...properties},
-        reference?:RefObject<Reference>
+        reference?:MutableRefObject<Reference>
     ):ReactElement => {
         const wrapped = <WrappedComponent {...{
             ...(properties as FirstParameter<Type>),

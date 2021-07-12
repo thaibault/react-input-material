@@ -20,14 +20,14 @@
 import Tools from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import {
-    createRef,
     ForwardedRef,
     forwardRef,
     memo as memorize,
+    MutableRefObject,
     ReactElement,
-    RefObject,
     useImperativeHandle,
     useEffect,
+    useRef,
     useState
 } from 'react'
 import {ComponentAdapter} from 'web-component-wrapper/type'
@@ -223,7 +223,7 @@ export const InputsInner = function<
         // NOTE: Indicates to be filled later from state.
         givenProperties.value = []
 
-    const references:Array<RefObject<ComponentAdapter<P, State>>> = []
+    const references:Array<MutableRefObject<ComponentAdapter<P, State>>> = []
 
     const properties:InputsProperties<T, P> =
         getConsolidatedProperties<InputsProps<T, P>, InputsProperties<T, P>>(
@@ -315,8 +315,8 @@ export const InputsInner = function<
         properties.value?.length || 0,
         !controlled && values?.length || 0
     ); index += 1) {
-        const reference:RefObject<ComponentAdapter<P, State>> =
-            createRef<ComponentAdapter<P, State>>()
+        const reference:MutableRefObject<ComponentAdapter<P, State>> =
+            useRef<ComponentAdapter<P, State>>()
         references.push(reference)
 
         if (!properties.value)

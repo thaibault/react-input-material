@@ -40,9 +40,9 @@ import {
     HTMLProps,
     KeyboardEvent,
     MouseEvent,
+    MutableRefObject,
     ReactElement,
     RefAttributes,
-    RefObject,
     Requireable,
     SyntheticEvent
 } from 'react'
@@ -56,6 +56,7 @@ import {MDCListFoundation} from '@material/list'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
 import {CardMediaProps} from '@rmwc/card'
+import {ListApi} from '@rmwc/list'
 import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
@@ -537,15 +538,16 @@ export type InputAdapter<T = unknown> = ComponentAdapter<
 export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T> {
     references:{
         codeEditorReference?:CodeEditorType
-        codeEditorInputReference:RefObject<HTMLTextAreaElement>
-        foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation>
-        inputReference:RefObject<
+        codeEditorInputReference:MutableRefObject<HTMLTextAreaElement>
+        foundationRef:MutableRefObject<MDCSelectFoundation|MDCTextFieldFoundation>
+        inputReference:MutableRefObject<
             HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement
         >
-        richTextEditorInputReference:RefObject<HTMLTextAreaElement>
+        richTextEditorInputReference:MutableRefObject<HTMLTextAreaElement>
         richTextEditorInstance?:RichTextEditor
         richTextEditorReference?:RichTextEditorComponent
-        suggestionListFoundationReference?:RefObject<MDCListFoundation>
+        suggestionListAPIReference?:MutableRefObject<ListApi>
+        suggestionListFoundationReference?:MutableRefObject<MDCListFoundation>
     }
 }
 
@@ -767,11 +769,11 @@ export type FileInputAdapter = ComponentAdapter<
 >
 export interface FileInputAdapterWithReferences extends FileInputAdapter {
     references:{
-        deleteButtonReference:RefObject<HTMLButtonElement>
-        downloadLinkReference:RefObject<HTMLAnchorElement>
-        fileInputReference:RefObject<HTMLInputElement>
-        nameInputReference:RefObject<InputAdapter<string>>
-        uploadButtonReference:RefObject<HTMLButtonElement>
+        deleteButtonReference:MutableRefObject<HTMLButtonElement>
+        downloadLinkReference:MutableRefObject<HTMLAnchorElement>
+        fileInputReference:MutableRefObject<HTMLInputElement>
+        nameInputReference:MutableRefObject<InputAdapter<string>>
+        uploadButtonReference:MutableRefObject<HTMLButtonElement>
     }
 }
 
@@ -957,7 +959,7 @@ export type InputsAdapterWithReferences<
     T = unknown,
     P extends InputsPropertiesItem<T> = Properties<T>,
     RefType = unknown
-> = InputsAdapter<T, P> & {references:Array<RefObject<RefType>>}
+> = InputsAdapter<T, P> & {references:Array<MutableRefObject<RefType>>}
 
 export interface InputsComponent extends
     Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
@@ -1059,8 +1061,8 @@ export type IntervalAdapter =
     ComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
 export interface IntervalAdapterWithReferences extends IntervalAdapter {
     references:{
-        end:RefObject<InputAdapterWithReferences<number>>
-        start:RefObject<InputAdapterWithReferences<number>>
+        end:MutableRefObject<InputAdapterWithReferences<number>>
+        start:MutableRefObject<InputAdapterWithReferences<number>>
     }
 }
 

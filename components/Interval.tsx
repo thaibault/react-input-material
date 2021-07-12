@@ -21,13 +21,13 @@ import Tools from 'clientnode'
 import {Icon} from '@rmwc/icon'
 import {IconOptions} from '@rmwc/types'
 import {
-    createRef,
     ForwardedRef,
     forwardRef,
     memo as memorize,
+    MutableRefObject,
     ReactElement,
-    RefObject,
     useImperativeHandle,
+    useRef,
     useState
 } from 'react'
 
@@ -246,10 +246,12 @@ export const IntervalInner = function(
     )
     endProperties.value = properties.value.end.value
 
-    const endInputReference:RefObject<InputAdapterWithReferences<number>> =
-        createRef<InputAdapterWithReferences<number>>()
-    const startInputReference:RefObject<InputAdapterWithReferences<number>> =
-        createRef<InputAdapterWithReferences<number>>()
+    const endInputReference:MutableRefObject<InputAdapterWithReferences<
+        number
+    >> = useRef<InputAdapterWithReferences<number>>()
+    const startInputReference:MutableRefObject<
+        InputAdapterWithReferences<number>
+    > = useRef<InputAdapterWithReferences<number>>()
 
     const valueState:Value = {
         end: properties.value.end.value,
