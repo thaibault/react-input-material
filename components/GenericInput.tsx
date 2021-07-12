@@ -21,7 +21,6 @@ import Tools, {optionalRequire} from 'clientnode'
 import {EvaluationResult, FirstParameter, Mapping} from 'clientnode/type'
 import {
     ComponentType,
-    createRef,
     FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardedRef,
@@ -35,6 +34,7 @@ import {
     Suspense,
     useEffect,
     useImperativeHandle,
+    useRef,
     useState,
     VoidFunctionComponent
 } from 'react'
@@ -43,13 +43,14 @@ import {TransitionProps} from 'react-transition-group/Transition'
 import {
     Editor as RichTextEditor, RawEditorSettings as RawTinyMCEEditorSettings
 } from 'tinymce'
+import {MDCListFoundation} from '@material/list'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
 import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
-import {CollapsibleList, ListItem} from '@rmwc/list'
+import {List, ListItem} from '@rmwc/list'
 import {
     FormattedOption as FormattedSelectionOption, Select, SelectProps
 } from '@rmwc/select'
@@ -259,6 +260,7 @@ export function normalizeSelection(
                 })
             return result
         }
+
         for (const [value, label] of Object.entries(selection as Mapping))
             (selection as Mapping)[value] = labels.hasOwnProperty(value) ?
                 (labels as Mapping)[value] as string :
@@ -282,23 +284,25 @@ export function determineValidationState<T>(
                 properties.model.maximum >= 0 &&
                 properties.model.maximum < properties.model.value
             ),
-            invalidMaximumLength: ():boolean => (
-                typeof properties.model.maximumLength === 'number' &&
-                typeof properties.model.value === 'string' &&
-                properties.model.maximumLength >= 0 &&
-                properties.model.maximumLength < properties.model.value.length
-            ),
             invalidMinimum: ():boolean => (
                 typeof properties.model.minimum === 'number' &&
                 typeof properties.model.value === 'number' &&
                 !isNaN(properties.model.value) &&
                 properties.model.value < properties.model.minimum
             ),
+
+            invalidMaximumLength: ():boolean => (
+                typeof properties.model.maximumLength === 'number' &&
+                typeof properties.model.value === 'string' &&
+                properties.model.maximumLength >= 0 &&
+                properties.model.maximumLength < properties.model.value.length
+            ),
             invalidMinimumLength: ():boolean => (
                 typeof properties.model.minimumLength === 'number' &&
                 typeof properties.model.value === 'string' &&
                 properties.model.value.length < properties.model.minimumLength
             ),
+
             invalidInvertedPattern: ():boolean => (
                 typeof properties.model.value === 'string' &&
                 (
@@ -328,6 +332,11 @@ export function determineValidationState<T>(
                     !properties.model.regularExpressionPattern
                         .test(properties.model.value)
                 )
+            ),
+
+            invalidSelection: ():boolean => (
+                Boolean(properties.searchSelection) &&
+                !(properties.selection?.includes(properties.value))
             )
         }
     )
@@ -357,8 +366,8 @@ export function determineValidationState<T>(
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
-    props:Props<Type, Suggestion>, reference?:ForwardedRef<Adapter<Type, Suggestion>>
+export const GenericInputInner = function<Type = unknown>(
+    props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
 ):ReactElement {
     // region live-cycle
     /**
@@ -482,7 +491,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
      * @returns Determined input type.
      */
     const determineNativeType = (
-        properties:Properties<Type, Suggestion>
+        properties:Properties<Type>
     ):NativeInputType =>
         (
             properties.type === 'string' ?
@@ -888,7 +897,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
         if (givenProperties.showDeclaration === undefined)
             givenProperties.showDeclaration = showDeclaration
 
-        deriveMissingBasePropertiesFromState<Props<Type, Suggestion>, ValueState<Type>>(
+        deriveMissingBasePropertiesFromState<Props<Type>, ValueState<Type>>(
             givenProperties, valueState
         )
 
@@ -916,10 +925,10 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
      * @returns Nothing.
     */
     const mapPropertiesAndValidationStateIntoModel = (
-        properties:Props<Type, Suggestion>
+        properties:Props<Type>
     ):DefaultProperties<Type> => {
         const result:DefaultProperties<Type> =
-            mapPropertiesIntoModel<Props<Type, Suggestion>, DefaultProperties<Type>>(
+            mapPropertiesIntoModel<Props<Type>, DefaultProperties<Type>>(
                 properties,
                 GenericInput.defaultProperties.model as unknown as Model<Type>
             )
@@ -938,12 +947,12 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
      * @returns External properties object.
      */
     const getConsolidatedProperties = (
-        properties:Props<Type, Suggestion>
-    ):Properties<Type, Suggestion> => {
-        const result:Properties<Type, Suggestion> =
-            getBaseConsolidatedProperties<Props<Type, Suggestion>, Properties<Type, Suggestion>>(
+        properties:Props<Type>
+    ):Properties<Type> => {
+        const result:Properties<Type> =
+            getBaseConsolidatedProperties<Props<Type>, Properties<Type>>(
                 mapPropertiesAndValidationStateIntoModel(properties) as
-                    Props<Type, Suggestion>
+                    Props<Type>
             )
 
         if (!result.selection && result.type === 'boolean')
@@ -1039,6 +1048,8 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
     const onBlur = (event:GenericEvent):void => setValueState((
         oldValueState:ValueState<Type, ModelState>
     ):ValueState<Type, ModelState> => {
+        setIsSuggestionOpen(false)
+
         let changed:boolean = false
         let stateChanged:boolean = false
 
@@ -1071,7 +1082,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
             onChange(event)
 
         if (oldValueState.value !== properties.value)
-            triggerCallbackIfExists<Properties<Type, Suggestion>>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeValue',
                 controlled,
@@ -1081,7 +1092,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
             )
 
         if (stateChanged)
-            triggerCallbackIfExists<Properties<Type, Suggestion>>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeState',
                 controlled,
@@ -1090,7 +1101,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
                 properties
             )
 
-        triggerCallbackIfExists<Properties<Type, Suggestion>>(
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'blur', controlled, event, properties
         )
 
@@ -1117,11 +1128,11 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
                     Workaround since "Type" isn't identified as subset of
                     "RecursivePartial<Type>" yet.
                 */
-                properties as unknown as Props<Type, Suggestion>
+                properties as unknown as Props<Type>
             )
         )
 
-        triggerCallbackIfExists<Properties<Type, Suggestion>>(
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'change', controlled, properties, event
         )
     }
@@ -1141,7 +1152,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
 
             onChange(event)
 
-            triggerCallbackIfExists<Properties<Type, Suggestion>>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeEditorIsActive',
                 controlled,
@@ -1171,7 +1182,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
 
             onChange(event)
 
-            triggerCallbackIfExists<Properties<Type, Suggestion>>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeShowDeclaration',
                 controlled,
@@ -1264,7 +1275,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
             ))
                 stateChanged = true
 
-            triggerCallbackIfExists<Properties<Type, Suggestion>>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeValue',
                 controlled,
@@ -1276,7 +1287,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
             if (stateChanged) {
                 result.modelState = properties.model.state
 
-                triggerCallbackIfExists<Properties<Type, Suggestion>>(
+                triggerCallbackIfExists<Properties<Type>>(
                     properties,
                     'changeState',
                     controlled,
@@ -1297,7 +1308,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
     const onClick = (event:ReactMouseEvent):void => {
         onSelectionChange(event)
 
-        triggerCallbackIfExists<Properties<Type, Suggestion>>(
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'click', controlled, event, properties
         )
 
@@ -1309,7 +1320,9 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
-        triggerCallbackIfExists<Properties<Type, Suggestion>>(
+        setIsSuggestionOpen(true)
+
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'focus', controlled, event, properties
         )
 
@@ -1321,6 +1334,9 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
      * @returns Nothing.
      */
     const onKeyDown = (event:ReactKeyboardEvent):void => {
+        if (useSuggestions && Tools.keyCode.DOWN === event.keyCode)
+            suggestionListAPIReference.current?.focusItemAtIndex(0)
+
         /*
             NOTE: We do not want to forward keydown enter events coming from
             textareas.
@@ -1332,7 +1348,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
         )
             event.stopPropagation()
 
-        triggerCallbackIfExists<Properties<Type, Suggestion>>(
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'keyDown', controlled, event, properties
         )
     }
@@ -1346,7 +1362,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
         if (event.keyCode) {
             onSelectionChange(event)
 
-            triggerCallbackIfExists<Properties<Type, Suggestion>>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties, 'keyUp', controlled, event, properties
             )
         }
@@ -1359,7 +1375,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
     const onSelectionChange = (event:GenericEvent):void => {
         saveSelectionState(event)
 
-        triggerCallbackIfExists<Properties<Type, Suggestion>>(
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'selectionChange', controlled, event, properties
         )
     }
@@ -1392,7 +1408,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
 
                 result = {...oldValueState, modelState: properties.model.state}
 
-                triggerCallbackIfExists<Properties<Type, Suggestion>>(
+                triggerCallbackIfExists<Properties<Type>>(
                     properties,
                     'changeState',
                     controlled,
@@ -1402,7 +1418,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
                 )
             }
 
-            triggerCallbackIfExists<Properties<Type, Suggestion>>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties, 'touch', controlled, event, properties
             )
 
@@ -1413,23 +1429,27 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
     // / region references
     let codeEditorReference:CodeEditorType|undefined
     let codeEditorInputReference:RefObject<HTMLTextAreaElement> =
-        createRef<HTMLTextAreaElement>()
-    const foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation> =
-        createRef<MDCSelectFoundation|MDCTextFieldFoundation>()
+        useRef<HTMLTextAreaElement>()
+    const foundationReference:RefObject<MDCSelectFoundation|MDCTextFieldFoundation> =
+        useRef<MDCSelectFoundation|MDCTextFieldFoundation>()
     const inputReference:RefObject<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement> =
-        createRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>()
+        useRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>()
     let richTextEditorInputReference:RefObject<HTMLTextAreaElement> =
-        createRef<HTMLTextAreaElement>()
+        useRef<HTMLTextAreaElement>()
     let richTextEditorInstance:RichTextEditor|undefined
     let richTextEditorReference:RichTextEditorComponent|undefined
+    const suggestionListAPIReference:RefObject<ListApi> = useRef<ListApi>()
+    const suggestionListFoundationReference:RefObject<MDCListFoundation> =
+        useRef<MDCListFoundaction>()
     // / endregion
-    const givenProps:Props<Type, Suggestion> = translateKnownSymbols(props)
+    const givenProps:Props<Type> = translateKnownSymbols(props)
 
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
-    let [hidden, setHidden] = useState<boolean|undefined>()
     let [editorState, setEditorState] = useState<EditorState>({
         editorIsActive: false, selectionIsUnstable: false
     })
+    let [hidden, setHidden] = useState<boolean|undefined>()
+    const [isSuggestionOpen, setIsSuggestionOpen] = useState<boolean>(false)
     let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
 
     const initialValue:null|Type = determineInitialValue<Type>(
@@ -1441,7 +1461,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:Props<Type, Suggestion> = Tools.extend(
+    const givenProperties:Props<Type> = Tools.extend(
         true, Tools.copy(GenericInput.defaultProperties), givenProps
     )
 
@@ -1497,7 +1517,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
 
     deriveMissingPropertiesFromState()
 
-    const properties:Properties<Type, Suggestion> =
+    const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
 
     if (properties.hidden === undefined)
@@ -1539,7 +1559,7 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
     // endregion
     useImperativeHandle(
         reference,
-        ():AdapterWithReferences<Type, Suggestion> => {
+        ():AdapterWithReferences<Type> => {
             const state:State<Type> =
                 {modelState: properties.model.state} as State<Type>
 
@@ -1559,11 +1579,13 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
                 references: {
                     codeEditorReference,
                     codeEditorInputReference,
-                    foundationRef,
+                    foundationReference,
                     inputReference,
                     richTextEditorInputReference,
                     richTextEditorInstance,
-                    richTextEditorReference
+                    richTextEditorReference,
+                    suggestionListAPIReference,
+                    suggestionListFoundationReference
                 },
                 state
             }
@@ -1644,24 +1666,59 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
         )
     )
 
-    const suggestions:Array<ReactElement> = []
-    if (properties.suggestions) {
+    const currentRenderableSuggestions:Array<ReactElement> = []
+    const currentSuggestions:Array<ReactElement> = []
+    // TODO: Support other forms of selection types or labels.
+    const useSuggestions:boolean =
+        properties.selection?.length &&
+        (properties.searchSelection || properties.suggestSelection)
+    if (useSuggestions) {
         let index:number = 0
-        for (const suggestion of properties.suggestions) {
+        for (const suggestion of properties.selection) {
             if (Tools.isFunction(properties.children)) {
                 const result:null|ReactElement =
                     properties.children({index, properties, suggestion})
 
-                if (result)
-                    suggestions.push(<ListItem key={index}>{result}</ListItem>)
-            } else if ((suggestion as unknown as string).includes(
-                properties.value as unknown as string
-            ))
-                suggestions.push(<ListItem key={index}>{suggestion}</ListItem>)
+                if (result) {
+                    currentRenderableSuggestions.push(
+                        <ListItem
+                            className={styles['generic-input__suggestions__suggestion']}
+                            key={index}
+                        >{result}</ListItem>
+                    )
+                    currentSuggestions.push(suggestion)
+                }
+            } else if (
+                !properties.value ||
+                (suggestion as unknown as string).includes(
+                    properties.value as unknown as string
+                )
+            ) {
+                currentRenderableSuggestions.push(
+                    <ListItem
+                        className={styles['generic-input__suggestions__suggestion']}
+                        dangerouslySetInnerHTML={{
+                            __html: Tools.stringMark(
+                                suggestion,
+                                properties.value?.split(' ') || '',
+                                (value:string):string => `${value}`.toLowerCase(),
+                                '<span class="' +
+                                styles['generic-input__suggestions__suggestion__mark'] +
+                                '">{1}</span>'
+                            )
+                        }}
+                        key={index}
+                    />
+                )
+                currentSuggestions.push(suggestion)
+            }
 
             index += 1
         }
     }
+    const useSelection:boolean =
+        (Boolean(properties.selection) || Boolean(properties.labels)) &&
+        !useSuggestions
     // / endregion
     // / region main markup
     return <WrapConfigurations
@@ -1678,14 +1735,12 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
         }
         style={properties.styles}
     >
-        <GenericAnimate
-            in={Boolean(properties.selection) || Boolean(properties.labels)}
-        >
+        {wrapAnimationConditionally(
             <Select
                 {...genericProperties as SelectProps}
                 {...materialProperties as SelectProps}
                 enhanced
-                foundationRef={foundationRef as unknown as
+                foundationRef={foundationReference as unknown as
                     RefCallback<MDCSelectFoundation>
                 }
                 inputRef={inputReference as unknown as
@@ -1700,8 +1755,9 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
                 options={normalizeSelection(
                     properties.selection, properties.labels
                 ) as SelectProps['options']}
-            />
-        </GenericAnimate>
+            />,
+            useSelection
+        )}
         {wrapAnimationConditionally(
             [
                 <FormField
@@ -1857,11 +1913,12 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
                     )}
                     align={properties.align}
                     characterCount
-                    foundationRef={foundationRef as unknown as
+                    foundationRef={foundationReference as unknown as
                         RefCallback<MDCTextFieldFoundation>
                     }
                     fullwidth={properties.fullWidth}
-                    inputRef={inputReference as unknown as
+                    inputRef={inputReference as
+                        unknown as
                         RefCallback<HTMLInputElement|HTMLTextAreaElement>
                     }
                     onChange={onChangeValue}
@@ -1882,17 +1939,28 @@ export const GenericInputInner = function<Type = unknown, Suggestion = unknown>(
                     ))}
                     type={determineNativeType(properties)}
                 />
-                {suggestions.length ?
-                    <CollapsibleList
+                {wrapAnimationConditionally(
+                    <List
+                        apiRef={suggestionListAPIReference}
                         className={styles['generic-input__suggestions']}
-                        open={true}
+                        foundationRef={suggestionListFoundationReference}
+                        onAction={(event:ListOnActionEventT) => {
+                            onChangeValue(
+                                currentSuggestions[event.detail.index]
+                            )
+                            setIsSuggestionOpen(false)
+                        }}
+                        onBlur={onBlur}
+                        onFocus={onFocus}
                     >
-                        {suggestions}
-                    </CollapsibleList> :
-                    ''
-                }
+                        {currentRenderableSuggestions}
+                    </List>,
+                    isSuggestionOpen &&
+                    currentSuggestions.length &&
+                    !properties.selection.includes(properties.value)
+                )}
             </div>,
-            !(isAdvancedEditor || properties.selection || properties.labels),
+            !(isAdvancedEditor || useSelection),
             richTextEditorLoadedOnce || properties.editor.startsWith('code')
         )}
     </div></WrapConfigurations>

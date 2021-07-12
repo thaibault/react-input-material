@@ -421,7 +421,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 placeholder="input12Placeholder"
                 required
-                suggestions={useMemorizedValue(['hans', 'peter', 'klaus'])}
+                suggestSelection
+                selection={useMemorizedValue(['hans', 'peter', 'klaus'])}
             />
 {/*
             <GenericInput<boolean>
