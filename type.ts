@@ -52,11 +52,10 @@ import {Editor as RichTextEditor} from 'tinymce'
 import {
     ComponentAdapter, StaticWebComponent as StaticBaseWebComponent
 } from 'web-component-wrapper/type'
-import {MDCListFoundation} from '@material/list'
+import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
 import {CardMediaProps} from '@rmwc/card'
-import {ListApi} from '@rmwc/list'
 import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
@@ -548,9 +547,8 @@ export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T>
         richTextEditorInputReference:MutableRefObject<HTMLTextAreaElement|null>
         richTextEditorInstance:MutableRefObject<RichTextEditor|null>
         richTextEditorReference:MutableRefObject<RichTextEditorComponent|null>
-        suggestionListAPIReference:MutableRefObject<ListApi|null>
-        suggestionListFoundationReference:MutableRefObject<
-            MDCListFoundation|null
+        suggestionMenuFoundationReference:MutableRefObject<
+            MDCMenuFoundation|null
         >
     }
 }

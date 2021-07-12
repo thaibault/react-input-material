@@ -64,6 +64,7 @@
     "@rmwc/formfield": "*",
     "@rmwc/icon": "*",
     "@rmwc/icon-button": "*",
+    "@rmwc/menu": "*",
     "@rmwc/select": "*",
     "@rmwc/textfield": "*",
     "@rmwc/theme": "*",

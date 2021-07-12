@@ -43,14 +43,16 @@ import {TransitionProps} from 'react-transition-group/Transition'
 import {
     Editor as RichTextEditor, RawEditorSettings as RawTinyMCEEditorSettings
 } from 'tinymce'
-import {MDCListFoundation} from '@material/list'
+import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
 import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
-import {List, ListApi, ListItem, ListOnActionEventT} from '@rmwc/list'
+import {
+    Menu, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
+} from '@rmwc/menu'
 import {
     FormattedOption as FormattedSelectionOption, Select, SelectProps
 } from '@rmwc/select'
@@ -1339,7 +1341,8 @@ export const GenericInputInner = function<Type = unknown>(
      */
     const onKeyDown = (event:ReactKeyboardEvent):void => {
         if (useSuggestions && Tools.keyCode.DOWN === event.keyCode)
-            suggestionListAPIReference.current?.focusItemAtIndex(0)
+            suggestionMenuFoundationReference.current?.adapter_
+                .focusItemAtIndex(0)
 
         /*
             NOTE: We do not want to forward keydown enter events coming from
@@ -1449,11 +1452,9 @@ export const GenericInputInner = function<Type = unknown>(
     const richTextEditorReference:MutableRefObject<
         null|RichTextEditorComponent
     > = useRef<RichTextEditorComponent>(null)
-    const suggestionListAPIReference:MutableRefObject<ListApi|null> =
-        useRef<ListApi>(null)
-    const suggestionListFoundationReference:MutableRefObject<
-        MDCListFoundation|null
-    > = useRef<MDCListFoundation>(null)
+    const suggestionMenuFoundationReference:MutableRefObject<
+        MDCMenuFoundation|null
+    > = useRef<MDCMenuFoundation>(null)
     // / endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
 
@@ -1597,8 +1598,7 @@ export const GenericInputInner = function<Type = unknown>(
                     richTextEditorInputReference,
                     richTextEditorInstance,
                     richTextEditorReference,
-                    suggestionListAPIReference,
-                    suggestionListFoundationReference
+                    suggestionMenuFoundationReference
                 },
                 state
             }
@@ -1698,10 +1698,12 @@ export const GenericInputInner = function<Type = unknown>(
 
                 if (result) {
                     currentRenderableSuggestions.push(
-                        <ListItem
+                        <MenuItem
                             className={styles['generic-input__suggestions__suggestion']}
                             key={index}
-                        >{result}</ListItem>
+                        >
+                            {result}
+                        </MenuItem>
                     )
                     currentSuggestions.push(suggestion)
                 }
@@ -1710,7 +1712,7 @@ export const GenericInputInner = function<Type = unknown>(
                 suggestion.includes(properties.representation)
             ) {
                 currentRenderableSuggestions.push(
-                    <ListItem
+                    <MenuItem
                         className={styles['generic-input__suggestions__suggestion']}
                         dangerouslySetInnerHTML={{
                             __html: Tools.stringMark(
@@ -1952,32 +1954,37 @@ export const GenericInputInner = function<Type = unknown>(
                     ))}
                     type={determineNativeType(properties)}
                 />
-                {wrapAnimationConditionally(
-                    <List
-                        apiRef={suggestionListAPIReference as
-                            unknown as
-                            (apiReference:ListApi|null) => void
-                        }
-                        className={styles['generic-input__suggestions']}
-                        foundationRef={suggestionListFoundationReference}
-                        onAction={(event:ListOnActionEventT) => {
-                            onChangeValue(
-                                currentSuggestions[event.detail.index] as
+                {useSuggestions ?
+                    <MenuSurfaceAnchor>
+                        <Menu
+                            className={styles['generic-input__suggestions']}
+                            focusOnOpen={false}
+                            foundationRef={suggestionMenuFoundationReference}
+                            onSelect={(event:MenuOnSelectEventT):void => {
+                                onChangeValue(
+                                    currentSuggestions[event.detail.index] as
                                     unknown as
                                     Type
-                            )
-                            setIsSuggestionOpen(false)
-                        }}
-                        onBlur={onBlur}
-                        onFocus={onFocus}
-                    >
-                        {currentRenderableSuggestions}
-                    </List>,
-                    isSuggestionOpen &&
-                    Boolean(currentSuggestions.length) &&
-                    !(properties.selection as Array<string>)
-                        .includes(properties.representation as string)
-                )}
+                                )
+                                setIsSuggestionOpen(false)
+                            }}
+                            open={
+                                currentSuggestions.length &&
+                                isSuggestionOpen &&
+                                /*
+                                    NOTE: If single possibility is already
+                                    selected avoid showing this suggestion.
+                                */
+                                !currentSuggestions.includes(
+                                    properties.representation as string
+                                )
+                            }
+                        >
+                            {currentRenderableSuggestions}
+                        </Menu>
+                    </MenuSurfaceAnchor> :
+                    ''
+                }
             </div>,
             !(isAdvancedEditor || useSelection),
             richTextEditorLoadedOnce || properties.editor.startsWith('code')
