@@ -414,12 +414,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <hr/>
 
             <GenericInput
-                declaration="suggestion"
                 description="input12Description"
                 name="input12"
                 onChange={onChange}
                 placeholder="input12Placeholder"
-                required
                 suggestSelection
                 selection={useMemorizedValue(['hans', 'peter', 'klaus'])}
             />
@@ -430,7 +428,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     description: 'input12ModelDescription',
                     name: 'input12Model',
                     nullable: false,
-                    selection: ['hans', 'peter', 'klaus']
+                    selection: [
+                        'hans with veeeeeeeeeeeeeeeery loooooooooooooooong second name',
+                        'peter',
+                        'klaus'
+                    ]
                 })}
                 onChange={onChange}
                 placeholder="input12ModelPlaceholder"

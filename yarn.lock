@@ -1667,7 +1667,7 @@
     "@rmwc/ripple" "^6.1.4"
     "@rmwc/types" "^6.0.5"
 
-"@rmwc/menu@^6.1.4":
+"@rmwc/menu@*", "@rmwc/menu@^6.1.4":
   version "6.1.4"
   resolved "https://registry.yarnpkg.com/@rmwc/menu/-/menu-6.1.4.tgz#ca23e6e35187ef346966c55ebdb772a6872a5446"
   integrity sha512-s2EDZhCHJrt//k44TWLgfSHflDisxmPk4en/M1PWeJkT4uz33T06UyEcSaJGKEv1uU+PEfepOqvmuZ56YPGmuQ==
