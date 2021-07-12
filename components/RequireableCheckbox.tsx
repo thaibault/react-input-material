@@ -385,8 +385,8 @@ export const RequireableCheckboxInner = function(
         reference,
         ():Adapter & {
             references:{
-                foundationRef:MutableRefObject<MDCCheckboxFoundation>
-                inputReference:MutableRefObject<HTMLInputElement>
+                foundationRef:MutableRefObject<MDCCheckboxFoundation|null>
+                inputReference:MutableRefObject<HTMLInputElement|null>
             }
         } => ({
             properties,

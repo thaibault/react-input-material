@@ -50,7 +50,7 @@ import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
-import {List, ListApi, ListItem} from '@rmwc/list'
+import {List, ListApi, ListItem, ListOnActionEventT} from '@rmwc/list'
 import {
     FormattedOption as FormattedSelectionOption, Select, SelectProps
 } from '@rmwc/select'
@@ -385,17 +385,19 @@ export const GenericInputInner = function<Type = unknown>(
                     will set the selection state on initialisation as long as
                     "editorState.selectionIsUnstable" is set to "true".
                 */
-                if (codeEditorReference?.editor?.selection) {
-                    codeEditorReference.editor.textInput.focus()
-                    setCodeEditorSelectionState(codeEditorReference)
+                if (codeEditorReference.current?.editor?.selection) {
+                    codeEditorReference.current.editor.textInput.focus()
+                    setCodeEditorSelectionState(codeEditorReference.current)
 
                     if (editorState.selectionIsUnstable)
                         setEditorState(
                             {...editorState, selectionIsUnstable: false}
                         )
-                } else if (richTextEditorInstance?.selection) {
-                    richTextEditorInstance.focus(false)
-                    setRichTextEditorSelectionState(richTextEditorInstance)
+                } else if (richTextEditorInstance.current?.selection) {
+                    richTextEditorInstance.current.focus(false)
+                    setRichTextEditorSelectionState(
+                        richTextEditorInstance.current
+                    )
 
                     if (editorState.selectionIsUnstable)
                         setEditorState(
@@ -815,9 +817,9 @@ export const GenericInputInner = function<Type = unknown>(
             the one in current selected node.
         */
         const codeEditorRange =
-            codeEditorReference?.editor?.selection?.getRange()
+            codeEditorReference.current?.editor?.selection?.getRange()
         const richTextEditorRange =
-            richTextEditorInstance?.selection?.getRng()
+            richTextEditorInstance.current?.selection?.getRng()
         const selectionEnd:null|number = (
             inputReference.current as HTMLInputElement|HTMLTextAreaElement
         )?.selectionEnd
@@ -846,13 +848,13 @@ export const GenericInputInner = function<Type = unknown>(
         else if (richTextEditorRange)
             setCursor({
                 end: determineAbsoluteSymbolOffsetFromHTML(
-                    richTextEditorInstance!.getBody(),
-                    richTextEditorInstance!.selection.getEnd(),
+                    richTextEditorInstance.current!.getBody(),
+                    richTextEditorInstance.current!.selection.getEnd(),
                     richTextEditorRange.endOffset
                 ),
                 start: determineAbsoluteSymbolOffsetFromHTML(
-                    richTextEditorInstance!.getBody(),
-                    richTextEditorInstance!.selection.getStart(),
+                    richTextEditorInstance.current!.getBody(),
+                    richTextEditorInstance.current!.selection.getStart(),
                     richTextEditorRange.startOffset
                 )
             })
@@ -1003,22 +1005,21 @@ export const GenericInputInner = function<Type = unknown>(
      * @param instance - Code editor instance.
      * @returns Nothing.
      */
-    const setCodeEditorReference = (instance?:CodeEditorType):void => {
-        codeEditorReference = instance
+    const setCodeEditorReference = (instance:CodeEditorType|null):void => {
+        codeEditorReference.current = instance
 
-        if (codeEditorReference?.editor?.container?.querySelector('textarea'))
-            codeEditorInputReference = {
-                current: codeEditorReference.editor.container
-                    .querySelector('textarea') || undefined
-            }
+        if (codeEditorReference.current?.editor?.container?.querySelector('textarea'))
+            codeEditorInputReference.current =
+                codeEditorReference.current.editor.container
+                    .querySelector('textarea')
 
         if (
-            codeEditorReference &&
+            codeEditorReference.current &&
             properties.editorIsActive &&
             editorState.selectionIsUnstable
         ) {
-            codeEditorReference.editor.textInput.focus()
-            setCodeEditorSelectionState(codeEditorReference)
+            codeEditorReference.current.editor.textInput.focus()
+            setCodeEditorSelectionState(codeEditorReference.current)
             setEditorState({...editorState, selectionIsUnstable: false})
         }
     }
@@ -1027,15 +1028,17 @@ export const GenericInputInner = function<Type = unknown>(
      * @param instance - Editor instance.
      * @returns Nothing.
      */
-    const setRichTextEditorReference = (instance?:RichTextEditorComponent):void => {
-        richTextEditorReference = instance
+    const setRichTextEditorReference = (
+        instance:null|RichTextEditorComponent
+    ):void => {
+        richTextEditorReference.current = instance
 
         /*
             Refer inner element here is possible but marked as private.
 
-            if (richTextEditorReference?.elementRef)
-                richTextEditorInputReference =
-                    richTextEditorReference.elementRef
+            if (richTextEditorReference.current?.elementRef)
+                richTextEditorInputReference.current =
+                    richTextEditorReference.current.elementRef
         */
     }
     // / endregion
@@ -1428,7 +1431,8 @@ export const GenericInputInner = function<Type = unknown>(
     // endregion
     // region properties
     // / region references
-    let codeEditorReference:CodeEditorType|undefined
+    const codeEditorReference:MutableRefObject<CodeEditorType|null> =
+        useRef<CodeEditorType>(null)
     let codeEditorInputReference:MutableRefObject<HTMLTextAreaElement|null> =
         useRef<HTMLTextAreaElement>(null)
     const foundationReference:MutableRefObject<
@@ -1437,11 +1441,14 @@ export const GenericInputInner = function<Type = unknown>(
     const inputReference:MutableRefObject<
         HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement|null
     > = useRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>(null)
-    let richTextEditorInputReference:MutableRefObject<
+    const richTextEditorInputReference:MutableRefObject<
         HTMLTextAreaElement|null
     > = useRef<HTMLTextAreaElement>(null)
-    let richTextEditorInstance:RichTextEditor|undefined
-    let richTextEditorReference:RichTextEditorComponent|undefined
+    const richTextEditorInstance:MutableRefObject<null|RichTextEditor> =
+        useRef<RichTextEditor>(null)
+    const richTextEditorReference:MutableRefObject<
+        null|RichTextEditorComponent
+    > = useRef<RichTextEditorComponent>(null)
     const suggestionListAPIReference:MutableRefObject<ListApi|null> =
         useRef<ListApi>(null)
     const suggestionListFoundationReference:MutableRefObject<
@@ -1600,7 +1607,9 @@ export const GenericInputInner = function<Type = unknown>(
     // endregion
     // region render
     // / region intermediate render properties
-    const genericProperties:Partial<CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps> = {
+    const genericProperties:Partial<
+        CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
+    > = {
         onBlur: onBlur,
         onFocus: onFocus,
         placeholder: properties.placeholder,
@@ -1628,9 +1637,9 @@ export const GenericInputInner = function<Type = unknown>(
         placeholder: properties.placeholder,
         readonly: Boolean(properties.disabled),
         setup: (instance:RichTextEditor):void => {
-            richTextEditorInstance = instance
-            richTextEditorInstance.on('init', ():void => {
-                if (!richTextEditorInstance)
+            richTextEditorInstance.current = instance
+            richTextEditorInstance.current.on('init', ():void => {
+                if (!richTextEditorInstance.current)
                     return
 
                 richTextEditorLoadedOnce = true
@@ -1639,8 +1648,10 @@ export const GenericInputInner = function<Type = unknown>(
                     properties.editorIsActive &&
                     editorState.selectionIsUnstable
                 ) {
-                    richTextEditorInstance.focus(false)
-                    setRichTextEditorSelectionState(richTextEditorInstance)
+                    richTextEditorInstance.current.focus(false)
+                    setRichTextEditorSelectionState(
+                        richTextEditorInstance.current
+                    )
                     setEditorState(
                         {...editorState, selectionIsUnstable: false}
                     )
@@ -1673,14 +1684,14 @@ export const GenericInputInner = function<Type = unknown>(
     )
 
     const currentRenderableSuggestions:Array<ReactElement> = []
-    const currentSuggestions:Array<ReactElement> = []
-    // TODO: Support other forms of selection types or labels.
-    const useSuggestions:boolean =
+    const currentSuggestions:Array<string> = []
+    const useSuggestions:boolean = Boolean(
         properties.selection?.length &&
         (properties.searchSelection || properties.suggestSelection)
+    )
     if (useSuggestions) {
         let index:number = 0
-        for (const suggestion of properties.selection) {
+        for (const suggestion of properties.selection as Array<string>) {
             if (Tools.isFunction(properties.children)) {
                 const result:null|ReactElement =
                     properties.children({index, properties, suggestion})
@@ -1696,9 +1707,7 @@ export const GenericInputInner = function<Type = unknown>(
                 }
             } else if (
                 !properties.value ||
-                (suggestion as unknown as string).includes(
-                    properties.value as unknown as string
-                )
+                suggestion.includes(properties.representation)
             ) {
                 currentRenderableSuggestions.push(
                     <ListItem
@@ -1706,7 +1715,7 @@ export const GenericInputInner = function<Type = unknown>(
                         dangerouslySetInnerHTML={{
                             __html: Tools.stringMark(
                                 suggestion,
-                                properties.value?.split(' ') || '',
+                                properties.representation?.split(' ') || '',
                                 (value:string):string => `${value}`.toLowerCase(),
                                 '<span class="' +
                                 styles['generic-input__suggestions__suggestion__mark'] +
@@ -1746,17 +1755,22 @@ export const GenericInputInner = function<Type = unknown>(
                 {...genericProperties as SelectProps}
                 {...materialProperties as SelectProps}
                 enhanced
-                foundationRef={foundationReference}
-                inputRef={inputReference}
+                foundationRef={foundationReference as
+                    MutableRefObject<MDCSelectFoundation|null>
+                }
+                inputRef={inputReference as
+                    unknown as
+                    (reference:HTMLSelectElement|null) => void
+                }
+                onChange={onChangeValue}
+                options={normalizeSelection(
+                    properties.selection, properties.labels
+                ) as SelectProps['options']}
                 rootProps={{
                     name: properties.name,
                     onClick: onClick,
                     ...properties.rootProps
                 }}
-                onChange={onChangeValue}
-                options={normalizeSelection(
-                    properties.selection, properties.labels
-                ) as SelectProps['options']}
             />,
             useSelection
         )}
@@ -1913,9 +1927,13 @@ export const GenericInputInner = function<Type = unknown>(
                     )}
                     align={properties.align}
                     characterCount
-                    foundationRef={foundationReference}
+                    foundationRef={foundationReference as
+                        MutableRefObject<MDCTextFieldFoundation|null>
+                    }
                     fullwidth={properties.fullWidth}
-                    inputRef={inputReference}
+                    inputRef={inputReference as
+                        MutableRefObject<HTMLInputElement|null>
+                    }
                     onChange={onChangeValue}
                     ripple={properties.ripple}
                     rootProps={{
@@ -1936,12 +1954,17 @@ export const GenericInputInner = function<Type = unknown>(
                 />
                 {wrapAnimationConditionally(
                     <List
-                        apiRef={suggestionListAPIReference}
+                        apiRef={suggestionListAPIReference as
+                            unknown as
+                            (apiReference:ListApi|null) => void
+                        }
                         className={styles['generic-input__suggestions']}
                         foundationRef={suggestionListFoundationReference}
                         onAction={(event:ListOnActionEventT) => {
                             onChangeValue(
-                                currentSuggestions[event.detail.index]
+                                currentSuggestions[event.detail.index] as
+                                    unknown as
+                                    Type
                             )
                             setIsSuggestionOpen(false)
                         }}
@@ -1951,8 +1974,9 @@ export const GenericInputInner = function<Type = unknown>(
                         {currentRenderableSuggestions}
                     </List>,
                     isSuggestionOpen &&
-                    currentSuggestions.length &&
-                    !properties.selection.includes(properties.value)
+                    Boolean(currentSuggestions.length) &&
+                    !(properties.selection as Array<string>)
+                        .includes(properties.representation as string)
                 )}
             </div>,
             !(isAdvancedEditor || useSelection),

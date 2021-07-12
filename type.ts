@@ -537,19 +537,19 @@ export type InputAdapter<T = unknown> = ComponentAdapter<
 >
 export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T> {
     references:{
-        codeEditorReference?:CodeEditorType
+        codeEditorReference:MutableRefObject<CodeEditorType|null>
         codeEditorInputReference:MutableRefObject<HTMLTextAreaElement|null>
-        foundationRef:MutableRefObject<
+        foundationReference:MutableRefObject<
             MDCSelectFoundation|MDCTextFieldFoundation|null
         >
         inputReference:MutableRefObject<
             HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement|null
         >
         richTextEditorInputReference:MutableRefObject<HTMLTextAreaElement|null>
-        richTextEditorInstance?:RichTextEditor
-        richTextEditorReference?:RichTextEditorComponent
-        suggestionListAPIReference?:MutableRefObject<ListApi|null>
-        suggestionListFoundationReference?:MutableRefObject<
+        richTextEditorInstance:MutableRefObject<RichTextEditor|null>
+        richTextEditorReference:MutableRefObject<RichTextEditorComponent|null>
+        suggestionListAPIReference:MutableRefObject<ListApi|null>
+        suggestionListFoundationReference:MutableRefObject<
             MDCListFoundation|null
         >
     }

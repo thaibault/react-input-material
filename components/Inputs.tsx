@@ -223,7 +223,8 @@ export const InputsInner = function<
         // NOTE: Indicates to be filled later from state.
         givenProperties.value = []
 
-    const references:Array<MutableRefObject<ComponentAdapter<P, State>>> = []
+    const references:Array<MutableRefObject<ComponentAdapter<P, State>|null>> =
+        []
 
     const properties:InputsProperties<T, P> =
         getConsolidatedProperties<InputsProps<T, P>, InputsProperties<T, P>>(
