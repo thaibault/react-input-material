@@ -24,8 +24,8 @@ import {
     ForwardedRef,
     forwardRef,
     memo as memorize,
+    MutableRefObject,
     ReactElement,
-    RefObject,
     useImperativeHandle,
     useEffect,
     useState
@@ -223,7 +223,8 @@ export const InputsInner = function<
         // NOTE: Indicates to be filled later from state.
         givenProperties.value = []
 
-    const references:Array<RefObject<ComponentAdapter<P, State>>> = []
+    const references:Array<MutableRefObject<ComponentAdapter<P, State>|null>> =
+        []
 
     const properties:InputsProperties<T, P> =
         getConsolidatedProperties<InputsProps<T, P>, InputsProperties<T, P>>(
@@ -315,7 +316,11 @@ export const InputsInner = function<
         properties.value?.length || 0,
         !controlled && values?.length || 0
     ); index += 1) {
-        const reference:RefObject<ComponentAdapter<P, State>> =
+        /*
+            NOTE: We cannot use "useRef" here since the number of calls would
+            be variable und therefor break the rules of hooks.
+        */
+        const reference:MutableRefObject<ComponentAdapter<P, State>|null> =
             createRef<ComponentAdapter<P, State>>()
         references.push(reference)
 

@@ -23,7 +23,7 @@ import {
     ForwardRefRenderFunction,
     FunctionComponent,
     ReactElement,
-    RefObject
+    MutableRefObject
 } from 'react'
 
 import {Renderable} from '../type'
@@ -32,9 +32,9 @@ import {Renderable} from '../type'
  * Generic strict wrapper component.
  */
 export const Dummy:FunctionComponent<any> & {isDummy:true} = forwardRef(
-    ((properties:Mapping<any>, reference:null|RefObject<any>):ReactElement =>
-        <div/>
-    ) as ForwardRefRenderFunction<any, Mapping<any>>
+    ((
+        properties:Mapping<any>, reference:null|MutableRefObject<any>
+    ):ReactElement => <div/>) as ForwardRefRenderFunction<any, Mapping<any>>
 ) as unknown as FunctionComponent<any> & {isDummy:true}
 Dummy.isDummy = true
 export const CodeEditor = Dummy

@@ -54,6 +54,25 @@ endregion */
 .generic-input__editor__label {
     top: 9px !important;
 }
+
+.generic-input__suggestions {
+    background-color: var(--mdc-theme-surface);
+    display: flex;
+    flex-direction: column;
+    margin-top: -30px;
+    opacity: .85;
+    overflow: hidden;
+    position: absolute;
+    z-index: 2;
+}
+
+.generic-input__suggestions__suggestion {
+    visibility: visible;
+}
+
+.generic-input__suggestions__suggestion__mark {
+    background-color: var(--mdc-theme-secondary);
+}
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:
 vim: foldmethod=marker foldmarker=region,endregion:

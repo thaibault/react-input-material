@@ -40,9 +40,9 @@ import {
     HTMLProps,
     KeyboardEvent,
     MouseEvent,
+    MutableRefObject,
     ReactElement,
     RefAttributes,
-    RefObject,
     Requireable,
     SyntheticEvent
 } from 'react'
@@ -52,9 +52,11 @@ import {Editor as RichTextEditor} from 'tinymce'
 import {
     ComponentAdapter, StaticWebComponent as StaticBaseWebComponent
 } from 'web-component-wrapper/type'
+import {MDCListFoundation} from '@material/list'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
 import {CardMediaProps} from '@rmwc/card'
+import {ListApi} from '@rmwc/list'
 import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
@@ -433,11 +435,15 @@ export type InputDataTransformation =
 // // endregion
 export interface InputModelState extends ModelState {
     invalidMaximum:boolean
-    invalidMaximumLength:boolean
     invalidMinimum:boolean
+
+    invalidMaximumLength:boolean
     invalidMinimumLength:boolean
-    invalidPattern:boolean
+
     invalidInvertedPattern:boolean
+    invalidPattern:boolean
+
+    invalidSelection:boolean
 }
 export interface InputModel<T = unknown> extends Model<T> {
     state:InputModelState
@@ -449,8 +455,16 @@ export interface InputValueState<T = unknown, MS = ModelState> extends
 }
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export interface InputProperties<T = unknown> extends InputModelState, Properties<T> {
+export type InputChildrenOptions<P> = {
+    index:number
+    properties:P
+    suggestion:string
+}
+export interface InputProperties<T = unknown> extends
+    InputModelState, Properties<T>
+{
     align:'end'|'start'
+    children:(options:InputChildrenOptions<this>) => null|ReactElement
     cursor:CursorState
     /*
         plain -> input field
@@ -486,6 +500,8 @@ export interface InputProperties<T = unknown> extends InputModelState, Propertie
     rows:number
     selectableEditor:boolean
     step:number
+    searchSelection:boolean
+    suggestSelection:boolean
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
     transformer:RecursivePartial<DataTransformSpecification<T>>
 }
@@ -521,15 +537,21 @@ export type InputAdapter<T = unknown> = ComponentAdapter<
 >
 export interface InputAdapterWithReferences<T = unknown> extends InputAdapter<T> {
     references:{
-        codeEditorReference?:CodeEditorType
-        codeEditorInputReference:RefObject<HTMLTextAreaElement>
-        foundationRef:RefObject<MDCSelectFoundation|MDCTextFieldFoundation>
-        inputReference:RefObject<
-            HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement
+        codeEditorReference:MutableRefObject<CodeEditorType|null>
+        codeEditorInputReference:MutableRefObject<HTMLTextAreaElement|null>
+        foundationReference:MutableRefObject<
+            MDCSelectFoundation|MDCTextFieldFoundation|null
         >
-        richTextEditorInputReference:RefObject<HTMLTextAreaElement>
-        richTextEditorInstance?:RichTextEditor
-        richTextEditorReference?:RichTextEditorComponent
+        inputReference:MutableRefObject<
+            HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement|null
+        >
+        richTextEditorInputReference:MutableRefObject<HTMLTextAreaElement|null>
+        richTextEditorInstance:MutableRefObject<RichTextEditor|null>
+        richTextEditorReference:MutableRefObject<RichTextEditorComponent|null>
+        suggestionListAPIReference:MutableRefObject<ListApi|null>
+        suggestionListFoundationReference:MutableRefObject<
+            MDCListFoundation|null
+        >
     }
 }
 
@@ -549,12 +571,17 @@ export const inputModelStatePropertyTypes:{
     [key in keyof InputModelState]:Requireable<boolean|symbol>
 } = {
     ...modelStatePropertyTypes,
-    invalidInvertedPattern: oneOfType([boolean, symbol]),
+
     invalidMaximum: oneOfType([boolean, symbol]),
-    invalidMaximumLength: oneOfType([boolean, symbol]),
     invalidMinimum: oneOfType([boolean, symbol]),
+
+    invalidMaximumLength: oneOfType([boolean, symbol]),
     invalidMinimumLength: oneOfType([boolean, symbol]),
-    invalidPattern: oneOfType([boolean, symbol])
+
+    invalidInvertedPattern: oneOfType([boolean, symbol]),
+    invalidPattern: oneOfType([boolean, symbol]),
+
+    invalidSelection: oneOfType([boolean, symbol])
 } as const
 export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -617,12 +644,17 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
 } as const
 export const defaultInputModelState:InputModelState = {
     ...defaultModelState,
-    invalidInvertedPattern: false,
+
     invalidMaximum: false,
-    invalidMaximumLength: false,
     invalidMinimum: false,
+
+    invalidMaximumLength: false,
     invalidMinimumLength: false,
-    invalidPattern: false
+
+    invalidInvertedPattern: false,
+    invalidPattern: false,
+
+    invalidSelection: false
 } as const
 export const defaultInputModel:InputModel<string> = {
     ...defaultModel as InputModel<string>,
@@ -741,11 +773,11 @@ export type FileInputAdapter = ComponentAdapter<
 >
 export interface FileInputAdapterWithReferences extends FileInputAdapter {
     references:{
-        deleteButtonReference:RefObject<HTMLButtonElement>
-        downloadLinkReference:RefObject<HTMLAnchorElement>
-        fileInputReference:RefObject<HTMLInputElement>
-        nameInputReference:RefObject<InputAdapter<string>>
-        uploadButtonReference:RefObject<HTMLButtonElement>
+        deleteButtonReference:MutableRefObject<HTMLButtonElement|null>
+        downloadLinkReference:MutableRefObject<HTMLAnchorElement|null>
+        fileInputReference:MutableRefObject<HTMLInputElement|null>
+        nameInputReference:MutableRefObject<InputAdapter<string>|null>
+        uploadButtonReference:MutableRefObject<HTMLButtonElement|null>
     }
 }
 
@@ -931,7 +963,7 @@ export type InputsAdapterWithReferences<
     T = unknown,
     P extends InputsPropertiesItem<T> = Properties<T>,
     RefType = unknown
-> = InputsAdapter<T, P> & {references:Array<RefObject<RefType>>}
+> = InputsAdapter<T, P> & {references:Array<MutableRefObject<RefType>>}
 
 export interface InputsComponent extends
     Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
@@ -1033,8 +1065,8 @@ export type IntervalAdapter =
     ComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
 export interface IntervalAdapterWithReferences extends IntervalAdapter {
     references:{
-        end:RefObject<InputAdapterWithReferences<number>>
-        start:RefObject<InputAdapterWithReferences<number>>
+        end:MutableRefObject<InputAdapterWithReferences<number>|null>
+        start:MutableRefObject<InputAdapterWithReferences<number>|null>
     }
 }
 

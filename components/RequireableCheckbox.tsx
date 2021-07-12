@@ -20,17 +20,17 @@
 import Tools from 'clientnode'
 import {FirstParameter} from 'clientnode/type'
 import {
-    createRef,
     FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardRefRenderFunction,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
+    MutableRefObject,
     ReactElement,
     RefCallback,
-    RefObject,
     SyntheticEvent,
     useImperativeHandle,
+    useRef,
     useState
 } from 'react'
 import {MDCCheckboxFoundation} from '@material/checkbox'
@@ -106,7 +106,7 @@ export function determineValidationState(
  * @returns React elements.
  */
 export const RequireableCheckboxInner = function(
-    props:Props, reference?:RefObject<Adapter>
+    props:Props, reference?:MutableRefObject<Adapter>
 ):ReactElement {
     // region property aggregation
     /**
@@ -321,10 +321,10 @@ export const RequireableCheckboxInner = function(
     // endregion
     // region properties
     // / region references
-    const inputReference:RefObject<HTMLInputElement> =
-        createRef<HTMLInputElement>()
-    const foundationRef:RefObject<MDCCheckboxFoundation> =
-        createRef<MDCCheckboxFoundation>()
+    const inputReference:MutableRefObject<HTMLInputElement|null> =
+        useRef<HTMLInputElement>(null)
+    const foundationRef:MutableRefObject<MDCCheckboxFoundation|null> =
+        useRef<MDCCheckboxFoundation>(null)
     // / endregion
     const givenProps:Props = translateKnownSymbols(props)
 
@@ -385,8 +385,8 @@ export const RequireableCheckboxInner = function(
         reference,
         ():Adapter & {
             references:{
-                foundationRef:RefObject<MDCCheckboxFoundation>
-                inputReference:RefObject<HTMLInputElement>
+                foundationRef:MutableRefObject<MDCCheckboxFoundation|null>
+                inputReference:MutableRefObject<HTMLInputElement|null>
             }
         } => ({
             properties,
@@ -416,14 +416,10 @@ export const RequireableCheckboxInner = function(
         <Checkbox
             checked={Boolean(properties.value)}
             disabled={properties.disabled}
-            foundationRef={
-                foundationRef as unknown as RefCallback<MDCCheckboxFoundation>
-            }
+            foundationRef={foundationRef}
             id={properties.id || properties.name}
             indeterminate={properties.value === null}
-            inputRef={
-                inputReference as unknown as RefCallback<HTMLInputElement>
-            }
+            inputRef={inputReference}
             label={(
                 properties.invalid &&
                 (
