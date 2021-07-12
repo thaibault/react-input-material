@@ -20,6 +20,7 @@
 import Tools from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import {
+    createRef,
     ForwardedRef,
     forwardRef,
     memo as memorize,
@@ -27,7 +28,6 @@ import {
     ReactElement,
     useImperativeHandle,
     useEffect,
-    useRef,
     useState
 } from 'react'
 import {ComponentAdapter} from 'web-component-wrapper/type'
@@ -316,8 +316,12 @@ export const InputsInner = function<
         properties.value?.length || 0,
         !controlled && values?.length || 0
     ); index += 1) {
+        /*
+            NOTE: We cannot use "useRef" here since the number of calls would
+            be variable und therefor break the rules of hooks.
+        */
         const reference:MutableRefObject<ComponentAdapter<P, State>|null> =
-            useRef<ComponentAdapter<P, State>>(null)
+            createRef<ComponentAdapter<P, State>>()
         references.push(reference)
 
         if (!properties.value)
