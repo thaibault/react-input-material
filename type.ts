@@ -498,9 +498,9 @@ export interface InputProperties<T = unknown> extends
     placeholder:string
     representation:string
     rows:number
+    searchSelection:boolean
     selectableEditor:boolean
     step:number
-    searchSelection:boolean
     suggestSelection:boolean
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
     transformer:RecursivePartial<DataTransformSpecification<T>>
@@ -637,8 +637,10 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     placeholder: string,
     representation: oneOfType([string, symbol]),
     rows: number,
+    searchSelection: boolean,
     selectableEditor: boolean,
     step: number,
+    suggestSelection: boolean,
     trailingIcon: any,
     transformer: object
 } as const
@@ -683,8 +685,10 @@ export const defaultInputProperties:DefaultInputProperties = {
     patternText:
         'Your string have to match the regular expression: "${pattern}".',
     rows: 4,
+    searchSelection: false,
     selectableEditor: false,
-    step: 1
+    step: 1,
+    suggestSelection: false
 } as const
 // // endregion
 // / endregion
