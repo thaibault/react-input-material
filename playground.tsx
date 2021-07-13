@@ -427,16 +427,24 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     declaration: 'selection',
                     description: 'input12ModelDescription',
                     name: 'input12Model',
-                    nullable: false,
-                    selection: [
-                        'hans with veeeeeeeeeeeeeeeery loooooooooooooooong second name',
-                        'peter',
-                        'klaus'
-                    ]
+                    nullable: false
                 })}
                 onChange={onChange}
                 placeholder="input12ModelPlaceholder"
                 searchSelection
+                suggestionCreator={useMemorizedValue(
+                    async (query:string):Promise<Array<string>> => {
+                        await Tools.timeout(500)
+                        return [
+                            'hans with veeeeeeeeeeeeeeeery ' +
+                            'loooooooooooooooong second name',
+                            'peter',
+                            'klaus'
+                        ].filter((name:string):boolean =>
+                            !query || name.includes(query)
+                        )
+                    }
+                )}
             />
 
             <hr/>
