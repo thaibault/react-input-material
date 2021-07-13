@@ -100,6 +100,7 @@ import {
     InputProperties as Properties,
     inputPropertyTypes as propertyTypes,
     InputProps as Props,
+    inputRenderProperties as renderProperties,
     InputState as State,
     InputModel as Model,
     NativeInputType,
@@ -2061,6 +2062,7 @@ GenericInput.defaultProperties = {
 }
 GenericInput.locales = Tools.locales
 GenericInput.propTypes = propertyTypes
+GenericInput.renderProperties = renderProperties
 GenericInput.strict = false
 GenericInput.transformer = {
     boolean: {
