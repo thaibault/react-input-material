@@ -442,8 +442,6 @@ export interface InputModelState extends ModelState {
 
     invalidInvertedPattern:boolean
     invalidPattern:boolean
-
-    invalidSelection:boolean
 }
 export interface InputModel<T = unknown> extends Model<T> {
     state:InputModelState
@@ -455,10 +453,14 @@ export interface InputValueState<T = unknown, MS = ModelState> extends
 }
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export type InputChildrenOptions<P> = {
+export interface InputChildrenOptions<P> {
     index:number
     properties:P
     suggestion:string
+}
+export interface SuggestionCreatorOptions<P> {
+    properties:P
+    query:string
 }
 export interface InputProperties<T = unknown> extends
     InputModelState, Properties<T>
@@ -501,7 +503,8 @@ export interface InputProperties<T = unknown> extends
     searchSelection:boolean
     selectableEditor:boolean
     step:number
-    suggestionCreator?:(query:string) => Promise<Array<string>>
+    suggestionCreator?:(options:SuggestionCreatorOptions<this>) =>
+        Promise<InputProperties['selection']>
     suggestSelection:boolean
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
     transformer:RecursivePartial<DataTransformSpecification<T>>
@@ -580,9 +583,7 @@ export const inputModelStatePropertyTypes:{
     invalidMinimumLength: oneOfType([boolean, symbol]),
 
     invalidInvertedPattern: oneOfType([boolean, symbol]),
-    invalidPattern: oneOfType([boolean, symbol]),
-
-    invalidSelection: oneOfType([boolean, symbol])
+    invalidPattern: oneOfType([boolean, symbol])
 } as const
 export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -658,9 +659,7 @@ export const defaultInputModelState:InputModelState = {
     invalidMinimumLength: false,
 
     invalidInvertedPattern: false,
-    invalidPattern: false,
-
-    invalidSelection: false
+    invalidPattern: false
 } as const
 export const defaultInputModel:InputModel<string> = {
     ...defaultModel as InputModel<string>,

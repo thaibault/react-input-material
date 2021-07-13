@@ -186,14 +186,73 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 }
 // endregion
 // region static helper
+export function getLabels(
+    selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
+):Array<string> {
+    if (Array.isArray(selection)) {
+        const labels:Array<string> = []
+
+        for (const value of selection)
+            if (['number', 'string'].includes(typeof value))
+                labels.push(`${value}`)
+            else if (typeof (value as {label:string})?.label === 'string')
+                labels.push((value as {label:string}).label)
+            else if (['number', 'string'].includes(
+                typeof (value as {value:string})?.value
+            ))
+                labels.push(`${(value as {value:string}).value}`)
+
+        return labels
+    }
+
+    if (selection !== null && typeof selection === 'object')
+        return Object.values(selection).sort()
+
+    return []
+}
+export function getValueFromSelection<T>(
+    label:string,
+    selection:SelectProps['options']|Array<{label?:string;value:unknown}>
+):null|T {
+    if (Array.isArray(selection))
+        for (const value of selection) {
+            if (
+                ['number', 'string'].includes(typeof value) &&
+                `${value}` === label
+            )
+                return value as unknown as T
+
+            if (
+                typeof (value as {label:string})?.label === 'string' &&
+                (value as {label:string}).label === label
+            )
+                return (value as {value:T}).value
+
+            if (
+                ['number', 'string'].includes(
+                    typeof (value as {value:string})?.value
+                ) &&
+                `${(value as {value:string}).value}` === label
+            )
+                return (value as {value:T}).value
+        }
+
+    if (selection !== null && typeof selection === 'object')
+        for (const [value, selectionLabel] of Object.entries(selection))
+            if (selectionLabel === label)
+                return value as unknown as T
+
+    return null
+}
 export function normalizeSelection(
     selection?:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:any}>,
     labels?:Array<string>|Mapping
-):SelectProps['options']|Array<{label?:string;value:any}> {
+):SelectProps['options']|Array<{label?:string;value:any}>|undefined {
     if (!selection) {
         selection = labels
         labels = undefined
     }
+
     if (Array.isArray(selection) && selection.length) {
         const result:Array<FormattedSelectionOption> = []
         let index:number = 0
@@ -233,6 +292,7 @@ export function normalizeSelection(
             }
         selection = result
     }
+
     if (labels !== null && typeof labels === 'object') {
         if (Array.isArray(selection)) {
             const result:Array<FormattedSelectionOption> = []
@@ -269,10 +329,14 @@ export function normalizeSelection(
                 (labels as Mapping)[value] as string :
                 label
     }
-    return selection as SelectProps['options']
+
+    return selection as
+        SelectProps['options']|Array<{label?:string;value:any}>|undefined
 }
 export function determineValidationState<T>(
-    properties:DefaultProperties<T>, currentState:Partial<ModelState>
+    properties:DefaultProperties<T>,
+    currentState:Partial<ModelState>,
+    suggestions:Array<string>
 ):boolean {
     return determineBaseValidationState<
         DefaultProperties<T>, Partial<ModelState>
@@ -335,13 +399,6 @@ export function determineValidationState<T>(
                     !properties.model.regularExpressionPattern
                         .test(properties.model.value)
                 )
-            ),
-
-            invalidSelection: ():boolean => (
-                Boolean(properties.searchSelection) &&
-                !((properties.selection as Array<string>)?.includes(
-                    properties.representation as string
-                ))
             )
         }
     )
@@ -946,7 +1003,7 @@ export const GenericInputInner = function<Type = unknown>(
             result, result.model.value as null|Type, transformer
         )
 
-        determineValidationState<Type>(result, result.model.state)
+        determineValidationState<Type>(result, result.model.state, suggestions)
 
         return result
     }
@@ -1074,12 +1131,14 @@ export const GenericInputInner = function<Type = unknown>(
             stateChanged = true
         }
 
-        properties.value = parseValue<Type>(
-            properties, properties.value as null|Type, transformer
-        )
-        properties.representation = formatValue<Type>(
-            properties, properties.value as null|Type, transformer
-        )
+        if (!useSuggestions || properties.suggestSelection) {
+            properties.value = parseValue<Type>(
+                properties, properties.value as null|Type, transformer
+            )
+            properties.representation = formatValue<Type>(
+                properties, properties.value as null|Type, transformer
+            )
+        }
 
         if (
             oldValueState.value !== properties.value ||
@@ -1118,7 +1177,7 @@ export const GenericInputInner = function<Type = unknown>(
             {
                 modelState: properties.model.state,
                 representation: properties.representation,
-                value: properties.value
+                value: properties.value as null|Type
             } :
             oldValueState
     })
@@ -1205,7 +1264,13 @@ export const GenericInputInner = function<Type = unknown>(
     }
     /**
      * Triggered when ever the value changes.
+     * Takes a given value or determines it from given event object and
+     * generates new value state (internal value, representation and validation
+     * states). Derived event handler will be triggered when internal state
+     * has been consolidated.
      * @param eventOrValue - Event object or new value.
+     * @param editorInstance - Potential editor instance if triggered from a
+     * rich text or code editor.
      * @returns Nothing.
      */
     const onChangeValue = (
@@ -1213,6 +1278,7 @@ export const GenericInputInner = function<Type = unknown>(
     ):void => {
         if (properties.disabled)
             return
+
         let event:GenericEvent|undefined
         if (eventOrValue !== null && typeof eventOrValue === 'object') {
             const target:any =
@@ -1227,21 +1293,17 @@ export const GenericInputInner = function<Type = unknown>(
         } else
             properties.value = eventOrValue as null|Type
 
-        setValueState((
+        const setHelper = ():void => setValueState((
             oldValueState:ValueState<Type, ModelState>
         ):ValueState<Type, ModelState> => {
-            properties.representation = typeof properties.value === 'string' ?
-                properties.value :
-                formatValue<Type>(
-                    properties, properties.value as null|Type, transformer
-                )
-            properties.value = parseValue<Type>(
-                properties, properties.value as null|Type, transformer
-            )
-
             if (
                 !representationControlled &&
-                oldValueState.representation === properties.representation
+                oldValueState.representation === properties.representation &&
+                /*
+                    NOTE: Unstable intermediate states have to be synced of a
+                    suggestion creator was pending.
+                */
+                !properties.suggestionCreator
             )
                 /*
                     NOTE: No representation update and no controlled value or
@@ -1266,7 +1328,7 @@ export const GenericInputInner = function<Type = unknown>(
                 */
                 return valueState
 
-            valueState.value = properties.value
+            valueState.value = properties.value as null|Type
 
             let stateChanged:boolean = false
 
@@ -1279,7 +1341,9 @@ export const GenericInputInner = function<Type = unknown>(
             onChange(event)
 
             if (determineValidationState<Type>(
-                properties as DefaultProperties<Type>, oldValueState.modelState
+                properties as DefaultProperties<Type>,
+                oldValueState.modelState,
+                suggestions
             ))
                 stateChanged = true
 
@@ -1305,15 +1369,73 @@ export const GenericInputInner = function<Type = unknown>(
                 )
             }
 
-            // region retrieve suggestions
-            if (properties.suggestionCreator)
-                properties.suggestionCreator(
-                    valueState.value as unknown as string
-                ).then((results:Array<string>):void => setSuggestions(results))
-            // endregion
-
             return valueState
         })
+
+        properties.representation = typeof properties.value === 'string' ?
+            properties.value :
+            formatValue<Type>(
+                properties, properties.value as null|Type, transformer
+            )
+
+        if (!useSuggestions) {
+            properties.value = parseValue<Type>(
+                properties, properties.value as null|Type, transformer
+            )
+
+            setHelper()
+        } else if (properties.suggestionCreator) {
+            /*
+                NOTE: Immediate sync current representation to maintain cursor
+                state.
+            */
+            setValueState((
+                oldValueState:ValueState<Type, ModelState>
+            ):ValueState<Type, ModelState> => ({
+                ...oldValueState, representation: properties.representation
+            }))
+
+            /*
+                Trigger asynchronous suggestions retrieving and delayed state
+                consolidation.
+            */
+            properties.suggestionCreator({
+                properties, query: properties.representation
+            }).then((results:Properties['selection']):void => {
+                setSelection(results)
+
+                const result:null|Type = getValueFromSelection<Type>(
+                    properties.representation, normalizeSelection(results)
+                )
+
+                if (result !== null || properties.searchSelection)
+                    properties.value = result
+                else
+                    properties.value = parseValue<Type>(
+                        properties,
+                        properties.representation as unknown as null|Type,
+                        transformer
+                    )
+
+                setHelper()
+            })
+        } else {
+            // Map value from given selections and trigger state consolidation.
+            const result:null|Type = getValueFromSelection<Type>(
+                properties.representation, normalizedSelection
+            )
+
+            if (result !== null || properties.searchSelection)
+                properties.value = result
+            else
+                properties.value = parseValue<Type>(
+                    properties,
+                    properties.representation as unknown as null|Type,
+                    transformer
+                )
+
+            setHelper()
+        }
     }
     /**
      * Triggered on click events.
@@ -1544,8 +1666,11 @@ export const GenericInputInner = function<Type = unknown>(
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
 
-    const [suggestions, setSuggestions] =
-        useState<Array<string>>(properties.selection as Array<string> || [])
+    const [selection, setSelection] =
+        useState<Properties['selection']>(properties.selection)
+    const normalizedSelection:SelectProps['options']|Array<{label?:string;value:any}>|undefined =
+        normalizeSelection(selection, properties.labels)
+    const suggestions:Array<string> = getLabels(normalizedSelection)
 
     if (properties.hidden === undefined)
         properties.hidden = properties.name?.startsWith('password')
@@ -1701,10 +1826,13 @@ export const GenericInputInner = function<Type = unknown>(
     const currentSuggestions:Array<string> = []
     const useSuggestions:boolean = Boolean(
         properties.suggestionCreator ||
-        properties.selection?.length &&
+        suggestions.length &&
         (properties.searchSelection || properties.suggestSelection)
     )
     if (useSuggestions && suggestions.length) {
+        // NOTE: Create consistent property configuration.
+        properties.suggestSelection = !properties.searchSelection
+
         let index:number = 0
         for (const suggestion of suggestions) {
             if (Tools.isFunction(properties.children)) {
@@ -1725,7 +1853,7 @@ export const GenericInputInner = function<Type = unknown>(
                     currentSuggestions.push(suggestion)
                 }
             } else if (
-                !properties.value ||
+                !properties.representation ||
                 properties.suggestionCreator ||
                 suggestion.includes(properties.representation)
             ) {
@@ -1755,7 +1883,7 @@ export const GenericInputInner = function<Type = unknown>(
         }
     }
     const useSelection:boolean =
-        (Boolean(properties.selection) || Boolean(properties.labels)) &&
+        (Boolean(normalizedSelection) || Boolean(properties.labels)) &&
         !useSuggestions
     // / endregion
     // / region main markup
@@ -1786,9 +1914,7 @@ export const GenericInputInner = function<Type = unknown>(
                     (reference:HTMLSelectElement|null) => void
                 }
                 onChange={onChangeValue}
-                options={normalizeSelection(
-                    properties.selection, properties.labels
-                ) as SelectProps['options']}
+                options={normalizedSelection as SelectProps['options']}
                 rootProps={{
                     name: properties.name,
                     onClick: onClick,
@@ -1921,8 +2047,8 @@ export const GenericInputInner = function<Type = unknown>(
                             onSelect={(event:MenuOnSelectEventT):void => {
                                 onChangeValue(
                                     currentSuggestions[event.detail.index] as
-                                    unknown as
-                                    Type
+                                        unknown as
+                                        Type
                                 )
                                 setIsSuggestionOpen(false)
                             }}
