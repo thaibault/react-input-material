@@ -1836,8 +1836,12 @@ export const GenericInputInner = function<Type = unknown>(
         let index:number = 0
         for (const suggestion of suggestions) {
             if (Tools.isFunction(properties.children)) {
-                const result:null|ReactElement =
-                    properties.children({index, properties, suggestion})
+                const result:null|ReactElement = properties.children({
+                    index,
+                    properties,
+                    query: properties.representation,
+                    suggestion
+                })
 
                 if (result) {
                     currentRenderableSuggestions.push(
