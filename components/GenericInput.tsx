@@ -213,7 +213,7 @@ export function getLabels(
 export function getValueFromSelection<T>(
     label:string,
     selection:SelectProps['options']|Array<{label?:string;value:unknown}>
-):T {
+):null|T {
     if (Array.isArray(selection))
         for (const value of selection) {
             if (
@@ -242,7 +242,7 @@ export function getValueFromSelection<T>(
             if (selectionLabel === label)
                 return value as unknown as T
 
-    return label as unknown as T
+    return null
 }
 export function normalizeSelection(
     selection?:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:any}>,
@@ -399,11 +399,6 @@ export function determineValidationState<T>(
                     !properties.model.regularExpressionPattern
                         .test(properties.model.value)
                 )
-            ),
-
-            invalidSelection: ():boolean => (
-                Boolean(properties.searchSelection) &&
-                !(suggestions.includes(properties.representation!))
             )
         }
     )
@@ -1290,18 +1285,9 @@ export const GenericInputInner = function<Type = unknown>(
         } else
             properties.value = eventOrValue as null|Type
 
-        setValueState((
+        const set = ():void => setValueState((
             oldValueState:ValueState<Type, ModelState>
         ):ValueState<Type, ModelState> => {
-            properties.representation = typeof properties.value === 'string' ?
-                properties.value :
-                formatValue<Type>(
-                    properties, properties.value as null|Type, transformer
-                )
-            properties.value = parseValue<Type>(
-                properties, properties.value as null|Type, transformer
-            )
-
             if (
                 !representationControlled &&
                 oldValueState.representation === properties.representation
@@ -1329,7 +1315,7 @@ export const GenericInputInner = function<Type = unknown>(
                 */
                 return valueState
 
-            valueState.value = properties.value
+            valueState.value = properties.value as null|Type
 
             let stateChanged:boolean = false
 
@@ -1370,18 +1356,33 @@ export const GenericInputInner = function<Type = unknown>(
                 )
             }
 
-            // region retrieve suggestions
-            if (properties.suggestionCreator)
-                properties.suggestionCreator({
-                    properties,
-                    query: properties.representation,
-                }).then((results:Properties['selection']):void =>
-                    setSelection(results)
-                )
-            // endregion
-
             return valueState
         })
+
+         properties.representation = typeof properties.value === 'string' ?
+            properties.value :
+            formatValue<Type>(
+                properties, properties.value as null|Type, transformer
+            )
+
+        if (!useSuggestions || properties.suggestSelection) {
+            properties.value = parseValue<Type>(
+                properties, properties.value as null|Type, transformer
+            )
+
+            set()
+        } else if (properties.suggestionCreator)
+            properties.suggestionCreator({
+                properties, query: properties.representation
+            }).then((results:Properties['selection']):void => {
+                setSelection(results)
+
+                properties.value = getValueFromSelection<Type>(
+                    properties.representation, normalizedSelection
+                )
+
+                set()
+            })
     }
     /**
      * Triggered on click events.
@@ -1609,15 +1610,14 @@ export const GenericInputInner = function<Type = unknown>(
 
     deriveMissingPropertiesFromState()
 
-    const [selection, setSelection] = useState<Properties['selection']>(
-        givenProperties.selection || givenProperties.model?.selection
-    )
-    const normalizedSelection:SelectProps['options']|Array<{label?:string;value:any}>|undefined =
-        normalizeSelection(selection, givenProperties.labels)
-    const suggestions:Array<string> = getLabels(normalizedSelection)
-
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
+
+    const [selection, setSelection] =
+        useState<Properties['selection']>(properties.selection)
+    const normalizedSelection:SelectProps['options']|Array<{label?:string;value:any}>|undefined =
+        normalizeSelection(selection, properties.labels)
+    const suggestions:Array<string> = getLabels(normalizedSelection)
 
     if (properties.hidden === undefined)
         properties.hidden = properties.name?.startsWith('password')
@@ -1777,6 +1777,9 @@ export const GenericInputInner = function<Type = unknown>(
         (properties.searchSelection || properties.suggestSelection)
     )
     if (useSuggestions && suggestions.length) {
+        // NOTE: Create consistent property configuration.
+        properties.suggestSelection = !properties.searchSelection
+
         let index:number = 0
         for (const suggestion of suggestions) {
             if (Tools.isFunction(properties.children)) {
@@ -1989,10 +1992,11 @@ export const GenericInputInner = function<Type = unknown>(
                             foundationRef={suggestionMenuFoundationReference}
                             onFocus={onFocus}
                             onSelect={(event:MenuOnSelectEventT):void => {
-                                onChangeValue(getValueFromSelection<Type>(
-                                    currentSuggestions[event.detail.index],
-                                    normalizedSelection
-                                ))
+                                onChangeValue(
+                                    currentSuggestions[event.detail.index] as
+                                        unknown as
+                                        Type
+                                )
                                 setIsSuggestionOpen(false)
                             }}
                             open={

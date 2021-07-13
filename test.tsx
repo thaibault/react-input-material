@@ -164,7 +164,8 @@ describe('GenericInput', ():void => {
         ['a', 'a', ['b', 'a']],
         [1, 'a', [{label: 'a', value: 1}, {label: 'b', value: 2}]],
         ['b', 'b', [{label: 'a', value: 1}, {value: 'b'}]],
-        [2, '2', [{label: 'a', value: 1}, {value: 2}]]
+        [2, '2', [{label: 'a', value: 1}, {value: 2}]],
+        [null, '2', [{label: 'a', value: 1}]]
     )
     testEach<typeof normalizeSelection>(
         'normalizeSelection',

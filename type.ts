@@ -442,8 +442,6 @@ export interface InputModelState extends ModelState {
 
     invalidInvertedPattern:boolean
     invalidPattern:boolean
-
-    invalidSelection:boolean
 }
 export interface InputModel<T = unknown> extends Model<T> {
     state:InputModelState
@@ -585,9 +583,7 @@ export const inputModelStatePropertyTypes:{
     invalidMinimumLength: oneOfType([boolean, symbol]),
 
     invalidInvertedPattern: oneOfType([boolean, symbol]),
-    invalidPattern: oneOfType([boolean, symbol]),
-
-    invalidSelection: oneOfType([boolean, symbol])
+    invalidPattern: oneOfType([boolean, symbol])
 } as const
 export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     ...propertyTypes,
@@ -663,9 +659,7 @@ export const defaultInputModelState:InputModelState = {
     invalidMinimumLength: false,
 
     invalidInvertedPattern: false,
-    invalidPattern: false,
-
-    invalidSelection: false
+    invalidPattern: false
 } as const
 export const defaultInputModel:InputModel<string> = {
     ...defaultModel as InputModel<string>,
