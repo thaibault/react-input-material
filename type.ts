@@ -460,6 +460,10 @@ export type InputChildrenOptions<P> = {
     properties:P
     suggestion:string
 }
+export type SuggestionCreatorOptions<P> = {
+    properties:P
+    query:string
+}
 export interface InputProperties<T = unknown> extends
     InputModelState, Properties<T>
 {
@@ -501,7 +505,8 @@ export interface InputProperties<T = unknown> extends
     searchSelection:boolean
     selectableEditor:boolean
     step:number
-    suggestionCreator?:(query:string) => Promise<Array<string>>
+    suggestionCreator?:(options:SuggestionCreatorOptions<this>) =>
+        Promise<InputProperties['selection']>
     suggestSelection:boolean
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
     transformer:RecursivePartial<DataTransformSpecification<T>>

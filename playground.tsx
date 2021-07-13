@@ -433,7 +433,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 placeholder="input12ModelPlaceholder"
                 searchSelection
                 suggestionCreator={useMemorizedValue(
-                    async (query:string):Promise<Array<string>> => {
+                    async ({query}):Promise<Array<string>> => {
                         await Tools.timeout(500)
                         return [
                             'hans with veeeeeeeeeeeeeeeery ' +
@@ -470,7 +470,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 placeholder="input13ModelPlaceholder"
                 suggestionCreator={useMemorizedValue(
-                    async (query:string):Promise<Array<string>> => {
+                    async ({query}):Promise<Array<string>> => {
                         await Tools.timeout(500)
                         const selection:Mapping = {
                             a: 'hans with veeeeeeeeeeeeeeeery ' +

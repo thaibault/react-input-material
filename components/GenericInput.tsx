@@ -186,14 +186,37 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 }
 // endregion
 // region static helper
+export function getLabels(
+    selection?:SelectProps['options']|Array<{label?:string;value:any}>
+):Array<string> {
+    if (Array.isArray(selection)) {
+        const labels:Array<string> = []
+
+        for (const value of selection)
+            if (typeof value === 'string')
+                labels.push(value)
+            else if (typeof value?.label === 'string')
+                labels.push(value.label)
+            else if (['number', 'string'].includes(typeof value?.value))
+                labels.push(`${value.value}`)
+
+        return labels
+    }
+
+    if (selection !== null && typeof selection === 'object')
+        return Object.values(selection).sort()
+
+    return []
+}
 export function normalizeSelection(
     selection?:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:any}>,
     labels?:Array<string>|Mapping
-):SelectProps['options']|Array<{label?:string;value:any}> {
+):SelectProps['options']|Array<{label?:string;value:any}>|undefined {
     if (!selection) {
         selection = labels
         labels = undefined
     }
+
     if (Array.isArray(selection) && selection.length) {
         const result:Array<FormattedSelectionOption> = []
         let index:number = 0
@@ -233,6 +256,7 @@ export function normalizeSelection(
             }
         selection = result
     }
+
     if (labels !== null && typeof labels === 'object') {
         if (Array.isArray(selection)) {
             const result:Array<FormattedSelectionOption> = []
@@ -269,7 +293,9 @@ export function normalizeSelection(
                 (labels as Mapping)[value] as string :
                 label
     }
-    return selection as SelectProps['options']
+
+    return selection as
+        SelectProps['options']|Array<{label?:string;value:any}>|undefined
 }
 export function determineValidationState<T>(
     properties:DefaultProperties<T>, currentState:Partial<ModelState>
@@ -1307,9 +1333,12 @@ export const GenericInputInner = function<Type = unknown>(
 
             // region retrieve suggestions
             if (properties.suggestionCreator)
-                properties.suggestionCreator(
-                    valueState.value as unknown as string
-                ).then((results:Array<string>):void => setSuggestions(results))
+                properties.suggestionCreator({
+                    properties,
+                    query: properties.representation,
+                }).then((results:Properties['selection']):void =>
+                    setSelection(results)
+                )
             // endregion
 
             return valueState
@@ -1544,8 +1573,8 @@ export const GenericInputInner = function<Type = unknown>(
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
 
-    const [suggestions, setSuggestions] =
-        useState<Array<string>>(properties.selection as Array<string> || [])
+    const [selection, setSelection] =
+        useState<Properties['selection']>(properties.selection)
 
     if (properties.hidden === undefined)
         properties.hidden = properties.name?.startsWith('password')
@@ -1697,13 +1726,18 @@ export const GenericInputInner = function<Type = unknown>(
         )
     )
 
+    const selection:SelectProps['options']|Array<{label?:string;value:any}>|undefined =
+        normalizeSelection(selection, properties.labels)
+    const suggestions:Array<string> = getLabels(selection)
+
     const currentRenderableSuggestions:Array<ReactElement> = []
     const currentSuggestions:Array<string> = []
     const useSuggestions:boolean = Boolean(
         properties.suggestionCreator ||
-        properties.selection?.length &&
+        suggestions.length &&
         (properties.searchSelection || properties.suggestSelection)
     )
+    // TODO handle all selection cases
     if (useSuggestions && suggestions.length) {
         let index:number = 0
         for (const suggestion of suggestions) {
@@ -1786,9 +1820,7 @@ export const GenericInputInner = function<Type = unknown>(
                     (reference:HTMLSelectElement|null) => void
                 }
                 onChange={onChangeValue}
-                options={normalizeSelection(
-                    properties.selection, properties.labels
-                ) as SelectProps['options']}
+                options={selection}
                 rootProps={{
                     name: properties.name,
                     onClick: onClick,
