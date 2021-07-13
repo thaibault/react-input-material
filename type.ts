@@ -646,6 +646,8 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     trailingIcon: any,
     transformer: object
 } as const
+export const inputRenderProperties:Array<string> =
+    ['children', 'suggestionCreator']
 export const defaultInputModelState:InputModelState = {
     ...defaultModelState,
 
