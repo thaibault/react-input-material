@@ -380,6 +380,7 @@ export const GenericInputInner = function<Type = unknown>(
      * @returns Nothing.
      */
     useEffect(():void => {
+        // region text-editor selection synchronisation
         if (selectionIsUnstable || editorState.selectionIsUnstable)
             if (properties.editorIsActive) {
                 /*
@@ -419,6 +420,7 @@ export const GenericInputInner = function<Type = unknown>(
                         {...editorState, selectionIsUnstable: false}
                     )
             }
+        // endregion
     })
     // endregion
     // region context helper
@@ -1210,7 +1212,6 @@ export const GenericInputInner = function<Type = unknown>(
     ):void => {
         if (properties.disabled)
             return
-
         let event:GenericEvent|undefined
         if (eventOrValue !== null && typeof eventOrValue === 'object') {
             const target:any =
@@ -1251,7 +1252,7 @@ export const GenericInputInner = function<Type = unknown>(
                 */
                 return oldValueState
 
-            const result:ValueState<Type, ModelState> = {
+            const valueState:ValueState<Type, ModelState> = {
                 ...oldValueState, representation: properties.representation
             }
 
@@ -1262,9 +1263,9 @@ export const GenericInputInner = function<Type = unknown>(
                         -> No state update
                         -> Nothing to trigger
                 */
-                return result
+                return valueState
 
-            result.value = properties.value
+            valueState.value = properties.value
 
             let stateChanged:boolean = false
 
@@ -1291,7 +1292,7 @@ export const GenericInputInner = function<Type = unknown>(
             )
 
             if (stateChanged) {
-                result.modelState = properties.model.state
+                valueState.modelState = properties.model.state
 
                 triggerCallbackIfExists<Properties<Type>>(
                     properties,
@@ -1303,7 +1304,14 @@ export const GenericInputInner = function<Type = unknown>(
                 )
             }
 
-            return result
+            // region retrieve suggestions
+            if (properties.suggestionCreator)
+                properties.suggestionCreator(
+                    valueState.value as unknown as string
+                ).then((results:Array<string>):void => setSuggestions(results))
+            // endregion
+
+            return valueState
         })
     }
     /**
@@ -1535,6 +1543,9 @@ export const GenericInputInner = function<Type = unknown>(
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
 
+    const [suggestions, setSuggestions] =
+        useState<Array<string>>(properties.selection as Array<string> || [])
+
     if (properties.hidden === undefined)
         properties.hidden = properties.name?.startsWith('password')
     // region synchronize properties into state where values are not controlled
@@ -1688,12 +1699,13 @@ export const GenericInputInner = function<Type = unknown>(
     const currentRenderableSuggestions:Array<ReactElement> = []
     const currentSuggestions:Array<string> = []
     const useSuggestions:boolean = Boolean(
+        properties.suggestionCreator ||
         properties.selection?.length &&
         (properties.searchSelection || properties.suggestSelection)
     )
-    if (useSuggestions) {
+    if (useSuggestions && suggestions.length) {
         let index:number = 0
-        for (const suggestion of properties.selection as Array<string>) {
+        for (const suggestion of suggestions) {
             if (Tools.isFunction(properties.children)) {
                 const result:null|ReactElement =
                     properties.children({index, properties, suggestion})
@@ -1701,7 +1713,9 @@ export const GenericInputInner = function<Type = unknown>(
                 if (result) {
                     currentRenderableSuggestions.push(
                         <MenuItem
-                            className={styles['generic-input__suggestions__suggestion']}
+                            className={
+                                styles['generic-input__suggestions__suggestion']
+                            }
                             key={index}
                         >
                             {result}
@@ -1711,16 +1725,20 @@ export const GenericInputInner = function<Type = unknown>(
                 }
             } else if (
                 !properties.value ||
+                properties.suggestionCreator ||
                 suggestion.includes(properties.representation)
             ) {
                 currentRenderableSuggestions.push(
                     <MenuItem
-                        className={styles['generic-input__suggestions__suggestion']}
+                        className={
+                            styles['generic-input__suggestions__suggestion']
+                        }
                         dangerouslySetInnerHTML={{
                             __html: Tools.stringMark(
                                 suggestion,
                                 properties.representation?.split(' ') || '',
-                                (value:string):string => `${value}`.toLowerCase(),
+                                (value:string):string =>
+                                    `${value}`.toLowerCase(),
                                 '<span class="' +
                                 styles['generic-input__suggestions__suggestion__mark'] +
                                 '">{1}</span>'
