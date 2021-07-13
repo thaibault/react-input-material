@@ -456,6 +456,7 @@ export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|N
 export interface InputChildrenOptions<P> {
     index:number
     properties:P
+    query:string
     suggestion:string
 }
 export interface SuggestionCreatorOptions<P> {
