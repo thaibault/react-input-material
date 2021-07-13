@@ -476,7 +476,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 suggestionCreator={useMemorizedValue(
                     async ({query}:SuggestionCreatorOptions<InputProperties<
                         string
-                    >>):Promise<Array<string>> => {
+                    >>):Promise<Mapping> => {
                         await Tools.timeout(500)
 
                         const selection:Mapping = {
@@ -486,10 +486,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                             c: 'klaus'
                         }
 
-                        return Object.keys(selection)
-                            .filter((key:string):boolean =>
-                                !query || selection[key].includes(query)
-                            )
+                        const result:Mapping = {}
+                        for (const [key, value] of Object.entries(selection))
+                            if (!query || value.includes(query))
+                                result[key] = value
+                        return result
                     }
                 )}
             />

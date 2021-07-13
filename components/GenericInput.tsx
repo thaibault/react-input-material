@@ -187,7 +187,7 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 // endregion
 // region static helper
 export function getLabels(
-    selection?:SelectProps['options']|Array<{label?:string;value:any}>
+    selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
 ):Array<string> {
     if (Array.isArray(selection)) {
         const labels:Array<string> = []
@@ -1131,12 +1131,14 @@ export const GenericInputInner = function<Type = unknown>(
             stateChanged = true
         }
 
-        properties.value = parseValue<Type>(
-            properties, properties.value as null|Type, transformer
-        )
-        properties.representation = formatValue<Type>(
-            properties, properties.value as null|Type, transformer
-        )
+        if (!useSuggestions || properties.suggestSelection) {
+            properties.value = parseValue<Type>(
+                properties, properties.value as null|Type, transformer
+            )
+            properties.representation = formatValue<Type>(
+                properties, properties.value as null|Type, transformer
+            )
+        }
 
         if (
             oldValueState.value !== properties.value ||
@@ -1175,7 +1177,7 @@ export const GenericInputInner = function<Type = unknown>(
             {
                 modelState: properties.model.state,
                 representation: properties.representation,
-                value: properties.value
+                value: properties.value as null|Type
             } :
             oldValueState
     })
@@ -1262,7 +1264,13 @@ export const GenericInputInner = function<Type = unknown>(
     }
     /**
      * Triggered when ever the value changes.
+     * Takes a given value or determines it from given event object and
+     * generates new value state (internal value, representation and validation
+     * states). Derived event handler will be triggered when internal state
+     * has been consolidated.
      * @param eventOrValue - Event object or new value.
+     * @param editorInstance - Potential editor instance if triggered from a
+     * rich text or code editor.
      * @returns Nothing.
      */
     const onChangeValue = (
@@ -1285,12 +1293,17 @@ export const GenericInputInner = function<Type = unknown>(
         } else
             properties.value = eventOrValue as null|Type
 
-        const set = ():void => setValueState((
+        const setHelper = ():void => setValueState((
             oldValueState:ValueState<Type, ModelState>
         ):ValueState<Type, ModelState> => {
             if (
                 !representationControlled &&
-                oldValueState.representation === properties.representation
+                oldValueState.representation === properties.representation &&
+                /*
+                    NOTE: Unstable intermediate states have to be synced of a
+                    suggestion creator was pending.
+                */
+                !properties.suggestionCreator
             )
                 /*
                     NOTE: No representation update and no controlled value or
@@ -1359,30 +1372,70 @@ export const GenericInputInner = function<Type = unknown>(
             return valueState
         })
 
-         properties.representation = typeof properties.value === 'string' ?
+        properties.representation = typeof properties.value === 'string' ?
             properties.value :
             formatValue<Type>(
                 properties, properties.value as null|Type, transformer
             )
 
-        if (!useSuggestions || properties.suggestSelection) {
+        if (!useSuggestions) {
             properties.value = parseValue<Type>(
                 properties, properties.value as null|Type, transformer
             )
 
-            set()
-        } else if (properties.suggestionCreator)
+            setHelper()
+        } else if (properties.suggestionCreator) {
+            /*
+                NOTE: Immediate sync current representation to maintain cursor
+                state.
+            */
+            setValueState((
+                oldValueState:ValueState<Type, ModelState>
+            ):ValueState<Type, ModelState> => ({
+                ...oldValueState, representation: properties.representation
+            }))
+
+            /*
+                Trigger asynchronous suggestions retrieving and delayed state
+                consolidation.
+            */
             properties.suggestionCreator({
                 properties, query: properties.representation
             }).then((results:Properties['selection']):void => {
                 setSelection(results)
 
-                properties.value = getValueFromSelection<Type>(
-                    properties.representation, normalizedSelection
+                const result:null|Type = getValueFromSelection<Type>(
+                    properties.representation, normalizeSelection(results)
                 )
 
-                set()
+                if (result !== null || properties.searchSelection)
+                    properties.value = result
+                else
+                    properties.value = parseValue<Type>(
+                        properties,
+                        properties.representation as unknown as null|Type,
+                        transformer
+                    )
+
+                setHelper()
             })
+        } else {
+            // Map value from given selections and trigger state consolidation.
+            const result:null|Type = getValueFromSelection<Type>(
+                properties.representation, normalizedSelection
+            )
+
+            if (result !== null || properties.searchSelection)
+                properties.value = result
+            else
+                properties.value = parseValue<Type>(
+                    properties,
+                    properties.representation as unknown as null|Type,
+                    transformer
+                )
+
+            setHelper()
+        }
     }
     /**
      * Triggered on click events.
@@ -1800,7 +1853,7 @@ export const GenericInputInner = function<Type = unknown>(
                     currentSuggestions.push(suggestion)
                 }
             } else if (
-                !properties.value ||
+                !properties.representation ||
                 properties.suggestionCreator ||
                 suggestion.includes(properties.representation)
             ) {
