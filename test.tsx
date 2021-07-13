@@ -22,7 +22,7 @@ import {SelectProps} from '@rmwc/select'
 import GenericAnimate from './components/GenericAnimate'
 import FileInput from './components/FileInput'
 import GenericInput, {
-    getLabels, normalizeSelection
+    getLabels, getValueFromSelection, normalizeSelection
 } from './components/GenericInput'
 import Inputs from './components/Inputs'
 import Interval from './components/Interval'
@@ -153,6 +153,18 @@ describe('GenericInput', ():void => {
         [['A', 'B'], {a: 'A', b: 'B'}],
         [['a', 'B'], [{value: 'a'}, {label: 'B', value: 'b'}]],
         [['JA', 'NEIN'], {false: 'NEIN', true: 'JA'}]
+    )
+    testEach<typeof getValueFromSelection>(
+        'getValueFromSelection',
+        getValueFromSelection,
+
+        ['false', 'No', {false: 'No', true: 'Yes'}],
+        ['true', 'Yes', {false: 'No', true: 'Yes'}],
+        ['a', 'a', ['a', 'b']],
+        ['a', 'a', ['b', 'a']],
+        [1, 'a', [{label: 'a', value: 1}, {label: 'b', value: 2}]],
+        ['b', 'b', [{label: 'a', value: 1}, {value: 'b'}]],
+        [2, '2', [{label: 'a', value: 1}, {value: 2}]]
     )
     testEach<typeof normalizeSelection>(
         'normalizeSelection',

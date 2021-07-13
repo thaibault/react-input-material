@@ -193,12 +193,14 @@ export function getLabels(
         const labels:Array<string> = []
 
         for (const value of selection)
-            if (typeof value === 'string')
-                labels.push(value)
-            else if (typeof value?.label === 'string')
-                labels.push(value.label)
-            else if (['number', 'string'].includes(typeof value?.value))
-                labels.push(`${value.value}`)
+            if (['number', 'string'].includes(typeof value))
+                labels.push(`${value}`)
+            else if (typeof (value as {label:string})?.label === 'string')
+                labels.push((value as {label:string}).label)
+            else if (['number', 'string'].includes(
+                typeof (value as {value:string})?.value
+            ))
+                labels.push(`${(value as {value:string}).value}`)
 
         return labels
     }
@@ -207,6 +209,40 @@ export function getLabels(
         return Object.values(selection).sort()
 
     return []
+}
+export function getValueFromSelection<T>(
+    label:string,
+    selection:SelectProps['options']|Array<{label?:string;value:unknown}>
+):T {
+    if (Array.isArray(selection))
+        for (const value of selection) {
+            if (
+                ['number', 'string'].includes(typeof value) &&
+                `${value}` === label
+            )
+                return value as unknown as T
+
+            if (
+                typeof (value as {label:string})?.label === 'string' &&
+                (value as {label:string}).label === label
+            )
+                return (value as {value:T}).value
+
+            if (
+                ['number', 'string'].includes(
+                    typeof (value as {value:string})?.value
+                ) &&
+                `${(value as {value:string}).value}` === label
+            )
+                return (value as {value:T}).value
+        }
+
+    if (selection !== null && typeof selection === 'object')
+        for (const [value, selectionLabel] of Object.entries(selection))
+            if (selectionLabel === label)
+                return value as unknown as T
+
+    return label as unknown as T
 }
 export function normalizeSelection(
     selection?:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:any}>,
@@ -298,7 +334,9 @@ export function normalizeSelection(
         SelectProps['options']|Array<{label?:string;value:any}>|undefined
 }
 export function determineValidationState<T>(
-    properties:DefaultProperties<T>, currentState:Partial<ModelState>
+    properties:DefaultProperties<T>,
+    currentState:Partial<ModelState>,
+    suggestions:Array<string>
 ):boolean {
     return determineBaseValidationState<
         DefaultProperties<T>, Partial<ModelState>
@@ -365,9 +403,7 @@ export function determineValidationState<T>(
 
             invalidSelection: ():boolean => (
                 Boolean(properties.searchSelection) &&
-                !((properties.selection as Array<string>)?.includes(
-                    properties.representation as string
-                ))
+                !(suggestions.includes(properties.representation!))
             )
         }
     )
@@ -972,7 +1008,7 @@ export const GenericInputInner = function<Type = unknown>(
             result, result.model.value as null|Type, transformer
         )
 
-        determineValidationState<Type>(result, result.model.state)
+        determineValidationState<Type>(result, result.model.state, suggestions)
 
         return result
     }
@@ -1239,6 +1275,7 @@ export const GenericInputInner = function<Type = unknown>(
     ):void => {
         if (properties.disabled)
             return
+
         let event:GenericEvent|undefined
         if (eventOrValue !== null && typeof eventOrValue === 'object') {
             const target:any =
@@ -1305,7 +1342,9 @@ export const GenericInputInner = function<Type = unknown>(
             onChange(event)
 
             if (determineValidationState<Type>(
-                properties as DefaultProperties<Type>, oldValueState.modelState
+                properties as DefaultProperties<Type>,
+                oldValueState.modelState,
+                suggestions
             ))
                 stateChanged = true
 
@@ -1570,11 +1609,15 @@ export const GenericInputInner = function<Type = unknown>(
 
     deriveMissingPropertiesFromState()
 
+    const [selection, setSelection] = useState<Properties['selection']>(
+        givenProperties.selection || givenProperties.model?.selection
+    )
+    const normalizedSelection:SelectProps['options']|Array<{label?:string;value:any}>|undefined =
+        normalizeSelection(selection, givenProperties.labels)
+    const suggestions:Array<string> = getLabels(normalizedSelection)
+
     const properties:Properties<Type> =
         getConsolidatedProperties(givenProperties)
-
-    const [selection, setSelection] =
-        useState<Properties['selection']>(properties.selection)
 
     if (properties.hidden === undefined)
         properties.hidden = properties.name?.startsWith('password')
@@ -1726,10 +1769,6 @@ export const GenericInputInner = function<Type = unknown>(
         )
     )
 
-    const selection:SelectProps['options']|Array<{label?:string;value:any}>|undefined =
-        normalizeSelection(selection, properties.labels)
-    const suggestions:Array<string> = getLabels(selection)
-
     const currentRenderableSuggestions:Array<ReactElement> = []
     const currentSuggestions:Array<string> = []
     const useSuggestions:boolean = Boolean(
@@ -1737,7 +1776,6 @@ export const GenericInputInner = function<Type = unknown>(
         suggestions.length &&
         (properties.searchSelection || properties.suggestSelection)
     )
-    // TODO handle all selection cases
     if (useSuggestions && suggestions.length) {
         let index:number = 0
         for (const suggestion of suggestions) {
@@ -1789,7 +1827,7 @@ export const GenericInputInner = function<Type = unknown>(
         }
     }
     const useSelection:boolean =
-        (Boolean(properties.selection) || Boolean(properties.labels)) &&
+        (Boolean(normalizedSelection) || Boolean(properties.labels)) &&
         !useSuggestions
     // / endregion
     // / region main markup
@@ -1820,7 +1858,7 @@ export const GenericInputInner = function<Type = unknown>(
                     (reference:HTMLSelectElement|null) => void
                 }
                 onChange={onChangeValue}
-                options={selection}
+                options={normalizedSelection as SelectProps['options']}
                 rootProps={{
                     name: properties.name,
                     onClick: onClick,
@@ -1951,11 +1989,10 @@ export const GenericInputInner = function<Type = unknown>(
                             foundationRef={suggestionMenuFoundationReference}
                             onFocus={onFocus}
                             onSelect={(event:MenuOnSelectEventT):void => {
-                                onChangeValue(
-                                    currentSuggestions[event.detail.index] as
-                                    unknown as
-                                    Type
-                                )
+                                onChangeValue(getValueFromSelection<Type>(
+                                    currentSuggestions[event.detail.index],
+                                    normalizedSelection
+                                ))
                                 setIsSuggestionOpen(false)
                             }}
                             open={

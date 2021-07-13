@@ -39,7 +39,8 @@ import {
     IntervalConfiguration,
     IntervalProps,
     IntervalValue,
-    Model
+    Model,
+    SuggestionCreatorOptions
 } from './type'
 // endregion
 Tools.locales.push('de-DE')
@@ -433,8 +434,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 placeholder="input12ModelPlaceholder"
                 searchSelection
                 suggestionCreator={useMemorizedValue(
-                    async ({query}):Promise<Array<string>> => {
+                    async ({query}:SuggestionCreatorOptions<InputProperties<
+                        string
+                    >>):Promise<Array<string>> => {
                         await Tools.timeout(500)
+
                         return [
                             'hans with veeeeeeeeeeeeeeeery ' +
                             'loooooooooooooooong second name',
@@ -470,14 +474,18 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 placeholder="input13ModelPlaceholder"
                 suggestionCreator={useMemorizedValue(
-                    async ({query}):Promise<Array<string>> => {
+                    async ({query}:SuggestionCreatorOptions<InputProperties<
+                        string
+                    >>):Promise<Array<string>> => {
                         await Tools.timeout(500)
+
                         const selection:Mapping = {
                             a: 'hans with veeeeeeeeeeeeeeeery ' +
                                'loooooooooooooooong second name',
                             b: 'peter',
                             c: 'klaus'
                         }
+
                         return Object.keys(selection)
                             .filter((key:string):boolean =>
                                 !query || selection[key].includes(query)

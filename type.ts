@@ -455,12 +455,12 @@ export interface InputValueState<T = unknown, MS = ModelState> extends
 }
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export type InputChildrenOptions<P> = {
+export interface InputChildrenOptions<P> {
     index:number
     properties:P
     suggestion:string
 }
-export type SuggestionCreatorOptions<P> = {
+export interface SuggestionCreatorOptions<P> {
     properties:P
     query:string
 }
