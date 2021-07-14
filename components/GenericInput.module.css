@@ -58,6 +58,7 @@ endregion */
 .generic-input__suggestions {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    bottom: unset !important;
     top: 54px !important;
     width: 100%;
 }
@@ -67,8 +68,8 @@ endregion */
 }
 
 .generic-input__suggestions__suggestion__mark {
-    background-color: var(--mdc-theme-secondary);
-    display: inline;
+    color: var(--mdc-theme-secondary);
+    display: contents;
 }
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:
