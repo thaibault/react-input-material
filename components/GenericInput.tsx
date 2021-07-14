@@ -1681,6 +1681,7 @@ export const GenericInputInner = function<Type = unknown>(
         useState<Properties['selection']>(properties.selection)
     const normalizedSelection:SelectProps['options']|Array<{label?:string;value:any}>|undefined =
         normalizeSelection(selection, properties.labels)
+    // TODO what about complexer data structures?
     const suggestions:Array<string> = getLabels(normalizedSelection)
 
     if (properties.hidden === undefined)
