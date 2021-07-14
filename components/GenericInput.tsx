@@ -2041,6 +2041,7 @@ export const GenericInputInner = function<Type = unknown>(
                 {useSuggestions ?
                     <MenuSurfaceAnchor>
                         <Menu
+                            anchorCorner="bottomLeft"
                             apiRef={(instance:MenuApi|null):void => {
                                 suggestionMenuAPIReference.current = instance
                             }}
