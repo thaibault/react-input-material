@@ -245,9 +245,9 @@ export function getValueFromSelection<T>(
     return null
 }
 export function normalizeSelection(
-    selection?:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:any}>,
+    selection?:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:unknown}>,
     labels?:Array<string>|Mapping
-):SelectProps['options']|Array<{label?:string;value:any}>|undefined {
+):SelectProps['options']|Array<{label?:string;value:unknown}>|undefined {
     if (!selection) {
         selection = labels
         labels = undefined
@@ -331,7 +331,7 @@ export function normalizeSelection(
     }
 
     return selection as
-        SelectProps['options']|Array<{label?:string;value:any}>|undefined
+        SelectProps['options']|Array<{label?:string;value:unknown}>|undefined
 }
 export function determineValidationState<T>(
     properties:DefaultProperties<T>,
@@ -1679,7 +1679,7 @@ export const GenericInputInner = function<Type = unknown>(
 
     const [selection, setSelection] =
         useState<Properties['selection']>(properties.selection)
-    const normalizedSelection:SelectProps['options']|Array<{label?:string;value:any}>|undefined =
+    const normalizedSelection:SelectProps['options']|Array<{label?:string;value:unknown}>|undefined =
         normalizeSelection(selection, properties.labels)
     // TODO what about complexer data structures?
     const suggestions:Array<string> = getLabels(normalizedSelection)
@@ -1850,9 +1850,13 @@ export const GenericInputInner = function<Type = unknown>(
             if (Tools.isFunction(properties.children)) {
                 const result:null|ReactElement = properties.children({
                     index,
+                    normalizedSelection,
                     properties,
                     query: properties.representation,
-                    suggestion
+                    suggestion,
+                    value: getValueFromSelection<Type>(
+                        suggestion, normalizedSelection
+                    ) as Type
                 })
 
                 if (result) {

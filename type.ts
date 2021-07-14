@@ -453,11 +453,13 @@ export interface InputValueState<T = unknown, MS = ModelState> extends
 }
 export type NativeInputType = 'date'|'datetime-local'|'month'|'number'|'range'|'text'|'time'|'week'
 export type GenericInputType = 'boolean'|'currency'|'float'|'integer'|'string'|NativeInputType
-export interface InputChildrenOptions<P> {
+export interface InputChildrenOptions<P, T> {
     index:number
+    normalizedSelection:SelectProps['options']|Array<{label?:string;value:unknown}>
     properties:P
     query:string
     suggestion:string
+    value:T
 }
 export interface SuggestionCreatorOptions<P> {
     properties:P
@@ -467,7 +469,7 @@ export interface InputProperties<T = unknown> extends
     InputModelState, Properties<T>
 {
     align:'end'|'start'
-    children:(options:InputChildrenOptions<this>) => null|ReactElement
+    children:(options:InputChildrenOptions<this, T>) => null|ReactElement
     cursor:CursorState
     /*
         plain -> input field
