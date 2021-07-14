@@ -594,6 +594,7 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
         align: oneOf(['end', 'start']),
     */
     align: string,
+    children: func,
     cursor: oneOfType([
         shape({
             end: number.isRequired,
