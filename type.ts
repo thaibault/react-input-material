@@ -505,7 +505,7 @@ export interface InputProperties<T = unknown> extends
     selectableEditor:boolean
     step:number
     suggestionCreator?:(options:SuggestionCreatorOptions<this>) =>
-        Promise<InputProperties['selection']>
+        InputProperties['selection']|Promise<InputProperties['selection']>
     suggestSelection:boolean
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
     transformer:RecursivePartial<DataTransformSpecification<T>>

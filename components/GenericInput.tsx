@@ -1385,23 +1385,9 @@ export const GenericInputInner = function<Type = unknown>(
 
             setHelper()
         } else if (properties.suggestionCreator) {
-            /*
-                NOTE: Immediate sync current representation to maintain cursor
-                state.
-            */
-            setValueState((
-                oldValueState:ValueState<Type, ModelState>
-            ):ValueState<Type, ModelState> => ({
-                ...oldValueState, representation: properties.representation
-            }))
-
-            /*
-                Trigger asynchronous suggestions retrieving and delayed state
-                consolidation.
-            */
-            properties.suggestionCreator({
-                properties, query: properties.representation
-            }).then((results:Properties['selection']):void => {
+            const onResultsRetrieved = (
+                results:Properties['selection']
+            ):void => {
                 setSelection(results)
 
                 const result:null|Type = getValueFromSelection<Type>(
@@ -1418,7 +1404,32 @@ export const GenericInputInner = function<Type = unknown>(
                     )
 
                 setHelper()
-            })
+            }
+
+            /*
+                Trigger asynchronous suggestions retrieving and delayed state
+                consolidation.
+            */
+            const result:Properties['selection']|Promise<Properties['selection']> =
+                properties.suggestionCreator({
+                    properties, query: properties.representation
+                })
+
+            if ((result as Promise<Properties['selection']>)?.then) {
+                /*
+                    NOTE: Immediate sync current representation to maintain
+                    cursor state.
+                */
+                setValueState((
+                    oldValueState:ValueState<Type, ModelState>
+                ):ValueState<Type, ModelState> => ({
+                    ...oldValueState, representation: properties.representation
+                }))
+
+                ;(result as Promise<Properties['selection']>)
+                    .then(onResultsRetrieved)
+            } else
+                onResultsRetrieved(result as Properties['selection'])
         } else {
             // Map value from given selections and trigger state consolidation.
             const result:null|Type = getValueFromSelection<Type>(
