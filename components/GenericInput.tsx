@@ -494,7 +494,7 @@ export const GenericInputInner = function<Type = unknown>(
         if (options === 'clear_preset')
             return {
                 icon: <GenericAnimate
-                    in={properties.value !== properties.default}
+                    in={!Tools.equals(properties.value, properties.default)}
                 >
                     {(
                         UseAnimations === null ||
@@ -1141,7 +1141,7 @@ export const GenericInputInner = function<Type = unknown>(
         }
 
         if (
-            oldValueState.value !== properties.value ||
+            !Tools.equals(oldValueState.value, properties.value) ||
             oldValueState.representation !== properties.representation
         )
             changed = true
@@ -1149,7 +1149,7 @@ export const GenericInputInner = function<Type = unknown>(
         if (changed)
             onChange(event)
 
-        if (oldValueState.value !== properties.value)
+        if (!Tools.equals(oldValueState.value, properties.value))
             triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeValue',
@@ -1319,7 +1319,10 @@ export const GenericInputInner = function<Type = unknown>(
                 ...oldValueState, representation: properties.representation
             }
 
-            if (!controlled && oldValueState.value === properties.value)
+            if (
+                !controlled &&
+                Tools.equals(oldValueState.value, properties.value)
+            )
                 /*
                     NOTE: No value update and no controlled value:
 
@@ -1710,7 +1713,7 @@ export const GenericInputInner = function<Type = unknown>(
     if (
         !controlled &&
         (
-            properties.value !== valueState.value ||
+            !Tools.equals(properties.value, valueState.value) ||
             properties.representation !== valueState.representation
         ) ||
         !Tools.equals(properties.model.state, valueState.modelState)
