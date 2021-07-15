@@ -51,7 +51,7 @@ import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
 import {IconButton} from '@rmwc/icon-button'
 import {
-    Menu, MenuApi, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
+    Menu, MenuApi, MenuSurface, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
 } from '@rmwc/menu'
 import {
     FormattedOption as FormattedSelectionOption, Select, SelectProps
@@ -1401,9 +1401,14 @@ export const GenericInputInner = function<Type = unknown>(
 
             setHelper()
         } else if (properties.suggestionCreator) {
+            const abortController:AbortController = new AbortController()
+
             const onResultsRetrieved = (
                 results:Properties['selection']
             ):void => {
+                if (abortController.signal.aborted)
+                    return
+
                 setSelection(results)
 
                 const result:null|Type = getValueFromSelection<Type>(
@@ -1428,7 +1433,9 @@ export const GenericInputInner = function<Type = unknown>(
             */
             const result:Properties['selection']|Promise<Properties['selection']> =
                 properties.suggestionCreator({
-                    properties, query: properties.representation
+                    abortController,
+                    properties,
+                    query: properties.representation
                 })
 
             if ((result as Promise<Properties['selection']>)?.then) {
@@ -1441,6 +1448,13 @@ export const GenericInputInner = function<Type = unknown>(
                 ):ValueState<Type, ModelState> => ({
                     ...oldValueState, representation: properties.representation
                 }))
+
+                setSelection((oldSelection) => {
+                    if (oldSelection instanceof AbortController)
+                        oldSelection.abort()
+
+                    return abortController
+                })
 
                 ;(result as Promise<Properties['selection']>)
                     .then(onResultsRetrieved)
@@ -1694,11 +1708,14 @@ export const GenericInputInner = function<Type = unknown>(
         getConsolidatedProperties(givenProperties)
 
     const [selection, setSelection] =
-        useState<Properties['selection']>(properties.selection)
+        useState<Properties['selection']|AbortController>(properties.selection)
     const normalizedSelection:SelectProps['options']|Array<{label?:string;value:unknown}>|undefined =
-        normalizeSelection(selection, properties.labels)
-    // TODO what about complexer data structures?
-    const suggestions:Array<string> = getLabels(normalizedSelection)
+        selection instanceof AbortController ?
+            [] :
+            normalizeSelection(selection, properties.labels)
+    const suggestions:Array<string> = selection instanceof AbortController ?
+        [] :
+        getLabels(normalizedSelection)
 
     if (properties.hidden === undefined)
         properties.hidden = properties.name?.startsWith('password')
@@ -2072,37 +2089,50 @@ export const GenericInputInner = function<Type = unknown>(
             <div>
                 {useSuggestions ?
                     <MenuSurfaceAnchor>
-                        <Menu
-                            anchorCorner="bottomLeft"
-                            apiRef={(instance:MenuApi|null):void => {
-                                suggestionMenuAPIReference.current = instance
-                            }}
-                            className={styles['generic-input__suggestions']}
-                            focusOnOpen={false}
-                            foundationRef={suggestionMenuFoundationReference}
-                            onFocus={onFocus}
-                            onSelect={(event:MenuOnSelectEventT):void => {
-                                onChangeValue(
-                                    currentSuggestions[event.detail.index] as
-                                        unknown as
-                                        Type
-                                )
-                                setIsSuggestionOpen(false)
-                            }}
-                            open={
-                                Boolean(currentSuggestions.length) &&
-                                isSuggestionOpen &&
-                                /*
-                                    NOTE: If single possibility is already
-                                    selected avoid showing this suggestion.
-                                */
-                                !currentSuggestions.includes(
-                                    properties.representation as string
-                                )
-                            }
-                        >
-                            {currentRenderableSuggestions}
-                        </Menu>
+                        {selection instanceof AbortController ?
+                            <MenuSurface
+                                anchorCorner="bottomLeft"
+                                className={
+                                    styles['generic-input__suggestions'] +
+                                    ' ' +
+                                    styles['generic-input__suggestions--pending']
+                                }
+                                open={true}
+                            >
+                                <CircularProgress size="large" />
+                            </MenuSurface> :
+                            <Menu
+                                anchorCorner="bottomLeft"
+                                apiRef={(instance:MenuApi|null):void => {
+                                    suggestionMenuAPIReference.current = instance
+                                }}
+                                className={styles['generic-input__suggestions']}
+                                focusOnOpen={false}
+                                foundationRef={suggestionMenuFoundationReference}
+                                onFocus={onFocus}
+                                onSelect={(event:MenuOnSelectEventT):void => {
+                                    onChangeValue(
+                                        currentSuggestions[event.detail.index] as
+                                            unknown as
+                                            Type
+                                    )
+                                    setIsSuggestionOpen(false)
+                                }}
+                                open={
+                                    Boolean(currentSuggestions.length) &&
+                                    isSuggestionOpen &&
+                                    /*
+                                        NOTE: If single possibility is already
+                                        selected avoid showing this suggestion.
+                                    */
+                                    !currentSuggestions.includes(
+                                        properties.representation as string
+                                    )
+                                }
+                            >
+                                {currentRenderableSuggestions}
+                            </Menu>
+                        }
                     </MenuSurfaceAnchor> :
                     ''
                 }

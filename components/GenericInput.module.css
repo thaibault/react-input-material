@@ -63,6 +63,10 @@ endregion */
     width: 100%;
 }
 
+.generic-input__suggestions--pending {
+    padding: 10px;
+}
+
 .generic-input__suggestions__suggestion {
     visibility: visible;
 }
