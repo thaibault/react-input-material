@@ -186,6 +186,76 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
 }
 // endregion
 // region static helper
+export function determineValidationState<T>(
+    properties:DefaultProperties<T>,
+    currentState:Partial<ModelState>,
+    suggestions:Array<string>
+):boolean {
+    return determineBaseValidationState<
+        DefaultProperties<T>, Partial<ModelState>
+    >(
+        properties,
+        currentState,
+        {
+            invalidMaximum: ():boolean => (
+                typeof properties.model.maximum === 'number' &&
+                typeof properties.model.value === 'number' &&
+                !isNaN(properties.model.value) &&
+                properties.model.maximum >= 0 &&
+                properties.model.maximum < properties.model.value
+            ),
+            invalidMinimum: ():boolean => (
+                typeof properties.model.minimum === 'number' &&
+                typeof properties.model.value === 'number' &&
+                !isNaN(properties.model.value) &&
+                properties.model.value < properties.model.minimum
+            ),
+
+            invalidMaximumLength: ():boolean => (
+                typeof properties.model.maximumLength === 'number' &&
+                typeof properties.model.value === 'string' &&
+                properties.model.maximumLength >= 0 &&
+                properties.model.maximumLength < properties.model.value.length
+            ),
+            invalidMinimumLength: ():boolean => (
+                typeof properties.model.minimumLength === 'number' &&
+                typeof properties.model.value === 'string' &&
+                properties.model.value.length < properties.model.minimumLength
+            ),
+
+            invalidInvertedPattern: ():boolean => (
+                typeof properties.model.value === 'string' &&
+                (
+                    typeof properties.model
+                        .invertedRegularExpressionPattern === 'string' &&
+                    (new RegExp(
+                        properties.model.invertedRegularExpressionPattern
+                    )).test(properties.model.value) ||
+                    properties.model
+                        .invertedRegularExpressionPattern !== null &&
+                    typeof properties.model
+                        .invertedRegularExpressionPattern === 'object' &&
+                    properties.model.invertedRegularExpressionPattern
+                        .test(properties.model.value)
+                )
+            ),
+            invalidPattern: ():boolean => (
+                typeof properties.model.value === 'string' &&
+                (
+                    typeof properties.model.regularExpressionPattern ===
+                        'string' &&
+                    !(new RegExp(properties.model.regularExpressionPattern))
+                        .test(properties.model.value) ||
+                    properties.model.regularExpressionPattern !== null &&
+                    typeof properties.model.regularExpressionPattern ===
+                        'object' &&
+                    !properties.model.regularExpressionPattern
+                        .test(properties.model.value)
+                )
+            )
+        }
+    )
+}
 export function getLabels(
     selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
 ):Array<string> {
@@ -333,75 +403,18 @@ export function normalizeSelection(
     return selection as
         SelectProps['options']|Array<{label?:string;value:unknown}>|undefined
 }
-export function determineValidationState<T>(
-    properties:DefaultProperties<T>,
-    currentState:Partial<ModelState>,
-    suggestions:Array<string>
+export function suggestionMatches(
+    suggestion:string, query?:null|string
 ):boolean {
-    return determineBaseValidationState<
-        DefaultProperties<T>, Partial<ModelState>
-    >(
-        properties,
-        currentState,
-        {
-            invalidMaximum: ():boolean => (
-                typeof properties.model.maximum === 'number' &&
-                typeof properties.model.value === 'number' &&
-                !isNaN(properties.model.value) &&
-                properties.model.maximum >= 0 &&
-                properties.model.maximum < properties.model.value
-            ),
-            invalidMinimum: ():boolean => (
-                typeof properties.model.minimum === 'number' &&
-                typeof properties.model.value === 'number' &&
-                !isNaN(properties.model.value) &&
-                properties.model.value < properties.model.minimum
-            ),
+    if (query) {
+        suggestion = suggestion.toLowerCase()
 
-            invalidMaximumLength: ():boolean => (
-                typeof properties.model.maximumLength === 'number' &&
-                typeof properties.model.value === 'string' &&
-                properties.model.maximumLength >= 0 &&
-                properties.model.maximumLength < properties.model.value.length
-            ),
-            invalidMinimumLength: ():boolean => (
-                typeof properties.model.minimumLength === 'number' &&
-                typeof properties.model.value === 'string' &&
-                properties.model.value.length < properties.model.minimumLength
-            ),
+        return query.replace(/  +/g, ' ').toLowerCase().split(' ').every(
+            (part:string):boolean => suggestion.includes(part)
+        )
+    }
 
-            invalidInvertedPattern: ():boolean => (
-                typeof properties.model.value === 'string' &&
-                (
-                    typeof properties.model
-                        .invertedRegularExpressionPattern === 'string' &&
-                    (new RegExp(
-                        properties.model.invertedRegularExpressionPattern
-                    )).test(properties.model.value) ||
-                    properties.model
-                        .invertedRegularExpressionPattern !== null &&
-                    typeof properties.model
-                        .invertedRegularExpressionPattern === 'object' &&
-                    properties.model.invertedRegularExpressionPattern
-                        .test(properties.model.value)
-                )
-            ),
-            invalidPattern: ():boolean => (
-                typeof properties.model.value === 'string' &&
-                (
-                    typeof properties.model.regularExpressionPattern ===
-                        'string' &&
-                    !(new RegExp(properties.model.regularExpressionPattern))
-                        .test(properties.model.value) ||
-                    properties.model.regularExpressionPattern !== null &&
-                    typeof properties.model.regularExpressionPattern ===
-                        'object' &&
-                    !properties.model.regularExpressionPattern
-                        .test(properties.model.value)
-                )
-            )
-        }
-    )
+    return false
 }
 // endregion
 /**
@@ -1878,7 +1891,7 @@ export const GenericInputInner = function<Type = unknown>(
             } else if (
                 !properties.representation ||
                 properties.suggestionCreator ||
-                suggestion.includes(properties.representation)
+                suggestionMatches(suggestion, properties.representation)
             ) {
                 currentRenderableSuggestions.push(
                     <MenuItem
