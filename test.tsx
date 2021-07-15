@@ -22,7 +22,7 @@ import {SelectProps} from '@rmwc/select'
 import GenericAnimate from './components/GenericAnimate'
 import FileInput from './components/FileInput'
 import GenericInput, {
-    getLabels, getValueFromSelection, normalizeSelection
+    getLabels, getValueFromSelection, normalizeSelection, suggestionMatches
 } from './components/GenericInput'
 import Inputs from './components/Inputs'
 import Interval from './components/Interval'
@@ -192,6 +192,20 @@ describe('GenericInput', ():void => {
             [{label: 'No', value: false}, {label: 'Yes', value: true}],
             {false: 'NEIN', true: 'JA'}
         ]
+    )
+    testEach<typeof suggestionMatches>(
+        'suggestionMatches',
+        suggestionMatches,
+
+        [false, 'a', ''],
+        [false, 'a', null],
+        [false, 'a', undefined],
+        [false, 'a', 'b'],
+        [false, 'a', 'a b'],
+        [false, 'a', 'a  b'],
+        [true, 'b', 'b'],
+        [true, 'a b', 'b'],
+        [true, 'a b', 'a b']
     )
     test('render', ():void => {
         expect(render(<GenericInput/>)).toBeDefined()
