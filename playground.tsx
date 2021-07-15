@@ -437,7 +437,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     async ({query}:SuggestionCreatorOptions<InputProperties<
                         string
                     >>):Promise<Array<string>> => {
-                        await Tools.timeout(500)
+                        await Tools.timeout(2000)
 
                         return [
                             'hans with veeeeeeeeeeeeeeeery ' +
