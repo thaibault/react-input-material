@@ -1521,8 +1521,11 @@ export const GenericInputInner = function<Type = unknown>(
         */
         if (
             Tools.keyCode.ENTER === event.keyCode &&
-            properties.type === 'string' &&
-            properties.editor !== 'plain'
+            (
+                useSuggestions ||
+                properties.type === 'string' &&
+                properties.editor !== 'plain'
+            )
         )
             event.stopPropagation()
 
