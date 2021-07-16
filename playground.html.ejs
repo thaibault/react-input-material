@@ -21,33 +21,67 @@
         <title>playground</title>
         <!--region polyfills-->
         <%_
-            const features = [
+            const features = new Set([
+                // Most polyfills are determined via "create-polyfill-service-url".
                 // Asynchronous suggestion creator.
                 'AbortController',
                 // MDC-Input - Label moving to top does not work.
                 'Array.from',
+                'Array.isArray',
+                'Array.prototype.entries',
+                'Array.prototype.every',
+                'Array.prototype.filter',
+                'Array.prototype.forEach',
                 // clientnode - Usage.
                 'Array.prototype.includes',
+                'Array.prototype.indexOf',
+                'Array.prototype.keys',
+                'Array.prototype.map',
+                'Array.prototype.reduce',
+                'Array.prototype.some',
+                'Array.prototype.sort',
+                'Array.prototype.values',
                 // Usual array interaction.
                 'Array.prototype.@@iterator',
+                'ArrayBuffer',
+                'Blob',
+                'console',
                 // MDC-Select - Throws about missing object.
                 'CustomEvent',
+                'DataView',
+                'Date.prototype.toISOString',
+                'document',
+                'Function.prototype.bind',
+                'Intl',
+                'Map',
+                'Object.create',
+                'Object.defineProperty',
                 // Iterating over mapping objects everywhere.
                 'Object.entries',
+                'Object.getOwnPropertyNames',
+                'Object.getPrototypeOf',
+                'Object.keys',
                 // Applying a scope object during template function call.
                 'Object.values',
                 // React uses for rendering.
                 'Promise',
+                'Set',
                 // Many usages e.g. in clientnode.
                 'String.prototype.endsWith',
                 'String.prototype.includes',
                 'String.prototype.startsWith',
+                'String.prototype.trim',
                 // Used by react to identify its own entities.
                 'Symbol',
-                'Symbol.for'
-            ]
+                'Symbol.for',
+                'Symbol.iterator',
+                'Symbol.prototype.description',
+                'Symbol.toStringTag',
+                'WeakMap',
+                'WeakSet'
+            ])
         _%>
-        <script src="https://polyfill.io/v3/polyfill.js?features=<%- encodeURIComponent(features.join(',')) %>"></script>
+        <script src="https://polyfill.io/v3/polyfill.js?features=<%- encodeURIComponent(Array.from(features).sort().join(',')) %>"></script>
         <!--endregion-->
     </head>
     <style>
