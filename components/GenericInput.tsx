@@ -403,6 +403,10 @@ export function normalizeSelection(
     return selection as
         SelectProps['options']|Array<{label?:string;value:unknown}>|undefined
 }
+export function preventEnterKeyPropagation(event:ReactKeyboardEvent):void {
+    if (Tools.keyCode.ENTER === event.keyCode)
+        event.stopPropagation()
+}
 export function suggestionMatches(
     suggestion:string, query?:null|string
 ):boolean {
@@ -1519,15 +1523,8 @@ export const GenericInputInner = function<Type = unknown>(
             NOTE: We do not want to forward keydown enter events coming from
             textareas.
         */
-        if (
-            Tools.keyCode.ENTER === event.keyCode &&
-            (
-                useSuggestions ||
-                properties.type === 'string' &&
-                properties.editor !== 'plain'
-            )
-        )
-            event.stopPropagation()
+        if (properties.type === 'string' && properties.editor !== 'plain')
+            preventEnterKeyPropagation(event)
 
         triggerCallbackIfExists<Properties<Type>>(
             properties, 'keyDown', controlled, event, properties
@@ -2091,7 +2088,7 @@ export const GenericInputInner = function<Type = unknown>(
         {wrapAnimationConditionally(
             <div>
                 {useSuggestions ?
-                    <MenuSurfaceAnchor>
+                    <MenuSurfaceAnchor onKeyDown={preventEnterKeyPropagation}>
                         {selection instanceof AbortController ?
                             <MenuSurface
                                 anchorCorner="bottomLeft"
