@@ -1294,10 +1294,14 @@ export const GenericInputInner = function<Type = unknown>(
      * @param eventOrValue - Event object or new value.
      * @param editorInstance - Potential editor instance if triggered from a
      * rich text or code editor.
+     * @param selected - Indicates whether given event was triggered by a
+     * selection.
      * @returns Nothing.
      */
     const onChangeValue = (
-        eventOrValue:GenericEvent|null|Type, editorInstance?:RichTextEditor
+        eventOrValue:GenericEvent|null|Type,
+        editorInstance?:RichTextEditor,
+        selected:boolean = false
     ):void => {
         if (properties.disabled)
             return
@@ -1394,6 +1398,15 @@ export const GenericInputInner = function<Type = unknown>(
                     properties
                 )
             }
+
+            if (useSelection || selected)
+                triggerCallbackIfExists<Properties<Type>>(
+                    properties,
+                    'select',
+                    controlled,
+                    event,
+                    properties
+                )
 
             return valueState
         })
@@ -2118,9 +2131,11 @@ export const GenericInputInner = function<Type = unknown>(
                                 onFocus={onFocus}
                                 onSelect={(event:MenuOnSelectEventT):void => {
                                     onChangeValue(
-                                        currentSuggestions[event.detail.index] as
-                                            unknown as
-                                            Type
+                                        currentSuggestions[
+                                            event.detail.index
+                                        ] as unknown as Type,
+                                        undefined,
+                                        true
                                     )
                                     setIsSuggestionOpen(false)
                                 }}

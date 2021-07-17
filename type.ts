@@ -497,6 +497,7 @@ export interface InputProperties<T = unknown> extends
     ) => void
     onKeyDown:(event:KeyboardEvent, properties:this) => void
     onKeyUp:(event:KeyboardEvent, properties:this) => void
+    onSelect:(event:GenericEvent, properties:this) => void
     onSelectionChange:(event:GenericEvent, properties:this) => void
     outlined:boolean
     pattern:RegExp|string
@@ -638,6 +639,7 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     onChangeEditorIsActive: func,
     onKeyDown: func,
     onKeyUp: func,
+    onSelect: func,
     onSelectionChange: func,
     outlined: boolean,
     patternText: string,
