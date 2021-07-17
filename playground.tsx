@@ -70,8 +70,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         useMemorizedValue<(value:null|string) => void>(setValue2)
 
     type FloatValueState = {
-        value?:null|number
         representation:string
+        value?:null|number
     }
     const [value3, setValue3] = useState<FloatValueState>({
         value: 1234.34, representation: '1.234,34'
@@ -79,19 +79,28 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     const onChangeValue3 =
         useMemorizedValue<(value:FloatValueState) => void>(setValue3)
 
+    type SelectionValueType = {
+        representation:string
+        value?:null|string
+    }
     const [value4, setValue4] =
-        useState<IntervalValue|null>({end: 120, start: 60})
+        useState<SelectionValueType>({representation: 'klaus', value: 'b'})
     const onChangeValue4 =
-        useMemorizedValue<(value:IntervalValue|null) => void>(setValue4)
+        useMemorizedValue<(value:SelectionValueType) => void>(setValue4)
 
-    const [value5, setValue5] = useState<boolean|null>(false)
+    const [value5, setValue5] =
+        useState<IntervalValue|null>({end: 120, start: 60})
     const onChangeValue5 =
-        useMemorizedValue<(value:boolean|null) => void>(setValue5)
+        useMemorizedValue<(value:IntervalValue|null) => void>(setValue5)
 
-    const [value6, setValue6] =
-        useState<Array<null|string>|null>(['first item'])
+    const [value6, setValue6] = useState<boolean|null>(false)
     const onChangeValue6 =
-        useMemorizedValue<(values:Array<null|string>|null) => void>(setValue6)
+        useMemorizedValue<(value:boolean|null) => void>(setValue6)
+
+    const [value7, setValue7] =
+        useState<Array<null|string>|null>(['first item'])
+    const onChangeValue7 =
+        useMemorizedValue<(values:Array<null|string>|null) => void>(setValue7)
     // endregion
 
     return (<>
@@ -419,8 +428,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 name="input12"
                 onChange={onChange}
                 placeholder="input12Placeholder"
-                suggestSelection
                 selection={useMemorizedValue(['hans', 'peter', 'klaus'])}
+                suggestSelection
             />
             <GenericInput
                 initialValue="peter"
@@ -493,6 +502,38 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                         return result
                     }
                 )}
+            />
+            <GenericInput
+                name="controlled"
+                onChange={useMemorizedValue((properties:InputProperties<string>):void => {
+                    onChangeValue4({
+                        representation: properties.representation,
+                        value: properties.value
+                    })
+                    onChange(properties)
+                })}
+                representation={value4.representation}
+                searchSelection
+                selection={useMemorizedValue(
+                    {a: 'hans', b: 'peter', c: 'klaus'}
+                )}
+                value={value4.value}
+            />
+            <GenericInput
+                name="controlled"
+                onChange={useMemorizedValue((properties:InputProperties<string>):void => {
+                    onChangeValue4({
+                        representation: properties.representation,
+                        value: properties.value
+                    })
+                    onChange(properties)
+                })}
+                representation={value4.representation}
+                suggestSelection
+                selection={useMemorizedValue(
+                    {a: 'hans', b: 'peter', c: 'klaus'}
+                )}
+                value={value4.value}
             />
 
             <hr/>
@@ -711,9 +752,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 name="controlled"
                 default={120}
                 onChange={onChange}
-                onChangeValue={onChangeValue4}
+                onChangeValue={onChangeValue5}
                 step={60}
-                value={value4}
+                value={value5}
             />
 
             <hr/>
@@ -737,8 +778,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             <RequireableCheckbox
                 name="controlled"
                 onChange={onChange}
-                onChangeValue={onChangeValue5}
-                value={value5}
+                onChangeValue={onChangeValue6}
+                value={value6}
             />
 
             <hr/>
@@ -845,10 +886,10 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 )}
             </Inputs>
             <Inputs
-                name="inputs4"
+                name="controlled"
                 onChange={onChange}
-                onChangeValue={onChangeValue6}
-                value={value6}
+                onChangeValue={onChangeValue7}
+                value={value7}
             />
         </div>
 

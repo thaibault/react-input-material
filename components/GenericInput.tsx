@@ -1149,12 +1149,18 @@ export const GenericInputInner = function<Type = unknown>(
         }
 
         if (!useSuggestions || properties.suggestSelection) {
-            properties.value = parseValue<Type>(
-                properties, properties.value as null|Type, transformer
+            const candidate:null|Type = getValueFromSelection<Type>(
+                properties.representation, normalizedSelection
             )
-            properties.representation = formatValue<Type>(
-                properties, properties.value as null|Type, transformer
-            )
+            if (candidate === null) {
+                properties.value = parseValue<Type>(
+                    properties, properties.value as null|Type, transformer
+                )
+                properties.representation = formatValue<Type>(
+                    properties, properties.value as null|Type, transformer
+                )
+            } else
+                properties.value = candidate
         }
 
         if (
