@@ -1432,7 +1432,18 @@ export const GenericInputInner = function<Type = unknown>(
                 if (abortController.signal.aborted)
                     return
 
-                setSelection(results)
+                /*
+                    NOTE: A synchronous retrieved selection may habe to stop a
+                    pending (slower) asynchronous request.
+                */
+                setSelection((
+                    oldSelection:AbortController|Properties['selection']
+                ):Properties['selection'] => {
+                    if (oldSelection instanceof AbortController)
+                        oldSelection.abort()
+
+                    return results as Properties['selection']
+                })
 
                 const result:null|Type = getValueFromSelection<Type>(
                     properties.representation, normalizeSelection(results)
@@ -1462,6 +1473,14 @@ export const GenericInputInner = function<Type = unknown>(
                 })
 
             if ((result as Promise<Properties['selection']>)?.then) {
+                setSelection((
+                    oldSelection:AbortController|Properties['selection']
+                ):AbortController => {
+                    if (oldSelection instanceof AbortController)
+                        oldSelection.abort()
+
+                    return abortController
+                })
                 /*
                     NOTE: Immediate sync current representation to maintain
                     cursor state.
@@ -1472,15 +1491,14 @@ export const GenericInputInner = function<Type = unknown>(
                     ...oldValueState, representation: properties.representation
                 }))
 
-                setSelection((oldSelection) => {
-                    if (oldSelection instanceof AbortController)
-                        oldSelection.abort()
-
-                    return abortController
-                })
-
-                ;(result as Promise<Properties['selection']>)
-                    .then(onResultsRetrieved)
+                ;(result as Promise<Properties['selection']>).then(
+                    onResultsRetrieved,
+                    /*
+                        NOTE: Avoid throghing an exception when aborting the
+                        request intentionally.
+                    */
+                    Tools.noop
+                )
             } else
                 onResultsRetrieved(result as Properties['selection'])
         } else {
@@ -1727,7 +1745,7 @@ export const GenericInputInner = function<Type = unknown>(
         getConsolidatedProperties(givenProperties)
 
     const [selection, setSelection] =
-        useState<Properties['selection']|AbortController>(properties.selection)
+        useState<AbortController|Properties['selection']>(properties.selection)
     const normalizedSelection:SelectProps['options']|Array<{label?:string;value:unknown}>|undefined =
         selection instanceof AbortController ?
             [] :
