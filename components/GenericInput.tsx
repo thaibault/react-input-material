@@ -421,6 +421,7 @@ export function suggestionMatches(
     return false
 }
 // endregion
+// TODO whenever formatValue is used the searchSelection and selection combi has to be checked!
 /**
  * Generic input wrapper component which automatically determines a useful
  * input field depending on given model specification.
