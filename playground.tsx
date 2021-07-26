@@ -464,6 +464,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
 
             <GenericInput
                 description="input13Description"
+                default={'a'}
                 name="input13"
                 onChange={onChange}
                 placeholder="input13Placeholder"

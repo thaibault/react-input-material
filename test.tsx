@@ -21,9 +21,7 @@ import {SelectProps} from '@rmwc/select'
 
 import GenericAnimate from './components/GenericAnimate'
 import FileInput from './components/FileInput'
-import GenericInput, {
-    getLabels, getValueFromSelection, normalizeSelection, suggestionMatches
-} from './components/GenericInput'
+import GenericInput, {suggestionMatches} from './components/GenericInput'
 import Inputs from './components/Inputs'
 import Interval from './components/Interval'
 import RequireableCheckbox from './components/RequireableCheckbox'
@@ -31,7 +29,13 @@ import WrapConfigurations from './components/WrapConfigurations'
 import WrapStrict from './components/WrapStrict'
 import WrapThemeProvider from './components/WrapThemeProvider'
 import WrapTooltip from './components/WrapTooltip'
-import {determineInitialValue} from './helper'
+import {
+    determineInitialValue,
+    getLabels,
+    getRepresentationFromValueSelection,
+    getValueFromSelection,
+    normalizeSelection
+} from './helper'
 import prepareTestEnvironment from './testHelper'
 import {TestEnvironment} from './type'
 // endregion
@@ -121,28 +125,6 @@ describe('Interval', ():void => {
 // endregion
 // region helper
 describe('helper', ():void => {
-    test('determineInitialValue', ():void => {
-        expect(
-            determineInitialValue({model: {default: true}}, false)
-        ).toStrictEqual(true)
-        expect(
-            determineInitialValue({model: {default: true, value: null}}, false)
-        ).toStrictEqual(null)
-    })
-})
-// endregion
-// region GenericAnimate
-describe('GenericAnimate', ():void => {
-    test('render', ():void => {
-        expect(GenericAnimate({children: <div/>}))
-            .toHaveProperty('props.in', true)
-        expect(GenericAnimate({children: <div/>, in: false}))
-            .toHaveProperty('props.in', false)
-    })
-})
-// endregion
-// region GenericInput
-describe('GenericInput', ():void => {
     testEach<typeof getLabels>(
         'getLabels',
         getLabels,
@@ -153,6 +135,19 @@ describe('GenericInput', ():void => {
         [['A', 'B'], {a: 'A', b: 'B'}],
         [['a', 'B'], [{value: 'a'}, {label: 'B', value: 'b'}]],
         [['JA', 'NEIN'], {false: 'NEIN', true: 'JA'}]
+    )
+    testEach<typeof getRepresentationFromValueSelection>(
+        'getRepresentationFromValueSelection',
+        getRepresentationFromValueSelection,
+
+        ['No', 'false', {false: 'No', true: 'Yes'}],
+        ['Yes', 'true', {false: 'No', true: 'Yes'}],
+        ['a', 'a', ['a', 'b']],
+        ['a', 'a', ['b', 'a']],
+        ['a', 1, [{label: 'a', value: 1}, {label: 'b', value: 2}]],
+        ['b', 'b', [{label: 'a', value: 1}, {value: 'b'}]],
+        ['2', 2, [{label: 'a', value: 1}, {value: 2}]],
+        [null, 2, [{label: 'a', value: 1}]]
     )
     testEach<typeof getValueFromSelection>(
         'getValueFromSelection',
@@ -193,6 +188,29 @@ describe('GenericInput', ():void => {
             {false: 'NEIN', true: 'JA'}
         ]
     )
+    test('determineInitialValue', ():void => {
+        expect(
+            determineInitialValue({model: {default: true}}, false)
+        ).toStrictEqual(true)
+        expect(
+            determineInitialValue({model: {default: true, value: null}}, false)
+        ).toStrictEqual(null)
+    })
+})
+// endregion
+// region GenericAnimate
+describe('GenericAnimate', ():void => {
+    test('render', ():void => {
+        expect(GenericAnimate({children: <div/>}))
+            .toHaveProperty('props.in', true)
+        expect(GenericAnimate({children: <div/>, in: false}))
+            .toHaveProperty('props.in', false)
+    })
+})
+// endregion
+// region GenericInput
+describe('GenericInput', ():void => {
+
     testEach<typeof suggestionMatches>(
         'suggestionMatches',
         suggestionMatches,
