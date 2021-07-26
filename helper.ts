@@ -24,6 +24,9 @@ import {
 } from 'clientnode/type'
 import {ReactElement, useMemo, useState} from 'react'
 import {render as renderReact, unmountComponentAtNode} from 'react-dom'
+import {
+    FormattedOption as FormattedSelectionOption, SelectProps
+} from '@rmwc/select'
 
 import {
     BaseModel,
@@ -354,6 +357,180 @@ export const getConsolidatedProperties = <
 }
 // endregion
 // region value transformer
+// / region selection
+export function getLabels(
+    selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
+):Array<string> {
+    if (Array.isArray(selection)) {
+        const labels:Array<string> = []
+
+        for (const value of selection)
+            if (['number', 'string'].includes(typeof value))
+                labels.push(`${value}`)
+            else if (typeof (value as {label:string})?.label === 'string')
+                labels.push((value as {label:string}).label)
+            else if (['number', 'string'].includes(
+                typeof (value as {value:string})?.value
+            ))
+                labels.push(`${(value as {value:string}).value}`)
+
+        return labels
+    }
+
+    if (selection !== null && typeof selection === 'object')
+        return Object.values(selection).sort()
+
+    return []
+}
+export function getRepresentationFromValueSelection(
+    value:unknown,
+    selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
+):null|string {
+    if (selection) {
+        if (Array.isArray(selection))
+            for (const option of selection) {
+                if (Tools.equals(option, value))
+                    return `${value}`
+
+                if (Tools.equals((option as {value:unknown})?.value, value))
+                    return (option as {label:string}).label || `${value}`
+            }
+
+        if (
+            selection !== null &&
+            typeof selection === 'object' &&
+            typeof value === 'string' &&
+            selection.hasOwnProperty(value)
+        )
+            return (selection as Mapping)[value]
+    }
+
+    return null
+}
+export function getValueFromSelection<T>(
+    label:string,
+    selection:SelectProps['options']|Array<{label?:string;value:unknown}>
+):null|T {
+    if (Array.isArray(selection))
+        for (const value of selection) {
+            if (
+                ['number', 'string'].includes(typeof value) &&
+                `${value}` === label
+            )
+                return value as unknown as T
+
+            if (
+                typeof (value as {label:string})?.label === 'string' &&
+                (value as {label:string}).label === label
+            )
+                return (value as {value:T}).value
+
+            if (
+                ['number', 'string'].includes(
+                    typeof (value as {value:string})?.value
+                ) &&
+                `${(value as {value:string}).value}` === label
+            )
+                return (value as {value:T}).value
+        }
+
+    if (selection !== null && typeof selection === 'object')
+        for (const [value, selectionLabel] of Object.entries(selection))
+            if (selectionLabel === label)
+                return value as unknown as T
+
+    return null
+}
+export function normalizeSelection(
+    selection?:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:unknown}>,
+    labels?:Array<string>|Mapping
+):SelectProps['options']|Array<{label?:string;value:unknown}>|undefined {
+    if (!selection) {
+        selection = labels
+        labels = undefined
+    }
+
+    if (Array.isArray(selection) && selection.length) {
+        const result:Array<FormattedSelectionOption> = []
+        let index:number = 0
+        if (Array.isArray(selection[0]))
+            for (
+                const [value, label] of selection as Array<[string, string]>
+            ) {
+                result.push({
+                    label: Array.isArray(labels) && index < labels.length ?
+                        labels[index] :
+                        label,
+                    value
+                })
+                index += 1
+            }
+        else if (selection[0] !== null && typeof selection[0] === 'object')
+            for (
+                const option of selection as Array<FormattedSelectionOption>
+            ) {
+                result.push({
+                    ...(option as FormattedSelectionOption),
+                    label: Array.isArray(labels) && index < labels.length ?
+                        labels[index] :
+                        option.label
+                })
+                index += 1
+            }
+        else
+            for (const value of selection as Array<string>) {
+                result.push({
+                    label: Array.isArray(labels) && index < labels.length ?
+                        labels[index] :
+                        value,
+                    value
+                })
+                index += 1
+            }
+        selection = result
+    }
+
+    if (labels !== null && typeof labels === 'object') {
+        if (Array.isArray(selection)) {
+            const result:Array<FormattedSelectionOption> = []
+            for (const option of selection as Array<FormattedSelectionOption>)
+                result.push({
+                    ...option,
+                    label: labels.hasOwnProperty(
+                        (option.value || option.label) as string
+                    ) ?
+                        (
+                            labels as Mapping
+                        )[(option.value || option.label) as string] :
+                        // Map boolean values to their string representation.
+                        (
+                            (option as unknown as {value:boolean}).value ===
+                                true &&
+                            (labels as {true:string}).true
+                        ) ?
+                            (labels as {true:string}).true :
+                            (
+                                (
+                                    option as unknown as {value:boolean}
+                                ).value === false &&
+                                (labels as {false:string}).false
+                            ) ?
+                                (labels as {false:string}).false :
+                                option.label
+                })
+            return result
+        }
+
+        for (const [value, label] of Object.entries(selection as Mapping))
+            (selection as Mapping)[value] = labels.hasOwnProperty(value) ?
+                (labels as Mapping)[value] as string :
+                label
+    }
+
+    return selection as
+        SelectProps['options']|Array<{label?:string;value:unknown}>|undefined
+}
+// / endregion
 /**
  * Applies configured value transformations.
  *
@@ -455,6 +632,7 @@ export function formatValue<
  * @param defaultProperties - Components default properties.
  * @param value - Current value to represent.
  * @param transformer - To apply to given value.
+ * @param selection - Data mapping of allowed values.
  *
  * @returns Determined initial representation.
  */
@@ -466,11 +644,18 @@ export function determineInitialRepresentation<
     defaultProperties:P,
     value:null|T,
     transformer:InputDataTransformation,
+    selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
 ):string {
     if (typeof properties.representation === 'string')
         return properties.representation
 
-    if (value !== null)
+    if (value !== null) {
+        const candidate:null|string =
+            getRepresentationFromValueSelection(value, selection)
+
+        if (typeof candidate === 'string')
+            return candidate
+
         return formatValue<T, P & {type:string}>(
             {
                 ...properties,
@@ -483,6 +668,7 @@ export function determineInitialRepresentation<
             value,
             transformer
         )
+    }
 
     return ''
 }
