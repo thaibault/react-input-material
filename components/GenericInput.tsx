@@ -35,8 +35,7 @@ import {
     useEffect,
     useImperativeHandle,
     useRef,
-    useState,
-    VoidFunctionComponent
+    useState
 } from 'react'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 import {TransitionProps} from 'react-transition-group/Transition'
