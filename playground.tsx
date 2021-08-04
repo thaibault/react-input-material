@@ -443,12 +443,13 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 placeholder="input12ModelPlaceholder"
                 searchSelection
-                suggestionCreator={useMemorizedValue(
+                suggestionCreator={useMemorizedValue(Tools.debounce<Array<string>>(
                     async ({query}:SuggestionCreatorOptions<InputProperties<
                         string
                     >>):Promise<Array<string>> => {
                         await Tools.timeout(2000)
 
+                        console.log('A', query)
                         return [
                             'hans with veeeeeeeeeeeeeeeery ' +
                             'loooooooooooooooong second name',
@@ -458,7 +459,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                             !query || name.includes(query)
                         )
                     }
-                )}
+                ))}
             />
 
             <hr/>
