@@ -443,7 +443,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 placeholder="input12ModelPlaceholder"
                 searchSelection
-                suggestionCreator={useMemorizedValue(
+                suggestionCreator={useMemorizedValue(Tools.debounce<Array<string>>(
                     async ({query}:SuggestionCreatorOptions<InputProperties<
                         string
                     >>):Promise<Array<string>> => {
@@ -458,7 +458,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                             !query || name.includes(query)
                         )
                     }
-                )}
+                ))}
             />
 
             <hr/>
