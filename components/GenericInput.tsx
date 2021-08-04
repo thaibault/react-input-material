@@ -1785,9 +1785,7 @@ export const GenericInputInner = function<Type = unknown>(
                     properties,
                     query: properties.representation,
                     suggestion,
-                    value: getValueFromSelection<Type>(
-                        suggestion, normalizedSelection
-                    ) as Type
+                    value: suggestionValues[index] as Type
                 })
 
                 if (result) {
