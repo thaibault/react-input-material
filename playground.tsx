@@ -449,7 +449,6 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     >>):Promise<Array<string>> => {
                         await Tools.timeout(2000)
 
-                        console.log('A', query)
                         return [
                             'hans with veeeeeeeeeeeeeeeery ' +
                             'loooooooooooooooong second name',
