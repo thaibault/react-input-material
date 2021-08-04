@@ -2093,7 +2093,7 @@
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.6.tgz#250a7b16c3b91f672a24552ec64678eeb1d3a08d"
   integrity sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==
 
-"@types/webpack@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.0.tgz", "core@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.0.tgz":
+"@types/webpack@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.0.tgz":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.0.tgz#7ff0adb2a0e32b1a0a48f432cf31c16b53f7f4ea"
 
@@ -11186,9 +11186,9 @@ wbuf@^1.1.0, wbuf@^1.7.3:
     minimalistic-assert "^1.0.0"
 
 web-component-wrapper@*:
-  version "0.0.280"
-  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.280.tgz#8a119d14acbf56f45d758dd5d54949b058ece240"
-  integrity sha512-Df/X/WwnYQ9qzDQK8F7E5eIdV3hzLvflT1EpqFo+JxErdlNJ8e45T9pfB58bYoj1Z7rZIo7OTBGmNQHCqSATpw==
+  version "0.0.281"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.281.tgz#8e03ce927f69589accee1d6ad41bccf93c88145c"
+  integrity sha512-Wp7sr0hwOH3N3+TTxArhj/k67KYXCRW9NVHXSPTrIbJ5x2HJTgXhwp03+BAQZKVNppL9IWS/NRELy3fo+3Oxig==
   dependencies:
     "@types/webpack" "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.0.tgz"
 

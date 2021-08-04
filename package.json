@@ -147,6 +147,80 @@
     "react-useanimations": "*",
     "tinymce": "^5.0.0"
   },
+  "peerDependenciesMeta": {
+    "@babel/runtime": {
+      "optional": true
+    },
+    "@rmwc/card": {
+      "optional": true
+    },
+    "@rmwc/checkbox": {
+      "optional": true
+    },
+    "@rmwc/circular-progress": {
+      "optional": true
+    },
+    "@rmwc/formfield": {
+      "optional": true
+    },
+    "@rmwc/icon-button": {
+      "optional": true
+    },
+    "@rmwc/select": {
+      "optional": true
+    },
+    "@rmwc/textfield": {
+      "optional": true
+    },
+    "@rmwc/theme": {
+      "optional": true
+    },
+    "@rmwc/tooltip": {
+      "optional": true
+    },
+    "@rmwc/typography": {
+      "optional": true
+    },
+    "@tinymce/tinymce-react": {
+      "optional": true
+    },
+    "@types/react": {
+      "optional": true
+    },
+    "@types/react-dom": {
+      "optional": true
+    },
+    "@types/react-transition-group": {
+      "optional": true
+    },
+    "blob-util": {
+      "optional": true
+    },
+    "clientnode": {
+      "optional": true
+    },
+    "material-icons": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-ace": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "react-transition-group": {
+      "optional": true
+    },
+    "react-useanimations": {
+      "optional": true
+    },
+    "tinymce": {
+      "optional": true
+    }
+  },
   "resolutions": {
     "@types/webpack": "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.0.tgz"
   },
