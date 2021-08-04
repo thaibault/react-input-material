@@ -358,29 +358,39 @@ export const getConsolidatedProperties = <
 // endregion
 // region value transformer
 // / region selection
-export function getLabels(
+export function getLabelAndValues(
     selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
-):Array<string> {
+):[Array<string>, Array<unknown>] {
     if (Array.isArray(selection)) {
         const labels:Array<string> = []
+        const values:Array<unknown> = []
 
         for (const value of selection)
-            if (['number', 'string'].includes(typeof value))
+            if (['number', 'string'].includes(typeof value)) {
                 labels.push(`${value}`)
-            else if (typeof (value as {label:string})?.label === 'string')
+                values.push(value)
+            } else if (typeof (value as {label:string})?.label === 'string') {
                 labels.push((value as {label:string}).label)
-            else if (['number', 'string'].includes(
+                values.push((value as {value:unknown}).value)
+            } else if (['number', 'string'].includes(
                 typeof (value as {value:string})?.value
-            ))
+            )) {
                 labels.push(`${(value as {value:string}).value}`)
+                values.push((value as {value:string}).value)
+            }
 
-        return labels
+        return [labels, values]
     }
 
-    if (selection !== null && typeof selection === 'object')
-        return Object.values(selection).sort()
+    if (selection !== null && typeof selection === 'object') {
+        const values:Array<string> = Object.keys(selection).sort(
+            (first:string, second:string):number =>
+                selection[first].localeCompare(selection[second])
+        )
+        return [values.map((value:string) => selection[value]), values]
+    }
 
-    return []
+    return [[], []]
 }
 export function getRepresentationFromValueSelection(
     value:unknown,

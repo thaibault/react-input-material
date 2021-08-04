@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import {FirstParameter, GenericFunction} from 'clientnode/type'
+import {AnyFunction, FirstParameter} from 'clientnode/type'
 import {
     ComponentType,
     forwardRef,
@@ -58,7 +58,7 @@ export const WrapConfigurations:FunctionComponent<
     </WrapStrict>
 
 export function createWrapConfigurationsComponent<
-    Type extends GenericFunction = GenericFunction, Reference = unknown
+    Type extends AnyFunction = AnyFunction, Reference = unknown
 >(
     WrappedComponent:Type,
     options:{withReference?:boolean|null, withThemeWrapper?:boolean} = {}
