@@ -18,6 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
+import {Mapping} from 'clientnode/type'
 import {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
 import {render} from 'react-dom'
@@ -470,7 +471,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 placeholder="input13Placeholder"
                 searchSelection
                 selection={useMemorizedValue(
-                    {a: 'hans', b: 'peter', c: 'klaus'}
+                    {a: 'hans', b: 'hans', c: 'klaus'}
                 )}
             />
             <GenericInput

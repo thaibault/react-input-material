@@ -31,7 +31,7 @@ import WrapThemeProvider from './components/WrapThemeProvider'
 import WrapTooltip from './components/WrapTooltip'
 import {
     determineInitialValue,
-    getLabels,
+    getLabelAndValues,
     getRepresentationFromValueSelection,
     getValueFromSelection,
     normalizeSelection
@@ -125,16 +125,19 @@ describe('Interval', ():void => {
 // endregion
 // region helper
 describe('helper', ():void => {
-    testEach<typeof getLabels>(
-        'getLabels',
-        getLabels,
+    testEach<typeof getLabelAndValues>(
+        'getLabelAndValues',
+        getLabelAndValues,
 
-        [[], undefined],
-        [[], []],
-        [['A', 'B'], [{label: 'A', value: 'a'}, {label: 'B', value: 'b'}]],
-        [['A', 'B'], {a: 'A', b: 'B'}],
-        [['a', 'B'], [{value: 'a'}, {label: 'B', value: 'b'}]],
-        [['JA', 'NEIN'], {false: 'NEIN', true: 'JA'}]
+        [[[], []], undefined],
+        [[[], []], []],
+        [
+            [['A', 'B'], ['a', 'b']],
+            [{label: 'A', value: 'a'}, {label: 'B', value: 'b'}]
+        ],
+        [[['A', 'B'], ['a', 'b']], {a: 'A', b: 'B'}],
+        [[['a', 'B'], ['a', 'b']], [{value: 'a'}, {label: 'B', value: 'b'}]],
+        [[['JA', 'NEIN'], ['true', 'false']], {false: 'NEIN', true: 'JA'}]
     )
     testEach<typeof getRepresentationFromValueSelection>(
         'getRepresentationFromValueSelection',
