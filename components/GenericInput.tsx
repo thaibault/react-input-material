@@ -1348,7 +1348,7 @@ export const GenericInputInner = function<Type = unknown>(
                 ;(result as Promise<Properties['selection']>).then(
                     onResultsRetrieved,
                     /*
-                        NOTE: Avoid throghing an exception when aborting the
+                        NOTE: Avoid to through an exception when aborting the
                         request intentionally.
                     */
                     Tools.noop
