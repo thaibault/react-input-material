@@ -1348,7 +1348,7 @@ export const GenericInputInner = function<Type = unknown>(
                 ;(result as Promise<Properties['selection']>).then(
                     onResultsRetrieved,
                     /*
-                        NOTE: Avoid throghing an exception when aborting the
+                        NOTE: Avoid to through an exception when aborting the
                         request intentionally.
                     */
                     Tools.noop
@@ -1561,10 +1561,11 @@ export const GenericInputInner = function<Type = unknown>(
             } :
             GenericInput.transformer
 
-    const [selection, setSelection] =
-        useState<AbortController|Properties['selection']>(
-            givenProperties.selection || givenProperties.model?.selection
-        )
+    let [selection, setSelection] =
+        useState<AbortController|Properties['selection']>()
+    if (givenProperties.selection || givenProperties.model?.selection)
+        selection = givenProperties.selection || givenProperties.model?.selection
+
     const normalizedSelection:SelectProps['options']|Array<{label?:string;value:unknown}>|undefined =
         selection instanceof AbortController ?
             [] :
