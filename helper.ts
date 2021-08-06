@@ -503,6 +503,7 @@ export function normalizeSelection(
     if (labels !== null && typeof labels === 'object') {
         if (Array.isArray(selection)) {
             const result:Array<FormattedSelectionOption> = []
+
             for (const option of selection as Array<FormattedSelectionOption>)
                 result.push({
                     ...option,
@@ -528,6 +529,7 @@ export function normalizeSelection(
                                 (labels as {false:string}).false :
                                 option.label
                 })
+
             return result
         }
 

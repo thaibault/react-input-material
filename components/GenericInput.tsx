@@ -1561,10 +1561,11 @@ export const GenericInputInner = function<Type = unknown>(
             } :
             GenericInput.transformer
 
-    const [selection, setSelection] =
-        useState<AbortController|Properties['selection']>(
-            givenProperties.selection || givenProperties.model?.selection
-        )
+    let [selection, setSelection] =
+        useState<AbortController|Properties['selection']>()
+    if (givenProperties.selection || givenProperties.model?.selection)
+        selection = givenProperties.selection || givenProperties.model?.selection
+
     const normalizedSelection:SelectProps['options']|Array<{label?:string;value:unknown}>|undefined =
         selection instanceof AbortController ?
             [] :
