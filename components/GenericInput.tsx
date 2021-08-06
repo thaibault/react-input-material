@@ -1285,7 +1285,7 @@ export const GenericInputInner = function<Type = unknown>(
                     return
 
                 /*
-                    NOTE: A synchronous retrieved selection may habe to stop a
+                    NOTE: A synchronous retrieved selection may has to stop a
                     pending (slower) asynchronous request.
                 */
                 setSelection((
