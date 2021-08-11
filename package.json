@@ -25,13 +25,13 @@
     "helper.js",
     "index.styles.css",
     "index.d.ts",
+    "index.js",
     "material-fixes.css",
     "material-fixes.styles.css",
     "testHelper.d.ts",
     "testHelper.js",
     "type.d.ts"
   ],
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/thaibault/react-input-material"
