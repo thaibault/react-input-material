@@ -1285,13 +1285,16 @@ export const GenericInputInner = function<Type = unknown>(
                     return
 
                 /*
-                    NOTE: A synchronous retrieved selection may habe to stop a
+                    NOTE: A synchronous retrieved selection may has to stop a
                     pending (slower) asynchronous request.
                 */
                 setSelection((
                     oldSelection:AbortController|Properties['selection']
                 ):Properties['selection'] => {
-                    if (oldSelection instanceof AbortController)
+                    if (
+                        oldSelection instanceof AbortController &&
+                        !oldSelection.signal.aborted
+                    )
                         oldSelection.abort()
 
                     return results as Properties['selection']
@@ -1330,7 +1333,10 @@ export const GenericInputInner = function<Type = unknown>(
                 setSelection((
                     oldSelection:AbortController|Properties['selection']
                 ):AbortController => {
-                    if (oldSelection instanceof AbortController)
+                    if (
+                        oldSelection instanceof AbortController &&
+                        !oldSelection.signal.aborted
+                    )
                         oldSelection.abort()
 
                     return abortController

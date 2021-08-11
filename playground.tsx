@@ -444,20 +444,24 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 placeholder="input12ModelPlaceholder"
                 searchSelection
                 suggestionCreator={useMemorizedValue(Tools.debounce<Array<string>>(
-                    async ({query}:SuggestionCreatorOptions<InputProperties<
+                    ({query}:SuggestionCreatorOptions<InputProperties<
                         string
-                    >>):Promise<Array<string>> => {
-                        await Tools.timeout(2000)
+                    >>):Array<string>|Promise<Array<string>> => {
+                        if (!query || query.length < 3)
+                            return []
 
-                        return [
-                            'hans with veeeeeeeeeeeeeeeery ' +
-                            'loooooooooooooooong second name',
-                            'peter',
-                            'klaus'
-                        ].filter((name:string):boolean =>
-                            !query || name.includes(query)
+                        return Tools.timeout(2000).then(():Array<string> =>
+                            [
+                                'hans with veeeeeeeeeeeeeeeery ' +
+                                'loooooooooooooooong second name',
+                                'peter',
+                                'klaus'
+                            ].filter((name:string):boolean =>
+                                !query || name.includes(query)
+                            )
                         )
-                    }
+                    },
+                    1000
                 ))}
             />
 
