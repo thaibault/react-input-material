@@ -17,6 +17,7 @@
     endregion
 */
 // region imports
+import {Ace as CodeEditorNamespace} from 'ace-builds'
 import Tools, {optionalRequire} from 'clientnode'
 import {EvaluationResult, FirstParameter, Mapping} from 'clientnode/type'
 import {
@@ -106,6 +107,7 @@ import {
     NativeInputType,
     Renderable,
     GenericInputComponent,
+    InputTablePosition as TablePosition,
     InputValueState as ValueState
 } from '../type'
 
@@ -130,6 +132,7 @@ const CodeEditor = lazy(async ():Promise<{default:ComponentType<any>}> => {
     const {config} = await import('ace-builds')
     for (const [name, value] of Object.entries(ACEEditorOptions))
         config.set(name, value)
+
     return await import('react-ace')
 })
 // endregion
@@ -641,11 +644,9 @@ export const GenericInputInner = function<Type = unknown>(
      * @param offset - Absolute position.
      * @returns Position.
      */
-    const determineTablePosition = (offset:number):{
-        column:number
-        row:number
-    } => {
-        const result = {column: 0, row: 0}
+    const determineTablePosition = (offset:number):TablePosition => {
+        const result:TablePosition = {column: 0, row: 0}
+
         if (typeof properties.value === 'string')
             for (const line of properties.value.split('\n')) {
                 if (line.length < offset)
@@ -654,8 +655,10 @@ export const GenericInputInner = function<Type = unknown>(
                     result.column = offset
                     break
                 }
+
                 result.row += 1
             }
+
         return result
     }
     /**
@@ -664,10 +667,13 @@ export const GenericInputInner = function<Type = unknown>(
      * @returns Nothing.
      */
     const setCodeEditorSelectionState = (instance:CodeEditorType):void => {
-        const range = instance.editor.selection.getRange()
-        const endPosition = determineTablePosition(properties.cursor.end)
+        const range:CodeEditorNamespace.Range =
+            instance.editor.selection.getRange()
+        const endPosition:TablePosition =
+            determineTablePosition(properties.cursor.end)
         range.setEnd(endPosition.row, endPosition.column)
-        const startPosition = determineTablePosition(properties.cursor.start)
+        const startPosition:TablePosition =
+            determineTablePosition(properties.cursor.start)
         range.setStart(startPosition.row, startPosition.column)
         instance.editor.selection.setRange(range)
     }
@@ -700,14 +706,11 @@ export const GenericInputInner = function<Type = unknown>(
             )
         instance.getBody().innerHTML = value
 
-        const walker = document.createTreeWalker(
-            instance.getBody(),
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
+        const walker:TreeWalker = document.createTreeWalker(
+            instance.getBody(), NodeFilter.SHOW_TEXT, null
         )
 
-        const range = instance.dom.createRng()
+        const range:Range = instance.dom.createRng()
         const result:{
             end?:[Node, number]
             start?:[Node, number]
@@ -1547,22 +1550,29 @@ export const GenericInputInner = function<Type = unknown>(
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:Props<Type> = Tools.extend(
-        true, Tools.copy(GenericInput.defaultProperties), givenProps
+    const givenProperties:Props<Type> = Tools.extend<Props<Type>>(
+        true,
+        Tools.copy<Props<Type>>(GenericInput.defaultProperties as Props<Type>),
+        givenProps
     )
 
-    const type:string =
-        givenProperties.type || givenProperties.model?.type || 'string'
+    const type:keyof InputDataTransformation =
+        givenProperties.type as keyof InputDataTransformation ||
+        givenProperties.model?.type ||
+        'string'
     const transformer:InputDataTransformation =
         givenProperties.transformer ?
             {
                 ...GenericInput.transformer,
-                [type]: Tools.extend(
+                [type]: Tools.extend<DataTransformSpecification<Type>>(
                     true,
-                    Tools.copy(GenericInput.transformer[
-                        type as keyof InputDataTransformation
-                    ]) || {},
-                    givenProperties.transformer
+                    Tools.copy<DataTransformSpecification<Type>>(
+                        GenericInput.transformer[type] as
+                            DataTransformSpecification<Type>
+                    ) ||
+                    {},
+                    givenProperties.transformer as
+                        DataTransformSpecification<Type>
                 )
             } :
             GenericInput.transformer
@@ -1828,7 +1838,7 @@ export const GenericInputInner = function<Type = unknown>(
                                 '<span class="' +
                                 styles['generic-input__suggestions__suggestion__mark'] +
                                 '">{1}</span>'
-                            )
+                            ) as string
                         }}
                         key={index}
                     />

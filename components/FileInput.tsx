@@ -584,9 +584,9 @@ export const FileInputInner = function(
         to avoid endless rendering loops when a value is provided via
         properties.
     */
-    if (valueState.attachBlobProperty)
+    if (valueState.attachBlobProperty && valueState.value)
         properties.value =
-            Tools.extend(true, valueState.value, properties.value)
+            Tools.extend<FileValue>(true, valueState.value, properties.value!)
 
     // / region synchronize properties into state where values are not controlled
     const currentValueState:ValueState = {

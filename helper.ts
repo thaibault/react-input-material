@@ -273,8 +273,11 @@ export const mapPropertiesIntoModel = <
         NOTE: Default props seems not to respect nested layers to merge so we
         have to manage this for nested model structure.
     */
-    const result:DP =
-        Tools.extend(true, {model: Tools.copy(defaultModel)}, properties)
+    const result:DP = Tools.extend<DP>(
+        true,
+        {model: Tools.copy<DP['model']>(defaultModel)} as DP,
+        properties as DP
+    )
     // region handle aliases
     if (result.disabled) {
         result.model.mutable = false
