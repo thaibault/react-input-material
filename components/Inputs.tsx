@@ -168,8 +168,12 @@ export const InputsInner = function<
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:InputsProps<T, P> = Tools.extend(
-        true, Tools.copy(Inputs.defaultProperties), givenProps
+    const givenProperties:InputsProps<T, P> = Tools.extend<InputsProps<T, P>>(
+        true,
+        Tools.copy<InputsProps<T, P>>(
+            Inputs.defaultProperties as InputsProps<T, P>
+        ),
+        givenProps
     )
     // endregion
     // region consolidate state
@@ -329,7 +333,7 @@ export const InputsInner = function<
         if (index >= properties.value.length)
             properties.value.push({} as P)
 
-        properties.value[index] = Tools.extend(
+        properties.value[index] = Tools.extend<P>(
             true,
             {
                 ...properties.createPrototype!({
@@ -354,17 +358,23 @@ export const InputsInner = function<
                     ),
                 ref: reference
             },
-            properties.model?.value &&
-            properties.model.value.length > index &&
-            properties.model.value[index].model ?
-                {model: properties.model.value[index].model} :
-                {},
-            properties.value && properties.value.length > index ?
-                {value: (properties.value as Array<P>)[index].value} :
-                {},
-            !controlled && values && values.length > index ?
-                {value: values[index]} :
-                {}
+            (
+                properties.model?.value &&
+                properties.model.value.length > index &&
+                properties.model.value[index].model ?
+                    {model: properties.model.value[index].model} :
+                    {}
+            ) as P,
+            (
+                properties.value && properties.value.length > index ?
+                    {value: (properties.value as Array<P>)[index].value} :
+                    {}
+            ) as P,
+            (
+                !controlled && values && values.length > index ?
+                    {value: values[index]} :
+                    {}
+            ) as P
         )
     }
 
@@ -375,6 +385,7 @@ export const InputsInner = function<
         properties.value = values = null
     else
         values = inputPropertiesToValues<T, P>(properties.value)
+
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal

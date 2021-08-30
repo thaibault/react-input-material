@@ -428,11 +428,17 @@ export type InputDataTransformation =
         float:DataTransformSpecification<number, string>
         integer:DataTransformSpecification<number, string>
         number:DataTransformSpecification<number, number>
+
+        string?:DataTransformSpecification<unknown>
     } &
     {[key in Exclude<
         NativeInputType, 'date'|'datetime-local'|'time'|'number'
     >]?:DataTransformSpecification<unknown>}
 // // endregion
+export interface InputTablePosition {
+    column:number
+    row:number
+}
 export interface InputModelState extends ModelState {
     invalidMaximum:boolean
     invalidMinimum:boolean
