@@ -127,11 +127,11 @@ export interface BaseProperties extends CommonBaseModel, ModelState {
     enforceUncontrolled:boolean
     id:string
     initialValue:unknown
-    invertedPattern:null|RegExp|string
+    invertedPattern:Array<RegExp|string>|null|RegExp|string
     label:string
     model:BaseModel
     name:string
-    pattern:null|RegExp|string
+    pattern:Array<RegExp|string>|null|RegExp|string
     required:boolean
     requiredText:string
     ripple:RipplePropT
@@ -506,7 +506,6 @@ export interface InputProperties<T = unknown> extends
     onSelect:(event:GenericEvent, properties:this) => void
     onSelectionChange:(event:GenericEvent, properties:this) => void
     outlined:boolean
-    pattern:RegExp|string
     patternText:string
     placeholder:string
     representation:string
@@ -749,7 +748,7 @@ export interface FileInputProperties extends
     Properties<FileValue>, FileInputModelState
 {
     children:(options:FileInputChildrenOptions<this>) => null|ReactElement
-    contentTypePattern:null|RegExp|string
+    contentTypePattern:Array<RegExp|string>|null|RegExp|string
     contentTypePatternText:string
     deleteButton:ReactElement|string
     downloadButton:ReactElement|string
@@ -759,7 +758,7 @@ export interface FileInputProperties extends
         prototype:InputProps<string>,
         properties:this & {value:FileValue & {name:string}}
     ) => InputProps<string>
-    invertedContentTypePattern:null|RegExp|string
+    invertedContentTypePattern:Array<RegExp|string>|null|RegExp|string
     invertedContentTypePatternText:string
     maximumSizeText:string
     media:CardMediaProps
