@@ -159,38 +159,32 @@ export const determineValidationState = <P extends DefaultProperties>(
         invalidName: ():boolean => invalidName,
         invalidContentTypePattern: ():boolean => (
             typeof properties.model.value?.blob?.type === 'string' &&
-            (
-                typeof properties.model
-                    .contentTypeRegularExpressionPattern === 'string' &&
-                !(new RegExp(
-                    properties.model.contentTypeRegularExpressionPattern
-                )).test(properties.model.value.blob.type) ||
-                properties.model.contentTypeRegularExpressionPattern !==
-                    null &&
-                typeof properties.model
-                    .contentTypeRegularExpressionPattern === 'object' &&
-                !properties.model.contentTypeRegularExpressionPattern
-                    .test(properties.model.value.blob.type)
-            )
+            ([] as Array<null|RegExp|string>)
+                .concat(properties.model.contentTypeRegularExpressionPattern)
+                .some((expression:null|RegExp|string):boolean =>
+                    typeof expression === 'string' &&
+                    !(new RegExp(expression))
+                        .test(properties.model.value!.blob!.type!) ||
+                    expression !== null &&
+                    typeof expression === 'object' &&
+                    !expression.test(properties.model.value!.blob!.type!)
+                )
         ),
         invalidInvertedContentTypePattern: ():boolean => (
             typeof properties.model.value?.blob?.type === 'string' &&
-            (
-                typeof properties.model
-                    .invertedContentTypeRegularExpressionPattern ===
-                        'string' &&
-                (new RegExp(
+            ([] as Array<null|RegExp|string>)
+                .concat(
                     properties.model
                         .invertedContentTypeRegularExpressionPattern
-                )).test(properties.model.value.blob.type) ||
-                properties.model.invertedContentTypeRegularExpressionPattern
-                    !== null &&
-                typeof properties.model
-                    .invertedContentTypeRegularExpressionPattern ===
-                        'object' &&
-                properties.model.invertedContentTypeRegularExpressionPattern
-                    .test(properties.model.value.blob.type)
-            )
+                )
+                .some((expression:null|RegExp|string):boolean =>
+                    typeof expression === 'string' &&
+                    (new RegExp(expression))
+                        .test(properties.model.value!.blob!.type!) ||
+                    expression !== null &&
+                    typeof expression === 'object' &&
+                    expression.test(properties.model.value!.blob!.type!)
+                )
         )
     }
 )

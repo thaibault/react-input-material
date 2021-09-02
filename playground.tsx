@@ -283,11 +283,11 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 placeholder="input6Placeholder"
             />
             <GenericInput
-                initialValue="only a`s allowed"
+                initialValue="has a`s and b`s"
                 model={useMemorizedValue({
                     declaration: 'pattern',
                     description: 'input6ModelDescription',
-                    regularExpressionPattern: 'a+'
+                    regularExpressionPattern: ['.*a+.*', /.*b+.*/]
                 })}
                 name="input6Model"
                 onChange={onChange}
