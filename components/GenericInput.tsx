@@ -1710,8 +1710,7 @@ export const GenericInputInner = function<Type = unknown>(
     > = {
         onBlur: onBlur,
         onFocus: onFocus,
-        placeholder: properties.placeholder,
-        value: properties.representation
+        placeholder: properties.placeholder
     }
     const materialProperties:SelectProps|TextFieldProps = {
         disabled: properties.disabled,
@@ -1888,6 +1887,7 @@ export const GenericInputInner = function<Type = unknown>(
                     onClick: onClick,
                     ...properties.rootProps
                 }}
+                value={properties.value as unknown as string}
             />,
             useSelection
         )}
@@ -1957,6 +1957,7 @@ export const GenericInputInner = function<Type = unknown>(
                                             useWorker: false
                                         }}
                                         theme="github"
+                                        value={properties.representation}
                                     />
                                 </Suspense>
                             :
@@ -1981,6 +1982,7 @@ export const GenericInputInner = function<Type = unknown>(
                                     ref={setRichTextEditorReference}
                                     textareaName={properties.name}
                                     tinymceScriptSrc={`${TINYMCE_DEFAULT_OPTIONS.base_url}tinymce.min.js`}
+                                    value={properties.representation}
                                 />
                         }
                     </label>
@@ -2121,6 +2123,7 @@ export const GenericInputInner = function<Type = unknown>(
                         properties.trailingIcon
                     ))}
                     type={determineNativeType(properties)}
+                    value={properties.representation}
                 />
             </div>,
             !(isAdvancedEditor || useSelection),
