@@ -105,10 +105,10 @@ export interface ModelState {
     visited:boolean
 }
 export interface BaseModel extends CommonBaseModel {
-    invertedRegularExpressionPattern:null|RegExp|string
+    invertedRegularExpressionPattern:Array<RegExp|string>|null|RegExp|string
     mutable:boolean
     nullable:boolean
-    regularExpressionPattern:null|RegExp|string
+    regularExpressionPattern:Array<RegExp|string>|null|RegExp|string
     state:ModelState
     writable:boolean
 }
@@ -731,8 +731,8 @@ export interface FileInputModelState extends ModelState {
     invalidName:boolean
 }
 export interface FileInputModel extends Model<FileValue> {
-    contentTypeRegularExpressionPattern:null|RegExp|string
-    invertedContentTypeRegularExpressionPattern:null|RegExp|string
+    contentTypeRegularExpressionPattern:Array<RegExp|string>|null|RegExp|string
+    invertedContentTypeRegularExpressionPattern:Array<RegExp|string>|null|RegExp|string
     maximumSize:number
     minimumSize:number
     fileName:InputModel<string>
