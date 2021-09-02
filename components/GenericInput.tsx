@@ -226,33 +226,33 @@ export function determineValidationState<T>(
 
             invalidInvertedPattern: ():boolean => (
                 typeof properties.model.value === 'string' &&
-                (
-                    typeof properties.model
-                        .invertedRegularExpressionPattern === 'string' &&
-                    (new RegExp(
-                        properties.model.invertedRegularExpressionPattern
-                    )).test(properties.model.value) ||
-                    properties.model
-                        .invertedRegularExpressionPattern !== null &&
-                    typeof properties.model
-                        .invertedRegularExpressionPattern === 'object' &&
-                    properties.model.invertedRegularExpressionPattern
-                        .test(properties.model.value)
-                )
+                ([] as Array<null|RegExp|string>)
+                    .concat(properties.model.invertedRegularExpressionPattern)
+                    .some((expression:null|RegExp|string):boolean =>
+                        typeof expression === 'string' &&
+                        (new RegExp(expression)).test(
+                            properties.model.value as unknown as string
+                        ) ||
+                        expression !== null &&
+                        typeof expression === 'object' &&
+                        expression
+                            .test(properties.model.value as unknown as string)
+                    )
             ),
             invalidPattern: ():boolean => (
                 typeof properties.model.value === 'string' &&
-                (
-                    typeof properties.model.regularExpressionPattern ===
-                        'string' &&
-                    !(new RegExp(properties.model.regularExpressionPattern))
-                        .test(properties.model.value) ||
-                    properties.model.regularExpressionPattern !== null &&
-                    typeof properties.model.regularExpressionPattern ===
-                        'object' &&
-                    !properties.model.regularExpressionPattern
-                        .test(properties.model.value)
-                )
+                ([] as Array<null|RegExp|string>)
+                    .concat(properties.model.regularExpressionPattern)
+                    .some((expression:null|RegExp|string):boolean =>
+                        typeof expression === 'string' &&
+                        !(new RegExp(expression)).test(
+                            properties.model.value as unknown as string
+                        ) ||
+                        expression !== null &&
+                        typeof expression === 'object' &&
+                        !expression
+                            .test(properties.model.value as unknown as string)
+                    )
             )
         }
     )
