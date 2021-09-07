@@ -1887,7 +1887,7 @@ export const GenericInputInner = function<Type = unknown>(
                     onClick: onClick,
                     ...properties.rootProps
                 }}
-                value={properties.value as unknown as string}
+                value={`${properties.value}`}
             />,
             useSelection
         )}

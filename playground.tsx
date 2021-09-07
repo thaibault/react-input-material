@@ -394,7 +394,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     description: 'input10ModelDescription',
                     name: 'input10Model',
                     nullable: false,
-                    type: 'string'
+                    type: 'boolean'
                 })}
                 onChange={onChange}
             />
