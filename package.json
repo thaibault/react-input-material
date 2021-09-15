@@ -1,6 +1,6 @@
 {
   "name": "react-input-material",
-  "version": "0.0.334",
+  "version": "0.0.335",
   "license": "CC-BY-3.0",
   "description": "Reusable material design based input field with support for (richt-)text, code, selections, numbers, dates and so on.",
   "homepage": "https://torben.website/react-input-material",
@@ -252,7 +252,6 @@
         "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? ['./index.css', './playground'] : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'test' ? './test' : {'./components/Dummy': './components/Dummy', './components/FileInput': './components/FileInput', './components/GenericAnimate': './components/GenericAnimate', './components/GenericInput': './components/GenericInput', './components/Inputs': './components/Inputs', './components/Interval': './components/Interval', './components/RequireableCheckbox': './components/RequireableCheckbox', './components/WrapConfigurations': './components/WrapConfigurations', './components/WrapThemeProvider': './components/WrapThemeProvider', './components/WrapTooltip': './components/WrapTooltip', helper: './helper', index: ['./index.css', './index.tsx'], testHelper: './testHelper'}"
       },
       "ignorePattern": {
-        "resourceRegExp": "jquery",
         "resourceRegExp": "node-fetch"
       }
     },
