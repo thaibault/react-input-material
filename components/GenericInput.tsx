@@ -1162,6 +1162,8 @@ export const GenericInputInner = function<Type = unknown>(
         if (properties.disabled)
             return
 
+        setIsSuggestionOpen(true)
+
         let event:GenericEvent|undefined
         if (eventOrValue !== null && typeof eventOrValue === 'object') {
             const target:any =
@@ -1401,13 +1403,21 @@ export const GenericInputInner = function<Type = unknown>(
         onTouch(event)
     }
     /**
+     * Triggered on focus events and opens suggestions.
+     * @param event - Focus event object.
+     * @returns Nothing.
+     */
+    const triggerOnFocusAndOpenSuggestions = (event:ReactFocusEvent):void => {
+        setIsSuggestionOpen(true)
+
+        onFocus(event)
+    }
+    /**
      * Triggered on focus events.
      * @param event - Focus event object.
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
-        setIsSuggestionOpen(true)
-
         triggerCallbackIfExists<Properties<Type>>(
             properties, 'focus', controlled, event, properties
         )
@@ -1710,8 +1720,8 @@ export const GenericInputInner = function<Type = unknown>(
     const genericProperties:Partial<
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     > = {
-        onBlur: onBlur,
-        onFocus: onFocus,
+        onBlur,
+        onFocus: triggerOnFocusAndOpenSuggestions,
         placeholder: properties.placeholder
     }
     const materialProperties:SelectProps|TextFieldProps = {
@@ -2028,6 +2038,7 @@ export const GenericInputInner = function<Type = unknown>(
                                 className={styles['generic-input__suggestions']}
                                 focusOnOpen={false}
                                 foundationRef={suggestionMenuFoundationReference}
+                                onFocus={onFocus}
                                 onSelect={(event:MenuOnSelectEventT):void => {
                                     onChangeValue(
                                         currentSuggestionValues[
