@@ -2029,7 +2029,6 @@ export const GenericInputInner = function<Type = unknown>(
                                 focusOnOpen={false}
                                 foundationRef={suggestionMenuFoundationReference}
                                 onSelect={(event:MenuOnSelectEventT):void => {
-                                    console.log('E', event)
                                     onChangeValue(
                                         currentSuggestionValues[
                                             event.detail.index
