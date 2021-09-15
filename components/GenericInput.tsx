@@ -1145,11 +1145,13 @@ export const GenericInputInner = function<Type = unknown>(
      * generates new value state (internal value, representation and validation
      * states). Derived event handler will be triggered when internal state
      * has been consolidated.
+     *
      * @param eventOrValue - Event object or new value.
      * @param editorInstance - Potential editor instance if triggered from a
      * rich text or code editor.
      * @param selectedIndex - Indicates whether given event was triggered by a
      * selection.
+     *
      * @returns Nothing.
      */
     const onChangeValue = (
@@ -2026,8 +2028,8 @@ export const GenericInputInner = function<Type = unknown>(
                                 className={styles['generic-input__suggestions']}
                                 focusOnOpen={false}
                                 foundationRef={suggestionMenuFoundationReference}
-                                onFocus={onFocus}
                                 onSelect={(event:MenuOnSelectEventT):void => {
+                                    console.log('E', event)
                                     onChangeValue(
                                         currentSuggestionValues[
                                             event.detail.index
