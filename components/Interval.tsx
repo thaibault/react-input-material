@@ -191,7 +191,7 @@ export const IntervalInner = function(
                 style: true,
                 value: true
             }}
-        )
+        ) as InputProps<number>
 
     endProperties = Tools.extend(
         true,
