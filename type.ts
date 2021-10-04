@@ -262,7 +262,6 @@ export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     minimum: oneOfType([number, string]),
     minimumLength: number,
     mutable: boolean,
-    pattern: oneOfType([object, string]),
     state: shape(modelStatePropertyTypes),
     writable: boolean,
     regularExpressionPattern:
