@@ -249,15 +249,26 @@
     },
     "injection": {
       "entry": {
-        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? ['./index.css', './playground'] : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'test' ? './test' : {'./components/Dummy': './components/Dummy', './components/FileInput': './components/FileInput', './components/GenericAnimate': './components/GenericAnimate', './components/GenericInput': './components/GenericInput', './components/Inputs': './components/Inputs', './components/Interval': './components/Interval', './components/RequireableCheckbox': './components/RequireableCheckbox', './components/WrapConfigurations': './components/WrapConfigurations', './components/WrapThemeProvider': './components/WrapThemeProvider', './components/WrapTooltip': './components/WrapTooltip', helper: './helper', index: ['./index.css', './index.tsx'], testHelper: './testHelper'}"
+        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? ['./index.css', './playground'] : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'test' ? {testBundle: './test'} : {'./components/Dummy': './components/Dummy', './components/FileInput': './components/FileInput', './components/GenericAnimate': './components/GenericAnimate', './components/GenericInput': './components/GenericInput', './components/Inputs': './components/Inputs', './components/Interval': './components/Interval', './components/RequireableCheckbox': './components/RequireableCheckbox', './components/WrapConfigurations': './components/WrapConfigurations', './components/WrapThemeProvider': './components/WrapThemeProvider', './components/WrapTooltip': './components/WrapTooltip', helper: './helper', index: ['./index.css', './index.tsx'], testHelper: './testHelper'}"
       }
     },
     "module": {
       "cascadingStyleSheet": {
         "exclude": false,
         "options": {
+          "esModule": false,
           "modules": {
-            "localIdentName": "[local]"
+            "namedExport": false,
+            "localIdentName": "[local]",
+            "getLocalIdent": {
+              "__evaluate__": "(context, localIdentName, localName, options) => options.namedExport ? `${localName}ClassName` : localName"
+            },
+            "mode": "local"
+          },
+          "import": {
+            "filter": {
+              "__evaluate__": "(url) => console.log('AAA', url) || !url.includes('.css')"
+            }
           }
         }
       },

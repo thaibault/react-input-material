@@ -32,6 +32,11 @@ import {
 } from 'react'
 
 import GenericInput from './GenericInput'
+/*
+"namedExport" version of css-loader:
+
+import {intervalClassName, intervalDisabledClassName} from './Interval.module'
+*/
 import styles from './Interval.module'
 import WrapConfigurations from './WrapConfigurations'
 import {

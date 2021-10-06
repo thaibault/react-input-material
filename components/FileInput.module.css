@@ -10,16 +10,36 @@ This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
 /* region imports */
-/*import '@rmwc/card/styles'*/
-@import '@material/card/dist/mdc.card.css';
-/*import '@rmwc/circular-progress/styles'*/
-/* Imported by GenericInput
+/*
+
+CSS Modules:
+
+@import '@rmwc/button/styles'
+
+@import '@rmwc/card/styles'
+
+*/
+
+/*
+
+Imported by GenericInput
+
+@import '@rmwc/circular-progress/styles'
+
 @import '@rmwc/circular-progress/circular-progress.css';
+@import '@material/icon-button/dist/mdc.icon-button.css';
+
+*/
+
+/*
+
+Plain CSS:
+
 */
 @import '@material/button/dist/mdc.button.css';
-/* Imported by GenericInput
-@import '@material/icon-button/dist/mdc.icon-button.css';
-*/
+
+@import '@material/card/dist/mdc.card.css';
+
 
 @import './GenericInput.module';
 /* endregion */
