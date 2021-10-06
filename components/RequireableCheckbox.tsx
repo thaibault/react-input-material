@@ -37,6 +37,11 @@ import {MDCCheckboxFoundation} from '@material/checkbox'
 import {Checkbox} from '@rmwc/checkbox'
 import {Theme} from '@rmwc/theme'
 
+/*
+"namedExport" version of css-loader:
+
+import {requireableCheckboxClassName} from './RequireableCheckbox.module'
+*/
 import styles from './RequireableCheckbox.module'
 import {WrapConfigurations} from './WrapConfigurations'
 import {

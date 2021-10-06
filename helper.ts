@@ -223,7 +223,8 @@ export const determineValidationState = <
             properties.model.nullable === false &&
             (
                 properties.model.type !== 'boolean' &&
-                !properties.model.value
+                !properties.model.value &&
+                properties.model.value !== 0
             ) ||
             (
                 properties.model.type === 'boolean' &&

@@ -66,6 +66,19 @@ import {
 
 import Dummy from './Dummy'
 import GenericAnimate from './GenericAnimate'
+/*
+"namedExport" version of css-loader:
+
+import {
+    genericInputSuggestionsSuggestionClassName,
+    genericInputSuggestionsSuggestionMarkClassName,
+    genericInputClassName,
+    genericInputCustomClassName,
+    genericInputEditorLabelClassName,
+    genericInputSuggestionsClassName,
+    genericInputSuggestionsPendingClassName
+} from './GenericInput.module'
+ */
 import styles from './GenericInput.module'
 import WrapConfigurations from './WrapConfigurations'
 import WrapTooltip from './WrapTooltip'

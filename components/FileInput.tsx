@@ -48,6 +48,17 @@ import {Theme} from '@rmwc/theme'
 import {Typography} from '@rmwc/typography'
 import {ComponentAdapter} from 'web-component-wrapper/type'
 
+/*
+"namedExport" version of css-loader:
+
+import {
+    fileInputClassName,
+    fileInputDownloadClassName,
+    fileInputIframeWrapperPaddingClassName,
+    fileInputNativeClassName,
+    fileInputTextRepresentationClassName
+} from './FileInput.module'
+*/
 import styles from './FileInput.module'
 import GenericInput from './GenericInput'
 import {WrapConfigurations} from './WrapConfigurations'

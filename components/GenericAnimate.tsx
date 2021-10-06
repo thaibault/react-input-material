@@ -22,6 +22,15 @@ import {FunctionComponent, ReactElement} from 'react'
 import {CSSTransition} from 'react-transition-group'
 import {TransitionProps} from 'react-transition-group/Transition'
 
+/*
+"namedExport" version of css-loader:
+
+import {
+    genericAnimateClassName,
+    genericAnimateListWrapperClassName,
+    genericAnimateWrapperClassName
+} from './GenericAnimate.module'
+*/
 import styles from './GenericAnimate.module'
 // endregion
 /**

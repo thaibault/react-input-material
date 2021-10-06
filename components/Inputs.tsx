@@ -34,6 +34,19 @@ import {ComponentAdapter} from 'web-component-wrapper/type'
 import {IconButton} from '@rmwc/icon-button'
 
 import GenericInput from './GenericInput'
+/*
+"namedExport" version of css-loader:
+
+import {
+    inputsAddButtonClassName,
+    inputsAddClassName,
+    inputsClassName,
+    inputsItemClassName,
+    inputsItemDisabledClassName,
+    inputsItemInputClassName,
+    inputsItemRemoveClassName
+} from './Inputs.module'
+*/
 import styles from './Inputs.module'
 import WrapConfigurations from './WrapConfigurations'
 import {
