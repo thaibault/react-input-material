@@ -328,11 +328,12 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 declaration="selection"
                 description="input8Description"
                 initialValue="A"
+                labels={useMemorizedValue({A: 'LA', B: 'LB', C: 'LC', D: 'LD'})}
                 name="input8"
                 onChange={onChange}
                 placeholder="input8Placeholder"
-                selection={useMemorizedValue(['A', 'B', 'C'])}
                 required
+                selection={useMemorizedValue(['A', 'B', 'C'])}
             />
             <GenericInput
                 initialValue="A"

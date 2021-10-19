@@ -477,6 +477,7 @@ export function normalizeSelection(
                         label,
                     value
                 })
+
                 index += 1
             }
         else if (selection[0] !== null && typeof selection[0] === 'object')
@@ -489,6 +490,7 @@ export function normalizeSelection(
                         labels[index] :
                         option.label
                 })
+
                 index += 1
             }
         else
@@ -499,8 +501,10 @@ export function normalizeSelection(
                         value,
                     value
                 })
+
                 index += 1
             }
+
         selection = result
     }
 
