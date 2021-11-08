@@ -1857,7 +1857,7 @@ export const GenericInputInner = function<Type = unknown>(
                             __html: Tools.stringMark(
                                 suggestion,
                                 properties.representation?.split(' ') || '',
-                                (value:string):string =>
+                                (value:unknown):string =>
                                     `${value}`.toLowerCase(),
                                 '<span class="' +
                                 styles['generic-input__suggestions__suggestion__mark'] +

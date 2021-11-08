@@ -18,7 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
-import {Mapping} from 'clientnode/type'
+import {Mapping, UnknownFunction} from 'clientnode/type'
 import {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
 import {render} from 'react-dom'
@@ -445,7 +445,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 placeholder="input12ModelPlaceholder"
                 searchSelection
                 suggestionCreator={useMemorizedValue(Tools.debounce<Array<string>>(
-                    ({query}:SuggestionCreatorOptions<InputProperties<
+                    (({query}:SuggestionCreatorOptions<InputProperties<
                         string
                     >>):Array<string>|Promise<Array<string>> => {
                         if (!query || query.length < 3)
@@ -461,7 +461,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                                 !query || name.includes(query)
                             )
                         )
-                    },
+                    }) as UnknownFunction,
                     1000
                 ))}
             />
