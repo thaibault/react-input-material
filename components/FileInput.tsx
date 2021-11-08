@@ -99,7 +99,7 @@ const imageContentTypeRegularExpression:RegExp = new RegExp(
     '|vnd\\.wap\\.wbmp|x-(icon|jng|ms-bmp))$'
 )
 const textContentTypeRegularExpression:RegExp =
-    /^(application/xml)|(text/(plain|x-ndpb[wy]html|(x-)?csv|x?html?|xml))$/
+    /^(application\/xml)|(text\/(plain|x-ndpb[wy]html|(x-)?csv|x?html?|xml))$/
 const representableTextContentTypeRegularExpression:RegExp =
     // Plain version:
     /^text\/plain$/
