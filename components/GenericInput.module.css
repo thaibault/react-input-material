@@ -15,40 +15,32 @@ endregion */
 
 CSS-Modules:
 
-import '@rmwc/circular-progress/styles'
+import "@rmwc/circular-progress/styles";
 
-import '@rmwc/formfield/styles'
+import "@rmwc/formfield/styles";
 
-import '@rmwc/icon-button/styles'
+import "@rmwc/icon-button/styles";
 
-import '@rmwc/select/styles'
+import "@rmwc/select/styles";
 
-import '@rmwc/textfield/styles'
+import "@rmwc/textfield/styles";
 
-import '@rmwc/theme/styles'
+import "@rmwc/theme/styles";
 
-import '@rmwc/tooltip/styles'
+import "@rmwc/tooltip/styles";
 
-import '@rmwc/typography/styles'
-
-*/
-
-/*
+import "@rmwc/typography/styles";
 
 Redundant:
 
-@import '@material/ripple/dist/mdc.ripple.css';
+@import "@material/ripple/dist/mdc.ripple.css";
 
-@import '@material/floating-label/dist/mdc.floating-label.css';
-@import '@material/line-ripple/dist/mdc.line-ripple.css';
-@import '@material/notched-outline/dist/mdc.notched-outline.css';
-@import '@material/ripple/dist/mdc.ripple.css';
+@import "@material/floating-label/dist/mdc.floating-label.css";
+@import "@material/line-ripple/dist/mdc.line-ripple.css";
+@import "@material/notched-outline/dist/mdc.notched-outline.css";
+@import "@material/ripple/dist/mdc.ripple.css";
 
-@import '@rmwc/icon/icon.css';
-
-*/
-
-/*
+@import "@rmwc/icon/icon.css";
 
 Plain CSS:
 

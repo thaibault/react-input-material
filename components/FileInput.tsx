@@ -19,7 +19,6 @@
 // region imports
 import {blobToBase64String, dataURLToBlob} from 'blob-util'
 import Tools from 'clientnode'
-import {FirstParameter} from 'clientnode/type'
 import {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
@@ -28,7 +27,6 @@ import {
     MouseEvent as ReactMouseEvent,
     MutableRefObject,
     ReactElement,
-    RefCallback,
     SyntheticEvent,
     useEffect,
     useImperativeHandle,
@@ -46,7 +44,6 @@ import {
 import {CircularProgress} from '@rmwc/circular-progress'
 import {Theme} from '@rmwc/theme'
 import {Typography} from '@rmwc/typography'
-import {ComponentAdapter} from 'web-component-wrapper/type'
 
 /*
 "namedExport" version of css-loader:
@@ -78,11 +75,9 @@ import {
     defaultFileInputProperties as defaultProperties,
     defaultFileNameInputProperties,
     FileInputAdapter as Adapter,
-    FileInputModel as Model,
     FileInputModelState as ModelState,
     FileInputProperties as Properties,
     FileInputProps as Props,
-    FileInputState as State,
     FileValue,
     FileInputValueState as ValueState,
     fileInputPropertyTypes as propertyTypes,
@@ -94,18 +89,18 @@ import {
 } from '../type'
 // endregion
 // region constants
-const imageContentTypeRegularExpression:RegExp = new RegExp(
-    '^image/(p?jpe?g|png|svg(\\+xml)?|vnd\\.microsoft\\.icon|gif|tiff|webp' +
+const imageContentTypeRegularExpression = new RegExp(
+    '^image\/(p?jpe?g|png|svg(\\+xml)?|vnd\\.microsoft\\.icon|gif|tiff|webp' +
     '|vnd\\.wap\\.wbmp|x-(icon|jng|ms-bmp))$'
 )
-const textContentTypeRegularExpression:RegExp =
+const textContentTypeRegularExpression =
     /^(application\/xml)|(text\/(plain|x-ndpb[wy]html|(x-)?csv|x?html?|xml))$/
-const representableTextContentTypeRegularExpression:RegExp =
+const representableTextContentTypeRegularExpression =
     // Plain version:
     /^text\/plain$/
     // Rendered version:
     // '^(application/xml)|(text/(plain|x?html?|xml))$'
-const videoContentTypeRegularExpression:RegExp = new RegExp(
+const videoContentTypeRegularExpression = new RegExp(
     '^video/((x-)?(x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|(x-)?flv|(x-)?m4v' +
     '|(x-)mng|x-ms-as|x-ms-wmv|x-msvideo)|(application/(x-)?shockwave-flash)$'
 )

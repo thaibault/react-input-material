@@ -10,10 +10,10 @@ This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
 /* region imports */
-/*import '@rmwc/icon-button/styles'*/
-@import '@material/icon-button/dist/mdc.icon-button.css';
-@import '@material/ripple/dist/mdc.ripple.css';
-@import '@rmwc/icon/icon.css';
+/* import "@rmwc/icon-button/styles" */
+@import "@material/icon-button/dist/mdc.icon-button.css";
+@import "@material/ripple/dist/mdc.ripple.css";
+@import "@rmwc/icon/icon.css";
 /* endregion */
 .inputs {
     display: flex;
@@ -26,7 +26,8 @@ endregion */
     justify-content: flex-end;
 }
 
-.inputs__add__button, .inputs__item__remove {
+.inputs__add__button,
+.inputs__item__remove {
     box-sizing: border-box;
     margin: 6px;
     text-align: center;
@@ -39,12 +40,12 @@ endregion */
     justify-content: space-between;
 }
 
-.inputs__item--disabled .inputs__item__input {
-    opacity: .7;
-}
-
 .inputs__item__input {
     width: 100%;
+}
+
+.inputs__item--disabled .inputs__item__input {
+    opacity: 70%;
 }
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:

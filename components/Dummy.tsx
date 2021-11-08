@@ -25,22 +25,22 @@ import {
     ReactElement,
     MutableRefObject
 } from 'react'
-
-import {Renderable} from '../type'
 // endregion
 /**
  * Generic strict wrapper component.
  */
 export const Dummy:FunctionComponent<any> & {isDummy:true} = forwardRef(
     ((
-        properties:Mapping<any>, reference:null|MutableRefObject<any>
+        _properties:Mapping<any>, _reference:MutableRefObject<any>|null
     ):ReactElement => <div/>) as ForwardRefRenderFunction<any, Mapping<any>>
 ) as unknown as FunctionComponent<any> & {isDummy:true}
 Dummy.isDummy = true
+
 export const CodeEditor = Dummy
 export const Editor = Dummy
 export const RichTextEditor = Dummy
 export const TextEditor = Dummy
+
 export default Dummy
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

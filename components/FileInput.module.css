@@ -14,16 +14,16 @@ endregion */
 
 CSS Modules:
 
-@import '@rmwc/button/styles'
+@import "@rmwc/button/styles";
 
-@import '@rmwc/card/styles'
+@import "@rmwc/card/styles";
 
 Imported by GenericInput
 
-@import '@rmwc/circular-progress/styles'
+@import "@rmwc/circular-progress/styles";
 
-@import '@rmwc/circular-progress/circular-progress.css';
-@import '@material/icon-button/dist/mdc.icon-button.css';
+@import "@rmwc/circular-progress/circular-progress.css";
+@import "@material/icon-button/dist/mdc.icon-button.css";
 
 Plain CSS:
 
