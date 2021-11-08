@@ -36,7 +36,6 @@ endregion */
 .generic-animate-exit-active {
     transition: opacity 200ms ease-in;
 }
-
 /*
     NOTE: If this class is not defined dedicated due to some pre-processing
     animations gets broken.

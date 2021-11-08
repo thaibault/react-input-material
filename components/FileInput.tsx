@@ -90,7 +90,7 @@ import {
 // endregion
 // region constants
 const imageContentTypeRegularExpression = new RegExp(
-    '^image\/(p?jpe?g|png|svg(\\+xml)?|vnd\\.microsoft\\.icon|gif|tiff|webp' +
+    '^image\\/(p?jpe?g|png|svg(\\+xml)?|vnd\\.microsoft\\.icon|gif|tiff|webp' +
     '|vnd\\.wap\\.wbmp|x-(icon|jng|ms-bmp))$'
 )
 const textContentTypeRegularExpression =

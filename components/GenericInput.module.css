@@ -10,9 +10,7 @@ This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
 /* region imports */
-
 /*
-
 CSS-Modules:
 
 import "@rmwc/circular-progress/styles";
@@ -43,7 +41,6 @@ Redundant:
 @import "@rmwc/icon/icon.css";
 
 Plain CSS:
-
 */
 @import "@rmwc/circular-progress/circular-progress.css";
 
@@ -71,8 +68,6 @@ Plain CSS:
 @import "@rmwc/tooltip/tooltip.css";
 
 @import "@material/typography/dist/mdc.typography.css";
-
-
 /* endregion */
 .generic-input {
     display: block;
