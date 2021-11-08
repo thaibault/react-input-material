@@ -18,10 +18,6 @@ CSS Modules:
 
 @import '@rmwc/card/styles'
 
-*/
-
-/*
-
 Imported by GenericInput
 
 @import '@rmwc/circular-progress/styles'
@@ -29,19 +25,12 @@ Imported by GenericInput
 @import '@rmwc/circular-progress/circular-progress.css';
 @import '@material/icon-button/dist/mdc.icon-button.css';
 
-*/
-
-/*
-
 Plain CSS:
 
 */
-@import '@material/button/dist/mdc.button.css';
-
-@import '@material/card/dist/mdc.card.css';
-
-
-@import './GenericInput.module';
+@import "@material/button/dist/mdc.button.css";
+@import "@material/card/dist/mdc.card.css";
+@import "./GenericInput.module";
 /* endregion */
 .file-input {
     /*
@@ -60,15 +49,16 @@ Plain CSS:
     text-decoration: none;
 }
 
-.file-input__iframe-wrapper, .file-input__text-representation {
+.file-input__iframe-wrapper,
+.file-input__text-representation {
     border-left: 1px dashed black;
     box-sizing: content-box;
-    opacity: .5;
+    opacity: 50%;
 
     margin-bottom: -55px;
 
     height: 200px;
-    transform: scale(.75);
+    transform: scale(0.75);
     transform-origin: 0 0;
 }
 
