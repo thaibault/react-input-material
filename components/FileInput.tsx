@@ -90,23 +90,25 @@ import {
 // endregion
 // region constants
 const imageContentTypeRegularExpression = new RegExp(
-    '^' +
-    /image\/(p?jpe?g|png|svg(\+xml)?|vnd\.microsoft\.icon|gif|tiff|webp|vnd\.wap\.wbmp|x-(icon|jng|ms-bmp))/.source +
-    '$'
+    '^image/(?:p?jpe?g|png|svg(?:\\+xml)?|vnd\\.microsoft\\.icon|gif|tiff|webp' +
+    '|vnd\\.wap\\.wbmp|x-(?:icon|jng|ms-bmp))$',
+    'i'
 )
-const textContentTypeRegularExpression =
-    /^(application\/xml)|(text\/(plain|x-ndpb[wy]html|(x-)?csv|x?html?|xml))$/
+const textContentTypeRegularExpression = new RegExp(
+    '^(?:application/xml)|(?:text/(?:plain|x-ndpb[wy]html|(?:x-)?csv' +
+    '|x?html?|xml))$',
+    'i'
+)
 const representableTextContentTypeRegularExpression =
     // Plain version:
-    /^text\/plain$/
+    /^text\/plain$/i
     // Rendered version:
-    // '^(application/xml)|(text/(plain|x?html?|xml))$'
+    // /^(application\/xml)|(text\/(plain|x?html?|xml))$/i
 const videoContentTypeRegularExpression = new RegExp(
-    '^' +
-    /video\/((x-)?(x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|(x-)?flv|(x-)?m4v|(x-)mng|x-ms-as|x-ms-wmv|x-msvideo)/.source +
-    '|' +
-    /(application\/(x-)?shockwave-flash)/.source +
-    '$'
+    '^video/(?:(?:x-)?(?:x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|(?:x-)?flv' +
+    '|(?:x-)?m4v|(?:x-)mng|x-ms-as|x-ms-wmv|x-msvideo)' +
+    '|(?:application/(?:x-)?shockwave-flash)$',
+    'i'
 )
 // endregion
 // region helper
