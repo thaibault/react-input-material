@@ -24,9 +24,11 @@ Project status
 
 [![code coverage](https://coveralls.io/repos/github/thaibault/react-input-material/badge.svg)](https://coveralls.io/github/thaibault/react-input-material)
 
+<!-- Too unstable yet
 [![dependencies](https://img.shields.io/david/thaibault/react-input-material.svg)](https://david-dm.org/thaibault/react-input-material)
 [![development dependencies](https://img.shields.io/david/dev/thaibault/react-input-material.svg)](https://david-dm.org/thaibault/react-input-material?type=dev)
 [![peer dependencies](https://img.shields.io/david/peer/thaibault/react-input-material.svg)](https://david-dm.org/thaibault/react-input-material?type=peer)
+-->
 [![documentation website](https://img.shields.io/website-up-down-green-red/https/torben.website/react-input-material.svg?label=documentation-website)](https://torben.website/react-input-material)
 
 Use case
