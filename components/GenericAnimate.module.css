@@ -22,13 +22,13 @@ endregion */
 .generic-animate-appear,
 .generic-animate-enter,
 .generic-animate-exit-active {
-    opacity: 0;
+    opacity: 0%;
 }
 
 .generic-animate-appear-active,
 .generic-animate-enter-active,
 .generic-animate-exit {
-    opacity: 1;
+    opacity: 100%;
 }
 
 .generic-animate-appear-active,
@@ -36,13 +36,12 @@ endregion */
 .generic-animate-exit-active {
     transition: opacity 200ms ease-in;
 }
-
 /*
     NOTE: If this class is not defined dedicated due to some pre-processing
     animations gets broken.
 */
 .generic-animate-exit-active {
-    opacity: 0;
+    opacity: 0%;
 }
 
 .generic-animate-exit-done {
