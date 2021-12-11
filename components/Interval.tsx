@@ -45,7 +45,6 @@ import {
 import {
     defaultIntervalProperties as defaultProperties,
     GenericEvent,
-    InputModel,
     InputProps,
     InputProperties,
     InputAdapterWithReferences,
@@ -84,9 +83,6 @@ const getExternalProperties = (
 ):Properties => {
     const modelState:ModelState =
         getModelState(startProperties, endProperties)
-    const value:Value = {
-        end: endProperties.value, start: startProperties.value
-    }
 
     return {
         ...properties,
@@ -109,12 +105,9 @@ const getExternalProperties = (
 // endregion
 /**
  * Generic interval start, end input wrapper component.
+ * @param props - Component properties.
+ * @param reference - Mutable reference bound to created component instance.
  *
- * @property static:displayName - Descriptive name for component to show in web
- * developer tools.
- *
- * @param props - Given components properties.
- * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
 export const IntervalInner = function(
@@ -139,7 +132,7 @@ export const IntervalInner = function(
         default property object untouched for unchanged usage in other
         instances.
     */
-    const properties:Omit<Props, 'value'> & {value: Properties['value']} =
+    const properties:Omit<Props, 'value'> & {value:Properties['value']} =
         Tools.extend(
             true, Tools.copy(Interval.defaultProperties), givenProps
         ) as Properties
@@ -261,7 +254,7 @@ export const IntervalInner = function(
     const valueState:Value = {
         end: properties.value.end.value,
         start: properties.value.start.value
-     }
+    }
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
@@ -411,13 +404,14 @@ IntervalInner.displayName = 'Interval'
 /**
  * Wrapping web component compatible react component.
  * @property static:defaultProperties - Initial property configuration.
- * @property static:propTypes - Triggers reacts runtime property value checks
+ * @property static:propTypes - Triggers reacts runtime property value checks.
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
  * @property static:wrapped - Wrapped component.
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
+ *
  * @returns React elements.
  */
 export const Interval:IntervalComponent =

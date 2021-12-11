@@ -18,7 +18,6 @@
 */
 // region imports
 import Tools from 'clientnode'
-import {FirstParameter} from 'clientnode/type'
 import {
     FocusEvent as ReactFocusEvent,
     forwardRef,
@@ -27,7 +26,6 @@ import {
     MouseEvent as ReactMouseEvent,
     MutableRefObject,
     ReactElement,
-    RefCallback,
     SyntheticEvent,
     useImperativeHandle,
     useRef,
@@ -59,7 +57,6 @@ import {
     CheckboxModel as Model,
     CheckboxProperties as Properties,
     CheckboxProps as Props,
-    CheckboxState as State,
     defaultModelState,
     DefaultCheckboxProperties as DefaultProperties,
     defaultCheckboxProperties as defaultProperties,
@@ -70,6 +67,13 @@ import {
 } from '../type'
 // endregion
 // region helper
+/**
+ * Derives validation state from provided properties and state.
+ * @param properties - Current component properties.
+ * @param currentState - Current component state.
+ *
+ * @returns Whether component is in an aggregated valid or invalid state.
+ */
 export function determineValidationState(
     properties:DefaultProperties, currentState:Partial<ModelState>
 ):boolean {
@@ -102,12 +106,12 @@ export function determineValidationState(
  * 4. All state changes except selection changes trigger an "onChange" event
  *    which delivers the consolidated properties object (with latest
  *    modifications included).
- *
  * @property static:displayName - Descriptive name for component to show in web
  * developer tools.
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
+ *
  * @returns React elements.
  */
 export const RequireableCheckboxInner = function(
@@ -117,6 +121,7 @@ export const RequireableCheckboxInner = function(
     /**
      * Calculate external properties (a set of all configurable properties).
      * @param properties - Properties to merge.
+     *
      * @returns External properties object.
      */
     const getConsolidatedProperties = (properties:Props):Properties => {
@@ -137,6 +142,7 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered on blur events.
      * @param event - Event object.
+     *
      * @returns Nothing.
      */
     const onBlur = (event:SyntheticEvent):void => setValueState((
@@ -179,6 +185,7 @@ export const RequireableCheckboxInner = function(
      * Triggered on any change events. Consolidates properties object and
      * triggers given on change callbacks.
      * @param event - Potential event object.
+     *
      * @returns Nothing.
      */
     const onChange = (event?:SyntheticEvent):void => {
@@ -201,6 +208,7 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered when ever the value changes.
      * @param event - Event object.
+     *
      * @returns Nothing.
      */
     const onChangeValue = (event:SyntheticEvent):void => {
@@ -259,6 +267,7 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered on click events.
      * @param event - Mouse event object.
+     *
      * @returns Nothing.
      */
     const onClick = (event:ReactMouseEvent):void => {
@@ -271,6 +280,7 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered on focus events.
      * @param event - Focus event object.
+     *
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
@@ -283,6 +293,7 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
+     *
      * @returns Nothing.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
@@ -465,6 +476,7 @@ RequireableCheckboxInner.displayName = 'RequireableCheckbox'
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
+ *
  * @returns React elements.
  */
 export const RequireableCheckbox:CheckboxComponent =

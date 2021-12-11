@@ -1986,7 +1986,7 @@ export const GenericInputInner = function<Type = unknown>(
                         onClick: onClick,
                         ...properties.rootProps
                     }}
-                    value={`${properties.value as string}`}
+                    value={`${properties.value as unknown as string}`}
                 />,
                 useSelection
             )}
@@ -2169,7 +2169,7 @@ export const GenericInputInner = function<Type = unknown>(
                                         onChangeValue(
                                             currentSuggestionValues[
                                                 event.detail.index
-                                            ],
+                                            ] as Type,
                                             undefined,
                                             event.detail.index
                                         )
