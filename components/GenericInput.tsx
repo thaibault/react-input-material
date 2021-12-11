@@ -19,7 +19,7 @@
 // region imports
 import {Ace as CodeEditorNamespace} from 'ace-builds'
 import Tools, {optionalRequire} from 'clientnode'
-import {EvaluationResult, FirstParameter, Mapping} from 'clientnode/type'
+import {EvaluationResult} from 'clientnode/type'
 import {
     ComponentType,
     FocusEvent as ReactFocusEvent,
@@ -31,7 +31,6 @@ import {
     MouseEvent as ReactMouseEvent,
     MutableRefObject,
     ReactElement,
-    RefCallback,
     Suspense,
     useEffect,
     useImperativeHandle,
@@ -124,8 +123,8 @@ import {
     InputValueState as ValueState
 } from '../type'
 
-declare var TARGET_TECHNOLOGY:string
-const isBrowser:boolean =
+declare const TARGET_TECHNOLOGY:string
+const isBrowser =
     !(TARGET_TECHNOLOGY === 'node' || typeof window === undefined)
 const UseAnimations:any|null =
     isBrowser ? optionalRequire('react-useanimations') : null
@@ -154,14 +153,12 @@ export type TinyMCEOptions = RawTinyMCEEditorSettings & {
     selector?:undefined
     target?:undefined
 }
-declare var UTC_BUILD_TIMESTAMP:number
+declare const UTC_BUILD_TIMESTAMP:number|undefined
 // NOTE: Could be set via module bundler environment variables.
-if (typeof UTC_BUILD_TIMESTAMP === 'undefined')
-    /* eslint-disable no-var */
-    var UTC_BUILD_TIMESTAMP:number = 1
-    /* eslint-enable no-var */
-let richTextEditorLoadedOnce:boolean = false
-const tinymceBasePath:string = '/node_modules/tinymce/'
+const CURRENT_UTC_BUILD_TIMESTAMP =
+    typeof UTC_BUILD_TIMESTAMP === 'undefined' ? 1 : UTC_BUILD_TIMESTAMP
+let richTextEditorLoadedOnce = false
+const tinymceBasePath = '/node_modules/tinymce/'
 export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
     /* eslint-disable camelcase */
     // region paths
@@ -173,7 +170,7 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
     allow_script_urls: false,
     body_class: 'mdc-text-field__input',
     branding: false,
-    cache_suffix: `?version=${UTC_BUILD_TIMESTAMP}`,
+    cache_suffix: `?version=${CURRENT_UTC_BUILD_TIMESTAMP}`,
     contextmenu: false,
     convert_fonts_to_spans: true,
     document_base_url: '/',
@@ -193,15 +190,28 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
     remove_script_host: false,
     remove_trailing_brs: true,
     schema: 'html5',
-    /* eslint-disable max-len */
-    toolbar1: 'cut copy paste | undo redo removeformat | styleselect formatselect fontselect fontsizeselect | searchreplace visualblocks fullscreen code',
-    toolbar2: 'alignleft aligncenter alignright alignjustify outdent indent | link hr nonbreaking bullist numlist bold italic underline strikethrough',
-    /* eslint-enable max-len */
+    toolbar1: `
+        cut copy paste |
+        undo redo removeformat |
+        styleselect formatselect fontselect fontsizeselect |
+        searchreplace visualblocks fullscreen code
+    `.trim(),
+    toolbar2: `
+        alignleft aligncenter alignright alignjustify outdent indent |
+        link hr nonbreaking bullist numlist bold italic underline strikethrough
+    `.trim(),
     trim: true
     /* eslint-enable camelcase */
 }
 // endregion
 // region static helper
+/**
+ * Derives validation state from provided properties and state.
+ * @param properties - Current component properties.
+ * @param currentState - Current component state.
+ *
+ * @returns Whether component is in an aggregated valid or invalid state.
+ */
 export function determineValidationState<T>(
     properties:DefaultProperties<T>, currentState:Partial<ModelState>
 ):boolean {
@@ -270,19 +280,37 @@ export function determineValidationState<T>(
         }
     )
 }
+/**
+ * Avoid propagating the enter key event since this usually sends a form which
+ * is not intended when working in a text field.
+ * @param event - Keyboard event.
+ *
+ * @returns Nothing.
+ */
 export function preventEnterKeyPropagation(event:ReactKeyboardEvent):void {
     if (Tools.keyCode.ENTER === event.keyCode)
         event.stopPropagation()
 }
+/**
+ * Indicates whether a provided query is matching currently provided
+ * suggestion.
+ * @param suggestion - Candidate to match again.
+ * @param query - Search query to check for matching.
+ *
+ * @returns Boolean result whether provided suggestion matches given query or
+ * not.
+ */
 export function suggestionMatches(
     suggestion:string, query?:null|string
 ):boolean {
     if (query) {
         suggestion = suggestion.toLowerCase()
 
-        return query.replace(/  +/g, ' ').toLowerCase().split(' ').every(
-            (part:string):boolean => suggestion.includes(part)
-        )
+        return query
+            .replace(/  +/g, ' ')
+            .toLowerCase()
+            .split(' ')
+            .every((part:string):boolean => suggestion.includes(part))
     }
 
     return false
@@ -304,12 +332,12 @@ export function suggestionMatches(
  * 4. All state changes except selection changes trigger an "onChange" event
  *    which delivers the consolidated properties object (with latest
  *    modifications included).
- *
  * @property static:displayName - Descriptive name for component to show in web
  * developer tools.
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
+ *
  * @returns React elements.
  */
 export const GenericInputInner = function<Type = unknown>(
@@ -350,6 +378,7 @@ export const GenericInputInner = function<Type = unknown>(
                         )
                 }
             } else if (inputReference.current) {
+                // eslint-disable-next-line @typescript-eslint/no-extra-semi
                 ;(
                     inputReference.current as
                         HTMLInputElement|HTMLTextAreaElement
@@ -370,7 +399,8 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Applies icon preset configurations.
      * @param options - Icon options to extend of known preset identified.
-     * @return Given potential extended icon configuration.
+     *
+     * @returns Given potential extended icon configuration.
      */
     const applyIconPreset = (
         options?:Properties['icon']
@@ -438,6 +468,7 @@ export const GenericInputInner = function<Type = unknown>(
      * Derives native input type from given input property configuration.
      * @param properties - Input configuration to derive native input type
      * from.
+     *
      * @returns Determined input type.
      */
     const determineNativeType = (
@@ -448,20 +479,22 @@ export const GenericInputInner = function<Type = unknown>(
                 properties.hidden ?
                     'password' :
                     'text' :
-                    transformer[
-                        properties.type as keyof InputDataTransformation
-                    ]?.type ?? properties.type
+                transformer[
+                    properties.type as keyof InputDataTransformation
+                ]?.type ?? properties.type
         ) as NativeInputType
     /**
      * Render help or error texts with current validation state color.
-     * @return Determined renderable markup specification.
+     * @returns Determined renderable markup specification.
      */
     const renderHelpText = ():ReactElement => <>
-       <GenericAnimate in={
-            properties.selectableEditor &&
-            properties.type === 'string' &&
-            properties.editor !== 'plain'
-        }>
+        <GenericAnimate
+            in={
+                properties.selectableEditor &&
+                properties.type === 'string' &&
+                properties.editor !== 'plain'
+            }
+        >
             <IconButton
                 icon={{
                     icon: properties.editorIsActive ?
@@ -521,21 +554,22 @@ export const GenericInputInner = function<Type = unknown>(
      * Renders given template string against all properties in current
      * instance.
      * @param template - Template to render.
+     *
      * @returns Evaluated template or an empty string if something goes wrong.
      */
     const renderMessage = (template?:any):string => {
         if (typeof template === 'string') {
             const evaluated:EvaluationResult = Tools.stringEvaluate(
                 `\`${template}\``,
-                 {
-                     formatValue: (value:Type):string =>
-                         formatValue<Type>(properties, value, transformer),
-                     ...properties
+                {
+                    formatValue: (value:Type):string =>
+                        formatValue<Type>(properties, value, transformer),
+                    ...properties
                 }
             )
             if (evaluated.error) {
                 console.warn(
-                    'Given message template could not be proceed: ' +
+                    'Given message template could not be proceed:',
                     evaluated.error
                 )
                 return ''
@@ -549,13 +583,16 @@ export const GenericInputInner = function<Type = unknown>(
      * @param content - Component or string to wrap.
      * @param propertiesOrInCondition - Animation properties or in condition
      * only.
+     * @param condition - Show condition.
+     *
      * @returns Wrapped component.
      */
     const wrapAnimationConditionally = (
         content:Renderable,
-        propertiesOrInCondition:boolean|Partial<TransitionProps<HTMLElement|undefined>> =
-            {},
-        condition:boolean = true
+        propertiesOrInCondition:(
+            boolean|Partial<TransitionProps<HTMLElement|undefined>>
+        ) = {},
+        condition = true
     ):Renderable => {
         if (typeof propertiesOrInCondition === 'boolean')
             return condition ?
@@ -563,6 +600,7 @@ export const GenericInputInner = function<Type = unknown>(
                     {content}
                 </GenericAnimate> :
                 propertiesOrInCondition ? content : ''
+
         return condition ?
             <GenericAnimate {...propertiesOrInCondition}>
                 {content}
@@ -575,6 +613,7 @@ export const GenericInputInner = function<Type = unknown>(
      * tooltip configuration.
      * @param options - Icon configuration potential extended a tooltip
      * configuration.
+     *
      * @returns Resolved icon configuration.
      */
     const wrapIconWithTooltip = (
@@ -601,6 +640,7 @@ export const GenericInputInner = function<Type = unknown>(
      * contained.
      * @param domNode - Dom node which contains given position.
      * @param offset - Relative position within given node.
+     *
      * @returns Determine absolute offset.
      */
     const determineAbsoluteSymbolOffsetFromHTML = (
@@ -609,9 +649,9 @@ export const GenericInputInner = function<Type = unknown>(
         if (!properties.value)
             return 0
 
-        const indicatorKey:string = 'generic-input-selection-indicator'
-        const indicatorValue:string = '###'
-        const indicator:string = ` ${indicatorKey}="${indicatorValue}"`
+        const indicatorKey = 'generic-input-selection-indicator'
+        const indicatorValue = '###'
+        const indicator = ` ${indicatorKey}="${indicatorValue}"`
 
         domNode.setAttribute(indicatorKey, indicatorValue)
         // NOTE: TinyMCE seems to add a newline after each paragraph.
@@ -636,6 +676,7 @@ export const GenericInputInner = function<Type = unknown>(
      * Determines absolute range from table oriented position.
      * @param column - Symbol offset in given row.
      * @param row - Offset row.
+     *
      * @returns Determined offset.
      */
     const determineAbsoluteSymbolOffsetFromTable = (
@@ -655,6 +696,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Converts absolute range into table oriented position.
      * @param offset - Absolute position.
+     *
      * @returns Position.
      */
     const determineTablePosition = (offset:number):TablePosition => {
@@ -677,6 +719,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Sets current cursor selection range in given code editor instance.
      * @param instance - Code editor instance.
+     *
      * @returns Nothing.
      */
     const setCodeEditorSelectionState = (instance:CodeEditorType):void => {
@@ -693,6 +736,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Sets current cursor selection range in given rich text editor instance.
      * @param instance - Code editor instance.
+     *
      * @returns Nothing.
      */
     const setRichTextEditorSelectionState = (instance:RichTextEditor):void => {
@@ -713,9 +757,9 @@ export const GenericInputInner = function<Type = unknown>(
         let value:string = properties.representation
         for (const type of keysSorted)
             value = (
-                value.substring(0, cursor[type as keyof typeof indicator]) +
+                value.substring(0, cursor[type]) +
                 indicator[type] +
-                value.substring(cursor[type as keyof typeof indicator])
+                value.substring(cursor[type])
             )
         instance.getBody().innerHTML = value
 
@@ -728,9 +772,10 @@ export const GenericInputInner = function<Type = unknown>(
             end?:[Node, number]
             start?:[Node, number]
         } = {}
-        let node
+
+        let node:Node|null
         while (node = walker.nextNode())
-            for (const type of keysSorted) {
+            for (const type of keysSorted)
                 if (node.nodeValue) {
                     const index:number =
                         node.nodeValue.indexOf(indicator[type])
@@ -738,16 +783,17 @@ export const GenericInputInner = function<Type = unknown>(
                         node.nodeValue = node.nodeValue.replace(
                             indicator[type], ''
                         )
+
                         result[type] = [node, index]
                     }
                 }
-            }
 
         for (const type of keysSorted)
             if (result[type])
                 range[
                     `set${Tools.stringCapitalize(type)}` as 'setEnd'|'setStart'
                 ](...(result[type] as [Node, number]))
+
         if (result.end && result.start)
             instance.selection.setRng(range)
     }
@@ -755,6 +801,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Saves current selection/cursor state in components state.
      * @param event - Event which triggered selection change.
+     *
      * @returns Nothing.
      */
     const saveSelectionState = (event:GenericEvent):void => {
@@ -810,11 +857,11 @@ export const GenericInputInner = function<Type = unknown>(
         ) {
             const add:0|1|-1 =
                 (event as unknown as KeyboardEvent)?.key?.length === 1 ?
-                1 :
-                (event as unknown as KeyboardEvent)?.key === 'Backspace' &&
-                properties.representation.length > selectionStart ?
-                    -1 :
-                    0
+                    1 :
+                    (event as unknown as KeyboardEvent)?.key === 'Backspace' &&
+                    properties.representation.length > selectionStart ?
+                        -1 :
+                        0
             setCursor({end: selectionEnd + add, start: selectionStart + add})
         }
     }
@@ -872,6 +919,7 @@ export const GenericInputInner = function<Type = unknown>(
      * Properties overwrites default properties which overwrites default model
      * properties.
      * @param properties - Properties to merge.
+     *
      * @returns Nothing.
     */
     const mapPropertiesAndValidationStateIntoModel = (
@@ -894,6 +942,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Calculate external properties (a set of all configurable properties).
      * @param properties - Properties to merge.
+     *
      * @returns External properties object.
      */
     const getConsolidatedProperties = (
@@ -949,12 +998,15 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Set code editor references.
      * @param instance - Code editor instance.
+     *
      * @returns Nothing.
      */
     const setCodeEditorReference = (instance:CodeEditorType|null):void => {
         codeEditorReference.current = instance
 
-        if (codeEditorReference.current?.editor?.container?.querySelector('textarea'))
+        if (codeEditorReference.current?.editor?.container?.querySelector(
+            'textarea'
+        ))
             codeEditorInputReference.current =
                 codeEditorReference.current.editor.container
                     .querySelector('textarea')
@@ -972,6 +1024,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Set rich text editor references.
      * @param instance - Editor instance.
+     *
      * @returns Nothing.
      */
     const setRichTextEditorReference = (
@@ -993,6 +1046,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Triggered on blur events.
      * @param event - Event object.
+     *
      * @returns Nothing.
      */
     const onBlur = (event:GenericEvent):void => setValueState((
@@ -1000,8 +1054,8 @@ export const GenericInputInner = function<Type = unknown>(
     ):ValueState<Type, ModelState> => {
         setIsSuggestionOpen(false)
 
-        let changed:boolean = false
-        let stateChanged:boolean = false
+        let changed = false
+        let stateChanged = false
 
         if (oldValueState.modelState.focused) {
             properties.focused = false
@@ -1024,7 +1078,7 @@ export const GenericInputInner = function<Type = unknown>(
                     properties, properties.value as null|Type, transformer
                 )
                 properties.representation = formatValue<Type>(
-                    properties, properties.value as null|Type, transformer
+                    properties, properties.value, transformer
                 )
             } else
                 properties.value = candidate
@@ -1075,6 +1129,7 @@ export const GenericInputInner = function<Type = unknown>(
      * Triggered on any change events. Consolidates properties object and
      * triggers given on change callbacks.
      * @param event - Potential event object.
+     *
      * @returns Nothing.
      */
     const onChange = (event?:GenericEvent):void => {
@@ -1097,6 +1152,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Triggered when editor is active indicator should be changed.
      * @param event - Mouse event object.
+     *
      * @returns Nothing.
      */
     const onChangeEditorIsActive = (event?:ReactMouseEvent):void => {
@@ -1128,6 +1184,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Triggered when show declaration indicator should be changed.
      * @param event - Potential event object.
+     *
      * @returns Nothing.
      */
     const onChangeShowDeclaration = (event?:ReactMouseEvent):void => {
@@ -1158,7 +1215,6 @@ export const GenericInputInner = function<Type = unknown>(
      * generates new value state (internal value, representation and validation
      * states). Derived event handler will be triggered when internal state
      * has been consolidated.
-     *
      * @param eventOrValue - Event object or new value.
      * @param editorInstance - Potential editor instance if triggered from a
      * rich text or code editor.
@@ -1170,7 +1226,7 @@ export const GenericInputInner = function<Type = unknown>(
     const onChangeValue = (
         eventOrValue:GenericEvent|null|Type,
         editorInstance?:RichTextEditor,
-        selectedIndex:number = -1
+        selectedIndex = -1
     ):void => {
         if (properties.disabled)
             return
@@ -1189,7 +1245,7 @@ export const GenericInputInner = function<Type = unknown>(
             else
                 properties.value = eventOrValue as null|Type
         } else
-            properties.value = eventOrValue as null|Type
+            properties.value = eventOrValue
 
         const setHelper = ():void => setValueState((
             oldValueState:ValueState<Type, ModelState>
@@ -1232,7 +1288,7 @@ export const GenericInputInner = function<Type = unknown>(
 
             valueState.value = properties.value as null|Type
 
-            let stateChanged:boolean = false
+            let stateChanged = false
 
             if (oldValueState.modelState.pristine) {
                 properties.dirty = true
@@ -1317,7 +1373,7 @@ export const GenericInputInner = function<Type = unknown>(
                     )
                         oldSelection.abort()
 
-                    return results as Properties['selection']
+                    return results
                 })
 
                 if (selectedIndex === -1) {
@@ -1342,12 +1398,13 @@ export const GenericInputInner = function<Type = unknown>(
                 Trigger asynchronous suggestions retrieving and delayed state
                 consolidation.
             */
-            const result:Properties['selection']|Promise<Properties['selection']> =
-                properties.suggestionCreator({
-                    abortController,
-                    properties,
-                    query: properties.representation
-                })
+            const result:(
+                Properties['selection']|Promise<Properties['selection']>
+            ) = properties.suggestionCreator({
+                abortController,
+                properties,
+                query: properties.representation
+            })
 
             if ((result as Promise<Properties['selection']>)?.then) {
                 setSelection((
@@ -1383,7 +1440,10 @@ export const GenericInputInner = function<Type = unknown>(
                 onResultsRetrieved(result as Properties['selection'])
         } else {
             if (selectedIndex === -1) {
-                // Map value from given selections and trigger state consolidation.
+                /*
+                    Map value from given selections and trigger state
+                    consolidation.
+                */
                 const result:null|Type = getValueFromSelection<Type>(
                     properties.representation, normalizedSelection
                 )
@@ -1404,6 +1464,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Triggered on click events.
      * @param event - Mouse event object.
+     *
      * @returns Nothing.
      */
     const onClick = (event:ReactMouseEvent):void => {
@@ -1418,6 +1479,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Triggered on focus events and opens suggestions.
      * @param event - Focus event object.
+     *
      * @returns Nothing.
      */
     const triggerOnFocusAndOpenSuggestions = (event:ReactFocusEvent):void => {
@@ -1428,6 +1490,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Triggered on focus events.
      * @param event - Focus event object.
+     *
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
@@ -1440,6 +1503,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Triggered on down up events.
      * @param event - Key up event object.
+     *
      * @returns Nothing.
      */
     const onKeyDown = (event:ReactKeyboardEvent):void => {
@@ -1460,6 +1524,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Triggered on key up events.
      * @param event - Key up event object.
+     *
      * @returns Nothing.
      */
     const onKeyUp = (event:ReactKeyboardEvent):void => {
@@ -1475,6 +1540,7 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Triggered on selection change events.
      * @param event - Event which triggered selection change.
+     *
      * @returns Nothing.
      */
     const onSelectionChange = (event:GenericEvent):void => {
@@ -1487,13 +1553,14 @@ export const GenericInputInner = function<Type = unknown>(
     /**
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
+     *
      * @returns Nothing.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
         setValueState((
             oldValueState:ValueState<Type, ModelState>
         ):ValueState<Type, ModelState> => {
-            let changedState:boolean = false
+            let changedState = false
 
             if (!oldValueState.modelState.focused) {
                 properties.focused = true
@@ -1534,7 +1601,7 @@ export const GenericInputInner = function<Type = unknown>(
     // / region references
     const codeEditorReference:MutableRefObject<CodeEditorType|null> =
         useRef<CodeEditorType>(null)
-    let codeEditorInputReference:MutableRefObject<HTMLTextAreaElement|null> =
+    const codeEditorInputReference:MutableRefObject<HTMLTextAreaElement|null> =
         useRef<HTMLTextAreaElement>(null)
     const foundationReference:MutableRefObject<
         MDCSelectFoundation|MDCTextFieldFoundation|null
@@ -1559,12 +1626,12 @@ export const GenericInputInner = function<Type = unknown>(
     const givenProps:Props<Type> = translateKnownSymbols(props)
 
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
-    let [editorState, setEditorState] = useState<EditorState>({
+    const [editorState, setEditorState] = useState<EditorState>({
         editorIsActive: false, selectionIsUnstable: false
     })
-    let [hidden, setHidden] = useState<boolean|undefined>()
+    const [hidden, setHidden] = useState<boolean|undefined>()
     const [isSuggestionOpen, setIsSuggestionOpen] = useState<boolean>(false)
-    let [showDeclaration, setShowDeclaration] = useState<boolean>(false)
+    const [showDeclaration, setShowDeclaration] = useState<boolean>(false)
 
     const initialValue:null|Type = determineInitialValue<Type>(
         givenProps,
@@ -1605,12 +1672,14 @@ export const GenericInputInner = function<Type = unknown>(
     let [selection, setSelection] =
         useState<AbortController|Properties['selection']>()
     if (givenProperties.selection || givenProperties.model?.selection)
-        selection = givenProperties.selection || givenProperties.model?.selection
+        selection =
+            givenProperties.selection || givenProperties.model?.selection
 
-    const normalizedSelection:SelectProps['options']|Array<{label?:string;value:unknown}>|undefined =
-        selection instanceof AbortController ?
-            [] :
-            normalizeSelection(selection, givenProperties.labels)
+    const normalizedSelection:(
+        SelectProps['options']|Array<{label?:string;value:unknown}>|undefined
+    ) = selection instanceof AbortController ?
+        [] :
+        normalizeSelection(selection, givenProperties.labels)
     const [suggestionLabels, suggestionValues] =
         selection instanceof AbortController ?
             [[], []] :
@@ -1649,7 +1718,7 @@ export const GenericInputInner = function<Type = unknown>(
         Boolean(givenProps.onChange || givenProps.onChangeValue)
     const representationControlled:boolean =
         controlled && givenProps.representation !== undefined
-    let selectionIsUnstable:boolean = false
+    let selectionIsUnstable = false
 
     deriveMissingPropertiesFromState()
 
@@ -1702,7 +1771,7 @@ export const GenericInputInner = function<Type = unknown>(
             for (const name of [
                 'cursor', 'editorIsActive', 'hidden', 'showDeclaration'
             ] as const)
-                if (!givenProps.hasOwnProperty(name))
+                if (!Object.prototype.hasOwnProperty.call(givenProps, name))
                     (state[name] as boolean|CursorState) = properties[name]
 
             if (!representationControlled)
@@ -1755,6 +1824,7 @@ export const GenericInputInner = function<Type = unknown>(
 
     const tinyMCEOptions:TinyMCEOptions = {
         ...TINYMCE_DEFAULT_OPTIONS,
+        // eslint-disable-next-line camelcase
         content_style: properties.disabled ? 'body {opacity: .38}' : '',
         placeholder: properties.placeholder,
         readonly: Boolean(properties.disabled),
@@ -1808,7 +1878,7 @@ export const GenericInputInner = function<Type = unknown>(
     const currentRenderableSuggestions:Array<ReactElement> = []
     const currentSuggestionLabels:Array<string> = []
     const currentSuggestionValues:Array<unknown> = []
-    const useSuggestions:boolean = Boolean(
+    const useSuggestions = Boolean(
         properties.suggestionCreator ||
         suggestionLabels.length &&
         (properties.searchSelection || properties.suggestSelection)
@@ -1817,7 +1887,7 @@ export const GenericInputInner = function<Type = unknown>(
         // NOTE: Create consistent property configuration.
         properties.suggestSelection = !properties.searchSelection
 
-        let index:number = 0
+        let index = 0
         for (const suggestion of suggestionLabels) {
             if (Tools.isFunction(properties.children)) {
                 const result:null|ReactElement = properties.children({
@@ -1858,9 +1928,12 @@ export const GenericInputInner = function<Type = unknown>(
                                 suggestion,
                                 properties.representation?.split(' ') || '',
                                 (value:unknown):string =>
-                                    `${value}`.toLowerCase(),
+                                    `${value as string}`.toLowerCase(),
                                 '<span class="' +
-                                styles['generic-input__suggestions__suggestion__mark'] +
+                                (styles[
+                                    'generic-input__suggestions__suggestion' +
+                                    '__mark'
+                                ] as string) +
                                 '">{1}</span>'
                             ) as string
                         }}
@@ -1883,278 +1956,328 @@ export const GenericInputInner = function<Type = unknown>(
         strict={GenericInput.strict}
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
-    ><div
-        className={[styles['generic-input']]
-            .concat(
-                isAdvancedEditor ? styles['generic-input--custom'] : [],
-                properties.className ?? []
-            )
-            .join(' ')
-        }
-        style={properties.styles}
     >
-        {wrapAnimationConditionally(
-            <Select
-                {...genericProperties as SelectProps}
-                {...materialProperties as SelectProps}
-                enhanced
-                foundationRef={foundationReference as
-                    MutableRefObject<MDCSelectFoundation|null>
-                }
-                inputRef={inputReference as
-                    unknown as
-                    (reference:HTMLSelectElement|null) => void
-                }
-                onChange={onChangeValue}
-                options={normalizedSelection as SelectProps['options']}
-                rootProps={{
-                    name: properties.name,
-                    onClick: onClick,
-                    ...properties.rootProps
-                }}
-                value={`${properties.value}`}
-            />,
-            useSelection
-        )}
-        {wrapAnimationConditionally(
-            [
-                <FormField
-                    className={['mdc-text-field']
-                        .concat(
-                            properties.disabled ?
-                                'mdc-text-field--disabled' :
-                                [],
-                            'mdc-text-field--textarea'
-                        )
-                        .join(' ')
-                    }
-                    key="advanced-editor-form-field"
-                >
-                    <label>
-                        <span className={
-                            [styles['generic-input__editor__label']]
-                                .concat(
-                                    'mdc-floating-label',
-                                    'mdc-floating-label--float-above'
-                                )
-                                .join(' ')
-                        }>
-                            <Theme use={
-                                properties.invalid &&
-                                (
-                                    properties.showInitialValidationState ||
-                                    properties.visited
-                                ) ? 'error' : undefined
-                            }>
-                                {properties.description || properties.name}{properties.required ? '*' : ''}
-                            </Theme>
-                        </span>
-                        {
-                            properties.editor.startsWith('code') ?
-                                <Suspense fallback={
-                                    <CircularProgress size="large" />
-                                }>
-                                    <CodeEditor
-                                        {...genericProperties as
-                                            CodeEditorProps
-                                        }
-                                        className="mdc-text-field__input"
-                                        mode={(
-                                            properties.editor.startsWith('code(') &&
-                                            properties.editor.endsWith(')')
-                                        ) ?
-                                            properties.editor.substring(
-                                                'code('.length,
-                                                properties.editor.length - 1
-                                            ) :
-                                            'javascript'
-                                        }
-                                        name={properties.name}
-                                        onChange={onChangeValue}
-                                        onCursorChange={onSelectionChange}
-                                        onSelectionChange={onSelectionChange}
-                                        ref={setCodeEditorReference}
-                                        setOptions={{
-                                            maxLines: properties.rows,
-                                            minLines: properties.rows,
-                                            readOnly: properties.disabled,
-                                            tabSize: 4,
-                                            useWorker: false
-                                        }}
-                                        theme="github"
-                                        value={properties.representation}
-                                    />
-                                </Suspense>
-                            :
-                                <RichTextEditorComponent
-                                    {...genericProperties as
-                                        RichTextEditorProps
-                                    }
-                                    disabled={properties.disabled}
-                                    init={tinyMCEOptions}
-                                    onClick={onClick as
-                                        unknown as
-                                        RichTextEventHandler<MouseEvent>
-                                    }
-                                    onEditorChange={onChangeValue as
-                                        unknown as
-                                        RichTextEditorProps['onEditorChange']
-                                    }
-                                    onKeyUp={onKeyUp as
-                                        unknown as
-                                        RichTextEventHandler<KeyboardEvent>
-                                    }
-                                    ref={setRichTextEditorReference}
-                                    textareaName={properties.name}
-                                    tinymceScriptSrc={`${TINYMCE_DEFAULT_OPTIONS.base_url}tinymce.min.js`}
-                                    value={properties.representation}
-                                />
-                        }
-                    </label>
-                </FormField>,
-                <div
-                    className="mdc-text-field-helper-line"
-                    key="advanced-editor-helper-line"
-                >
-                    <p className={
-                        'mdc-text-field-helper-text' +
-                        ' mdc-text-field-helper-text--persistent'
-                    }>{(
-                        materialProperties.helpText as {children:ReactElement}
-                    ).children}</p>
-                </div>
-            ],
-            isAdvancedEditor,
-            richTextEditorLoadedOnce || properties.editor.startsWith('code')
-        )}
-        {wrapAnimationConditionally(
-            <div>
-                {useSuggestions ?
-                    <MenuSurfaceAnchor onKeyDown={preventEnterKeyPropagation}>
-                        {selection instanceof AbortController ?
-                            <MenuSurface
-                                anchorCorner="bottomLeft"
-                                className={
-                                    styles['generic-input__suggestions'] +
-                                    ' ' +
-                                    styles['generic-input__suggestions--pending']
-                                }
-                                open={true}
-                            >
-                                <CircularProgress size="large" />
-                            </MenuSurface> :
-                            <Menu
-                                anchorCorner="bottomLeft"
-                                apiRef={(instance:MenuApi|null):void => {
-                                    suggestionMenuAPIReference.current = instance
-                                }}
-                                className={styles['generic-input__suggestions']}
-                                focusOnOpen={false}
-                                foundationRef={suggestionMenuFoundationReference}
-                                onFocus={onFocus}
-                                onSelect={(event:MenuOnSelectEventT):void => {
-                                    onChangeValue(
-                                        currentSuggestionValues[
-                                            event.detail.index
-                                        ] as unknown as Type,
-                                        undefined,
-                                        event.detail.index
-                                    )
-                                    setIsSuggestionOpen(false)
-                                }}
-                                open={
-                                    Boolean(currentSuggestionLabels.length) &&
-                                    isSuggestionOpen &&
-                                    /*
-                                        NOTE: If single possibility is already
-                                        selected avoid showing this suggestion.
-                                    */
-                                    !(
-                                        currentSuggestionLabels.length === 1 &&
-                                        currentSuggestionLabels[0] ===
-                                            properties.representation as string
-                                    )
-                                }
-                            >
-                                {currentRenderableSuggestions}
-                            </Menu>
-                        }
-                    </MenuSurfaceAnchor> :
-                    ''
-                }
-                <TextField
-                    {...genericProperties as TextFieldProps}
-                    {...materialProperties as TextFieldProps}
-                    {...(properties.type === 'number' ?
-                        {
-                            max: properties.maximum,
-                            min: properties.minimum,
-                            step: properties.step
-                        } :
-                        properties.type === 'string' ?
-                            {
-                                maxLength: properties.maximumLength >= 0 ?
-                                    properties.maximumLength :
-                                    Infinity,
-                                minLength: properties.minimumLength >= 0 ?
-                                    properties.minimumLength :
-                                    0,
-                                ...(properties.editor === 'plain' ?
-                                    {} :
-                                    {rows: properties.rows}
-                                )
-                            } :
-                            ['date', 'datetime-local', 'time'].includes(
-                                properties.type
-                            ) ?
-                                {
-                                    max: formatValue<Type>(
-                                        properties,
-                                        properties.maximum as unknown as Type,
-                                        transformer
-                                    ),
-                                    min: formatValue<Type>(
-                                        properties,
-                                        properties.minimum as unknown as Type,
-                                        transformer
-                                    ),
-                                    step: properties.step
-                                } :
-                                {}
-                    )}
-                    align={properties.align}
-                    characterCount
+        <div
+            className={[styles['generic-input']]
+                .concat(
+                    isAdvancedEditor ? styles['generic-input--custom'] : [],
+                    properties.className ?? []
+                )
+                .join(' ')
+            }
+            style={properties.styles}
+        >
+            {wrapAnimationConditionally(
+                <Select
+                    {...genericProperties as SelectProps}
+                    {...materialProperties as SelectProps}
+                    enhanced
                     foundationRef={foundationReference as
-                        MutableRefObject<MDCTextFieldFoundation|null>
+                        MutableRefObject<MDCSelectFoundation|null>
                     }
-                    fullwidth={properties.fullWidth}
                     inputRef={inputReference as
-                        MutableRefObject<HTMLInputElement|null>
+                        unknown as
+                        (_reference:HTMLSelectElement|null) => void
                     }
                     onChange={onChangeValue}
-                    ripple={properties.ripple}
+                    options={normalizedSelection as SelectProps['options']}
                     rootProps={{
                         name: properties.name,
                         onClick: onClick,
-                        onKeyDown: onKeyDown,
-                        onKeyUp: onKeyUp,
                         ...properties.rootProps
                     }}
-                    textarea={
-                        properties.type === 'string' &&
-                        properties.editor !== 'plain'
+                    value={`${properties.value as string}`}
+                />,
+                useSelection
+            )}
+            {wrapAnimationConditionally(
+                [
+                    <FormField
+                        className={['mdc-text-field']
+                            .concat(
+                                properties.disabled ?
+                                    'mdc-text-field--disabled' :
+                                    [],
+                                'mdc-text-field--textarea'
+                            )
+                            .join(' ')
+                        }
+                        key="advanced-editor-form-field"
+                    >
+                        <label>
+                            <span className={
+                                [styles['generic-input__editor__label']]
+                                    .concat(
+                                        'mdc-floating-label',
+                                        'mdc-floating-label--float-above'
+                                    )
+                                    .join(' ')
+                            }>
+                                <Theme use={
+                                    properties.invalid &&
+                                    (
+                                        properties.showInitialValidationState ||
+                                        properties.visited
+                                    ) ? 'error' : undefined
+                                }>
+                                    {
+                                        (
+                                            properties.description ||
+                                            properties.name
+                                        ) +
+                                        (properties.required ? '*' : '')
+                                    }
+                                </Theme>
+                            </span>
+                            {
+                                properties.editor.startsWith('code') ?
+                                    <Suspense fallback={
+                                        <CircularProgress size="large" />
+                                    }>
+                                        <CodeEditor
+                                            {...genericProperties as
+                                                CodeEditorProps
+                                            }
+                                            className="mdc-text-field__input"
+                                            mode={(
+                                                properties.editor.startsWith(
+                                                    'code('
+                                                ) &&
+                                                properties.editor.endsWith(')')
+                                            ) ?
+                                                properties.editor.substring(
+                                                    'code('.length,
+                                                    properties.editor.length -
+                                                    1
+                                                ) :
+                                                'javascript'
+                                            }
+                                            name={properties.name}
+                                            onChange={onChangeValue}
+                                            onCursorChange={onSelectionChange}
+                                            onSelectionChange={
+                                                onSelectionChange
+                                            }
+                                            ref={setCodeEditorReference}
+                                            setOptions={{
+                                                maxLines: properties.rows,
+                                                minLines: properties.rows,
+                                                readOnly: properties.disabled,
+                                                tabSize: 4,
+                                                useWorker: false
+                                            }}
+                                            theme="github"
+                                            value={properties.representation}
+                                        />
+                                    </Suspense> :
+                                    <RichTextEditorComponent
+                                        {...genericProperties as
+                                            RichTextEditorProps
+                                        }
+                                        disabled={properties.disabled}
+                                        init={tinyMCEOptions}
+                                        onClick={onClick as
+                                            unknown as
+                                            RichTextEventHandler<MouseEvent>
+                                        }
+                                        onEditorChange={onChangeValue as
+                                            unknown as
+                                            RichTextEditorProps[
+                                                'onEditorChange'
+                                            ]
+                                        }
+                                        onKeyUp={onKeyUp as
+                                            unknown as
+                                            RichTextEventHandler<KeyboardEvent>
+                                        }
+                                        ref={setRichTextEditorReference}
+                                        textareaName={properties.name}
+                                        tinymceScriptSrc={
+                                            (TINYMCE_DEFAULT_OPTIONS.base_url as
+                                                string
+                                            ) +
+                                            'tinymce.min.js'
+                                        }
+                                        value={properties.representation}
+                                    />
+                            }
+                        </label>
+                    </FormField>,
+                    <div
+                        className="mdc-text-field-helper-line"
+                        key="advanced-editor-helper-line"
+                    >
+                        <p className={
+                            'mdc-text-field-helper-text ' +
+                            'mdc-text-field-helper-text--persistent'
+                        }>
+                            {(
+                                materialProperties.helpText as
+                                    {children:ReactElement}
+                            ).children}
+                        </p>
+                    </div>
+                ],
+                isAdvancedEditor,
+                richTextEditorLoadedOnce ||
+                properties.editor.startsWith('code')
+            )}
+            {wrapAnimationConditionally(
+                <div>
+                    {useSuggestions ?
+                        <MenuSurfaceAnchor
+                            onKeyDown={preventEnterKeyPropagation}
+                        >
+                            {selection instanceof AbortController ?
+                                <MenuSurface
+                                    anchorCorner="bottomLeft"
+                                    className={
+                                        (
+                                            styles[
+                                                'generic-input__suggestions'
+                                            ] as string
+                                        ) +
+                                        ' ' +
+                                        (
+                                            styles[
+                                                'generic-input__suggestions' +
+                                                '--pending'
+                                            ] as string
+                                        )
+                                    }
+                                    open={true}
+                                >
+                                    <CircularProgress size="large" />
+                                </MenuSurface> :
+                                <Menu
+                                    anchorCorner="bottomLeft"
+                                    apiRef={(instance:MenuApi|null):void => {
+                                        suggestionMenuAPIReference.current =
+                                            instance
+                                    }}
+                                    className={
+                                        styles['generic-input__suggestions']
+                                    }
+                                    focusOnOpen={false}
+                                    foundationRef={
+                                        suggestionMenuFoundationReference
+                                    }
+                                    onFocus={onFocus}
+                                    onSelect={(
+                                        event:MenuOnSelectEventT
+                                    ):void => {
+                                        onChangeValue(
+                                            currentSuggestionValues[
+                                                event.detail.index
+                                            ],
+                                            undefined,
+                                            event.detail.index
+                                        )
+                                        setIsSuggestionOpen(false)
+                                    }}
+                                    open={
+                                        Boolean(
+                                            currentSuggestionLabels.length
+                                        ) &&
+                                        isSuggestionOpen &&
+                                        /*
+                                            NOTE: If single possibility is
+                                            already selected avoid showing this
+                                            suggestion.
+                                        */
+                                        !(
+                                            currentSuggestionLabels.length ===
+                                                1 &&
+                                            currentSuggestionLabels[0] ===
+                                                properties.representation
+                                        )
+                                    }
+                                >
+                                    {currentRenderableSuggestions}
+                                </Menu>
+                            }
+                        </MenuSurfaceAnchor> :
+                        ''
                     }
-                    trailingIcon={wrapIconWithTooltip(applyIconPreset(
-                        properties.trailingIcon
-                    ))}
-                    type={determineNativeType(properties)}
-                    value={properties.representation}
-                />
-            </div>,
-            !(isAdvancedEditor || useSelection),
-            richTextEditorLoadedOnce || properties.editor.startsWith('code')
-        )}
-    </div></WrapConfigurations>
+                    <TextField
+                        {...genericProperties as TextFieldProps}
+                        {...materialProperties as TextFieldProps}
+                        {...(properties.type === 'number' ?
+                            {
+                                max: properties.maximum,
+                                min: properties.minimum,
+                                step: properties.step
+                            } :
+                            properties.type === 'string' ?
+                                {
+                                    maxLength: properties.maximumLength >= 0 ?
+                                        properties.maximumLength :
+                                        Infinity,
+                                    minLength: properties.minimumLength >= 0 ?
+                                        properties.minimumLength :
+                                        0,
+                                    ...(properties.editor === 'plain' ?
+                                        {} :
+                                        {rows: properties.rows}
+                                    )
+                                } :
+                                ['date', 'datetime-local', 'time'].includes(
+                                    properties.type
+                                ) ?
+                                    {
+                                        max: formatValue<Type>(
+                                            properties,
+                                            properties.maximum as
+                                                unknown as
+                                                Type,
+                                            transformer
+                                        ),
+                                        min: formatValue<Type>(
+                                            properties,
+                                            properties.minimum as
+                                                unknown as
+                                                Type,
+                                            transformer
+                                        ),
+                                        step: properties.step
+                                    } :
+                                    {}
+                        )}
+                        align={properties.align}
+                        characterCount
+                        foundationRef={foundationReference as
+                            MutableRefObject<MDCTextFieldFoundation|null>
+                        }
+                        fullwidth={properties.fullWidth}
+                        inputRef={inputReference as
+                            MutableRefObject<HTMLInputElement|null>
+                        }
+                        onChange={onChangeValue}
+                        ripple={properties.ripple}
+                        rootProps={{
+                            name: properties.name,
+                            onClick: onClick,
+                            onKeyDown: onKeyDown,
+                            onKeyUp: onKeyUp,
+                            ...properties.rootProps
+                        }}
+                        textarea={
+                            properties.type === 'string' &&
+                            properties.editor !== 'plain'
+                        }
+                        trailingIcon={wrapIconWithTooltip(applyIconPreset(
+                            properties.trailingIcon
+                        ))}
+                        type={determineNativeType(properties)}
+                        value={properties.representation}
+                    />
+                </div>,
+                !(isAdvancedEditor || useSelection),
+                richTextEditorLoadedOnce ||
+                properties.editor.startsWith('code')
+            )}
+        </div>
+    </WrapConfigurations>
     // / endregion
     // endregion
 }
@@ -2165,7 +2288,7 @@ GenericInputInner.displayName = 'GenericInput'
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProperties - Initial property configuration.
  * @property static:locales - Defines input formatting locales.
- * @property static:propTypes - Triggers reacts runtime property value checks
+ * @property static:propTypes - Triggers reacts runtime property value checks.
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
  * @property static:transformer - Generic input data transformation
@@ -2174,6 +2297,7 @@ GenericInputInner.displayName = 'GenericInput'
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
+ *
  * @returns React elements.
  */
 export const GenericInput:GenericInputComponent =
@@ -2272,8 +2396,7 @@ GenericInput.transformer = {
                     return ''
 
                 const formattedValue:string =
-                    (new Date(Math.round((value as number) * 1000)))
-                        .toISOString()
+                    (new Date(Math.round(value * 1000))).toISOString()
 
                 return formattedValue.substring(0, formattedValue.indexOf('T'))
             }},
@@ -2309,8 +2432,7 @@ GenericInput.transformer = {
                     return ''
 
                 const formattedValue:string =
-                    (new Date(Math.round((value as number) * 1000)))
-                        .toISOString()
+                    (new Date(Math.round(value * 1000))).toISOString()
 
                 return formattedValue.substring(0, formattedValue.length - 1)
             }},
@@ -2348,8 +2470,7 @@ GenericInput.transformer = {
                     return ''
 
                 const formattedValue:string =
-                    (new Date(Math.round((value as number) * 1000)))
-                        .toISOString()
+                    (new Date(Math.round(value * 1000))).toISOString()
 
                 return formattedValue.substring(
                     formattedValue.indexOf('T') + 1, formattedValue.length - 1
@@ -2397,7 +2518,7 @@ GenericInput.transformer = {
             if (typeof value === 'string')
                 value = parseFloat(
                     GenericInput.locales[0] === 'de-DE' ?
-                        value.replace(/\./g, '').replace(/\,/g, '.') :
+                        value.replace(/\./g, '').replace(/,/g, '.') :
                         value
                 )
 

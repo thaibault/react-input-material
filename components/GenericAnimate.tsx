@@ -35,6 +35,9 @@ import styles from './GenericAnimate.module'
 // endregion
 /**
  * Generic animation wrapper component.
+ * @param properties - Component given properties object.
+ *
+ * @returns React elements.
  */
 export const GenericAnimate:FunctionComponent<Partial<TransitionProps<
     HTMLElement|undefined
@@ -49,17 +52,21 @@ export const GenericAnimate:FunctionComponent<Partial<TransitionProps<
             timeout={200}
             unmountOnExit
             {...properties}
-        >{
-            typeof properties.children === 'string' ?
-                <span className={styles['generic-animate__wrapper']}>
-                    {properties.children}
-                </span> :
-                Array.isArray(properties.children) ?
-                    <div className={styles['generic-animate__list-wrapper']}>
+        >
+            {
+                typeof properties.children === 'string' ?
+                    <span className={styles['generic-animate__wrapper']}>
                         {properties.children}
-                    </div> :
-                    properties.children
-        }</CSSTransition>
+                    </span> :
+                    Array.isArray(properties.children) ?
+                        <div
+                            className={styles['generic-animate__list-wrapper']}
+                        >
+                            {properties.children}
+                        </div> :
+                        properties.children
+            }
+        </CSSTransition>
 // region static properties
 GenericAnimate.propTypes = {
     appear: boolean,

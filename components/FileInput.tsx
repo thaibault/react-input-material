@@ -742,45 +742,51 @@ export const FileInputInner = function(
             <CardPrimaryAction>
                 {properties.value?.url ?
                     representationType === 'image' ?
-                <CardMedia
-                    {...properties.media}
-                    style={
-                        {backgroundImage: `url(${properties.value.url})`}
-                    }
-                /> :
-                representationType === 'video' ?
-                    <video autoPlay loop muted>
-                        <source
-                            src={properties.value.url}
-                            type={properties.value.blob!.type}
-                        />
-                    </video> :
-                representationType === 'renderableText' ?
-                    <div className={
-                        [styles['file-input__iframe-wrapper']].concat(
-                                ['text/html', 'text/plain'].includes(
-                                    properties.value.blob!.type!
-                                ) ?
-                                    styles[
-                                        'file-input__iframe-wrapper--padding'
-                                    ] :
-                                    []
-                            )
-                            .join(' ')
-                        }>
-                            <iframe
-                                frameBorder="no"
-                                scrolling="no"
-                                src={properties.value.url}
-                            />
-                        </div> :
-                    properties.value?.source && representationType === 'text' ?
-                        <pre className={styles[
-                            'file-input__text-representation'
-                        ]}>
-                            {properties.value.source}
-                        </pre> :
-                        '' :
+                        <CardMedia
+                            {...properties.media}
+                            style={{
+                                backgroundImage: `url(${properties.value.url})`
+                            }}
+                        /> :
+                        representationType === 'video' ?
+                            <video autoPlay loop muted>
+                                <source
+                                    src={properties.value.url}
+                                    type={properties.value.blob!.type}
+                                />
+                            </video> :
+                            representationType === 'renderableText' ?
+                                <div className={
+                                    [styles['file-input__iframe-wrapper']]
+                                        .concat(
+                                            ['text/html', 'text/plain']
+                                                .includes(
+                                                    properties.value.blob!.type!
+                                                ) ?
+                                                styles[
+                                                    'file-input__iframe-' +
+                                                    'wrapper--padding'
+                                                ] :
+                                                []
+                                        )
+                                        .join(' ')
+                                }>
+                                    <iframe
+                                        frameBorder="no"
+                                        scrolling="no"
+                                        src={properties.value.url}
+                                    />
+                                </div> :
+                                properties.value?.source &&
+                                representationType === 'text' ?
+                                    <pre
+                                        className={styles[
+                                            'file-input__text-representation'
+                                        ]}
+                                    >
+                                        {properties.value.source}
+                                    </pre> :
+                                    '' :
                     properties.value?.blob &&
                     properties.value.blob instanceof Blob ?
                         // NOTE: Only blobs have to red asynchronously.
@@ -845,7 +851,7 @@ export const FileInputInner = function(
                         ''
                     }
                 </div>
-                {/*TODO use "accept" attribute*/}
+                {/* TODO use "accept" attribute for better validation. */}
                 <input
                     disabled={properties.disabled}
                     className={styles['file-input__native']}
@@ -929,7 +935,7 @@ FileInputInner.displayName = 'FileInput'
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProperties - Initial property configuration.
- * @property static:propTypes - Triggers reacts runtime property value checks
+ * @property static:propTypes - Triggers reacts runtime property value checks.
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
  * @property static:wrapped - Wrapped component.
