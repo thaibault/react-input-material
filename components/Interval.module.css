@@ -31,7 +31,7 @@ endregion */
 }
 
 .interval--disabled .interval__icon {
-    opacity: 50%;
+    opacity: 0.5;
 }
 
 .interval__end,

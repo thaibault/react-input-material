@@ -28,12 +28,17 @@ import {
 // endregion
 /**
  * Generic strict wrapper component.
+ * @param _properties - Given component properties.
+ * @param _reference - Given reference to mutable persistent object.
+ *
+ * @returns React elements.
  */
-export const Dummy:FunctionComponent<any> & {isDummy:true} = forwardRef(
+export const Dummy:FunctionComponent<unknown> & {isDummy:true} = forwardRef(
     ((
-        _properties:Mapping<any>, _reference:MutableRefObject<any>|null
-    ):ReactElement => <div/>) as ForwardRefRenderFunction<any, Mapping<any>>
-) as unknown as FunctionComponent<any> & {isDummy:true}
+        _properties:Mapping<unknown>, _reference:MutableRefObject<unknown>|null
+    ):ReactElement => <div/>) as
+        ForwardRefRenderFunction<unknown, Mapping<unknown>>
+) as unknown as FunctionComponent<unknown> & {isDummy:true}
 Dummy.isDummy = true
 
 export const CodeEditor = Dummy

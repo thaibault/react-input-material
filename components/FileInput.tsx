@@ -90,8 +90,8 @@ import {
 // endregion
 // region constants
 const imageContentTypeRegularExpression = new RegExp(
-    '^image/(?:p?jpe?g|png|svg(?:\\+xml)?|vnd\\.microsoft\\.icon|gif|tiff|webp' +
-    '|vnd\\.wap\\.wbmp|x-(?:icon|jng|ms-bmp))$',
+    '^image/(?:p?jpe?g|png|svg(?:\\+xml)?|vnd\\.microsoft\\.icon|gif|tiff|' +
+    'webp|vnd\\.wap\\.wbmp|x-(?:icon|jng|ms-bmp))$',
     'i'
 )
 const textContentTypeRegularExpression = new RegExp(
@@ -112,7 +112,9 @@ const videoContentTypeRegularExpression = new RegExp(
 )
 // endregion
 // region helper
-export const preserveStaticFileBaseNameInputGenerator:Properties['generateFileNameInputProperties'] = (
+export const preserveStaticFileBaseNameInputGenerator:Properties[
+    'generateFileNameInputProperties'
+] = (
     prototype:InputProps<string>, {name, value: {name: fileName}}
 ):InputProps<string> => ({
     ...prototype,
@@ -198,9 +200,11 @@ export const determineValidationState = <P extends DefaultProperties>(
     }
 )
 export const readBinaryDataIntoText = (
-    blob:Blob, encoding:string = 'utf-8'
+    blob:Blob, encoding = 'utf-8'
 ):Promise<string> =>
-    new Promise<string>((resolve:Function, reject:Function):void => {
+    new Promise<string>((
+        resolve:(_value:string) => void, reject:(_reason:Error) => void
+    ):void => {
         const fileReader:FileReader = new FileReader()
 
         fileReader.onload = (event:Event):void => {
@@ -218,8 +222,8 @@ export const readBinaryDataIntoText = (
             resolve(content)
         }
 
-        fileReader.onabort = ():void => reject('abort')
-        fileReader.onerror = ():void => reject('error')
+        fileReader.onabort = ():void => reject(new Error('abort'))
+        fileReader.onerror = ():void => reject(new Error())
 
         fileReader.readAsText(
             blob,
@@ -231,7 +235,6 @@ export const readBinaryDataIntoText = (
 // endregion
 /**
  * Validateable checkbox wrapper component.
- *
  * @property static:displayName - Descriptive name for component to show in web
  * developer tools.
  *
@@ -253,6 +256,7 @@ export const readBinaryDataIntoText = (
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
+ *
  * @returns React elements.
  */
 export const FileInputInner = function(
@@ -262,10 +266,11 @@ export const FileInputInner = function(
     /**
      * Calculate external properties (a set of all configurable properties).
      * @param properties - Properties to merge.
+     *
      * @returns External properties object.
      */
     const getConsolidatedProperties = (properties:Props):Properties => {
-        let result:DefaultProperties =
+        const result:DefaultProperties =
             mapPropertiesIntoModel<Props, DefaultProperties>(
                 properties, FileInput.defaultProperties.model
             )
@@ -274,11 +279,13 @@ export const FileInputInner = function(
             result,
             // TODO not available
             false
-            /*nameInputReference.current?.properties.invalid ??
+            /*
+            nameInputReference.current?.properties.invalid ??
                 result.fileNameInputProperties.invalid ??
                 result.model.fileName.invalid ??
-                result.model!.state.invalidName*/,
-            result.model!.state as ModelState
+                result.model!.state.invalidName
+            */,
+            result.model.state
         )
 
         return getBaseConsolidatedProperties<Props, Properties>(result)
@@ -288,12 +295,13 @@ export const FileInputInner = function(
     /**
      * Triggered on blur events.
      * @param event - Event object.
+     *
      * @returns Nothing.
      */
     const onBlur = (event:SyntheticEvent):void => setValueState((
         oldValueState:ValueState
     ):ValueState => {
-        let changed:boolean = false
+        let changed = false
 
         if (oldValueState.modelState.focused) {
             properties.focused = false
@@ -330,6 +338,7 @@ export const FileInputInner = function(
      * Triggered on any change events. Consolidates properties object and
      * triggers given on change callbacks.
      * @param event - Potential event object.
+     *
      * @returns Nothing.
      */
     const onChange = (event?:SyntheticEvent):void => {
@@ -364,13 +373,14 @@ export const FileInputInner = function(
      * @param inputProperties - Current properties state.
      * @param attachBlobProperty - Indicates whether additional data is added
      * through post processed data properties.
+     *
      * @returns Nothing.
      */
     const onChangeValue = (
         eventSourceOrName:FileValue|null|string|SyntheticEvent,
         event?:SyntheticEvent|undefined,
         inputProperties?:InputProperties<string>|undefined,
-        attachBlobProperty:boolean = false
+        attachBlobProperty = false
     ):void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
@@ -416,7 +426,7 @@ export const FileInputInner = function(
             if (Tools.equals(oldValueState.value, properties.value))
                 return oldValueState
 
-            let stateChanged:boolean = false
+            let stateChanged = false
 
             const result:ValueState = {
                 ...oldValueState, value: properties.value as FileValue|null
@@ -469,6 +479,7 @@ export const FileInputInner = function(
     /**
      * Triggered on click events.
      * @param event - Mouse event object.
+     *
      * @returns Nothing.
      */
     const onClick = (event:ReactMouseEvent):void => {
@@ -481,6 +492,7 @@ export const FileInputInner = function(
     /**
      * Triggered on focus events.
      * @param event - Focus event object.
+     *
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
@@ -493,11 +505,12 @@ export const FileInputInner = function(
     /**
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
+     *
      * @returns Nothing.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
         setValueState((oldValueState:ValueState):ValueState => {
-            let changedState:boolean = false
+            let changedState = false
 
             if (!oldValueState.modelState.focused) {
                 properties.focused = true
@@ -550,7 +563,7 @@ export const FileInputInner = function(
     const givenProps:Props = translateKnownSymbols(props)
 
     const initialValue:FileValue|null = determineInitialValue<FileValue>(
-        givenProps, FileInput.defaultProperties.model!.default
+        givenProps, FileInput.defaultProperties.model.default
     )
     /*
         NOTE: Extend default properties with given properties while letting
@@ -591,7 +604,7 @@ export const FileInputInner = function(
         properties.value =
             Tools.extend<FileValue>(true, valueState.value, properties.value!)
 
-    // / region synchronize properties into state where values are not controlled
+    // / region synchronize uncontrolled properties into state
     const currentValueState:ValueState = {
         attachBlobProperty: false,
         modelState: properties.model.state,
@@ -655,7 +668,7 @@ export const FileInputInner = function(
                         typeof Blob === 'undefined' ?
                             (properties.value.toString as
                                 unknown as
-                                (encoding:string) => string
+                                (_encoding:string) => string
                             )('base64') :
                             await blobToBase64String(properties.value.blob)
                 }
@@ -692,6 +705,7 @@ export const FileInputInner = function(
             if (valueChanged)
                 onChangeValue(valueChanged, undefined, undefined, true)
         })()
+            .catch(console.error)
     })
     // region render
     const representationType:RepresentationType =
@@ -714,21 +728,25 @@ export const FileInputInner = function(
         strict={FileInput.strict}
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
-    ><Card
-        className={
-            [styles['file-input']].concat(properties.className ?? []).join(' ')
-        }
-        onBlur={onBlur}
-        onClick={onClick}
-        onFocus={onFocus}
-        style={properties.styles}
     >
-        <CardPrimaryAction>
-            {properties.value?.url ?
-                representationType === 'image' ?
+        <Card
+            className={
+                [styles['file-input']].concat(properties.className ?? [])
+                    .join(' ')
+            }
+            onBlur={onBlur}
+            onClick={onClick}
+            onFocus={onFocus}
+            style={properties.styles}
+        >
+            <CardPrimaryAction>
+                {properties.value?.url ?
+                    representationType === 'image' ?
                 <CardMedia
                     {...properties.media}
-                    style={{backgroundImage: `url(${properties.value.url})`}}
+                    style={
+                        {backgroundImage: `url(${properties.value.url})`}
+                    }
                 /> :
                 representationType === 'video' ?
                     <video autoPlay loop muted>
@@ -740,160 +758,169 @@ export const FileInputInner = function(
                 representationType === 'renderableText' ?
                     <div className={
                         [styles['file-input__iframe-wrapper']].concat(
-                            ['text/html', 'text/plain'].includes(
-                                properties.value.blob!.type!
-                            ) ?
-                                styles['file-input__iframe-wrapper--padding'] :
-                                []
-                        )
-                        .join(' ')
-                    }>
-                        <iframe
-                            frameBorder="no"
-                            scrolling="no"
-                            src={properties.value.url}
-                        />
-                    </div> :
-                properties.value?.source && representationType === 'text' ?
-                    <pre className={styles['file-input__text-representation']}>
-                        {properties.value.source}
-                    </pre> :
-                    '' :
-            properties.value?.blob && properties.value.blob instanceof Blob ?
-                // NOTE: Only blobs have to red asynchronously.
-                <CircularProgress size="large" /> :
-                ''
-            }
-            <div>
-                <Typography tag="h2" use="headline6">
-                    {invalid ?
-                        <Theme use="error">{
+                                ['text/html', 'text/plain'].includes(
+                                    properties.value.blob!.type!
+                                ) ?
+                                    styles[
+                                        'file-input__iframe-wrapper--padding'
+                                    ] :
+                                    []
+                            )
+                            .join(' ')
+                        }>
+                            <iframe
+                                frameBorder="no"
+                                scrolling="no"
+                                src={properties.value.url}
+                            />
+                        </div> :
+                    properties.value?.source && representationType === 'text' ?
+                        <pre className={styles[
+                            'file-input__text-representation'
+                        ]}>
+                            {properties.value.source}
+                        </pre> :
+                        '' :
+                    properties.value?.blob &&
+                    properties.value.blob instanceof Blob ?
+                        // NOTE: Only blobs have to red asynchronously.
+                        <CircularProgress size="large" /> :
+                        ''
+                }
+                <div>
+                    <Typography tag="h2" use="headline6">
+                        {invalid ?
+                            <Theme use="error">{
+                                properties.description ?
+                                    properties.description :
+                                    properties.name
+                            }</Theme> :
                             properties.description ?
                                 properties.description :
                                 properties.name
-                        }</Theme> :
-                        properties.description ?
-                            properties.description :
-                            properties.name
-                    }
-                </Typography>
-                {properties.declaration ?
-                    <Typography
-                        style={{marginTop: '-1rem'}}
-                        tag="h3"
-                        theme="textSecondaryOnBackground"
-                        use="subtitle2"
-                    >
-                        {invalid ?
-                            <Theme use="error">
-                                {properties.declaration}
-                            </Theme> :
-                            properties.declaration
                         }
-                    </Typography> :
-                    ''
-                }
-                {properties.value ?
-                    <GenericInput
-                        ref={nameInputReference}
-                        {...properties.generateFileNameInputProperties(
-                            {
-                                disabled: properties.disabled,
-                                value: properties.value?.name,
-                                ...defaultFileNameInputProperties,
-                                model: properties.model.fileName,
-                                onChangeValue: onChangeValue,
-                                default: properties.value.name
-                            },
-                            properties as
-                                Omit<Properties, 'value'> &
-                                {value:FileValue & {name:string}}
-                        )}
-                    /> :
-                    ''
-                }
-                {properties.children ?
-                    properties.children({
-                        declaration: properties.declaration,
-                        invalid,
-                        properties,
-                        value: properties.value
-                    }) :
-                    ''
-                }
-            </div>
-            {/*TODO use "accept" attribute*/}
-            <input
-                disabled={properties.disabled}
-                className={styles['file-input__native']}
-                id={properties.id || properties.name}
-                name={properties.name}
-                onChange={onChangeValue}
-                ref={fileInputReference}
-                type="file"
-            />
-        </CardPrimaryAction>
-        {!properties.disabled || properties.value ?
-            <CardActions>
-                <CardActionButtons>
-                    {!properties.disabled ?
-                        <CardActionButton
-                            onClick={():void =>
-                                fileInputReference.current?.click()
-                            }
-                            ref={uploadButtonReference}
-                            ripple={properties.ripple}
+                    </Typography>
+                    {properties.declaration ?
+                        <Typography
+                            style={{marginTop: '-1rem'}}
+                            tag="h3"
+                            theme="textSecondaryOnBackground"
+                            use="subtitle2"
                         >
-                            {properties.value ?
-                                properties.editButton :
-                                properties.newButton
+                            {invalid ?
+                                <Theme use="error">
+                                    {properties.declaration}
+                                </Theme> :
+                                properties.declaration
                             }
-                        </CardActionButton> :
+                        </Typography> :
                         ''
                     }
                     {properties.value ?
-                        <>
-                            {!properties.disabled ?
-                                <CardActionButton
-                                    onClick={():void => onChangeValue(null)}
-                                    ref={deleteButtonReference}
-                                    ripple={properties.ripple}
-                                >{properties.deleteButton}</CardActionButton> :
-                                ''
-                            }
-                            {properties.value.url ?
-                                <CardActionButton
-                                    onClick={():void =>
-                                        downloadLinkReference.current?.click()
-                                    }
-                                    ripple={properties.ripple}
-                                >
-                                    <a
-                                        className={
-                                            styles['file-input__download']
-                                        }
-                                        download={properties.value.name}
-                                        href={properties.value.url}
-                                        ref={downloadLinkReference}
-                                        target="_blank"
-                                        {...(properties.value.blob?.type ?
-                                            {type:
-                                                properties.value.blob.type
-                                            } :
-                                            {}
-                                        )}
-                                    >{properties.downloadButton}</a>
-                                </CardActionButton> :
-                                ''
-                            }
-                        </> :
+                        <GenericInput
+                            ref={nameInputReference}
+                            {...properties.generateFileNameInputProperties(
+                                {
+                                    disabled: properties.disabled,
+                                    value: properties.value?.name,
+                                    ...defaultFileNameInputProperties,
+                                    model: properties.model.fileName,
+                                    onChangeValue: onChangeValue,
+                                    default: properties.value.name
+                                },
+                                properties as
+                                    Omit<Properties, 'value'> &
+                                    {value:FileValue & {name:string}}
+                            )}
+                        /> :
                         ''
                     }
-                </CardActionButtons>
-            </CardActions> :
-            ''
-        }
-    </Card></WrapConfigurations>
+                    {properties.children ?
+                        properties.children({
+                            declaration: properties.declaration,
+                            invalid,
+                            properties,
+                            value: properties.value
+                        }) :
+                        ''
+                    }
+                </div>
+                {/*TODO use "accept" attribute*/}
+                <input
+                    disabled={properties.disabled}
+                    className={styles['file-input__native']}
+                    id={properties.id || properties.name}
+                    name={properties.name}
+                    onChange={onChangeValue}
+                    ref={fileInputReference}
+                    type="file"
+                />
+            </CardPrimaryAction>
+            {!properties.disabled || properties.value ?
+                <CardActions>
+                    <CardActionButtons>
+                        {!properties.disabled ?
+                            <CardActionButton
+                                onClick={():void =>
+                                    fileInputReference.current?.click()
+                                }
+                                ref={uploadButtonReference}
+                                ripple={properties.ripple}
+                            >
+                                {properties.value ?
+                                    properties.editButton :
+                                    properties.newButton
+                                }
+                            </CardActionButton> :
+                            ''
+                        }
+                        {properties.value ?
+                            <>
+                                {!properties.disabled ?
+                                    <CardActionButton
+                                        onClick={():void => onChangeValue(null)}
+                                        ref={deleteButtonReference}
+                                        ripple={properties.ripple}
+                                    >
+                                        {properties.deleteButton}
+                                    </CardActionButton> :
+                                    ''
+                                }
+                                {properties.value.url ?
+                                    <CardActionButton
+                                        onClick={():void =>
+                                            downloadLinkReference
+                                                .current?.click()
+                                        }
+                                        ripple={properties.ripple}
+                                    >
+                                        <a
+                                            className={
+                                                styles['file-input__download']
+                                            }
+                                            download={properties.value.name}
+                                            href={properties.value.url}
+                                            ref={downloadLinkReference}
+                                            target="_blank"
+                                            {...(properties.value.blob?.type ?
+                                                {type:
+                                                    properties.value.blob.type
+                                                } :
+                                                {}
+                                            )}
+                                        >{properties.downloadButton}</a>
+                                    </CardActionButton> :
+                                    ''
+                                }
+                            </> :
+                            ''
+                        }
+                    </CardActionButtons>
+                </CardActions> :
+                ''
+            }
+        </Card>
+    </WrapConfigurations>
     // endregion
 }
 // NOTE: This is useful in react dev tools.
@@ -909,6 +936,7 @@ FileInputInner.displayName = 'FileInput'
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
+ *
  * @returns React elements.
  */
 export const FileInput:FileInputComponent =
