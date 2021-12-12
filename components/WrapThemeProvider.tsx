@@ -22,11 +22,13 @@ import {ThemeProvider, ThemeProviderProps} from '@rmwc/theme'
 // endregion
 /**
  * Wraps a theme provider to given element if a configuration is provided.
- * @param children - Component or string to wrap.
- * @param configuration - Potential theme provider configuration.
- * @param wrap - Instead of injecting a div tag, wrap a child component by
- * merging the theme styles directly onto it. Useful when you don't want to
- * mess with layout.
+ * @param properties - Component provided properties.
+ * @param properties.children - Component or string to wrap.
+ * @param properties.configuration - Potential theme provider configuration.
+ * @param properties.wrap - Instead of injecting a div tag, wrap a child
+ * component by merging the theme styles directly onto it. Useful when you
+ * don't want to mess with layout.
+ *
  * @returns Wrapped content.
  */
 export const WrapThemeProvider:FunctionComponent<{
@@ -38,6 +40,7 @@ export const WrapThemeProvider:FunctionComponent<{
         {children}
     </ThemeProvider> :
     children
+
 export default WrapThemeProvider
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

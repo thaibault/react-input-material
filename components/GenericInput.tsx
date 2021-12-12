@@ -1762,6 +1762,8 @@ export const GenericInputInner = function<Type = unknown>(
             setValueState, currentValueState
         )
     // endregion
+    // endregion
+    // region export references
     useImperativeHandle(
         reference,
         ():AdapterWithReferences<Type> => {

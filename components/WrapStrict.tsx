@@ -23,12 +23,19 @@ import {Renderable} from '../type'
 // endregion
 /**
  * Generic strict wrapper component.
+ * @param properties - Provided component properties.
+ * @param properties.children - Components to wrap.
+ * @param properties.strict - Indicates whether to wrap with strict indicating
+ * component.
+ *
+ * @returns React component.
  */
 export const WrapStrict:FunctionComponent<{
     children:Renderable
     strict:boolean
 }> = ({children, strict}):ReactElement =>
     strict ? <StrictMode>{children}</StrictMode> : <>{children}</>
+
 export default WrapStrict
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

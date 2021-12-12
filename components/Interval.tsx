@@ -168,7 +168,7 @@ export const IntervalInner = function(
             properties.model?.value?.end?.value ??
             startProperties.default ??
             properties.model?.value?.start?.default ??
-            null,
+            null
     })
     if (!properties.value)
         properties.value =
