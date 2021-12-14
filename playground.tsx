@@ -40,19 +40,19 @@ import {
     IntervalConfiguration,
     IntervalProps,
     IntervalValue,
-    Model,
     SuggestionCreatorOptions
 } from './type'
 // endregion
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format!.final.options = {currency: 'EUR'}
 
-import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 const Application:FunctionComponent<{}> = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<unknown>()
-    const onChange:((properties:{model:unknown}) => void) = useMemorizedValue<
-        (properties:{model:unknown}) => void
-    >(({model}):void => setSelectedState(model))
+
+    const onChange:((_properties:{model:unknown}) => void) =
+        useMemorizedValue<(_properties:{model:unknown}) => void>(
+            ({model}):void => setSelectedState(model)
+        )
 
     const [fadeState, setFadeState] = useState<boolean>(false)
     useEffect(():(() => void) => Tools.timeout(
@@ -63,12 +63,12 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         blob: new Blob(['test'], {type: 'text/plain'}),
         name: 'test.txt'
     })
-    const onChangeValue1 = useMemorizedValue<(value:FileValue|null) =>
-        void>(setValue1)
+    const onChangeValue1 =
+        useMemorizedValue<(_value:FileValue|null) => void>(setValue1)
 
     const [value2, setValue2] = useState<null|string>('')
     const onChangeValue2 =
-        useMemorizedValue<(value:null|string) => void>(setValue2)
+        useMemorizedValue<(_value:null|string) => void>(setValue2)
 
     type FloatValueState = {
         representation:string
@@ -78,7 +78,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
         value: 1234.34, representation: '1.234,34'
     })
     const onChangeValue3 =
-        useMemorizedValue<(value:FloatValueState) => void>(setValue3)
+        useMemorizedValue<(_value:FloatValueState) => void>(setValue3)
 
     type SelectionValueType = {
         representation:string
@@ -87,21 +87,21 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
     const [value4, setValue4] =
         useState<SelectionValueType>({representation: 'klaus', value: 'b'})
     const onChangeValue4 =
-        useMemorizedValue<(value:SelectionValueType) => void>(setValue4)
+        useMemorizedValue<(_value:SelectionValueType) => void>(setValue4)
 
     const [value5, setValue5] =
         useState<IntervalValue|null>({end: 120, start: 60})
     const onChangeValue5 =
-        useMemorizedValue<(value:IntervalValue|null) => void>(setValue5)
+        useMemorizedValue<(_value:IntervalValue|null) => void>(setValue5)
 
     const [value6, setValue6] = useState<boolean|null>(false)
     const onChangeValue6 =
-        useMemorizedValue<(value:boolean|null) => void>(setValue6)
+        useMemorizedValue<(_value:boolean|null) => void>(setValue6)
 
     const [value7, setValue7] =
         useState<Array<null|string>|null>(['first item'])
     const onChangeValue7 =
-        useMemorizedValue<(values:Array<null|string>|null) => void>(setValue7)
+        useMemorizedValue<(_values:Array<null|string>|null) => void>(setValue7)
     // endregion
 
     return (<>
@@ -124,7 +124,8 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                                 <li>
                                     Last modified date time:
                                     {Tools.dateTimeFormat(
-                                        '${mediumDay}.${mediumMonth}.${fullYear}',
+                                        '${mediumDay}.${mediumMonth}.' +
+                                        '${fullYear}',
                                         new Date(
                                             (value.blob as File).lastModified
                                         )
@@ -314,7 +315,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 model={useMemorizedValue({
                     declaration: 'password',
                     description: 'input7ModelDescription',
-                    regularExpressionPattern: 'a+',
+                    regularExpressionPattern: 'a+'
                 })}
                 name="passwordInput7Model"
                 onChange={onChange}
@@ -344,7 +345,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     name: 'input8Model',
                     mutable: false,
                     nullable: false,
-                    selection: ['A', 'B', 'C'],
+                    selection: ['A', 'B', 'C']
                 })}
                 onChange={onChange}
                 placeholder="input8ModelPlaceholder"
@@ -418,7 +419,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     description: 'input11ModelDescription',
                     name: 'input11Model',
                     nullable: false,
-                    selection: {a: 'A', b: 'B', c: 'C'},
+                    selection: {a: 'A', b: 'B', c: 'C'}
                 })}
                 onChange={onChange}
             />
@@ -444,26 +445,28 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 placeholder="input12ModelPlaceholder"
                 searchSelection
-                suggestionCreator={useMemorizedValue(Tools.debounce<Array<string>>(
-                    (({query}:SuggestionCreatorOptions<InputProperties<
-                        string
-                    >>):Array<string>|Promise<Array<string>> => {
-                        if (!query || query.length < 3)
-                            return []
+                suggestionCreator={useMemorizedValue(
+                    Tools.debounce<Array<string>>(
+                        (({query}:SuggestionCreatorOptions<InputProperties<
+                            string
+                        >>):Array<string>|Promise<Array<string>> => {
+                            if (!query || query.length < 3)
+                                return []
 
-                        return Tools.timeout(2000).then(():Array<string> =>
-                            [
-                                'hans with veeeeeeeeeeeeeeeery ' +
-                                'loooooooooooooooong second name',
-                                'peter',
-                                'klaus'
-                            ].filter((name:string):boolean =>
-                                !query || name.includes(query)
+                            return Tools.timeout(2000).then(():Array<string> =>
+                                [
+                                    'hans with veeeeeeeeeeeeeeeery ' +
+                                    'loooooooooooooooong second name',
+                                    'peter',
+                                    'klaus'
+                                ].filter((name:string):boolean =>
+                                    !query || name.includes(query)
+                                )
                             )
-                        )
-                    }) as UnknownFunction,
-                    1000
-                ))}
+                        }) as UnknownFunction,
+                        1000
+                    )
+                )}
             />
 
             <hr/>
@@ -512,13 +515,15 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 name="controlled"
-                onChange={useMemorizedValue((properties:InputProperties<string>):void => {
-                    onChangeValue4({
-                        representation: properties.representation,
-                        value: properties.value
-                    })
-                    onChange(properties)
-                })}
+                onChange={useMemorizedValue(
+                    (properties:InputProperties<string>):void => {
+                        onChangeValue4({
+                            representation: properties.representation,
+                            value: properties.value
+                        })
+                        onChange(properties)
+                    }
+                )}
                 representation={value4.representation}
                 searchSelection
                 selection={useMemorizedValue(
@@ -528,13 +533,15 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <GenericInput
                 name="controlled"
-                onChange={useMemorizedValue((properties:InputProperties<string>):void => {
-                    onChangeValue4({
-                        representation: properties.representation,
-                        value: properties.value
-                    })
-                    onChange(properties)
-                })}
+                onChange={useMemorizedValue(
+                    (properties:InputProperties<string>):void => {
+                        onChangeValue4({
+                            representation: properties.representation,
+                            value: properties.value
+                        })
+                        onChange(properties)
+                    }
+                )}
                 representation={value4.representation}
                 suggestSelection
                 selection={useMemorizedValue(
@@ -566,7 +573,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     declaration: 'text',
                     description: 'input14ModelDescription',
                     name: 'input14Model',
-                    nullable: false,
+                    nullable: false
                 })}
                 onChange={onChange}
                 rows={2}
@@ -592,7 +599,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                     declaration: 'code',
                     description: 'input15ModelDescription',
                     name: 'input15Model',
-                    nullable: false,
+                    nullable: false
                 })}
                 onChange={onChange}
                 rows={6}
@@ -808,7 +815,7 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
             />
             <RequireableCheckbox
                 model={useMemorizedValue(
-                    {name: 'checkbox2Model', mutable:false, nullable: false}
+                    {name: 'checkbox2Model', mutable: false, nullable: false}
                 )}
                 onChange={onChange}
             />

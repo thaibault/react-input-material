@@ -19,11 +19,8 @@
 // region imports
 import Tools from 'clientnode'
 import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
-import {
-    FirstParameter, Mapping, RecursivePartial, ValueOf
-} from 'clientnode/type'
-import {ReactElement, useMemo, useState} from 'react'
-import {render as renderReact, unmountComponentAtNode} from 'react-dom'
+import {FirstParameter, Mapping, ValueOf} from 'clientnode/type'
+import {useMemo, useState} from 'react'
 import {
     FormattedOption as FormattedSelectionOption, SelectProps
 } from '@rmwc/select'
@@ -44,24 +41,24 @@ import {
 /**
  * Creates a mocked a state setter. Useful to dynamically convert a component
  * from uncontrolled to controlled.
- *
  * @param value - Parameter for state setter.
  *
  * @returns Nothing.
  */
-export const createDummyStateSetter = <
-    Type = unknown
->(value:Type):ReturnType<typeof useState>[1] => (
-    callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
-):void => {
-    if (typeof callbackOrData === 'function')
-        callbackOrData(value)
-}
+export const createDummyStateSetter =
+    <Type = unknown>(value:Type):ReturnType<typeof useState>[1] =>
+        (
+            callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
+        ):void => {
+            if (typeof callbackOrData === 'function')
+                callbackOrData(value)
+        }
 /**
  * Consolidates properties not found in properties but in state into
  * properties.
  * @param properties - To consolidate.
  * @param state - To search values in.
+ *
  * @returns Consolidated properties.
  */
 export const deriveMissingPropertiesFromState = <
@@ -100,7 +97,6 @@ export const deriveMissingPropertiesFromState = <
  * Creates a hybrid a state setter wich only triggers when model state changes
  * occur. Useful to dynamically convert a component from uncontrolled to
  * controlled while model state should be uncontrolled either.
- *
  * @param setValueState - Value setter to wrap.
  * @param currentValueState - Last known value state to provide to setter when
  * called.
@@ -108,24 +104,26 @@ export const deriveMissingPropertiesFromState = <
  * @returns Wrapped given method.
  */
 export const wrapStateSetter = <Type = any>(
-    setValueState:(value:Type|((value:Type) => Type)) => void,
+    setValueState:(_value:Type|((_value:Type) => Type)) => void,
     currentValueState:Type
-):ReturnType<typeof useState>[1] => (
-    callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
-) => {
-    const result:Type = typeof callbackOrData === 'function' ?
-        callbackOrData(currentValueState) :
-        callbackOrData
+):ReturnType<typeof useState>[1] =>
+        (
+            callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
+        ):void => {
+            const result:Type = typeof callbackOrData === 'function' ?
+                callbackOrData(currentValueState) :
+                callbackOrData
 
-    if (!Tools.equals(
-        (result as unknown as {modelState:unknown})?.modelState,
-        (currentValueState as unknown as {modelState:unknown})?.modelState
-    ))
-        setValueState(result)
-}
+            if (!Tools.equals(
+                (result as unknown as {modelState:unknown})?.modelState,
+                (
+                    currentValueState as unknown as {modelState:unknown}
+                )?.modelState
+            ))
+                setValueState(result)
+        }
 /**
  * Triggered when a value state changes like validation or focusing.
- *
  * @param properties - Properties to search in.
  * @param name - Event callback name to search for in given properties.
  * @param synchronous - Indicates whether to trigger callback immediately or
@@ -135,30 +133,32 @@ export const wrapStateSetter = <Type = any>(
  *
  * @returns Nothing.
  */
-export const triggerCallbackIfExists = <
-    P extends Omit<BaseProperties, 'model'> & {model:unknown}
->(
-    properties:P,
-    name:string,
-    synchronous:boolean = true,
-    ...parameters:Array<unknown>
-):void => {
-    name = `on${Tools.stringCapitalize(name)}`
+export const triggerCallbackIfExists =
+    <P extends Omit<BaseProperties, 'model'> & {model:unknown}>(
+        properties:P,
+        name:string,
+        synchronous = true,
+        ...parameters:Array<unknown>
+    ):void => {
+        name = `on${Tools.stringCapitalize(name)}`
 
-    if (properties[name as keyof P])
-        if (synchronous)
-            (properties[name as keyof P] as unknown as Function)(...parameters)
-        else
-            Tools.timeout(() =>
+        if (properties[name as keyof P])
+            if (synchronous)
                 (properties[name as keyof P] as unknown as Function)(
                     ...parameters
                 )
-            )
-}
+            else
+                void Tools.timeout(() =>
+                    (properties[name as keyof P] as unknown as Function)(
+                        ...parameters
+                    )
+                )
+    }
 // region consolidation state
 /**
  * Translate known symbols in a copied and return properties object.
  * @param properties - Object to translate.
+ *
  * @returns Transformed properties.
  */
 export const translateKnownSymbols = <Type = any>(
@@ -172,6 +172,7 @@ export const translateKnownSymbols = <Type = any>(
             (result[name] as unknown as null) = null
         else
             result[name] = Tools.copy(properties[name] as Type)
+
     return result
 }
 /**
@@ -179,6 +180,7 @@ export const translateKnownSymbols = <Type = any>(
  * @param properties - Components properties.
  * @param defaultValue - Internal fallback value.
  * @param alternateValue - Alternate value to respect.
+ *
  * @returns Determined value.
  */
 export const determineInitialValue = <Type = any>(
@@ -187,19 +189,26 @@ export const determineInitialValue = <Type = any>(
     alternateValue?:null|Type
 ):null|Type => {
     if (alternateValue !== undefined)
-        return alternateValue as null|Type
+        return alternateValue
+
     if (properties.value !== undefined)
         return properties.value as null|Type
+
     if (properties.model?.value !== undefined)
-        return properties.model!.value as null|Type
+        return properties.model.value as null|Type
+
     if (properties.initialValue !== undefined)
         return Tools.copy(properties.initialValue as null|Type)
+
     if (properties.default !== undefined)
         return Tools.copy(properties.default as null|Type)
+
     if (properties.model?.default !== undefined)
-        return Tools.copy(properties.model!.default as null|Type)
+        return Tools.copy(properties.model.default as null|Type)
+
     if (defaultValue !== undefined)
         return defaultValue
+
     return null
 }
 /**
@@ -208,62 +217,67 @@ export const determineInitialValue = <Type = any>(
  * @param currentState - Current validation state.
  * @param validators - Mapping from validation state key to corresponding
  * validator function.
+ *
  * @returns A boolean indicating if validation state has changed.
  */
-export const determineValidationState = <
-    P extends DefaultBaseProperties = DefaultBaseProperties,
-    MS extends Partial<ModelState> = Partial<ModelState>
->(
-    properties:P, currentState:MS, validators:Mapping<() => boolean> = {}
-):boolean => {
-    let changed:boolean = false
+export const determineValidationState =
+    <
+        P extends DefaultBaseProperties = DefaultBaseProperties,
+        MS extends Partial<ModelState> = Partial<ModelState>
+    >(
+        properties:P, currentState:MS, validators:Mapping<() => boolean> = {}
+    ):boolean => {
+        let changed = false
 
-    validators = {
-        invalidRequired: ():boolean => (
-            properties.model.nullable === false &&
-            (
-                properties.model.type !== 'boolean' &&
-                !properties.model.value &&
-                properties.model.value !== 0
-            ) ||
-            (
-                properties.model.type === 'boolean' &&
-                !(
-                    typeof properties.model.value === 'boolean' ||
-                    ['false', 'true'].includes(
-                        properties.model.value as unknown as string
+        validators = {
+            invalidRequired: ():boolean => (
+                properties.model.nullable === false &&
+                (
+                    properties.model.type !== 'boolean' &&
+                    !properties.model.value &&
+                    properties.model.value !== 0
+                ) ||
+                (
+                    properties.model.type === 'boolean' &&
+                    !(
+                        typeof properties.model.value === 'boolean' ||
+                        ['false', 'true'].includes(
+                            properties.model.value as string
+                        )
                     )
                 )
-            )
-        ),
-        ...validators
-    }
+            ),
+            ...validators
+        }
 
-    properties.model.state = properties.model.state || {} as MS
-    for (const [name, validator] of Object.entries(validators)) {
-        const oldValue:boolean|undefined =
-            currentState[name as keyof ModelState]
-        properties.model.state[name as keyof ModelState] = validator()
-        changed =
-            changed || oldValue !== currentState[name as keyof ModelState]
-    }
+        properties.model.state = properties.model.state || {} as MS
+        for (const [name, validator] of Object.entries(validators)) {
+            const oldValue:boolean|undefined =
+                currentState[name as keyof ModelState]
 
-    if (changed) {
-        properties.model.state.invalid =
-            Object.keys(validators).some((name:string):boolean =>
-                properties.model.state[name as keyof ModelState]
-            )
-        properties.model.state.valid = !properties.model.state.invalid
-    }
+            properties.model.state[name as keyof ModelState] = validator()
 
-    return changed
-}
+            changed =
+                changed || oldValue !== currentState[name as keyof ModelState]
+        }
+
+        if (changed) {
+            properties.model.state.invalid =
+                Object.keys(validators).some((name:string):boolean =>
+                    properties.model.state[name as keyof ModelState]
+                )
+            properties.model.state.valid = !properties.model.state.invalid
+        }
+
+        return changed
+    }
 /**
  * Synchronizes property, state and model configuration:
  * Properties overwrites default properties which overwrites default model
  * properties.
  * @param properties - Properties to merge.
  * @param defaultModel - Default model to merge.
+ *
  * @returns Merged properties.
 */
 export const mapPropertiesIntoModel = <
@@ -279,7 +293,7 @@ export const mapPropertiesIntoModel = <
         {model: Tools.copy<DP['model']>(defaultModel)} as DP,
         properties as DP
     )
-    // region handle aliases
+    // region handle  aliases
     if (result.disabled) {
         result.model.mutable = false
         delete result.disabled
@@ -308,6 +322,7 @@ export const mapPropertiesIntoModel = <
         )
             (result.model[name as keyof BaseModel] as ValueOf<DP['model']>) =
                 result[name as keyof DP] as unknown as ValueOf<DP['model']>
+
     // Map property state into model state
     for (const name in result.model.state)
         if (
@@ -326,6 +341,7 @@ export const mapPropertiesIntoModel = <
 /**
  * Calculate external properties (a set of all configurable properties).
  * @param properties - Properties to merge.
+ *
  * @returns External properties object.
  */
 export const getConsolidatedProperties = <
@@ -362,6 +378,13 @@ export const getConsolidatedProperties = <
 // endregion
 // region value transformer
 // / region selection
+/**
+ * Determine normalized labels and values for selection and auto-complete
+ * components.
+ * @param selection - Selection component property configuration.
+ *
+ * @returns Normalized sorted listed of labels and values.
+ */
 export function getLabelAndValues(
     selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
 ):[Array<string>, Array<unknown>] {
@@ -371,7 +394,7 @@ export function getLabelAndValues(
 
         for (const value of selection)
             if (['number', 'string'].includes(typeof value)) {
-                labels.push(`${value}`)
+                labels.push(`${value as string}`)
                 values.push(value)
             } else if (typeof (value as {label:string})?.label === 'string') {
                 labels.push((value as {label:string}).label)
@@ -396,6 +419,13 @@ export function getLabelAndValues(
 
     return [[], []]
 }
+/**
+ * Determine representation for given value while respecting existing labels.
+ * @param value - To represent.
+ * @param selection - Selection component property configuration.
+ *
+ * @returns Determined representation.
+ */
 export function getRepresentationFromValueSelection(
     value:unknown,
     selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
@@ -404,23 +434,33 @@ export function getRepresentationFromValueSelection(
         if (Array.isArray(selection))
             for (const option of selection) {
                 if (Tools.equals(option, value))
-                    return `${value}`
+                    return `${value as string}`
 
                 if (Tools.equals((option as {value:unknown})?.value, value))
-                    return (option as {label:string}).label || `${value}`
+                    return (
+                        (option as {label:string}).label ||
+                        `${value as string}`
+                    )
             }
 
         if (
             selection !== null &&
             typeof selection === 'object' &&
             typeof value === 'string' &&
-            selection.hasOwnProperty(value)
+            Object.prototype.hasOwnProperty.call(selection, value)
         )
             return (selection as Mapping)[value]
     }
 
     return null
 }
+/**
+ * Determine value from provided representation (for example user inputs).
+ * @param label - To search a value for.
+ * @param selection - Selection component property configuration.
+ *
+ * @returns Determined value.
+ */
 export function getValueFromSelection<T>(
     label:string,
     selection:SelectProps['options']|Array<{label?:string;value:unknown}>
@@ -429,7 +469,7 @@ export function getValueFromSelection<T>(
         for (const value of selection) {
             if (
                 ['number', 'string'].includes(typeof value) &&
-                `${value}` === label
+                `${value as string}` === label
             )
                 return value as unknown as T
 
@@ -455,8 +495,20 @@ export function getValueFromSelection<T>(
 
     return null
 }
+/**
+ * Normalize given selection.
+ * @param selection - Selection component property configuration.
+ * @param labels - Additional labels to take into account (for example provided
+ * via a content management system).
+ *
+ * @returns Determined normalized selection configuration.
+ */
 export function normalizeSelection(
-    selection?:Array<[string, string]>|SelectProps['options']|Array<{label?:string;value:unknown}>,
+    selection?:(
+        Array<[string, string]> |
+        SelectProps['options'] |
+        Array<{label?:string;value:unknown}>
+    ),
     labels?:Array<string>|Mapping
 ):SelectProps['options']|Array<{label?:string;value:unknown}>|undefined {
     if (!selection) {
@@ -466,7 +518,7 @@ export function normalizeSelection(
 
     if (Array.isArray(selection) && selection.length) {
         const result:Array<FormattedSelectionOption> = []
-        let index:number = 0
+        let index = 0
         if (Array.isArray(selection[0]))
             for (
                 const [value, label] of selection as Array<[string, string]>
@@ -485,7 +537,7 @@ export function normalizeSelection(
                 const option of selection as Array<FormattedSelectionOption>
             ) {
                 result.push({
-                    ...(option as FormattedSelectionOption),
+                    ...(option),
                     label: Array.isArray(labels) && index < labels.length ?
                         labels[index] :
                         option.label
@@ -515,8 +567,8 @@ export function normalizeSelection(
             for (const option of selection as Array<FormattedSelectionOption>)
                 result.push({
                     ...option,
-                    label: labels.hasOwnProperty(
-                        (option.value || option.label) as string
+                    label: Object.prototype.hasOwnProperty.call(
+                        labels, (option.value || option.label) as string
                     ) ?
                         (
                             labels as Mapping
@@ -542,9 +594,10 @@ export function normalizeSelection(
         }
 
         for (const [value, label] of Object.entries(selection as Mapping))
-            (selection as Mapping)[value] = labels.hasOwnProperty(value) ?
-                (labels as Mapping)[value] as string :
-                label
+            (selection as Mapping)[value] =
+                Object.prototype.hasOwnProperty.call(labels, value) ?
+                    (labels as Mapping)[value] :
+                    label
     }
 
     return selection as
@@ -553,54 +606,53 @@ export function normalizeSelection(
 // / endregion
 /**
  * Applies configured value transformations.
- *
  * @param configuration - Input configuration.
  * @param value - Value to transform.
  * @param transformer - To apply to given value.
  *
  * @returns Transformed value.
  */
-export const parseValue = <
-    T = unknown,
-    P extends DefaultInputProperties<T> = DefaultInputProperties<T>,
-    InputType = T
->(
-    configuration:P,
-    value:null|InputType,
-    transformer:InputDataTransformation
-):null|T => {
-    if (configuration.model.trim && typeof value === 'string')
-        (value as string) = value.trim().replace(/ +\n/g, '\\n')
+export const parseValue =
+    <
+        T = unknown,
+        P extends DefaultInputProperties<T> = DefaultInputProperties<T>,
+        InputType = T
+    >(
+        configuration:P,
+        value:null|InputType,
+        transformer:InputDataTransformation
+    ):null|T => {
+        if (configuration.model.trim && typeof value === 'string')
+            (value as string) = value.trim().replace(/ +\n/g, '\\n')
 
-    if (
-        configuration.model.emptyEqualsNull &&
-        value as unknown as string === ''
-    )
-        return null
+        if (
+            configuration.model.emptyEqualsNull &&
+            value as unknown as string === ''
+        )
+            return null
 
-    let result:null|T = value as unknown as null|T
-    if (
-        ![null, undefined].includes(value as null) &&
-        transformer[
-            configuration.model.type as keyof InputDataTransformation
-        ]?.parse
-    )
-        result = (
+        let result:null|T = value as unknown as null|T
+        if (
+            ![null, undefined].includes(value as null) &&
             transformer[
                 configuration.model.type as keyof InputDataTransformation
-            ]!.parse as
-                unknown as
-                DataTransformSpecification<T, InputType>['parse']
-        )!(value as InputType, configuration, transformer)
+            ]?.parse
+        )
+            result = (
+                transformer[
+                    configuration.model.type as keyof InputDataTransformation
+                ]!.parse as
+                    unknown as
+                    DataTransformSpecification<T, InputType>['parse']
+            )!(value as InputType, configuration, transformer)
 
-    if (typeof result === 'number' && isNaN(result))
-        return null
+        if (typeof result === 'number' && isNaN(result))
+            return null
 
-    return result
-}
+        return result
+    }
 /**
  * Represents configured value as string.
- *
  * @param configuration - Input configuration.
  * @param value - To represent.
  * @param transformer - To apply to given value.
@@ -615,7 +667,7 @@ export function formatValue<
     configuration:P,
     value:null|T,
     transformer:InputDataTransformation,
-    final:boolean = true
+    final = true
 ):string {
     const methodName:'final'|'intermediate' = final ? 'final' : 'intermediate'
 
@@ -647,7 +699,6 @@ export function formatValue<
 }
 /**
  * Determines initial value representation as string.
- *
  * @param properties - Components properties.
  * @param defaultProperties - Components default properties.
  * @param value - Current value to represent.
@@ -699,6 +750,7 @@ export function determineInitialRepresentation<
  * using previous constant complex object within a render function.
  * @param value - Value to memorize.
  * @param dependencies - Optional dependencies when to update given value.
+ *
  * @returns Given cached value.
  */
 export const useMemorizedValue = <T = unknown>(

@@ -19,24 +19,24 @@
 // region imports
 import {AnyFunction, FirstParameter} from 'clientnode/type'
 import {
-    ComponentType,
     forwardRef,
     ForwardRefRenderFunction,
     FunctionComponent,
     MutableRefObject,
     ReactElement
 } from 'react'
-import {Theme, ThemeProviderProps} from '@rmwc/theme'
+import {Theme} from '@rmwc/theme'
 import {ThemePropT} from '@rmwc/types'
 
 import {WrapStrict} from './WrapStrict'
 import {WrapThemeProvider} from './WrapThemeProvider'
 import {WrapTooltip} from './WrapTooltip'
-import {ConfigurationProperties, Properties} from '../type'
-// endregion
+import {ConfigurationProperties} from '../type'
+//  endregion
 /**
  * Wraps a theme provider, strict wrapper and tooltip to given element if
  * corresponding configurations are provided.
+ * @param properties - Component provided properties.
  * @param properties.children - Component or string to wrap.
  * @param properties.strict - Indicates whether to render in strict mode.
  * @param properties.themeConfiguration - Optional theme configurations.
@@ -44,6 +44,7 @@ import {ConfigurationProperties, Properties} from '../type'
  * @param properties.wrap - Instead of injecting a div tag, wrap a child
  * component by merging the theme styles directly onto it. Useful when you
  * don't want to mess with layout.
+ *
  * @returns Wrapped content.
  */
 export const WrapConfigurations:FunctionComponent<
@@ -56,7 +57,17 @@ export const WrapConfigurations:FunctionComponent<
             </WrapThemeProvider>
         </WrapTooltip>
     </WrapStrict>
-
+/**
+ * Component factory to dynamically create a wrapped component.
+ * @param WrappedComponent - Component to wrap.
+ * @param options - Options configure wrapping.
+ * @param options.withReference - Indicates whether to add a mutable reference
+ * to wrapping component.
+ * @param options.withThemeWrapper - Indicates whether all theme configurations
+ * should be provided.
+ *
+ * @returns Created wrapped component.
+ */
 export function createWrapConfigurationsComponent<
     Type extends AnyFunction = AnyFunction, Reference = unknown
 >(
@@ -91,6 +102,7 @@ export function createWrapConfigurationsComponent<
             }
         </WrapConfigurations>
     }
+
     return options.withReference ?
         forwardRef(component as ForwardRefRenderFunction<typeof component>) :
         component

@@ -22,13 +22,13 @@ endregion */
 .generic-animate-appear,
 .generic-animate-enter,
 .generic-animate-exit-active {
-    opacity: 0%;
+    opacity: 0;
 }
 
 .generic-animate-appear-active,
 .generic-animate-enter-active,
 .generic-animate-exit {
-    opacity: 100%;
+    opacity: 1;
 }
 
 .generic-animate-appear-active,
@@ -41,7 +41,7 @@ endregion */
     animations gets broken.
 */
 .generic-animate-exit-active {
-    opacity: 0%;
+    opacity: 0;
 }
 
 .generic-animate-exit-done {

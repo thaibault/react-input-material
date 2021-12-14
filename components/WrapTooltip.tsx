@@ -26,8 +26,10 @@ import {Properties} from '../type'
 /**
   * Wraps given component with a tooltip component with given tooltip
   * configuration.
-  * @param children - Component or string to wrap.
-  * @param options - Tooltip options.
+  * @param properties - Component provided properties.
+  * @param properties.children - Component or string to wrap.
+  * @param properties.options - Tooltip options.
+  *
   * @returns Wrapped given content.
  */
 export const WrapTooltip:FunctionComponent<{
@@ -37,7 +39,10 @@ export const WrapTooltip:FunctionComponent<{
     if (typeof options === 'string')
         return <Tooltip
             content={<Typography use="caption">{options}</Typography>}
-        ><div className="generic-tooltip">{children}</div></Tooltip>
+        >
+            <div className="generic-tooltip">{children}</div>
+        </Tooltip>
+
     if (options !== null && typeof options === 'object') {
         if (typeof options.content === 'string')
             options = {
@@ -46,12 +51,15 @@ export const WrapTooltip:FunctionComponent<{
                     {options.content}
                 </Typography>
             }
-        return <Tooltip {...options}><div className="generic-tooltip">
-            {children}
-        </div></Tooltip>
+
+        return <Tooltip {...options}>
+            <div className="generic-tooltip">{children}</div>
+        </Tooltip>
     }
+
     return <>{children}</>
 }
+
 export default WrapTooltip
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

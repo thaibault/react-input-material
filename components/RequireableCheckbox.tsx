@@ -18,7 +18,6 @@
 */
 // region imports
 import Tools from 'clientnode'
-import {FirstParameter} from 'clientnode/type'
 import {
     FocusEvent as ReactFocusEvent,
     forwardRef,
@@ -27,7 +26,6 @@ import {
     MouseEvent as ReactMouseEvent,
     MutableRefObject,
     ReactElement,
-    RefCallback,
     SyntheticEvent,
     useImperativeHandle,
     useRef,
@@ -56,10 +54,8 @@ import {
 } from '../helper'
 import {
     CheckboxAdapter as Adapter,
-    CheckboxModel as Model,
     CheckboxProperties as Properties,
     CheckboxProps as Props,
-    CheckboxState as State,
     defaultModelState,
     DefaultCheckboxProperties as DefaultProperties,
     defaultCheckboxProperties as defaultProperties,
@@ -70,6 +66,13 @@ import {
 } from '../type'
 // endregion
 // region helper
+/**
+ * Derives validation state from provided properties and state.
+ * @param properties - Current component properties.
+ * @param currentState - Current component state.
+ *
+ * @returns Whether component is in an aggregated valid or invalid state.
+ */
 export function determineValidationState(
     properties:DefaultProperties, currentState:Partial<ModelState>
 ):boolean {
@@ -86,7 +89,6 @@ export function determineValidationState(
 // endregion
 /**
  * Validateable checkbox wrapper component.
- *
  * @property static:displayName - Descriptive name for component to show in web
  * developer tools.
  *
@@ -102,12 +104,12 @@ export function determineValidationState(
  * 4. All state changes except selection changes trigger an "onChange" event
  *    which delivers the consolidated properties object (with latest
  *    modifications included).
- *
  * @property static:displayName - Descriptive name for component to show in web
  * developer tools.
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
+ *
  * @returns React elements.
  */
 export const RequireableCheckboxInner = function(
@@ -117,12 +119,14 @@ export const RequireableCheckboxInner = function(
     /**
      * Calculate external properties (a set of all configurable properties).
      * @param properties - Properties to merge.
+     *
      * @returns External properties object.
      */
     const getConsolidatedProperties = (properties:Props):Properties => {
-        let result:DefaultProperties = mapPropertiesIntoModel<Props, DefaultProperties>(
-            properties, RequireableCheckbox.defaultProperties.model as Model
-        )
+        let result:DefaultProperties =
+            mapPropertiesIntoModel<Props, DefaultProperties>(
+                properties, RequireableCheckbox.defaultProperties.model
+            )
 
         determineValidationState(result, result.model.state)
 
@@ -137,12 +141,13 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered on blur events.
      * @param event - Event object.
+     *
      * @returns Nothing.
      */
     const onBlur = (event:SyntheticEvent):void => setValueState((
         oldValueState:ValueState
     ):ValueState => {
-        let changed:boolean = false
+        let changed = false
 
         if (oldValueState.modelState.focused) {
             properties.focused = false
@@ -179,6 +184,7 @@ export const RequireableCheckboxInner = function(
      * Triggered on any change events. Consolidates properties object and
      * triggers given on change callbacks.
      * @param event - Potential event object.
+     *
      * @returns Nothing.
      */
     const onChange = (event?:SyntheticEvent):void => {
@@ -201,6 +207,7 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered when ever the value changes.
      * @param event - Event object.
+     *
      * @returns Nothing.
      */
     const onChangeValue = (event:SyntheticEvent):void => {
@@ -215,7 +222,7 @@ export const RequireableCheckboxInner = function(
             if (oldValueState.value === properties.value)
                 return oldValueState
 
-            let stateChanged:boolean = false
+            let stateChanged = false
 
             const result:ValueState =
                 {...oldValueState, value: properties.value as boolean|null}
@@ -259,6 +266,7 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered on click events.
      * @param event - Mouse event object.
+     *
      * @returns Nothing.
      */
     const onClick = (event:ReactMouseEvent):void => {
@@ -271,6 +279,7 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered on focus events.
      * @param event - Focus event object.
+     *
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
@@ -283,11 +292,12 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
+     *
      * @returns Nothing.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
         setValueState((oldValueState:ValueState):ValueState => {
-            let changedState:boolean = false
+            let changedState = false
 
             if (!oldValueState.modelState.focused) {
                 properties.focused = true
@@ -335,7 +345,7 @@ export const RequireableCheckboxInner = function(
 
     const initialValue:boolean|null = determineInitialValue<boolean>(
         givenProps,
-        RequireableCheckbox.defaultProperties.model!.default,
+        RequireableCheckbox.defaultProperties.model.default,
         givenProps.checked
     )
     /*
@@ -386,6 +396,7 @@ export const RequireableCheckboxInner = function(
         setValueState =
             wrapStateSetter<ValueState>(setValueState, currentValueState)
     // endregion
+    // region export references
     useImperativeHandle(
         reference,
         ():Adapter & {
@@ -411,45 +422,48 @@ export const RequireableCheckboxInner = function(
         strict={RequireableCheckbox.strict}
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
-    ><div
-        className={[styles['requireable-checkbox']]
-            .concat(properties.className ?? [])
-            .join(' ')
-        }
-        style={properties.styles}
     >
-        <Checkbox
-            checked={Boolean(properties.value)}
-            disabled={properties.disabled}
-            foundationRef={foundationRef}
-            id={properties.id || properties.name}
-            indeterminate={properties.value === null}
-            inputRef={inputReference}
-            label={(
-                properties.invalid &&
-                (
-                    properties.showInitialValidationState ||
-                    /*
-                        Material inputs show their validation state at least
-                        after a blur event so we synchronize error appearances.
-                    */
-                    properties.visited
-                )
-            ) ?
-                <Theme use="error">
-                    {properties.description || properties.name}
-                </Theme> :
-                properties.description || properties.name
+        <div
+            className={[styles['requireable-checkbox']]
+                .concat(properties.className ?? [])
+                .join(' ')
             }
-            name={properties.name}
-            onBlur={onBlur}
-            onChange={onChangeValue}
-            onClick={onClick}
-            onFocus={onFocus}
-            ripple={properties.ripple}
-            value={`${properties.value}`}
-        />
-    </div></WrapConfigurations>
+            style={properties.styles}
+        >
+            <Checkbox
+                checked={Boolean(properties.value)}
+                disabled={properties.disabled}
+                foundationRef={foundationRef}
+                id={properties.id || properties.name}
+                indeterminate={properties.value === null}
+                inputRef={inputReference}
+                label={(
+                    properties.invalid &&
+                    (
+                        properties.showInitialValidationState ||
+                        /*
+                            Material inputs show their validation state at
+                            least after a blur event so we synchronize error
+                            appearances.
+                        */
+                        properties.visited
+                    )
+                ) ?
+                    <Theme use="error">
+                        {properties.description || properties.name}
+                    </Theme> :
+                    properties.description || properties.name
+                }
+                name={properties.name}
+                onBlur={onBlur}
+                onChange={onChangeValue}
+                onClick={onClick}
+                onFocus={onFocus}
+                ripple={properties.ripple}
+                value={`${properties.value as unknown as string}`}
+            />
+        </div>
+    </WrapConfigurations>
     // endregion
 } as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
@@ -458,13 +472,14 @@ RequireableCheckboxInner.displayName = 'RequireableCheckbox'
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
  * @property static:defaultProperties - Initial property configuration.
- * @property static:propTypes - Triggers reacts runtime property value checks
+ * @property static:propTypes - Triggers reacts runtime property value checks.
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
  * @property static:wrapped - Wrapped component.
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
+ *
  * @returns React elements.
  */
 export const RequireableCheckbox:CheckboxComponent =

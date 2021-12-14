@@ -15,9 +15,7 @@
 */
 // region imports
 import {testEach} from 'clientnode/testHelper'
-import {Mapping} from 'clientnode/type'
 import React from 'react'
-import {SelectProps} from '@rmwc/select'
 
 import GenericAnimate from './components/GenericAnimate'
 import FileInput from './components/FileInput'
@@ -213,7 +211,6 @@ describe('GenericAnimate', ():void => {
 // endregion
 // region GenericInput
 describe('GenericInput', ():void => {
-
     testEach<typeof suggestionMatches>(
         'suggestionMatches',
         suggestionMatches,

@@ -58,7 +58,6 @@ import {
     triggerCallbackIfExists
 } from '../helper'
 import {
-    BaseProperties,
     defaultInputsProperties,
     DefaultInputsProperties,
     defaultProperties,
@@ -84,7 +83,7 @@ const getPrototype = function<T, P>(
         ...defaultProperties as unknown as Partial<P>,
         className: styles.inputs__item__input,
         ...(properties.default && properties.default.length > 0 ?
-            properties.default![0] :
+            properties.default[0] :
             {}
         )
     } as Partial<P>
@@ -103,8 +102,8 @@ const getModelState = function<T, P extends InputsPropertiesItem<T>>(
 ):ModelState {
     const properties:Array<P> = inputsProperties.value || []
 
-    const unpack = (name:string, defaultValue:boolean = false) =>
-        (properties:P):boolean =>
+    const unpack = (name:string, defaultValue = false) =>
+        (properties:P) =>
             properties[name as keyof P] as unknown as boolean ?? defaultValue
 
     const validMaximumNumber:boolean =
@@ -146,12 +145,11 @@ const getExternalProperties = function<T, P extends InputsPropertiesItem<T>>(
 // endregion
 /**
  * Generic inputs wrapper component.
- *
  * @property static:displayName - Descriptive name for component to show in web
  * developer tools.
- *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
+ *
  * @returns React elements.
  */
 export const InputsInner = function<
@@ -162,7 +160,7 @@ export const InputsInner = function<
     props:InputsProps<T, P>, reference?:ForwardedRef<Adapter<T, P>>
 ):ReactElement {
     // region consolidate properties
-    let givenProps:InputsProps<T, P> =
+    const givenProps:InputsProps<T, P> =
         translateKnownSymbols(props) as InputsProps<T, P>
     /*
         Normalize value property (providing only value instead of props is
@@ -190,7 +188,7 @@ export const InputsInner = function<
     )
     // endregion
     // region consolidate state
-    let [newInputState, setNewInputState] =
+    const [newInputState, setNewInputState] =
         useState<'added'|'rendered'|'stabilized'>('stabilized')
     useEffect(():void => {
         if (newInputState === 'added')
@@ -273,9 +271,9 @@ export const InputsInner = function<
 
         if (inputProperties)
             if (typeof index === 'number')
-                properties.value![index] = inputProperties as P
+                properties.value[index] = inputProperties as P
             else
-                properties.value!.push(inputProperties as P)
+                properties.value.push(inputProperties as P)
         else if (inputProperties === undefined && typeof index === 'number')
             properties.value.splice(index, 1)
 
@@ -286,10 +284,10 @@ export const InputsInner = function<
             properties.value = null
 
         triggerCallbackIfExists<InputsProperties<T, P>>(
-            properties as InputsProperties<T, P>,
+            properties,
             'change',
             controlled,
-            getExternalProperties<T, P>(properties as InputsProperties<T, P>),
+            getExternalProperties<T, P>(properties),
             event,
             properties
         )
@@ -317,7 +315,7 @@ export const InputsInner = function<
             values = null
 
         triggerCallbackIfExists<InputsProperties<T, P>>(
-            properties as InputsProperties<T, P>,
+            properties,
             'changeValue',
             controlled,
             values,
@@ -328,7 +326,7 @@ export const InputsInner = function<
         return values
     }
 
-    for (let index:number = 0; index < Math.max(
+    for (let index = 0; index < Math.max(
         properties.model?.value?.length || 0,
         properties.value?.length || 0,
         !controlled && values?.length || 0
@@ -349,7 +347,7 @@ export const InputsInner = function<
         properties.value[index] = Tools.extend<P>(
             true,
             {
-                ...properties.createPrototype!({
+                ...properties.createPrototype({
                     index,
                     properties,
                     prototype: Tools.copy(getPrototype<T, P>(properties)),
@@ -380,7 +378,7 @@ export const InputsInner = function<
             ) as P,
             (
                 properties.value && properties.value.length > index ?
-                    {value: (properties.value as Array<P>)[index].value} :
+                    {value: (properties.value)[index].value} :
                     {}
             ) as P,
             (
@@ -417,7 +415,7 @@ export const InputsInner = function<
     useImperativeHandle(
         reference,
         ():AdapterWithReferences<T, P> => ({
-            properties: properties as InputsProperties<T, P>,
+            properties: properties,
             references,
             state: controlled ?
                 {} :
@@ -428,7 +426,7 @@ export const InputsInner = function<
     const add = (event?:GenericEvent):void => setValues((
         values:Array<null|T|undefined>|null
     ):Array<null|T|undefined> => {
-        const newProperties:Partial<P> = properties.createPrototype!({
+        const newProperties:Partial<P> = properties.createPrototype({
             index: values?.length || 0,
             properties,
             prototype: getPrototype<T, P>(properties),
@@ -492,7 +490,7 @@ export const InputsInner = function<
             style={properties.styles}
         >
             {properties.value ?
-                (properties.value as Array<P>).map((
+                (properties.value).map((
                     inputProperties:P, index:number
                 ):ReactElement =>
                     <div className={styles.inputs__item} key={index}>
@@ -512,7 +510,7 @@ export const InputsInner = function<
                     styles.inputs__item, styles['inputs__item--disabled']
                 ].join(' ')}>
                     {renderInput(
-                        properties.createPrototype!({
+                        properties.createPrototype({
                             index: 0,
                             properties,
                             prototype: {
@@ -550,13 +548,14 @@ InputsInner.displayName = 'Inputs'
 /**
  * Wrapping web component compatible react component.
  * @property static:defaultProperties - Initial property configuration.
- * @property static:propTypes - Triggers reacts runtime property value checks
+ * @property static:propTypes - Triggers reacts runtime property value checks.
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
  * @property static:wrapped - Wrapped component.
  *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
+ *
  * @returns React elements.
  */
 export const Inputs:InputsComponent =

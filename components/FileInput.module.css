@@ -53,7 +53,7 @@ Plain CSS:
 .file-input__text-representation {
     border-left: 1px dashed black;
     box-sizing: content-box;
-    opacity: 50%;
+    opacity: 0.5;
 
     margin-bottom: -55px;
 
