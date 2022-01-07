@@ -89,13 +89,17 @@ import {
 } from '../type'
 // endregion
 // region constants
+/*
+    NOTE: Caused by a bug transpiling regular expression which ignores needed
+    escape sequences for "/" when using the nativ regular expression type.
+*/
 const imageContentTypeRegularExpression = new RegExp(
     '^image\\/(?:p?jpe?g|png|svg(?:\\+xml)?|vnd\\.microsoft\\.icon|gif|tiff|' +
     'webp|vnd\\.wap\\.wbmp|x-(?:icon|jng|ms-bmp))$',
     'i'
 )
 const textContentTypeRegularExpression = new RegExp(
-    '^(?:application/xml)|(?:text/(?:plain|x-ndpb[wy]html|(?:x-)?csv' +
+    '^(?:application\\/xml)|(?:text\\/(?:plain|x-ndpb[wy]html|(?:x-)?csv' +
     '|x?html?|xml))$',
     'i'
 )
@@ -105,9 +109,9 @@ const representableTextContentTypeRegularExpression =
     // Rendered version:
     // /^(application\/xml)|(text\/(plain|x?html?|xml))$/i
 const videoContentTypeRegularExpression = new RegExp(
-    '^video/(?:(?:x-)?(?:x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|(?:x-)?flv' +
+    '^video\/(?:(?:x-)?(?:x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|(?:x-)?flv' +
     '|(?:x-)?m4v|(?:x-)mng|x-ms-as|x-ms-wmv|x-msvideo)' +
-    '|(?:application/(?:x-)?shockwave-flash)$',
+    '|(?:application\/(?:x-)?shockwave-flash)$',
     'i'
 )
 // endregion
