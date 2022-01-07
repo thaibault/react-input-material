@@ -59,11 +59,14 @@
     "update:documentation": "documentationWebsite --log-level info",
     "watch": "weboptimizer build --watch"
   },
+  "dependencies": {
+    "@types/webpack": "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.1.tgz"
+  },
   "devDependencies": {
     "@babel/eslint-parser": "*",
     "@babel/plugin-transform-proto-to-assign": "*",
     "@babel/preset-react": "*",
-    "@emotion/react": "*",
+    "@emotion/react": "^11.7.1",
     "@rmwc/card": "*",
     "@rmwc/checkbox": "*",
     "@rmwc/circular-progress": "*",
@@ -106,6 +109,7 @@
     "material-icons": "*",
     "mini-css-extract-plugin": "*",
     "object-visit": "^1.0.1",
+    "postcss": "*",
     "postcss-import": "<=12",
     "postcss-loader": "*",
     "postcss-preset-env": "*",
@@ -225,7 +229,7 @@
     }
   },
   "engines": {
-    "node": ">=16",
+    "node": ">=17",
     "npm": ">=7"
   },
   "resolutions": {
@@ -272,15 +276,6 @@
       "cascadingStyleSheet": {
         "exclude": false,
         "options": {
-          "esModule": false,
-          "modules": {
-            "namedExport": false,
-            "localIdentName": "[local]",
-            "getLocalIdent": {
-              "__evaluate__": "(context, localIdentName, localName, options) => options.namedExport ? `${localName}ClassName` : localName"
-            },
-            "mode": "local"
-          },
           "import": {
             "filter": {
               "__evaluate__": "(url) => console.log('AAA', url) || !url.includes('.css')"
@@ -344,8 +339,5 @@
         }
       }
     }
-  },
-  "dependencies": {
-    "@types/webpack": "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.1.tgz"
   }
 }
