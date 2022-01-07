@@ -109,9 +109,9 @@ const representableTextContentTypeRegularExpression =
     // Rendered version:
     // /^(application\/xml)|(text\/(plain|x?html?|xml))$/i
 const videoContentTypeRegularExpression = new RegExp(
-    '^video\/(?:(?:x-)?(?:x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|(?:x-)?flv' +
+    '^video\\/(?:(?:x-)?(?:x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|(?:x-)?flv' +
     '|(?:x-)?m4v|(?:x-)mng|x-ms-as|x-ms-wmv|x-msvideo)' +
-    '|(?:application\/(?:x-)?shockwave-flash)$',
+    '|(?:application\\/(?:x-)?shockwave-flash)$',
     'i'
 )
 // endregion
