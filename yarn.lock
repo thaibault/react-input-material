@@ -3905,9 +3905,9 @@ cli-table3@^0.5.0:
     colors "^1.1.2"
 
 clientnode@*:
-  version "3.0.865"
-  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.865.tgz#ee6b1e3120ad995ab8f36c64ce4f10c0aef952fa"
-  integrity sha512-uPFZZbHDdQJKSgwmjLiVvMsZum8021USnMI9FkR70kYHS1pTF1Lgjc8sGrCQbt1ydID8AQnEyDuld2+aYWZLwQ==
+  version "3.0.866"
+  resolved "https://registry.yarnpkg.com/clientnode/-/clientnode-3.0.866.tgz#2d880bb41d8cdc3315ad9232955b31651c36b4e5"
+  integrity sha512-dllq0i4bB3oNa3MkfABC6V7AuqCV2iAplIpbxsVjd/hRm6mi3Wk7peIGIu3oe2ra/l4BWWcGHuojXaOy/js1fg==
   dependencies:
     "@types/webpack" "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.1.tgz"
 
@@ -10034,9 +10034,9 @@ wbuf@^1.1.0, wbuf@^1.7.3:
     minimalistic-assert "^1.0.0"
 
 web-component-wrapper@*:
-  version "0.0.339"
-  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.339.tgz#eaf7aa8d12e6b03147b101c05cd3ee951cd1b206"
-  integrity sha512-df74LAF+mnBAU52nYx1/+R+sQb3L3XdrsU3d22g827VZ0gsEYuHUC1IoxrjZ0cLPbg0Am4ivZhZeL8q0ioHAdw==
+  version "0.0.340"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.340.tgz#858482076aefbd486564522528146124791ed424"
+  integrity sha512-kreHF+T0dSMiZpQtBK7N7iVty/winLhH4/Ys7SnXB7MSKHt3eVRO/vpXI/2qBVbddCLuB5Ci/1LKKHolMqY4hw==
   dependencies:
     "@types/webpack" "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.1.tgz"
 
@@ -10051,9 +10051,9 @@ webidl-conversions@^6.1.0:
   integrity sha512-qBIvFLGiBpLjfwmYAaHPXsn+ho5xZnGvyGvsarywGNc8VyQJUMHJ8OBKGGrPER0okBeMDaan4mNBlgBROxuI8w==
 
 weboptimizer@*:
-  version "2.0.1116"
-  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.1116.tgz#062c49ec4e0267ab135eedcbc4d60e43e9cb0d0b"
-  integrity sha512-YbCb9q6W6F4DfzwJBalMusvS6axcMcmkDbhmjYK8ANzr4WIm4bxaZVWjME+p0mCXhGjtXpKTlkeJhalSGYScIA==
+  version "2.0.1117"
+  resolved "https://registry.yarnpkg.com/weboptimizer/-/weboptimizer-2.0.1117.tgz#1803c3b3780cc3cc9d531ef0fd336966d481d029"
+  integrity sha512-3m/NJZ3vUoaboApPzgC2KMg3i4/kV/ssRlxX0WejzCiSXLrr6QR8B0Xo+UdFkrJhBTdkeSEhvrsjvGtHdexixA==
   dependencies:
     "@babel/core" "*"
     "@babel/plugin-proposal-decorators" "*"
