@@ -172,7 +172,6 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
     branding: false,
     cache_suffix: `?version=${CURRENT_UTC_BUILD_TIMESTAMP}`,
     contextmenu: false,
-    convert_fonts_to_spans: true,
     document_base_url: '/',
     element_format: 'xhtml',
     entity_encoding: 'raw',
