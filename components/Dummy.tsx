@@ -25,6 +25,8 @@ import {
     ReactElement,
     MutableRefObject
 } from 'react'
+
+import {DummyProps} from '../type'
 // endregion
 /**
  * Generic strict wrapper component.
@@ -33,11 +35,14 @@ import {
  *
  * @returns React elements.
  */
-export const Dummy:FunctionComponent<unknown> & {isDummy:true} = forwardRef(
+export const Dummy:FunctionComponent<DummyProps> & {isDummy:true} = forwardRef(
     ((
-        _properties:Mapping<unknown>, _reference:MutableRefObject<unknown>|null
-    ):ReactElement => <div/>) as
-        ForwardRefRenderFunction<unknown, Mapping<unknown>>
+        properties:DummyProps, _reference:MutableRefObject<unknown>|null
+    ):ReactElement =>
+        <div>
+            {properties.children ?? null}
+        </div>
+    ) as ForwardRefRenderFunction<unknown, Mapping<unknown>>
 ) as unknown as FunctionComponent<unknown> & {isDummy:true}
 Dummy.isDummy = true
 

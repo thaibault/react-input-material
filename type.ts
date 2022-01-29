@@ -63,6 +63,9 @@ import {IconOptions, RipplePropT} from '@rmwc/types'
 import {Editor as RichTextEditorComponent} from '@tinymce/tinymce-react'
 // endregion
 // region exports
+// / region dummy
+export type DummyProps = Mapping<unknown> & {children?:ReactElement}
+// / endregion
 // / region generic
 export interface GenericEvent<T = unknown> extends SyntheticEvent {
     detail?:T
