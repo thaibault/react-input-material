@@ -1632,10 +1632,12 @@ export const GenericInputInner = function<Type = unknown>(
     const [isSuggestionOpen, setIsSuggestionOpen] = useState<boolean>(false)
     const [showDeclaration, setShowDeclaration] = useState<boolean>(false)
 
-    const initialValue:null|Type = determineInitialValue<Type>(
+    let initialValue:null|Type = determineInitialValue<Type>(
         givenProps,
         GenericInput.defaultProperties.model?.default as unknown as null|Type
     )
+    if (initialValue instanceof Date)
+        initialValue = (initialValue.getTime() / 1000) as unknown as Type
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
@@ -2413,11 +2415,14 @@ GenericInput.transformer = {
                     `${value}`
             }
         },
-        parse: (value:number|string):number => typeof value === 'number' ?
-            value :
-            `${parseFloat(value)}` === value ?
-                parseFloat(value) :
-                Date.parse(value) / 1000
+        parse: (value:Date|number|string):number =>
+            typeof value === 'number' ?
+                value :
+                value instanceof Date ?
+                    value.getTime() / 1000 :
+                    `${parseFloat(value)}` === value ?
+                        parseFloat(value) :
+                        Date.parse(value) / 1000
     },
     // TODO respect local to utc conversion.
     'datetime-local': {
@@ -2489,13 +2494,21 @@ GenericInput.transformer = {
                     `${value}`
             }
         },
-        parse: (value:number|string):number => typeof value === 'number' ?
-            value :
-            parseInt(value.replace(
-                /^([0-9]{2}):([0-9]{2})$/,
-                (_:string, hour:string, minute:string):string =>
-                    String(parseInt(hour) * 60 ** 2 + parseInt(minute) * 60)
-            ))
+        parse: (value:Date|number|string):number =>
+            typeof value === 'number' ?
+                value :
+                value instanceof Date ?
+                    value.getTime() / 1000 :
+                    parseInt(value.replace(
+                        /^([0-9]{2}):([0-9]{2})$/,
+                        (_:string, hour:string, minute:string):string =>
+                            String(
+                                parseInt(hour) *
+                                60 ** 2 +
+                                parseInt(minute) *
+                                60
+                            )
+                    ))
     },
 
     float: {
@@ -2505,12 +2518,14 @@ GenericInput.transformer = {
             transformer:InputDataTransformation
         ):string =>
             transformer.float.format ?
-                value === Infinity ? 'Infinity' : value === -Infinity ?
-                    '- Infinity' :
-                    (new Intl.NumberFormat(
-                        GenericInput.locales,
-                        transformer.float.format.final.options || {}
-                    )).format(value) :
+                value === Infinity ?
+                    'Infinity' :
+                    value === -Infinity ?
+                        '- Infinity' :
+                        (new Intl.NumberFormat(
+                            GenericInput.locales,
+                            transformer.float.format.final.options || {}
+                        )).format(value) :
                 `${value}`
         }},
         parse: (
