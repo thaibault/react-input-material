@@ -217,9 +217,9 @@ const Application:FunctionComponent<{}> = ():ReactElement => {
                 onChange={onChange}
                 type="datetime-local"
             />
-            <GenericInput<number>
+            <GenericInput<Date|number>
                 model={useMemorizedValue({
-                    default: 60,
+                    default: new Date(60 * 1000),
                     maximum: 3600,
                     minimum: 60,
                     name: 'input3Model',
