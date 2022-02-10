@@ -221,12 +221,9 @@ export const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     default: any,
     description: string,
     name: string,
-    selection: oneOfType([
-        arrayOf(oneOfType([number, string])),
-        objectOf(oneOfType([number, string]))
-    ]),
+    selection: arrayOf(oneOfType([number, string])),
     /*
-        NOTE: Not yet working:
+        NOTE: Also not yet working:
         type: oneOf([
             'date',
             'datetime-local',
@@ -687,6 +684,19 @@ export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     representation: oneOfType([string, symbol]),
     rows: number,
     searchSelection: boolean,
+    /*
+        NOTE: Override model configuration since more input data schemes are
+        possible here.
+    */
+    selection: oneOfType([
+        arrayOf(oneOfType([
+            arrayOf(oneOfType([number, string])),
+            number,
+            objectOf(oneOfType([number, string])),
+            string
+        ])),
+        objectOf(oneOfType([number, string]))
+    ]),
     selectableEditor: boolean,
     step: number,
     suggestionCreator: func,
