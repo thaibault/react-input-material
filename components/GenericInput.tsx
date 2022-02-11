@@ -1990,6 +1990,7 @@ export const GenericInputInner = function<Type = unknown>(
                         ...properties.rootProps
                     }}
                     value={`${properties.value as unknown as string}`}
+                    {...properties.inputProperties as SelectProps}
                 />,
                 useSelection
             )}
@@ -2071,6 +2072,9 @@ export const GenericInputInner = function<Type = unknown>(
                                             }}
                                             theme="github"
                                             value={properties.representation}
+                                            {...properties.inputProperties as
+                                                CodeEditorProps
+                                            }
                                         />
                                     </Suspense> :
                                     <RichTextEditorComponent
@@ -2102,6 +2106,9 @@ export const GenericInputInner = function<Type = unknown>(
                                             'tinymce.min.js'
                                         }
                                         value={properties.representation}
+                                        {...properties.inputProperties as
+                                            RichTextEditorProps
+                                        }
                                     />
                             }
                         </label>
@@ -2273,6 +2280,7 @@ export const GenericInputInner = function<Type = unknown>(
                         ))}
                         type={determineNativeType(properties)}
                         value={properties.representation}
+                        {...properties.inputProperties as TextFieldProps}
                     />
                 </div>,
                 !(isAdvancedEditor || useSelection),
