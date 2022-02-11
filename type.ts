@@ -45,7 +45,7 @@ import {
     Requireable,
     SyntheticEvent
 } from 'react'
-import CodeEditorType from 'react-ace'
+import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 
 import {Editor as RichTextEditor} from 'tinymce'
 import {
@@ -57,10 +57,13 @@ import {MDCTextFieldFoundation} from '@material/textfield'
 import {CardMediaProps} from '@rmwc/card'
 import {MenuApi} from '@rmwc/menu'
 import {SelectProps} from '@rmwc/select'
+import {TextFieldProps} from '@rmwc/textfield'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
 import {IconOptions, RipplePropT} from '@rmwc/types'
-import {Editor as RichTextEditorComponent} from '@tinymce/tinymce-react'
+import {
+    Editor as RichTextEditorComponent, IAllProps as RichTextEditorProps
+} from '@tinymce/tinymce-react'
 // endregion
 // region exports
 // / region dummy
@@ -282,6 +285,7 @@ export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     disabled: boolean,
     enforceUncontrolled: boolean,
     initialValue: any,
+    inputProperties: object,
     model: shape<any>(modelPropertyTypes),
     onChange: func,
     onChangeValue: func,
@@ -527,6 +531,9 @@ export interface InputProperties<T = unknown> extends
     fullWidth:boolean
     hidden:boolean
     icon:string|(IconOptions & {tooltip?:string|TooltipProps})
+    inputProperties:Partial<
+        CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
+    >
     invertedPatternText:string
     labels:Array<string>|Mapping
     maximumLengthText:string
