@@ -66,7 +66,7 @@
     "@babel/eslint-parser": "*",
     "@babel/plugin-transform-proto-to-assign": "*",
     "@babel/preset-react": "*",
-    "@emotion/react": "^11.7.1",
+    "@emotion/react": "*",
     "@rmwc/card": "*",
     "@rmwc/checkbox": "*",
     "@rmwc/circular-progress": "*",
@@ -105,10 +105,8 @@
     "identity-obj-proxy": "*",
     "jest": "*",
     "jsdoc": "*",
-    "map-visit": "^1.0.0",
     "material-icons": "*",
     "mini-css-extract-plugin": "*",
-    "object-visit": "^1.0.1",
     "postcss": "*",
     "postcss-import": "<=12",
     "postcss-loader": "*",
@@ -123,6 +121,7 @@
     "stylelint": "*",
     "stylelint-config-standard": "*",
     "tinymce": "*",
+    "tslib": "*",
     "typescript-plugin-css-modules": "*",
     "web-component-wrapper": "*",
     "weboptimizer": "*",
@@ -152,7 +151,8 @@
     "react-dom": "*",
     "react-transition-group": "*",
     "react-useanimations": "*",
-    "tinymce": "^5.0.0"
+    "tinymce": "^5.0.0",
+    "tslib": "*"
   },
   "peerDependenciesMeta": {
     "@babel/runtime": {
