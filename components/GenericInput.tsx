@@ -40,7 +40,7 @@ import {
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 import {TransitionProps} from 'react-transition-group/Transition'
 import {
-    Editor as RichTextEditor, RawEditorSettings as RawTinyMCEEditorSettings
+    Editor as RichTextEditor, RawEditorSettings as RawTinyMCEEditorOptions
 } from 'tinymce'
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
@@ -149,7 +149,7 @@ const CodeEditor = lazy(async ():Promise<{default:ComponentType<any>}> => {
 })
 // endregion
 // region rich text editor configuration
-export type TinyMCEOptions = RawTinyMCEEditorSettings & {
+export interface TinyMCEOptions extends RawTinyMCEEditorOptions {
     selector?:undefined
     target?:undefined
 }

@@ -119,7 +119,6 @@
     "style-loader": "*",
     "stylelint": "*",
     "stylelint-config-standard": "*",
-    "tinymce": "*",
     "tslib": "*",
     "typescript-plugin-css-modules": "*",
     "web-component-wrapper": "*",
@@ -150,7 +149,6 @@
     "react-dom": "*",
     "react-transition-group": "*",
     "react-useanimations": "*",
-    "tinymce": "^5.0.0",
     "tslib": "*"
   },
   "peerDependenciesMeta": {
