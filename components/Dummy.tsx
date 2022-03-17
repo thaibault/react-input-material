@@ -30,7 +30,7 @@ import {DummyProps} from '../type'
 // endregion
 /**
  * Generic strict wrapper component.
- * @param _properties - Given component properties.
+ * @param properties - Given component properties.
  * @param _reference - Given reference to mutable persistent object.
  *
  * @returns React elements.
