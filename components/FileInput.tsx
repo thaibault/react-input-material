@@ -19,6 +19,7 @@
 // region imports
 import {blobToBase64String, dataURLToBlob} from 'blob-util'
 import Tools from 'clientnode'
+import {Mapping} from 'clientnode/type'
 import {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
@@ -56,7 +57,7 @@ import {
     fileInputTextRepresentationClassName
 } from './FileInput.module'
 */
-import styles from './FileInput.module'
+import cssClassNames from './FileInput.module'
 import GenericInput from './GenericInput'
 import {WrapConfigurations} from './WrapConfigurations'
 import {
@@ -89,26 +90,27 @@ import {
 } from '../type'
 // endregion
 // region constants
+const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 /*
     NOTE: Caused by a bug transpiling regular expression which ignores needed
     escape sequences for "/" when using the nativ regular expression type.
 */
-const imageContentTypeRegularExpression = new RegExp(
+const IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
     '^image\\/(?:p?jpe?g|png|svg(?:\\+xml)?|vnd\\.microsoft\\.icon|gif|tiff|' +
     'webp|vnd\\.wap\\.wbmp|x-(?:icon|jng|ms-bmp))$',
     'i'
 )
-const textContentTypeRegularExpression = new RegExp(
+const TEXT_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
     '^(?:application\\/xml)|(?:text\\/(?:plain|x-ndpb[wy]html|(?:x-)?csv' +
     '|x?html?|xml))$',
     'i'
 )
-const representableTextContentTypeRegularExpression =
+const REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION =
     // Plain version:
     /^text\/plain$/i
     // Rendered version:
     // /^(application\/xml)|(text\/(plain|x?html?|xml))$/i
-const videoContentTypeRegularExpression = new RegExp(
+const VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
     '^video\\/(?:(?:x-)?(?:x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|(?:x-)?flv' +
     '|(?:x-)?m4v|(?:x-)mng|x-ms-as|x-ms-wmv|x-msvideo)' +
     '|(?:application\\/(?:x-)?shockwave-flash)$',
@@ -140,17 +142,19 @@ export const determineRepresentationType = (
 ):RepresentationType => {
     contentType = contentType.replace(/; *charset=.+$/, '')
 
-    if (textContentTypeRegularExpression.test(contentType)) {
-        if (representableTextContentTypeRegularExpression.test(contentType))
+    if (TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType)) {
+        if (REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
+            contentType
+        ))
             return 'renderableText'
 
         return 'text'
     }
 
-    if (imageContentTypeRegularExpression.test(contentType))
+    if (IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType))
         return 'image'
 
-    if (videoContentTypeRegularExpression.test(contentType))
+    if (VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType))
         return 'video'
 
     return 'binary'
@@ -237,6 +241,7 @@ export const readBinaryDataIntoText = (
         )
     })
 // endregion
+/* eslint-disable jsdoc/require-description-complete-sentence */
 /**
  * Validateable checkbox wrapper component.
  * @property static:displayName - Descriptive name for component to show in web
@@ -663,7 +668,7 @@ export const FileInputInner = function(
                 !properties.value.source
             )
                 valueChanged = {
-                    source: textContentTypeRegularExpression.test(
+                    source: TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
                         properties.value.blob.type
                     ) ?
                         await readBinaryDataIntoText(
@@ -692,7 +697,7 @@ export const FileInputInner = function(
                         }
 
                 if (!properties.value.url && properties.value.blob?.type) {
-                    const source = textContentTypeRegularExpression.test(
+                    const source = TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
                         properties.value.blob.type
                     ) ?
                         btoa(properties.value.source) :
@@ -735,7 +740,8 @@ export const FileInputInner = function(
     >
         <Card
             className={
-                [styles['file-input']].concat(properties.className ?? [])
+                [CSS_CLASS_NAMES['file-input']]
+                    .concat(properties.className ?? [])
                     .join(' ')
             }
             onBlur={onBlur}
@@ -761,13 +767,16 @@ export const FileInputInner = function(
                             </video> :
                             representationType === 'renderableText' ?
                                 <div className={
-                                    [styles['file-input__iframe-wrapper']]
+                                    [CSS_CLASS_NAMES[
+                                        'file-input__iframe-wrapper'
+                                    ]]
                                         .concat(
                                             ['text/html', 'text/plain']
                                                 .includes(
-                                                    properties.value.blob!.type!
+                                                    properties.value.blob!
+                                                        .type!
                                                 ) ?
-                                                styles[
+                                                CSS_CLASS_NAMES[
                                                     'file-input__iframe-' +
                                                     'wrapper--padding'
                                                 ] :
@@ -784,7 +793,7 @@ export const FileInputInner = function(
                                 properties.value?.source &&
                                 representationType === 'text' ?
                                     <pre
-                                        className={styles[
+                                        className={CSS_CLASS_NAMES[
                                             'file-input__text-representation'
                                         ]}
                                     >
@@ -858,7 +867,7 @@ export const FileInputInner = function(
                 {/* TODO use "accept" attribute for better validation. */}
                 <input
                     disabled={properties.disabled}
-                    className={styles['file-input__native']}
+                    className={CSS_CLASS_NAMES['file-input__native']}
                     id={properties.id || properties.name}
                     name={properties.name}
                     onChange={onChangeValue}
@@ -888,7 +897,9 @@ export const FileInputInner = function(
                             <>
                                 {!properties.disabled ?
                                     <CardActionButton
-                                        onClick={():void => onChangeValue(null)}
+                                        onClick={
+                                            ():void => onChangeValue(null)
+                                        }
                                         ref={deleteButtonReference}
                                         ripple={properties.ripple}
                                     >
@@ -905,9 +916,9 @@ export const FileInputInner = function(
                                         ripple={properties.ripple}
                                     >
                                         <a
-                                            className={
-                                                styles['file-input__download']
-                                            }
+                                            className={CSS_CLASS_NAMES[
+                                                'file-input__download'
+                                            ]}
                                             download={properties.value.name}
                                             href={properties.value.url}
                                             ref={downloadLinkReference}
@@ -933,6 +944,7 @@ export const FileInputInner = function(
     </WrapConfigurations>
     // endregion
 }
+/* eslint-enable jsdoc/require-description-complete-sentence */
 // NOTE: This is useful in react dev tools.
 FileInputInner.displayName = 'FileInput'
 /**
