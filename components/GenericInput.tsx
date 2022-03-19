@@ -39,6 +39,9 @@ import {
 } from 'react'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 import {TransitionProps} from 'react-transition-group/Transition'
+import UseAnimationsType from 'react-useanimations'
+import LockAnimation from 'react-useanimations/lib/lock'
+import PlusToXAnimation from 'react-useanimations/lib/plusToX'
 import {
     Editor as RichTextEditor, RawEditorSettings as RawTinyMCEEditorOptions
 } from 'tinymce'
@@ -126,12 +129,12 @@ import {
 declare const TARGET_TECHNOLOGY:string
 const isBrowser =
     !(TARGET_TECHNOLOGY === 'node' || typeof window === undefined)
-const UseAnimations:any|null =
+const UseAnimations:null|typeof Dummy|typeof UseAnimationsType =
     isBrowser ? optionalRequire('react-useanimations') : null
-const lock:any|null = isBrowser ?
+const lockAnimation:null|typeof LockAnimation = isBrowser ?
     optionalRequire('react-useanimations/lib/lock') :
     null
-const plusToX:any|null = isBrowser ?
+const plusToXAnimation:null|typeof PlusToXAnimation = isBrowser ?
     optionalRequire('react-useanimations/lib/plusToX') :
     null
 // endregion
@@ -410,11 +413,14 @@ export const GenericInputInner = function<Type = unknown>(
                     in={!Tools.equals(properties.value, properties.default)}
                 >
                     {(
-                        UseAnimations === null ||
-                        (UseAnimations as typeof Dummy).isDummy
+                        UseAnimations &&
+                        !(UseAnimations as typeof Dummy).isDummy &&
+                        plusToXAnimation
                     ) ?
-                        <IconButton icon="clear"/> :
-                        <UseAnimations animation={plusToX} reverse={true}/>
+                        <UseAnimations
+                            animation={plusToXAnimation} reverse={true}
+                        /> :
+                        <IconButton icon="clear"/>
                     }
                 </GenericAnimate>,
                 onClick: (event:ReactMouseEvent):void => {
@@ -434,14 +440,16 @@ export const GenericInputInner = function<Type = unknown>(
             return useMemorizedValue(
                 {
                     icon: (
-                        UseAnimations === null ||
-                        (UseAnimations as typeof Dummy).isDummy
+                        UseAnimations &&
+                        !(UseAnimations as typeof Dummy).isDummy &&
+                        lockAnimation
                     ) ?
+                        <UseAnimations
+                            animation={lockAnimation}
+                            reverse={!properties.hidden}
+                        /> :
                         <IconButton
                             icon={properties.hidden ? 'lock_open' : 'lock'}
-                        /> :
-                        <UseAnimations
-                            animation={lock} reverse={!properties.hidden}
                         />,
                     onClick: (event:ReactMouseEvent):void => {
                         event.preventDefault()
@@ -450,6 +458,7 @@ export const GenericInputInner = function<Type = unknown>(
                             if (value === undefined)
                                 value = properties.hidden
                             properties.hidden = !value
+
                             onChange(event)
 
                             return properties.hidden

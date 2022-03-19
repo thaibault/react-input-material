@@ -28,7 +28,8 @@ import PropertyTypes, {
     oneOfType,
     shape,
     string,
-    symbol
+    symbol,
+    ValidationMap
 } from 'clientnode/property-types'
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
@@ -140,7 +141,7 @@ export interface BaseProperties extends CommonBaseModel, ModelState {
     required:boolean
     requiredText:string
     ripple:RipplePropT
-    rootProps:HTMLProps<any>
+    rootProps:HTMLProps<Mapping<unknown>>
     showDeclaration:boolean
     showInitialValidationState:boolean
     // NOTE: We want to avoid a collision with html's native "style" property.
@@ -262,7 +263,9 @@ export const modelStatePropertyTypes:{
     valid: oneOfType([boolean, symbol]),
     visited: oneOfType([boolean, symbol])
 } as const
-export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+export const modelPropertyTypes:ValidationMap<ValueOf<
+    typeof PropertyTypes
+>> = {
     ...baseModelPropertyTypes,
     emptyEqualsNull: boolean,
     invertedRegularExpressionPattern:
@@ -278,7 +281,7 @@ export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
     trim: boolean
 } as const
-export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+export const propertyTypes:ValidationMap<ValueOf<typeof PropertyTypes>> = {
     ...baseModelPropertyTypes,
     ...modelStatePropertyTypes,
     className: string,
@@ -286,7 +289,9 @@ export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     enforceUncontrolled: boolean,
     initialValue: any,
     inputProperties: object,
-    model: shape<any>(modelPropertyTypes),
+    model: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
+        modelPropertyTypes
+    ),
     onChange: func,
     onChangeValue: func,
     onChangeShowDeclaration: func,
@@ -958,13 +963,6 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 // // endregion
 // / endregion
 // / region inputs
-export interface InputsPropertiesItem<T> {
-    model?:{
-        state?:{}
-        value?:null|T
-    }
-    value?:null|T
-}
 export interface InputsModelState extends ModelState {
     invalidMaximumNumber:boolean
     invalidMinimumNumber:boolean
@@ -976,6 +974,14 @@ export interface InputsModel<T, P extends InputsPropertiesItem<T>> extends
     minimumNumber:number
     state:InputsModelState
     writable:boolean
+}
+
+export interface InputsPropertiesItem<T> {
+    model?:{
+        state?:InputsModelState
+        value?:null|T
+    }
+    value?:null|T
 }
 
 export interface InputsChildrenOptions<
