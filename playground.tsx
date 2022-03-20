@@ -46,7 +46,7 @@ import {
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format!.final.options = {currency: 'EUR'}
 
-const Application:FunctionComponent<{}> = ():ReactElement => {
+const Application:FunctionComponent = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<unknown>()
 
     const onChange:((_properties:{model:unknown}) => void) =
