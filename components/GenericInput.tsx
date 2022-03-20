@@ -19,7 +19,7 @@
 // region imports
 import {Ace as CodeEditorNamespace} from 'ace-builds'
 import Tools, {optionalRequire} from 'clientnode'
-import {EvaluationResult} from 'clientnode/type'
+import {EvaluationResult, Mapping} from 'clientnode/type'
 import {
     ComponentType,
     FocusEvent as ReactFocusEvent,
@@ -81,7 +81,7 @@ import {
     genericInputSuggestionsPendingClassName
 } from './GenericInput.module'
  */
-import styles from './GenericInput.module'
+import cssClassNames from './GenericInput.module'
 import WrapConfigurations from './WrapConfigurations'
 import WrapTooltip from './WrapTooltip'
 import {
@@ -138,6 +138,7 @@ const plusToXAnimation:null|typeof PlusToXAnimation = isBrowser ?
     optionalRequire('react-useanimations/lib/plusToX') :
     null
 // endregion
+const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region code editor configuration
 export const ACEEditorOptions = {
     basePath: '/node_modules/ace-builds/src-noconflict/',
@@ -318,6 +319,7 @@ export function suggestionMatches(
     return false
 }
 // endregion
+/* eslint-disable jsdoc/require-description-complete-sentence */
 /**
  * Generic input wrapper component which automatically determines a useful
  * input field depending on given model specification.
@@ -345,6 +347,7 @@ export function suggestionMatches(
 export const GenericInputInner = function<Type = unknown>(
     props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
 ):ReactElement {
+/* eslint-enable jsdoc/require-description-complete-sentence */
     // region live-cycle
     /**
      * Is triggered immediate after a re-rendering. Re-stores cursor selection
@@ -1914,9 +1917,9 @@ export const GenericInputInner = function<Type = unknown>(
                 if (result) {
                     currentRenderableSuggestions.push(
                         <MenuItem
-                            className={
-                                styles['generic-input__suggestions__suggestion']
-                            }
+                            className={CSS_CLASS_NAMES[
+                                'generic-input__suggestions__suggestion'
+                            ]}
                             key={index}
                         >
                             {result}
@@ -1932,9 +1935,9 @@ export const GenericInputInner = function<Type = unknown>(
             ) {
                 currentRenderableSuggestions.push(
                     <MenuItem
-                        className={
-                            styles['generic-input__suggestions__suggestion']
-                        }
+                        className={CSS_CLASS_NAMES[
+                            'generic-input__suggestions__suggestion'
+                        ]}
                         dangerouslySetInnerHTML={{
                             __html: Tools.stringMark(
                                 suggestion,
@@ -1942,10 +1945,10 @@ export const GenericInputInner = function<Type = unknown>(
                                 (value:unknown):string =>
                                     `${value as string}`.toLowerCase(),
                                 '<span class="' +
-                                (styles[
+                                CSS_CLASS_NAMES[
                                     'generic-input__suggestions__suggestion' +
                                     '__mark'
-                                ] as string) +
+                                ] +
                                 '">{1}</span>'
                             ) as string
                         }}
@@ -1970,9 +1973,11 @@ export const GenericInputInner = function<Type = unknown>(
         tooltip={properties.tooltip}
     >
         <div
-            className={[styles['generic-input']]
+            className={[CSS_CLASS_NAMES['generic-input']]
                 .concat(
-                    isAdvancedEditor ? styles['generic-input--custom'] : [],
+                    isAdvancedEditor ?
+                        CSS_CLASS_NAMES['generic-input--custom'] :
+                        [],
                     properties.className ?? []
                 )
                 .join(' ')
@@ -2019,7 +2024,9 @@ export const GenericInputInner = function<Type = unknown>(
                     >
                         <label>
                             <span className={
-                                [styles['generic-input__editor__label']]
+                                [CSS_CLASS_NAMES[
+                                    'generic-input__editor__label'
+                                ]]
                                     .concat(
                                         'mdc-floating-label',
                                         'mdc-floating-label--float-above'
@@ -2151,18 +2158,14 @@ export const GenericInputInner = function<Type = unknown>(
                                 <MenuSurface
                                     anchorCorner="bottomLeft"
                                     className={
-                                        (
-                                            styles[
-                                                'generic-input__suggestions'
-                                            ] as string
-                                        ) +
+                                        CSS_CLASS_NAMES[
+                                            'generic-input__suggestions'
+                                        ] +
                                         ' ' +
-                                        (
-                                            styles[
-                                                'generic-input__suggestions' +
-                                                '--pending'
-                                            ] as string
-                                        )
+                                        CSS_CLASS_NAMES[
+                                            'generic-input__suggestions' +
+                                            '--pending'
+                                        ]
                                     }
                                     open={true}
                                 >
@@ -2174,9 +2177,9 @@ export const GenericInputInner = function<Type = unknown>(
                                         suggestionMenuAPIReference.current =
                                             instance
                                     }}
-                                    className={
-                                        styles['generic-input__suggestions']
-                                    }
+                                    className={CSS_CLASS_NAMES[
+                                        'generic-input__suggestions'
+                                    ]}
                                     focusOnOpen={false}
                                     foundationRef={
                                         suggestionMenuFoundationReference
