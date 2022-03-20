@@ -18,6 +18,7 @@
 */
 // region imports
 import {boolean, number, string} from 'clientnode/property-types'
+import {Mapping} from 'clientnode/type'
 import {FunctionComponent, ReactElement} from 'react'
 import {CSSTransition} from 'react-transition-group'
 import {TransitionProps} from 'react-transition-group/Transition'
@@ -31,8 +32,9 @@ import {
     genericAnimateWrapperClassName
 } from './GenericAnimate.module'
 */
-import styles from './GenericAnimate.module'
+import cssClassNames from './GenericAnimate.module'
 // endregion
+const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 /**
  * Generic animation wrapper component.
  * @param properties - Component given properties object.
@@ -47,7 +49,7 @@ export const GenericAnimate:FunctionComponent<Partial<TransitionProps<
     ):ReactElement =>
         <CSSTransition
             appear
-            classNames={styles['generic-animate']}
+            classNames={CSS_CLASS_NAMES['generic-animate']}
             in
             timeout={200}
             unmountOnExit
@@ -55,12 +57,16 @@ export const GenericAnimate:FunctionComponent<Partial<TransitionProps<
         >
             {
                 typeof properties.children === 'string' ?
-                    <span className={styles['generic-animate__wrapper']}>
+                    <span className={
+                        CSS_CLASS_NAMES['generic-animate__wrapper']
+                    }>
                         {properties.children}
                     </span> :
                     Array.isArray(properties.children) ?
                         <div
-                            className={styles['generic-animate__list-wrapper']}
+                            className={CSS_CLASS_NAMES[
+                                'generic-animate__list-wrapper'
+                            ]}
                         >
                             {properties.children}
                         </div> :

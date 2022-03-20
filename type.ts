@@ -28,7 +28,9 @@ import PropertyTypes, {
     oneOfType,
     shape,
     string,
-    symbol
+    symbol,
+    ValidationMap,
+    Validator
 } from 'clientnode/property-types'
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
@@ -49,7 +51,10 @@ import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 
 import {Editor as RichTextEditor} from 'tinymce'
 import {
-    ComponentAdapter, StaticWebComponent as StaticBaseWebComponent
+    ComponentAdapter,
+    PropertiesValidationMap,
+    StaticWebComponent as StaticBaseWebComponent,
+    ValidationMapping
 } from 'web-component-wrapper/type'
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
@@ -140,7 +145,7 @@ export interface BaseProperties extends CommonBaseModel, ModelState {
     required:boolean
     requiredText:string
     ripple:RipplePropT
-    rootProps:HTMLProps<any>
+    rootProps:HTMLProps<Mapping<unknown>>
     showDeclaration:boolean
     showInitialValidationState:boolean
     // NOTE: We want to avoid a collision with html's native "style" property.
@@ -219,7 +224,7 @@ export interface InputComponent<
     (_props:P & RefAttributes<A>):ReactElement
 }
 // // region constants
-export const baseModelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+export const baseModelPropertyTypes:ValidationMapping = {
     declaration: string,
     default: any,
     description: string,
@@ -253,32 +258,40 @@ export const modelStatePropertyTypes:{
     [_key in keyof ModelState]:Requireable<boolean|symbol>
 } = {
     dirty: oneOfType([boolean, symbol]),
-    focused: oneOfType([boolean, symbol]),
-    invalid: oneOfType([boolean, symbol]),
-    invalidRequired: oneOfType([boolean, symbol]),
     pristine: oneOfType([boolean, symbol]),
     touched: oneOfType([boolean, symbol]),
     untouched: oneOfType([boolean, symbol]),
-    valid: oneOfType([boolean, symbol]),
-    visited: oneOfType([boolean, symbol])
+
+    focused: oneOfType([boolean, symbol]),
+    visited: oneOfType([boolean, symbol]),
+
+    invalid: oneOfType([boolean, symbol]),
+    invalidRequired: oneOfType([boolean, symbol]),
+    valid: oneOfType([boolean, symbol])
 } as const
-export const modelPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+export const modelPropertyTypes:ValidationMapping = {
     ...baseModelPropertyTypes,
+
     emptyEqualsNull: boolean,
+    trim: boolean,
+
     invertedRegularExpressionPattern:
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
-    maximum: oneOfType([number, string]),
-    maximumLength: number,
-    minimum: oneOfType([number, string]),
-    minimumLength: number,
-    mutable: boolean,
-    state: shape(modelStatePropertyTypes),
-    writable: boolean,
     regularExpressionPattern:
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
-    trim: boolean
+
+    maximum: oneOfType([number, string]),
+    minimum: oneOfType([number, string]),
+
+    maximumLength: number,
+    minimumLength: number,
+
+    mutable: boolean,
+    writable: boolean,
+
+    state: shape(modelStatePropertyTypes)
 } as const
-export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+export const propertyTypes:ValidationMapping = {
     ...baseModelPropertyTypes,
     ...modelStatePropertyTypes,
     className: string,
@@ -286,7 +299,9 @@ export const propertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
     enforceUncontrolled: boolean,
     initialValue: any,
     inputProperties: object,
-    model: shape<any>(modelPropertyTypes),
+    model: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
+        modelPropertyTypes
+    ),
     onChange: func,
     onChangeValue: func,
     onChangeShowDeclaration: func,
@@ -379,7 +394,7 @@ export type CheckboxComponent = InputComponent<
     CheckboxAdapter
 >
 // // region constants
-export const checkboxPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+export const checkboxPropertyTypes:PropertiesValidationMap = {
     ...propertyTypes,
     ...modelStatePropertyTypes,
     checked: boolean,
@@ -640,7 +655,7 @@ export const inputModelStatePropertyTypes:{
     invalidInvertedPattern: oneOfType([boolean, symbol]),
     invalidPattern: oneOfType([boolean, symbol])
 } as const
-export const inputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+export const inputPropertyTypes:PropertiesValidationMap = {
     ...propertyTypes,
     ...inputModelStatePropertyTypes,
     /*
@@ -777,7 +792,9 @@ export interface FileInputValueState extends
 export interface FileInputModelState extends ModelState {
     invalidMaximumSize:boolean
     invalidMinimumSize:boolean
+
     invalidContentTypePattern:boolean
+
     invalidName:boolean
 }
 export interface FileInputModel extends Model<FileValue> {
@@ -785,9 +802,12 @@ export interface FileInputModel extends Model<FileValue> {
     invertedContentTypeRegularExpressionPattern:(
         Array<RegExp|string>|null|RegExp|string
     )
+
     maximumSize:number
     minimumSize:number
+
     fileName:InputModel<string>
+
     state:FileInputModelState
 }
 
@@ -801,24 +821,33 @@ export interface FileInputProperties extends
     Properties<FileValue>, FileInputModelState
 {
     children:(_options:FileInputChildrenOptions<this>) => null|ReactElement
+
     contentTypePattern:Array<RegExp|string>|null|RegExp|string
+    invertedContentTypePattern:Array<RegExp|string>|null|RegExp|string
+
     contentTypePatternText:string
+    invertedContentTypePatternText:string
+    maximumSizeText:string
+    minimumSizeText:string
+
     deleteButton:ReactElement|string
     downloadButton:ReactElement|string
     editButton:ReactElement|string
+    newButton:ReactElement|string
+
     encoding:string
+
     generateFileNameInputProperties:(
         _prototype:InputProps<string>,
         _properties:this & {value:FileValue & {name:string}}
     ) => InputProps<string>
-    invertedContentTypePattern:Array<RegExp|string>|null|RegExp|string
-    invertedContentTypePatternText:string
-    maximumSizeText:string
+
     media:CardMediaProps
-    minimumSizeText:string
+
     model:FileInputModel
-    newButton:ReactElement|string
+
     outlined:boolean
+
     sourceToBlobOptions:{
         endings?:'native'|'transparent'
         type?:string
@@ -864,49 +893,66 @@ export const fileInputModelStatePropertyTypes:{
     [_key in keyof FileInputModelState]:Requireable<boolean|symbol>
 } = {
     ...modelStatePropertyTypes,
+
+    invalidContentTypePattern: oneOfType([boolean, symbol]),
+
     invalidMaximumSize: oneOfType([boolean, symbol]),
     invalidMinimumSize: oneOfType([boolean, symbol]),
-    invalidContentTypePattern: oneOfType([boolean, symbol]),
+
     invalidName: oneOfType([boolean, symbol])
 } as const
-export const fileInputPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+export const fileInputPropertyTypes:PropertiesValidationMap = {
     ...propertyTypes,
     ...fileInputModelStatePropertyTypes,
+
     children: func,
+
     contentTypePatternText:
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
+    invertedContentTypePatternText:
+        oneOfType([arrayOf(oneOfType([object, string])), object, string]),
+
     deleteButton: oneOfType([object, string]),
     downloadButton: oneOfType([object, string]),
     editButton: oneOfType([object, string]),
+    newButton: oneOfType([object, string]),
+
     encoding: string,
+
     generateFileNameInputProperties: func,
-    invertedContentTypePatternText:
-        oneOfType([arrayOf(oneOfType([object, string])), object, string]),
+
     maximumSizeText: string,
     minimumSizeText: string,
-    newButton: oneOfType([object, string]),
+
     onBlur: func,
+
     outlined: boolean
 } as const
 export const defaultFileInputModelState:FileInputModelState = {
     ...defaultModelState,
+    invalidContentTypePattern: false,
+
     invalidMaximumSize: false,
     invalidMinimumSize: false,
-    invalidContentTypePattern: false,
+
     invalidName: false
 } as const
 export const defaultFileInputModel:FileInputModel = {
     ...defaultModel as Model<FileValue>,
+
     contentTypeRegularExpressionPattern: /^.+\/.+$/,
+    invertedContentTypeRegularExpressionPattern: null,
+
     fileName: {
         ...defaultInputModel,
         maximumLength: 1024,
         name: 'Name',
         regularExpressionPattern: /^[^/]+$/
     },
-    invertedContentTypeRegularExpressionPattern: null,
+
     maximumSize: Infinity,
     minimumSize: 0,
+
     state: defaultFileInputModelState
 } as const
 /*
@@ -915,7 +961,9 @@ export const defaultFileInputModel:FileInputModel = {
 */
 export const defaultFileNameInputProperties:InputProps<string> = {
     ...defaultInputProperties,
+
     emptyEqualsNull: false,
+
     invertedPatternText:
         'Your file\'s name should not match the regular expression' +
         '${[].concat(invertedPattern).length > 1 ? "s" : ""}: "' +
@@ -924,47 +972,65 @@ export const defaultFileNameInputProperties:InputProps<string> = {
         'Your file\'s name has to match the regular expression' +
         '${[].concat(pattern).length > 1 ? "s" : ""}: "' +
         '"${[].concat(pattern).join("\\", \\"")}".',
+
     required: true
 } as const
 delete (defaultFileNameInputProperties as {model?:InputModel}).model
 export const defaultFileInputProperties:DefaultFileInputProperties = {
     ...defaultProperties as unknown as Partial<DefaultFileInputProperties>,
+
     contentTypePatternText:
         'Your file\'s mime-type has to match the regular expression' +
         '${[].concat(contentTypePattern).length > 1 ? "s" : ""}: "' +
         '"${[].concat(contentTypePattern).join("\\", \\"")}".',
-    deleteButton: 'delete',
-    downloadButton: 'download',
-    editButton: 'edit',
-    encoding: 'utf-8',
-    generateFileNameInputProperties: Tools.identity,
     invertedContentTypePatternText:
         'Your file\'s mime-type should not match the regular expression' +
         '${[].concat(invertedContentTypePattern).length > 1 ? "s" : ""}: "' +
         '"${[].concat(invertedContentTypePattern).join("\\", \\"")}".',
+
+    deleteButton: 'delete',
+    downloadButton: 'download',
+    editButton: 'edit',
+    newButton: 'new',
+
+    encoding: 'utf-8',
+
+    generateFileNameInputProperties: Tools.identity,
+
     maximumSizeText:
         'Please provide a file with less or equal size than ${maximumSize} ' +
         'byte.',
-    media: {
-        sixteenByNine: true
-    },
     minimumSizeText:
         'Please provide a file with more or equal size than ${maximumSize} ' +
         'byte.',
+
+    media: {
+        sixteenByNine: true
+    },
+
     model: {...defaultFileInputModel},
-    newButton: 'new',
+
     sourceToBlobOptions: {endings: 'transparent', type: 'text/plain'}
 } as const
 // // endregion
 // / endregion
 // / region inputs
-export interface InputsPropertiesItem<T> {
+export interface InputsPropertiesItem<T, TS = unknown> {
     model?:{
-        state?:{}
+        state?:TS
         value?:null|T
     }
     value?:null|T
 }
+export interface InputsCreatePrototypeOptions<
+    T, P extends InputsPropertiesItem<T>, IP
+> {
+    index:number
+    properties:IP
+    prototype:Partial<P>
+    values:Array<null|T|undefined>|null
+}
+
 export interface InputsModelState extends ModelState {
     invalidMaximumNumber:boolean
     invalidMinimumNumber:boolean
@@ -974,7 +1040,9 @@ export interface InputsModel<T, P extends InputsPropertiesItem<T>> extends
 {
     maximumNumber:number
     minimumNumber:number
+
     state:InputsModelState
+
     writable:boolean
 }
 
@@ -985,30 +1053,29 @@ export interface InputsChildrenOptions<
     inputsProperties:IP
     properties:Partial<P>
 }
-export interface InputsCreatePrototypeOptions<
-    T, P extends InputsPropertiesItem<T>, IP
-> {
-    index:number
-    properties:IP
-    prototype:Partial<P>
-    values:Array<null|T|undefined>|null
-}
 export interface InputsProperties<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
 > extends InputsModelState, Omit<Properties<Array<P>>, 'onChangeValue'> {
     addIcon:IconOptions
+    removeIcon:IconOptions
+
     children:(_options:InputsChildrenOptions<T, P, this>) => ReactElement
+
     createPrototype:(_options:InputsCreatePrototypeOptions<T, P, this>) => P
+
     maximumNumber:number
     minimumNumber:number
+
     model:InputsModel<T, P>
+
     onChangeValue:(
         _values:Array<null|T>|null,
         _event:GenericEvent|unknown,
         _properties:this
     ) => void
-    removeIcon:IconOptions
+
     value:Array<P>|null
+
     writable:boolean
 }
 export type InputsProps<
@@ -1052,12 +1119,14 @@ export interface InputsComponent extends
     ):ReactElement
 }
 // // region constants
-export const inputsPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
+export const inputsPropertyTypes:PropertiesValidationMap = {
     ...propertyTypes,
     ...inputModelStatePropertyTypes,
     // We use that function (render prop) to produce input component instances.
     children: func,
+
     createPrototype: func,
+
     maximumNumber: number,
     minimumNumber: number
 } as const
@@ -1065,13 +1134,17 @@ export const inputsRenderProperties:Array<string> =
     ['children', 'createPrototype']
 export const defaultInputsModel:InputsModel<string, InputProperties<string>> = {
     ...defaultModel as InputsModel<string, InputProperties<string>>,
+
     state: {
         ...defaultModel.state,
+
         invalidMaximumNumber: false,
         invalidMinimumNumber: false
     },
+
     maximumNumber: Infinity,
     minimumNumber: 0,
+
     type: 'string[]'
 } as const
 /*
@@ -1080,10 +1153,13 @@ export const defaultInputsModel:InputsModel<string, InputProperties<string>> = {
 */
 export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties as DefaultInputsProperties,
+
     addIcon: {icon: 'add'},
+    removeIcon: {icon: 'clear'},
+
     createPrototype: ({prototype}):InputProps<string> => prototype,
-    model: {...defaultInputsModel},
-    removeIcon: {icon: 'clear'}
+
+    model: {...defaultInputsModel}
 } as const
 // // endregion
 // / endregion
@@ -1113,9 +1189,12 @@ export interface IntervalProperties extends Omit<
     'icon'|'model'|'onChange'|'onChangeValue'|'value'
 > {
     icon:IconOptions
+
     model:IntervalModel
+
     onChange:(_properties:this, _event?:GenericEvent) => void
     onChangeValue:(_value:null|IntervalValue, _event?:GenericEvent) => void
+
     value:IntervalConfiguration
 }
 export type IntervalProps =
@@ -1124,11 +1203,15 @@ export type IntervalProps =
     > &
     Partial<{
         end:InputProps<number>
+        start:InputProps<number>
+
         icon:IntervalProperties['icon']
+
         model:IntervalProperties['model']
+
         onChange:IntervalProperties['onChange']
         onChangeValue:IntervalProperties['onChangeValue']
-        start:InputProps<number>
+
         value:IntervalConfiguration|IntervalValue|null
     }>
 
@@ -1155,18 +1238,34 @@ export type IntervalComponent = InputComponent<
     IntervalAdapter
 >
 // // region constants
-export const intervalPropertyTypes:Mapping<ValueOf<typeof PropertyTypes>> = {
-    ...inputPropertyTypes,
-    value: shape<any>({
-        end: oneOfType([number, shape<any>(inputPropertyTypes)]),
-        start: oneOfType([number, shape<any>(inputPropertyTypes)])
+export const intervalPropertyTypes:PropertiesValidationMap = {
+    ...inputPropertyTypes as Mapping<ValueOf<PropertiesValidationMap>>,
+    value: shape<ValidationMap<{
+        end:unknown
+        start:unknown
+    }>>({
+        end: oneOfType<Validator<unknown>>([
+            number,
+            shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
+                inputPropertyTypes
+            )
+        ]),
+        start: oneOfType<Validator<unknown>>([
+            number,
+            shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
+                inputPropertyTypes
+            )
+        ])
     })
 } as const
 export const defaultIntervalProperties:DefaultIntervalProperties = {
     icon: {icon: 'timelapse'},
+
     maximumText:
         'Please provide somthing earlier than ${formatValue(maximum)}.',
     minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
+    requiredText: 'Please provide a range.',
+
     model: {
         name: 'NO_NAME_DEFINED',
         state: {...defaultModelState},
@@ -1183,7 +1282,7 @@ export const defaultIntervalProperties:DefaultIntervalProperties = {
             }
         }
     },
-    requiredText: 'Please provide a range.',
+
     type: 'time'
 } as const
 // // endregion
