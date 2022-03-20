@@ -24,7 +24,7 @@ import {act} from 'react-dom/test-utils'
 import {TestEnvironment} from './type'
 // endregion
 export const prepareTestEnvironment = (
-    beforeEach:Function, afterEach:Function
+    beforeEach:jest.Lifecycle, afterEach:jest.Lifecycle
 ):TestEnvironment => {
     const result:TestEnvironment = {
         container: null,
@@ -32,23 +32,28 @@ export const prepareTestEnvironment = (
             act(():void => {
                 render(component, result.container)
             })
+
             return (result.container as HTMLDivElement).childNodes.length ?
                 (result.container as HTMLDivElement).childNodes[0] :
                 null
         }
     }
+
     beforeEach(():void => {
         result.container = document.createElement('div')
         result.container.setAttribute('class', 'test-wrapper')
         document.body.appendChild(result.container)
     })
+
     afterEach(():void => {
         unmountComponentAtNode(result.container as HTMLDivElement);
         (result.container as HTMLDivElement).remove()
         result.container = null
     })
+
     return result
 }
+
 export default prepareTestEnvironment
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

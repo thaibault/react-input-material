@@ -103,7 +103,7 @@ export const deriveMissingPropertiesFromState = <
  *
  * @returns Wrapped given method.
  */
-export const wrapStateSetter = <Type = any>(
+export const wrapStateSetter = <Type = unknown>(
     setValueState:(_value:Type|((_value:Type) => Type)) => void,
     currentValueState:Type
 ):ReturnType<typeof useState>[1] =>
@@ -144,14 +144,16 @@ export const triggerCallbackIfExists =
 
         if (properties[name as keyof P])
             if (synchronous)
-                (properties[name as keyof P] as unknown as Function)(
-                    ...parameters
-                )
+                (properties[name as keyof P] as
+                    unknown as
+                    (..._parameters:Array<unknown>) => void
+                )(...parameters)
             else
                 void Tools.timeout(() =>
-                    (properties[name as keyof P] as unknown as Function)(
-                        ...parameters
-                    )
+                    (properties[name as keyof P] as
+                        unknown as
+                        (..._parameters:Array<unknown>) => void
+                    )(...parameters)
                 )
     }
 // region consolidation state
@@ -161,7 +163,7 @@ export const triggerCallbackIfExists =
  *
  * @returns Transformed properties.
  */
-export const translateKnownSymbols = <Type = any>(
+export const translateKnownSymbols = <Type = unknown>(
     properties:Mapping<typeof NullSymbol|Type|typeof UndefinedSymbol>
 ):Mapping<Type> => {
     const result:Mapping<Type> = {}
@@ -183,7 +185,7 @@ export const translateKnownSymbols = <Type = any>(
  *
  * @returns Determined value.
  */
-export const determineInitialValue = <Type = any>(
+export const determineInitialValue = <Type = unknown>(
     properties:BaseProps,
     defaultValue?:null|Type,
     alternateValue?:null|Type
