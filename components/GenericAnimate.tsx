@@ -16,7 +16,7 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region imports
+// region import s
 import {boolean, number, string} from 'clientnode/property-types'
 import {Mapping} from 'clientnode/type'
 import {FunctionComponent, ReactElement} from 'react'

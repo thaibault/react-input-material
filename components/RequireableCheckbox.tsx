@@ -18,6 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
+import {Mapping} from 'clientnode/type'
 import {
     FocusEvent as ReactFocusEvent,
     forwardRef,
@@ -40,7 +41,7 @@ import {Theme} from '@rmwc/theme'
 
 import {requireableCheckboxClassName} from './RequireableCheckbox.module'
 */
-import styles from './RequireableCheckbox.module'
+import cssClassNames from './RequireableCheckbox.module'
 import {WrapConfigurations} from './WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
@@ -65,6 +66,7 @@ import {
     CheckboxValueState as ValueState
 } from '../type'
 // endregion
+const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region helper
 /**
  * Derives validation state from provided properties and state.
@@ -87,6 +89,7 @@ export function determineValidationState(
     )
 }
 // endregion
+/* eslint-disable jsdoc/require-description-complete-sentence */
 /**
  * Validateable checkbox wrapper component.
  * @property static:displayName - Descriptive name for component to show in web
@@ -115,6 +118,7 @@ export function determineValidationState(
 export const RequireableCheckboxInner = function(
     props:Props, reference?:MutableRefObject<Adapter>
 ):ReactElement {
+/* eslint-enable jsdoc/require-description-complete-sentence */
     // region property aggregation
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -424,7 +428,7 @@ export const RequireableCheckboxInner = function(
         tooltip={properties.tooltip}
     >
         <div
-            className={[styles['requireable-checkbox']]
+            className={[CSS_CLASS_NAMES['requireable-checkbox']]
                 .concat(properties.className ?? [])
                 .join(' ')
             }

@@ -18,6 +18,7 @@
 */
 // region imports
 import Tools from 'clientnode'
+import {Mapping} from 'clientnode/type'
 import {Icon} from '@rmwc/icon'
 import {IconOptions} from '@rmwc/types'
 import {
@@ -37,7 +38,7 @@ import GenericInput from './GenericInput'
 
 import {intervalClassName, intervalDisabledClassName} from './Interval.module'
 */
-import styles from './Interval.module'
+import cssClassNames from './Interval.module'
 import WrapConfigurations from './WrapConfigurations'
 import {
     createDummyStateSetter, translateKnownSymbols, triggerCallbackIfExists
@@ -58,6 +59,7 @@ import {
     IntervalValue as Value
 } from '../type'
 // endregion
+const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region helper
 const getModelState = (
     startProperties:InputProperties<number>,
@@ -209,11 +211,11 @@ export const IntervalInner = function(
     )
 
     if (!endProperties.className)
-        endProperties.className = `${styles.interval}__end`
+        endProperties.className = `${CSS_CLASS_NAMES.interval}__end`
     if (!iconProperties.className)
-        iconProperties.className = `${styles.interval}__icon`
+        iconProperties.className = `${CSS_CLASS_NAMES.interval}__icon`
     if (!startProperties.className)
-        startProperties.className = `${styles.interval}__start`
+        startProperties.className = `${CSS_CLASS_NAMES.interval}__start`
 
     const endConfiguration = {...endProperties.model, ...endProperties}
     const startConfiguration = {...startProperties.model, ...startProperties}
@@ -381,10 +383,12 @@ export const IntervalInner = function(
         themeConfiguration={properties.themeConfiguration}
     >
         <div
-            className={[styles.interval]
+            className={[CSS_CLASS_NAMES.interval]
                 .concat(
                     properties.className ?? [],
-                    properties.disabled ? styles['interval--disabled'] : []
+                    properties.disabled ?
+                        CSS_CLASS_NAMES['interval--disabled'] :
+                        []
                 )
                 .join(' ')
             }
