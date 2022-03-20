@@ -51,7 +51,10 @@ import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 
 import {Editor as RichTextEditor} from 'tinymce'
 import {
-    ComponentAdapter, StaticWebComponent as StaticBaseWebComponent
+    ComponentAdapter,
+    PropertiesValidationMap,
+    StaticWebComponent as StaticBaseWebComponent,
+    ValidationMapping
 } from 'web-component-wrapper/type'
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
@@ -221,9 +224,7 @@ export interface InputComponent<
     (_props:P & RefAttributes<A>):ReactElement
 }
 // // region constants
-export const baseModelPropertyTypes:ValidationMap<ValueOf<
-    typeof PropertyTypes
->> = {
+export const baseModelPropertyTypes:ValidationMapping = {
     declaration: string,
     default: any,
     description: string,
@@ -257,34 +258,40 @@ export const modelStatePropertyTypes:{
     [_key in keyof ModelState]:Requireable<boolean|symbol>
 } = {
     dirty: oneOfType([boolean, symbol]),
-    focused: oneOfType([boolean, symbol]),
-    invalid: oneOfType([boolean, symbol]),
-    invalidRequired: oneOfType([boolean, symbol]),
     pristine: oneOfType([boolean, symbol]),
     touched: oneOfType([boolean, symbol]),
     untouched: oneOfType([boolean, symbol]),
-    valid: oneOfType([boolean, symbol]),
-    visited: oneOfType([boolean, symbol])
+
+    focused: oneOfType([boolean, symbol]),
+    visited: oneOfType([boolean, symbol]),
+
+    invalid: oneOfType([boolean, symbol]),
+    invalidRequired: oneOfType([boolean, symbol]),
+    valid: oneOfType([boolean, symbol])
 } as const
-export const modelPropertyTypes:ValidationMap<ValueOf<
-    typeof PropertyTypes
->> = {
+export const modelPropertyTypes:ValidationMapping = {
     ...baseModelPropertyTypes,
+
     emptyEqualsNull: boolean,
+    trim: boolean,
+
     invertedRegularExpressionPattern:
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
-    maximum: oneOfType([number, string]),
-    maximumLength: number,
-    minimum: oneOfType([number, string]),
-    minimumLength: number,
-    mutable: boolean,
-    state: shape(modelStatePropertyTypes),
-    writable: boolean,
     regularExpressionPattern:
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
-    trim: boolean
+
+    maximum: oneOfType([number, string]),
+    minimum: oneOfType([number, string]),
+
+    maximumLength: number,
+    minimumLength: number,
+
+    mutable: boolean,
+    writable: boolean,
+
+    state: shape(modelStatePropertyTypes)
 } as const
-export const propertyTypes:ValidationMap<ValueOf<typeof PropertyTypes>> = {
+export const propertyTypes:ValidationMapping = {
     ...baseModelPropertyTypes,
     ...modelStatePropertyTypes,
     className: string,
@@ -387,9 +394,7 @@ export type CheckboxComponent = InputComponent<
     CheckboxAdapter
 >
 // // region constants
-export const checkboxPropertyTypes:ValidationMap<ValueOf<
-    typeof PropertyTypes
->> = {
+export const checkboxPropertyTypes:PropertiesValidationMap = {
     ...propertyTypes,
     ...modelStatePropertyTypes,
     checked: boolean,
@@ -650,9 +655,7 @@ export const inputModelStatePropertyTypes:{
     invalidInvertedPattern: oneOfType([boolean, symbol]),
     invalidPattern: oneOfType([boolean, symbol])
 } as const
-export const inputPropertyTypes:ValidationMap<ValueOf<
-    typeof PropertyTypes
->> = {
+export const inputPropertyTypes:PropertiesValidationMap = {
     ...propertyTypes,
     ...inputModelStatePropertyTypes,
     /*
@@ -898,9 +901,7 @@ export const fileInputModelStatePropertyTypes:{
 
     invalidName: oneOfType([boolean, symbol])
 } as const
-export const fileInputPropertyTypes:ValidationMap<ValueOf<
-    typeof PropertyTypes
->> = {
+export const fileInputPropertyTypes:PropertiesValidationMap = {
     ...propertyTypes,
     ...fileInputModelStatePropertyTypes,
 
@@ -1118,9 +1119,7 @@ export interface InputsComponent extends
     ):ReactElement
 }
 // // region constants
-export const inputsPropertyTypes:ValidationMap<ValueOf<
-    typeof PropertyTypes
->> = {
+export const inputsPropertyTypes:PropertiesValidationMap = {
     ...propertyTypes,
     ...inputModelStatePropertyTypes,
     // We use that function (render prop) to produce input component instances.
@@ -1135,13 +1134,17 @@ export const inputsRenderProperties:Array<string> =
     ['children', 'createPrototype']
 export const defaultInputsModel:InputsModel<string, InputProperties<string>> = {
     ...defaultModel as InputsModel<string, InputProperties<string>>,
+
     state: {
         ...defaultModel.state,
+
         invalidMaximumNumber: false,
         invalidMinimumNumber: false
     },
+
     maximumNumber: Infinity,
     minimumNumber: 0,
+
     type: 'string[]'
 } as const
 /*
@@ -1152,11 +1155,11 @@ export const defaultInputsProperties:DefaultInputsProperties = {
     ...defaultProperties as DefaultInputsProperties,
 
     addIcon: {icon: 'add'},
-    removeIcon: {icon: 'clear'}
+    removeIcon: {icon: 'clear'},
 
     createPrototype: ({prototype}):InputProps<string> => prototype,
 
-    model: {...defaultInputsModel},
+    model: {...defaultInputsModel}
 } as const
 // // endregion
 // / endregion
@@ -1235,21 +1238,19 @@ export type IntervalComponent = InputComponent<
     IntervalAdapter
 >
 // // region constants
-export const intervalPropertyTypes:ValidationMap<ValueOf<
-    typeof PropertyTypes
->> = {
-    ...inputPropertyTypes,
+export const intervalPropertyTypes:PropertiesValidationMap = {
+    ...inputPropertyTypes as Mapping<ValueOf<PropertiesValidationMap>>,
     value: shape<ValidationMap<{
-        end:Validator<NonNullable<Validator<any>>>
-        start:Validator<NonNullable<Validator<any>>>
+        end:unknown
+        start:unknown
     }>>({
-        end: oneOfType<any>([
+        end: oneOfType<Validator<unknown>>([
             number,
             shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
                 inputPropertyTypes
             )
         ]),
-        start: oneOfType<any>([
+        start: oneOfType<Validator<unknown>>([
             number,
             shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
                 inputPropertyTypes
