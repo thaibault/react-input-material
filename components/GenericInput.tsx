@@ -21,7 +21,6 @@ import {Ace as CodeEditorNamespace} from 'ace-builds'
 import Tools, {optionalRequire} from 'clientnode'
 import {EvaluationResult, Mapping} from 'clientnode/type'
 import {
-    ComponentType,
     FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardedRef,
@@ -144,13 +143,15 @@ export const ACEEditorOptions = {
     basePath: '/node_modules/ace-builds/src-noconflict/',
     useWorker: false
 }
-const CodeEditor = lazy(async ():Promise<{default:ComponentType<any>}> => {
-    const {config} = await import('ace-builds')
-    for (const [name, value] of Object.entries(ACEEditorOptions))
-        config.set(name, value)
+const CodeEditor = lazy<typeof CodeEditorType>(
+    async ():Promise<{default:typeof CodeEditorType}> => {
+        const {config} = await import('ace-builds')
+        for (const [name, value] of Object.entries(ACEEditorOptions))
+            config.set(name, value)
 
-    return await import('react-ace')
-})
+        return await import('react-ace')
+    }
+)
 // endregion
 // region rich text editor configuration
 export interface TinyMCEOptions extends RawTinyMCEEditorOptions {
@@ -364,7 +365,9 @@ export const GenericInputInner = function<Type = unknown>(
                     "editorState.selectionIsUnstable" is set to "true".
                 */
                 if (codeEditorReference.current?.editor?.selection) {
-                    codeEditorReference.current.editor.textInput.focus()
+                    (codeEditorReference.current.editor.textInput as
+                        HTMLInputElement
+                    ).focus()
                     setCodeEditorSelectionState(codeEditorReference.current)
 
                     if (editorState.selectionIsUnstable)
@@ -568,7 +571,7 @@ export const GenericInputInner = function<Type = unknown>(
      *
      * @returns Evaluated template or an empty string if something goes wrong.
      */
-    const renderMessage = (template?:any):string => {
+    const renderMessage = (template?:unknown):string => {
         if (typeof template === 'string') {
             const evaluated:EvaluationResult = Tools.stringEvaluate(
                 `\`${template}\``,
@@ -578,15 +581,19 @@ export const GenericInputInner = function<Type = unknown>(
                     ...properties
                 }
             )
+
             if (evaluated.error) {
                 console.warn(
                     'Given message template could not be proceed:',
                     evaluated.error
                 )
+
                 return ''
             }
+
             return evaluated.result
         }
+
         return ''
     }
     /**
@@ -1027,7 +1034,9 @@ export const GenericInputInner = function<Type = unknown>(
             properties.editorIsActive &&
             editorState.selectionIsUnstable
         ) {
-            codeEditorReference.current.editor.textInput.focus()
+            (codeEditorReference.current.editor.textInput as
+                HTMLInputElement
+            ).focus()
             setCodeEditorSelectionState(codeEditorReference.current)
             setEditorState({...editorState, selectionIsUnstable: false})
         }
@@ -1246,13 +1255,13 @@ export const GenericInputInner = function<Type = unknown>(
 
         let event:GenericEvent|undefined
         if (eventOrValue !== null && typeof eventOrValue === 'object') {
-            const target:any =
-                (eventOrValue as GenericEvent).target ||
-                (eventOrValue as GenericEvent).detail
+            const target:HTMLInputElement|null|undefined =
+                (eventOrValue as GenericEvent).target as HTMLInputElement ||
+                (eventOrValue as GenericEvent).detail as HTMLInputElement
             if (target)
                 properties.value = typeof target.value === 'undefined' ?
                     null :
-                    target.value
+                    target.value as unknown as Type
             else
                 properties.value = eventOrValue as null|Type
         } else
@@ -1352,14 +1361,11 @@ export const GenericInputInner = function<Type = unknown>(
             currentSuggestionLabels[selectedIndex] :
             typeof properties.value === 'string' ?
                 properties.value :
-                formatValue<Type>(
-                    properties, properties.value as null|Type, transformer
-                )
+                formatValue<Type>(properties, properties.value, transformer)
 
         if (!useSuggestions) {
-            properties.value = parseValue<Type>(
-                properties, properties.value as null|Type, transformer
-            )
+            properties.value =
+                parseValue<Type>(properties, properties.value, transformer)
 
             setHelper()
         } else if (properties.suggestionCreator) {
@@ -2073,7 +2079,13 @@ export const GenericInputInner = function<Type = unknown>(
                                                 'javascript'
                                             }
                                             name={properties.name}
-                                            onChange={onChangeValue}
+                                            onChange={onChangeValue as
+                                                unknown as
+                                                (
+                                                    _value:string,
+                                                    _event?:unknown
+                                                ) => void
+                                            }
                                             onCursorChange={onSelectionChange}
                                             onSelectionChange={
                                                 onSelectionChange
