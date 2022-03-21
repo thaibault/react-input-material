@@ -380,7 +380,7 @@ export const getConsolidatedProperties = <
 }
 // endregion
 // region value transformer
-// / region selection
+/// region selection
 /**
  * Determine normalized labels and values for selection and auto-complete
  * components.
@@ -606,7 +606,7 @@ export function normalizeSelection(
     return selection as
         SelectProps['options']|Array<{label?:string;value:unknown}>|undefined
 }
-// / endregion
+/// endregion
 /**
  * Applies configured value transformations.
  * @param configuration - Input configuration.

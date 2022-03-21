@@ -71,10 +71,10 @@ import {
 } from '@tinymce/tinymce-react'
 // endregion
 // region exports
-// / region dummy
+/// region dummy
 export type DummyProps = Mapping<unknown> & {children?:ReactElement}
-// / endregion
-// / region generic
+/// endregion
+/// region generic
 export interface GenericEvent<T = unknown> extends SyntheticEvent {
     detail?:T
 }
@@ -87,7 +87,7 @@ export interface CursorState {
     start:number
 }
 export type Renderable = Array<ReactElement|string>|ReactElement|string
-// // region model
+//// region model
 export interface CommonBaseModel {
     declaration:string
     default:unknown
@@ -130,7 +130,7 @@ export interface Model<T = unknown> extends BaseModel {
     default:null|T
     value?:null|T
 }
-// // endregion
+//// endregion
 export interface BaseProperties extends CommonBaseModel, ModelState {
     className:string
     disabled:boolean
@@ -183,7 +183,7 @@ export type Props<T = unknown> =
 
 export type DefaultProperties<T = unknown> =
     Omit<Props<T>, 'model'> & {model:Model<T>}
-// // region state
+//// region state
 export interface State<T = unknown> {
     modelState?:ModelState
     value?:null|T
@@ -196,7 +196,7 @@ export interface EditorState {
     editorIsActive:boolean
     selectionIsUnstable:boolean
 }
-// // endregion
+//// endregion
 export interface StaticWebComponent<
     MS = ModelState, DP = DefaultProperties
 > extends StaticBaseWebComponent {
@@ -223,7 +223,7 @@ export interface InputComponent<
 {
     (_props:P & RefAttributes<A>):ReactElement
 }
-// // region constants
+//// region constants
 export const baseModelPropertyTypes:ValidationMapping = {
     declaration: string,
     default: any,
@@ -368,9 +368,9 @@ export const defaultProperties:DefaultProperties<string> = {
     showInitialValidationState: false,
     requiredText: 'Please fill this field.'
 } as const
-// // endregion
-// / endregion
-// / region checkbox
+//// endregion
+/// endregion
+/// region checkbox
 export interface CheckboxProperties extends Properties<boolean> {
     checked:boolean
     id:string
@@ -393,7 +393,7 @@ export type CheckboxComponent = InputComponent<
     DefaultCheckboxProperties,
     CheckboxAdapter
 >
-// // region constants
+//// region constants
 export const checkboxPropertyTypes:PropertiesValidationMap = {
     ...propertyTypes,
     ...modelStatePropertyTypes,
@@ -416,10 +416,10 @@ export const defaultCheckboxProperties:DefaultCheckboxProperties = {
     model: {...defaultCheckboxModel},
     requiredText: 'Please check this field.'
 } as const
-// // endregion
-// / endregion
-// / region input
-// // region data transformation
+//// endregion
+/// endregion
+/// region input
+//// region data transformation
 export interface FormatSpecification<T = unknown> {
     options?:PlainObject
     transform?:(
@@ -461,7 +461,7 @@ export type InputDataTransformation =
     {[_key in Exclude<
         NativeInputType, 'date'|'datetime-local'|'time'|'number'
     >]?:DataTransformSpecification<unknown>}
-// // endregion
+//// endregion
 export interface InputTablePosition {
     column:number
     row:number
@@ -640,7 +640,7 @@ export interface GenericInputComponent extends
     locales:Array<string>
     transformer:InputDataTransformation
 }
-// // region constants
+//// region constants
 export const inputModelStatePropertyTypes:{
     [_key in keyof InputModelState]:Requireable<boolean|symbol>
 } = {
@@ -771,9 +771,9 @@ export const defaultInputProperties:DefaultInputProperties = {
     step: 1,
     suggestSelection: false
 } as const
-// // endregion
-// / endregion
-// / region file-input
+//// endregion
+/// endregion
+/// region file-input
 export type FileRepresentationType =
     'binary'|'image'|'renderableText'|'text'|'video'
 export interface FileValue {
@@ -888,7 +888,7 @@ export type FileInputComponent = InputComponent<
     DefaultFileInputProperties,
     FileInputAdapter
 >
-// // region constants
+//// region constants
 export const fileInputModelStatePropertyTypes:{
     [_key in keyof FileInputModelState]:Requireable<boolean|symbol>
 } = {
@@ -1012,9 +1012,9 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 
     sourceToBlobOptions: {endings: 'transparent', type: 'text/plain'}
 } as const
-// // endregion
-// / endregion
-// / region inputs
+//// endregion
+/// endregion
+/// region inputs
 export interface InputsPropertiesItem<T, TS = unknown> {
     model?:{
         state?:TS
@@ -1118,7 +1118,7 @@ export interface InputsComponent extends
         _props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
     ):ReactElement
 }
-// // region constants
+//// region constants
 export const inputsPropertyTypes:PropertiesValidationMap = {
     ...propertyTypes,
     ...inputModelStatePropertyTypes,
@@ -1161,9 +1161,9 @@ export const defaultInputsProperties:DefaultInputsProperties = {
 
     model: {...defaultInputsModel}
 } as const
-// // endregion
-// / endregion
-// / region interval
+//// endregion
+/// endregion
+/// region interval
 export interface IntervalValue {
     end?:null|number
     start?:null|number
@@ -1237,7 +1237,7 @@ export type IntervalComponent = InputComponent<
     DefaultIntervalProperties,
     IntervalAdapter
 >
-// // region constants
+//// region constants
 export const intervalPropertyTypes:PropertiesValidationMap = {
     ...inputPropertyTypes as Mapping<ValueOf<PropertiesValidationMap>>,
     value: shape<ValidationMap<{
@@ -1285,8 +1285,8 @@ export const defaultIntervalProperties:DefaultIntervalProperties = {
 
     type: 'time'
 } as const
-// // endregion
-// / endregion
+//// endregion
+/// endregion
 export interface ConfigurationProperties {
     strict?:boolean
     themeConfiguration?:ThemeProviderProps['options']

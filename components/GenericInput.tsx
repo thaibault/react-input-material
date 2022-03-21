@@ -403,7 +403,7 @@ export const GenericInputInner = function<Type = unknown>(
     })
     // endregion
     // region context helper
-    // / region render helper
+    /// region render helper
     /**
      * Applies icon preset configurations.
      * @param options - Icon options to extend of known preset identified.
@@ -649,9 +649,9 @@ export const GenericInputInner = function<Type = unknown>(
         }
         return options as IconOptions|undefined
     }
-    // / endregion
-    // / region handle cursor selection state
-    // // region rich-text editor
+    /// endregion
+    /// region handle cursor selection state
+    //// region rich-text editor
     /**
      * Determines absolute offset in given markup.
      * @param contentDomNode - Wrapping dom node where all content is
@@ -688,8 +688,8 @@ export const GenericInputInner = function<Type = unknown>(
             indicator.length
         )
     }
-    // // endregion
-    // // region code editor
+    //// endregion
+    //// region code editor
     /**
      * Determines absolute range from table oriented position.
      * @param column - Symbol offset in given row.
@@ -815,7 +815,7 @@ export const GenericInputInner = function<Type = unknown>(
         if (result.end && result.start)
             instance.selection.setRng(range)
     }
-    // // endregion
+    //// endregion
     /**
      * Saves current selection/cursor state in components state.
      * @param event - Event which triggered selection change.
@@ -883,8 +883,8 @@ export const GenericInputInner = function<Type = unknown>(
             setCursor({end: selectionEnd + add, start: selectionStart + add})
         }
     }
-    // / endregion
-    // / region property aggregation
+    /// endregion
+    /// region property aggregation
     const deriveMissingPropertiesFromState = () => {
         if (
             givenProperties.cursor === null ||
@@ -1011,8 +1011,8 @@ export const GenericInputInner = function<Type = unknown>(
 
         return result
     }
-    // / endregion
-    // / region reference setter
+    /// endregion
+    /// region reference setter
     /**
      * Set code editor references.
      * @param instance - Code editor instance.
@@ -1060,7 +1060,7 @@ export const GenericInputInner = function<Type = unknown>(
                     richTextEditorReference.current.elementRef
         */
     }
-    // / endregion
+    /// endregion
     // endregion
     // region event handler
     /**
@@ -1615,7 +1615,7 @@ export const GenericInputInner = function<Type = unknown>(
         })
     // endregion
     // region properties
-    // / region references
+    /// region references
     const codeEditorReference:MutableRefObject<CodeEditorType|null> =
         useRef<CodeEditorType>(null)
     const codeEditorInputReference:MutableRefObject<HTMLTextAreaElement|null> =
@@ -1639,7 +1639,7 @@ export const GenericInputInner = function<Type = unknown>(
     const suggestionMenuFoundationReference:MutableRefObject<
         MDCMenuFoundation|null
     > = useRef<MDCMenuFoundation>(null)
-    // / endregion
+    /// endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
 
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
@@ -1819,7 +1819,7 @@ export const GenericInputInner = function<Type = unknown>(
     )
     // endregion
     // region render
-    // / region intermediate render properties
+    /// region intermediate render properties
     const genericProperties:Partial<
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     > = {
@@ -1971,8 +1971,8 @@ export const GenericInputInner = function<Type = unknown>(
     const useSelection:boolean =
         (Boolean(normalizedSelection) || Boolean(properties.labels)) &&
         !useSuggestions
-    // / endregion
-    // / region main markup
+    /// endregion
+    /// region main markup
     return <WrapConfigurations
         strict={GenericInput.strict}
         themeConfiguration={properties.themeConfiguration}
@@ -2313,7 +2313,7 @@ export const GenericInputInner = function<Type = unknown>(
             )}
         </div>
     </WrapConfigurations>
-    // / endregion
+    /// endregion
     // endregion
 }
 // NOTE: This is useful in react dev tools.
@@ -2338,10 +2338,10 @@ GenericInputInner.displayName = 'GenericInput'
 export const GenericInput:GenericInputComponent =
     memorize(forwardRef(GenericInputInner)) as unknown as GenericInputComponent
 // region static properties
-// / region web-component hints
+/// region web-component hints
 GenericInput.wrapped = GenericInputInner
 GenericInput.webComponentAdapterWrapped = 'react'
-// / endregion
+/// endregion
 GenericInput.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where
