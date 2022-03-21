@@ -46,7 +46,7 @@
     "check:types": "weboptimizer check:types",
     "clear": "weboptimizer clear && (rm *.styles.css components/*.styles.css 2>/dev/null || true)",
     "document": "weboptimizer document",
-    "lint": "weboptimizer lint",
+    "lint": "yarn clear && weboptimizer lint",
     "prepare": "ln --force --symbolic react node_modules/@emotion/core && yarn build",
     "serve": "weboptimizer serve",
     "serve:minimal": "weboptimizer serve '{__reference__: \"target:minimal\"}'",
