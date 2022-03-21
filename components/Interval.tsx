@@ -421,10 +421,10 @@ IntervalInner.displayName = 'Interval'
 export const Interval:IntervalComponent =
     memorize(forwardRef(IntervalInner)) as unknown as IntervalComponent
 // region static properties
-// / region web-component hints
+/// region web-component hints
 Interval.wrapped = IntervalInner
 Interval.webComponentAdapterWrapped = 'react'
-// / endregion
+/// endregion
 Interval.defaultProperties = defaultProperties
 Interval.propTypes = propertyTypes
 Interval.strict = false

@@ -339,12 +339,12 @@ export const RequireableCheckboxInner = function(
         })
     // endregion
     // region properties
-    // / region references
+    /// region references
     const inputReference:MutableRefObject<HTMLInputElement|null> =
         useRef<HTMLInputElement>(null)
     const foundationRef:MutableRefObject<MDCCheckboxFoundation|null> =
         useRef<MDCCheckboxFoundation>(null)
-    // / endregion
+    /// endregion
     const givenProps:Props = translateKnownSymbols(props)
 
     const initialValue:boolean|null = determineInitialValue<boolean>(
@@ -491,10 +491,10 @@ export const RequireableCheckbox:CheckboxComponent =
         unknown as
         CheckboxComponent
 // region static properties
-// / region web-component hints
+/// region web-component hints
 RequireableCheckbox.wrapped = RequireableCheckboxInner
 RequireableCheckbox.webComponentAdapterWrapped = 'react'
-// / endregion
+/// endregion
 RequireableCheckbox.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where

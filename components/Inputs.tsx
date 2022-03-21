@@ -567,10 +567,10 @@ InputsInner.displayName = 'Inputs'
 export const Inputs:InputsComponent =
     memorize(forwardRef(InputsInner)) as unknown as InputsComponent
 // region static properties
-// / region web-component hints
+/// region web-component hints
 Inputs.wrapped = InputsInner
 Inputs.webComponentAdapterWrapped = 'react'
-// / endregion
+/// endregion
 Inputs.defaultProperties = defaultInputsProperties
 Inputs.propTypes = propertyTypes
 Inputs.renderProperties = renderProperties

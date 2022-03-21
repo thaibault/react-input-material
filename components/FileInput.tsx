@@ -557,7 +557,7 @@ export const FileInputInner = function(
         })
     // endregion
     // region properties
-    // / region references
+    /// region references
     const deleteButtonReference:MutableRefObject<HTMLButtonElement|null> =
         useRef<HTMLButtonElement>(null)
     const downloadLinkReference:MutableRefObject<HTMLAnchorElement|null> =
@@ -568,7 +568,7 @@ export const FileInputInner = function(
         useRef<InputAdapter<string>>(null)
     const uploadButtonReference:MutableRefObject<HTMLDivElement|null> =
         useRef<HTMLDivElement>(null)
-    // / endregion
+    /// endregion
     const givenProps:Props = translateKnownSymbols(props)
 
     const initialValue:FileValue|null = determineInitialValue<FileValue>(
@@ -613,7 +613,7 @@ export const FileInputInner = function(
         properties.value =
             Tools.extend<FileValue>(true, valueState.value, properties.value!)
 
-    // / region synchronize uncontrolled properties into state
+    /// region synchronize uncontrolled properties into state
     const currentValueState:ValueState = {
         attachBlobProperty: false,
         modelState: properties.model.state,
@@ -632,7 +632,7 @@ export const FileInputInner = function(
     if (controlled)
         setValueState =
             wrapStateSetter<ValueState>(setValueState, currentValueState)
-    // / endregion
+    /// endregion
     useImperativeHandle(
         reference,
         ():Adapter & {
@@ -964,10 +964,10 @@ FileInputInner.displayName = 'FileInput'
 export const FileInput:FileInputComponent =
     memorize(forwardRef(FileInputInner)) as unknown as FileInputComponent
 // region static properties
-// / region web-component hints
+/// region web-component hints
 FileInput.wrapped = FileInputInner
 FileInput.webComponentAdapterWrapped = 'react'
-// / endregion
+/// endregion
 FileInput.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where
