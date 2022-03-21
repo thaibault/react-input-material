@@ -110,9 +110,10 @@ export const wrapStateSetter = <Type = unknown>(
         (
             callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
         ):void => {
-            const result:Type = typeof callbackOrData === 'function' ?
+            const result:Type = (typeof callbackOrData === 'function' ?
                 callbackOrData(currentValueState) :
                 callbackOrData
+            ) as Type
 
             if (!Tools.equals(
                 (result as unknown as {modelState:unknown})?.modelState,

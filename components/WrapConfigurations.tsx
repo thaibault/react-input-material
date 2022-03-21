@@ -79,25 +79,37 @@ export function createWrapConfigurationsComponent<
     const component:FunctionComponent<
         FirstParameter<Type> &
         ConfigurationProperties &
-        {theme?:ThemePropT}
+        {theme:ThemePropT}
     > = (
         {strict, theme, themeConfiguration, tooltip, wrap, ...properties},
         reference?:MutableRefObject<Reference>
     ):ReactElement => {
-        const wrapped = <WrappedComponent {...{
+        const wrapped:ReactElement = <WrappedComponent {...{
             ...(properties as FirstParameter<Type>),
             ...(options.withReference === false ?
                 {} :
                 reference ? {ref: reference} : {}
             ),
-            ...(options.withThemeWrapper && theme ? {} : {theme})
+            ...(options.withThemeWrapper && theme ?
+                {theme: theme as ThemePropT} :
+                {}
+            )
         }} />
 
         return <WrapConfigurations
-            {...{strict, themeConfiguration, tooltip, wrap}}
+            {...{
+                strict: strict as boolean,
+                themeConfiguration: themeConfiguration as
+                    ConfigurationProperties['themeConfiguration'],
+                tooltip: tooltip as ConfigurationProperties['tooltip'],
+                wrap: wrap as ConfigurationProperties['wrap']
+            }}
         >
             {options.withThemeWrapper && theme ?
-                <Theme use={theme} wrap={wrap}>{wrapped}</Theme> :
+                <Theme
+                    use={theme as ThemePropT}
+                    wrap={wrap as ConfigurationProperties['wrap']}
+                >{wrapped}</Theme> :
                 wrapped
             }
         </WrapConfigurations>
