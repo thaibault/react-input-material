@@ -275,7 +275,7 @@
         "options": {
           "import": {
             "filter": {
-              "__evaluate__": "(url) => console.log('AAA', url) || !url.includes('.css')"
+              "__evaluate__": "(url) => !url.includes('.css')"
             }
           }
         }
