@@ -41,9 +41,7 @@ import {TransitionProps} from 'react-transition-group/Transition'
 import UseAnimationsType from 'react-useanimations'
 import LockAnimation from 'react-useanimations/lib/lock'
 import PlusToXAnimation from 'react-useanimations/lib/plusToX'
-import {
-    Editor as RichTextEditor, RawEditorSettings as RawTinyMCEEditorOptions
-} from 'tinymce'
+import {Editor as RichTextEditor} from 'tinymce'
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
@@ -122,7 +120,8 @@ import {
     Renderable,
     GenericInputComponent,
     InputTablePosition as TablePosition,
-    InputValueState as ValueState
+    InputValueState as ValueState,
+    TinyMCEOptions
 } from '../type'
 
 declare const TARGET_TECHNOLOGY:string
@@ -154,17 +153,13 @@ const CodeEditor = lazy<typeof CodeEditorType>(
 )
 // endregion
 // region rich text editor configuration
-export interface TinyMCEOptions extends RawTinyMCEEditorOptions {
-    selector?:undefined
-    target?:undefined
-}
 declare const UTC_BUILD_TIMESTAMP:number|undefined
 // NOTE: Could be set via module bundler environment variables.
 const CURRENT_UTC_BUILD_TIMESTAMP =
     typeof UTC_BUILD_TIMESTAMP === 'undefined' ? 1 : UTC_BUILD_TIMESTAMP
 let richTextEditorLoadedOnce = false
 const tinymceBasePath = '/node_modules/tinymce/'
-export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
+export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
     /* eslint-disable camelcase */
     // region paths
     base_url: tinymceBasePath,
@@ -176,7 +171,7 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
     body_class: 'mdc-text-field__input',
     branding: false,
     cache_suffix: `?version=${CURRENT_UTC_BUILD_TIMESTAMP}`,
-    contextmenu: false,
+    contextmenu: [],
     document_base_url: '/',
     element_format: 'xhtml',
     entity_encoding: 'raw',
@@ -188,7 +183,15 @@ export const TINYMCE_DEFAULT_OPTIONS:TinyMCEOptions = {
     keep_styles: false,
     menubar: false,
     /* eslint-disable max-len */
-    plugins: 'fullscreen link code hr nonbreaking searchreplace visualblocks',
+    plugins: [
+        'fullscreen',
+        'link',
+        'code',
+        'hr',
+        'nonbreaking',
+        'searchreplace',
+        'visualblocks'
+    ],
     /* eslint-enable max-len */
     relative_urls: false,
     remove_script_host: false,
@@ -1843,7 +1846,7 @@ export const GenericInputInner = function<Type = unknown>(
             applyIconPreset(properties.icon) as IconOptions
         ) as IconOptions
 
-    const tinyMCEOptions:TinyMCEOptions = {
+    const tinyMCEOptions:Partial<TinyMCEOptions> = {
         ...TINYMCE_DEFAULT_OPTIONS,
         // eslint-disable-next-line camelcase
         content_style: properties.disabled ? 'body {opacity: .38}' : '',

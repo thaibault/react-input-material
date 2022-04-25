@@ -18,7 +18,7 @@
 */
 // region imports
 import {ReactElement} from 'react'
-import {render, unmountComponentAtNode} from 'react-dom'
+import {createRoot, Root as ReactRoot} from 'react-dom/client'
 import {act} from 'react-dom/test-utils'
 
 import {TestEnvironment} from './type'
@@ -26,11 +26,15 @@ import {TestEnvironment} from './type'
 export const prepareTestEnvironment = (
     beforeEach:jest.Lifecycle, afterEach:jest.Lifecycle
 ):TestEnvironment => {
+    let root:null|ReactRoot = null
+
     const result:TestEnvironment = {
         container: null,
         render: (component:ReactElement):ChildNode|null => {
+            root = createRoot(result.container!)
+
             act(():void => {
-                render(component, result.container)
+                root!.render(component)
             })
 
             return (result.container as HTMLDivElement).childNodes.length ?
@@ -46,8 +50,8 @@ export const prepareTestEnvironment = (
     })
 
     afterEach(():void => {
-        unmountComponentAtNode(result.container as HTMLDivElement);
-        (result.container as HTMLDivElement).remove()
+        root && root.unmount()
+        ;(result.container as HTMLDivElement).remove()
         result.container = null
     })
 

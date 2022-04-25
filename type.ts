@@ -49,7 +49,9 @@ import {
 } from 'react'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 
-import {Editor as RichTextEditor} from 'tinymce'
+import {
+    EditorOptions as RawTinyMCEOptions, Editor as RichTextEditor
+} from 'tinymce'
 import {
     ComponentAdapter,
     PropertiesValidationMap,
@@ -627,6 +629,11 @@ export interface InputAdapterWithReferences<T = unknown> extends
             MDCMenuFoundation|null
         >
     }
+}
+
+export interface TinyMCEOptions extends RawTinyMCEOptions {
+    selector?:undefined
+    target?:undefined
 }
 
 export interface GenericInputComponent extends
