@@ -31,9 +31,9 @@ export const prepareTestEnvironment = (
     const result:TestEnvironment = {
         container: null,
         render: (component:ReactElement):ChildNode|null => {
-            root = createRoot(result.container!)
 
             act(():void => {
+                root = createRoot(result.container!)
                 root!.render(component)
             })
 
