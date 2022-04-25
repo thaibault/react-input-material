@@ -23,6 +23,8 @@ import {act} from 'react-dom/test-utils'
 
 import {TestEnvironment} from './type'
 // endregion
+globalThis.IS_REACT_ACT_ENVIRONMENT = true
+
 export const prepareTestEnvironment = (
     beforeEach:jest.Lifecycle, afterEach:jest.Lifecycle
 ):TestEnvironment => {
