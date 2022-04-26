@@ -17,13 +17,14 @@
     endregion
 */
 // region imports
+import {globalContext} from 'clientnode'
 import {ReactElement} from 'react'
 import {createRoot, Root as ReactRoot} from 'react-dom/client'
 import {act} from 'react-dom/test-utils'
 
 import {TestEnvironment} from './type'
 // endregion
-globalThis.IS_REACT_ACT_ENVIRONMENT = true
+globalContext.IS_REACT_ACT_ENVIRONMENT = true
 
 export const prepareTestEnvironment = (
     beforeEach:jest.Lifecycle, afterEach:jest.Lifecycle
