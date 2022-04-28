@@ -82,7 +82,7 @@ export interface GenericEvent<T = unknown> extends SyntheticEvent {
 }
 export interface TestEnvironment {
     container:HTMLDivElement|null
-    render:(_component:ReactElement) => ChildNode|null
+    render:<T = HTMLElement>(_component:ReactElement) => null|T
 }
 export interface CursorState {
     end:number

@@ -18,43 +18,55 @@
 */
 // region imports
 import {globalContext} from 'clientnode'
+import {$Global} from 'clientnode/type'
 import {ReactElement} from 'react'
 import {createRoot, Root as ReactRoot} from 'react-dom/client'
 import {act} from 'react-dom/test-utils'
 
 import {TestEnvironment} from './type'
 // endregion
-globalContext.IS_REACT_ACT_ENVIRONMENT = true
+;(globalContext as $Global & {IS_REACT_ACT_ENVIRONMENT:boolean})
+    .IS_REACT_ACT_ENVIRONMENT = true
 
 export const prepareTestEnvironment = (
-    beforeEach:jest.Lifecycle, afterEach:jest.Lifecycle
+    beforeAll:jest.Lifecycle, afterAll:jest.Lifecycle
 ):TestEnvironment => {
     let root:null|ReactRoot = null
 
     const result:TestEnvironment = {
         container: null,
-        render: (component:ReactElement):ChildNode|null => {
-
+        render: <T = HTMLElement>(component:ReactElement):null|T => {
             act(():void => {
-                root = createRoot(result.container!)
-                root!.render(component)
+                if (root)
+                    root.render(component)
+                else
+                    console.error(
+                        'You call "render" outside a testing context.'
+                    )
             })
 
-            return (result.container as HTMLDivElement).childNodes.length ?
-                (result.container as HTMLDivElement).childNodes[0] :
-                null
+            return (
+                result.container?.childNodes?.length ?
+                    result.container.childNodes[0] :
+                    result.container
+            ) as unknown as T
         }
     }
 
-    beforeEach(():void => {
+    beforeAll(():void => {
         result.container = document.createElement('div')
         result.container.setAttribute('class', 'test-wrapper')
         document.body.appendChild(result.container)
+
+        if (!root)
+            root = createRoot(result.container!)
     })
 
-    afterEach(():void => {
-        root && root.unmount()
-        ;(result.container as HTMLDivElement).remove()
+    afterAll(():void => {
+        if (root)
+            root.unmount()
+
+        result.container!.remove()
         result.container = null
     })
 

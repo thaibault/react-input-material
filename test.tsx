@@ -38,22 +38,20 @@ import prepareTestEnvironment from './testHelper'
 import {TestEnvironment} from './type'
 // endregion
 const testEnvironment:TestEnvironment =
-    prepareTestEnvironment(beforeEach, afterEach)
+    prepareTestEnvironment(beforeAll, afterAll)
 const {render} = testEnvironment
 // region FileInput
 describe('FileInput', ():void => {
     test('render', ():void => {
         expect(render(<FileInput/>)).toBeDefined()
 
-        expect((render(<FileInput/>) as HTMLElement).querySelector('input'))
-            .toBeDefined()
+        expect(render(<FileInput/>)!.querySelector('input')).toBeDefined()
 
-        expect((render(<FileInput/>) as HTMLElement).getAttribute('class'))
+        expect(render(<FileInput/>)!.getAttribute('class'))
             .toStrictEqual('file-input mdc-card')
 
         expect(
-            (render(<FileInput name="test"/>) as HTMLElement)
-                .querySelector('[name="test"]')
+            render(<FileInput name="test"/>)!.querySelector('[name="test"]')
         ).not.toStrictEqual(null)
     })
 })
@@ -63,14 +61,14 @@ describe('Inputs', ():void => {
     test('render', ():void => {
         expect(render(<Inputs/>)).toBeDefined()
 
-        let domNode:HTMLElement = render(<Inputs/>) as HTMLElement
+        let domNode:HTMLElement = render(<Inputs/>)!
         expect(domNode.querySelector('input')).toHaveProperty('disabled', true)
         expect(domNode.querySelector('.inputs__add__button'))
             .not.toStrictEqual(null)
         expect(domNode.querySelector('.inputs__item__remove'))
             .toStrictEqual(null)
 
-        domNode = render(<Inputs value={['a']}/>) as HTMLElement
+        domNode = render(<Inputs value={['a']}/>)!
         expect(Array.from(domNode.querySelectorAll('input'))).toHaveLength(1)
         expect(Array.from(domNode.querySelectorAll('.inputs__add')))
             .toHaveLength(1)
@@ -86,8 +84,7 @@ describe('Inputs', ():void => {
             .toHaveLength(2)
 
         expect(
-            (render(<Inputs value={['a']}/>) as HTMLElement)
-                .querySelector('input')
+            render(<Inputs value={['a']}/>)!.querySelector('input')
         ).toHaveProperty('value', 'a')
     })
 })
@@ -98,25 +95,22 @@ describe('Interval', ():void => {
         expect(render(<Interval/>)).toBeDefined()
 
         expect(Array.from(
-            (render(<Interval/>) as HTMLElement).querySelectorAll('input')
+            render(<Interval/>)!.querySelectorAll('input')
         )).toHaveLength(2)
 
-        expect((render(<Interval/>) as HTMLElement).getAttribute('class'))
+        expect(render(<Interval/>)!.getAttribute('class'))
             .toStrictEqual('interval')
 
-        expect((render(<Interval/>) as HTMLElement)
-            .querySelectorAll('.interval__end')
+        expect(render(<Interval/>)!.querySelectorAll('.interval__end')
         ).toBeDefined()
-        expect((render(<Interval/>) as HTMLElement)
-            .querySelectorAll('.interval__icon')
+        expect(render(<Interval/>)!.querySelectorAll('.interval__icon')
         ).toBeDefined()
-        expect((render(<Interval/>) as HTMLElement)
-            .querySelectorAll('.interval__start')
+        expect(
+            render(<Interval/>)!.querySelectorAll('.interval__start')
         ).toBeDefined()
 
         expect(
-            (render(<Interval name="test"/>) as HTMLElement)
-                .getAttribute('data-name')
+            render(<Interval name="test"/>)!.getAttribute('data-name')
         ).toStrictEqual('test')
     })
 })
@@ -228,15 +222,13 @@ describe('GenericInput', ():void => {
     test('render', ():void => {
         expect(render(<GenericInput/>)).toBeDefined()
 
-        expect((render(<GenericInput/>) as HTMLElement).querySelector('input'))
-            .toBeDefined()
+        expect(render(<GenericInput/>)!.querySelector('input')).toBeDefined()
 
-        expect((render(<GenericInput/>) as HTMLElement).getAttribute('class'))
+        expect(render(<GenericInput/>)!.getAttribute('class'))
             .toStrictEqual('generic-input')
 
         expect(
-            (render(<GenericInput name="test"/>) as HTMLElement)
-                .querySelector('[name="test"]')
+            render(<GenericInput name="test"/>)!.querySelector('[name="test"]')
         ).not.toStrictEqual(null)
     })
 })
@@ -247,23 +239,20 @@ describe('RequireableCheckbox', ():void => {
         expect(render(<RequireableCheckbox/>)).toBeDefined()
 
         expect(
-            (render(<RequireableCheckbox/>) as HTMLElement)
-                .querySelector('input')
+            render(<RequireableCheckbox/>)!.querySelector('input')
         ).toBeDefined()
-
         expect(
-            (render(<RequireableCheckbox/>) as HTMLElement)
-                .getAttribute('class')
+            render(<RequireableCheckbox/>)!.getAttribute('class')
         ).toStrictEqual('requireable-checkbox')
 
         expect(
-            (render(<RequireableCheckbox/>) as HTMLElement)
+            render(<RequireableCheckbox/>)!
                 .querySelector('input')!
                 .getAttribute('id')
         ).toStrictEqual('NO_NAME_DEFINED')
     })
     test('render id', ():void => expect(
-        (render(<RequireableCheckbox name="test"/>) as HTMLElement)
+        render(<RequireableCheckbox name="test"/>)!
             .querySelector('input')!
             .getAttribute('id')
     ).toStrictEqual('test'))
@@ -272,9 +261,9 @@ describe('RequireableCheckbox', ():void => {
 // region WrapConfigurations
 describe('WrapConfigurations', ():void => {
     test('render', ():void => expect(
-        (render(
+        render(
             <WrapConfigurations><div className="test"/></WrapConfigurations>
-        ) as HTMLElement).querySelector('.test')
+        )!.querySelector('.test')
     ).toBeDefined())
 })
 // endregion
@@ -288,9 +277,9 @@ describe('WrapStrict', ():void => {
         ).toBeDefined()
 
         expect(
-            (render(
+            render(
                 <WrapStrict strict={false}><div className="test"/></WrapStrict>
-            ) as HTMLElement).querySelector('.test')
+            )!.querySelector('.test')
         ).toBeDefined()
     })
 })
@@ -298,18 +287,17 @@ describe('WrapStrict', ():void => {
 // region WrapThemeProvider
 describe('WrapThemeProvider', ():void => {
     test('render', ():void => expect(
-        (render(
+        render(
             <WrapThemeProvider><div className="test"/></WrapThemeProvider>
-        ) as HTMLElement).querySelector('.test')
+        )!.querySelector('.test')
     ).toBeDefined())
 })
 // endregion
 // region WrapTooltip
 describe('WrapTooltip', ():void => {
     test('render', ():void => expect(
-        (render(
-            <WrapTooltip><div className="test"/></WrapTooltip>) as HTMLElement
-        ).querySelector('.test')
+        render(<WrapTooltip><div className="test"/></WrapTooltip>)!
+            .querySelector('.test')
     ).toBeDefined())
 })
 // endregion
