@@ -14,6 +14,7 @@
     endregion
 */
 // region imports
+import Tools from 'clientnode'
 import {testEach} from 'clientnode/testHelper'
 import React from 'react'
 
@@ -37,14 +38,12 @@ import {
 import prepareTestEnvironment from './testHelper'
 import {TestEnvironment} from './type'
 // endregion
-const testEnvironment:TestEnvironment =
-    prepareTestEnvironment(beforeAll, afterAll)
+const testEnvironment:TestEnvironment = prepareTestEnvironment()
 const {render} = testEnvironment
 // region FileInput
 describe('FileInput', ():void => {
     test('render', ():void => {
         expect(render(<FileInput/>)).toBeDefined()
-
         expect(render(<FileInput/>)!.querySelector('input')).toBeDefined()
 
         expect(render(<FileInput/>)!.getAttribute('class'))
@@ -251,11 +250,16 @@ describe('RequireableCheckbox', ():void => {
                 .getAttribute('id')
         ).toStrictEqual('NO_NAME_DEFINED')
     })
-    test('render id', ():void => expect(
-        render(<RequireableCheckbox name="test"/>)!
-            .querySelector('input')!
-            .getAttribute('id')
-    ).toStrictEqual('test'))
+    test('render id', async ():Promise<void> => {
+        const domNode:HTMLDivElement =
+            render(<RequireableCheckbox id="test" name="test"/>)!
+
+        await Tools.timeout()
+        await Tools.timeout()
+
+        expect(domNode.querySelector('input')!.getAttribute('id'))
+            .toStrictEqual('test')
+    })
 })
 // endregion
 // region WrapConfigurations

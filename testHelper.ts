@@ -29,7 +29,7 @@ import {TestEnvironment} from './type'
     .IS_REACT_ACT_ENVIRONMENT = true
 
 export const prepareTestEnvironment = (
-    beforeAll:jest.Lifecycle, afterAll:jest.Lifecycle
+    currentBeforeEach?:jest.Lifecycle, currentAfterEach?:jest.Lifecycle
 ):TestEnvironment => {
     let root:null|ReactRoot = null
 
@@ -53,18 +53,23 @@ export const prepareTestEnvironment = (
         }
     }
 
-    beforeAll(():void => {
+    ;(currentBeforeEach ?? beforeEach)(() => {
         result.container = document.createElement('div')
         result.container.setAttribute('class', 'test-wrapper')
         document.body.appendChild(result.container)
 
         if (!root)
-            root = createRoot(result.container!)
+            act(() => {
+                root = createRoot(result.container!)
+            })
     })
 
-    afterAll(():void => {
+    ;(currentAfterEach ?? afterEach)(() => {
         if (root)
-            root.unmount()
+            act(() => {
+                root!.unmount()
+                root = null
+            })
 
         result.container!.remove()
         result.container = null
