@@ -21,7 +21,7 @@ import Tools from 'clientnode'
 import {Mapping, UnknownFunction} from 'clientnode/type'
 import {FunctionComponent, useEffect, useState} from 'react'
 import {ReactElement} from 'react'
-import {render} from 'react-dom'
+import {createRoot} from 'react-dom/client'
 
 import {
     FileInput,
@@ -917,7 +917,7 @@ const Application:FunctionComponent = ():ReactElement => {
     </>)
 }
 window.onload = ():void =>
-    render(<Application />, document.querySelector('application'))
+    createRoot(document.querySelector('application')!).render(<Application />)
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:
