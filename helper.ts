@@ -81,15 +81,12 @@ export const deriveMissingPropertiesFromState = <
     else
         properties.model!.state = {} as ModelState
 
-    for (const key in state.modelState)
-        if (
-            Object.prototype.hasOwnProperty.call(state.modelState, key) &&
-            (
-                properties.model!.state as Partial<ModelState>
-            )[key as keyof ModelState] === undefined
-        )
+    for (const [key, value] of Object.entries(state.modelState))
+        if ((
+            properties.model!.state as Partial<ModelState>
+        )[key as keyof ModelState] === undefined)
             properties.model!.state[key as keyof ModelState] =
-                state.modelState[key as keyof ModelState]
+                value as ValueOf<ModelState>
 
     return properties
 }
