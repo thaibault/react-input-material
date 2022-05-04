@@ -296,8 +296,8 @@
         "javaScript": {
           "options": {
             "presets": {
-              "#": "TODO: Remove \"@babel/preset-react\" options when updated to babel 8. NOTE: We have to disable module export/import transformation to allow tree shaking by the final (minimizer).",
-              "__evaluate__": "[['@babel/preset-react', {runtime: 'automatic'}], ['@babel/preset-env', {loose: true, modules: false, targets: self.targetTechnology === 'node' ? {node: 'current'} : {browsers: self.generic.supportedBrowsers, node: 'current'}}], '@babel/typescript'].concat((self.debug || !self.module.optimizer.babelMinify.module || 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'document') ? [] : [['minify', self.module.optimizer.babelMinify.module]])"
+              "#": "TODO: Remove \"@babel/react\" options when updated to babel 8. NOTE: We have to disable module export/import transformation to allow tree shaking by the final (minimizer).",
+              "__evaluate__": "[['@babel/react', {runtime: 'automatic'}], ['@babel/preset-env', {loose: true, modules: false, targets: self.targetTechnology === 'node' ? {node: 'current'} : {browsers: self.generic.supportedBrowsers, node: 'current'}}], '@babel/typescript'].concat((self.debug || !self.module.optimizer.babelMinify.module || 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'document') ? [] : [['minify', self.module.optimizer.babelMinify.module]])"
             }
           }
         }
