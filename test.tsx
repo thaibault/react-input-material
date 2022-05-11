@@ -14,7 +14,7 @@
     endregion
 */
 // region imports
-import {describe, expect, test} from '@jest/globals'
+import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
 import Tools from 'clientnode'
 import {testEach} from 'clientnode/testHelper'
 import React from 'react'
@@ -39,7 +39,8 @@ import {
 import prepareTestEnvironment from './testHelper'
 import {TestEnvironment} from './type'
 // endregion
-const testEnvironment:TestEnvironment = prepareTestEnvironment()
+const testEnvironment:TestEnvironment =
+    prepareTestEnvironment(beforeEach, afterEach)
 const {render} = testEnvironment
 // region FileInput
 describe('FileInput', ():void => {
