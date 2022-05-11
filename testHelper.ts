@@ -17,6 +17,7 @@
     endregion
 */
 // region imports
+import {afterEach, beforeEach} from '@jest/globals'
 import {globalContext} from 'clientnode'
 import {$Global} from 'clientnode/type'
 import {ReactElement} from 'react'
@@ -29,7 +30,7 @@ import {TestEnvironment} from './type'
     .IS_REACT_ACT_ENVIRONMENT = true
 
 export const prepareTestEnvironment = (
-    currentBeforeEach?:jest.Lifecycle, currentAfterEach?:jest.Lifecycle
+    currentBeforeEach?:typeof afterEach, currentAfterEach?:typeof afterEach
 ):TestEnvironment => {
     let root:null|ReactRoot = null
 
