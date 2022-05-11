@@ -30,7 +30,7 @@ import {TestEnvironment} from './type'
     .IS_REACT_ACT_ENVIRONMENT = true
 
 export const prepareTestEnvironment = (
-    currentBeforeEach?:typeof afterEach, currentAfterEach?:typeof afterEach
+    currentBeforeEach:typeof beforeEach, currentAfterEach:typeof afterEach
 ):TestEnvironment => {
     let root:null|ReactRoot = null
 
@@ -54,7 +54,7 @@ export const prepareTestEnvironment = (
         }
     }
 
-    ;(currentBeforeEach ?? beforeEach)(() => {
+    currentBeforeEach(() => {
         result.container = document.createElement('div')
         result.container.setAttribute('class', 'test-wrapper')
         document.body.appendChild(result.container)
@@ -65,7 +65,7 @@ export const prepareTestEnvironment = (
             })
     })
 
-    ;(currentAfterEach ?? afterEach)(() => {
+    currentAfterEach(() => {
         if (root)
             act(() => {
                 root!.unmount()
