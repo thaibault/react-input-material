@@ -28,7 +28,6 @@
     "index.d.ts",
     "index.js",
     "material-fixes.css",
-    "material-fixes.styles.css",
     "testHelper.d.ts",
     "testHelper.js",
     "type.d.ts"
@@ -39,7 +38,8 @@
   },
   "scripts": {
     "build": "yarn build:types; yarn build:plain",
-    "build:export": "weboptimizer build '{__reference__: \"target:export\"}'",
+    "build:export": "yarn build:types; yarn build:export:plain",
+    "build:export:plain": "weboptimizer build '{__reference__: \"target:export\"}'",
     "build:plain": "weboptimizer build",
     "build:types": "weboptimizer build:types",
     "check": "yarn check:types; yarn lint",
