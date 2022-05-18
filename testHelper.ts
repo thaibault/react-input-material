@@ -21,6 +21,7 @@ import {afterEach, beforeEach} from '@jest/globals'
 import {globalContext} from 'clientnode'
 import {$Global} from 'clientnode/type'
 import {ReactElement} from 'react'
+import {flushSync} from 'react-dom'
 import {createRoot, Root as ReactRoot} from 'react-dom/client'
 import {act} from 'react-dom/test-utils'
 
@@ -36,10 +37,15 @@ export const prepareTestEnvironment = (
 
     const result:TestEnvironment = {
         container: null,
-        render: <T = HTMLElement>(component:ReactElement):null|T => {
+        render: <T = HTMLElement>(
+            component:ReactElement, flush = true
+        ):null|T => {
             act(():void => {
                 if (root)
-                    root.render(component)
+                    if (flush)
+                        flushSync(():void => root!.render(component))
+                    else
+                        root.render(component)
                 else
                     console.error(
                         'You call "render" outside a testing context.'
