@@ -15,7 +15,6 @@
 */
 // region imports
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
-import Tools from 'clientnode'
 import {testEach} from 'clientnode/testHelper'
 import React from 'react'
 
@@ -252,12 +251,9 @@ describe('RequireableCheckbox', ():void => {
                 .getAttribute('id')
         ).toStrictEqual('NO_NAME_DEFINED')
     })
-    test('render id', async ():Promise<void> => {
+    test('render id', ():void => {
         const domNode:HTMLDivElement =
             render(<RequireableCheckbox id="test" name="test"/>)!
-
-        await Tools.timeout()
-        await Tools.timeout()
 
         expect(domNode.querySelector('input')!.getAttribute('id'))
             .toStrictEqual('test')
