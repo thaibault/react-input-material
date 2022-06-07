@@ -369,6 +369,7 @@ export const GenericInputInner = function<Type = unknown>(
                 */
                 if (codeEditorReference.current?.editor?.selection) {
                     (codeEditorReference.current.editor.textInput as
+                        unknown as
                         HTMLInputElement
                     ).focus()
                     setCodeEditorSelectionState(codeEditorReference.current)
@@ -1038,6 +1039,7 @@ export const GenericInputInner = function<Type = unknown>(
             editorState.selectionIsUnstable
         ) {
             (codeEditorReference.current.editor.textInput as
+                unknown as
                 HTMLInputElement
             ).focus()
             setCodeEditorSelectionState(codeEditorReference.current)
@@ -2285,7 +2287,6 @@ export const GenericInputInner = function<Type = unknown>(
                         foundationRef={foundationReference as
                             MutableRefObject<MDCTextFieldFoundation|null>
                         }
-                        fullwidth={properties.fullWidth}
                         inputRef={inputReference as
                             MutableRefObject<HTMLInputElement|null>
                         }

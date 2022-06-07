@@ -545,7 +545,6 @@ export interface InputProperties<T = unknown> extends
         'richtext(advanced)'
     )
     editorIsActive:boolean
-    fullWidth:boolean
     hidden:boolean
     icon:string|(IconOptions & {tooltip?:string|TooltipProps})
     inputProperties:Partial<
@@ -694,7 +693,6 @@ export const inputPropertyTypes:PropertiesValidationMap = {
     */
     editor: string,
     editorIsActive: oneOfType([boolean, symbol]),
-    fullWidth: boolean,
     hidden: oneOfType([boolean, symbol]),
     /*
         NOTE: Not yet working:
