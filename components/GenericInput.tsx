@@ -1949,7 +1949,9 @@ export const GenericInputInner = function<Type = unknown>(
                         className={CSS_CLASS_NAMES[
                             'generic-input__suggestions__suggestion'
                         ]}
-                        dangerouslySetInnerHTML={{
+                        key={index}
+                    >
+                        <span dangerouslySetInnerHTML={{
                             __html: Tools.stringMark(
                                 suggestion,
                                 properties.representation?.split(' ') || '',
@@ -1962,9 +1964,8 @@ export const GenericInputInner = function<Type = unknown>(
                                 ] +
                                 '">{1}</span>'
                             ) as string
-                        }}
-                        key={index}
-                    />
+                        }} />
+                    </MenuItem>
                 )
                 currentSuggestionLabels.push(suggestion)
                 currentSuggestionValues.push(suggestionValues[index])
@@ -2283,7 +2284,11 @@ export const GenericInputInner = function<Type = unknown>(
                                     {}
                         )}
                         align={properties.align}
-                        characterCount
+                        characterCount={
+                            typeof properties.maximumLength === 'number' &&
+                            !isNaN(properties.maximumLength) &&
+                            properties.maximumLength >= 0
+                        }
                         foundationRef={foundationReference as
                             MutableRefObject<MDCTextFieldFoundation|null>
                         }
