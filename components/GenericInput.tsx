@@ -18,8 +18,10 @@
 */
 // region imports
 import {Ace as CodeEditorNamespace} from 'ace-builds'
+
 import Tools, {optionalRequire} from 'clientnode'
 import {EvaluationResult, Mapping} from 'clientnode/type'
+
 import {
     FocusEvent as ReactFocusEvent,
     forwardRef,
@@ -41,10 +43,13 @@ import {TransitionProps} from 'react-transition-group/Transition'
 import UseAnimationsType from 'react-useanimations'
 import LockAnimation from 'react-useanimations/lib/lock'
 import PlusToXAnimation from 'react-useanimations/lib/plusToX'
+
 import {Editor as RichTextEditor} from 'tinymce'
+
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
+
 import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
@@ -56,6 +61,7 @@ import {Select, SelectProps} from '@rmwc/select'
 import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
 import {IconOptions} from '@rmwc/types'
+
 import {
     Editor as RichTextEditorComponent, IAllProps as RichTextEditorProps
 } from '@tinymce/tinymce-react'

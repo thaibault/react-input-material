@@ -41,7 +41,7 @@ endregion */
 }
 
 .inputs__item__input {
-    width: 1;
+    width: 100%;
 }
 
 .inputs__item--disabled .inputs__item__input {
