@@ -290,6 +290,10 @@
           },
           "#": "Avoids TypeError: Cannot read property 'removeBinding' of null.",
           "module": null
+        },
+        "#": "We have to add disable \"mergeRules\" since it removes some needed css directives otherwise.",
+        "cssnano": {
+          "__evaluate__": "self.debug ? null : {preset: [optionalRequire('cssnano-preset-default'), {autoprefixer: false, discardUnused: !self.library, mergeRules: false}]}"
         }
       },
       "preprocessor": {

@@ -39,12 +39,16 @@ endregion */
         width: 30px;
     }
 
-    & .mdc-select__menu {
+    & .mdc-select {
         width: 100%;
-    }
 
-    & .mdc-select-helper-text {
-        color: rgba(0, 0, 0, 0.6);
+        & .mdc-select__menu {
+            width: 100%;
+        }
+
+        & .mdc-select-helper-text {
+            color: rgba(0, 0, 0, 0.6);
+        }
     }
 
     & .mdc-text-field {
