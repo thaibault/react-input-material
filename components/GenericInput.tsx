@@ -1957,21 +1957,20 @@ export const GenericInputInner = function<Type = unknown>(
                         ]}
                         key={index}
                     >
-                        <span dangerouslySetInnerHTML={{
-                            __html: Tools.stringMark(
-                                suggestion,
-                                properties.representation?.split(' ') || '',
-                                (value:unknown):string =>
-                                    `${value as string}`.toLowerCase(),
-                                '<span class="' +
-                                CSS_CLASS_NAMES[
+                        {Tools.stringMark(
+                            suggestion,
+                            properties.representation?.split(' ') || '',
+                            (value:unknown):string =>
+                                `${value as string}`.toLowerCase(),
+                            (foundWord:string):ReactElement =>
+                                <span className={CSS_CLASS_NAMES[
                                     'generic-input__suggestions__suggestion' +
                                     '__mark'
-                                ] +
-                                '">{1}</span>',
-                                null
-                            ) as string
-                        }} />
+                                ]}>
+                                    {foundWord}
+                                </span>,
+                            null
+                        ) as Array<ReactElement>|string}
                     </MenuItem>
                 )
                 currentSuggestionLabels.push(suggestion)
