@@ -1968,7 +1968,8 @@ export const GenericInputInner = function<Type = unknown>(
                                     'generic-input__suggestions__suggestion' +
                                     '__mark'
                                 ] +
-                                '">{1}</span>'
+                                '">{1}</span>',
+                                null
                             ) as string
                         }} />
                     </MenuItem>
