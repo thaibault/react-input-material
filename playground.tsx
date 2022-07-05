@@ -19,8 +19,7 @@
 // region imports
 import Tools from 'clientnode'
 import {Mapping, UnknownFunction} from 'clientnode/type'
-import {FunctionComponent, useEffect, useState} from 'react'
-import {ReactElement} from 'react'
+import {FunctionComponent, ReactElement, useEffect, useState} from 'react'
 import {createRoot} from 'react-dom/client'
 
 import {
@@ -103,7 +102,6 @@ const Application:FunctionComponent = ():ReactElement => {
     const onChangeValue7 =
         useMemorizedValue<(_values:Array<null|string>|null) => void>(setValue7)
     // endregion
-
     return (<>
         <div className="playground__inputs">
             <FileInput onChange={onChange} />

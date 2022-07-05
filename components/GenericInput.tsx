@@ -1957,7 +1957,7 @@ export const GenericInputInner = function<Type = unknown>(
                         ]}
                         key={index}
                     >
-                        {Tools.stringMark(
+                        {(Tools.stringMark(
                             suggestion,
                             properties.representation?.split(' ') || '',
                             (value:unknown):string =>
@@ -1970,7 +1970,11 @@ export const GenericInputInner = function<Type = unknown>(
                                     {foundWord}
                                 </span>,
                             null
-                        ) as Array<ReactElement>|string}
+                        ) as Array<ReactElement|string>).map((
+                            item:ReactElement|string, index:number
+                        ):ReactElement =>
+                            <span key={index}>{item}</span>
+                        )}
                     </MenuItem>
                 )
                 currentSuggestionLabels.push(suggestion)
