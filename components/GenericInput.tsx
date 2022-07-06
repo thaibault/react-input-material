@@ -1270,9 +1270,25 @@ export const GenericInputInner = function<Type = unknown>(
                 (eventOrValue as GenericEvent).target as HTMLInputElement ||
                 (eventOrValue as GenericEvent).detail as HTMLInputElement
             if (target)
-                properties.value = typeof target.value === 'undefined' ?
-                    null :
-                    target.value as unknown as Type
+                /*
+                    NOTE: Enhanced select fields (menus) do not provide the
+                    selected value but index.
+                */
+                if (typeof (
+                    target as unknown as {index:number}
+                ).index === 'number') {
+                    const index:number = (
+                        target as unknown as {index:number}
+                    ).index - (properties.placeholder ? 1 : 0)
+                    properties.value =
+                        index >= 0 &&
+                        index < suggestionValues.length ?
+                            suggestionValues[index] as Type :
+                            null
+                } else
+                    properties.value = typeof target.value === 'undefined' ?
+                        null :
+                        target.value as unknown as Type
             else
                 properties.value = eventOrValue as null|Type
         } else
@@ -1957,7 +1973,7 @@ export const GenericInputInner = function<Type = unknown>(
                         ]}
                         key={index}
                     >
-                        {Tools.stringMark(
+                        {(Tools.stringMark(
                             suggestion,
                             properties.representation?.split(' ') || '',
                             (value:unknown):string =>
@@ -1970,7 +1986,11 @@ export const GenericInputInner = function<Type = unknown>(
                                     {foundWord}
                                 </span>,
                             null
-                        ) as Array<ReactElement>|string}
+                        ) as Array<ReactElement|string>).map((
+                            item:ReactElement|string, index:number
+                        ):ReactElement =>
+                            <span key={index}>{item}</span>
+                        )}
                     </MenuItem>
                 )
                 currentSuggestionLabels.push(suggestion)
