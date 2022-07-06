@@ -48,8 +48,8 @@ GenericInput.transformer.currency.format!.final.options = {currency: 'EUR'}
 const Application:FunctionComponent = ():ReactElement => {
     const [selectedState, setSelectedState] = useState<unknown>()
 
-    const onChange:((_properties:{model:unknown}) => void) =
-        useMemorizedValue<(_properties:{model:unknown}) => void>(
+    const onChange:((properties:{model:unknown}) => void) =
+        useMemorizedValue<(properties:{model:unknown}) => void>(
             ({model}):void => setSelectedState(model)
         )
 
