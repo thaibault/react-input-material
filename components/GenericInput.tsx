@@ -2004,6 +2004,47 @@ export const GenericInputInner = function<Type = unknown>(
         (Boolean(normalizedSelection) || Boolean(properties.labels)) &&
         !useSuggestions
     /// endregion
+    /// region determine type specific constraints
+    const constraints:Mapping<unknown> = {}
+    if (properties.type === 'number') {
+        constraints.step = properties.step
+
+        if (properties.maximum !== Infinity)
+            constraints.max = properties.maximum
+        if (properties.minimum !== -Infinity)
+            constraints.min = properties.minimum
+    } else if (properties.type === 'string') {
+        if (
+            properties.maximumLength >= 0 &&
+            properties.maximumLength !== Infinity
+        )
+            constraints.maxLength = properties.maximumLength
+        if (properties.minimumLength > 0)
+            constraints.minLength = properties.minimumLength
+
+        if (properties.editor !== 'plain')
+            constraints.rows = properties.rows
+    } else if (['date', 'datetime-local', 'time'].includes(properties.type)) {
+        constraints.step = properties.step
+
+        if (properties.maximum !== Infinity)
+            constraints.max = formatValue<Type>(
+                properties,
+                properties.maximum as
+                    unknown as
+                    Type,
+                transformer
+            )
+        if (properties.minimum !== -Infinity)
+            constraints.min = formatValue<Type>(
+                properties,
+                properties.minimum as
+                    unknown as
+                    Type,
+                transformer
+            )
+    }
+    /// endregion
     /// region main markup
     return <WrapConfigurations
         strict={GenericInput.strict}
@@ -2268,47 +2309,7 @@ export const GenericInputInner = function<Type = unknown>(
                     <TextField
                         {...genericProperties as TextFieldProps}
                         {...materialProperties as TextFieldProps}
-                        {...(properties.type === 'number' ?
-                            {
-                                max: properties.maximum,
-                                min: properties.minimum,
-                                step: properties.step
-                            } :
-                            properties.type === 'string' ?
-                                {
-                                    maxLength: properties.maximumLength >= 0 ?
-                                        properties.maximumLength :
-                                        Infinity,
-                                    minLength: properties.minimumLength >= 0 ?
-                                        properties.minimumLength :
-                                        0,
-                                    ...(properties.editor === 'plain' ?
-                                        {} :
-                                        {rows: properties.rows}
-                                    )
-                                } :
-                                ['date', 'datetime-local', 'time'].includes(
-                                    properties.type
-                                ) ?
-                                    {
-                                        max: formatValue<Type>(
-                                            properties,
-                                            properties.maximum as
-                                                unknown as
-                                                Type,
-                                            transformer
-                                        ),
-                                        min: formatValue<Type>(
-                                            properties,
-                                            properties.minimum as
-                                                unknown as
-                                                Type,
-                                            transformer
-                                        ),
-                                        step: properties.step
-                                    } :
-                                    {}
-                        )}
+                        {...constraints}
                         align={properties.align}
                         characterCount={
                             typeof properties.maximumLength === 'number' &&
