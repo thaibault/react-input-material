@@ -219,6 +219,40 @@ describe('GenericInput', ():void => {
         [true, 'a b', 'b'],
         [true, 'a b', 'a b']
     )
+    testEach<typeof GenericInput.transformer.boolean.parse>(
+        'transformer.boolean.parse',
+        GenericInput.transformer.boolean.parse,
+
+        [false, false],
+        [true, true],
+        [false, 'false'],
+        [true, 'true'],
+        [false, 0],
+        [true, 1],
+        [true, 'a'],
+        [true, null]
+    )
+
+    testEach<typeof GenericInput.transformer.currency.parse>(
+        'transformer.currency.parse',
+        GenericInput.transformer.currency.parse,
+
+        [1, 1, {}, GenericInput.transformer],
+        [0, 0, {}, GenericInput.transformer],
+        [1, '1', {}, GenericInput.transformer],
+        [0, '0', {}, GenericInput.transformer],
+        [1, '1 €', {}, GenericInput.transformer],
+        [1.1, '1.1 $', {}, GenericInput.transformer]
+    )
+    testEach<typeof GenericInput.transformer.currency.format.final.tranform>(
+        'transformer.currency.format.final.transform',
+        GenericInput.transformer.currency.format.final.transform,
+
+        ['1,00 $', 1, {}, GenericInput.transformer],
+        // TODO
+    )
+
+    // TODO
     test('render', ():void => {
         expect(render(<GenericInput/>)).toBeDefined()
 
