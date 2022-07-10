@@ -233,6 +233,19 @@ describe('GenericInput', ():void => {
         [true, null]
     )
 
+    testEach<typeof GenericInput.transformer.currency.format.final.tranform>(
+        'transformer.currency.format.final.transform',
+        GenericInput.transformer.currency.format.final.transform,
+
+        ['0,00 $', 0, {}, GenericInput.transformer],
+        ['0,10 $', 0.1, {}, GenericInput.transformer],
+        ['0,01 $', 0.01, {}, GenericInput.transformer],
+        ['0,00 $', 0.001, {}, GenericInput.transformer],
+        ['1,00 $', 1, {}, GenericInput.transformer],
+        ['Infinity USD', Infinity, {}, GenericInput.transformer],
+        ['- Infinity USD', -Infinity, {}, GenericInput.transformer],
+        ['unknown', NaN, {}, GenericInput.transformer]
+    )
     testEach<typeof GenericInput.transformer.currency.parse>(
         'transformer.currency.parse',
         GenericInput.transformer.currency.parse,
@@ -244,13 +257,28 @@ describe('GenericInput', ():void => {
         [1, '1 €', {}, GenericInput.transformer],
         [1.1, '1.1 $', {}, GenericInput.transformer]
     )
-    testEach<typeof GenericInput.transformer.currency.format.final.tranform>(
-        'transformer.currency.format.final.transform',
-        GenericInput.transformer.currency.format.final.transform,
 
-        ['1,00 $', 1, {}, GenericInput.transformer],
-        // TODO
+    testEach<typeof GenericInput.transformer.date.format.final.tranform>(
+        'transformer.date.format.final.transform',
+        GenericInput.transformer.date.format.final.transform,
+
+        ['1970-01-01', 0],
+        ['Infinitely far in the future', Infinity],
+        ['Infinitely early in the past', -Infinity],
+        ['', NaN]
     )
+    testEach<typeof GenericInput.transformer.date.parse>(
+        'transformer.date.parse',
+        GenericInput.transformer.date.parse,
+
+        [1, 1, {}, GenericInput.transformer],
+        [0, 0, {}, GenericInput.transformer],
+        [1, '1', {}, GenericInput.transformer],
+        [0, '0', {}, GenericInput.transformer],
+        [1, '1', {}, GenericInput.transformer],
+        [1.1, '1.1', {}, GenericInput.transformer]
+    )
+    // TODO
 
     // TODO
     test('render', ():void => {

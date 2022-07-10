@@ -677,23 +677,17 @@ export function formatValue<
     )
         return ''
 
-    if (
-        transformer[
-            (configuration.type || configuration.model.type) as
-                keyof InputDataTransformation
-        ]?.format &&
-        transformer[
-            (configuration.type || configuration.model.type) as
-                keyof InputDataTransformation
-        ]!.format![methodName]?.transform
-    )
-        return (
-            transformer[
-                (configuration.type || configuration.model.type) as
-                    keyof InputDataTransformation
-            ]!.format![methodName]!.transform as
-                FormatSpecification<T>['transform']
-        )!(value as T, configuration, transformer)
+    const format:FormatSpecifications|undefined = transformer[
+        (configuration.type || configuration.model.type) as
+            keyof InputDataTransformation
+    ]?.format
+    if (format) {
+        const tranformer:Transformer|undefined =
+            format![methodName]?.transform || format!.final?.transform
+
+        if (transformer)
+            return transformer(value as T, configuration, transformer)
+    }
 
     return String(value)
 }

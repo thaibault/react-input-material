@@ -422,25 +422,27 @@ export const defaultCheckboxProperties:DefaultCheckboxProperties = {
 /// endregion
 /// region input
 //// region data transformation
+export type Transformer = (
+    value:T,
+    configuration:DefaultInputProperties<T>,
+    transformer:InputDataTransformation
+) => string
 export interface FormatSpecification<T = unknown> {
     options?:PlainObject
-    transform?:(
-        _value:T,
-        _configuration:DefaultInputProperties<T>,
-        _transformer:InputDataTransformation
-    ) => string
+    transform?:Transformer
+}
+export interface FormatSpecifications<T = unknown> {
+    final:FormatSpecification<T>
+    intermediate?:FormatSpecification<T>
 }
 export interface DataTransformSpecification<
     T = unknown, InputType = number|string
 > {
-    format?:{
-        final:FormatSpecification<T>
-        intermediate?:FormatSpecification<T>
-    }
+    format?:FormatSpecifications<T>
     parse?:(
-        _value:InputType,
-        _configuration:DefaultInputProperties<T>,
-        _transformer:InputDataTransformation
+        value:InputType,
+        configuration:DefaultInputProperties<T>,
+        transformer:InputDataTransformation
     ) => T
     type?:NativeInputType
 }
