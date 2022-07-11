@@ -15,6 +15,7 @@
 */
 // region imports
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
+import {AnyFunction} from 'clientnode/type'
 import {testEach} from 'clientnode/testHelper'
 import React from 'react'
 
@@ -219,9 +220,9 @@ describe('GenericInput', ():void => {
         [true, 'a b', 'b'],
         [true, 'a b', 'a b']
     )
-    testEach<typeof GenericInput.transformer.boolean.parse>(
+    testEach<AnyFunction>(
         'transformer.boolean.parse',
-        GenericInput.transformer.boolean.parse,
+        GenericInput.transformer.boolean.parse!,
 
         [false, false],
         [true, true],
@@ -233,50 +234,91 @@ describe('GenericInput', ():void => {
         [true, null]
     )
 
-    testEach<typeof GenericInput.transformer.currency.format.final.tranform>(
+    testEach<AnyFunction>(
         'transformer.currency.format.final.transform',
-        GenericInput.transformer.currency.format.final.transform,
+        GenericInput.transformer.currency.format!.final.transform!,
 
-        ['0,00 $', 0, {}, GenericInput.transformer],
-        ['0,10 $', 0.1, {}, GenericInput.transformer],
-        ['0,01 $', 0.01, {}, GenericInput.transformer],
-        ['0,00 $', 0.001, {}, GenericInput.transformer],
-        ['1,00 $', 1, {}, GenericInput.transformer],
-        ['Infinity USD', Infinity, {}, GenericInput.transformer],
-        ['- Infinity USD', -Infinity, {}, GenericInput.transformer],
-        ['unknown', NaN, {}, GenericInput.transformer]
+        ...([
+            ['0,00 $', 0],
+            ['0,10 $', 0.1],
+            ['0,01 $', 0.01],
+            ['0,00 $', 0.001],
+            ['1,00 $', 1],
+            ['Infinity USD', Infinity],
+            ['- Infinity USD', -Infinity],
+            ['unknown', NaN]
+        ].map((item:Array<unknown>):Array<unknown> =>
+            item.concat({}, GenericInput.transformer)
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
-    testEach<typeof GenericInput.transformer.currency.parse>(
+    testEach<AnyFunction>(
         'transformer.currency.parse',
-        GenericInput.transformer.currency.parse,
+        GenericInput.transformer.currency.parse!,
 
-        [1, 1, {}, GenericInput.transformer],
-        [0, 0, {}, GenericInput.transformer],
-        [1, '1', {}, GenericInput.transformer],
-        [0, '0', {}, GenericInput.transformer],
-        [1, '1 €', {}, GenericInput.transformer],
-        [1.1, '1.1 $', {}, GenericInput.transformer]
+        ...([
+            [1, 1],
+            [0, 0],
+            [1, '1'],
+            [0, '0'],
+            [1, '1 €'],
+            [1.1, '1.1 $']
+        ].map((item:Array<unknown>):Array<unknown> =>
+            item.concat({}, GenericInput.transformer)
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
-    testEach<typeof GenericInput.transformer.date.format.final.tranform>(
+    testEach<AnyFunction>(
         'transformer.date.format.final.transform',
-        GenericInput.transformer.date.format.final.transform,
+        GenericInput.transformer.date.format!.final.transform!,
 
         ['1970-01-01', 0],
+        ['1970-01-01', 10],
+        ['1970-01-02', 60 ** 2 * 24],
         ['Infinitely far in the future', Infinity],
         ['Infinitely early in the past', -Infinity],
         ['', NaN]
     )
-    testEach<typeof GenericInput.transformer.date.parse>(
+    testEach<AnyFunction>(
         'transformer.date.parse',
-        GenericInput.transformer.date.parse,
+        GenericInput.transformer.date.parse!,
 
-        [1, 1, {}, GenericInput.transformer],
-        [0, 0, {}, GenericInput.transformer],
-        [1, '1', {}, GenericInput.transformer],
-        [0, '0', {}, GenericInput.transformer],
-        [1, '1', {}, GenericInput.transformer],
-        [1.1, '1.1', {}, GenericInput.transformer]
+        ...([
+            [1, 1],
+            [0, 0],
+            [1, '1'],
+            [0, '0'],
+            [1, '1'],
+            [1.1, '1.1']
+        ].map((item:Array<unknown>):Array<unknown> =>
+            item.concat({}, GenericInput.transformer)
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
+    )
+
+    testEach<AnyFunction>(
+        'transformer.datetime-local.format.final.transform',
+        GenericInput.transformer['datetime-local'].format!.final.transform!,
+
+        ['1970-01-01T00:00', 0],
+        ['1970-01-01T00:00', 10],
+        ['1970-01-02T00:00', 60 ** 2 * 24],
+        ['Infinitely far in the future', Infinity],
+        ['Infinitely early in the past', -Infinity],
+        ['', NaN]
+    )
+    testEach<AnyFunction>(
+        'transformer.datetime-local.parse',
+        GenericInput.transformer['datetime-local'].parse!,
+
+        ...([
+            [1, 1],
+            [0, 0],
+            [1, '1'],
+            [0, '0'],
+            [1, '1'],
+            [1.1, '1.1']
+        ].map((item:Array<unknown>):Array<unknown> =>
+            item.concat({}, GenericInput.transformer)
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
     // TODO
 
