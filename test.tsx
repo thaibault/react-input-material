@@ -325,16 +325,21 @@ describe('GenericInput', ():void => {
         'transformer.time.format.final.transform',
         GenericInput.transformer.time.format!.final.transform!,
 
-        ['00:00:00.000', 0],
-        ['00:00:10.000', 10],
-        ['00:00:00.000', 60 ** 2 * 24],
-        ['00:00:20.000', 60 ** 2 * 24 + 20],
-        ['00:10:00.000', 10 * 60],
-        ['10:10:00.000', 10 * 60 ** 2 + 10 * 60],
-        ['10:10:00.100', 10 * 60 ** 2 + 10 * 60 + 0.1],
-        ['Infinitely far in the future', Infinity],
-        ['Infinitely early in the past', -Infinity],
-        ['', NaN]
+        ['00:00:00.000', 0, {}],
+        ['00:00', 0, {step: 60}],
+        ['00:00:10.000', 10, {}],
+        ['00:00', 10, {step: 120}],
+        ['00:00:00.000', 60 ** 2 * 24, {}],
+        ['00:00:00.000', 60 ** 2 * 24, {step: 61}],
+        ['00:00', 60 ** 2 * 24, {step: 60}],
+        ['00:00:20.000', 60 ** 2 * 24 + 20, {}],
+        ['00:10:00.000', 10 * 60, {}],
+        ['10:10:00.000', 10 * 60 ** 2 + 10 * 60, {}],
+        ['10:10:00.100', 10 * 60 ** 2 + 10 * 60 + 0.1, {}],
+        ['10:10', 10 * 60 ** 2 + 10 * 60 + 0.1, {step: 60}],
+        ['Infinitely far in the future', Infinity, {}],
+        ['Infinitely early in the past', -Infinity, {}],
+        ['', NaN, {}]
     )
     testEach<AnyFunction>(
         'transformer.time.parse', GenericInput.transformer.time.parse!,

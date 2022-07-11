@@ -2506,7 +2506,9 @@ GenericInput.transformer = {
                 Date.parse(value as string) / 1000
     },
     time: {
-        format: {final: {transform: (value:number):string => {
+        format: {final: {transform: (
+            value:number, configuration:DefaultProperties<number>
+        ):string => {
             value = typeof value === 'number' ? value : parseFloat(value)
 
             if (value === Infinity)
@@ -2516,12 +2518,23 @@ GenericInput.transformer = {
             if (!isFinite(value))
                 return ''
 
-            const formattedValue:string =
+            let formattedValue:string =
                 (new Date(Math.round(value * 1000))).toISOString()
 
-            return formattedValue.substring(
+            formattedValue = formattedValue.substring(
                 formattedValue.indexOf('T') + 1, formattedValue.length - 1
             )
+
+            if (
+                configuration.step &&
+                configuration.step >= 60 &&
+                (configuration.step % 60) === 0
+            )
+                return formattedValue.substring(
+                    0, formattedValue.lastIndexOf(':')
+                )
+
+            return formattedValue
         }}},
         parse: (value:Date|number|string):number =>
             typeof value === 'number' ?
