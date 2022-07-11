@@ -298,9 +298,9 @@ describe('GenericInput', ():void => {
         'transformer.datetime-local.format.final.transform',
         GenericInput.transformer['datetime-local'].format!.final.transform!,
 
-        ['1970-01-01T00:00', 0],
-        ['1970-01-01T00:00', 10],
-        ['1970-01-02T00:00', 60 ** 2 * 24],
+        ['1970-01-01T00:00:00.000', 0],
+        ['1970-01-01T00:00:10.000', 10],
+        ['1970-01-02T00:00:00.000', 60 ** 2 * 24],
         ['Infinitely far in the future', Infinity],
         ['Infinitely early in the past', -Infinity],
         ['', NaN]
@@ -320,7 +320,39 @@ describe('GenericInput', ():void => {
             item.concat({}, GenericInput.transformer)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
-    // TODO
+
+    testEach<AnyFunction>(
+        'transformer.time.format.final.transform',
+        GenericInput.transformer.time.format!.final.transform!,
+
+        ['00:00:00.000', 0],
+        ['00:00:10.000', 10],
+        ['00:00:00.000', 60 ** 2 * 24],
+        ['00:00:20.000', 60 ** 2 * 24 + 20],
+        ['00:10:00.000', 10 * 60],
+        ['10:10:00.000', 10 * 60 ** 2 + 10 * 60],
+        ['10:10:00.100', 10 * 60 ** 2 + 10 * 60 + 0.1],
+        ['Infinitely far in the future', Infinity],
+        ['Infinitely early in the past', -Infinity],
+        ['', NaN]
+    )
+    testEach<AnyFunction>(
+        'transformer.time.parse', GenericInput.transformer.time.parse!,
+
+        ...([
+            [1, 1],
+            [0, 0],
+            [1, '1'],
+            [0, '0'],
+            [1, '1'],
+            [1.1, '1.1'],
+            [10 * 60 ** 2 + 10 * 60, '10:10'],
+            [10 * 60 ** 2 + 10 * 60 + 10, '10:10:10'],
+            [10 * 60 ** 2 + 10 * 60 + 10.1, '10:10:10.10']
+        ].map((item:Array<unknown>):Array<unknown> =>
+            item.concat({}, GenericInput.transformer)
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
+    )
 
     // TODO
     test('render', ():void => {

@@ -2485,9 +2485,9 @@ GenericInput.transformer = {
             value = typeof value === 'number' ? value : parseFloat(value)
 
             if (value === Infinity)
-                return 'infinitely far in the future'
+                return 'Infinitely far in the future'
             if (value === -Infinity)
-                return 'infinitely early in the past'
+                return 'Infinitely early in the past'
             if (!isFinite(value))
                 return ''
 
@@ -2510,9 +2510,9 @@ GenericInput.transformer = {
             value = typeof value === 'number' ? value : parseFloat(value)
 
             if (value === Infinity)
-                return 'infinitely far in the future'
+                return 'Infinitely far in the future'
             if (value === -Infinity)
-                return 'infinitely early in the past'
+                return 'Infinitely early in the past'
             if (!isFinite(value))
                 return ''
 
@@ -2528,14 +2528,22 @@ GenericInput.transformer = {
                 value :
                 value instanceof Date ?
                     value.getTime() / 1000 :
-                    parseInt(value.replace(
-                        /^([0-9]{2}):([0-9]{2})$/,
-                        (_:string, hour:string, minute:string):string =>
+                    parseFloat(value.replace(
+                        /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
+                        (
+                            _match:string,
+                            hour:string,
+                            minute:string,
+                            secondsSuffix?:string,
+                            seconds?:string,
+                            _millisecondsSuffix?:string
+                        ):string =>
                             String(
                                 parseInt(hour) *
                                 60 ** 2 +
                                 parseInt(minute) *
-                                60
+                                60 +
+                                (secondsSuffix ? parseFloat(seconds!) : 0)
                             )
                     ))
     },
