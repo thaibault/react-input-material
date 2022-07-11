@@ -2455,34 +2455,21 @@ GenericInput.transformer = {
         type: 'text'
     },
     date: {
-        format: {
-            final: {transform: (value:number):string => {
-                value = typeof value === 'number' ? value : parseFloat(value)
+        format: {final: {transform: (value:number):string => {
+            value = typeof value === 'number' ? value : parseFloat(value)
 
-                if (value === Infinity)
-                    return 'infinitely far in the future'
-                if (value === -Infinity)
-                    return 'infinitely early in the past'
-                if (!isFinite(value))
-                    return ''
+            if (value === Infinity)
+                return 'Infinitely far in the future'
+            if (value === -Infinity)
+                return 'Infinitely early in the past'
+            if (!isFinite(value))
+                return ''
 
-                const formattedValue:string =
-                    (new Date(Math.round(value * 1000))).toISOString()
+            const formattedValue:string =
+                (new Date(Math.round(value * 1000))).toISOString()
 
-                return formattedValue.substring(0, formattedValue.indexOf('T'))
-            }},
-            intermediate: {transform: (
-                value:number,
-                configuration:DefaultProperties<number>,
-                transformer:InputDataTransformation
-            ):string =>
-                transformer.date.format?.final.transform ?
-                    transformer.date.format.final.transform(
-                        value, configuration, transformer
-                    ) :
-                    `${value}`
-            }
-        },
+            return formattedValue.substring(0, formattedValue.indexOf('T'))
+        }}},
         parse: (value:Date|number|string):number =>
             typeof value === 'number' ?
                 value :
@@ -2494,34 +2481,21 @@ GenericInput.transformer = {
     },
     // TODO respect local to utc conversion.
     'datetime-local': {
-        format: {
-            final: {transform: (value:number):string => {
-                value = typeof value === 'number' ? value : parseFloat(value)
+        format: {final: {transform: (value:number):string => {
+            value = typeof value === 'number' ? value : parseFloat(value)
 
-                if (value === Infinity)
-                    return 'infinitely far in the future'
-                if (value === -Infinity)
-                    return 'infinitely early in the past'
-                if (!isFinite(value))
-                    return ''
+            if (value === Infinity)
+                return 'Infinitely far in the future'
+            if (value === -Infinity)
+                return 'Infinitely early in the past'
+            if (!isFinite(value))
+                return ''
 
-                const formattedValue:string =
-                    (new Date(Math.round(value * 1000))).toISOString()
+            const formattedValue:string =
+                (new Date(Math.round(value * 1000))).toISOString()
 
-                return formattedValue.substring(0, formattedValue.length - 1)
-            }},
-            intermediate: {transform: (
-                value:number,
-                configuration:DefaultProperties<number>,
-                transformer:InputDataTransformation
-            ):string =>
-                transformer['datetime-local'].format?.final.transform ?
-                    transformer['datetime-local'].format.final.transform(
-                        value, configuration, transformer
-                    ) :
-                    `${value}`
-            }
-        },
+            return formattedValue.substring(0, formattedValue.length - 1)
+        }}},
         parse: (
             value:number|string,
             configuration:DefaultProperties<number>,
@@ -2532,49 +2506,57 @@ GenericInput.transformer = {
                 Date.parse(value as string) / 1000
     },
     time: {
-        format: {
-            final: {transform: (value:number):string => {
-                value = typeof value === 'number' ? value : parseFloat(value)
+        format: {final: {transform: (
+            value:number, configuration:DefaultProperties<number>
+        ):string => {
+            value = typeof value === 'number' ? value : parseFloat(value)
 
-                if (value === Infinity)
-                    return 'infinitely far in the future'
-                if (value === -Infinity)
-                    return 'infinitely early in the past'
-                if (!isFinite(value))
-                    return ''
+            if (value === Infinity)
+                return 'Infinitely far in the future'
+            if (value === -Infinity)
+                return 'Infinitely early in the past'
+            if (!isFinite(value))
+                return ''
 
-                const formattedValue:string =
-                    (new Date(Math.round(value * 1000))).toISOString()
+            let formattedValue:string =
+                (new Date(Math.round(value * 1000))).toISOString()
 
+            formattedValue = formattedValue.substring(
+                formattedValue.indexOf('T') + 1, formattedValue.length - 1
+            )
+
+            if (
+                configuration.step &&
+                configuration.step >= 60 &&
+                (configuration.step % 60) === 0
+            )
                 return formattedValue.substring(
-                    formattedValue.indexOf('T') + 1, formattedValue.length - 1
+                    0, formattedValue.lastIndexOf(':')
                 )
-            }},
-            intermediate: {transform: (
-                value:number,
-                configuration:DefaultProperties<number>,
-                transformer:InputDataTransformation
-            ):string =>
-                transformer.time.format?.final.transform ?
-                    transformer.time.format.final.transform(
-                        value, configuration, transformer
-                    ) :
-                    `${value}`
-            }
-        },
+
+            return formattedValue
+        }}},
         parse: (value:Date|number|string):number =>
             typeof value === 'number' ?
                 value :
                 value instanceof Date ?
                     value.getTime() / 1000 :
-                    parseInt(value.replace(
-                        /^([0-9]{2}):([0-9]{2})$/,
-                        (_:string, hour:string, minute:string):string =>
+                    parseFloat(value.replace(
+                        /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
+                        (
+                            _match:string,
+                            hour:string,
+                            minute:string,
+                            secondsSuffix?:string,
+                            seconds?:string,
+                            _millisecondsSuffix?:string
+                        ):string =>
                             String(
                                 parseInt(hour) *
                                 60 ** 2 +
                                 parseInt(minute) *
-                                60
+                                60 +
+                                (secondsSuffix ? parseFloat(seconds!) : 0)
                             )
                     ))
     },

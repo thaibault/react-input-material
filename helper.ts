@@ -32,9 +32,10 @@ import {
     DataTransformSpecification,
     DefaultBaseProperties,
     DefaultInputProperties,
-    FormatSpecification,
+    FormatSpecifications,
     InputDataTransformation,
     ModelState,
+    Transformer,
     ValueState
 } from './type'
 // endregion
@@ -655,7 +656,7 @@ export const parseValue =
  * Represents configured value as string.
  * @param configuration - Input configuration.
  * @param value - To represent.
- * @param transformer - To apply to given value.
+ * @param transformerMapping - To apply to given value.
  * @param final - Specifies whether it is a final representation.
  *
  * @returns Transformed value.
@@ -666,7 +667,7 @@ export function formatValue<
 >(
     configuration:P,
     value:null|T,
-    transformer:InputDataTransformation,
+    transformerMapping:InputDataTransformation,
     final = true
 ):string {
     const methodName:'final'|'intermediate' = final ? 'final' : 'intermediate'
@@ -677,23 +678,17 @@ export function formatValue<
     )
         return ''
 
-    if (
-        transformer[
-            (configuration.type || configuration.model.type) as
-                keyof InputDataTransformation
-        ]?.format &&
-        transformer[
-            (configuration.type || configuration.model.type) as
-                keyof InputDataTransformation
-        ]!.format![methodName]?.transform
-    )
-        return (
-            transformer[
-                (configuration.type || configuration.model.type) as
-                    keyof InputDataTransformation
-            ]!.format![methodName]!.transform as
-                FormatSpecification<T>['transform']
-        )!(value as T, configuration, transformer)
+    const format:FormatSpecifications<T>|undefined = transformerMapping[
+        (configuration.type || configuration.model.type) as
+            keyof InputDataTransformation
+    ]?.format as FormatSpecifications<T>|undefined
+    if (format) {
+        const transformer:Transformer<T>|undefined =
+            format[methodName]?.transform || format.final?.transform
+
+        if (transformer)
+            return transformer(value as T, configuration, transformerMapping)
+    }
 
     return String(value)
 }
