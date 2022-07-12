@@ -127,35 +127,24 @@ describe('helper', ():void => {
         [
             [['A', 'B'], ['a', 'b']],
             [{label: 'A', value: 'a'}, {label: 'B', value: 'b'}]
-        ],
-        [[['A', 'B'], ['a', 'b']], {a: 'A', b: 'B'}],
-        [[['a', 'B'], ['a', 'b']], [{value: 'a'}, {label: 'B', value: 'b'}]],
-        [[['JA', 'NEIN'], ['true', 'false']], {false: 'NEIN', true: 'JA'}]
+        ]
     )
     testEach<typeof getRepresentationFromValueSelection>(
         'getRepresentationFromValueSelection',
         getRepresentationFromValueSelection,
 
-        ['No', 'false', {false: 'No', true: 'Yes'}],
-        ['Yes', 'true', {false: 'No', true: 'Yes'}],
-        ['a', 'a', ['a', 'b']],
-        ['a', 'a', ['b', 'a']],
         ['a', 1, [{label: 'a', value: 1}, {label: 'b', value: 2}]],
-        ['b', 'b', [{label: 'a', value: 1}, {value: 'b'}]],
-        ['2', 2, [{label: 'a', value: 1}, {value: 2}]],
+        ['b', 'b', [{label: 'a', value: 1}, {label: 'b', value: 'b'}]],
+        ['2', 2, [{label: 'a', value: 1}, {label: '2', value: 2}]],
         [null, 2, [{label: 'a', value: 1}]]
     )
     testEach<typeof getValueFromSelection>(
         'getValueFromSelection',
         getValueFromSelection,
 
-        ['false', 'No', {false: 'No', true: 'Yes'}],
-        ['true', 'Yes', {false: 'No', true: 'Yes'}],
-        ['a', 'a', ['a', 'b']],
-        ['a', 'a', ['b', 'a']],
         [1, 'a', [{label: 'a', value: 1}, {label: 'b', value: 2}]],
-        ['b', 'b', [{label: 'a', value: 1}, {value: 'b'}]],
-        [2, '2', [{label: 'a', value: 1}, {value: 2}]],
+        ['b', 'b', [{label: 'a', value: 1}, {label: 'b', value: 'b'}]],
+        [2, '2', [{label: 'a', value: 1}, {label: '2', value: 2}]],
         [null, '2', [{label: 'a', value: 1}]]
     )
     testEach<typeof normalizeSelection>(

@@ -95,6 +95,7 @@ Plain CSS:
 
 .generic-input__suggestions__suggestion {
     visibility: visible;
+    white-space: break-spaces;
 }
 
 .generic-input__suggestions__suggestion__mark {
