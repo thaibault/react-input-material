@@ -32,6 +32,7 @@ import {
     MouseEvent as ReactMouseEvent,
     MutableRefObject,
     ReactElement,
+    ReactNode,
     Suspense,
     useEffect,
     useImperativeHandle,
@@ -123,6 +124,7 @@ import {
     InputState as State,
     InputModel as Model,
     NativeInputType,
+    NormalizedSelection,
     Renderable,
     GenericInputComponent,
     InputTablePosition as TablePosition,
@@ -782,7 +784,7 @@ export const GenericInputInner = function<Type = unknown>(
         const keysSorted:Array<keyof typeof indicator> =
             ['start', 'end']
 
-        let value:string = properties.representation
+        let value:string = properties.representation as string
         for (const type of keysSorted)
             value = (
                 value.substring(0, cursor[type]) +
@@ -887,9 +889,13 @@ export const GenericInputInner = function<Type = unknown>(
                 (event as unknown as KeyboardEvent)?.key?.length === 1 ?
                     1 :
                     (event as unknown as KeyboardEvent)?.key === 'Backspace' &&
-                    properties.representation.length > selectionStart ?
+                    (
+                        (properties.representation as string).length >
+                        selectionStart
+                    ) ?
                         -1 :
                         0
+
             setCursor({end: selectionEnd + add, start: selectionStart + add})
         }
     }
@@ -1102,7 +1108,7 @@ export const GenericInputInner = function<Type = unknown>(
 
         if (!useSuggestions || properties.suggestSelection) {
             const candidate:null|Type = getValueFromSelection<Type>(
-                properties.representation, normalizedSelection
+                properties.representation, normalizedSelection!
             )
             if (candidate === null) {
                 properties.value = parseValue<Type>(
@@ -1422,7 +1428,7 @@ export const GenericInputInner = function<Type = unknown>(
 
                 if (selectedIndex === -1) {
                     const result:null|Type = getValueFromSelection<Type>(
-                        properties.representation, normalizeSelection(results)
+                        properties.representation, normalizeSelection(results)!
                     )
 
                     if (result !== null || properties.searchSelection)
@@ -1447,7 +1453,7 @@ export const GenericInputInner = function<Type = unknown>(
             ) = properties.suggestionCreator({
                 abortController,
                 properties,
-                query: properties.representation
+                query: properties.representation as string
             })
 
             if ((result as Promise<Properties['selection']>)?.then) {
@@ -1489,7 +1495,7 @@ export const GenericInputInner = function<Type = unknown>(
                     consolidation.
                 */
                 const result:null|Type = getValueFromSelection<Type>(
-                    properties.representation, normalizedSelection
+                    properties.representation, normalizedSelection!
                 )
 
                 if (result !== null || properties.searchSelection)
@@ -1721,11 +1727,10 @@ export const GenericInputInner = function<Type = unknown>(
         selection =
             givenProperties.selection || givenProperties.model?.selection
 
-    const normalizedSelection:(
-        SelectProps['options']|Array<{label?:string;value:unknown}>|undefined
-    ) = selection instanceof AbortController ?
-        [] :
-        normalizeSelection(selection, givenProperties.labels)
+    const normalizedSelection:NormalizedSelection|undefined =
+        selection instanceof AbortController ?
+            [] :
+            normalizeSelection(selection, givenProperties.labels)
     const [suggestionLabels, suggestionValues] =
         selection instanceof AbortController ?
             [[], []] :
@@ -1924,7 +1929,7 @@ export const GenericInputInner = function<Type = unknown>(
     )
 
     const currentRenderableSuggestions:Array<ReactElement> = []
-    const currentSuggestionLabels:Array<string> = []
+    const currentSuggestionLabels:Array<ReactNode|string> = []
     const currentSuggestionValues:Array<unknown> = []
     const useSuggestions = Boolean(
         properties.suggestionCreator ||
@@ -1940,9 +1945,9 @@ export const GenericInputInner = function<Type = unknown>(
             if (Tools.isFunction(properties.children)) {
                 const result:null|ReactElement = properties.children({
                     index,
-                    normalizedSelection,
+                    normalizedSelection: normalizedSelection!,
                     properties,
-                    query: properties.representation,
+                    query: properties.representation as string,
                     suggestion,
                     value: suggestionValues[index] as Type
                 })
@@ -1964,7 +1969,9 @@ export const GenericInputInner = function<Type = unknown>(
             } else if (
                 !properties.representation ||
                 properties.suggestionCreator ||
-                suggestionMatches(suggestion, properties.representation)
+                suggestionMatches(
+                    suggestion as string, properties.representation as string
+                )
             ) {
                 currentRenderableSuggestions.push(
                     <MenuItem
@@ -1975,7 +1982,9 @@ export const GenericInputInner = function<Type = unknown>(
                     >
                         {(Tools.stringMark(
                             suggestion,
-                            properties.representation?.split(' ') || '',
+                            (
+                                properties.representation as string
+                            )?.split(' ') || '',
                             (value:unknown):string =>
                                 `${value as string}`.toLowerCase(),
                             (foundWord:string):ReactElement =>
@@ -2172,7 +2181,10 @@ export const GenericInputInner = function<Type = unknown>(
                                                 useWorker: false
                                             }}
                                             theme="github"
-                                            value={properties.representation}
+                                            value={
+                                                properties.representation as
+                                                    string
+                                            }
                                             {...properties.inputProperties as
                                                 CodeEditorProps
                                             }
@@ -2201,12 +2213,16 @@ export const GenericInputInner = function<Type = unknown>(
                                         ref={setRichTextEditorReference}
                                         textareaName={properties.name}
                                         tinymceScriptSrc={
-                                            (TINYMCE_DEFAULT_OPTIONS.base_url as
-                                                string
+                                            (
+                                                TINYMCE_DEFAULT_OPTIONS
+                                                    .base_url as
+                                                        string
                                             ) +
                                             'tinymce.min.js'
                                         }
-                                        value={properties.representation}
+                                        value={
+                                            properties.representation as string
+                                        }
                                         {...properties.inputProperties as
                                             RichTextEditorProps
                                         }
@@ -2339,7 +2355,7 @@ export const GenericInputInner = function<Type = unknown>(
                             properties.trailingIcon
                         ))}
                         type={determineNativeType(properties)}
-                        value={properties.representation}
+                        value={properties.representation as string}
                         {...properties.inputProperties as TextFieldProps}
                     />
                 </div>,

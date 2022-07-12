@@ -19,7 +19,9 @@
 // region imports
 import Tools from 'clientnode'
 import {Mapping, UnknownFunction} from 'clientnode/type'
-import {FunctionComponent, ReactElement, useEffect, useState} from 'react'
+import {
+    FunctionComponent, ReactElement, ReactNode, useEffect, useState
+} from 'react'
 import {createRoot} from 'react-dom/client'
 
 import {
@@ -70,7 +72,7 @@ const Application:FunctionComponent = ():ReactElement => {
         useMemorizedValue<(_value:null|string) => void>(setValue2)
 
     type FloatValueState = {
-        representation:string
+        representation:ReactNode|string
         value?:null|number
     }
     const [value3, setValue3] = useState<FloatValueState>({
@@ -80,7 +82,7 @@ const Application:FunctionComponent = ():ReactElement => {
         useMemorizedValue<(_value:FloatValueState) => void>(setValue3)
 
     type SelectionValueType = {
-        representation:string
+        representation:ReactNode|string
         value?:null|string
     }
     const [value4, setValue4] =

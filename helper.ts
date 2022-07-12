@@ -20,10 +20,8 @@
 import Tools from 'clientnode'
 import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 import {FirstParameter, Mapping, ValueOf} from 'clientnode/type'
-import {useMemo, useState} from 'react'
-import {
-    FormattedOption as FormattedSelectionOption, SelectProps
-} from '@rmwc/select'
+import {ReactNode, useMemo, useState} from 'react'
+import {SelectProps} from '@rmwc/select'
 
 import {
     BaseModel,
@@ -35,6 +33,7 @@ import {
     FormatSpecifications,
     InputDataTransformation,
     ModelState,
+    NormalizedSelection,
     Transformer,
     ValueState
 } from './type'
@@ -386,36 +385,20 @@ export const getConsolidatedProperties = <
  *
  * @returns Normalized sorted listed of labels and values.
  */
-export function getLabelAndValues(
-    selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
-):[Array<string>, Array<unknown>] {
+export function getLabelAndValues(selection?:NormalizedSelection):[
+    Array<ReactNode|string>, Array<unknown>
+] {
     if (Array.isArray(selection)) {
         const labels:Array<string> = []
         const values:Array<unknown> = []
 
         for (const value of selection)
-            if (['number', 'string'].includes(typeof value)) {
-                labels.push(`${value as string}`)
-                values.push(value)
-            } else if (typeof (value as {label:string})?.label === 'string') {
+            if (typeof (value as {label:string})?.label === 'string') {
                 labels.push((value as {label:string}).label)
                 values.push((value as {value:unknown}).value)
-            } else if (['number', 'string'].includes(
-                typeof (value as {value:string})?.value
-            )) {
-                labels.push(`${(value as {value:string}).value}`)
-                values.push((value as {value:string}).value)
             }
 
         return [labels, values]
-    }
-
-    if (selection !== null && typeof selection === 'object') {
-        const values:Array<string> = Object.keys(selection).sort(
-            (first:string, second:string):number =>
-                selection[first].localeCompare(selection[second])
-        )
-        return [values.map((value:string) => selection[value]), values]
     }
 
     return [[], []]
@@ -428,30 +411,14 @@ export function getLabelAndValues(
  * @returns Determined representation.
  */
 export function getRepresentationFromValueSelection(
-    value:unknown,
-    selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
+    value:unknown, selection?:NormalizedSelection
 ):null|string {
-    if (selection) {
-        if (Array.isArray(selection))
-            for (const option of selection) {
-                if (Tools.equals(option, value))
-                    return `${value as string}`
-
-                if (Tools.equals((option as {value:unknown})?.value, value))
-                    return (
-                        (option as {label:string}).label ||
-                        `${value as string}`
-                    )
-            }
-
-        if (
-            selection !== null &&
-            typeof selection === 'object' &&
-            typeof value === 'string' &&
-            Object.prototype.hasOwnProperty.call(selection, value)
-        )
-            return (selection as Mapping)[value]
-    }
+    if (selection)
+        for (const option of selection)
+            if (Tools.equals((option as {value:unknown})?.value, value))
+                return (
+                    (option as {label:string}).label || `${value as string}`
+                )
 
     return null
 }
@@ -463,22 +430,15 @@ export function getRepresentationFromValueSelection(
  * @returns Determined value.
  */
 export function getValueFromSelection<T>(
-    label:string,
-    selection:SelectProps['options']|Array<{label?:string;value:unknown}>
+    label:ReactNode|string, selection:NormalizedSelection
 ):null|T {
     if (Array.isArray(selection))
         for (const value of selection) {
             if (
-                ['number', 'string'].includes(typeof value) &&
-                `${value as string}` === label
-            )
-                return value as unknown as T
-
-            if (
                 typeof (value as {label:string})?.label === 'string' &&
                 (value as {label:string}).label === label
             )
-                return (value as {value:T}).value
+                return (value as unknown as {value:T}).value
 
             if (
                 ['number', 'string'].includes(
@@ -486,39 +446,33 @@ export function getValueFromSelection<T>(
                 ) &&
                 `${(value as {value:string}).value}` === label
             )
-                return (value as {value:T}).value
+                return (value as unknown as {value:T}).value
         }
-
-    if (selection !== null && typeof selection === 'object')
-        for (const [value, selectionLabel] of Object.entries(selection))
-            if (selectionLabel === label)
-                return value as unknown as T
 
     return null
 }
 /**
- * Normalize given selection.
+ * Normalize given selection. NOTE: It is important to have an ordered list
+ * to map values to labels and the other way around in a deterministic way.
  * @param selection - Selection component property configuration.
  * @param labels - Additional labels to take into account (for example provided
  * via a content management system).
  *
- * @returns Determined normalized selection configuration.
+ * @returns Determined normalized sorted selection configuration.
  */
 export function normalizeSelection(
     selection?:(
-        Array<[string, string]> |
-        SelectProps['options'] |
-        Array<{label?:string;value:unknown}>
+        Array<[string, string]>|NormalizedSelection|SelectProps['options']
     ),
     labels?:Array<string>|Mapping
-):SelectProps['options']|Array<{label?:string;value:unknown}>|undefined {
+):NormalizedSelection|undefined {
     if (!selection) {
         selection = labels
         labels = undefined
     }
 
     if (Array.isArray(selection) && selection.length) {
-        const result:Array<FormattedSelectionOption> = []
+        const result:NormalizedSelection = []
         let index = 0
         if (Array.isArray(selection[0]))
             for (
@@ -534,11 +488,9 @@ export function normalizeSelection(
                 index += 1
             }
         else if (selection[0] !== null && typeof selection[0] === 'object')
-            for (
-                const option of selection as Array<FormattedSelectionOption>
-            ) {
+            for (const option of selection as NormalizedSelection) {
                 result.push({
-                    ...(option),
+                    ...option,
                     label: Array.isArray(labels) && index < labels.length ?
                         labels[index] :
                         option.label
@@ -561,48 +513,66 @@ export function normalizeSelection(
         selection = result
     }
 
-    if (labels !== null && typeof labels === 'object') {
-        if (Array.isArray(selection)) {
-            const result:Array<FormattedSelectionOption> = []
+    const hasLabels:boolean = labels !== null && typeof labels === 'object'
 
-            for (const option of selection as Array<FormattedSelectionOption>)
-                result.push({
-                    ...option,
-                    label: Object.prototype.hasOwnProperty.call(
-                        labels, (option.value || option.label) as string
-                    ) ?
-                        (
-                            labels as Mapping
-                        )[(option.value || option.label) as string] :
-                        // Map boolean values to their string representation.
-                        (
-                            (option as unknown as {value:boolean}).value ===
-                                true &&
-                            (labels as {true:string}).true
+    if (selection)
+        if (Array.isArray(selection)) {
+            if (hasLabels) {
+                const result:NormalizedSelection = []
+
+                for (const option of selection as NormalizedSelection)
+                    result.push({
+                        ...option,
+                        label: Object.prototype.hasOwnProperty.call(
+                            labels, (option.value || option.label) as string
                         ) ?
-                            (labels as {true:string}).true :
+                            (
+                                labels as Mapping
+                            )[(option.value || option.label) as string] :
+                            /*
+                                Map boolean values to their string
+                                representation.
+                            */
                             (
                                 (
                                     option as unknown as {value:boolean}
-                                ).value === false &&
-                                (labels as {false:string}).false
+                                ).value === true &&
+                                (labels as {true:string}).true
                             ) ?
-                                (labels as {false:string}).false :
-                                option.label
+                                (labels as {true:string}).true :
+                                (
+                                    (
+                                        option as unknown as {value:boolean}
+                                    ).value === false &&
+                                    (labels as {false:string}).false
+                                ) ?
+                                    (labels as {false:string}).false :
+                                    option.label
+                    })
+
+                return result
+            }
+        } else {
+            const result:NormalizedSelection = []
+            for (const value of Object.keys(selection as Mapping<unknown>).sort(
+                (first:string, second:string):number =>
+                    (selection as Mapping)[first].localeCompare(
+                        (selection as Mapping)[second]
+                    )
+            ))
+                result.push({
+                    label:
+                        hasLabels &&
+                        Object.prototype.hasOwnProperty.call(labels, value) ?
+                            (labels as Mapping)[value] :
+                            (selection as Mapping)[value],
+                    value
                 })
 
             return result
         }
 
-        for (const [value, label] of Object.entries(selection as Mapping))
-            (selection as Mapping)[value] =
-                Object.prototype.hasOwnProperty.call(labels, value) ?
-                    (labels as Mapping)[value] :
-                    label
-    }
-
-    return selection as
-        SelectProps['options']|Array<{label?:string;value:unknown}>|undefined
+    return selection as NormalizedSelection|undefined
 }
 /// endregion
 /**
@@ -710,7 +680,7 @@ export function determineInitialRepresentation<
     defaultProperties:P,
     value:null|T,
     transformer:InputDataTransformation,
-    selection?:SelectProps['options']|Array<{label?:string;value:unknown}>
+    selection?:NormalizedSelection
 ):string {
     if (typeof properties.representation === 'string')
         return properties.representation

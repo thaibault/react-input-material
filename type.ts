@@ -43,6 +43,7 @@ import {
     MouseEvent,
     MutableRefObject,
     ReactElement,
+    ReactNode,
     RefAttributes,
     Requireable,
     SyntheticEvent
@@ -63,7 +64,9 @@ import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
 import {CardMediaProps} from '@rmwc/card'
 import {MenuApi} from '@rmwc/menu'
-import {SelectProps} from '@rmwc/select'
+import {
+    FormattedOption as FormattedSelectionOption, SelectProps
+} from '@rmwc/select'
 import {TextFieldProps} from '@rmwc/textfield'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {TooltipProps} from '@rmwc/tooltip'
@@ -466,6 +469,8 @@ export type InputDataTransformation =
         NativeInputType, 'date'|'datetime-local'|'time'|'number'
     >]?:DataTransformSpecification<unknown>}
 //// endregion
+export type NormalizedSelection =
+    Array<Omit<FormattedSelectionOption, 'value'> & {value:unknown}>
 export interface InputTablePosition {
     column:number
     row:number
@@ -486,7 +491,7 @@ export interface InputModel<T = unknown> extends Model<T> {
 export interface InputValueState<T = unknown, MS = ModelState> extends
     ValueState<T, MS>
 {
-    representation?:string
+    representation?:ReactNode|string
 }
 export type NativeInputType = (
     'date' |
@@ -508,12 +513,10 @@ export type GenericInputType = (
 )
 export interface InputChildrenOptions<P, T> {
     index:number
-    normalizedSelection:(
-        SelectProps['options']|Array<{label?:string;value:unknown}>
-    )
+    normalizedSelection:NormalizedSelection
     properties:P
     query:string
-    suggestion:string
+    suggestion:ReactNode|string
     value:T
 }
 export interface SuggestionCreatorOptions<P> {
@@ -569,7 +572,7 @@ export interface InputProperties<T = unknown> extends
     outlined:boolean
     patternText:string
     placeholder:string
-    representation:string
+    representation:ReactNode|string
     rows:number
     searchSelection:boolean
     selectableEditor:boolean
@@ -596,7 +599,7 @@ export interface InputState<T = unknown> extends State<T> {
     editorIsActive:boolean
     hidden?:boolean
     modelState:InputModelState
-    representation?:string
+    representation?:ReactNode|string
     selectionIsUnstable:boolean
     showDeclaration:boolean
 }
@@ -606,7 +609,7 @@ export type InputAdapter<T = unknown> = ComponentAdapter<
     InputProperties<T>,
     Omit<InputState<T>, 'representation'|'selectionIsUnstable'|'value'> &
     {
-        representation?:string
+        representation?:ReactNode|string
         value?:null|T
     }
 >
