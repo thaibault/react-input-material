@@ -95,7 +95,6 @@
     "@typescript-eslint/eslint-plugin": "*",
     "@typescript-eslint/parser": "*",
     "blob-util": "*",
-    "canvas": "*",
     "clientnode": "*",
     "css-loader": "*",
     "cssnano": "<=4",
