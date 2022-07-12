@@ -429,7 +429,9 @@ const Application:FunctionComponent = ():ReactElement => {
                 name="input12"
                 onChange={onChange}
                 placeholder="input12Placeholder"
-                selection={useMemorizedValue(['hans', 'peter', 'klaus'])}
+                selection={useMemorizedValue(
+                    ['hans hans', 'peter peter', 'klaus']
+                )}
                 suggestSelection
             />
             <GenericInput
