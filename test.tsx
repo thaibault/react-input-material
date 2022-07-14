@@ -194,6 +194,8 @@ describe('GenericAnimate', ():void => {
 })
 // endregion
 // region GenericInput
+GenericInput.locales = ['en-US']
+
 describe('GenericInput', ():void => {
     testEach<typeof suggestionMatches>(
         'suggestionMatches',
