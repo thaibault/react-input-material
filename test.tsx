@@ -253,7 +253,7 @@ describe('GenericInput', ():void => {
             [0, '0'],
             [1, '1 €'],
             [1.1, '1.1 $'],
-            [1.1, '$1.1']
+            [1.1, '1.1']
         ].map((item:Array<unknown>):Array<unknown> =>
             item.concat({}, GenericInput.transformer)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
