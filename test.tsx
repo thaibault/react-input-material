@@ -230,11 +230,11 @@ describe('GenericInput', ():void => {
         GenericInput.transformer.currency.format!.final.transform!,
 
         ...([
-            ['0,00 $', 0],
-            ['0,10 $', 0.1],
-            ['0,01 $', 0.01],
-            ['0,00 $', 0.001],
-            ['1,00 $', 1],
+            ['$0.00', 0],
+            ['$0.10', 0.1],
+            ['$0.01', 0.01],
+            ['$0.00', 0.001],
+            ['$1.00', 1],
             ['Infinity USD', Infinity],
             ['- Infinity USD', -Infinity],
             ['unknown', NaN]
@@ -252,7 +252,8 @@ describe('GenericInput', ():void => {
             [1, '1'],
             [0, '0'],
             [1, '1 €'],
-            [1.1, '1.1 $']
+            [1.1, '1.1 $'],
+            [1.1, '$1.1']
         ].map((item:Array<unknown>):Array<unknown> =>
             item.concat({}, GenericInput.transformer)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
