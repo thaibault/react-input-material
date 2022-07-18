@@ -277,10 +277,11 @@ describe('GenericInput', ():void => {
         ...([
             [1, 1],
             [0, 0],
-            [1, '1'],
-            [0, '0'],
-            [1, '1'],
-            [1.1, '1.1']
+            [1, '1 f'],
+            [0, '0 f'],
+            [1, '1 f'],
+            [1.1, '1.1 f'],
+            [8 * 60 ** 2, '1970-01-01T08:00:00.000Z']
         ].map((item:Array<unknown>):Array<unknown> =>
             item.concat({}, GenericInput.transformer)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
@@ -304,10 +305,11 @@ describe('GenericInput', ():void => {
         ...([
             [1, 1],
             [0, 0],
-            [1, '1'],
-            [0, '0'],
-            [1, '1'],
-            [1.1, '1.1']
+            [1, '1 f', {}, GenericInput.transformer],
+            [0, '0 f', {}, GenericInput.transformer],
+            [1, '1 f', {}, GenericInput.transformer],
+            [1.1, '1.1 f', {}, GenericInput.transformer],
+            [8 * 60 ** 2, '1970-01-01T08:00:00.000Z']
         ].map((item:Array<unknown>):Array<unknown> =>
             item.concat({}, GenericInput.transformer)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
@@ -339,13 +341,14 @@ describe('GenericInput', ():void => {
         ...([
             [1, 1],
             [0, 0],
-            [1, '1'],
-            [0, '0'],
-            [1, '1'],
-            [1.1, '1.1'],
+            [1, '1 f'],
+            [0, '0 f'],
+            [1, '1 f'],
+            [1.1, '1.1 f'],
             [10 * 60 ** 2 + 10 * 60, '10:10'],
             [10 * 60 ** 2 + 10 * 60 + 10, '10:10:10'],
-            [10 * 60 ** 2 + 10 * 60 + 10.1, '10:10:10.10']
+            [10 * 60 ** 2 + 10 * 60 + 10.1, '10:10:10.10'],
+            [8 * 60 ** 2, '1970-01-01T08:00:00.000Z']
         ].map((item:Array<unknown>):Array<unknown> =>
             item.concat({}, GenericInput.transformer)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
