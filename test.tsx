@@ -331,9 +331,21 @@ describe('GenericInput', ():void => {
         ['10:10:00.000', 10 * 60 ** 2 + 10 * 60, {}],
         ['10:10:00.100', 10 * 60 ** 2 + 10 * 60 + 0.1, {}],
         ['10:10', 10 * 60 ** 2 + 10 * 60 + 0.1, {step: 60}],
+        ['08:00', Date.parse('1970-01-01T08:00:00.000Z') / 1000, {step: 60}],
         ['Infinitely far in the future', Infinity, {}],
         ['Infinitely early in the past', -Infinity, {}],
         ['', NaN, {}]
+    )
+    testEach<AnyFunction>(
+        'transformer.time.format.intermediate.transform',
+        GenericInput.transformer.time.format!.intermediate!.transform!,
+
+        [
+            '08:00',
+            Date.parse('1970-01-01T08:00:00.000Z') / 1000,
+            {step: 60},
+            GenericInput.transformer
+        ]
     )
     testEach<AnyFunction>(
         'transformer.time.parse', GenericInput.transformer.time.parse!,

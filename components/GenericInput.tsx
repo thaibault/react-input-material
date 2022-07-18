@@ -2525,36 +2525,49 @@ GenericInput.transformer = {
                     Date.parse(value as string) / 1000
     },
     time: {
-        format: {final: {transform: (
-            value:number, configuration:DefaultProperties<number>
-        ):string => {
-            value = typeof value === 'number' ? value : parseFloat(value)
+        format: {
+            final: {transform: (
+                value:number, configuration:DefaultProperties<number>
+            ):string => {
+                value = typeof value === 'number' ? value : parseFloat(value)
 
-            if (value === Infinity)
-                return 'Infinitely far in the future'
-            if (value === -Infinity)
-                return 'Infinitely early in the past'
-            if (!isFinite(value))
-                return ''
+                if (value === Infinity)
+                    return 'Infinitely far in the future'
+                if (value === -Infinity)
+                    return 'Infinitely early in the past'
+                if (!isFinite(value))
+                    return ''
 
-            let formattedValue:string =
-                (new Date(Math.round(value * 1000))).toISOString()
+                let formattedValue:string =
+                    (new Date(Math.round(value * 1000))).toISOString()
 
-            formattedValue = formattedValue.substring(
-                formattedValue.indexOf('T') + 1, formattedValue.length - 1
-            )
-
-            if (
-                configuration.step &&
-                configuration.step >= 60 &&
-                (configuration.step % 60) === 0
-            )
-                return formattedValue.substring(
-                    0, formattedValue.lastIndexOf(':')
+                formattedValue = formattedValue.substring(
+                    formattedValue.indexOf('T') + 1, formattedValue.length - 1
                 )
 
-            return formattedValue
-        }}},
+                if (
+                    configuration.step &&
+                    configuration.step >= 60 &&
+                    (configuration.step % 60) === 0
+                )
+                    return formattedValue.substring(
+                        0, formattedValue.lastIndexOf(':')
+                    )
+
+                return formattedValue
+            }},
+            intermediate: {transform: (
+                value:number,
+                configuration:DefaultProperties<number>,
+                transformer:InputDataTransformation
+            ):string =>
+                transformer.time.format?.final.transform ?
+                    transformer.time.format.final.transform(
+                        value, configuration, transformer
+                    ) :
+                    String(value)
+            }
+        },
         parse: (value:Date|number|string):number =>
             typeof value === 'number' ?
                 value :

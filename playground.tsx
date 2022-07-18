@@ -203,10 +203,11 @@ const Application:FunctionComponent = ():ReactElement => {
                 onChange={onChange}
                 type="date"
             />
-            <GenericInput<number>
-                initialValue={1}
+            <GenericInput<string>
+                initialValue="1970-01-01T08:00:00.000Z"
                 model={useMemorizedValue({name: 'input2Model', type: 'time'})}
                 onChange={onChange}
+                step={60}
             />
 
             <hr/>
@@ -226,7 +227,6 @@ const Application:FunctionComponent = ():ReactElement => {
                     type: 'time'
                 })}
                 onChange={onChange}
-                step={60}
             />
 
             <hr/>
