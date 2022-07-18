@@ -2470,6 +2470,7 @@ GenericInput.transformer = {
                 NaN,
         type: 'text'
     },
+
     date: {
         format: {final: {transform: (value:number):string => {
             value = typeof value === 'number' ? value : parseFloat(value)
@@ -2491,7 +2492,7 @@ GenericInput.transformer = {
                 value :
                 value instanceof Date ?
                     value.getTime() / 1000 :
-                    `${parseFloat(value)}` === value ?
+                    isNaN(Date.parse(value)) ?
                         parseFloat(value) :
                         Date.parse(value) / 1000
     },
@@ -2519,7 +2520,9 @@ GenericInput.transformer = {
         ):number =>
             transformer.date.parse ?
                 transformer.date.parse(value, configuration, transformer) :
-                Date.parse(value as string) / 1000
+                isNaN(Date.parse(value as string)) ?
+                    0 :
+                    Date.parse(value as string) / 1000
     },
     time: {
         format: {final: {transform: (
@@ -2557,24 +2560,26 @@ GenericInput.transformer = {
                 value :
                 value instanceof Date ?
                     value.getTime() / 1000 :
-                    parseFloat(value.replace(
-                        /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
-                        (
-                            _match:string,
-                            hour:string,
-                            minute:string,
-                            secondsSuffix?:string,
-                            seconds?:string,
-                            _millisecondsSuffix?:string
-                        ):string =>
-                            String(
-                                parseInt(hour) *
-                                60 ** 2 +
-                                parseInt(minute) *
-                                60 +
-                                (secondsSuffix ? parseFloat(seconds!) : 0)
-                            )
-                    ))
+                    isNaN(Date.parse(value)) ?
+                        parseFloat(value.replace(
+                            /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
+                            (
+                                _match:string,
+                                hour:string,
+                                minute:string,
+                                secondsSuffix?:string,
+                                seconds?:string,
+                                _millisecondsSuffix?:string
+                            ):string =>
+                                String(
+                                    parseInt(hour) *
+                                    60 ** 2 +
+                                    parseInt(minute) *
+                                    60 +
+                                    (secondsSuffix ? parseFloat(seconds!) : 0)
+                                )
+                        )) :
+                        Date.parse(value) / 1000
     },
 
     float: {
