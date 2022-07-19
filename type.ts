@@ -455,9 +455,9 @@ export type InputDataTransformation =
 
         currency:DataTransformSpecification<number, string>
 
-        date:DataTransformSpecification<number, number|string>
-        'datetime-local':DataTransformSpecification<number, number|string>
-        time:DataTransformSpecification<number, number|string>
+        date:DataTransformSpecification<number, Date|number|string>
+        'datetime-local':DataTransformSpecification<number, Date|number|string>
+        time:DataTransformSpecification<number, Date|number|string>
 
         float:DataTransformSpecification<number, string>
         integer:DataTransformSpecification<number, string>
@@ -581,7 +581,9 @@ export interface InputProperties<T = unknown> extends
         InputProperties['selection']|Promise<InputProperties['selection']>
     suggestSelection:boolean
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
-    transformer:RecursivePartial<DataTransformSpecification<T>>
+    transformer:RecursivePartial<DataTransformSpecification<
+        T, Date|number|string
+    >>
 }
 export type InputProps<T = unknown> =
     Partial<Omit<InputProperties<T>, 'model'>> &

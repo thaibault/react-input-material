@@ -1006,6 +1006,7 @@ export const GenericInputInner = function<Type = unknown>(
                 transformer,
                 /*
                     NOTE: Handle two cases:
+
                     1. Representation has to be determine initially
                        (-> usually no focus).
                     2. Representation was set from the outside
@@ -2472,8 +2473,26 @@ GenericInput.transformer = {
     },
 
     date: {
-        format: {final: {transform: (value:number):string => {
-            value = typeof value === 'number' ? value : parseFloat(value)
+        format: {final: {transform: (
+            value:Date|number|string,
+            configuration:DefaultProperties<number>,
+            transformer:InputDataTransformation
+        ):string => {
+            if (typeof value !== 'number')
+                if (transformer.date.parse)
+                    value = transformer.date.parse(
+                        value, configuration, transformer
+                    )
+                else {
+                    const parsedDate:number = value instanceof Date ?
+                        value.getTime() / 1000 :
+                        Date.parse(value)
+                    if (isNaN(parsedDate)) {
+                        const parsedFloat:number = parseFloat(value as string)
+                        value = isNaN(parsedFloat) ? 0 : parsedFloat
+                    } else
+                        value = parsedDate / 1000
+                }
 
             if (value === Infinity)
                 return 'Infinitely far in the future'
@@ -2487,19 +2506,47 @@ GenericInput.transformer = {
 
             return formattedValue.substring(0, formattedValue.indexOf('T'))
         }}},
-        parse: (value:Date|number|string):number =>
-            typeof value === 'number' ?
-                value :
-                value instanceof Date ?
-                    value.getTime() / 1000 :
-                    isNaN(Date.parse(value)) ?
-                        parseFloat(value) :
-                        Date.parse(value) / 1000
+        parse: (value:Date|number|string):number => {
+            if (typeof value === 'number')
+                return value
+
+            if (value instanceof Date)
+                return value.getTime() / 1000
+
+            const parsedDate:number = Date.parse(value)
+            if (isNaN(parsedDate)) {
+                const parsedFloat:number = parseFloat(value)
+                if (isNaN(parsedFloat))
+                    return 0
+
+                return parsedFloat
+            }
+
+            return parsedDate / 1000
+        }
     },
     // TODO respect local to utc conversion.
     'datetime-local': {
-        format: {final: {transform: (value:number):string => {
-            value = typeof value === 'number' ? value : parseFloat(value)
+        format: {final: {transform: (
+            value:Date|number|string,
+            configuration:DefaultProperties<number>,
+            transformer:InputDataTransformation
+        ):string => {
+            if (typeof value !== 'number')
+                if (transformer['datetime-local'].parse)
+                    value = transformer['datetime-local'].parse(
+                        value, configuration, transformer
+                    )
+                else {
+                    const parsedDate:number = value instanceof Date ?
+                        value.getTime() / 1000 :
+                        Date.parse(value)
+                    if (isNaN(parsedDate)) {
+                        const parsedFloat:number = parseFloat(value as string)
+                        value = isNaN(parsedFloat) ? 0 : parsedFloat
+                    } else
+                        value = parsedDate / 1000
+                }
 
             if (value === Infinity)
                 return 'Infinitely far in the future'
@@ -2514,22 +2561,53 @@ GenericInput.transformer = {
             return formattedValue.substring(0, formattedValue.length - 1)
         }}},
         parse: (
-            value:number|string,
+            value:Date|number|string,
             configuration:DefaultProperties<number>,
             transformer:InputDataTransformation
-        ):number =>
-            transformer.date.parse ?
-                transformer.date.parse(value, configuration, transformer) :
-                isNaN(Date.parse(value as string)) ?
-                    0 :
-                    Date.parse(value as string) / 1000
+        ):number => {
+            if (transformer.date.parse)
+                return transformer.date.parse(
+                    value, configuration, transformer
+                )
+
+            if (value instanceof Date)
+                return value.getTime() / 1000
+
+            const parsedDate:number = Date.parse(value as string)
+            if (isNaN(parsedDate)) {
+                const parsedFloat:number = parseFloat(value as string)
+                if (isNaN(parsedFloat))
+                    return 0
+
+                return parsedFloat
+            }
+
+            return parsedDate / 1000
+        }
     },
     time: {
         format: {
             final: {transform: (
-                value:number, configuration:DefaultProperties<number>
+                value:Date|number|string,
+                configuration:DefaultProperties<number>,
+                transformer:InputDataTransformation
             ):string => {
-                value = typeof value === 'number' ? value : parseFloat(value)
+                if (typeof value !== 'number')
+                    if (transformer.time.parse)
+                        value = transformer.time.parse(
+                            value, configuration, transformer
+                        )
+                    else {
+                        const parsedDate:number = value instanceof Date ?
+                            value.getTime() / 1000 :
+                            Date.parse(value)
+                        if (isNaN(parsedDate)) {
+                            const parsedFloat:number =
+                                parseFloat(value as string)
+                            value = isNaN(parsedFloat) ? 0 : parsedFloat
+                        } else
+                            value = parsedDate / 1000
+                    }
 
                 if (value === Infinity)
                     return 'Infinitely far in the future'
@@ -2555,44 +2633,44 @@ GenericInput.transformer = {
                     )
 
                 return formattedValue
-            }},
-            intermediate: {transform: (
-                value:number,
-                configuration:DefaultProperties<number>,
-                transformer:InputDataTransformation
-            ):string =>
-                transformer.time.format?.final.transform ?
-                    transformer.time.format.final.transform(
-                        value, configuration, transformer
-                    ) :
-                    String(value)
-            }
+            }}
         },
-        parse: (value:Date|number|string):number =>
-            typeof value === 'number' ?
-                value :
-                value instanceof Date ?
-                    value.getTime() / 1000 :
-                    isNaN(Date.parse(value)) ?
-                        parseFloat(value.replace(
-                            /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
-                            (
-                                _match:string,
-                                hour:string,
-                                minute:string,
-                                secondsSuffix?:string,
-                                seconds?:string,
-                                _millisecondsSuffix?:string
-                            ):string =>
-                                String(
-                                    parseInt(hour) *
-                                    60 ** 2 +
-                                    parseInt(minute) *
-                                    60 +
-                                    (secondsSuffix ? parseFloat(seconds!) : 0)
-                                )
-                        )) :
-                        Date.parse(value) / 1000
+        parse: (value:Date|number|string):number => {
+            if (typeof value === 'number')
+                return value
+
+            if (value instanceof Date)
+                return value.getTime() / 1000
+
+            const parsedDate:number = Date.parse(value)
+            if (isNaN(parsedDate)) {
+                const parsedFloat:number = parseFloat(value.replace(
+                    /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
+                    (
+                        _match:string,
+                        hour:string,
+                        minute:string,
+                        secondsSuffix?:string,
+                        seconds?:string,
+                        _millisecondsSuffix?:string
+                    ):string =>
+                        String(
+                            parseInt(hour) *
+                            60 ** 2 +
+                            parseInt(minute) *
+                            60 +
+                            (secondsSuffix ? parseFloat(seconds!) : 0)
+                        )
+                ))
+
+                if (isNaN(parsedFloat))
+                    return 0
+
+                return parsedFloat
+            }
+
+            return parsedDate / 1000
+        }
     },
 
     float: {

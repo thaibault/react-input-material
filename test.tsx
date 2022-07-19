@@ -337,17 +337,6 @@ describe('GenericInput', ():void => {
         ['', NaN, {}]
     )
     testEach<AnyFunction>(
-        'transformer.time.format.intermediate.transform',
-        GenericInput.transformer.time.format!.intermediate!.transform!,
-
-        [
-            '08:00',
-            Date.parse('1970-01-01T08:00:00.000Z') / 1000,
-            {step: 60},
-            GenericInput.transformer
-        ]
-    )
-    testEach<AnyFunction>(
         'transformer.time.parse', GenericInput.transformer.time.parse!,
 
         ...([

@@ -288,7 +288,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 model={useMemorizedValue({
                     declaration: 'pattern',
                     description: 'input6ModelDescription',
-                    regularExpressionPattern: ['.*a+.*', /.*b+.*/]
+                    regularExpressionPattern: ['.*a+.*', /.*b+(.*)/]
                 })}
                 name="input6Model"
                 onChange={onChange}
