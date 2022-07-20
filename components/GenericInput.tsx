@@ -195,7 +195,6 @@ export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
         'fullscreen',
         'link',
         'code',
-        'hr',
         'nonbreaking',
         'searchreplace',
         'visualblocks'
@@ -213,7 +212,7 @@ export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
     `.trim(),
     toolbar2: `
         alignleft aligncenter alignright alignjustify outdent indent |
-        link hr nonbreaking bullist numlist bold italic underline strikethrough
+        link nonbreaking bullist numlist bold italic underline strikethrough
     `.trim(),
     trim: true
     /* eslint-enable camelcase */
