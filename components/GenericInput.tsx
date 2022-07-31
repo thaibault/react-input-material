@@ -2142,6 +2142,7 @@ export const GenericInputInner = function<Type = unknown>(
                                     <Suspense fallback={
                                         <CircularProgress size="large" />
                                     }>
+                                        {/*TODO prevent on key enter propagation!*/}
                                         <CodeEditor
                                             {...genericProperties as
                                                 CodeEditorProps
