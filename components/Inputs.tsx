@@ -84,7 +84,7 @@ const getPrototype = function<T, P>(
         ...defaultProperties as unknown as Partial<P>,
         className: CSS_CLASS_NAMES.inputs__item__input,
         ...(properties.default && properties.default.length > 0 ?
-            properties.default[0] :
+            properties.default[properties.default.length - 1] :
             {}
         )
     } as Partial<P>
