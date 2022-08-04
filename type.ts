@@ -85,7 +85,7 @@ export interface GenericEvent<T = unknown> extends SyntheticEvent {
 }
 export interface TestEnvironment {
     container:HTMLDivElement|null
-    render:<T = HTMLElement>(_component:ReactElement) => null|T
+    render:<T = HTMLElement>(component:ReactElement) => null|T
 }
 export interface CursorState {
     end:number
@@ -167,20 +167,20 @@ export type DefaultBaseProperties =
 export interface TypedProperties<T = unknown> extends BaseProperties {
     initialValue:null|T
     model:Model<T>
-    onBlur:(_event:GenericEvent|undefined, _properties:this) => void
-    onChange:(_properties:this, _event?:GenericEvent) => void
+    onBlur:(event:GenericEvent|undefined, properties:this) => void
+    onChange:(properties:this, event?:GenericEvent) => void
     onChangeShowDeclaration:(
-        _show:boolean, _event:GenericEvent|undefined, _properties:this
+        show:boolean, event:GenericEvent|undefined, properties:this
     ) => void
     onChangeState:(
-        _state:ModelState, _event:GenericEvent|undefined, _properties:this
+        state:ModelState, event:GenericEvent|undefined, properties:this
     ) => void
     onChangeValue:(
-        _value:null|T, _event:GenericEvent|undefined, _properties:this
+        value:null|T, event:GenericEvent|undefined, properties:this
     ) => void
-    onClick:(_event:MouseEvent, _properties:this) => void
-    onFocus:(_event:FocusEvent, _properties:this) => void
-    onTouch:(_event:GenericEvent, _properties:this) => void
+    onClick:(event:MouseEvent, properties:this) => void
+    onFocus:(event:FocusEvent, properties:this) => void
+    onTouch:(event:GenericEvent, properties:this) => void
 }
 export type Properties<T = unknown> = TypedProperties<T> & CommonModel<T>
 export type Props<T = unknown> =
@@ -226,7 +226,7 @@ export interface InputComponent<
     Omit<ForwardRefExoticComponent<P>, 'propTypes'>,
     StaticWebComponent<MS, DP>
 {
-    (_props:P & RefAttributes<A>):ReactElement
+    (props:P & RefAttributes<A>):ReactElement
 }
 //// region constants
 export const baseModelPropertyTypes:ValidationMapping = {
@@ -260,7 +260,7 @@ export const baseModelPropertyTypes:ValidationMapping = {
     value: any
 } as const
 export const modelStatePropertyTypes:{
-    [_key in keyof ModelState]:Requireable<boolean|symbol>
+    [key in keyof ModelState]:Requireable<boolean|symbol>
 } = {
     dirty: oneOfType([boolean, symbol]),
     pristine: oneOfType([boolean, symbol]),
@@ -465,7 +465,7 @@ export type InputDataTransformation =
 
         string?:DataTransformSpecification<unknown>
     } &
-    {[_key in Exclude<
+    {[key in Exclude<
         NativeInputType, 'date'|'datetime-local'|'time'|'number'
     >]?:DataTransformSpecification<unknown>}
 //// endregion
@@ -528,7 +528,7 @@ export interface InputProperties<T = unknown> extends
     InputModelState, Properties<T>
 {
     align:'end'|'start'
-    children:(_options:InputChildrenOptions<this, T>) => null|ReactElement
+    children:(options:InputChildrenOptions<this, T>) => null|ReactElement
     cursor:CursorState
     /*
         plain -> input field
@@ -563,12 +563,12 @@ export interface InputProperties<T = unknown> extends
     minimumText:string
     model:InputModel<T>
     onChangeEditorIsActive:(
-        _isActive:boolean, _event:MouseEvent|undefined, _properties:this
+        isActive:boolean, event:MouseEvent|undefined, properties:this
     ) => void
-    onKeyDown:(_event:KeyboardEvent, _properties:this) => void
-    onKeyUp:(_event:KeyboardEvent, _properties:this) => void
-    onSelect:(_event:GenericEvent, _properties:this) => void
-    onSelectionChange:(_event:GenericEvent, _properties:this) => void
+    onKeyDown:(event:KeyboardEvent, properties:this) => void
+    onKeyUp:(event:KeyboardEvent, properties:this) => void
+    onSelect:(event:GenericEvent, properties:this) => void
+    onSelectionChange:(event:GenericEvent, properties:this) => void
     outlined:boolean
     patternText:string
     placeholder:string
@@ -577,7 +577,7 @@ export interface InputProperties<T = unknown> extends
     searchSelection:boolean
     selectableEditor:boolean
     step:number
-    suggestionCreator?:(_options:SuggestionCreatorOptions<this>) =>
+    suggestionCreator?:(options:SuggestionCreatorOptions<this>) =>
         InputProperties['selection']|Promise<InputProperties['selection']>
     suggestSelection:boolean
     trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
@@ -593,7 +593,7 @@ export type DefaultInputProperties<T = string> =
     Omit<InputProps<T>, 'model'> & {model:InputModel<T>}
 
 export type InputPropertyTypes<T = unknown> = {
-    [_key in keyof InputProperties<T>]:ValueOf<typeof PropertyTypes>
+    [key in keyof InputProperties<T>]:ValueOf<typeof PropertyTypes>
 }
 
 export interface InputState<T = unknown> extends State<T> {
@@ -647,7 +647,7 @@ export interface GenericInputComponent extends
     StaticWebComponent<InputModelState, DefaultInputProperties>
 {
     <T = string>(
-        _props:InputProps<T> & RefAttributes<InputAdapter<T>>
+        props:InputProps<T> & RefAttributes<InputAdapter<T>>
     ):ReactElement
 
     locales:Array<string>
@@ -655,7 +655,7 @@ export interface GenericInputComponent extends
 }
 //// region constants
 export const inputModelStatePropertyTypes:{
-    [_key in keyof InputModelState]:Requireable<boolean|symbol>
+    [key in keyof InputModelState]:Requireable<boolean|symbol>
 } = {
     ...modelStatePropertyTypes,
 
@@ -832,7 +832,7 @@ export interface FileInputChildrenOptions<P> {
 export interface FileInputProperties extends
     Properties<FileValue>, FileInputModelState
 {
-    children:(_options:FileInputChildrenOptions<this>) => null|ReactElement
+    children:(options:FileInputChildrenOptions<this>) => null|ReactElement
 
     contentTypePattern:Array<RegExp|string>|null|RegExp|string
     invertedContentTypePattern:Array<RegExp|string>|null|RegExp|string
@@ -850,8 +850,8 @@ export interface FileInputProperties extends
     encoding:string
 
     generateFileNameInputProperties:(
-        _prototype:InputProps<string>,
-        _properties:this & {value:FileValue & {name:string}}
+        prototype:InputProps<string>,
+        properties:this & {value:FileValue & {name:string}}
     ) => InputProps<string>
 
     media:CardMediaProps
@@ -873,7 +873,7 @@ export type DefaultFileInputProperties =
     Omit<FileInputProps, 'model'> & {model:FileInputModel}
 
 export type FileInputPropertyTypes = {
-    [_key in keyof FileInputProperties]:ValueOf<typeof PropertyTypes>
+    [key in keyof FileInputProperties]:ValueOf<typeof PropertyTypes>
 }
 
 export interface FileInputState extends State<FileValue> {
@@ -902,7 +902,7 @@ export type FileInputComponent = InputComponent<
 >
 //// region constants
 export const fileInputModelStatePropertyTypes:{
-    [_key in keyof FileInputModelState]:Requireable<boolean|symbol>
+    [key in keyof FileInputModelState]:Requireable<boolean|symbol>
 } = {
     ...modelStatePropertyTypes,
 
@@ -1071,9 +1071,9 @@ export interface InputsProperties<
     addIcon:IconOptions
     removeIcon:IconOptions
 
-    children:(_options:InputsChildrenOptions<T, P, this>) => ReactElement
+    children:(options:InputsChildrenOptions<T, P, this>) => ReactElement
 
-    createPrototype:(_options:InputsCreatePrototypeOptions<T, P, this>) => P
+    createPrototype:(options:InputsCreatePrototypeOptions<T, P, this>) => P
 
     maximumNumber:number
     minimumNumber:number
@@ -1081,9 +1081,7 @@ export interface InputsProperties<
     model:InputsModel<T, P>
 
     onChangeValue:(
-        _values:Array<null|T>|null,
-        _event:GenericEvent|unknown,
-        _properties:this
+        values:Array<null|T>|null, event:GenericEvent|unknown, properties:this
     ) => void
 
     value:Array<P>|null
@@ -1108,7 +1106,7 @@ export type DefaultInputsProperties<
 export type InputsPropertyTypes<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
 > = {
-    [_key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
+    [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
 }
 
 export type InputsState<T = unknown> = State<Array<null|T|undefined>>
@@ -1127,7 +1125,7 @@ export interface InputsComponent extends
     StaticWebComponent<InputsModelState, DefaultInputsProperties>
 {
     <T = string, P extends InputsPropertiesItem<T> = InputProperties<T>>(
-        _props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
+        props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
     ):ReactElement
 }
 //// region constants
@@ -1204,8 +1202,8 @@ export interface IntervalProperties extends Omit<
 
     model:IntervalModel
 
-    onChange:(_properties:this, _event?:GenericEvent) => void
-    onChangeValue:(_value:null|IntervalValue, _event?:GenericEvent) => void
+    onChange:(properties:this, event?:GenericEvent) => void
+    onChangeValue:(value:null|IntervalValue, event?:GenericEvent) => void
 
     value:IntervalConfiguration
 }
@@ -1231,7 +1229,7 @@ export type DefaultIntervalProperties =
     Omit<IntervalProps, 'model'> & {model:IntervalModel}
 
 export type IntervalPropertyTypes = {
-    [_key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
+    [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
 }
 
 export type IntervalAdapter =
