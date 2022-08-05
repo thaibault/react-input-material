@@ -348,10 +348,10 @@ export const InputsInner = function<
         properties.value[index] = Tools.extend<P>(
             true,
             {
-                ...properties.createPrototype({
+                ...properties.createItem({
                     index,
+                    item: Tools.copy(getPrototype<T, P>(properties)),
                     properties,
-                    prototype: Tools.copy(getPrototype<T, P>(properties)),
                     values
                 }),
                 ...properties.value[index],
@@ -429,8 +429,9 @@ export const InputsInner = function<
     ):Array<null|T|undefined> => {
         const newProperties:Partial<P> = properties.createPrototype({
             index: values?.length || 0,
+            item: getPrototype<T, P>(properties),
+            lastValue: values?.length ? values[values.length - 1] : null,
             properties,
-            prototype: getPrototype<T, P>(properties),
             values
         })
 
@@ -518,11 +519,12 @@ export const InputsInner = function<
                     {renderInput(
                         properties.createPrototype({
                             index: 0,
-                            properties,
-                            prototype: {
+                            item: {
                                 ...getPrototype<T, P>(properties),
                                 disabled: true
                             },
+                            lastValue: null,
+                            properties,
                             values
                         }),
                         0

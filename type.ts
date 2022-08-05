@@ -1034,13 +1034,20 @@ export interface InputsPropertiesItem<T, TS = unknown> {
     }
     value?:null|T
 }
-export interface InputsCreatePrototypeOptions<
-    T, P extends InputsPropertiesItem<T>, IP
-> {
+export interface InputsCreateOptions<T, IP> {
     index:number
     properties:IP
-    prototype:Partial<P>
     values:Array<null|T|undefined>|null
+}
+export interface InputsCreateItemOptions<
+    T, P extends InputsPropertiesItem<T>, IP
+> extends InputsCreateOptions<T, IP> {
+    item:Partial<P>
+}
+export interface InputsCreatePrototypeOptions<
+    T, P extends InputsPropertiesItem<T>, IP
+> extends InputsCreateItemOptions<T, P, IP> {
+    lastValue:null|T|undefined
 }
 
 export interface InputsModelState extends ModelState {
@@ -1073,6 +1080,7 @@ export interface InputsProperties<
 
     children:(options:InputsChildrenOptions<T, P, this>) => ReactElement
 
+    createItem:(options:InputsCreateItemOptions<T, P, this>) => P
     createPrototype:(options:InputsCreatePrototypeOptions<T, P, this>) => P
 
     maximumNumber:number
@@ -1135,13 +1143,14 @@ export const inputsPropertyTypes:PropertiesValidationMap = {
     // We use that function (render prop) to produce input component instances.
     children: func,
 
+    createItem: func,
     createPrototype: func,
 
     maximumNumber: number,
     minimumNumber: number
 } as const
 export const inputsRenderProperties:Array<string> =
-    ['children', 'createPrototype']
+    ['children', 'createItem', 'createPrototype']
 export const defaultInputsModel:InputsModel<string, InputProperties<string>> = {
     ...defaultModel as InputsModel<string, InputProperties<string>>,
 
@@ -1167,7 +1176,8 @@ export const defaultInputsProperties:DefaultInputsProperties = {
     addIcon: {icon: 'add'},
     removeIcon: {icon: 'clear'},
 
-    createPrototype: ({prototype}):InputProps<string> => prototype,
+    createItem: ({item}):InputProps<string> => item,
+    createPrototype: ({item}):InputProps<string> => item,
 
     model: {...defaultInputsModel}
 } as const
