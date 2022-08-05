@@ -2343,9 +2343,9 @@ export const GenericInputInner = function<Type = unknown>(
                         ripple={properties.ripple}
                         rootProps={{
                             name: properties.name,
-                            onClick: onClick,
-                            onKeyDown: onKeyDown,
-                            onKeyUp: onKeyUp,
+                            onClick,
+                            onKeyDown,
+                            onKeyUp,
                             ...properties.rootProps
                         }}
                         textarea={
