@@ -72,7 +72,7 @@ Plain CSS:
 .generic-input {
     display: block;
 }
-
+/* stylelint-disable selector-class-pattern */
 .generic-input .ace_editor,
 .generic-input .tox-tinymce {
     border-radius: 0;
@@ -81,6 +81,7 @@ Plain CSS:
     margin-left: -4px;
     margin-right: 4px;
 }
+/* stylelint-enable selector-class-pattern */
 
 .generic-input .tox-tinymce {
     border-width: 1px;

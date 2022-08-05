@@ -2108,6 +2108,7 @@ export const GenericInputInner = function<Type = unknown>(
                             )
                             .join(' ')
                         }
+                        onKeyDown={preventEnterKeyPropagation}
                         key="advanced-editor-form-field"
                     >
                         <label>
@@ -2142,7 +2143,6 @@ export const GenericInputInner = function<Type = unknown>(
                                     <Suspense fallback={
                                         <CircularProgress size="large" />
                                     }>
-                                        {/*TODO prevent on key enter propagation!*/}
                                         <CodeEditor
                                             {...genericProperties as
                                                 CodeEditorProps

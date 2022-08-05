@@ -20,7 +20,12 @@
 import Tools from 'clientnode'
 import {Mapping, UnknownFunction} from 'clientnode/type'
 import {
-    FunctionComponent, ReactElement, ReactNode, useEffect, useState
+    FunctionComponent,
+    KeyboardEvent,
+    ReactElement,
+    ReactNode,
+    useEffect,
+    useState
 } from 'react'
 import {createRoot} from 'react-dom/client'
 
@@ -105,7 +110,15 @@ const Application:FunctionComponent = ():ReactElement => {
         useMemorizedValue<(_values:Array<null|string>|null) => void>(setValue7)
     // endregion
     return (<>
-        <div className="playground__inputs">
+        <div
+            className="playground__inputs"
+            onKeyDown={useMemorizedValue((
+                event:KeyboardEvent<HTMLDivElement>
+            ):void => {
+                if (Tools.keyCode.ENTER === event.keyCode)
+                    console.warn('Enter key propagated!')
+            })}
+        >
             <FileInput onChange={onChange} />
             <FileInput
                 default={useMemorizedValue(
@@ -846,9 +859,9 @@ const Application:FunctionComponent = ():ReactElement => {
             <hr/>
 
             <Inputs<FileValue, FileInputProps>
-                createPrototype={useMemorizedValue(
-                    ({index, properties: {name}, prototype}):FileInputProps =>
-                        ({...prototype, name: `${name}-${index + 1}`})
+                createItem={useMemorizedValue(
+                    ({index, item, properties: {name}}):FileInputProps =>
+                        ({...item, name: `${name}-${index + 1}`})
                 )}
                 model={useMemorizedValue({
                     default: [{name: 'inputs1-1'}], name: 'inputs1'
@@ -861,9 +874,9 @@ const Application:FunctionComponent = ():ReactElement => {
                 )}
             </Inputs>
             <Inputs<boolean, CheckboxProps>
-                createPrototype={useMemorizedValue(
-                    ({index, properties: {name}, prototype}):CheckboxProps =>
-                        ({...prototype, name: `${name}-${index + 1}`})
+                createItem={useMemorizedValue(
+                    ({index, item, properties: {name}}):CheckboxProps =>
+                        ({...item, name: `${name}-${index + 1}`})
                 )}
                 maximumNumber={2}
                 minimumNumber={2}
@@ -883,9 +896,9 @@ const Application:FunctionComponent = ():ReactElement => {
                 )}
             </Inputs>
             <Inputs<IntervalConfiguration|IntervalValue, IntervalProps>
-                createPrototype={useMemorizedValue(
-                    ({index, properties: {name}, prototype}):IntervalProps =>
-                        ({...prototype, name: `${name}-${index + 1}`})
+                createItem={useMemorizedValue(
+                    ({index, item, properties: {name}}):IntervalProps =>
+                        ({...item, name: `${name}-${index + 1}`})
                 )}
                 model={useMemorizedValue({
                     default: [{
