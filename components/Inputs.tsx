@@ -348,12 +348,6 @@ export const InputsInner = function<
         properties.value[index] = Tools.extend<P>(
             true,
             {
-                ...properties.createPrototype({
-                    index,
-                    properties,
-                    prototype: Tools.copy(getPrototype<T, P>(properties)),
-                    values
-                }),
                 ...properties.value[index],
                 onChange: (inputProperties:P, event?:GenericEvent):void =>
                     triggerOnChange(
