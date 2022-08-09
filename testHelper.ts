@@ -20,12 +20,12 @@
 import {afterEach, beforeEach} from '@jest/globals'
 import {globalContext} from 'clientnode'
 import {$Global} from 'clientnode/type'
-import {ReactElement} from 'react'
+import {createElement, FunctionComponent, ReactElement} from 'react'
 import {flushSync} from 'react-dom'
 import {createRoot, Root as ReactRoot} from 'react-dom/client'
 import {act} from 'react-dom/test-utils'
 
-import {TestEnvironment} from './type'
+import {TestEnvironment, TestHookResult} from './type'
 // endregion
 ;(globalContext as $Global & {IS_REACT_ACT_ENVIRONMENT:boolean})
     .IS_REACT_ACT_ENVIRONMENT = true
@@ -57,6 +57,42 @@ export const prepareTestEnvironment = (
                     result.container.childNodes[0] :
                     result.container
             ) as unknown as T
+        },
+        runHook: <R = unknown, P extends Array<unknown> = Array<unknown>>(
+            hook:(...parameters:P) => R,
+            parameters:P = [] as unknown as P,
+            flush = true
+        ):TestHookResult<R, P> => {
+            const hookResult:{result:R} = {} as unknown as {result:R}
+
+            const TestComponent:FunctionComponent<{parameters:P}> = (
+                {parameters}
+            ):null => {
+                hookResult.result = hook(...parameters)
+
+                return null
+            }
+
+            const render = (...parameters:P):void => {
+                const component =
+                    createElement<{parameters:P}>(TestComponent, {parameters})
+
+                act(():void => {
+                    if (root)
+                        if (flush)
+                            flushSync(():void => root!.render(component))
+                        else
+                            root.render(component)
+                    else
+                        console.error(
+                            'You call "render" outside a testing context.'
+                        )
+                })
+            }
+
+            render(...parameters)
+
+            return {result: hookResult, render}
         }
     }
 
