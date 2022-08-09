@@ -37,11 +37,8 @@ import {
     normalizeSelection
 } from './helper'
 import prepareTestEnvironment from './testHelper'
-import {TestEnvironment} from './type'
 // endregion
-const testEnvironment:TestEnvironment =
-    prepareTestEnvironment(beforeEach, afterEach)
-const {render} = testEnvironment
+const {render} = prepareTestEnvironment(beforeEach, afterEach)
 // region FileInput
 describe('FileInput', ():void => {
     test('render', ():void => {
