@@ -83,9 +83,18 @@ export type DummyProps = Mapping<unknown> & {children?:ReactElement}
 export interface GenericEvent<T = unknown> extends SyntheticEvent {
     detail?:T
 }
+export interface TestHookResult<
+    R = unknown, P extends Array<unknown> = Array<unknown>
+> {
+    result:{result:R}
+    render:(...parameters:P) => void
+}
 export interface TestEnvironment {
     container:HTMLDivElement|null
     render:<T = HTMLElement>(component:ReactElement) => null|T
+    runHook:<R = unknown, P extends Array<unknown> = Array<unknown>>(
+        hook:(...parameters:P) => R, parameters:P, flush:boolean
+    ) => TestHookResult<R, P>
 }
 export interface CursorState {
     end:number
