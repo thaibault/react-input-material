@@ -38,6 +38,7 @@ import {
     FocusEvent,
     ForwardRefExoticComponent,
     FunctionComponent,
+    FunctionComponentElement,
     HTMLProps,
     KeyboardEvent,
     MouseEvent,
@@ -83,9 +84,14 @@ export type DummyProps = Mapping<unknown> & {children?:ReactElement}
 export interface GenericEvent<T = unknown> extends SyntheticEvent {
     detail?:T
 }
-export interface TestHookWrapper<C = unknown, P = unknown> {
-    component:C
-    properties?:P
+export interface TestHookWrapper<
+    P extends Array<unknown> = Array<unknown>,
+    WP extends {children:FunctionComponentElement<{parameters:P}>} = {
+        children:FunctionComponentElement<{parameters:P}>
+    }
+> {
+    component:FunctionComponent<WP>
+    properties?:WP
 }
 export interface TestHookResult<
     R = unknown, P extends Array<unknown> = Array<unknown>
@@ -99,12 +105,13 @@ export interface TestEnvironment {
     runHook:<
         R = unknown,
         P extends Array<unknown> = Array<unknown>,
-        WC = unknown,
-        WP = unknown
+        WP extends {children:FunctionComponentElement<{parameters:P}>} = {
+            children:FunctionComponentElement<{parameters:P}>
+        }
     >(
         hook:(...parameters:P) => R,
         parameters:P,
-        wrapper:null|TestHookWrapper<WC, WP>,
+        wrapper:null|TestHookWrapper<P, WP>,
         flush:boolean
     ) => TestHookResult<R, P>
 }

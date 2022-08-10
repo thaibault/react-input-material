@@ -20,7 +20,9 @@
 import {afterEach, beforeEach} from '@jest/globals'
 import {globalContext} from 'clientnode'
 import {$Global} from 'clientnode/type'
-import {createElement, FunctionComponent, ReactElement} from 'react'
+import {
+    createElement, FunctionComponent, FunctionComponentElement, ReactElement
+} from 'react'
 import {flushSync} from 'react-dom'
 import {createRoot, Root as ReactRoot} from 'react-dom/client'
 import {act} from 'react-dom/test-utils'
@@ -61,12 +63,13 @@ export const prepareTestEnvironment = (
         runHook: <
             R = unknown,
             P extends Array<unknown> = Array<unknown>,
-            WC = unknown,
-            WP = unknown
+            WP extends {children:FunctionComponentElement<{parameters:P}>} = {
+                children:FunctionComponentElement<{parameters:P}>
+            }
         >(
             hook:(...parameters:P) => R,
             parameters:P = [] as unknown as P,
-            wrapper:null|TestHookWrapper<WC, WP> = null,
+            wrapper:null|TestHookWrapper<P, WP> = null,
             flush = true
         ):TestHookResult<R, P> => {
             const hookResult:{result:R} = {} as unknown as {result:R}
@@ -80,12 +83,15 @@ export const prepareTestEnvironment = (
             }
 
             const render = (...parameters:P):void => {
-                let component =
-                    createElement<{parameters:P}>(TestComponent, {parameters})
+                let component:(
+                    FunctionComponentElement<{parameters:P}> |
+                    FunctionComponentElement<WP>
+                ) = createElement<{parameters:P}>(TestComponent, {parameters})
                 if (wrapper)
-                    component = createElement(
+                    component = createElement<WP>(
                         wrapper.component,
-                        {...(wrapper.properties || {}), children: component}
+                        {...(wrapper.properties || {}), children: component} as
+                            WP
                     )
 
                 act(():void => {
