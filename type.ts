@@ -99,6 +99,16 @@ export interface TestHookResult<
     result:{value:R}
     render:(...parameters:P) => void
 }
+export interface HookOptions<
+    P extends Array<unknown> = Array<unknown>,
+    WP extends {children:FunctionComponentElement<{parameters:P}>} = {
+        children:FunctionComponentElement<{parameters:P}>
+    }
+> {
+    parameters:P,
+    wrapper?:null|TestHookWrapper<P, WP>,
+    flush?:boolean
+}
 export interface TestEnvironment {
     container:HTMLDivElement|null
     render:<T = HTMLElement>(component:ReactElement) => null|T
@@ -108,12 +118,8 @@ export interface TestEnvironment {
         WP extends {children:FunctionComponentElement<{parameters:P}>} = {
             children:FunctionComponentElement<{parameters:P}>
         }
-    >(
-        hook:(...parameters:P) => R,
-        parameters:P,
-        wrapper?:null|TestHookWrapper<P, WP>,
-        flush?:boolean
-    ) => TestHookResult<R, P>
+    >(hook:(...parameters:P) => R, options:Partial<HookOptions<P, WP>>) =>
+        TestHookResult<R, P>
 }
 export interface CursorState {
     end:number
