@@ -27,7 +27,7 @@ import {flushSync} from 'react-dom'
 import {createRoot, Root as ReactRoot} from 'react-dom/client'
 import {act} from 'react-dom/test-utils'
 
-import {TestEnvironment, TestHookResult, TestHookWrapper} from './type'
+import {HookOptions, TestEnvironment, TestHookResult} from './type'
 // endregion
 ;(globalContext as $Global & {IS_REACT_ACT_ENVIRONMENT:boolean})
     .IS_REACT_ACT_ENVIRONMENT = true
@@ -68,10 +68,14 @@ export const prepareTestEnvironment = (
             }
         >(
             hook:(...parameters:P) => R,
-            parameters:P = [] as unknown as P,
-            wrapper:null|TestHookWrapper<P, WP> = null,
-            flush = true
+            givenOptions:Partial<HookOptions<P, WP>> = {}
         ):TestHookResult<R, P> => {
+            const options:HookOptions<P, WP> = {
+                flush: true,
+                parameters: [] as unknown as P,
+                wrapper: null,
+                ...givenOptions
+            }
             const hookResult:{value:R} = {} as unknown as {value:R}
 
             const TestComponent:FunctionComponent<{parameters:P}> = (
@@ -87,16 +91,18 @@ export const prepareTestEnvironment = (
                     FunctionComponentElement<{parameters:P}> |
                     FunctionComponentElement<WP>
                 ) = createElement<{parameters:P}>(TestComponent, {parameters})
-                if (wrapper)
+                if (options.wrapper)
                     component = createElement<WP>(
-                        wrapper.component,
-                        {...(wrapper.properties || {}), children: component} as
-                            WP
+                        options.wrapper.component,
+                        {
+                            ...(options.wrapper.properties || {}),
+                            children: component
+                        } as WP
                     )
 
                 act(():void => {
                     if (root)
-                        if (flush)
+                        if (options.flush)
                             flushSync(():void => root!.render(component))
                         else
                             root.render(component)
@@ -107,7 +113,7 @@ export const prepareTestEnvironment = (
                 })
             }
 
-            render(...parameters)
+            render(...options.parameters)
 
             return {result: hookResult, render}
         }

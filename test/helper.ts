@@ -103,8 +103,9 @@ describe('helper', ():void => {
     test('useMemorizedValue', ():void => {
         // Simple forward primitive value.
         expect(
-            runHook<string, [string]>(useMemorizedValue, ['value'])
-                .result.value
+            runHook<string, [string]>(
+                useMemorizedValue, {parameters: ['value']}
+            ).result.value
         ).toStrictEqual('value')
 
         /*
@@ -115,7 +116,7 @@ describe('helper', ():void => {
         const hookResult:TestHookResult<
             Mapping<number>, [Mapping<number>, boolean]
         > = runHook<Mapping<number>, [Mapping<number>, boolean]>(
-            useMemorizedValue, [testObject, true]
+            useMemorizedValue, {parameters: [testObject, true]}
         )
 
         // Simple forward object reference.
