@@ -14,18 +14,35 @@
     endregion
 */
 // region imports
-import {describe, expect, test} from '@jest/globals'
+import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
 import {testEach} from 'clientnode/testHelper'
+import {Mapping} from 'clientnode/type'
 
 import {
     determineInitialValue,
     getLabelAndValues,
     getRepresentationFromValueSelection,
     getValueFromSelection,
-    normalizeSelection
+    normalizeSelection,
+    useMemorizedValue
 } from '../helper'
+import prepareTestEnvironment from '../testHelper'
+import {TestHookResult} from '../type'
 // endregion
+const {runHook} = prepareTestEnvironment(beforeEach, afterEach)
+
 describe('helper', ():void => {
+    // region consolidate state
+    test('determineInitialValue', ():void => {
+        expect(
+            determineInitialValue({model: {default: true}}, false)
+        ).toStrictEqual(true)
+        expect(
+            determineInitialValue({model: {default: true, value: null}}, false)
+        ).toStrictEqual(null)
+    })
+    // endregion
+    // region value transformer
     testEach<typeof getLabelAndValues>(
         'getLabelAndValues',
         getLabelAndValues,
@@ -81,14 +98,45 @@ describe('helper', ():void => {
             {false: 'NEIN', true: 'JA'}
         ]
     )
-    test('determineInitialValue', ():void => {
+    // endregion
+    // region hooks
+    test('useMemorizedValue', ():void => {
+        // Simple forward primitive value.
         expect(
-            determineInitialValue({model: {default: true}}, false)
-        ).toStrictEqual(true)
-        expect(
-            determineInitialValue({model: {default: true, value: null}}, false)
-        ).toStrictEqual(null)
+            runHook<string, [string]>(useMemorizedValue, ['value'])
+                .result.value
+        ).toStrictEqual('value')
+
+        /*
+            Prepare hook with mutable object as parameter and boolean change
+            trigger.
+        */
+        const testObject:Mapping<number> = {content: 1}
+        const hookResult:TestHookResult<
+            Mapping<number>, [Mapping<number>, boolean]
+        > = runHook<Mapping<number>, [Mapping<number>, boolean]>(
+            useMemorizedValue, [testObject, true]
+        )
+
+        // Simple forward object reference.
+        expect(hookResult.result.value).toStrictEqual(testObject)
+
+        /*
+            Do not update object since dependencies / change trigger is still
+            "true".
+        */
+        hookResult.render({content: 2}, true)
+        expect(hookResult.result.value).toStrictEqual(testObject)
+
+        /*
+            Do update object since dependencies / change trigger is still
+            "false" now.
+        */
+        hookResult.render({content: 2}, false)
+        expect(hookResult.result.value).not.toStrictEqual(testObject)
+        expect(hookResult.result.value).toStrictEqual({content: 2})
     })
+    // endregion
 })
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

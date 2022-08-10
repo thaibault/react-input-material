@@ -96,7 +96,7 @@ export interface TestHookWrapper<
 export interface TestHookResult<
     R = unknown, P extends Array<unknown> = Array<unknown>
 > {
-    result:{result:R}
+    result:{value:R}
     render:(...parameters:P) => void
 }
 export interface TestEnvironment {
@@ -111,8 +111,8 @@ export interface TestEnvironment {
     >(
         hook:(...parameters:P) => R,
         parameters:P,
-        wrapper:null|TestHookWrapper<P, WP>,
-        flush:boolean
+        wrapper?:null|TestHookWrapper<P, WP>,
+        flush?:boolean
     ) => TestHookResult<R, P>
 }
 export interface CursorState {
