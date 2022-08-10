@@ -72,12 +72,12 @@ export const prepareTestEnvironment = (
             wrapper:null|TestHookWrapper<P, WP> = null,
             flush = true
         ):TestHookResult<R, P> => {
-            const hookResult:{result:R} = {} as unknown as {result:R}
+            const hookResult:{value:R} = {} as unknown as {value:R}
 
             const TestComponent:FunctionComponent<{parameters:P}> = (
                 {parameters}
             ):null => {
-                hookResult.result = hook(...parameters)
+                hookResult.value = hook(...parameters)
 
                 return null
             }

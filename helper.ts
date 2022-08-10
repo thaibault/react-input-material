@@ -38,6 +38,7 @@ import {
     ValueState
 } from './type'
 // endregion
+// region state
 /**
  * Creates a mocked a state setter. Useful to dynamically convert a component
  * from uncontrolled to controlled.
@@ -120,6 +121,7 @@ export const wrapStateSetter = <Type = unknown>(
             ))
                 setValueState(result)
         }
+// endregion
 /**
  * Triggered when a value state changes like validation or focusing.
  * @param properties - Properties to search in.
@@ -174,6 +176,52 @@ export const translateKnownSymbols = <Type = unknown>(
             result[name] = Tools.copy(properties[name] as Type)
 
     return result
+}
+/**
+ * Determines initial value representation as string.
+ * @param properties - Components properties.
+ * @param defaultProperties - Components default properties.
+ * @param value - Current value to represent.
+ * @param transformer - To apply to given value.
+ * @param selection - Data mapping of allowed values.
+ *
+ * @returns Determined initial representation.
+ */
+export function determineInitialRepresentation<
+    T = unknown,
+    P extends DefaultInputProperties<T> = DefaultInputProperties<T>
+>(
+    properties:P,
+    defaultProperties:P,
+    value:null|T,
+    transformer:InputDataTransformation,
+    selection?:NormalizedSelection
+):string {
+    if (typeof properties.representation === 'string')
+        return properties.representation
+
+    if (value !== null) {
+        const candidate:null|string =
+            getRepresentationFromValueSelection(value, selection)
+
+        if (typeof candidate === 'string')
+            return candidate
+
+        return formatValue<T, P & {type:string}>(
+            {
+                ...properties,
+                type: (
+                    properties.type ||
+                    properties.model?.type ||
+                    defaultProperties.model.type
+                )
+            },
+            value,
+            transformer
+        )
+    }
+
+    return ''
 }
 /**
  * Determines initial value depending on given properties.
@@ -661,52 +709,6 @@ export function formatValue<
     }
 
     return String(value)
-}
-/**
- * Determines initial value representation as string.
- * @param properties - Components properties.
- * @param defaultProperties - Components default properties.
- * @param value - Current value to represent.
- * @param transformer - To apply to given value.
- * @param selection - Data mapping of allowed values.
- *
- * @returns Determined initial representation.
- */
-export function determineInitialRepresentation<
-    T = unknown,
-    P extends DefaultInputProperties<T> = DefaultInputProperties<T>
->(
-    properties:P,
-    defaultProperties:P,
-    value:null|T,
-    transformer:InputDataTransformation,
-    selection?:NormalizedSelection
-):string {
-    if (typeof properties.representation === 'string')
-        return properties.representation
-
-    if (value !== null) {
-        const candidate:null|string =
-            getRepresentationFromValueSelection(value, selection)
-
-        if (typeof candidate === 'string')
-            return candidate
-
-        return formatValue<T, P & {type:string}>(
-            {
-                ...properties,
-                type: (
-                    properties.type ||
-                    properties.model?.type ||
-                    defaultProperties.model.type
-                )
-            },
-            value,
-            transformer
-        )
-    }
-
-    return ''
 }
 // endregion
 // region hooks
