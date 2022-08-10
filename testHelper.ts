@@ -25,7 +25,7 @@ import {flushSync} from 'react-dom'
 import {createRoot, Root as ReactRoot} from 'react-dom/client'
 import {act} from 'react-dom/test-utils'
 
-import {TestEnvironment, TestHookResult} from './type'
+import {TestEnvironment, TestHookResult, TestHookWrapper} from './type'
 // endregion
 ;(globalContext as $Global & {IS_REACT_ACT_ENVIRONMENT:boolean})
     .IS_REACT_ACT_ENVIRONMENT = true
@@ -58,9 +58,15 @@ export const prepareTestEnvironment = (
                     result.container
             ) as unknown as T
         },
-        runHook: <R = unknown, P extends Array<unknown> = Array<unknown>>(
+        runHook: <
+            R = unknown,
+            P extends Array<unknown> = Array<unknown>,
+            WC = unknown,
+            WP = unknown
+        >(
             hook:(...parameters:P) => R,
             parameters:P = [] as unknown as P,
+            wrapper:null|TestHookWrapper<WC, WP> = null,
             flush = true
         ):TestHookResult<R, P> => {
             const hookResult:{result:R} = {} as unknown as {result:R}
@@ -74,8 +80,13 @@ export const prepareTestEnvironment = (
             }
 
             const render = (...parameters:P):void => {
-                const component =
+                let component =
                     createElement<{parameters:P}>(TestComponent, {parameters})
+                if (wrapper)
+                    component = createElement(
+                        wrapper.component,
+                        {...(wrapper.properties || {}), children: component}
+                    )
 
                 act(():void => {
                     if (root)
