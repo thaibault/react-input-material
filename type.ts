@@ -590,7 +590,7 @@ export interface InputProperties<T = unknown> extends
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     >
     invertedPatternText:string
-    labels:Array<string>|Mapping
+    labels:Array<[string, string]>|Array<string>|Mapping
     maximumLengthText:string
     maximumText:string
     minimumLengthText:string
@@ -741,7 +741,7 @@ export const inputPropertyTypes:PropertiesValidationMap = {
     */
     icon: oneOfType([string, object]),
     invertedPatternText: string,
-    labels: oneOfType([arrayOf(string), object]),
+    labels: oneOfType([arrayOf(arrayOf(string)), arrayOf(string), object]),
     maximum: oneOfType([number, string]),
     maximumLengthText: string,
     maximumText: string,
