@@ -512,13 +512,26 @@ export function normalizeSelection(
     selection?:(
         Array<[string, string]>|NormalizedSelection|SelectProps['options']
     ),
-    labels?:Array<string>|Mapping
+    labels?:Array<[string, string]>|Array<string>|Mapping
 ):NormalizedSelection|undefined {
     if (!selection) {
         selection = labels
         labels = undefined
     }
 
+    const getLabel = (value:string, index:number):null|string => {
+        if (Array.isArray(labels) && labels.length)
+            if (Array.isArray(labels[0])) {
+                for (const [labelValue, label] of labels)
+                    if (labelValue === value)
+                        return label
+            } else if (index < labels.length)
+                return labels[index]
+
+        return null
+    }
+
+    // region normalize options configuration
     if (Array.isArray(selection) && selection.length) {
         const result:NormalizedSelection = []
         let index = 0
@@ -527,9 +540,7 @@ export function normalizeSelection(
                 const [value, label] of selection as Array<[string, string]>
             ) {
                 result.push({
-                    label: Array.isArray(labels) && index < labels.length ?
-                        labels[index] :
-                        label,
+                    label: getLabel(value, index) ?? label,
                     value
                 })
 
@@ -539,9 +550,7 @@ export function normalizeSelection(
             for (const option of selection as NormalizedSelection) {
                 result.push({
                     ...option,
-                    label: Array.isArray(labels) && index < labels.length ?
-                        labels[index] :
-                        option.label
+                    label: getLabel(option.value, index) ?? option.label
                 })
 
                 index += 1
@@ -549,9 +558,7 @@ export function normalizeSelection(
         else
             for (const value of selection as Array<string>) {
                 result.push({
-                    label: Array.isArray(labels) && index < labels.length ?
-                        labels[index] :
-                        value,
+                    label: getLabel(value, index) ?? value,
                     value
                 })
 
@@ -560,9 +567,11 @@ export function normalizeSelection(
 
         selection = result
     }
+    // endregion
 
     const hasLabels:boolean = labels !== null && typeof labels === 'object'
 
+    // region arrange with given ordering
     if (selection)
         if (Array.isArray(selection)) {
             if (hasLabels) {
@@ -619,6 +628,7 @@ export function normalizeSelection(
 
             return result
         }
+    // endregion
 
     return selection as NormalizedSelection|undefined
 }
