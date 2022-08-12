@@ -519,84 +519,94 @@ export function normalizeSelection(
         labels = undefined
     }
 
+    if (!selection)
+        return selection
+
     const hasLabels:boolean = labels !== null && typeof labels === 'object'
 
-    const getLabel = (value:string, index:number):null|string => {
+    const getLabel = <T = unknown>(value:T, index?:number):null|string => {
         if (hasLabels)
             if (Array.isArray(labels)) {
                 if (labels.length)
                     if (Array.isArray(labels[0])) {
                         for (const [labelValue, label] of labels)
-                            if (labelValue === value)
+                            if ((labelValue as unknown as T) === value)
                                 return label
-                    } else if (index < labels.length)
-                        return labels[index]
-            } else if (Object.prototype.hasOwnProperty.call(labels, value))
-                return (labels as Mapping)[value]
+                    } else if (
+                        typeof index === 'number' && index < labels.length
+                    )
+                        return (labels as Array<string>)[index]
             // Map boolean values to their string representation.
-            else if (value === true && (labels as {true:string}).true)
+            } else if (
+                (value as unknown as boolean) === true &&
+                (labels as {true:string}).true
+            )
                 return (labels as {true:string}).true
-            else if (value === false && (labels as {false:string}).false)
+            else if (
+                (value as unknown as boolean) === false &&
+                (labels as {false:string}).false
+            )
                 return (labels as {false:string}).false
+            else if (
+                typeof value === 'string' &&
+                Object.prototype.hasOwnProperty.call(labels, value)
+            )
+                return (labels as Mapping)[value]
 
         return null
     }
 
+
     let selectionIsOrdered = false
     // region normalize options configuration
-    if (selection)
-        if (Array.isArray(selection)) {
-            selectionIsOrdered = true
+    if (Array.isArray(selection)) {
+        selectionIsOrdered = true
 
-            if (selection.length) {
-                const result:NormalizedSelection = []
-                let index = 0
-                if (Array.isArray(selection[0]))
-                    for (
-                        const [value, label] of selection as
-                            Array<[string, string]>
-                    ) {
-                        result.push({
-                            label: getLabel(value, index) ?? label,
-                            value
-                        })
-
-                        index += 1
-                    }
-                else if (
-                    selection[0] !== null && typeof selection[0] === 'object'
-                )
-                    for (const option of selection as NormalizedSelection) {
-                        result.push({
-                            ...option,
-                            label:
-                                getLabel(option.value, index) ?? option.label
-                        })
-
-                        index += 1
-                    }
-                else
-                    for (const value of selection as Array<string>) {
-                        result.push({
-                            label: getLabel(value, index) ?? value,
-                            value
-                        })
-
-                        index += 1
-                    }
-
-                selection = result
-            }
-        } else {
+        if (selection.length) {
             const result:NormalizedSelection = []
-            for (const value of Object.keys(selection as Mapping<unknown>))
-                result.push({
-                    label: getLabel(value) ?? (selection as Mapping)[value],
-                    value
-                })
+            let index = 0
+            if (Array.isArray(selection[0]))
+                for (
+                    const [value, label] of selection as
+                        Array<[string, string]>
+                ) {
+                    result.push({
+                        label: getLabel(value, index) ?? label, value
+                    })
+
+                    index += 1
+                }
+            else if (
+                selection[0] !== null && typeof selection[0] === 'object'
+            )
+                for (const option of selection as NormalizedSelection) {
+                    result.push({
+                        ...option,
+                        label: getLabel(option.value, index) ?? option.label
+                    })
+
+                    index += 1
+                }
+            else
+                for (const value of selection as Array<string>) {
+                    result.push({
+                        label: getLabel(value, index) ?? value, value
+                    })
+
+                    index += 1
+                }
 
             selection = result
         }
+    } else {
+        const result:NormalizedSelection = []
+        for (const value of Object.keys(selection as Mapping<unknown>))
+            result.push({
+                label: getLabel(value) ?? (selection as Mapping)[value], value
+            })
+
+        selection = result
+    }
     // endregion
     // region arrange with given ordering
     if (Array.isArray(labels) && labels.length && Array.isArray(labels[0])) {
@@ -609,15 +619,16 @@ export function normalizeSelection(
             index += 1
         }
 
-        selection = selection.sort(
+        selection = (selection as NormalizedSelection).sort(
             ({value: first}, {value: second}):number =>
-                labelMapping.get(first) - labelMapping.get(second)
+                (labelMapping.get(first as string) ?? 0) -
+                (labelMapping.get(second as string) ?? 0)
         )
-    } else (!selectionIsOrdered)
+    } else if (!selectionIsOrdered)
         // Sort alphabetically.
-        selection = selection.sort(
+        selection = (selection as NormalizedSelection).sort(
             ({value: first}, {value: second}):number =>
-                first.localeCompare(second)
+                (first as string).localeCompare(second as string)
         )
     // endregion
 
