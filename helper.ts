@@ -519,115 +519,106 @@ export function normalizeSelection(
         labels = undefined
     }
 
+    const hasLabels:boolean = labels !== null && typeof labels === 'object'
+
     const getLabel = (value:string, index:number):null|string => {
-        if (Array.isArray(labels) && labels.length)
-            if (Array.isArray(labels[0])) {
-                for (const [labelValue, label] of labels)
-                    if (labelValue === value)
-                        return label
-            } else if (index < labels.length)
-                return labels[index]
+        if (hasLabels)
+            if (Array.isArray(labels)) {
+                if (labels.length)
+                    if (Array.isArray(labels[0])) {
+                        for (const [labelValue, label] of labels)
+                            if (labelValue === value)
+                                return label
+                    } else if (index < labels.length)
+                        return labels[index]
+            } else if (Object.prototype.hasOwnProperty.call(labels, value))
+                return (labels as Mapping)[value]
+            // Map boolean values to their string representation.
+            else if (value === true && (labels as {true:string}).true)
+                return (labels as {true:string}).true
+            else if (value === false && (labels as {false:string}).false)
+                return (labels as {false:string}).false
 
         return null
     }
 
+    let selectionIsOrdered = false
     // region normalize options configuration
-    if (Array.isArray(selection) && selection.length) {
-        const result:NormalizedSelection = []
-        let index = 0
-        if (Array.isArray(selection[0]))
-            for (
-                const [value, label] of selection as Array<[string, string]>
-            ) {
-                result.push({
-                    label: getLabel(value, index) ?? label,
-                    value
-                })
-
-                index += 1
-            }
-        else if (selection[0] !== null && typeof selection[0] === 'object')
-            for (const option of selection as NormalizedSelection) {
-                result.push({
-                    ...option,
-                    label: getLabel(option.value, index) ?? option.label
-                })
-
-                index += 1
-            }
-        else
-            for (const value of selection as Array<string>) {
-                result.push({
-                    label: getLabel(value, index) ?? value,
-                    value
-                })
-
-                index += 1
-            }
-
-        selection = result
-    }
-    // endregion
-
-    const hasLabels:boolean = labels !== null && typeof labels === 'object'
-
-    // region arrange with given ordering
     if (selection)
         if (Array.isArray(selection)) {
-            if (hasLabels) {
+            selectionIsOrdered = true
+
+            if (selection.length) {
                 const result:NormalizedSelection = []
+                let index = 0
+                if (Array.isArray(selection[0]))
+                    for (
+                        const [value, label] of selection as
+                            Array<[string, string]>
+                    ) {
+                        result.push({
+                            label: getLabel(value, index) ?? label,
+                            value
+                        })
 
-                for (const option of selection as NormalizedSelection)
-                    result.push({
-                        ...option,
-                        label: Object.prototype.hasOwnProperty.call(
-                            labels, (option.value || option.label) as string
-                        ) ?
-                            (
-                                labels as Mapping
-                            )[(option.value || option.label) as string] :
-                            /*
-                                Map boolean values to their string
-                                representation.
-                            */
-                            (
-                                (
-                                    option as unknown as {value:boolean}
-                                ).value === true &&
-                                (labels as {true:string}).true
-                            ) ?
-                                (labels as {true:string}).true :
-                                (
-                                    (
-                                        option as unknown as {value:boolean}
-                                    ).value === false &&
-                                    (labels as {false:string}).false
-                                ) ?
-                                    (labels as {false:string}).false :
-                                    option.label
-                    })
+                        index += 1
+                    }
+                else if (
+                    selection[0] !== null && typeof selection[0] === 'object'
+                )
+                    for (const option of selection as NormalizedSelection) {
+                        result.push({
+                            ...option,
+                            label:
+                                getLabel(option.value, index) ?? option.label
+                        })
 
-                return result
+                        index += 1
+                    }
+                else
+                    for (const value of selection as Array<string>) {
+                        result.push({
+                            label: getLabel(value, index) ?? value,
+                            value
+                        })
+
+                        index += 1
+                    }
+
+                selection = result
             }
         } else {
             const result:NormalizedSelection = []
-            for (const value of Object.keys(selection as Mapping<unknown>).sort(
-                (first:string, second:string):number =>
-                    (selection as Mapping)[first].localeCompare(
-                        (selection as Mapping)[second]
-                    )
-            ))
+            for (const value of Object.keys(selection as Mapping<unknown>))
                 result.push({
-                    label:
-                        hasLabels &&
-                        Object.prototype.hasOwnProperty.call(labels, value) ?
-                            (labels as Mapping)[value] :
-                            (selection as Mapping)[value],
+                    label: getLabel(value) ?? (selection as Mapping)[value],
                     value
                 })
 
-            return result
+            selection = result
         }
+    // endregion
+    // region arrange with given ordering
+    if (Array.isArray(labels) && labels.length && Array.isArray(labels[0])) {
+        // Respect ordering given by labels.
+        const labelMapping:Map<string, number> = new Map<string, number>()
+        let index = 0
+        for (const [value] of labels) {
+            labelMapping.set(value, index)
+
+            index += 1
+        }
+
+        selection = selection.sort(
+            ({value: first}, {value: second}):number =>
+                labelMapping.get(first) - labelMapping.get(second)
+        )
+    } else (!selectionIsOrdered)
+        // Sort alphabetically.
+        selection = selection.sort(
+            ({value: first}, {value: second}):number =>
+                first.localeCompare(second)
+        )
     // endregion
 
     return selection as NormalizedSelection|undefined
