@@ -343,7 +343,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 description="input8Description"
                 initialValue="A"
                 labels={useMemorizedValue(
-                    ['C', 'LC'], ['D', 'LD'], ['A', 'LA'], ['B', 'LB']
+                    [['C', 'LC'], ['D', 'LD'], ['A', 'LA'], ['B', 'LB']]
                 )}
                 name="input8"
                 onChange={onChange}
