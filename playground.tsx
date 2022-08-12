@@ -342,7 +342,9 @@ const Application:FunctionComponent = ():ReactElement => {
                 declaration="selection"
                 description="input8Description"
                 initialValue="A"
-                labels={useMemorizedValue({A: 'LA', B: 'LB', C: 'LC', D: 'LD'})}
+                labels={useMemorizedValue(
+                    ['C', 'LC'], ['D', 'LD'], ['A', 'LA'], ['B', 'LB']
+                )}
                 name="input8"
                 onChange={onChange}
                 placeholder="input8Placeholder"
