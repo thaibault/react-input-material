@@ -77,7 +77,7 @@ import {
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region helper
-const getPrototype = function<T, P>(
+const getPrototype = function<T, P extends InputsPropertiesItem<T>>(
     properties:InputsProperties<T, P>
 ):Partial<P> {
     return {

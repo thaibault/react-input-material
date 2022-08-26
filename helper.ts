@@ -339,7 +339,7 @@ export const mapPropertiesIntoModel = <
     const result:DP = Tools.extend<DP>(
         true,
         {model: Tools.copy<DP['model']>(defaultModel)} as DP,
-        properties as DP
+        properties as unknown as DP
     )
     // region handle  aliases
     if (result.disabled) {
