@@ -29,6 +29,7 @@ import {
 } from 'react'
 import {createRoot} from 'react-dom/client'
 
+import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
 import {
     FileInput,
     GenericAnimate,
@@ -127,6 +128,9 @@ const Application:FunctionComponent = ():ReactElement => {
                         url: 'https://via.placeholder.com/150'
                     }
                 )}
+                generateFileNameInputProperties={
+                    preserveStaticFileBaseNameInputGenerator
+                }
                 name="UnControlled"
                 onChange={onChange}
             >

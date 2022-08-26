@@ -127,7 +127,7 @@ export const preserveStaticFileBaseNameInputGenerator:Properties[
     disabled: true,
     value:
         name +
-        (fileName.includes('.') ?
+        (fileName?.includes('.') ?
             `${fileName.substring(fileName.lastIndexOf('.'))}` :
             ''
         )
@@ -405,7 +405,23 @@ export const FileInputInner = function(
             if ((event.target as unknown as {files:FileList}).files?.length) {
                 const blob:File =
                     (event.target as unknown as {files:FileList}).files[0]
+
                 properties.value = {blob, name: blob.name}
+
+                properties.value.name =
+                    properties.generateFileNameInputProperties(
+                        {
+                            disabled: properties.disabled,
+                            value: blob.name,
+                            ...defaultFileNameInputProperties,
+                            model: properties.model.fileName,
+                            onChangeValue: onChangeValue,
+                            default: properties.value.name
+                        },
+                        properties as
+                            Omit<Properties, 'value'> &
+                            {value:FileValue & {name:string}}
+                    ).value
             } else
                 return
         }
