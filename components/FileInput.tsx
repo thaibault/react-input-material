@@ -128,7 +128,7 @@ export const preserveStaticFileBaseNameInputGenerator:Properties[
     value:
         name +
         (fileName?.includes('.') ?
-            `${fileName.substring(fileName.lastIndexOf('.'))}` :
+            fileName.substring(fileName.lastIndexOf('.')) :
             ''
         )
 })
@@ -421,7 +421,8 @@ export const FileInputInner = function(
                         properties as
                             Omit<Properties, 'value'> &
                             {value:FileValue & {name:string}}
-                    ).value
+                    )?.value ||
+                    blob.name
             } else
                 return
         }
