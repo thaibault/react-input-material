@@ -421,7 +421,8 @@ export const FileInputInner = function(
                         properties as
                             Omit<Properties, 'value'> &
                             {value:FileValue & {name:string}}
-                    ).value
+                    )?.value ||
+                    blob.name
             } else
                 return
         }
