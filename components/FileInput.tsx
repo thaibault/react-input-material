@@ -128,7 +128,7 @@ export const preserveStaticFileBaseNameInputGenerator:Properties[
     value:
         name +
         (fileName?.includes('.') ?
-            `${fileName.substring(fileName.lastIndexOf('.'))}` :
+            fileName.substring(fileName.lastIndexOf('.')) :
             ''
         )
 })
