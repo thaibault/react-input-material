@@ -415,7 +415,7 @@ export const FileInputInner = function(
                             value: blob.name,
                             ...defaultFileNameInputProperties,
                             model: properties.model.fileName,
-                            onChangeValue: onChangeValue,
+                            onChangeValue,
                             default: properties.value.name
                         },
                         properties as
