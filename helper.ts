@@ -341,7 +341,7 @@ export const mapPropertiesIntoModel = <
         {model: Tools.copy<DP['model']>(defaultModel)} as DP,
         properties as unknown as DP
     )
-    // region handle  aliases
+    // region handle aliases
     if (result.disabled) {
         result.model.mutable = false
         delete result.disabled
