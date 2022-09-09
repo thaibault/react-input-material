@@ -27,7 +27,6 @@ endregion */
     & .mdc-text-field--outlined {
         & .mdc-floating-label--float-above {
             background-color: var(--mdc-theme-surface);
-            padding: 0 8px 2px 8px;
         }
     }
 
