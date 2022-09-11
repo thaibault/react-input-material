@@ -2033,7 +2033,9 @@ export const GenericInputInner = function<Type = unknown>(
 
         if (properties.editor !== 'plain')
             constraints.rows = properties.rows
-    } else if (['date', 'datetime-local', 'time'].includes(properties.type)) {
+    } else if ([
+        'date', 'datetime-local', 'time', 'time-local'
+    ].includes(properties.type)) {
         constraints.step = properties.step
 
         if (properties.maximum !== Infinity)
@@ -2595,6 +2597,93 @@ GenericInput.transformer = {
                 if (typeof value !== 'number')
                     if (transformer.time.parse)
                         value = transformer.time.parse(
+                            value, configuration, transformer
+                        )
+                    else {
+                        const parsedDate:number = value instanceof Date ?
+                            value.getTime() / 1000 :
+                            Date.parse(value)
+                        if (isNaN(parsedDate)) {
+                            const parsedFloat:number =
+                                parseFloat(value as string)
+                            value = isNaN(parsedFloat) ? 0 : parsedFloat
+                        } else
+                            value = parsedDate / 1000
+                    }
+
+                if (value === Infinity)
+                    return 'Infinitely far in the future'
+                if (value === -Infinity)
+                    return 'Infinitely early in the past'
+                if (!isFinite(value))
+                    return ''
+
+                let formattedValue:string =
+                    (new Date(Math.round(value * 1000))).toISOString()
+
+                formattedValue = formattedValue.substring(
+                    formattedValue.indexOf('T') + 1, formattedValue.length - 1
+                )
+
+                if (
+                    configuration.step &&
+                    configuration.step >= 60 &&
+                    (configuration.step % 60) === 0
+                )
+                    return formattedValue.substring(
+                        0, formattedValue.lastIndexOf(':')
+                    )
+
+                return formattedValue
+            }}
+        },
+        parse: (value:Date|number|string):number => {
+            if (typeof value === 'number')
+                return value
+
+            if (value instanceof Date)
+                return value.getTime() / 1000
+
+            const parsedDate:number = Date.parse(value)
+            if (isNaN(parsedDate)) {
+                const parsedFloat:number = parseFloat(value.replace(
+                    /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
+                    (
+                        _match:string,
+                        hour:string,
+                        minute:string,
+                        secondsSuffix?:string,
+                        seconds?:string,
+                        _millisecondsSuffix?:string
+                    ):string =>
+                        String(
+                            parseInt(hour) *
+                            60 ** 2 +
+                            parseInt(minute) *
+                            60 +
+                            (secondsSuffix ? parseFloat(seconds!) : 0)
+                        )
+                ))
+
+                if (isNaN(parsedFloat))
+                    return 0
+
+                return parsedFloat
+            }
+
+            return parsedDate / 1000
+        }
+    },
+    'time-local': {
+        format: {
+            final: {transform: (
+                value:Date|number|string,
+                configuration:DefaultProperties<number>,
+                transformer:InputDataTransformation
+            ):string => {
+                if (typeof value !== 'number')
+                    if (transformer['time-local'].parse)
+                        value = transformer['time-local'].parse(
                             value, configuration, transformer
                         )
                     else {
