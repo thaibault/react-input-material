@@ -2650,16 +2650,16 @@ GenericInput.transformer = {
                     /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
                     (
                         _match:string,
-                        hour:string,
-                        minute:string,
+                        hours:string,
+                        minutes:string,
                         secondsSuffix?:string,
                         seconds?:string,
                         _millisecondsSuffix?:string
                     ):string =>
                         String(
-                            parseInt(hour) *
+                            parseInt(hours) *
                             60 ** 2 +
-                            parseInt(minute) *
+                            parseInt(minutes) *
                             60 +
                             (secondsSuffix ? parseFloat(seconds!) : 0)
                         )
@@ -2674,6 +2674,11 @@ GenericInput.transformer = {
             return parsedDate / 1000
         }
     },
+    /*
+        NOTE: Daylight saving time should not make a difference since times
+        will always be saved on zero unix timestamp where no daylight saving
+        time rules existing.
+    */
     'time-local': {
         format: {
             final: {transform: (
@@ -2705,21 +2710,27 @@ GenericInput.transformer = {
                 if (!isFinite(value))
                     return ''
 
-                let formattedValue:string =
-                    (new Date(Math.round(value * 1000))).toISOString()
+                const dateTime = new Date(Math.round(value * 1000))
+                const hours:number = dateTime.getHours()
+                const minutes:number = dateTime.getMinutes()
 
-                formattedValue = formattedValue.substring(
-                    formattedValue.indexOf('T') + 1, formattedValue.length - 1
+                const formattedValue:string = (
+                    `${hours < 10 ? '0' : ''}${String(hours)}:` +
+                    `${minutes < 10 ? '0' : ''}${String(minutes)}`
                 )
 
-                if (
+                if (!(
                     configuration.step &&
                     configuration.step >= 60 &&
                     (configuration.step % 60) === 0
-                )
-                    return formattedValue.substring(
-                        0, formattedValue.lastIndexOf(':')
+                )) {
+                    const seconds:number = dateTime.getSeconds()
+
+                    return (
+                        `${formattedValue}:${(seconds < 10) ? '0' : ''}` +
+                        String(seconds)
                     )
+                }
 
                 return formattedValue
             }}
@@ -2737,19 +2748,21 @@ GenericInput.transformer = {
                     /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
                     (
                         _match:string,
-                        hour:string,
-                        minute:string,
+                        hours:string,
+                        minutes:string,
                         secondsSuffix?:string,
                         seconds?:string,
                         _millisecondsSuffix?:string
-                    ):string =>
-                        String(
-                            parseInt(hour) *
-                            60 ** 2 +
-                            parseInt(minute) *
-                            60 +
-                            (secondsSuffix ? parseFloat(seconds!) : 0)
-                        )
+                    ):string => {
+                        const zeroDateTime = new Date(0)
+
+                        zeroDateTime.setHours(parseInt(hours))
+                        zeroDateTime.setMinutes(parseInt(minutes))
+                        if (secondsSuffix)
+                            zeroDateTime.setSeconds(parseInt(seconds!))
+
+                        return String(zeroDateTime.getTime() / 1000)
+                    }
                 ))
 
                 if (isNaN(parsedFloat))

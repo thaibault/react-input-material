@@ -185,12 +185,17 @@ describe('GenericInput', ():void => {
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
-    // TODO
+    /*
+        NOTE: Daylight saving time should not make a difference since times
+        will always be saved on zero unix timestamp where no daylight saving
+        time rules existing.
+    */
     testEach<AnyFunction>(
         'transformer.time-local.format.final.transform',
         GenericInput.transformer['time-local'].format!.final.transform!,
 
         [
+            // E.g. will result in 9 o'clock in germany.
             `0${new Date('1970-01-01T08:00:00.000Z').getHours()}:00`,
             Date.parse('1970-01-01T08:00:00.000Z') / 1000,
             {step: 60}
@@ -202,11 +207,12 @@ describe('GenericInput', ():void => {
 
         ...([
             [
-                (): => {
-                    const now = new Date()
-                    now.setHours(9)
-                    return now.getUTCHours() * 60 ** 2
-                },
+                // E.g. will result in 8 o'clock in germany.
+                (():number => {
+                    const zeroDateTime = new Date(0)
+                    zeroDateTime.setHours(9)
+                    return zeroDateTime.getTime() / 1000
+                })(),
                 '09:00'
             ]
         ].map((item:Array<unknown>):Array<unknown> =>
