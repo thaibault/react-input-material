@@ -2033,7 +2033,9 @@ export const GenericInputInner = function<Type = unknown>(
 
         if (properties.editor !== 'plain')
             constraints.rows = properties.rows
-    } else if (['date', 'datetime-local', 'time'].includes(properties.type)) {
+    } else if ([
+        'date', 'datetime-local', 'time', 'time-local'
+    ].includes(properties.type)) {
         constraints.step = properties.step
 
         if (properties.maximum !== Infinity)
@@ -2648,19 +2650,119 @@ GenericInput.transformer = {
                     /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
                     (
                         _match:string,
-                        hour:string,
-                        minute:string,
+                        hours:string,
+                        minutes:string,
                         secondsSuffix?:string,
                         seconds?:string,
                         _millisecondsSuffix?:string
                     ):string =>
                         String(
-                            parseInt(hour) *
+                            parseInt(hours) *
                             60 ** 2 +
-                            parseInt(minute) *
+                            parseInt(minutes) *
                             60 +
                             (secondsSuffix ? parseFloat(seconds!) : 0)
                         )
+                ))
+
+                if (isNaN(parsedFloat))
+                    return 0
+
+                return parsedFloat
+            }
+
+            return parsedDate / 1000
+        }
+    },
+    /*
+        NOTE: Daylight saving time should not make a difference since times
+        will always be saved on zero unix timestamp where no daylight saving
+        time rules existing.
+    */
+    'time-local': {
+        format: {
+            final: {transform: (
+                value:Date|number|string,
+                configuration:DefaultProperties<number>,
+                transformer:InputDataTransformation
+            ):string => {
+                if (typeof value !== 'number')
+                    if (transformer['time-local'].parse)
+                        value = transformer['time-local'].parse(
+                            value, configuration, transformer
+                        )
+                    else {
+                        const parsedDate:number = value instanceof Date ?
+                            value.getTime() / 1000 :
+                            Date.parse(value)
+                        if (isNaN(parsedDate)) {
+                            const parsedFloat:number =
+                                parseFloat(value as string)
+                            value = isNaN(parsedFloat) ? 0 : parsedFloat
+                        } else
+                            value = parsedDate / 1000
+                    }
+
+                if (value === Infinity)
+                    return 'Infinitely far in the future'
+                if (value === -Infinity)
+                    return 'Infinitely early in the past'
+                if (!isFinite(value))
+                    return ''
+
+                const dateTime = new Date(Math.round(value * 1000))
+                const hours:number = dateTime.getHours()
+                const minutes:number = dateTime.getMinutes()
+
+                const formattedValue:string = (
+                    `${hours < 10 ? '0' : ''}${String(hours)}:` +
+                    `${minutes < 10 ? '0' : ''}${String(minutes)}`
+                )
+
+                if (!(
+                    configuration.step &&
+                    configuration.step >= 60 &&
+                    (configuration.step % 60) === 0
+                )) {
+                    const seconds:number = dateTime.getSeconds()
+
+                    return (
+                        `${formattedValue}:${(seconds < 10) ? '0' : ''}` +
+                        String(seconds)
+                    )
+                }
+
+                return formattedValue
+            }}
+        },
+        parse: (value:Date|number|string):number => {
+            if (typeof value === 'number')
+                return value
+
+            if (value instanceof Date)
+                return value.getTime() / 1000
+
+            const parsedDate:number = Date.parse(value)
+            if (isNaN(parsedDate)) {
+                const parsedFloat:number = parseFloat(value.replace(
+                    /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
+                    (
+                        _match:string,
+                        hours:string,
+                        minutes:string,
+                        secondsSuffix?:string,
+                        seconds?:string,
+                        _millisecondsSuffix?:string
+                    ):string => {
+                        const zeroDateTime = new Date(0)
+
+                        zeroDateTime.setHours(parseInt(hours))
+                        zeroDateTime.setMinutes(parseInt(minutes))
+                        if (secondsSuffix)
+                            zeroDateTime.setSeconds(parseInt(seconds!))
+
+                        return String(zeroDateTime.getTime() / 1000)
+                    }
                 ))
 
                 if (isNaN(parsedFloat))

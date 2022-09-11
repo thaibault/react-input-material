@@ -287,6 +287,7 @@ export const baseModelPropertyTypes:ValidationMapping = {
             'range',
             'string',
             'time',
+            'time-local',
             'week'
         ])
     */
@@ -492,6 +493,7 @@ export type InputDataTransformation =
         date:DataTransformSpecification<number, Date|number|string>
         'datetime-local':DataTransformSpecification<number, Date|number|string>
         time:DataTransformSpecification<number, Date|number|string>
+        'time-local':DataTransformSpecification<number, Date|number|string>
 
         float:DataTransformSpecification<number, string>
         integer:DataTransformSpecification<number, string>
@@ -543,6 +545,7 @@ export type GenericInputType = (
     'float' |
     'integer' |
     'string' |
+    'time-local' |
     NativeInputType
 )
 export interface InputChildrenOptions<P, T> {
