@@ -215,7 +215,7 @@ const Application:FunctionComponent = ():ReactElement => {
             <hr/>
 
             <GenericInput<number>
-                default={1526165029}
+                default={new Date('2025-01-01T00:00:00.000Z').getTime() / 1000}
                 name="input2"
                 onChange={onChange}
                 type="date"
@@ -241,7 +241,7 @@ const Application:FunctionComponent = ():ReactElement => {
                     maximum: 3600,
                     minimum: 60,
                     name: 'input3Model',
-                    type: 'time'
+                    type: 'time-local'
                 })}
                 onChange={onChange}
             />
