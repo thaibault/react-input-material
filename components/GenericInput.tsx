@@ -2772,7 +2772,8 @@ GenericInput.transformer = {
             }
 
             return parsedDate / 1000
-        }
+        },
+        type: 'time'
     },
 
     float: {
