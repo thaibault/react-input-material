@@ -16,12 +16,13 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-// region import s
+// region imports
 import {boolean, number, string} from 'clientnode/property-types'
 import {Mapping} from 'clientnode/type'
-import {FunctionComponent, ReactElement} from 'react'
+import {
+    ForwardedRef, ForwardRefRenderFunction, forwardRef, ReactElement
+} from 'react'
 import {CSSTransition} from 'react-transition-group'
-import {TransitionProps} from 'react-transition-group/Transition'
 
 /*
 "namedExport" version of css-loader:
@@ -33,46 +34,52 @@ import {
 } from './GenericAnimate.module'
 */
 import cssClassNames from './GenericAnimate.module'
+import {GenericAnimateComponent, GenericAnimateProps as Props} from '../type'
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 /**
  * Generic animation wrapper component.
  * @param properties - Component given properties object.
+ * @param reference - Reference object to forward internal component.
  *
  * @returns React elements.
  */
-export const GenericAnimate:FunctionComponent<Partial<TransitionProps<
-    HTMLElement|undefined
->>> =
-    <Type extends HTMLElement|undefined = undefined>(
-        properties:Partial<TransitionProps<Type>>
-    ):ReactElement =>
-        <CSSTransition
-            appear
-            classNames={CSS_CLASS_NAMES['generic-animate']}
-            in
-            timeout={200}
-            unmountOnExit
-            {...properties}
-        >
-            {
-                typeof properties.children === 'string' ?
-                    <span className={
-                        CSS_CLASS_NAMES['generic-animate__wrapper']
-                    }>
+export const GenericAnimateInner = function(
+    properties:Props, reference?:ForwardedRef<HTMLDivElement|HTMLSpanElement>
+):ReactElement {
+    return <CSSTransition
+        appear
+        classNames={CSS_CLASS_NAMES['generic-animate']}
+        in
+        timeout={200}
+        unmountOnExit
+        {...properties}
+    >
+        {
+            typeof properties.children === 'string' ?
+                <span
+                    className={CSS_CLASS_NAMES['generic-animate__wrapper']}
+                    ref={reference as ForwardedRef<HTMLSpanElement>}
+                >
+                    {properties.children}
+                </span> :
+                Array.isArray(properties.children) ?
+                    <div
+                        className={CSS_CLASS_NAMES[
+                            'generic-animate__list-wrapper'
+                        ]}
+                        ref={reference as ForwardedRef<HTMLDivElement>}
+                    >
                         {properties.children}
-                    </span> :
-                    Array.isArray(properties.children) ?
-                        <div
-                            className={CSS_CLASS_NAMES[
-                                'generic-animate__list-wrapper'
-                            ]}
-                        >
-                            {properties.children}
-                        </div> :
-                        properties.children
-            }
-        </CSSTransition>
+                    </div> :
+                    properties.children
+        }
+    </CSSTransition>
+} as ForwardRefRenderFunction<unknown, Props>
+
+export const GenericAnimate:GenericAnimateComponent =
+    forwardRef(GenericAnimateInner) as unknown as GenericAnimateComponent
+
 // region static properties
 GenericAnimate.propTypes = {
     appear: boolean,

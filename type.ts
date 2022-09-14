@@ -50,6 +50,7 @@ import {
     SyntheticEvent
 } from 'react'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
+import {TransitionProps} from 'react-transition-group/Transition'
 
 import {
     EditorOptions as RawTinyMCEOptions, Editor as RichTextEditor
@@ -77,6 +78,19 @@ import {
 } from '@tinymce/tinymce-react'
 // endregion
 // region exports
+/// region animate
+export type GenericAnimateProps =
+    Partial<TransitionProps<HTMLElement|undefined>>
+
+export interface GenericAnimateComponent extends
+    Omit<ForwardRefExoticComponent<GenericAnimateProps>, 'propTypes'>,
+    StaticBaseWebComponent
+{
+    (props:(
+        GenericAnimateProps & RefAttributes<HTMLDivElement|HTMLSpanElement>
+    )):ReactElement
+}
+/// endregion
 /// region dummy
 export type DummyProps = Mapping<unknown> & {children?:ReactElement}
 /// endregion
