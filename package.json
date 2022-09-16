@@ -21,7 +21,9 @@
     "url": "https://torben.website"
   },
   "files": [
-    "components",
+    "components/*.css",
+    "components/*.d.ts",
+    "components/*.js",
     "helper.d.ts",
     "helper.js",
     "index.styles.css",
