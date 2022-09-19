@@ -566,8 +566,10 @@ InputsInner.displayName = 'Inputs'
  *
  * @returns React elements.
  */
-export const Inputs:InputsComponent =
-    memorize(forwardRef(InputsInner)) as unknown as InputsComponent
+export const Inputs:InputsComponent<typeof InputsInner> =
+    memorize(forwardRef(InputsInner)) as
+        unknown as
+        InputsComponent<typeof InputsInner>
 // region static properties
 /// region web-component hints
 Inputs.wrapped = InputsInner

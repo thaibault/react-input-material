@@ -486,10 +486,11 @@ RequireableCheckboxInner.displayName = 'RequireableCheckbox'
  *
  * @returns React elements.
  */
-export const RequireableCheckbox:CheckboxComponent =
-    memorize(forwardRef(RequireableCheckboxInner)) as
-        unknown as
-        CheckboxComponent
+export const RequireableCheckbox:CheckboxComponent<
+    typeof RequireableCheckboxInner
+> = memorize(forwardRef(RequireableCheckboxInner)) as
+    unknown as
+    CheckboxComponent<typeof RequireableCheckboxInner>
 // region static properties
 /// region web-component hints
 RequireableCheckbox.wrapped = RequireableCheckboxInner
