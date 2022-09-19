@@ -82,9 +82,9 @@ import {
 export type GenericAnimateProps =
     Partial<TransitionProps<HTMLElement|undefined>>
 
-export interface GenericAnimateComponent extends
+export interface GenericAnimateComponent<Type> extends
     Omit<ForwardRefExoticComponent<GenericAnimateProps>, 'propTypes'>,
-    StaticBaseWebComponent
+    StaticBaseWebComponent<Type>
 {
     (props:(
         GenericAnimateProps & RefAttributes<HTMLDivElement|HTMLSpanElement>
