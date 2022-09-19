@@ -418,8 +418,10 @@ IntervalInner.displayName = 'Interval'
  *
  * @returns React elements.
  */
-export const Interval:IntervalComponent =
-    memorize(forwardRef(IntervalInner)) as unknown as IntervalComponent
+export const Interval:IntervalComponent<typeof IntervalInner> =
+    memorize(forwardRef(IntervalInner)) as
+        unknown as
+        IntervalComponent<typeof IntervalInner>
 // region static properties
 /// region web-component hints
 Interval.wrapped = IntervalInner

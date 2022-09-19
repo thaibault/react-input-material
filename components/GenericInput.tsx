@@ -2390,8 +2390,10 @@ GenericInputInner.displayName = 'GenericInput'
  *
  * @returns React elements.
  */
-export const GenericInput:GenericInputComponent =
-    memorize(forwardRef(GenericInputInner)) as unknown as GenericInputComponent
+export const GenericInput:GenericInputComponent<typeof GenericInputInner> =
+    memorize(forwardRef(GenericInputInner)) as
+        unknown as
+        GenericInputComponent<typeof GenericInputInner>
 // region static properties
 /// region web-component hints
 GenericInput.wrapped = GenericInputInner

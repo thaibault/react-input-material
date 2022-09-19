@@ -978,8 +978,10 @@ FileInputInner.displayName = 'FileInput'
  *
  * @returns React elements.
  */
-export const FileInput:FileInputComponent =
-    memorize(forwardRef(FileInputInner)) as unknown as FileInputComponent
+export const FileInput:FileInputComponent<typeof FileInputInner> =
+    memorize(forwardRef(FileInputInner)) as
+        unknown as
+        FileInputComponent<typeof FileInputInner>
 // region static properties
 /// region web-component hints
 FileInput.wrapped = FileInputInner

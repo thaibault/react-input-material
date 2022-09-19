@@ -251,28 +251,29 @@ export interface EditorState {
 }
 //// endregion
 export interface StaticWebComponent<
-    MS = ModelState, DP = DefaultProperties
-> extends StaticBaseWebComponent {
+    Type, MS = ModelState, DP = DefaultProperties
+> extends StaticBaseWebComponent<Type> {
     defaultModelState:MS
     defaultProperties:DP
     strict:boolean
 }
 
 export type StaticComponent<
-    P = Props, MS = ModelState, DP = DefaultProperties
-> = Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<MS, DP>
+    Type, P = Props, MS = ModelState, DP = DefaultProperties
+> = Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<Type, MS, DP>
 export type StaticFunctionComponent<
-    P = Props, MS = ModelState, DP = DefaultProperties
-> = Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P, MS, DP>
+    Type, P = Props, MS = ModelState, DP = DefaultProperties
+> = Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<Type, P, MS, DP>
 
 export interface InputComponent<
+    Type,
     P = Props,
     MS = ModelState,
     DP = DefaultProperties,
     A = ComponentAdapter<P>
 > extends
     Omit<ForwardRefExoticComponent<P>, 'propTypes'>,
-    StaticWebComponent<MS, DP>
+    StaticWebComponent<Type, MS, DP>
 {
     (props:P & RefAttributes<A>):ReactElement
 }
@@ -441,7 +442,8 @@ export type CheckboxState = State<boolean>
 export type CheckboxAdapter =
     ComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
 
-export type CheckboxComponent = InputComponent<
+export type CheckboxComponent<Type> = InputComponent<
+    Type,
     CheckboxProps,
     CheckboxModelState,
     DefaultCheckboxProperties,
@@ -693,9 +695,9 @@ export interface TinyMCEOptions extends RawTinyMCEOptions {
     target?:undefined
 }
 
-export interface GenericInputComponent extends
+export interface GenericInputComponent<Type> extends
     Omit<ForwardRefExoticComponent<InputProps>, 'propTypes'>,
-    StaticWebComponent<InputModelState, DefaultInputProperties>
+    StaticWebComponent<Type, InputModelState, DefaultInputProperties>
 {
     <T = string>(
         props:InputProps<T> & RefAttributes<InputAdapter<T>>
@@ -945,7 +947,8 @@ export interface FileInputAdapterWithReferences extends FileInputAdapter {
     }
 }
 
-export type FileInputComponent = InputComponent<
+export type FileInputComponent<Type> = InputComponent<
+    Type,
     FileInputProps,
     FileInputModelState,
     DefaultFileInputProperties,
@@ -1179,9 +1182,9 @@ export type InputsAdapterWithReferences<
     RefType = unknown
 > = InputsAdapter<T, P> & {references:Array<MutableRefObject<RefType>>}
 
-export interface InputsComponent extends
+export interface InputsComponent<Type> extends
     Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
-    StaticWebComponent<InputsModelState, DefaultInputsProperties>
+    StaticWebComponent<Type, InputsModelState, DefaultInputsProperties>
 {
     <T = string, P extends InputsPropertiesItem<T> = InputProperties<T>>(
         props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
@@ -1302,7 +1305,8 @@ export interface IntervalAdapterWithReferences extends IntervalAdapter {
     }
 }
 
-export type IntervalComponent = InputComponent<
+export type IntervalComponent<Type> = InputComponent<
+    Type,
     IntervalProps,
     IntervalModelState,
     DefaultIntervalProperties,
