@@ -20,7 +20,11 @@
 import {boolean, number, string} from 'clientnode/property-types'
 import {Mapping} from 'clientnode/type'
 import {
-    ForwardedRef, ForwardRefRenderFunction, forwardRef, ReactElement
+    ForwardedRef,
+    ForwardRefRenderFunction,
+    forwardRef,
+    memo as memorize,
+    ReactElement
 } from 'react'
 import {CSSTransition} from 'react-transition-group'
 
@@ -76,11 +80,24 @@ export const GenericAnimateInner = function(
         }
     </CSSTransition>
 } as ForwardRefRenderFunction<unknown, Props>
-
+/**
+ * Generic animation wrapper component.
+ * @property static:propTypes - Triggers reacts runtime property value checks.
+ *
+ * @param properties - Component given properties object.
+ * @param reference - Reference object to forward internal component.
+ *
+ * @returns React elements.
+ */
 export const GenericAnimate:GenericAnimateComponent =
-    forwardRef(GenericAnimateInner) as unknown as GenericAnimateComponent
-
+    memorize(forwardRef(GenericAnimateInner)) as
+        unknown as
+        GenericAnimateComponent
 // region static properties
+/// region web-component hints
+GenericAnimate.wrapped = GenericAnimateInner
+GenericAnimate.webComponentAdapterWrapped = 'react'
+/// endregion
 GenericAnimate.propTypes = {
     appear: boolean,
     classNames: string,

@@ -20,9 +20,9 @@ import GenericAnimate from '../components/GenericAnimate'
 // endregion
 describe('GenericAnimate', ():void => {
     test('render', ():void => {
-        expect(GenericAnimate({children: <div/>}))
+        expect(GenericAnimate.wrapped({children: <div/>}))
             .toHaveProperty('props.in', true)
-        expect(GenericAnimate({children: <div/>, in: false}))
+        expect(GenericAnimate.wrapped({children: <div/>, in: false}))
             .toHaveProperty('props.in', false)
     })
 })
