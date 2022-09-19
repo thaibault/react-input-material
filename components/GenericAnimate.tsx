@@ -89,10 +89,11 @@ export const GenericAnimateInner = function(
  *
  * @returns React elements.
  */
-export const GenericAnimate:GenericAnimateComponent =
-    memorize(forwardRef(GenericAnimateInner)) as
-        unknown as
-        GenericAnimateComponent
+export const GenericAnimate:GenericAnimateComponent<
+    typeof GenericAnimateInner
+> = memorize(forwardRef(GenericAnimateInner)) as
+    unknown as
+    GenericAnimateComponent<typeof GenericAnimateInner>
 // region static properties
 /// region web-component hints
 GenericAnimate.wrapped = GenericAnimateInner
