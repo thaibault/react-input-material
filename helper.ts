@@ -32,6 +32,7 @@ import {
     DefaultInputProperties,
     FormatSpecifications,
     InputDataTransformation,
+    InputProperties,
     ModelState,
     NormalizedSelection,
     Transformer,
@@ -346,13 +347,15 @@ export const mapPropertiesIntoModel = <
         result.model.mutable = false
         delete result.disabled
     }
-    if (result.invertedPattern) {
-        result.model.invertedRegularExpressionPattern = result.invertedPattern
-        delete result.invertedPattern
+    if ((result as unknown as DefaultInputProperties).invertedPattern) {
+        result.model.invertedRegularExpressionPattern =
+            (result as unknown as DefaultInputProperties).invertedPattern!
+        delete (result as unknown as DefaultInputProperties).invertedPattern
     }
-    if (result.pattern) {
-        result.model.regularExpressionPattern = result.pattern
-        delete result.pattern
+    if ((result as unknown as DefaultInputProperties).pattern) {
+        result.model.regularExpressionPattern =
+            (result as unknown as DefaultInputProperties).pattern!
+        delete (result as unknown as DefaultInputProperties).pattern
     }
     if (result.required) {
         result.model.nullable = false
@@ -411,12 +414,14 @@ export const getConsolidatedProperties = <
     delete result.nullable
 
     if (result.invertedRegularExpressionPattern)
-        result.invertedPattern = result.invertedRegularExpressionPattern
+        (result as unknown as InputProperties).invertedPattern =
+            result.invertedRegularExpressionPattern
     // NOTE: Workaround since optional type configuration above is ignored.
     delete (result as {invertedRegularExpressionPattern?:RegExp|string})
         .invertedRegularExpressionPattern
     if (result.regularExpressionPattern)
-        result.pattern = result.regularExpressionPattern
+        (result as unknown as InputProperties).pattern =
+            result.regularExpressionPattern
     // NOTE: Workaround since optional type configuration above is ignored.
     delete (result as {regularExpressionPattern?:RegExp|string})
         .regularExpressionPattern

@@ -297,7 +297,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 initialValue="only a`s allowed"
                 name="input6"
                 onChange={onChange}
-                pattern="a+"
+                pattern="^a+$"
                 placeholder="input6Placeholder"
             />
             <GenericInput

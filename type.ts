@@ -190,11 +190,9 @@ export interface BaseProperties extends CommonBaseModel, ModelState {
     enforceUncontrolled:boolean
     id:string
     initialValue:unknown
-    invertedPattern:Array<RegExp|string>|null|RegExp|string
     label:string
     model:BaseModel
     name:string
-    pattern:Array<RegExp|string>|null|RegExp|string
     required:boolean
     requiredText:string
     ripple:RipplePropT
@@ -608,6 +606,7 @@ export interface InputProperties<T = unknown> extends
     inputProperties:Partial<
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     >
+    invertedPattern:Array<RegExp|string>|null|RegExp|string
     invertedPatternText:string
     labels:Array<[string, string]>|Array<string>|Mapping
     maximumLengthText:string
@@ -623,6 +622,7 @@ export interface InputProperties<T = unknown> extends
     onSelect:(event:GenericEvent, properties:this) => void
     onSelectionChange:(event:GenericEvent, properties:this) => void
     outlined:boolean
+    pattern:Array<RegExp|string>|null|RegExp|string
     patternText:string
     placeholder:string
     representation:ReactNode|string
@@ -759,6 +759,9 @@ export const inputPropertyTypes:PropertiesValidationMap = {
         icon?:string|(IconOptions & {tooltip?:string|TooltipProps})
     */
     icon: oneOfType([string, object]),
+    invertedPattern: oneOfType(
+        [arrayOf(oneOfType([object, string])), object, string]
+    ),
     invertedPatternText: string,
     labels: oneOfType([arrayOf(arrayOf(string)), arrayOf(string), object]),
     maximum: oneOfType([number, string]),
@@ -774,6 +777,7 @@ export const inputPropertyTypes:PropertiesValidationMap = {
     onSelect: func,
     onSelectionChange: func,
     outlined: boolean,
+    pattern: oneOfType([arrayOf(oneOfType([object, string])), object, string]),
     patternText: string,
     placeholder: string,
     representation: oneOfType([string, symbol]),
