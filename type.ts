@@ -39,7 +39,6 @@ import {
     ForwardRefExoticComponent,
     FunctionComponent,
     FunctionComponentElement,
-    HTMLProps,
     KeyboardEvent,
     MouseEvent,
     MutableRefObject,
@@ -196,7 +195,7 @@ export interface BaseProperties extends CommonBaseModel, ModelState {
     required:boolean
     requiredText:string
     ripple:RipplePropT
-    rootProps:HTMLProps<Mapping<unknown>>
+    rootProps:Mapping<boolean|number|string>
     showDeclaration:boolean
     showInitialValidationState:boolean
     // NOTE: We want to avoid a collision with html's native "style" property.
@@ -293,14 +292,19 @@ export const baseModelPropertyTypes:ValidationMapping = {
     /*
         NOTE: Also not yet working:
         type: oneOf([
+            'color',
             'date',
             'datetime-local',
+            'email',
             'month',
             'number',
+            'password',
             'range',
-            'string',
+            'search',
+            'text',
             'time',
             'time-local',
+            'url',
             'week'
         ])
     */
@@ -365,6 +369,7 @@ export const propertyTypes:ValidationMapping = {
     required: boolean,
     requiredText: string,
     ripple: oneOfType([boolean, object]),
+    rootProps: object,
     showDeclaration: oneOfType([boolean, symbol]),
     showInitialValidationState: boolean,
     styles: object,
@@ -606,6 +611,7 @@ export interface InputProperties<T = unknown> extends
     inputProperties:Partial<
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     >
+    inputProps:Mapping<boolean|number|string>
     invertedPattern:Array<RegExp|string>|null|RegExp|string
     invertedPatternText:string
     labels:Array<[string, string]>|Array<string>|Mapping
@@ -759,6 +765,7 @@ export const inputPropertyTypes:PropertiesValidationMap = {
         icon?:string|(IconOptions & {tooltip?:string|TooltipProps})
     */
     icon: oneOfType([string, object]),
+    inputProps: object,
     invertedPattern: oneOfType(
         [arrayOf(oneOfType([object, string])), object, string]
     ),

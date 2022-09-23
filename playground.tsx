@@ -203,6 +203,10 @@ const Application:FunctionComponent = ():ReactElement => {
 
             <GenericInput
                 declaration="This text can be seen initially."
+                inputProps={{
+                    ariaChecked: false,
+                    ariaDescription: 'test'
+                }}
                 name="input1"
                 onChange={onChange}
                 showDeclaration={true}
