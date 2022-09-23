@@ -35,6 +35,7 @@ import {
     ReactNode,
     Suspense,
     useEffect,
+    useId,
     useImperativeHandle,
     useRef,
     useState
@@ -358,6 +359,7 @@ export function suggestionMatches(
 export const GenericInputInner = function<Type = unknown>(
     props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
 ):ReactElement {
+    const id:string = useId()
 /* eslint-enable jsdoc/require-description-complete-sentence */
     // region live-cycle
     /**
@@ -410,6 +412,50 @@ export const GenericInputInner = function<Type = unknown>(
                         {...editorState, selectionIsUnstable: false}
                     )
             }
+        // endregion
+        // region input element property synchronisation
+        if (inputReference.current) {
+            if (properties.valid) {
+                inputReference.current.removeAttribute('aria-errormessage')
+                inputReference.current.removeAttribute('aria-invalid')
+            } else {
+                inputReference.current.setAttribute(
+                    'aria-errormessage', `${id}-error-message`
+                )
+                inputReference.current.setAttribute('aria-invalid', 'true')
+            }
+
+            if (useSuggestions) {
+                inputReference.current.setAttribute('role', 'searchbox')
+                inputReference.current.setAttribute(
+                    'aria-autocomplete',
+                    properties.searchSelection ? 'inline' : 'list'
+                )
+            }
+
+
+            if (properties.inputProps)
+                for (const [name, value] of Object.entries(
+                    properties.inputProps
+                )) {
+                    const attributeName:string =
+                        Tools.stringCamelCaseToDelimited(name)
+
+                    if (typeof value === 'boolean')
+                        if (value)
+                            inputReference.current.setAttribute(
+                                attributeName, ''
+                            )
+                        else
+                            inputReference.current.removeAttribute(
+                                attributeName
+                            )
+                    else
+                        inputReference.current.setAttribute(
+                            attributeName, String(value)
+                        )
+                }
+        }
         // endregion
     })
     // endregion
@@ -503,7 +549,9 @@ export const GenericInputInner = function<Type = unknown>(
             properties.type === 'string' ?
                 properties.hidden ?
                     'password' :
-                    'text' :
+                    useSuggestions ?
+                        'search' :
+                        'text' :
                 transformer[
                     properties.type as keyof InputDataTransformation
                 ]?.type ?? properties.type
@@ -544,35 +592,41 @@ export const GenericInputInner = function<Type = unknown>(
         <GenericAnimate in={properties.showDeclaration}>
             {properties.declaration}
         </GenericAnimate>
-        <GenericAnimate in={
-            !properties.showDeclaration &&
-            properties.invalid &&
-            (
-                properties.showInitialValidationState ||
-                /*
-                    Material inputs show their validation state at
-                    least after a blur event so we synchronize error
-                    message appearances.
-                */
-                properties.visited
-            )
-        }>
-            <Theme use="error">{renderMessage(
-                properties.invalidMaximum &&
-                properties.maximumText ||
-                properties.invalidMaximumLength &&
-                properties.maximumLengthText ||
-                properties.invalidMinimum &&
-                properties.minimumText ||
-                properties.invalidMinimumLength &&
-                properties.minimumLengthText ||
-                properties.invalidInvertedPattern &&
-                properties.invertedPatternText ||
-                properties.invalidPattern &&
-                properties.patternText ||
-                properties.invalidRequired &&
-                properties.requiredText
-            )}</Theme>
+        <GenericAnimate
+            in={
+                !properties.showDeclaration &&
+                properties.invalid &&
+                (
+                    properties.showInitialValidationState ||
+                    /*
+                        Material inputs show their validation state at
+                        least after a blur event so we synchronize error
+                        message appearances.
+                    */
+                    properties.visited
+                )
+            }
+        >
+            <Theme use="error" wrap={true}>
+                <span id={`${id}-error-message`}>
+                    {renderMessage(
+                        properties.invalidMaximum &&
+                        properties.maximumText ||
+                        properties.invalidMaximumLength &&
+                        properties.maximumLengthText ||
+                        properties.invalidMinimum &&
+                        properties.minimumText ||
+                        properties.invalidMinimumLength &&
+                        properties.minimumLengthText ||
+                        properties.invalidInvertedPattern &&
+                        properties.invertedPatternText ||
+                        properties.invalidPattern &&
+                        properties.patternText ||
+                        properties.invalidRequired &&
+                        properties.requiredText
+                    )}
+                </span>
+            </Theme>
         </GenericAnimate>
     </>
     /**
@@ -2073,6 +2127,7 @@ export const GenericInputInner = function<Type = unknown>(
                 .join(' ')
             }
             style={properties.styles}
+            {...(useSuggestions ? {role: 'search'} : {})}
         >
             {wrapAnimationConditionally(
                 <Select
@@ -2084,7 +2139,7 @@ export const GenericInputInner = function<Type = unknown>(
                     }
                     inputRef={inputReference as
                         unknown as
-                        (_reference:HTMLSelectElement|null) => void
+                        (_eference:HTMLSelectElement|null) => void
                     }
                     onChange={onChangeValue}
                     options={normalizedSelection as SelectProps['options']}
@@ -2167,8 +2222,8 @@ export const GenericInputInner = function<Type = unknown>(
                                             onChange={onChangeValue as
                                                 unknown as
                                                 (
-                                                    _value:string,
-                                                    _event?:unknown
+                                                    value:string,
+                                                    event?:unknown
                                                 ) => void
                                             }
                                             onCursorChange={onSelectionChange}
@@ -2237,10 +2292,13 @@ export const GenericInputInner = function<Type = unknown>(
                         className="mdc-text-field-helper-line"
                         key="advanced-editor-helper-line"
                     >
-                        <p className={
-                            'mdc-text-field-helper-text ' +
-                            'mdc-text-field-helper-text--persistent'
-                        }>
+                        <p
+                            className={
+                                'mdc-text-field-helper-text ' +
+                                'mdc-text-field-helper-text--persistent'
+                            }
+                            id={`${id}-error-message`}
+                        >
                             {(
                                 materialProperties.helpText as
                                     {children:ReactElement}
