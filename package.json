@@ -15,24 +15,18 @@
     "url": "https://github.com/thaibault/react-input-material/issues"
   },
   "license": "CC-BY-3.0",
+  "main": "dist/index.js",
   "author": {
     "name": "Torben Sickert",
     "email": "info@torben.website",
     "url": "https://torben.website"
   },
   "files": [
-    "components/*.css",
-    "components/*.d.ts",
-    "components/*.js",
-    "helper.d.ts",
-    "helper.js",
-    "index.styles.css",
-    "index.d.ts",
-    "index.js",
-    "material-fixes.css",
-    "testHelper.d.ts",
-    "testHelper.js",
-    "type.d.ts"
+    "dist/components",
+    "dist/*.css",
+    "dist/*.js",
+    "dist/*.d.ts",
+    "src/material-fixes.css"
   ],
   "repository": {
     "type": "git",
@@ -46,7 +40,7 @@
     "build:types": "weboptimizer build:types",
     "check": "yarn check:types; yarn lint",
     "check:types": "weboptimizer check:types",
-    "clear": "weboptimizer clear && (rm *.styles.css components/*.styles.css 2>/dev/null || true)",
+    "clear": "weboptimizer clear",
     "document": "weboptimizer document",
     "lint": "yarn clear && weboptimizer lint",
     "patch": "for path in patches/*.patch; do target_file_path=\"$(echo \"$path\" | sed --regexp-extended 's/patches\\/([^/]+).patch$/\\1/' | sed 's:\\+:/:g')\"; source_file_path=\"$path\"; echo \"Patch file \\\"$target_file_path\\\" with \\\"$source_file_path\\\".\"; patch --forward --input \"$source_file_path\" --reject-file - \"$target_file_path\"; done; true",
@@ -258,7 +252,7 @@
     "files": {
       "compose": {
         "cascadingStyleSheet": {
-          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['test:browser', 'serve'].includes(self.givenCommandLineArguments[2]) ? null : `${path.resolve(self.path.target.asset.cascadingStyleSheet, '[name].styles.css')}?${self.hashAlgorithm}=[chunkhash]`"
+          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['test:browser', 'serve'].includes(self.givenCommandLineArguments[2]) ? null : `${path.resolve(self.path.target.asset.cascadingStyleSheet, '[name].css')}?${self.hashAlgorithm}=[chunkhash]`"
         }
       }
     },
@@ -271,7 +265,7 @@
     },
     "injection": {
       "entry": {
-        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? ['./index.css', './playground'] : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2].startsWith('test') ? {testBundle: './test'} : {'./components/Dummy': './components/Dummy', './components/FileInput': './components/FileInput', './components/GenericAnimate': './components/GenericAnimate', './components/GenericInput': './components/GenericInput', './components/Inputs': './components/Inputs', './components/Interval': './components/Interval', './components/RequireableCheckbox': './components/RequireableCheckbox', './components/WrapConfigurations': './components/WrapConfigurations', './components/WrapThemeProvider': './components/WrapThemeProvider', './components/WrapTooltip': './components/WrapTooltip', helper: './helper', index: ['./index.css', './index.tsx'], testHelper: './testHelper'}"
+        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? ['../src/index.css', './playground'] : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2].startsWith('test') ? {testBundle: './test'} : {'./components/Dummy': './components/Dummy', './components/FileInput/index': './components/FileInput', './components/GenericAnimate/index': './components/GenericAnimate', './components/GenericInput/index': './components/GenericInput', './components/Inputs/index': './components/Inputs', './components/Interval/index': './components/Interval', './components/RequireableCheckbox/index': './components/RequireableCheckbox', './components/WrapConfigurations': './components/WrapConfigurations', './components/WrapThemeProvider': './components/WrapThemeProvider', './components/WrapTooltip': './components/WrapTooltip', helper: './helper', index: ['./index.css', './index.tsx'], testHelper: './testHelper'}"
       }
     },
     "module": {
@@ -319,6 +313,14 @@
             }
           }
         }
+      }
+    },
+    "path": {
+      "source": {
+        "base": "src/"
+      },
+      "target": {
+        "base": "dist/"
       }
     },
     "target:bundle": {

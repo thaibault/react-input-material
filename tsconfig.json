@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "declarationDir": "dist/"
+    },
+    "extends": "./node_modules/weboptimizer/tsconfigApplication.json",
+    "include": [
+        "src/*.d.ts",
+        "src/**/*.d.ts",
+        "src/*.ts", "src/*.tsx",
+        "src/**/*.ts", "src/**/*.tsx"
+    ]
+}

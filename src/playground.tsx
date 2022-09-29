@@ -29,7 +29,9 @@ import {
 } from 'react'
 import {createRoot} from 'react-dom/client'
 
-import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
+import {
+    preserveStaticFileBaseNameInputGenerator
+} from './components/FileInput'
 import {
     FileInput,
     GenericAnimate,

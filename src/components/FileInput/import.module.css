@@ -30,7 +30,8 @@ Plain CSS:
 @import "@material/button/dist/mdc.button.css";
 @import "@material/card/dist/mdc.card.css";
 
-@import "./GenericInput.module";
+@import "../GenericInput/import.module";
+@import "./style.module";
 /* endregion */
 .file-input {
     /*

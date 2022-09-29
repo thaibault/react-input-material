@@ -71,8 +71,8 @@ import {
     EventHandler as RichTextEventHandler
 } from '@tinymce/tinymce-react/lib/cjs/main/ts/Events'
 
-import Dummy from './Dummy'
-import GenericAnimate from './GenericAnimate'
+import Dummy from '../Dummy'
+import GenericAnimate from '../GenericAnimate'
 /*
 "namedExport" version of css-loader:
 
@@ -84,11 +84,11 @@ import {
     genericInputEditorLabelClassName,
     genericInputSuggestionsClassName,
     genericInputSuggestionsPendingClassName
-} from './GenericInput.module'
+} from './style.module'
  */
-import cssClassNames from './GenericInput.module'
-import WrapConfigurations from './WrapConfigurations'
-import WrapTooltip from './WrapTooltip'
+import cssClassNames from './style.module'
+import WrapConfigurations from '../WrapConfigurations'
+import WrapTooltip from '../WrapTooltip'
 import {
     deriveMissingPropertiesFromState as deriveMissingBasePropertiesFromState,
     determineInitialValue,
@@ -105,7 +105,7 @@ import {
     triggerCallbackIfExists,
     useMemorizedValue,
     wrapStateSetter
-} from '../helper'
+} from '../../helper'
 import {
     CursorState,
     DataTransformSpecification,
@@ -131,7 +131,7 @@ import {
     InputTablePosition as TablePosition,
     InputValueState as ValueState,
     TinyMCEOptions
-} from '../type'
+} from '../../type'
 
 declare const TARGET_TECHNOLOGY:string
 const isBrowser =
