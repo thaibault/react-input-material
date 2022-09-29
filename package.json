@@ -23,9 +23,11 @@
   },
   "files": [
     "dist/components",
-    "dist/*.css",
-    "dist/*.js",
-    "dist/*.d.ts",
+    "dist/helper.d.ts",
+    "dist/helper.js",
+    "dist/index.css",
+    "dist/index.d.ts",
+    "dist/index.js",
     "src/material-fixes.css"
   ],
   "repository": {
