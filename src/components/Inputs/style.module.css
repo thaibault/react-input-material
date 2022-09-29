@@ -9,12 +9,6 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
-/* region imports */
-/* import "@rmwc/icon-button/styles" */
-@import "@material/icon-button/dist/mdc.icon-button.css";
-@import "@material/ripple/dist/mdc.ripple.css";
-@import "@rmwc/icon/icon.css";
-/* endregion */
 .inputs {
     display: flex;
     flex-direction: column;

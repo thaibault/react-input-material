@@ -39,10 +39,10 @@ import {Theme} from '@rmwc/theme'
 /*
 "namedExport" version of css-loader:
 
-import {requireableCheckboxClassName} from './RequireableCheckbox.module'
+import {requireableCheckboxClassName} from './style.module'
 */
-import cssClassNames from './RequireableCheckbox.module'
-import {WrapConfigurations} from './WrapConfigurations'
+import cssClassNames from './style.module'
+import {WrapConfigurations} from '../WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
     determineInitialValue,
@@ -52,7 +52,7 @@ import {
     translateKnownSymbols,
     triggerCallbackIfExists,
     wrapStateSetter
-} from '../helper'
+} from '../../helper'
 import {
     CheckboxAdapter as Adapter,
     CheckboxProperties as Properties,
@@ -64,7 +64,7 @@ import {
     checkboxPropertyTypes as propertyTypes,
     CheckboxComponent,
     CheckboxValueState as ValueState
-} from '../type'
+} from '../../type'
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region helper

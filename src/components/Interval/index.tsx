@@ -32,17 +32,17 @@ import {
     useState
 } from 'react'
 
-import GenericInput from './GenericInput'
+import GenericInput from '../GenericInput'
 /*
 "namedExport" version of css-loader:
 
-import {intervalClassName, intervalDisabledClassName} from './Interval.module'
+import {intervalClassName, intervalDisabledClassName} from './style.module'
 */
-import cssClassNames from './Interval.module'
-import WrapConfigurations from './WrapConfigurations'
+import cssClassNames from './style.module'
+import WrapConfigurations from '../WrapConfigurations'
 import {
     createDummyStateSetter, translateKnownSymbols, triggerCallbackIfExists
-} from '../helper'
+} from '../../helper'
 import {
     defaultIntervalProperties as defaultProperties,
     GenericEvent,
@@ -57,7 +57,7 @@ import {
     intervalPropertyTypes as propertyTypes,
     IntervalProps as Props,
     IntervalValue as Value
-} from '../type'
+} from '../../type'
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region helper

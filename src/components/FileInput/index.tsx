@@ -55,11 +55,11 @@ import {
     fileInputIframeWrapperPaddingClassName,
     fileInputNativeClassName,
     fileInputTextRepresentationClassName
-} from './FileInput.module'
+} from './style.module'
 */
-import cssClassNames from './FileInput.module'
-import GenericInput from './GenericInput'
-import {WrapConfigurations} from './WrapConfigurations'
+import cssClassNames from './style.module'
+import GenericInput from '../GenericInput'
+import {WrapConfigurations} from '../WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
     determineInitialValue,
@@ -69,7 +69,7 @@ import {
     translateKnownSymbols,
     triggerCallbackIfExists,
     wrapStateSetter
-} from '../helper'
+} from '../../helper'
 import {
     defaultFileInputModelState as defaultModelState,
     DefaultFileInputProperties as DefaultProperties,
@@ -87,7 +87,7 @@ import {
     InputProps,
     FileRepresentationType as RepresentationType,
     FileInputComponent
-} from '../type'
+} from '../../type'
 // endregion
 // region constants
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping

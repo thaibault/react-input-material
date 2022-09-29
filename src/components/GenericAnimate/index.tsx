@@ -35,10 +35,12 @@ import {
     genericAnimateClassName,
     genericAnimateListWrapperClassName,
     genericAnimateWrapperClassName
-} from './GenericAnimate.module'
+} from './style.module'
 */
-import cssClassNames from './GenericAnimate.module'
-import {GenericAnimateComponent, GenericAnimateProps as Props} from '../type'
+import cssClassNames from './style.module'
+import {
+    GenericAnimateComponent, GenericAnimateProps as Props
+} from '../../type'
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 /**
