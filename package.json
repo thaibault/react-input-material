@@ -261,6 +261,26 @@
       }
     },
     "generic": {
+      "entry": {
+        "./components/Dummy": "./components/Dummy",
+        "./components/FileInput/import": "./components/FileInput/import.module",
+        "./components/FileInput/index": "./components/FileInput/index",
+        "./components/GenericAnimate/index": "./components/GenericAnimate/index",
+        "./components/GenericInput/import": "./components/GenericInput/import.module",
+        "./components/GenericInput/index": "./components/GenericInput/index",
+        "./components/Inputs/import.module": "./components/Inputs/import.module",
+        "./components/Inputs/index": "./components/Inputs/index",
+        "./components/Interval/import.module": "./components/Interval/import.module",
+        "./components/Interval/index": "./components/Interval/index",
+        "./components/RequireableCheckbox/import.module": "./components/RequireableCheckbox/import.module",
+        "./components/RequireableCheckbox/index": "./components/RequireableCheckbox/index",
+        "./components/WrapConfigurations": "./components/WrapConfigurations",
+        "./components/WrapThemeProvider": "./components/WrapThemeProvider",
+        "./components/WrapTooltip": "./components/WrapTooltip",
+        "helper": "./helper",
+        "index": ["./index.css", "./index.tsx"],
+        "testHelper": "./testHelper"
+      },
       "supportedBrowsers": [
         "IE >= 11",
         "last 2 versions",
@@ -269,7 +289,7 @@
     },
     "injection": {
       "entry": {
-        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? ['../src/index.css', './playground'] : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2].startsWith('test') ? {testBundle: './test'} : {'./components/Dummy': './components/Dummy', './components/FileInput/index': './components/FileInput', './components/GenericAnimate/index': './components/GenericAnimate', './components/GenericInput/index': './components/GenericInput', './components/Inputs/index': './components/Inputs', './components/Interval/index': './components/Interval', './components/RequireableCheckbox/index': './components/RequireableCheckbox', './components/WrapConfigurations': './components/WrapConfigurations', './components/WrapThemeProvider': './components/WrapThemeProvider', './components/WrapTooltip': './components/WrapTooltip', helper: './helper', index: ['./index.css', './index.tsx'], testHelper: './testHelper'}"
+        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? ['../src/index.css', './playground'] : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2].startsWith('test') ? {testBundle: './test'} : self.generic.entry"
       }
     },
     "module": {
