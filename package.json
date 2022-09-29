@@ -1,6 +1,6 @@
 {
   "name": "react-input-material",
-  "version": "0.0.444",
+  "version": "0.0.445",
   "description": "Reusable material design based input field with support for (richt-)text, code, selections, numbers, dates and so on.",
   "keywords": [
     "form-field",
@@ -278,7 +278,10 @@
         "./components/WrapThemeProvider": "./components/WrapThemeProvider",
         "./components/WrapTooltip": "./components/WrapTooltip",
         "helper": "./helper",
-        "index": ["./index.css", "./index.tsx"],
+        "index": [
+          "./index.css",
+          "./index.tsx"
+        ],
         "testHelper": "./testHelper"
       },
       "supportedBrowsers": [
