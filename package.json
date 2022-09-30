@@ -30,6 +30,7 @@
     "dist/index.js",
     "dist/testHelper.d.ts",
     "dist/testHelper.js",
+    "dist/type.d.ts",
     "src/material-fixes.css"
   ],
   "repository": {
