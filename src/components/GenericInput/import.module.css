@@ -67,8 +67,6 @@ Plain CSS:
 @import "@rmwc/tooltip/tooltip.css";
 
 @import "@material/typography/dist/mdc.typography.css";
-
-@import "./style.module";
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:
 vim: foldmethod=marker foldmarker=region,endregion:

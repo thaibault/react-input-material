@@ -12,8 +12,6 @@ endregion */
 @import "@material/icon-button/dist/mdc.icon-button.css";
 @import "@material/ripple/dist/mdc.ripple.css";
 @import "@rmwc/icon/icon.css";
-
-@import "./style.module"
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:
 vim: foldmethod=marker foldmarker=region,endregion:
