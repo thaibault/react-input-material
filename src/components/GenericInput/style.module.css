@@ -56,25 +56,17 @@ endregion */
     color: var(--mdc-theme-secondary);
     display: contents;
 }
-
 /* Clears the 'X' from Internet Explorer */
-.generic-input input[type=search]::-ms-clear {
+.generic-input input[type="search"]::-ms-clear,
+.generic-input input[type="search"]::-ms-reveal {
     display: none;
 
     height: 0;
     width: 0;
 }
-
-.generic-input input[type=search]::-ms-reveal {
-    display: none;
-
-    height: 0;
-    width: 0;
-}
-
 /* Clears the 'X' from Chrome */
-.generic-input input[type="search"]::-webkit-search-decoration,
 .generic-input input[type="search"]::-webkit-search-cancel-button,
+.generic-input input[type="search"]::-webkit-search-decoration,
 .generic-input input[type="search"]::-webkit-search-results-button,
 .generic-input input[type="search"]::-webkit-search-results-decoration {
     display: none;
