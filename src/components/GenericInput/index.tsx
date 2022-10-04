@@ -415,6 +415,7 @@ export const GenericInputInner = function<Type = unknown>(
         // endregion
         // region input element property synchronisation
         if (inputReference.current) {
+            // Apply aria attributes regarding validation state.
             if (properties.valid) {
                 inputReference.current.removeAttribute('aria-errormessage')
                 inputReference.current.removeAttribute('aria-invalid')
@@ -425,6 +426,7 @@ export const GenericInputInner = function<Type = unknown>(
                 inputReference.current.setAttribute('aria-invalid', 'true')
             }
 
+            // Apply aria attributes regarding searching.
             if (useSuggestions) {
                 inputReference.current.setAttribute('role', 'searchbox')
                 inputReference.current.setAttribute(
@@ -433,7 +435,7 @@ export const GenericInputInner = function<Type = unknown>(
                 )
             }
 
-
+            // Apply configured native input properties.
             if (properties.inputProps)
                 for (const [name, value] of Object.entries(
                     properties.inputProps
@@ -596,15 +598,8 @@ export const GenericInputInner = function<Type = unknown>(
             in={
                 !properties.showDeclaration &&
                 properties.invalid &&
-                (
-                    properties.showInitialValidationState ||
-                    /*
-                        Material inputs show their validation state at
-                        least after a blur event so we synchronize error
-                        message appearances.
-                    */
-                    properties.visited
-                )
+                properties.showValidationState &&
+                (properties.showInitialValidationState || properties.visited)
             }
         >
             <Theme use="error" wrap={true}>
@@ -1919,10 +1914,15 @@ export const GenericInputInner = function<Type = unknown>(
             children: renderHelpText(),
             persistent: Boolean(properties.declaration)
         },
-        invalid: properties.showInitialValidationState && properties.invalid,
+        invalid: (
+            properties.invalid &&
+            properties.showValidationState &&
+            (properties.showInitialValidationState || properties.visited)
+        ),
         label: properties.description || properties.name,
-        outlined: properties.outlined,
-        required: properties.required
+        outlined: properties.outlined
+        // NOTE: Validation is not handle by the material component:
+        // "required: properties.required".
     }
     if (properties.icon)
         materialProperties.icon = wrapIconWithTooltip(
@@ -2181,6 +2181,7 @@ export const GenericInputInner = function<Type = unknown>(
                             }>
                                 <Theme use={
                                     properties.invalid &&
+                                    properties.showValidationState &&
                                     (
                                         properties.showInitialValidationState ||
                                         properties.visited
