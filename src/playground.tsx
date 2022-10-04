@@ -279,6 +279,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 onChange={onChange}
                 placeholder="100.000,00"
                 required
+                showValidationState={false}
                 trailingIcon="clear_preset"
             />
             <GenericInput

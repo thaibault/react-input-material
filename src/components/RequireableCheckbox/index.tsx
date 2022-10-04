@@ -443,13 +443,9 @@ export const RequireableCheckboxInner = function(
                 inputRef={inputReference}
                 label={(
                     properties.invalid &&
+                    properties.showValidationState &&
                     (
                         properties.showInitialValidationState ||
-                        /*
-                            Material inputs show their validation state at
-                            least after a blur event so we synchronize error
-                            appearances.
-                        */
                         properties.visited
                     )
                 ) ?

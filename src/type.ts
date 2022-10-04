@@ -198,6 +198,7 @@ export interface BaseProperties extends CommonBaseModel, ModelState {
     rootProps:Mapping<boolean|number|string>
     showDeclaration:boolean
     showInitialValidationState:boolean
+    showValidationState:boolean
     // NOTE: We want to avoid a collision with html's native "style" property.
     styles:Mapping
     themeConfiguration:ThemeProviderProps['options']
@@ -372,6 +373,7 @@ export const propertyTypes:ValidationMapping = {
     rootProps: object,
     showDeclaration: oneOfType([boolean, symbol]),
     showInitialValidationState: boolean,
+    showValidationState: boolean,
     styles: object,
     themeConfiguration: object,
     /*
@@ -424,6 +426,7 @@ export const defaultProperties:DefaultProperties<string> = {
     model: {...defaultModel},
     showDeclaration: undefined,
     showInitialValidationState: false,
+    showValidationState: true,
     requiredText: 'Please fill this field.'
 } as const
 //// endregion

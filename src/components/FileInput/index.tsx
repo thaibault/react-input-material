@@ -740,14 +740,8 @@ export const FileInputInner = function(
             'binary'
     const invalid:boolean = (
         properties.invalid &&
-        (
-            properties.showInitialValidationState ||
-            /*
-                Material inputs show their validation state at least after a
-                blur event so we synchronize error appearances.
-            */
-            properties.visited
-        )
+        properties.showValidationState &&
+        (properties.showInitialValidationState || properties.visited)
     )
 
     return <WrapConfigurations
