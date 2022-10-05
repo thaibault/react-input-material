@@ -472,7 +472,20 @@ export const GenericInputInner = function<Type = unknown>(
     const applyIconPreset = (
         options?:Properties['icon']
     ):IconOptions|string|undefined => {
-        if (options === 'clear_preset')
+        if (options === 'clear_preset') {
+            const handler = (
+                event:ReactKeyboardEvent|ReactMouseEvent
+            ):void => {
+                event.preventDefault()
+                event.stopPropagation()
+
+                onChangeValue(parseValue<Type>(
+                    properties,
+                    properties.default as Type,
+                    GenericInput.transformer
+                ))
+            }
+
             return {
                 icon: <GenericAnimate
                     in={!Tools.equals(properties.value, properties.default)}
@@ -488,20 +501,40 @@ export const GenericInputInner = function<Type = unknown>(
                         <IconButton icon="clear"/>
                     }
                 </GenericAnimate>,
-                onClick: (event:ReactMouseEvent):void => {
-                    event.preventDefault()
-                    event.stopPropagation()
-
-                    onChangeValue(parseValue<Type>(
-                        properties,
-                        properties.default as Type,
-                        GenericInput.transformer
-                    ))
-                },
+                onClick: handler,
+                onKeyDown: handler,
                 strategy: 'component',
+                tabIndex: -1,
                 tooltip: 'Clear input'
             }
-        if (options === 'password_preset')
+        }
+
+        if (options === 'password_preset') {
+            const handler = (
+                event:ReactKeyboardEvent|ReactMouseEvent
+            ):void => {
+                if (
+                    typeof (event as ReactKeyboardEvent).keyCode ===
+                        'number' &&
+                    (event as ReactKeyboardEvent).keyCode !==
+                        Tools.keyCode.ENTER
+                )
+                    return
+
+                event.preventDefault()
+                event.stopPropagation()
+
+                setHidden((value:boolean|undefined):boolean => {
+                    if (value === undefined)
+                        value = properties.hidden
+                    properties.hidden = !value
+
+                    onChange(event)
+
+                    return properties.hidden
+                })
+            }
+
             return useMemorizedValue(
                 {
                     icon: (
@@ -516,25 +549,25 @@ export const GenericInputInner = function<Type = unknown>(
                         <IconButton
                             icon={properties.hidden ? 'lock_open' : 'lock'}
                         />,
-                    onClick: (event:ReactMouseEvent):void => {
-                        event.preventDefault()
-                        event.stopPropagation()
-                        setHidden((value:boolean|undefined):boolean => {
-                            if (value === undefined)
-                                value = properties.hidden
-                            properties.hidden = !value
-
-                            onChange(event)
-
-                            return properties.hidden
-                        })
-                    },
+                    onClick: handler,
+                    onKeyDown: handler,
                     strategy: 'component',
+                    tabIndex: -1,
                     tooltip:
                         `${(properties.hidden ? 'Show' : 'Hide')} password`
                 },
                 properties.hidden
             )
+        }
+
+        if (options) {
+            if (typeof options === 'string')
+                options = {icon: options}
+
+            if (!Object.prototype.hasOwnProperty.call(options, 'onClick'))
+                options.tabIndex = -1
+        }
+
         return options
     }
     /**
@@ -703,10 +736,12 @@ export const GenericInputInner = function<Type = unknown>(
             delete options.tooltip
             const nestedOptions:IconOptions = {...options}
             options.strategy = 'component'
+
             options.icon = <WrapTooltip options={tooltip}>
                 <Icon icon={nestedOptions} />
             </WrapTooltip>
         }
+
         return options as IconOptions|undefined
     }
     /// endregion
@@ -1600,7 +1635,7 @@ export const GenericInputInner = function<Type = unknown>(
         onTouch(event)
     }
     /**
-     * Triggered on down up events.
+     * Triggered on key down events.
      * @param event - Key up event object.
      *
      * @returns Nothing.
@@ -1613,7 +1648,11 @@ export const GenericInputInner = function<Type = unknown>(
             NOTE: We do not want to forward keydown enter events coming from
             textareas.
         */
-        if (properties.type === 'string' && properties.editor !== 'plain')
+        if (
+            useSelection ||
+            properties.type === 'string' &&
+            properties.editor !== 'plain'
+        )
             preventEnterKeyPropagation(event)
 
         triggerCallbackIfExists<Properties<Type>>(
@@ -1921,8 +1960,12 @@ export const GenericInputInner = function<Type = unknown>(
         ),
         label: properties.description || properties.name,
         outlined: properties.outlined
-        // NOTE: Validation is not handle by the material component:
-        // "required: properties.required".
+        /*
+            NOTE: Validation is not handle by the material component kike this:
+
+            pattern: properties.pattern,
+            required: properties.required
+        */
     }
     if (properties.icon)
         materialProperties.icon = wrapIconWithTooltip(
@@ -2126,6 +2169,7 @@ export const GenericInputInner = function<Type = unknown>(
                 )
                 .join(' ')
             }
+            onKeyDown={onKeyDown}
             style={properties.styles}
             {...(useSuggestions ? {role: 'search'} : {})}
         >
@@ -2133,13 +2177,13 @@ export const GenericInputInner = function<Type = unknown>(
                 <Select
                     {...genericProperties as SelectProps}
                     {...materialProperties as SelectProps}
-                    enhanced
+                    enhanced={!properties.disabled}
                     foundationRef={foundationReference as
                         MutableRefObject<MDCSelectFoundation|null>
                     }
                     inputRef={inputReference as
                         unknown as
-                        (_eference:HTMLSelectElement|null) => void
+                        (reference:HTMLSelectElement|null) => void
                     }
                     onChange={onChangeValue}
                     options={normalizedSelection as SelectProps['options']}
@@ -2405,7 +2449,6 @@ export const GenericInputInner = function<Type = unknown>(
                         rootProps={{
                             name: properties.name,
                             onClick,
-                            onKeyDown,
                             onKeyUp,
                             ...properties.rootProps
                         }}
