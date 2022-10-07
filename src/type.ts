@@ -696,6 +696,7 @@ export interface InputAdapterWithReferences<T = unknown> extends
         suggestionMenuFoundationReference:MutableRefObject<
             MDCMenuFoundation|null
         >
+        wrapperReference:MutableRefObject<HTMLDivElement|null>
     }
 }
 
