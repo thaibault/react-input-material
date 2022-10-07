@@ -1168,11 +1168,21 @@ export const GenericInputInner = function<Type = unknown>(
      * Triggered on blur events.
      * @param event - Event object.
      *
-     * @returns Nothing.
+     * @returns Newly computed value state.
      */
-    const onBlur = (event:GenericEvent):void => setValueState((
+    const onBlur = (
+        event:ReactFocusEvent<HTMLDivElement>
+    ):void => setValueState((
         oldValueState:ValueState<Type, ModelState>
     ):ValueState<Type, ModelState> => {
+        if (
+            event.relatedTarget &&
+            wrapperReference.current?.contains(
+                event.relatedTarget as unknown as Node
+            )
+        )
+            return oldValueState
+
         setIsSuggestionOpen(false)
 
         let changed = false
@@ -1641,7 +1651,11 @@ export const GenericInputInner = function<Type = unknown>(
      * @returns Nothing.
      */
     const onKeyDown = (event:ReactKeyboardEvent):void => {
-        if (useSuggestions && Tools.keyCode.DOWN === event.keyCode)
+        if (
+            useSuggestions &&
+            Tools.keyCode.DOWN === event.keyCode &&
+            event.target === inputReference.current
+        )
             suggestionMenuAPIReference.current?.focusItemAtIndex(0)
 
         /*
@@ -1760,6 +1774,8 @@ export const GenericInputInner = function<Type = unknown>(
     const suggestionMenuFoundationReference:MutableRefObject<
         MDCMenuFoundation|null
     > = useRef<MDCMenuFoundation>(null)
+    const wrapperReference:MutableRefObject<HTMLDivElement|null> =
+        useRef<HTMLDivElement>(null)
     /// endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
 
@@ -1931,7 +1947,8 @@ export const GenericInputInner = function<Type = unknown>(
                     richTextEditorInstance,
                     richTextEditorReference,
                     suggestionMenuAPIReference,
-                    suggestionMenuFoundationReference
+                    suggestionMenuFoundationReference,
+                    wrapperReference
                 },
                 state
             }
@@ -1943,7 +1960,6 @@ export const GenericInputInner = function<Type = unknown>(
     const genericProperties:Partial<
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     > = {
-        onBlur,
         onFocus: triggerOnFocusAndOpenSuggestions,
         placeholder: properties.placeholder
     }
@@ -2169,7 +2185,9 @@ export const GenericInputInner = function<Type = unknown>(
                 )
                 .join(' ')
             }
+            onBlur={onBlur}
             onKeyDown={onKeyDown}
+            ref={wrapperReference}
             style={properties.styles}
             {...(useSuggestions ? {role: 'search'} : {})}
         >

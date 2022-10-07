@@ -55,7 +55,7 @@
     "serve": "weboptimizer serve",
     "serve:minimal": "weboptimizer serve '{__reference__: \"target:minimal\"}'",
     "start": "yarn serve",
-    "test": "weboptimizer test",
+    "test": "yarn clear && weboptimizer test",
     "test:browser": "yarn clear && weboptimizer test:browser",
     "test:coverage": "yarn clear && weboptimizer test:coverage",
     "test:coverage:report": "yarn clear && weboptimizer test:coverage:report",
