@@ -2098,8 +2098,6 @@ export const GenericInputInner = function<Type = unknown>(
                             (
                                 properties.representation as string
                             )?.split(' ') || '',
-                            (value:unknown):string =>
-                                `${value as string}`.toLowerCase(),
                             {
                                 marker: (foundWord:string):ReactElement =>
                                     <span className={CSS_CLASS_NAMES[
@@ -2107,9 +2105,11 @@ export const GenericInputInner = function<Type = unknown>(
                                         '__suggestion__mark'
                                     ]}>
                                         {foundWord}
-                                    </span>
-                            },
-                            null
+                                    </span>,
+                                normalizer: (value:unknown):string =>
+                                    `${value as string}`.toLowerCase(),
+                                skipTagDelimitedParts: null
+                            }
                         ) as Array<ReactElement|string>).map((
                             item:ReactElement|string, index:number
                         ):ReactElement =>
