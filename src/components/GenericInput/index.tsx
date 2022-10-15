@@ -428,7 +428,9 @@ export const GenericInputInner = function<Type = unknown>(
 
             // Apply aria attributes regarding searching.
             if (useSuggestions) {
-                inputReference.current.setAttribute('role', 'searchbox')
+                if (inputReference.current.getAttribute('type') !== 'search')
+                    inputReference.current.setAttribute('role', 'searchbox')
+
                 inputReference.current.setAttribute(
                     'aria-autocomplete',
                     properties.searchSelection ? 'inline' : 'list'
