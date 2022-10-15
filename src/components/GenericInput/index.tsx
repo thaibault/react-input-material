@@ -459,6 +459,16 @@ export const GenericInputInner = function<Type = unknown>(
                 }
         }
         // endregion
+
+        // Apply missing initial aria attribute regarding menu popup state.
+        if (useSelection) {
+            const selectionWrapper:HTMLDivElement =
+                wrapperReference.current
+                    .querySelector('[aria-haspopup="listbox"]')
+            if (!selectionWrapper.hasAttribute('aria-expanded'))
+                selectionWrapper.setAttribute('aria-expanded', 'false')
+
+        }
     })
     // endregion
     // region context helper
