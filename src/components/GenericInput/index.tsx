@@ -469,7 +469,6 @@ export const GenericInputInner = function<Type = unknown>(
                     .querySelector('[aria-haspopup="listbox"]')!
             if (!selectionWrapper.hasAttribute('aria-expanded'))
                 selectionWrapper.setAttribute('aria-expanded', 'false')
-
         }
     })
     // endregion
