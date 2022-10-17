@@ -1355,8 +1355,8 @@ export const GenericInputInner = function<Type = unknown>(
      * Triggered when ever the value changes.
      * Takes a given value or determines it from given event object and
      * generates new value state (internal value, representation and validation
-     * states). Derived event handler will be triggered when internal state
-     * has been consolidated.
+     * states). Derived event handler will be triggered when internal state has
+     * been consolidated.
      * @param eventOrValue - Event object or new value.
      * @param editorInstance - Potential editor instance if triggered from a
      * rich text or code editor.
@@ -1370,9 +1370,6 @@ export const GenericInputInner = function<Type = unknown>(
         editorInstance?:RichTextEditor,
         selectedIndex = -1
     ):void => {
-        if (properties.disabled)
-            return
-
         setIsSuggestionOpen(true)
 
         let event:GenericEvent|undefined
@@ -1663,6 +1660,7 @@ export const GenericInputInner = function<Type = unknown>(
      */
     const onKeyDown = (event:ReactKeyboardEvent):void => {
         if (
+            !properties.disabled &&
             useSuggestions &&
             Tools.keyCode.DOWN === event.keyCode &&
             event.target === inputReference.current
@@ -2217,6 +2215,13 @@ export const GenericInputInner = function<Type = unknown>(
                         (reference:HTMLSelectElement|null) => void
                     }
                     onChange={onChangeValue}
+                    onKeyDown={(event:ReactKeyboardEvent):void => {
+                        if (!(
+                            properties.disabled ||
+                            event.keyCode === Tools.keyCode.TAB
+                        ))
+                            event.preventDefault()
+                    }}
                     options={normalizedSelection as SelectProps['options']}
                     rootProps={{
                         name: properties.name,
@@ -2481,6 +2486,14 @@ export const GenericInputInner = function<Type = unknown>(
                             name: properties.name,
                             onClick,
                             onKeyUp,
+                            /*
+                                NOTE: Disabled input fields are not focusable
+                                via keyboard which makes them unreachable for
+                                blind people using e.g. screen readers.
+                                Therefore the label gets a tabindex to make the
+                                input focusable.
+                            */
+                            tabIndex: properties.disabled ? '0' : '-1',
                             ...properties.rootProps
                         }}
                         textarea={
