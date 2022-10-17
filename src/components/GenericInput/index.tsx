@@ -428,7 +428,9 @@ export const GenericInputInner = function<Type = unknown>(
 
             // Apply aria attributes regarding searching.
             if (useSuggestions) {
-                inputReference.current.setAttribute('role', 'searchbox')
+                if (inputReference.current.getAttribute('type') !== 'search')
+                    inputReference.current.setAttribute('role', 'searchbox')
+
                 inputReference.current.setAttribute(
                     'aria-autocomplete',
                     properties.searchSelection ? 'inline' : 'list'
@@ -459,6 +461,16 @@ export const GenericInputInner = function<Type = unknown>(
                 }
         }
         // endregion
+
+        // Apply missing initial aria attribute regarding menu popup state.
+        if (useSelection) {
+            const selectionWrapper:HTMLDivElement =
+                wrapperReference.current!
+                    .querySelector('[aria-haspopup="listbox"]')!
+            if (!selectionWrapper.hasAttribute('aria-expanded'))
+                selectionWrapper.setAttribute('aria-expanded', 'false')
+
+        }
     })
     // endregion
     // region context helper
