@@ -281,7 +281,7 @@
         "helper": "./helper",
         "index": [
           "./index.css",
-          "./index.tsx"
+          "./index.ts"
         ],
         "material-fixes": "./material-fixes",
         "testHelper": "./testHelper"
