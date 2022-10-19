@@ -415,60 +415,83 @@ export const GenericInputInner = function<Type = unknown>(
         // endregion
         // region input element property synchronisation
         if (inputReference.current) {
+            const determinedInputProps:Mapping<boolean|number|string> = {}
+            const propsToRemove:Array<string> = []
+
+
             // Apply aria attributes regarding validation state.
             if (properties.valid) {
-                inputReference.current.removeAttribute('aria-errormessage')
-                inputReference.current.removeAttribute('aria-invalid')
+                propsToRemove.push('ariaErrormessage')
+                propsToRemove.push('ariaInvalid')
             } else {
-                inputReference.current.setAttribute(
-                    'aria-errormessage', `${id}-error-message`
-                )
-                inputReference.current.setAttribute('aria-invalid', 'true')
+                determinedInputProps.ariaErrormessage =
+                    `${id}-error-message`
+                determinedInputProps.ariaInvalid = 'true'
             }
 
             // Apply aria attributes regarding searching.
             if (useSuggestions) {
                 if (inputReference.current.getAttribute('type') !== 'search')
-                    inputReference.current.setAttribute('role', 'searchbox')
+                    determinedInputProps.role = 'searchbox'
 
-                inputReference.current.setAttribute(
-                    'aria-autocomplete',
+                determinedInputProps.ariaAutocomplete =
                     properties.searchSelection ? 'inline' : 'list'
-                )
+            } else {
+                propsToRemove.push('searchbox')
+                propsToRemove.push('ariaAutocomplete')
+            }
+
+            if (properties.showDeclaration)
+                determinedInputProps.ariaDescribedby = `${id}-declaration`
+            else
+                propsToRemove.push('ariaDescribedby')
+
+            const inputProps = {
+                ...determinedInputProps, ...properties.inputProps || {}
             }
 
             // Apply configured native input properties.
-            if (properties.inputProps)
-                for (const [name, value] of Object.entries(
-                    properties.inputProps
-                )) {
-                    const attributeName:string =
-                        Tools.stringCamelCaseToDelimited(name)
+            for (const [name, value] of Object.entries(inputProps)) {
+                const attributeName:string =
+                    Tools.stringCamelCaseToDelimited(name)
 
-                    if (typeof value === 'boolean')
-                        if (value)
-                            inputReference.current.setAttribute(
-                                attributeName, ''
-                            )
-                        else
-                            inputReference.current.removeAttribute(
-                                attributeName
-                            )
+                if (typeof value === 'boolean')
+                    if (value)
+                        inputReference.current.setAttribute(attributeName, '')
                     else
-                        inputReference.current.setAttribute(
-                            attributeName, String(value)
-                        )
-                }
+                        inputReference.current.removeAttribute(attributeName)
+                else
+                    inputReference.current.setAttribute(
+                        attributeName, String(value)
+                    )
+            }
+
+            for (const name of propsToRemove) {
+                const attributeName:string =
+                    Tools.stringCamelCaseToDelimited(name)
+                if (inputReference.current.hasAttribute(attributeName))
+                    inputReference.current.removeAttribute(attributeName)
+            }
         }
         // endregion
-
         // Apply missing initial aria attribute regarding menu popup state.
         if (useSelection) {
-            const selectionWrapper:HTMLDivElement =
-                wrapperReference.current!
-                    .querySelector('[aria-haspopup="listbox"]')!
-            if (!selectionWrapper.hasAttribute('aria-expanded'))
-                selectionWrapper.setAttribute('aria-expanded', 'false')
+            const selectionWrapper:HTMLElement|null = wrapperReference.current
+                .querySelector('[aria-haspopup="listbox"]')
+            if (selectionWrapper) {
+                if (!selectionWrapper.hasAttribute('aria-expanded'))
+                    selectionWrapper.setAttribute('aria-expanded', 'false')
+
+                const activeIcon:HTMLElement|null = selectionWrapper
+                    .querySelector('.mdc-select__dropdown-icon-active')
+                if (activeIcon && !activeIcon.hasAttribute('aria-hidden'))
+                    activeIcon.setAttribute('aria-hidden', 'true')
+
+                const inactiveIcon:HTMLElement|null = selectionWrapper
+                    .querySelector('.mdc-select__dropdown-icon-inactive')
+                if (inactiveIcon && !inactiveIcon.hasAttribute('aria-hidden'))
+                    inactiveIcon.setAttribute('aria-hidden', 'true')
+            }
         }
     })
     // endregion
@@ -575,8 +598,10 @@ export const GenericInputInner = function<Type = unknown>(
             if (typeof options === 'string')
                 options = {icon: options}
 
-            if (!Object.prototype.hasOwnProperty.call(options, 'onClick'))
+            if (!Object.prototype.hasOwnProperty.call(options, 'onClick')) {
                 options.tabIndex = -1
+                options['aria-hidden'] = true
+            }
         }
 
         return options
@@ -616,6 +641,13 @@ export const GenericInputInner = function<Type = unknown>(
         >
             <IconButton
                 icon={{
+                    // TODO make configurable
+                    'aria-label':
+                        properties.editorIsActive ?
+                            'plain' :
+                            properties.editor.startsWith('code') ?
+                                'code' :
+                                'richtext',
                     icon: properties.editorIsActive ?
                         'subject' :
                         properties.editor.startsWith('code') ?
@@ -628,6 +660,10 @@ export const GenericInputInner = function<Type = unknown>(
         <GenericAnimate in={Boolean(properties.declaration)}>
             <IconButton
                 icon={{
+                    'aria-expanded':
+                        properties.showDeclaration ? 'true' : 'false',
+                    // TODO make configurable
+                    'aria-label': 'declaration',
                     icon:
                         'more_' +
                         (properties.showDeclaration ? 'vert' : 'horiz'),
@@ -635,7 +671,10 @@ export const GenericInputInner = function<Type = unknown>(
                 }}
             />
         </GenericAnimate>
-        <GenericAnimate in={properties.showDeclaration}>
+        <GenericAnimate
+            id={`${id}-declaration`}
+            in={properties.showDeclaration}
+        >
             {properties.declaration}
         </GenericAnimate>
         <GenericAnimate
