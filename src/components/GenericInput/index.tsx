@@ -476,7 +476,7 @@ export const GenericInputInner = function<Type = unknown>(
         // endregion
         // Apply missing initial aria attribute regarding menu popup state.
         if (useSelection) {
-            const selectionWrapper:HTMLElement|null = wrapperReference.current
+            const selectionWrapper:HTMLElement|null = wrapperReference.current!
                 .querySelector('[aria-haspopup="listbox"]')
             if (selectionWrapper) {
                 if (!selectionWrapper.hasAttribute('aria-expanded'))
