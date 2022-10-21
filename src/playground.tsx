@@ -389,6 +389,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 required
             />
             <GenericInput<boolean>
+                disabled
                 initialValue={false}
                 labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
                 model={useMemorizedValue({
