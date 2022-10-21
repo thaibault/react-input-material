@@ -27,7 +27,7 @@ endregion */
         & .mdc-floating-label--float-above {
             background-color: var(--mdc-theme-surface);
         }
-    } 
+    }
 
     & .mdc-icon-button {
         font-size: 1rem;
