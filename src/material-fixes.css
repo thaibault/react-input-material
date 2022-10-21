@@ -27,7 +27,7 @@ endregion */
         & .mdc-floating-label--float-above {
             background-color: var(--mdc-theme-surface);
         }
-    }
+    } 
 
     & .mdc-icon-button {
         font-size: 1rem;
@@ -39,6 +39,10 @@ endregion */
 
     & .mdc-select {
         width: 100%;
+
+        &.mdc-select--disabled .mdc-select__dropdown-icon {
+            color: rgba(0 0 0 / 38);
+        }
 
         & .mdc-select__menu {
             width: 100%;
