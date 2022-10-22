@@ -19,7 +19,7 @@
 // region imports
 import {Ace as CodeEditorNamespace} from 'ace-builds'
 
-import Tools, {optionalRequire} from 'clientnode'
+import Tools from 'clientnode'
 import {EvaluationResult, Mapping} from 'clientnode/type'
 
 import {
@@ -134,16 +134,15 @@ import {
 } from '../../type'
 
 declare const TARGET_TECHNOLOGY:string
+
 const isBrowser =
     !(TARGET_TECHNOLOGY === 'node' || typeof window === undefined)
-const UseAnimations:null|typeof Dummy|typeof UseAnimationsType =
-    isBrowser ? optionalRequire('react-useanimations') : null
+const UseAnimations:null|typeof Dummy|typeof UseAnimationsType = isBrowser ?
+    require('react-useanimations')?.default : null
 const lockAnimation:null|typeof LockAnimation = isBrowser ?
-    optionalRequire('react-useanimations/lib/lock') :
-    null
+    require('react-useanimations/lib/lock')?.default : null
 const plusToXAnimation:null|typeof PlusToXAnimation = isBrowser ?
-    optionalRequire('react-useanimations/lib/plusToX') :
-    null
+    require('react-useanimations/lib/plusToX')?.default : null
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region code editor configuration
@@ -510,6 +509,15 @@ export const GenericInputInner = function<Type = unknown>(
             const handler = (
                 event:ReactKeyboardEvent|ReactMouseEvent
             ):void => {
+                if (
+                    typeof (event as ReactKeyboardEvent).keyCode ===
+                        'number' &&
+                    ![Tools.keyCode.ENTER, Tools.keyCode.SPACE].includes(
+                        (event as ReactKeyboardEvent).keyCode
+                    )
+                )
+                    return
+
                 event.preventDefault()
                 event.stopPropagation()
 
@@ -520,10 +528,10 @@ export const GenericInputInner = function<Type = unknown>(
                 ))
             }
 
+            const hide:boolean =
+                Tools.equals(properties.value, properties.default) as boolean
             return {
-                icon: <GenericAnimate
-                    in={!Tools.equals(properties.value, properties.default)}
-                >
+                icon: <GenericAnimate in={!hide}>
                     {(
                         UseAnimations &&
                         !(UseAnimations as typeof Dummy).isDummy &&
@@ -532,13 +540,15 @@ export const GenericInputInner = function<Type = unknown>(
                         <UseAnimations
                             animation={plusToXAnimation} reverse={true}
                         /> :
-                        <IconButton icon="clear"/>
+                        <Icon icon="clear" />
                     }
                 </GenericAnimate>,
+
+                'aria-hidden': hide ? 'true' : 'false',
                 onClick: handler,
                 onKeyDown: handler,
+                tabIndex: hide ? -1 : 0,
                 strategy: 'component',
-                tabIndex: -1,
                 tooltip: 'Clear input'
             }
         }
@@ -550,8 +560,9 @@ export const GenericInputInner = function<Type = unknown>(
                 if (
                     typeof (event as ReactKeyboardEvent).keyCode ===
                         'number' &&
-                    (event as ReactKeyboardEvent).keyCode !==
-                        Tools.keyCode.ENTER
+                    ![Tools.keyCode.ENTER, Tools.keyCode.SPACE].includes(
+                        (event as ReactKeyboardEvent).keyCode
+                    )
                 )
                     return
 
@@ -569,29 +580,23 @@ export const GenericInputInner = function<Type = unknown>(
                 })
             }
 
-            return useMemorizedValue(
-                {
-                    icon: (
-                        UseAnimations &&
-                        !(UseAnimations as typeof Dummy).isDummy &&
-                        lockAnimation
-                    ) ?
-                        <UseAnimations
-                            animation={lockAnimation}
-                            reverse={!properties.hidden}
-                        /> :
-                        <IconButton
-                            icon={properties.hidden ? 'lock_open' : 'lock'}
-                        />,
-                    onClick: handler,
-                    onKeyDown: handler,
-                    strategy: 'component',
-                    tabIndex: -1,
-                    tooltip:
-                        `${(properties.hidden ? 'Show' : 'Hide')} password`
-                },
-                properties.hidden
-            )
+            return {
+                icon: (
+                    UseAnimations &&
+                    !(UseAnimations as typeof Dummy).isDummy &&
+                    lockAnimation
+                ) ?
+                    <UseAnimations
+                        animation={lockAnimation}
+                        reverse={!properties.hidden}
+                    /> :
+                    properties.hidden ? 'lock_open' : 'lock',
+
+                onClick: handler,
+                onKeyDown: handler,
+                strategy: 'component',
+                tooltip: `${(properties.hidden ? 'Show' : 'Hide')} password`
+            }
         }
 
         if (options) {
@@ -667,7 +672,8 @@ export const GenericInputInner = function<Type = unknown>(
                     icon:
                         'more_' +
                         (properties.showDeclaration ? 'vert' : 'horiz'),
-                    onClick: onChangeShowDeclaration
+                    onClick: onChangeShowDeclaration,
+                    onKeyDown: onChangeShowDeclaration
                 }}
             />
         </GenericAnimate>
@@ -1368,11 +1374,22 @@ export const GenericInputInner = function<Type = unknown>(
      *
      * @returns Nothing.
      */
-    const onChangeShowDeclaration = (event?:ReactMouseEvent):void => {
+    const onChangeShowDeclaration = (
+        event?:ReactKeyboardEvent|ReactMouseEvent
+    ):void => {
         if (event) {
+            if (
+                typeof (event as ReactKeyboardEvent).keyCode === 'number' &&
+                ![Tools.keyCode.ENTER, Tools.keyCode.SPACE].includes(
+                    (event as ReactKeyboardEvent).keyCode
+                )
+            )
+                return
+
             event.preventDefault()
             event.stopPropagation()
         }
+
         setShowDeclaration((value:boolean):boolean => {
             properties.showDeclaration = !value
 
