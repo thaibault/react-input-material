@@ -103,7 +103,6 @@ import {
     parseValue,
     translateKnownSymbols,
     triggerCallbackIfExists,
-    useMemorizedValue,
     wrapStateSetter
 } from '../../helper'
 import {
@@ -137,12 +136,20 @@ declare const TARGET_TECHNOLOGY:string
 
 const isBrowser =
     !(TARGET_TECHNOLOGY === 'node' || typeof window === undefined)
+/* eslint-disable @typescript-eslint/no-var-requires */
 const UseAnimations:null|typeof Dummy|typeof UseAnimationsType = isBrowser ?
-    require('react-useanimations')?.default : null
+    (require('react-useanimations') as
+        {default:null|typeof Dummy|typeof UseAnimationsType}
+    )?.default : null
 const lockAnimation:null|typeof LockAnimation = isBrowser ?
-    require('react-useanimations/lib/lock')?.default : null
+    (require('react-useanimations/lib/lock') as
+        {default:null|typeof LockAnimation}
+    )?.default : null
 const plusToXAnimation:null|typeof PlusToXAnimation = isBrowser ?
-    require('react-useanimations/lib/plusToX')?.default : null
+    (require('react-useanimations/lib/plusToX') as
+        {default:null|typeof PlusToXAnimation}
+/* eslint-enable @typescript-eslint/no-var-requires */
+    )?.default : null
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region code editor configuration
