@@ -16,7 +16,6 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-export {Dummy} from './components/Dummy'
 export {FileInput} from './components/FileInput'
 export {GenericAnimate} from './components/GenericAnimate'
 export {GenericInput} from './components/GenericInput'
