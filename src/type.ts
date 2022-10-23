@@ -90,9 +90,6 @@ export interface GenericAnimateComponent<Type> extends
     )):ReactElement
 }
 /// endregion
-/// region dummy
-export type DummyProps = Mapping<unknown> & {children?:ReactElement}
-/// endregion
 /// region generic
 export interface GenericEvent<T = unknown> extends SyntheticEvent {
     detail?:T

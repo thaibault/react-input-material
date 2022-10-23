@@ -41,6 +41,7 @@ import {
     useState
 } from 'react'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
+import Dummy from 'react-generic-dummy'
 import {TransitionProps} from 'react-transition-group/Transition'
 import UseAnimationsType from 'react-useanimations'
 import LockAnimation from 'react-useanimations/lib/lock'
@@ -71,7 +72,6 @@ import {
     EventHandler as RichTextEventHandler
 } from '@tinymce/tinymce-react/lib/cjs/main/ts/Events'
 
-import Dummy from '../Dummy'
 import GenericAnimate from '../GenericAnimate'
 /*
 "namedExport" version of css-loader:
