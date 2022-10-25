@@ -137,6 +137,10 @@ declare const TARGET_TECHNOLOGY:string
 const isBrowser =
     !(TARGET_TECHNOLOGY === 'node' || typeof window === undefined)
 /* eslint-disable @typescript-eslint/no-var-requires */
+const GivenRichTextEditorComponent:typeof RichTextEditorComponent =
+    isBrowser && RichTextEditorComponent ?
+        RichTextEditorComponent :
+        Dummy as unknown as typeof RichTextEditorComponent
 const UseAnimations:null|typeof Dummy|typeof UseAnimationsType = isBrowser ?
     (require('react-useanimations') as
         {default:null|typeof Dummy|typeof UseAnimationsType}
@@ -148,8 +152,8 @@ const lockAnimation:null|typeof LockAnimation = isBrowser ?
 const plusToXAnimation:null|typeof PlusToXAnimation = isBrowser ?
     (require('react-useanimations/lib/plusToX') as
         {default:null|typeof PlusToXAnimation}
-/* eslint-enable @typescript-eslint/no-var-requires */
     )?.default : null
+/* eslint-enable @typescript-eslint/no-var-requires */
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region code editor configuration
@@ -2392,7 +2396,7 @@ export const GenericInputInner = function<Type = unknown>(
                                             }
                                         />
                                     </Suspense> :
-                                    <RichTextEditorComponent
+                                    <GivenRichTextEditorComponent
                                         {...genericProperties as
                                             RichTextEditorProps
                                         }
