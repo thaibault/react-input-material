@@ -1444,7 +1444,7 @@ export const GenericInputInner = function<Type = unknown>(
             const target:HTMLInputElement|null|undefined =
                 (eventOrValue as GenericEvent).target as HTMLInputElement ||
                 (eventOrValue as GenericEvent).detail as HTMLInputElement
-            if (target)
+            if (target) {
                 /*
                     NOTE: Enhanced select fields (menus) do not provide the
                     selected value but index.
@@ -1452,11 +1452,13 @@ export const GenericInputInner = function<Type = unknown>(
                 if (typeof (
                     target as unknown as {index:number}
                 ).index === 'number') {
-                    const index:number = (
-                        target as unknown as {index:number}
-                    ).index - (properties.placeholder ? 1 : 0)
+                    const index:number = Math.min(
+                        0,
+                        (
+                            target as unknown as {index:number}
+                        ).index - (properties.placeholder ? 1 : 0)
+                    )
                     properties.value =
-                        index >= 0 &&
                         index < suggestionValues.length ?
                             suggestionValues[index] as Type :
                             null
@@ -1464,7 +1466,7 @@ export const GenericInputInner = function<Type = unknown>(
                     properties.value = typeof target.value === 'undefined' ?
                         null :
                         target.value as unknown as Type
-            else
+            } else
                 properties.value = eventOrValue as null|Type
         } else
             properties.value = eventOrValue
