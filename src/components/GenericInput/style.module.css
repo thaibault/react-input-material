@@ -1,0 +1,77 @@
+/* !/usr/bin/env css
+-*- coding: utf-8 -*- */
+/* region header
+Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
+
+License
+-------
+
+This library written by Torben Sickert stand under a creative commons naming
+3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
+endregion */
+.generic-input {
+    display: block;
+}
+/* stylelint-disable selector-class-pattern */
+.generic-input .ace_editor,
+.generic-input .tox-tinymce {
+    border-radius: 0;
+
+    margin-top: 27px;
+    margin-left: -4px;
+    margin-right: 4px;
+}
+/* stylelint-enable selector-class-pattern */
+
+.generic-input .tox-tinymce {
+    border-width: 1px;
+}
+
+.generic-input--custom {
+    padding-top: 9px;
+}
+
+.generic-input__editor__label {
+    top: 9px !important;
+}
+
+.generic-input__suggestions {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    bottom: unset !important;
+    top: 54px !important;
+    width: 100%;
+}
+
+.generic-input__suggestions--pending {
+    padding: 10px;
+}
+
+.generic-input__suggestions__suggestion {
+    visibility: visible;
+    white-space: break-spaces;
+}
+
+.generic-input__suggestions__suggestion__mark {
+    color: var(--mdc-theme-secondary);
+    display: contents;
+}
+/* Clears the 'X' from Internet Explorer */
+.generic-input input[type="search"]::-ms-clear,
+.generic-input input[type="search"]::-ms-reveal {
+    display: none;
+
+    height: 0;
+    width: 0;
+}
+/* Clears the 'X' from Chrome */
+.generic-input input[type="search"]::-webkit-search-cancel-button,
+.generic-input input[type="search"]::-webkit-search-decoration,
+.generic-input input[type="search"]::-webkit-search-results-button,
+.generic-input input[type="search"]::-webkit-search-results-decoration {
+    display: none;
+}
+/* region vim modline
+vim: set tabstop=4 shiftwidth=4 expandtab:
+vim: foldmethod=marker foldmarker=region,endregion:
+endregion */

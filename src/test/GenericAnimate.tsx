@@ -15,15 +15,19 @@
 */
 // region imports
 import {describe, expect, test} from '@jest/globals'
+import {createRef, RefObject} from 'react'
 
 import GenericAnimate from '../components/GenericAnimate'
 // endregion
 describe('GenericAnimate', ():void => {
     test('render', ():void => {
-        expect(GenericAnimate({children: <div/>}))
+        const reference:RefObject<unknown> = createRef()
+
+        expect(GenericAnimate.wrapped!({children: <div/>}, reference))
             .toHaveProperty('props.in', true)
-        expect(GenericAnimate({children: <div/>, in: false}))
-            .toHaveProperty('props.in', false)
+        expect(
+            GenericAnimate.wrapped!({children: <div/>, in: false}, reference)
+        ).toHaveProperty('props.in', false)
     })
 })
 // region vim modline

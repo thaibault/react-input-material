@@ -39,7 +39,6 @@ import {
     ForwardRefExoticComponent,
     FunctionComponent,
     FunctionComponentElement,
-    HTMLProps,
     KeyboardEvent,
     MouseEvent,
     MutableRefObject,
@@ -50,6 +49,7 @@ import {
     SyntheticEvent
 } from 'react'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
+import {TransitionProps} from 'react-transition-group/Transition'
 
 import {
     EditorOptions as RawTinyMCEOptions, Editor as RichTextEditor
@@ -77,8 +77,18 @@ import {
 } from '@tinymce/tinymce-react'
 // endregion
 // region exports
-/// region dummy
-export type DummyProps = Mapping<unknown> & {children?:ReactElement}
+/// region animate
+export type GenericAnimateProps =
+    Partial<TransitionProps<HTMLElement|undefined>>
+
+export interface GenericAnimateComponent<Type> extends
+    Omit<ForwardRefExoticComponent<GenericAnimateProps>, 'propTypes'>,
+    StaticBaseWebComponent<Type>
+{
+    (props:(
+        GenericAnimateProps & RefAttributes<HTMLDivElement|HTMLSpanElement>
+    )):ReactElement
+}
 /// endregion
 /// region generic
 export interface GenericEvent<T = unknown> extends SyntheticEvent {
@@ -176,17 +186,16 @@ export interface BaseProperties extends CommonBaseModel, ModelState {
     enforceUncontrolled:boolean
     id:string
     initialValue:unknown
-    invertedPattern:Array<RegExp|string>|null|RegExp|string
     label:string
     model:BaseModel
     name:string
-    pattern:Array<RegExp|string>|null|RegExp|string
     required:boolean
     requiredText:string
     ripple:RipplePropT
-    rootProps:HTMLProps<Mapping<unknown>>
+    rootProps:Mapping<boolean|number|string>
     showDeclaration:boolean
     showInitialValidationState:boolean
+    showValidationState:boolean
     // NOTE: We want to avoid a collision with html's native "style" property.
     styles:Mapping
     themeConfiguration:ThemeProviderProps['options']
@@ -237,28 +246,29 @@ export interface EditorState {
 }
 //// endregion
 export interface StaticWebComponent<
-    MS = ModelState, DP = DefaultProperties
-> extends StaticBaseWebComponent {
+    Type, MS = ModelState, DP = DefaultProperties
+> extends StaticBaseWebComponent<Type> {
     defaultModelState:MS
     defaultProperties:DP
     strict:boolean
 }
 
 export type StaticComponent<
-    P = Props, MS = ModelState, DP = DefaultProperties
-> = Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<MS, DP>
+    Type, P = Props, MS = ModelState, DP = DefaultProperties
+> = Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<Type, MS, DP>
 export type StaticFunctionComponent<
-    P = Props, MS = ModelState, DP = DefaultProperties
-> = Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<P, MS, DP>
+    Type, P = Props, MS = ModelState, DP = DefaultProperties
+> = Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<Type, P, MS, DP>
 
 export interface InputComponent<
+    Type,
     P = Props,
     MS = ModelState,
     DP = DefaultProperties,
     A = ComponentAdapter<P>
 > extends
     Omit<ForwardRefExoticComponent<P>, 'propTypes'>,
-    StaticWebComponent<MS, DP>
+    StaticWebComponent<Type, MS, DP>
 {
     (props:P & RefAttributes<A>):ReactElement
 }
@@ -280,13 +290,19 @@ export const baseModelPropertyTypes:ValidationMapping = {
     /*
         NOTE: Also not yet working:
         type: oneOf([
+            'color',
             'date',
             'datetime-local',
+            'email',
             'month',
             'number',
+            'password',
             'range',
-            'string',
+            'search',
+            'text',
             'time',
+            'time-local',
+            'url',
             'week'
         ])
     */
@@ -351,8 +367,10 @@ export const propertyTypes:ValidationMapping = {
     required: boolean,
     requiredText: string,
     ripple: oneOfType([boolean, object]),
+    rootProps: object,
     showDeclaration: oneOfType([boolean, symbol]),
     showInitialValidationState: boolean,
+    showValidationState: boolean,
     styles: object,
     themeConfiguration: object,
     /*
@@ -405,6 +423,7 @@ export const defaultProperties:DefaultProperties<string> = {
     model: {...defaultModel},
     showDeclaration: undefined,
     showInitialValidationState: false,
+    showValidationState: true,
     requiredText: 'Please fill this field.'
 } as const
 //// endregion
@@ -426,7 +445,8 @@ export type CheckboxState = State<boolean>
 export type CheckboxAdapter =
     ComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
 
-export type CheckboxComponent = InputComponent<
+export type CheckboxComponent<Type> = InputComponent<
+    Type,
     CheckboxProps,
     CheckboxModelState,
     DefaultCheckboxProperties,
@@ -492,6 +512,7 @@ export type InputDataTransformation =
         date:DataTransformSpecification<number, Date|number|string>
         'datetime-local':DataTransformSpecification<number, Date|number|string>
         time:DataTransformSpecification<number, Date|number|string>
+        'time-local':DataTransformSpecification<number, Date|number|string>
 
         float:DataTransformSpecification<number, string>
         integer:DataTransformSpecification<number, string>
@@ -543,6 +564,7 @@ export type GenericInputType = (
     'float' |
     'integer' |
     'string' |
+    'time-local' |
     NativeInputType
 )
 export interface InputChildrenOptions<P, T> {
@@ -589,6 +611,8 @@ export interface InputProperties<T = unknown> extends
     inputProperties:Partial<
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     >
+    inputProps:Mapping<boolean|number|string>
+    invertedPattern:Array<RegExp|string>|null|RegExp|string
     invertedPatternText:string
     labels:Array<[string, string]>|Array<string>|Mapping
     maximumLengthText:string
@@ -604,6 +628,7 @@ export interface InputProperties<T = unknown> extends
     onSelect:(event:GenericEvent, properties:this) => void
     onSelectionChange:(event:GenericEvent, properties:this) => void
     outlined:boolean
+    pattern:Array<RegExp|string>|null|RegExp|string
     patternText:string
     placeholder:string
     representation:ReactNode|string
@@ -668,6 +693,7 @@ export interface InputAdapterWithReferences<T = unknown> extends
         suggestionMenuFoundationReference:MutableRefObject<
             MDCMenuFoundation|null
         >
+        wrapperReference:MutableRefObject<HTMLDivElement|null>
     }
 }
 
@@ -676,9 +702,9 @@ export interface TinyMCEOptions extends RawTinyMCEOptions {
     target?:undefined
 }
 
-export interface GenericInputComponent extends
+export interface GenericInputComponent<Type> extends
     Omit<ForwardRefExoticComponent<InputProps>, 'propTypes'>,
-    StaticWebComponent<InputModelState, DefaultInputProperties>
+    StaticWebComponent<Type, InputModelState, DefaultInputProperties>
 {
     <T = string>(
         props:InputProps<T> & RefAttributes<InputAdapter<T>>
@@ -740,6 +766,10 @@ export const inputPropertyTypes:PropertiesValidationMap = {
         icon?:string|(IconOptions & {tooltip?:string|TooltipProps})
     */
     icon: oneOfType([string, object]),
+    inputProps: object,
+    invertedPattern: oneOfType(
+        [arrayOf(oneOfType([object, string])), object, string]
+    ),
     invertedPatternText: string,
     labels: oneOfType([arrayOf(arrayOf(string)), arrayOf(string), object]),
     maximum: oneOfType([number, string]),
@@ -755,6 +785,7 @@ export const inputPropertyTypes:PropertiesValidationMap = {
     onSelect: func,
     onSelectionChange: func,
     outlined: boolean,
+    pattern: oneOfType([arrayOf(oneOfType([object, string])), object, string]),
     patternText: string,
     placeholder: string,
     representation: oneOfType([string, symbol]),
@@ -928,7 +959,8 @@ export interface FileInputAdapterWithReferences extends FileInputAdapter {
     }
 }
 
-export type FileInputComponent = InputComponent<
+export type FileInputComponent<Type> = InputComponent<
+    Type,
     FileInputProps,
     FileInputModelState,
     DefaultFileInputProperties,
@@ -1162,9 +1194,9 @@ export type InputsAdapterWithReferences<
     RefType = unknown
 > = InputsAdapter<T, P> & {references:Array<MutableRefObject<RefType>>}
 
-export interface InputsComponent extends
+export interface InputsComponent<Type> extends
     Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
-    StaticWebComponent<InputsModelState, DefaultInputsProperties>
+    StaticWebComponent<Type, InputsModelState, DefaultInputsProperties>
 {
     <T = string, P extends InputsPropertiesItem<T> = InputProperties<T>>(
         props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
@@ -1285,7 +1317,8 @@ export interface IntervalAdapterWithReferences extends IntervalAdapter {
     }
 }
 
-export type IntervalComponent = InputComponent<
+export type IntervalComponent<Type> = InputComponent<
+    Type,
     IntervalProps,
     IntervalModelState,
     DefaultIntervalProperties,

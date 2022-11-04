@@ -18,7 +18,6 @@ endregion */
             width: 100%;
         }
     }
-
     /*
         Fading input elements with pre-filled inputs or placeholder are not
         over background outline.
@@ -27,7 +26,6 @@ endregion */
     & .mdc-text-field--outlined {
         & .mdc-floating-label--float-above {
             background-color: var(--mdc-theme-surface);
-            padding: 0 8px 2px 8px;
         }
     }
 
@@ -42,21 +40,26 @@ endregion */
     & .mdc-select {
         width: 100%;
 
+        &.mdc-select--disabled .mdc-select__dropdown-icon {
+            color: rgba(0 0 0 / 38%);
+        }
+
         & .mdc-select__menu {
             width: 100%;
         }
 
         & .mdc-select-helper-text {
-            color: rgba(0, 0, 0, 0.6);
+            color: rgb(0 0 0 / 60%);
         }
     }
 
     & .mdc-text-field {
+        /* stylelint-disable-next-line selector-class-pattern */
         & .ace_editor.mdc-text-field__input {
             font-family: monospace;
         }
 
-        &+ .mdc-text-field-helper-line {
+        & + .mdc-text-field-helper-line {
             padding-left: 0;
             padding-right: 0;
         }

@@ -33,7 +33,7 @@ import {
 import {ComponentAdapter} from 'web-component-wrapper/type'
 import {IconButton} from '@rmwc/icon-button'
 
-import GenericInput from './GenericInput'
+import GenericInput from '../GenericInput'
 /*
 "namedExport" version of css-loader:
 
@@ -45,10 +45,10 @@ import {
     inputsItemDisabledClassName,
     inputsItemInputClassName,
     inputsItemRemoveClassName
-} from './Inputs.module'
+} from './style.module'
 */
-import cssClassNames from './Inputs.module'
-import WrapConfigurations from './WrapConfigurations'
+import cssClassNames from './style.module'
+import WrapConfigurations from '../WrapConfigurations'
 import {
     createDummyStateSetter,
     determineInitialValue,
@@ -56,7 +56,7 @@ import {
     mapPropertiesIntoModel,
     translateKnownSymbols,
     triggerCallbackIfExists
-} from '../helper'
+} from '../../helper'
 import {
     defaultInputsProperties,
     DefaultInputsProperties,
@@ -73,7 +73,7 @@ import {
     InputsProperties,
     InputsPropertiesItem,
     InputsProps
-} from '../type'
+} from '../../type'
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region helper
@@ -566,8 +566,10 @@ InputsInner.displayName = 'Inputs'
  *
  * @returns React elements.
  */
-export const Inputs:InputsComponent =
-    memorize(forwardRef(InputsInner)) as unknown as InputsComponent
+export const Inputs:InputsComponent<typeof InputsInner> =
+    memorize(forwardRef(InputsInner)) as
+        unknown as
+        InputsComponent<typeof InputsInner>
 // region static properties
 /// region web-component hints
 Inputs.wrapped = InputsInner

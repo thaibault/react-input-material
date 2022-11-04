@@ -9,17 +9,15 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
  endregion */
+@import "./components/FileInput/import.module";
 /*
-NOTE: Will be referenced via code files.
+    Included in File Input:
 
-@import './components/FileInput.module';
-@import './components/GenericAnimate.module';
+    @import "./components/GenericInput/import.module";
 */
-/* Included in File Input: @import './components/GenericInput.module'; */
-/*
-@import './components/RequireableCheckbox.module';
-*/
-@import './material-fixes.css';
+@import "./components/RequireableCheckbox/import.module";
+
+@import "./material-fixes.css";
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:
 vim: foldmethod=marker foldmarker=region,endregion:

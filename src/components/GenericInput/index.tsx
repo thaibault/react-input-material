@@ -19,7 +19,7 @@
 // region imports
 import {Ace as CodeEditorNamespace} from 'ace-builds'
 
-import Tools, {optionalRequire} from 'clientnode'
+import Tools from 'clientnode'
 import {EvaluationResult, Mapping} from 'clientnode/type'
 
 import {
@@ -35,11 +35,13 @@ import {
     ReactNode,
     Suspense,
     useEffect,
+    useId,
     useImperativeHandle,
     useRef,
     useState
 } from 'react'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
+import Dummy from 'react-generic-dummy'
 import {TransitionProps} from 'react-transition-group/Transition'
 import UseAnimationsType from 'react-useanimations'
 import LockAnimation from 'react-useanimations/lib/lock'
@@ -70,8 +72,7 @@ import {
     EventHandler as RichTextEventHandler
 } from '@tinymce/tinymce-react/lib/cjs/main/ts/Events'
 
-import Dummy from './Dummy'
-import GenericAnimate from './GenericAnimate'
+import GenericAnimate from '../GenericAnimate'
 /*
 "namedExport" version of css-loader:
 
@@ -83,11 +84,11 @@ import {
     genericInputEditorLabelClassName,
     genericInputSuggestionsClassName,
     genericInputSuggestionsPendingClassName
-} from './GenericInput.module'
+} from './style.module'
  */
-import cssClassNames from './GenericInput.module'
-import WrapConfigurations from './WrapConfigurations'
-import WrapTooltip from './WrapTooltip'
+import cssClassNames from './style.module'
+import WrapConfigurations from '../WrapConfigurations'
+import WrapTooltip from '../WrapTooltip'
 import {
     deriveMissingPropertiesFromState as deriveMissingBasePropertiesFromState,
     determineInitialValue,
@@ -102,9 +103,8 @@ import {
     parseValue,
     translateKnownSymbols,
     triggerCallbackIfExists,
-    useMemorizedValue,
     wrapStateSetter
-} from '../helper'
+} from '../../helper'
 import {
     CursorState,
     DataTransformSpecification,
@@ -130,19 +130,30 @@ import {
     InputTablePosition as TablePosition,
     InputValueState as ValueState,
     TinyMCEOptions
-} from '../type'
+} from '../../type'
 
 declare const TARGET_TECHNOLOGY:string
+
 const isBrowser =
     !(TARGET_TECHNOLOGY === 'node' || typeof window === undefined)
-const UseAnimations:null|typeof Dummy|typeof UseAnimationsType =
-    isBrowser ? optionalRequire('react-useanimations') : null
+/* eslint-disable @typescript-eslint/no-var-requires */
+const GivenRichTextEditorComponent:typeof RichTextEditorComponent =
+    isBrowser && RichTextEditorComponent ?
+        RichTextEditorComponent :
+        Dummy as unknown as typeof RichTextEditorComponent
+const UseAnimations:null|typeof Dummy|typeof UseAnimationsType = isBrowser ?
+    (require('react-useanimations') as
+        {default:null|typeof Dummy|typeof UseAnimationsType}
+    )?.default : null
 const lockAnimation:null|typeof LockAnimation = isBrowser ?
-    optionalRequire('react-useanimations/lib/lock') :
-    null
+    (require('react-useanimations/lib/lock') as
+        {default:null|typeof LockAnimation}
+    )?.default : null
 const plusToXAnimation:null|typeof PlusToXAnimation = isBrowser ?
-    optionalRequire('react-useanimations/lib/plusToX') :
-    null
+    (require('react-useanimations/lib/plusToX') as
+        {default:null|typeof PlusToXAnimation}
+    )?.default : null
+/* eslint-enable @typescript-eslint/no-var-requires */
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region code editor configuration
@@ -358,6 +369,7 @@ export function suggestionMatches(
 export const GenericInputInner = function<Type = unknown>(
     props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
 ):ReactElement {
+    const id:string = useId()
 /* eslint-enable jsdoc/require-description-complete-sentence */
     // region live-cycle
     /**
@@ -411,6 +423,86 @@ export const GenericInputInner = function<Type = unknown>(
                     )
             }
         // endregion
+        // region input element property synchronisation
+        if (inputReference.current) {
+            const determinedInputProps:Mapping<boolean|number|string> = {}
+            const propsToRemove:Array<string> = []
+
+
+            // Apply aria attributes regarding validation state.
+            if (properties.valid) {
+                propsToRemove.push('ariaErrormessage')
+                propsToRemove.push('ariaInvalid')
+            } else {
+                determinedInputProps.ariaErrormessage =
+                    `${id}-error-message`
+                determinedInputProps.ariaInvalid = 'true'
+            }
+
+            // Apply aria attributes regarding searching.
+            if (useSuggestions) {
+                if (inputReference.current.getAttribute('type') !== 'search')
+                    determinedInputProps.role = 'searchbox'
+
+                determinedInputProps.ariaAutocomplete =
+                    properties.searchSelection ? 'inline' : 'list'
+            } else {
+                propsToRemove.push('searchbox')
+                propsToRemove.push('ariaAutocomplete')
+            }
+
+            if (properties.showDeclaration)
+                determinedInputProps.ariaDescribedby = `${id}-declaration`
+            else
+                propsToRemove.push('ariaDescribedby')
+
+            const inputProps = {
+                ...determinedInputProps, ...properties.inputProps || {}
+            }
+
+            // Apply configured native input properties.
+            for (const [name, value] of Object.entries(inputProps)) {
+                const attributeName:string =
+                    Tools.stringCamelCaseToDelimited(name)
+
+                if (typeof value === 'boolean')
+                    if (value)
+                        inputReference.current.setAttribute(attributeName, '')
+                    else
+                        inputReference.current.removeAttribute(attributeName)
+                else
+                    inputReference.current.setAttribute(
+                        attributeName, String(value)
+                    )
+            }
+
+            for (const name of propsToRemove) {
+                const attributeName:string =
+                    Tools.stringCamelCaseToDelimited(name)
+                if (inputReference.current.hasAttribute(attributeName))
+                    inputReference.current.removeAttribute(attributeName)
+            }
+        }
+        // endregion
+        // Apply missing initial aria attribute regarding menu popup state.
+        if (useSelection) {
+            const selectionWrapper:HTMLElement|null = wrapperReference.current!
+                .querySelector('[aria-haspopup="listbox"]')
+            if (selectionWrapper) {
+                if (!selectionWrapper.hasAttribute('aria-expanded'))
+                    selectionWrapper.setAttribute('aria-expanded', 'false')
+
+                const activeIcon:HTMLElement|null = selectionWrapper
+                    .querySelector('.mdc-select__dropdown-icon-active')
+                if (activeIcon && !activeIcon.hasAttribute('aria-hidden'))
+                    activeIcon.setAttribute('aria-hidden', 'true')
+
+                const inactiveIcon:HTMLElement|null = selectionWrapper
+                    .querySelector('.mdc-select__dropdown-icon-inactive')
+                if (inactiveIcon && !inactiveIcon.hasAttribute('aria-hidden'))
+                    inactiveIcon.setAttribute('aria-hidden', 'true')
+            }
+        }
     })
     // endregion
     // region context helper
@@ -424,11 +516,33 @@ export const GenericInputInner = function<Type = unknown>(
     const applyIconPreset = (
         options?:Properties['icon']
     ):IconOptions|string|undefined => {
-        if (options === 'clear_preset')
+        if (options === 'clear_preset') {
+            const handler = (
+                event:ReactKeyboardEvent|ReactMouseEvent
+            ):void => {
+                if (
+                    typeof (event as ReactKeyboardEvent).keyCode ===
+                        'number' &&
+                    ![Tools.keyCode.ENTER, Tools.keyCode.SPACE].includes(
+                        (event as ReactKeyboardEvent).keyCode
+                    )
+                )
+                    return
+
+                event.preventDefault()
+                event.stopPropagation()
+
+                onChangeValue(parseValue<Type>(
+                    properties,
+                    properties.default as Type,
+                    GenericInput.transformer
+                ))
+            }
+
+            const hide:boolean =
+                Tools.equals(properties.value, properties.default) as boolean
             return {
-                icon: <GenericAnimate
-                    in={!Tools.equals(properties.value, properties.default)}
-                >
+                icon: <GenericAnimate in={!hide}>
                     {(
                         UseAnimations &&
                         !(UseAnimations as typeof Dummy).isDummy &&
@@ -437,56 +551,75 @@ export const GenericInputInner = function<Type = unknown>(
                         <UseAnimations
                             animation={plusToXAnimation} reverse={true}
                         /> :
-                        <IconButton icon="clear"/>
+                        <Icon icon="clear" />
                     }
                 </GenericAnimate>,
-                onClick: (event:ReactMouseEvent):void => {
-                    event.preventDefault()
-                    event.stopPropagation()
 
-                    onChangeValue(parseValue<Type>(
-                        properties,
-                        properties.default as Type,
-                        GenericInput.transformer
-                    ))
-                },
+                'aria-hidden': hide ? 'true' : 'false',
+                onClick: handler,
+                onKeyDown: handler,
+                tabIndex: hide ? -1 : 0,
                 strategy: 'component',
                 tooltip: 'Clear input'
             }
-        if (options === 'password_preset')
-            return useMemorizedValue(
-                {
-                    icon: (
-                        UseAnimations &&
-                        !(UseAnimations as typeof Dummy).isDummy &&
-                        lockAnimation
-                    ) ?
-                        <UseAnimations
-                            animation={lockAnimation}
-                            reverse={!properties.hidden}
-                        /> :
-                        <IconButton
-                            icon={properties.hidden ? 'lock_open' : 'lock'}
-                        />,
-                    onClick: (event:ReactMouseEvent):void => {
-                        event.preventDefault()
-                        event.stopPropagation()
-                        setHidden((value:boolean|undefined):boolean => {
-                            if (value === undefined)
-                                value = properties.hidden
-                            properties.hidden = !value
+        }
 
-                            onChange(event)
+        if (options === 'password_preset') {
+            const handler = (
+                event:ReactKeyboardEvent|ReactMouseEvent
+            ):void => {
+                if (
+                    typeof (event as ReactKeyboardEvent).keyCode ===
+                        'number' &&
+                    ![Tools.keyCode.ENTER, Tools.keyCode.SPACE].includes(
+                        (event as ReactKeyboardEvent).keyCode
+                    )
+                )
+                    return
 
-                            return properties.hidden
-                        })
-                    },
-                    strategy: 'component',
-                    tooltip:
-                        `${(properties.hidden ? 'Show' : 'Hide')} password`
-                },
-                properties.hidden
-            )
+                event.preventDefault()
+                event.stopPropagation()
+
+                setHidden((value:boolean|undefined):boolean => {
+                    if (value === undefined)
+                        value = properties.hidden
+                    properties.hidden = !value
+
+                    onChange(event)
+
+                    return properties.hidden
+                })
+            }
+
+            return {
+                icon: (
+                    UseAnimations &&
+                    !(UseAnimations as typeof Dummy).isDummy &&
+                    lockAnimation
+                ) ?
+                    <UseAnimations
+                        animation={lockAnimation}
+                        reverse={!properties.hidden}
+                    /> :
+                    properties.hidden ? 'lock_open' : 'lock',
+
+                onClick: handler,
+                onKeyDown: handler,
+                strategy: 'component',
+                tooltip: `${(properties.hidden ? 'Show' : 'Hide')} password`
+            }
+        }
+
+        if (options) {
+            if (typeof options === 'string')
+                options = {icon: options}
+
+            if (!Object.prototype.hasOwnProperty.call(options, 'onClick')) {
+                options.tabIndex = -1
+                options['aria-hidden'] = true
+            }
+        }
+
         return options
     }
     /**
@@ -503,7 +636,9 @@ export const GenericInputInner = function<Type = unknown>(
             properties.type === 'string' ?
                 properties.hidden ?
                     'password' :
-                    'text' :
+                    useSuggestions ?
+                        'search' :
+                        'text' :
                 transformer[
                     properties.type as keyof InputDataTransformation
                 ]?.type ?? properties.type
@@ -522,6 +657,13 @@ export const GenericInputInner = function<Type = unknown>(
         >
             <IconButton
                 icon={{
+                    // TODO make configurable
+                    'aria-label':
+                        properties.editorIsActive ?
+                            'plain' :
+                            properties.editor.startsWith('code') ?
+                                'code' :
+                                'richtext',
                     icon: properties.editorIsActive ?
                         'subject' :
                         properties.editor.startsWith('code') ?
@@ -534,45 +676,52 @@ export const GenericInputInner = function<Type = unknown>(
         <GenericAnimate in={Boolean(properties.declaration)}>
             <IconButton
                 icon={{
+                    'aria-expanded':
+                        properties.showDeclaration ? 'true' : 'false',
+                    // TODO make configurable
+                    'aria-label': 'declaration',
                     icon:
                         'more_' +
                         (properties.showDeclaration ? 'vert' : 'horiz'),
-                    onClick: onChangeShowDeclaration
+                    onClick: onChangeShowDeclaration,
+                    onKeyDown: onChangeShowDeclaration
                 }}
             />
         </GenericAnimate>
-        <GenericAnimate in={properties.showDeclaration}>
+        <GenericAnimate
+            id={`${id}-declaration`}
+            in={properties.showDeclaration}
+        >
             {properties.declaration}
         </GenericAnimate>
-        <GenericAnimate in={
-            !properties.showDeclaration &&
-            properties.invalid &&
-            (
-                properties.showInitialValidationState ||
-                /*
-                    Material inputs show their validation state at
-                    least after a blur event so we synchronize error
-                    message appearances.
-                */
-                properties.visited
-            )
-        }>
-            <Theme use="error">{renderMessage(
-                properties.invalidMaximum &&
-                properties.maximumText ||
-                properties.invalidMaximumLength &&
-                properties.maximumLengthText ||
-                properties.invalidMinimum &&
-                properties.minimumText ||
-                properties.invalidMinimumLength &&
-                properties.minimumLengthText ||
-                properties.invalidInvertedPattern &&
-                properties.invertedPatternText ||
-                properties.invalidPattern &&
-                properties.patternText ||
-                properties.invalidRequired &&
-                properties.requiredText
-            )}</Theme>
+        <GenericAnimate
+            in={
+                !properties.showDeclaration &&
+                properties.invalid &&
+                properties.showValidationState &&
+                (properties.showInitialValidationState || properties.visited)
+            }
+        >
+            <Theme use="error" wrap={true}>
+                <span id={`${id}-error-message`}>
+                    {renderMessage(
+                        properties.invalidMaximum &&
+                        properties.maximumText ||
+                        properties.invalidMaximumLength &&
+                        properties.maximumLengthText ||
+                        properties.invalidMinimum &&
+                        properties.minimumText ||
+                        properties.invalidMinimumLength &&
+                        properties.minimumLengthText ||
+                        properties.invalidInvertedPattern &&
+                        properties.invertedPatternText ||
+                        properties.invalidPattern &&
+                        properties.patternText ||
+                        properties.invalidRequired &&
+                        properties.requiredText
+                    )}
+                </span>
+            </Theme>
         </GenericAnimate>
     </>
     /**
@@ -654,10 +803,12 @@ export const GenericInputInner = function<Type = unknown>(
             delete options.tooltip
             const nestedOptions:IconOptions = {...options}
             options.strategy = 'component'
+
             options.icon = <WrapTooltip options={tooltip}>
                 <Icon icon={nestedOptions} />
             </WrapTooltip>
         }
+
         return options as IconOptions|undefined
     }
     /// endregion
@@ -1084,11 +1235,21 @@ export const GenericInputInner = function<Type = unknown>(
      * Triggered on blur events.
      * @param event - Event object.
      *
-     * @returns Nothing.
+     * @returns Newly computed value state.
      */
-    const onBlur = (event:GenericEvent):void => setValueState((
+    const onBlur = (
+        event:ReactFocusEvent<HTMLDivElement>
+    ):void => setValueState((
         oldValueState:ValueState<Type, ModelState>
     ):ValueState<Type, ModelState> => {
+        if (
+            event.relatedTarget &&
+            wrapperReference.current?.contains(
+                event.relatedTarget as unknown as Node
+            )
+        )
+            return oldValueState
+
         setIsSuggestionOpen(false)
 
         let changed = false
@@ -1224,11 +1385,22 @@ export const GenericInputInner = function<Type = unknown>(
      *
      * @returns Nothing.
      */
-    const onChangeShowDeclaration = (event?:ReactMouseEvent):void => {
+    const onChangeShowDeclaration = (
+        event?:ReactKeyboardEvent|ReactMouseEvent
+    ):void => {
         if (event) {
+            if (
+                typeof (event as ReactKeyboardEvent).keyCode === 'number' &&
+                ![Tools.keyCode.ENTER, Tools.keyCode.SPACE].includes(
+                    (event as ReactKeyboardEvent).keyCode
+                )
+            )
+                return
+
             event.preventDefault()
             event.stopPropagation()
         }
+
         setShowDeclaration((value:boolean):boolean => {
             properties.showDeclaration = !value
 
@@ -1250,8 +1422,8 @@ export const GenericInputInner = function<Type = unknown>(
      * Triggered when ever the value changes.
      * Takes a given value or determines it from given event object and
      * generates new value state (internal value, representation and validation
-     * states). Derived event handler will be triggered when internal state
-     * has been consolidated.
+     * states). Derived event handler will be triggered when internal state has
+     * been consolidated.
      * @param eventOrValue - Event object or new value.
      * @param editorInstance - Potential editor instance if triggered from a
      * rich text or code editor.
@@ -1265,9 +1437,6 @@ export const GenericInputInner = function<Type = unknown>(
         editorInstance?:RichTextEditor,
         selectedIndex = -1
     ):void => {
-        if (properties.disabled)
-            return
-
         setIsSuggestionOpen(true)
 
         let event:GenericEvent|undefined
@@ -1275,7 +1444,7 @@ export const GenericInputInner = function<Type = unknown>(
             const target:HTMLInputElement|null|undefined =
                 (eventOrValue as GenericEvent).target as HTMLInputElement ||
                 (eventOrValue as GenericEvent).detail as HTMLInputElement
-            if (target)
+            if (target) {
                 /*
                     NOTE: Enhanced select fields (menus) do not provide the
                     selected value but index.
@@ -1283,11 +1452,13 @@ export const GenericInputInner = function<Type = unknown>(
                 if (typeof (
                     target as unknown as {index:number}
                 ).index === 'number') {
-                    const index:number = (
-                        target as unknown as {index:number}
-                    ).index - (properties.placeholder ? 1 : 0)
+                    const index:number = Math.min(
+                        0,
+                        (
+                            target as unknown as {index:number}
+                        ).index - (properties.placeholder ? 1 : 0)
+                    )
                     properties.value =
-                        index >= 0 &&
                         index < suggestionValues.length ?
                             suggestionValues[index] as Type :
                             null
@@ -1295,7 +1466,7 @@ export const GenericInputInner = function<Type = unknown>(
                     properties.value = typeof target.value === 'undefined' ?
                         null :
                         target.value as unknown as Type
-            else
+            } else
                 properties.value = eventOrValue as null|Type
         } else
             properties.value = eventOrValue
@@ -1551,20 +1722,29 @@ export const GenericInputInner = function<Type = unknown>(
         onTouch(event)
     }
     /**
-     * Triggered on down up events.
+     * Triggered on key down events.
      * @param event - Key up event object.
      *
      * @returns Nothing.
      */
     const onKeyDown = (event:ReactKeyboardEvent):void => {
-        if (useSuggestions && Tools.keyCode.DOWN === event.keyCode)
+        if (
+            !properties.disabled &&
+            useSuggestions &&
+            Tools.keyCode.DOWN === event.keyCode &&
+            event.target === inputReference.current
+        )
             suggestionMenuAPIReference.current?.focusItemAtIndex(0)
 
         /*
             NOTE: We do not want to forward keydown enter events coming from
             textareas.
         */
-        if (properties.type === 'string' && properties.editor !== 'plain')
+        if (
+            useSelection ||
+            properties.type === 'string' &&
+            properties.editor !== 'plain'
+        )
             preventEnterKeyPropagation(event)
 
         triggerCallbackIfExists<Properties<Type>>(
@@ -1672,6 +1852,8 @@ export const GenericInputInner = function<Type = unknown>(
     const suggestionMenuFoundationReference:MutableRefObject<
         MDCMenuFoundation|null
     > = useRef<MDCMenuFoundation>(null)
+    const wrapperReference:MutableRefObject<HTMLDivElement|null> =
+        useRef<HTMLDivElement>(null)
     /// endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
 
@@ -1843,7 +2025,8 @@ export const GenericInputInner = function<Type = unknown>(
                     richTextEditorInstance,
                     richTextEditorReference,
                     suggestionMenuAPIReference,
-                    suggestionMenuFoundationReference
+                    suggestionMenuFoundationReference,
+                    wrapperReference
                 },
                 state
             }
@@ -1855,7 +2038,6 @@ export const GenericInputInner = function<Type = unknown>(
     const genericProperties:Partial<
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     > = {
-        onBlur,
         onFocus: triggerOnFocusAndOpenSuggestions,
         placeholder: properties.placeholder
     }
@@ -1865,10 +2047,19 @@ export const GenericInputInner = function<Type = unknown>(
             children: renderHelpText(),
             persistent: Boolean(properties.declaration)
         },
-        invalid: properties.showInitialValidationState && properties.invalid,
+        invalid: (
+            properties.invalid &&
+            properties.showValidationState &&
+            (properties.showInitialValidationState || properties.visited)
+        ),
         label: properties.description || properties.name,
-        outlined: properties.outlined,
-        required: properties.required
+        outlined: properties.outlined
+        /*
+            NOTE: Validation is not handle by the material component kike this:
+
+            pattern: properties.pattern,
+            required: properties.required
+        */
     }
     if (properties.icon)
         materialProperties.icon = wrapIconWithTooltip(
@@ -1985,16 +2176,18 @@ export const GenericInputInner = function<Type = unknown>(
                             (
                                 properties.representation as string
                             )?.split(' ') || '',
-                            (value:unknown):string =>
-                                `${value as string}`.toLowerCase(),
-                            (foundWord:string):ReactElement =>
-                                <span className={CSS_CLASS_NAMES[
-                                    'generic-input__suggestions__suggestion' +
-                                    '__mark'
-                                ]}>
-                                    {foundWord}
-                                </span>,
-                            null
+                            {
+                                marker: (foundWord:string):ReactElement =>
+                                    <span className={CSS_CLASS_NAMES[
+                                        'generic-input__suggestions' +
+                                        '__suggestion__mark'
+                                    ]}>
+                                        {foundWord}
+                                    </span>,
+                                normalizer: (value:unknown):string =>
+                                    `${value as string}`.toLowerCase(),
+                                skipTagDelimitedParts: null
+                            }
                         ) as Array<ReactElement|string>).map((
                             item:ReactElement|string, index:number
                         ):ReactElement =>
@@ -2033,7 +2226,9 @@ export const GenericInputInner = function<Type = unknown>(
 
         if (properties.editor !== 'plain')
             constraints.rows = properties.rows
-    } else if (['date', 'datetime-local', 'time'].includes(properties.type)) {
+    } else if ([
+        'date', 'datetime-local', 'time', 'time-local'
+    ].includes(properties.type)) {
         constraints.step = properties.step
 
         if (properties.maximum !== Infinity)
@@ -2070,21 +2265,32 @@ export const GenericInputInner = function<Type = unknown>(
                 )
                 .join(' ')
             }
+            onBlur={onBlur}
+            onKeyDown={onKeyDown}
+            ref={wrapperReference}
             style={properties.styles}
+            {...(useSuggestions ? {role: 'search'} : {})}
         >
             {wrapAnimationConditionally(
                 <Select
                     {...genericProperties as SelectProps}
                     {...materialProperties as SelectProps}
-                    enhanced
+                    enhanced={!properties.disabled}
                     foundationRef={foundationReference as
                         MutableRefObject<MDCSelectFoundation|null>
                     }
                     inputRef={inputReference as
                         unknown as
-                        (_reference:HTMLSelectElement|null) => void
+                        (reference:HTMLSelectElement|null) => void
                     }
                     onChange={onChangeValue}
+                    onKeyDown={(event:ReactKeyboardEvent):void => {
+                        if (!(
+                            properties.disabled ||
+                            event.keyCode === Tools.keyCode.TAB
+                        ))
+                            event.preventDefault()
+                    }}
                     options={normalizedSelection as SelectProps['options']}
                     rootProps={{
                         name: properties.name,
@@ -2124,6 +2330,7 @@ export const GenericInputInner = function<Type = unknown>(
                             }>
                                 <Theme use={
                                     properties.invalid &&
+                                    properties.showValidationState &&
                                     (
                                         properties.showInitialValidationState ||
                                         properties.visited
@@ -2165,8 +2372,8 @@ export const GenericInputInner = function<Type = unknown>(
                                             onChange={onChangeValue as
                                                 unknown as
                                                 (
-                                                    _value:string,
-                                                    _event?:unknown
+                                                    value:string,
+                                                    event?:unknown
                                                 ) => void
                                             }
                                             onCursorChange={onSelectionChange}
@@ -2191,7 +2398,7 @@ export const GenericInputInner = function<Type = unknown>(
                                             }
                                         />
                                     </Suspense> :
-                                    <RichTextEditorComponent
+                                    <GivenRichTextEditorComponent
                                         {...genericProperties as
                                             RichTextEditorProps
                                         }
@@ -2235,10 +2442,13 @@ export const GenericInputInner = function<Type = unknown>(
                         className="mdc-text-field-helper-line"
                         key="advanced-editor-helper-line"
                     >
-                        <p className={
-                            'mdc-text-field-helper-text ' +
-                            'mdc-text-field-helper-text--persistent'
-                        }>
+                        <p
+                            className={
+                                'mdc-text-field-helper-text ' +
+                                'mdc-text-field-helper-text--persistent'
+                            }
+                            id={`${id}-error-message`}
+                        >
                             {(
                                 materialProperties.helpText as
                                     {children:ReactElement}
@@ -2344,8 +2554,15 @@ export const GenericInputInner = function<Type = unknown>(
                         rootProps={{
                             name: properties.name,
                             onClick,
-                            onKeyDown,
                             onKeyUp,
+                            /*
+                                NOTE: Disabled input fields are not focusable
+                                via keyboard which makes them unreachable for
+                                blind people using e.g. screen readers.
+                                Therefore the label gets a tabindex to make the
+                                input focusable.
+                            */
+                            tabIndex: properties.disabled ? '0' : '-1',
                             ...properties.rootProps
                         }}
                         textarea={
@@ -2388,8 +2605,10 @@ GenericInputInner.displayName = 'GenericInput'
  *
  * @returns React elements.
  */
-export const GenericInput:GenericInputComponent =
-    memorize(forwardRef(GenericInputInner)) as unknown as GenericInputComponent
+export const GenericInput:GenericInputComponent<typeof GenericInputInner> =
+    memorize(forwardRef(GenericInputInner)) as
+        unknown as
+        GenericInputComponent<typeof GenericInputInner>
 // region static properties
 /// region web-component hints
 GenericInput.wrapped = GenericInputInner
@@ -2648,16 +2867,16 @@ GenericInput.transformer = {
                     /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
                     (
                         _match:string,
-                        hour:string,
-                        minute:string,
+                        hours:string,
+                        minutes:string,
                         secondsSuffix?:string,
                         seconds?:string,
                         _millisecondsSuffix?:string
                     ):string =>
                         String(
-                            parseInt(hour) *
+                            parseInt(hours) *
                             60 ** 2 +
-                            parseInt(minute) *
+                            parseInt(minutes) *
                             60 +
                             (secondsSuffix ? parseFloat(seconds!) : 0)
                         )
@@ -2671,6 +2890,107 @@ GenericInput.transformer = {
 
             return parsedDate / 1000
         }
+    },
+    /*
+        NOTE: Daylight saving time should not make a difference since times
+        will always be saved on zero unix timestamp where no daylight saving
+        time rules existing.
+    */
+    'time-local': {
+        format: {
+            final: {transform: (
+                value:Date|number|string,
+                configuration:DefaultProperties<number>,
+                transformer:InputDataTransformation
+            ):string => {
+                if (typeof value !== 'number')
+                    if (transformer['time-local'].parse)
+                        value = transformer['time-local'].parse(
+                            value, configuration, transformer
+                        )
+                    else {
+                        const parsedDate:number = value instanceof Date ?
+                            value.getTime() / 1000 :
+                            Date.parse(value)
+                        if (isNaN(parsedDate)) {
+                            const parsedFloat:number =
+                                parseFloat(value as string)
+                            value = isNaN(parsedFloat) ? 0 : parsedFloat
+                        } else
+                            value = parsedDate / 1000
+                    }
+
+                if (value === Infinity)
+                    return 'Infinitely far in the future'
+                if (value === -Infinity)
+                    return 'Infinitely early in the past'
+                if (!isFinite(value))
+                    return ''
+
+                const dateTime = new Date(Math.round(value * 1000))
+                const hours:number = dateTime.getHours()
+                const minutes:number = dateTime.getMinutes()
+
+                const formattedValue:string = (
+                    `${hours < 10 ? '0' : ''}${String(hours)}:` +
+                    `${minutes < 10 ? '0' : ''}${String(minutes)}`
+                )
+
+                if (!(
+                    configuration.step &&
+                    configuration.step >= 60 &&
+                    (configuration.step % 60) === 0
+                )) {
+                    const seconds:number = dateTime.getSeconds()
+
+                    return (
+                        `${formattedValue}:${(seconds < 10) ? '0' : ''}` +
+                        String(seconds)
+                    )
+                }
+
+                return formattedValue
+            }}
+        },
+        parse: (value:Date|number|string):number => {
+            if (typeof value === 'number')
+                return value
+
+            if (value instanceof Date)
+                return value.getTime() / 1000
+
+            const parsedDate:number = Date.parse(value)
+            if (isNaN(parsedDate)) {
+                const parsedFloat:number = parseFloat(value.replace(
+                    /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
+                    (
+                        _match:string,
+                        hours:string,
+                        minutes:string,
+                        secondsSuffix?:string,
+                        seconds?:string,
+                        _millisecondsSuffix?:string
+                    ):string => {
+                        const zeroDateTime = new Date(0)
+
+                        zeroDateTime.setHours(parseInt(hours))
+                        zeroDateTime.setMinutes(parseInt(minutes))
+                        if (secondsSuffix)
+                            zeroDateTime.setSeconds(parseInt(seconds!))
+
+                        return String(zeroDateTime.getTime() / 1000)
+                    }
+                ))
+
+                if (isNaN(parsedFloat))
+                    return 0
+
+                return parsedFloat
+            }
+
+            return parsedDate / 1000
+        },
+        type: 'time'
     },
 
     float: {

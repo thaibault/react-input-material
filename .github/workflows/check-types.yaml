@@ -1,4 +1,4 @@
-name: Build
+name: Check types
 
 on:
   # NOTE: Runs on branch to tag creation.
@@ -8,11 +8,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  check-types:
     runs-on: ubuntu-latest
     container: node:latest
     steps:
       - uses: thaibault/install-npm-package-dependencies-action@main
 
-      - name: Build package contents
-        run: yarn build
+      - name: Check-types
+        run: yarn check:types

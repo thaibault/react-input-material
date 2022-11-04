@@ -55,11 +55,11 @@ import {
     fileInputIframeWrapperPaddingClassName,
     fileInputNativeClassName,
     fileInputTextRepresentationClassName
-} from './FileInput.module'
+} from './style.module'
 */
-import cssClassNames from './FileInput.module'
-import GenericInput from './GenericInput'
-import {WrapConfigurations} from './WrapConfigurations'
+import cssClassNames from './style.module'
+import GenericInput from '../GenericInput'
+import {WrapConfigurations} from '../WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
     determineInitialValue,
@@ -69,7 +69,7 @@ import {
     translateKnownSymbols,
     triggerCallbackIfExists,
     wrapStateSetter
-} from '../helper'
+} from '../../helper'
 import {
     defaultFileInputModelState as defaultModelState,
     DefaultFileInputProperties as DefaultProperties,
@@ -87,7 +87,7 @@ import {
     InputProps,
     FileRepresentationType as RepresentationType,
     FileInputComponent
-} from '../type'
+} from '../../type'
 // endregion
 // region constants
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
@@ -740,14 +740,8 @@ export const FileInputInner = function(
             'binary'
     const invalid:boolean = (
         properties.invalid &&
-        (
-            properties.showInitialValidationState ||
-            /*
-                Material inputs show their validation state at least after a
-                blur event so we synchronize error appearances.
-            */
-            properties.visited
-        )
+        properties.showValidationState &&
+        (properties.showInitialValidationState || properties.visited)
     )
 
     return <WrapConfigurations
@@ -978,8 +972,10 @@ FileInputInner.displayName = 'FileInput'
  *
  * @returns React elements.
  */
-export const FileInput:FileInputComponent =
-    memorize(forwardRef(FileInputInner)) as unknown as FileInputComponent
+export const FileInput:FileInputComponent<typeof FileInputInner> =
+    memorize(forwardRef(FileInputInner)) as
+        unknown as
+        FileInputComponent<typeof FileInputInner>
 // region static properties
 /// region web-component hints
 FileInput.wrapped = FileInputInner

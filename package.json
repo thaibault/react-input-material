@@ -1,6 +1,6 @@
 {
   "name": "react-input-material",
-  "version": "0.0.424",
+  "version": "0.0.482",
   "description": "Reusable material design based input field with support for (richt-)text, code, selections, numbers, dates and so on.",
   "keywords": [
     "form-field",
@@ -15,22 +15,23 @@
     "url": "https://github.com/thaibault/react-input-material/issues"
   },
   "license": "CC-BY-3.0",
+  "main": "dist/index.js",
   "author": {
     "name": "Torben Sickert",
     "email": "info@torben.website",
     "url": "https://torben.website"
   },
   "files": [
-    "components",
-    "helper.d.ts",
-    "helper.js",
-    "index.styles.css",
-    "index.d.ts",
-    "index.js",
-    "material-fixes.css",
-    "testHelper.d.ts",
-    "testHelper.js",
-    "type.d.ts"
+    "dist/components",
+    "dist/helper.d.ts",
+    "dist/helper.js",
+    "dist/index.css",
+    "dist/index.d.ts",
+    "dist/index.js",
+    "dist/material-fixes.css",
+    "dist/testHelper.d.ts",
+    "dist/testHelper.js",
+    "dist/type.d.ts"
   ],
   "repository": {
     "type": "git",
@@ -39,28 +40,30 @@
   "scripts": {
     "build": "yarn build:types; yarn build:plain",
     "build:bundle": "yarn build:types; yarn build:bundle:plain",
-    "build:bundle:plain": "weboptimizer build '{__reference__: \"target:bundle\"}'",
+    "build:bundle:plain": "weboptimizer build '{__reference__: [\"target:minimal\", \"target:bundle\"]}'",
     "build:plain": "weboptimizer build",
     "build:types": "weboptimizer build:types",
     "check": "yarn check:types; yarn lint",
     "check:types": "weboptimizer check:types",
-    "clear": "weboptimizer clear && (rm *.styles.css components/*.styles.css 2>/dev/null || true)",
+    "clear": "weboptimizer clear",
     "document": "weboptimizer document",
     "lint": "yarn clear && weboptimizer lint",
     "patch": "for path in patches/*.patch; do target_file_path=\"$(echo \"$path\" | sed --regexp-extended 's/patches\\/([^/]+).patch$/\\1/' | sed 's:\\+:/:g')\"; source_file_path=\"$path\"; echo \"Patch file \\\"$target_file_path\\\" with \\\"$source_file_path\\\".\"; patch --forward --input \"$source_file_path\" --reject-file - \"$target_file_path\"; done; true",
     "prepare": "ln --force --symbolic react node_modules/@emotion/core && yarn build",
     "postinstall": "yarn patch || true",
+    "postversion": "yarn publish --non-interactive; git push --tags && git push",
     "serve": "weboptimizer serve",
     "serve:minimal": "weboptimizer serve '{__reference__: \"target:minimal\"}'",
     "start": "yarn serve",
-    "test": "weboptimizer test",
-    "test:browser": "yarn clear && weboptimizer test:browser",
+    "test": "yarn clear && weboptimizer test '{__reference__: \"target:minimal\"}'",
+    "test:browser": "yarn clear && weboptimizer test:browser '{__reference__: \"target:minimal\"}'",
     "test:coverage": "yarn clear && weboptimizer test:coverage",
-    "test:coverage:report": "yarn clear && weboptimizer test:coverage:report",
-    "update": "yarn version --patch && yarn publish",
+    "test:coverage:report": "yarn clear && weboptimizer test:coverage:report '{__reference__: \"target:minimal\"}'",
+    "update": "yarn version --patch",
     "update:documentation": "documentation-website",
     "watch": "weboptimizer build --watch"
   },
+  "runkitExample": "require('@babel/runtime/package.json')\n\nglobalThis.window = globalThis\n\nconst {GenericAnimate} = require('react-input-material')\n\nGenericAnimate.webComponentAdapterWrappedis",
   "dependencies": {
     "@types/webpack": "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.1.1.tgz"
   },
@@ -116,6 +119,7 @@
     "react": ">=17",
     "react-ace": "*",
     "react-dom": "*",
+    "react-generic-dummy": "*",
     "react-transition-group": "*",
     "react-useanimations": "*",
     "style-loader": "*",
@@ -255,11 +259,34 @@
     "files": {
       "compose": {
         "cascadingStyleSheet": {
-          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['test:browser', 'serve'].includes(self.givenCommandLineArguments[2]) ? null : `${path.resolve(self.path.target.asset.cascadingStyleSheet, '[name].styles.css')}?${self.hashAlgorithm}=[chunkhash]`"
+          "__evaluate__": "self.debug && 2 < self.givenCommandLineArguments.length && ['test:browser', 'serve'].includes(self.givenCommandLineArguments[2]) ? null : `${path.resolve(self.path.target.asset.cascadingStyleSheet, '[name].css')}?${self.hashAlgorithm}=[chunkhash]`"
         }
       }
     },
     "generic": {
+      "entry": {
+        "./components/FileInput/import": "./components/FileInput/import.module",
+        "./components/FileInput/index": "./components/FileInput/index",
+        "./components/GenericAnimate/index": "./components/GenericAnimate/index",
+        "./components/GenericInput/import": "./components/GenericInput/import.module",
+        "./components/GenericInput/index": "./components/GenericInput/index",
+        "./components/Inputs/import.module": "./components/Inputs/import.module",
+        "./components/Inputs/index": "./components/Inputs/index",
+        "./components/Interval/import.module": "./components/Interval/import.module",
+        "./components/Interval/index": "./components/Interval/index",
+        "./components/RequireableCheckbox/import.module": "./components/RequireableCheckbox/import.module",
+        "./components/RequireableCheckbox/index": "./components/RequireableCheckbox/index",
+        "./components/WrapConfigurations": "./components/WrapConfigurations",
+        "./components/WrapThemeProvider": "./components/WrapThemeProvider",
+        "./components/WrapTooltip": "./components/WrapTooltip",
+        "helper": "./helper",
+        "index": [
+          "./index.css",
+          "./index.ts"
+        ],
+        "material-fixes": "./material-fixes",
+        "testHelper": "./testHelper"
+      },
       "supportedBrowsers": [
         "IE >= 11",
         "last 2 versions",
@@ -268,7 +295,7 @@
     },
     "injection": {
       "entry": {
-        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? ['./index.css', './playground'] : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2].startsWith('test') ? {testBundle: './test'} : {'./components/Dummy': './components/Dummy', './components/FileInput': './components/FileInput', './components/GenericAnimate': './components/GenericAnimate', './components/GenericInput': './components/GenericInput', './components/Inputs': './components/Inputs', './components/Interval': './components/Interval', './components/RequireableCheckbox': './components/RequireableCheckbox', './components/WrapConfigurations': './components/WrapConfigurations', './components/WrapThemeProvider': './components/WrapThemeProvider', './components/WrapTooltip': './components/WrapTooltip', helper: './helper', index: ['./index.css', './index.tsx'], testHelper: './testHelper'}"
+        "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? ['./index.css', './playground'] : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2].startsWith('test') ? {testBundle: './test'} : self.generic.entry"
       }
     },
     "module": {
@@ -318,6 +345,14 @@
         }
       }
     },
+    "path": {
+      "source": {
+        "base": "src/"
+      },
+      "target": {
+        "base": "dist/"
+      }
+    },
     "target:bundle": {
       "inPlace": {
         "externalLibrary": {
@@ -341,19 +376,12 @@
       "module": {
         "aliases": {
           "#": "Remove unneeded optional dependencies.",
-          "#1": "Triggers error in debug mode:",
-          "#2": "@tinymce/tinymce-react$: false",
-          "#3": "ace-builds$: false",
-          "#4": "react-ace$: false",
-          "#5": "react-useanimations$: false",
-          "#6": "react-useanimations/lib/lock$: false",
-          "#7": "react-useanimations/lib/plusToX$: false",
-          "@tinymce/tinymce-react$": "./components/Dummy",
-          "ace-builds$": "./components/Dummy",
-          "react-ace$": "./components/Dummy",
-          "react-useanimations$": "./components/Dummy",
-          "react-useanimations/lib/lock$": "./components/Dummy",
-          "react-useanimations/lib/plusToX$": "./components/Dummy"
+          "@tinymce/tinymce-react$": "react-generic-dummy",
+          "ace-builds$": "react-generic-dummy",
+          "react-ace$": "react-generic-dummy",
+          "react-useanimations$": "react-generic-dummy",
+          "react-useanimations/lib/lock$": "react-generic-dummy",
+          "react-useanimations/lib/plusToX$": "react-generic-dummy"
         }
       }
     }

@@ -9,15 +9,13 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
-/* region imports */
-/* import "@rmwc/checkbox/styles"; */
-@import "@material/checkbox/dist/mdc.checkbox.css";
-@import "@material/form-field/dist/mdc.form-field.css";
-@import "@material/ripple/dist/mdc.ripple.css";
-/* endregion */
-.requireable-checkbox {
-    display: block;
-}
+/* import "@rmwc/icon/styles" */
+@import "@rmwc/icon/icon.css";
+/* import "@rmwc/theme/styles" */
+@import "@material/theme/dist/mdc.theme.css";
+@import "@rmwc/theme/theme.css";
+/* import "@rmwc/tooltip/styles" */
+@import "@rmwc/tooltip/tooltip.css";
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:
 vim: foldmethod=marker foldmarker=region,endregion:

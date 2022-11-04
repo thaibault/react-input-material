@@ -9,15 +9,6 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
-/* region imports */
-/* import "@rmwc/icon/styles" */
-@import "@rmwc/icon/icon.css";
-/* import "@rmwc/theme/styles" */
-@import "@material/theme/dist/mdc.theme.css";
-@import "@rmwc/theme/theme.css";
-/* import "@rmwc/tooltip/styles" */
-@import "@rmwc/tooltip/tooltip.css";
-/* endregion */
 .interval {
     display: flex;
     flex-direction: row;

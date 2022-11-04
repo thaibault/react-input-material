@@ -29,7 +29,9 @@ import {
 } from 'react'
 import {createRoot} from 'react-dom/client'
 
-import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
+import {
+    preserveStaticFileBaseNameInputGenerator
+} from './components/FileInput'
 import {
     FileInput,
     GenericAnimate,
@@ -71,11 +73,11 @@ const Application:FunctionComponent = ():ReactElement => {
         name: 'test.txt'
     })
     const onChangeValue1 =
-        useMemorizedValue<(_value:FileValue|null) => void>(setValue1)
+        useMemorizedValue<(value:FileValue|null) => void>(setValue1)
 
     const [value2, setValue2] = useState<null|string>('')
     const onChangeValue2 =
-        useMemorizedValue<(_value:null|string) => void>(setValue2)
+        useMemorizedValue<(value:null|string) => void>(setValue2)
 
     type FloatValueState = {
         representation:ReactNode|string
@@ -85,7 +87,7 @@ const Application:FunctionComponent = ():ReactElement => {
         value: 1234.34, representation: '1.234,34'
     })
     const onChangeValue3 =
-        useMemorizedValue<(_value:FloatValueState) => void>(setValue3)
+        useMemorizedValue<(value:FloatValueState) => void>(setValue3)
 
     type SelectionValueType = {
         representation:ReactNode|string
@@ -94,21 +96,21 @@ const Application:FunctionComponent = ():ReactElement => {
     const [value4, setValue4] =
         useState<SelectionValueType>({representation: 'klaus', value: 'b'})
     const onChangeValue4 =
-        useMemorizedValue<(_value:SelectionValueType) => void>(setValue4)
+        useMemorizedValue<(value:SelectionValueType) => void>(setValue4)
 
     const [value5, setValue5] =
         useState<IntervalValue|null>({end: 120, start: 60})
     const onChangeValue5 =
-        useMemorizedValue<(_value:IntervalValue|null) => void>(setValue5)
+        useMemorizedValue<(value:IntervalValue|null) => void>(setValue5)
 
     const [value6, setValue6] = useState<boolean|null>(false)
     const onChangeValue6 =
-        useMemorizedValue<(_value:boolean|null) => void>(setValue6)
+        useMemorizedValue<(value:boolean|null) => void>(setValue6)
 
     const [value7, setValue7] =
         useState<Array<null|string>|null>(['first item'])
     const onChangeValue7 =
-        useMemorizedValue<(_values:Array<null|string>|null) => void>(setValue7)
+        useMemorizedValue<(values:Array<null|string>|null) => void>(setValue7)
     // endregion
     return (<>
         <div
@@ -203,6 +205,10 @@ const Application:FunctionComponent = ():ReactElement => {
 
             <GenericInput
                 declaration="This text can be seen initially."
+                inputProps={{
+                    ariaChecked: false,
+                    ariaDescription: 'test'
+                }}
                 name="input1"
                 onChange={onChange}
                 showDeclaration={true}
@@ -215,7 +221,7 @@ const Application:FunctionComponent = ():ReactElement => {
             <hr/>
 
             <GenericInput<number>
-                default={1526165029}
+                default={new Date('2025-01-01T00:00:00.000Z').getTime() / 1000}
                 name="input2"
                 onChange={onChange}
                 type="date"
@@ -241,7 +247,7 @@ const Application:FunctionComponent = ():ReactElement => {
                     maximum: 3600,
                     minimum: 60,
                     name: 'input3Model',
-                    type: 'time'
+                    type: 'time-local'
                 })}
                 onChange={onChange}
             />
@@ -273,6 +279,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 onChange={onChange}
                 placeholder="100.000,00"
                 required
+                showValidationState={false}
                 trailingIcon="clear_preset"
             />
             <GenericInput
@@ -297,7 +304,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 initialValue="only a`s allowed"
                 name="input6"
                 onChange={onChange}
-                pattern="a+"
+                pattern="^a+$"
                 placeholder="input6Placeholder"
             />
             <GenericInput
@@ -345,7 +352,6 @@ const Application:FunctionComponent = ():ReactElement => {
             <GenericInput
                 declaration="selection"
                 description="input8Description"
-                initialValue="A"
                 labels={useMemorizedValue(
                     [['C', 'LC'], ['D', 'LD'], ['A', 'LA'], ['B', 'LB']]
                 )}
@@ -383,6 +389,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 required
             />
             <GenericInput<boolean>
+                disabled
                 initialValue={false}
                 labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
                 model={useMemorizedValue({

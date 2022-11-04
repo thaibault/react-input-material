@@ -1,4 +1,4 @@
-name: Build
+name: Test coverage and report
 
 on:
   # NOTE: Runs on branch to tag creation.
@@ -8,11 +8,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  test-coverage-report:
     runs-on: ubuntu-latest
     container: node:latest
     steps:
-      - uses: thaibault/install-npm-package-dependencies-action@main
-
-      - name: Build package contents
-        run: yarn build
+      - uses: thaibault/test-send-coveralls-npm-package-action@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
