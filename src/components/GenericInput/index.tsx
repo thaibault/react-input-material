@@ -2537,6 +2537,7 @@ export const GenericInputInner = function<Type = unknown>(
                         {...genericProperties as TextFieldProps}
                         {...materialProperties as TextFieldProps}
                         {...constraints}
+                        id={properties.name}
                         align={properties.align}
                         characterCount={
                             typeof properties.maximumLength === 'number' &&
