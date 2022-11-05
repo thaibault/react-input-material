@@ -357,7 +357,6 @@ const Application:FunctionComponent = ():ReactElement => {
                 )}
                 name="input8"
                 onChange={onChange}
-                placeholder="input8Placeholder"
                 required
                 selection={useMemorizedValue(['A', 'B', 'C'])}
             />
@@ -373,7 +372,6 @@ const Application:FunctionComponent = ():ReactElement => {
                     selection: ['A', 'B', 'C']
                 })}
                 onChange={onChange}
-                placeholder="input8ModelPlaceholder"
             />
 
             <hr/>

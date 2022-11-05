@@ -372,13 +372,13 @@ export const GenericInputInner = function<Type = unknown>(
     const id:string = useId()
 /* eslint-enable jsdoc/require-description-complete-sentence */
     // region live-cycle
+    /// region text-editor selection synchronisation
     /**
      * Is triggered immediate after a re-rendering. Re-stores cursor selection
      * state if editor has been switched.
      * @returns Nothing.
      */
     useEffect(():void => {
-        // region text-editor selection synchronisation
         if (selectionIsUnstable || editorState.selectionIsUnstable)
             if (properties.editorIsActive) {
                 /*
@@ -422,12 +422,18 @@ export const GenericInputInner = function<Type = unknown>(
                         {...editorState, selectionIsUnstable: false}
                     )
             }
-        // endregion
-        // region input element property synchronisation
+    })
+    /// endregion
+    /// region input element property synchronisation
+    /**
+     * Is triggered immediate after a re-rendering. Connects error message
+     * with input element.
+     * @returns Nothing.
+     */
+    useEffect(():void => {
         if (inputReference.current) {
             const determinedInputProps:Mapping<boolean|number|string> = {}
             const propsToRemove:Array<string> = []
-
 
             // Apply aria attributes regarding validation state.
             if (properties.valid) {
@@ -483,11 +489,20 @@ export const GenericInputInner = function<Type = unknown>(
                     inputReference.current.removeAttribute(attributeName)
             }
         }
-        // endregion
-        // Apply missing initial aria attribute regarding menu popup state.
+    })
+    /// endregion
+    /// region apply missing initial aria attribute regarding menu popup state.
+    /**
+     * Is triggered immediate after a re-rendering. Sets initial aria list box
+     * opening and hidden state.
+     * @returns Nothing.
+     */
+    useEffect(():void => {
         if (useSelection) {
-            const selectionWrapper:HTMLElement|null = wrapperReference.current!
-                .querySelector('[aria-haspopup="listbox"]')
+            const selectionWrapper:HTMLElement|null|undefined =
+                wrapperReference.current?.querySelector(
+                    '[aria-haspopup="listbox"]'
+                )
             if (selectionWrapper) {
                 if (!selectionWrapper.hasAttribute('aria-expanded'))
                     selectionWrapper.setAttribute('aria-expanded', 'false')
@@ -504,6 +519,36 @@ export const GenericInputInner = function<Type = unknown>(
             }
         }
     })
+    /// endregion
+    /// region avoid accidentally opening select menu.
+    /**
+     * Is triggered immediate after a re-rendering. Captures key down events
+     * on disabled select fields.
+     * @returns Nothing.
+     */
+    useEffect(():void|(() => void) => {
+        if (useSelection) {
+            const selectionWrapper:HTMLElement|null|undefined =
+                wrapperReference.current?.querySelector(
+                    '[aria-haspopup="listbox"]'
+                )
+            if (selectionWrapper) {
+                const handler = (event:KeyboardEvent):void => {
+                    if (properties.disabled)
+                        event.stopPropagation()
+                }
+
+                selectionWrapper.addEventListener('keydown', handler, true)
+
+                return ():void => {
+                    selectionWrapper.removeEventListener(
+                        'keydown', handler, true
+                    )
+                }
+            }
+        }
+    })
+    /// endregion
     // endregion
     // region context helper
     /// region render helper
@@ -2275,7 +2320,7 @@ export const GenericInputInner = function<Type = unknown>(
                 <Select
                     {...genericProperties as SelectProps}
                     {...materialProperties as SelectProps}
-                    enhanced={!properties.disabled}
+                    enhanced={true}
                     foundationRef={foundationReference as
                         MutableRefObject<MDCSelectFoundation|null>
                     }
@@ -2285,6 +2330,10 @@ export const GenericInputInner = function<Type = unknown>(
                     }
                     onChange={onChangeValue}
                     onKeyDown={(event:ReactKeyboardEvent):void => {
+                        /*
+                            Avoid scrolling page interactions when navigating
+                            through option.
+                        */
                         if (!(
                             properties.disabled ||
                             event.keyCode === Tools.keyCode.TAB
