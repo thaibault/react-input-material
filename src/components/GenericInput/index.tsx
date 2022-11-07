@@ -1497,12 +1497,13 @@ export const GenericInputInner = function<Type = unknown>(
                 if (typeof (
                     target as unknown as {index:number}
                 ).index === 'number') {
-                    const index:number = Math.min(
+                    const index:number = Math.max(
                         0,
                         (
                             target as unknown as {index:number}
                         ).index - (properties.placeholder ? 1 : 0)
                     )
+
                     properties.value =
                         index < suggestionValues.length ?
                             suggestionValues[index] as Type :
