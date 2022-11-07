@@ -376,6 +376,7 @@
       "module": {
         "aliases": {
           "#": "Remove unneeded optional dependencies.",
+          "@rmwc/tooltip": "react-generic-dummy",
           "@tinymce/tinymce-react$": "react-generic-dummy",
           "ace-builds$": "react-generic-dummy",
           "react-ace$": "react-generic-dummy",

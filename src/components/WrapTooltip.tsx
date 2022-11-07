@@ -18,11 +18,14 @@
 */
 // region imports
 import {FunctionComponent, ReactElement} from 'react'
+import Dummy from 'react-generic-dummy'
 import {Typography} from '@rmwc/typography'
 import {Tooltip} from '@rmwc/tooltip'
 
 import {Properties} from '../type'
 // endregion
+export const isDummy:boolean =
+    !Tooltip || (Tooltip as unknown as typeof Dummy).isDummy
 /**
   * Wraps given component with a tooltip component with given tooltip
   * configuration.
@@ -36,21 +39,39 @@ export const WrapTooltip:FunctionComponent<{
     children:ReactElement
     options?:Properties['tooltip']
 }> = ({children, options}):ReactElement => {
-    if (typeof options === 'string')
+    if (typeof options === 'string') {
+        if (isDummy)
+            return <div className="generic-tooltip" title={options}>
+                {children}
+            </div>
+
         return <Tooltip
             content={<Typography use="caption">{options}</Typography>}
         >
             <div className="generic-tooltip">{children}</div>
         </Tooltip>
+    }
 
     if (options !== null && typeof options === 'object') {
-        if (typeof options.content === 'string')
+        if (typeof options.content === 'string') {
+            if (isDummy)
+                return <div
+                    className="generic-tooltip"
+                    title={options.content}
+                >
+                    {children}
+                </div>
+
             options = {
                 ...options,
                 content: <Typography use="caption">
                     {options.content}
                 </Typography>
             }
+        }
+
+        if (isDummy)
+            return <div className="generic-tooltip">{children}</div>
 
         return <Tooltip {...options}>
             <div className="generic-tooltip">{children}</div>
