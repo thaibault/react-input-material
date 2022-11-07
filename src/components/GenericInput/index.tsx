@@ -2083,6 +2083,11 @@ export const GenericInputInner = function<Type = unknown>(
     const genericProperties:Partial<
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     > = {
+        /*
+            NOTE: If not set label with unalowed symbols will automatically
+            used.
+        */
+        id,
         onFocus: triggerOnFocusAndOpenSuggestions,
         placeholder: properties.placeholder
     }
