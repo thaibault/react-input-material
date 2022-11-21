@@ -42,7 +42,7 @@ export const prepareTestEnvironment = (
         render: <T = HTMLElement>(
             component:ReactElement, flush = true
         ):null|T => {
-            act(():void => {
+            void act(():void => {
                 if (root)
                     if (flush)
                         flushSync(():void => root!.render(component))
@@ -100,7 +100,7 @@ export const prepareTestEnvironment = (
                         } as WP
                     )
 
-                act(():void => {
+                void act(():void => {
                     if (root)
                         if (options.flush)
                             flushSync(():void => root!.render(component))
@@ -125,14 +125,14 @@ export const prepareTestEnvironment = (
         document.body.appendChild(result.container)
 
         if (!root)
-            act(() => {
+            void act(() => {
                 root = createRoot(result.container!)
             })
     })
 
     currentAfterEach(() => {
         if (root)
-            act(() => {
+            void act(() => {
                 root!.unmount()
                 root = null
             })
