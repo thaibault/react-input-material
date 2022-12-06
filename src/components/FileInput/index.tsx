@@ -714,11 +714,15 @@ export const FileInputInner = function(
                         }
 
                 if (!properties.value.url && properties.value.blob?.type) {
-                    const source = TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
+                    let source = properties.value.source
+                    if (TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
                         properties.value.blob.type
-                    ) ?
-                        btoa(properties.value.source) :
-                        properties.value.source
+                    ))
+                        try {
+                            source = btoa(properties.value.source)
+                        } catch (error) {
+                            console.warn(error)
+                        }
 
                     valueChanged = {
                         url:
