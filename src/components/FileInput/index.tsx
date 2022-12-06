@@ -679,28 +679,41 @@ export const FileInputInner = function(
     useEffect(():void => {
         (async ():Promise<void> => {
             let valueChanged:null|Partial<FileValue> = null
-            if (
-                properties.value?.blob &&
-                properties.value.blob instanceof Blob &&
-                !properties.value.source
-            )
-                valueChanged = {
-                    source: TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
-                        properties.value.blob.type
-                    ) ?
-                        await readBinaryDataIntoText(
-                            properties.value.blob
-                        ) :
-                        typeof Blob === 'undefined' ?
-                            (properties.value.toString as
-                                unknown as
-                                (_encoding:string) => string
-                            )('base64') :
-                            await blobToBase64String(properties.value.blob)
-                }
+            if (!properties.value?.source)
+                if (
+                    properties.value?.blob &&
+                    properties.value.blob instanceof Blob
+                )
+                    // Derive missing source from given blob.
+                    valueChanged = {
+                        source: TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
+                            properties.value.blob.type
+                        ) ?
+                            await readBinaryDataIntoText(
+                                properties.value.blob
+                            ) :
+                            typeof Blob === 'undefined' ?
+                                (properties.value.toString as
+                                    unknown as
+                                    (_encoding:string) => string
+                                )('base64') :
+                                await blobToBase64String(properties.value.blob)
+                    }
+                else if (
+                    properties.value?.url && representationType === 'text'
+                )
+                    // Derive missing source from given data url.
+                    valueChanged = {
+                        source: await (
+                            properties.value.url?.startsWith('data:') ?
+                                (await fetch(properties.value.url)) :
+                                dataURLToBlob(properties.value.url)
+                        ).text()
+                    }
 
             if (properties.value?.source) {
                 if (!properties.value.blob)
+                    // Derive missing blob from given source.
                     if (properties.value.url?.startsWith('data:'))
                         valueChanged = {
                             blob: dataURLToBlob(properties.value.source)
@@ -714,6 +727,10 @@ export const FileInputInner = function(
                         }
 
                 if (!properties.value.url && properties.value.blob?.type) {
+                    /*
+                        Try to derive missing encoded base64 url from given
+                        source.
+                    */
                     let source = properties.value.source
                     if (TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
                         properties.value.blob.type
@@ -735,7 +752,7 @@ export const FileInputInner = function(
             if (valueChanged)
                 onChangeValue(valueChanged, undefined, undefined, true)
         })()
-            .catch(console.error)
+            .catch(console.warn)
     })
     // region render
     const representationType:RepresentationType =
