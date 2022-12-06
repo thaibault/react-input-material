@@ -235,7 +235,8 @@ export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
  * @param properties - Current component properties.
  * @param currentState - Current component state.
  *
- * @returns Whether component is in an aggregated valid or invalid state.
+ * @returns Boolean indicating whether component is in an aggregated valid or
+ * invalid state.
  */
 export function determineValidationState<T>(
     properties:DefaultProperties<T>, currentState:Partial<ModelState>

@@ -130,6 +130,7 @@ const Application:FunctionComponent = ():ReactElement => {
                         url: 'https://via.placeholder.com/150'
                     }
                 )}
+                encoding="latin1"
                 generateFileNameInputProperties={
                     preserveStaticFileBaseNameInputGenerator
                 }
@@ -139,6 +140,9 @@ const Application:FunctionComponent = ():ReactElement => {
                 {useMemorizedValue(({value}):null|ReactElement =>
                     value?.blob ?
                         <ul>
+                            <li>
+                                Expected encoding for text based files: latin1
+                            </li>
                             {(value.blob as File).lastModified ?
                                 <li>
                                     Last modified date time:
