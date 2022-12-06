@@ -706,8 +706,8 @@ export const FileInputInner = function(
                     valueChanged = {
                         source: await (
                             properties.value.url?.startsWith('data:') ?
-                                (await fetch(properties.value.url)) :
-                                dataURLToBlob(properties.value.url)
+                                dataURLToBlob(properties.value.url) :
+                                (await fetch(properties.value.url))
                         ).text()
                     }
 
