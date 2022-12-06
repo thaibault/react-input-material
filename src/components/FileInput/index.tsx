@@ -101,8 +101,9 @@ const IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
     'i'
 )
 const TEXT_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
-    '^(?:application\\/xml)|(?:text\\/(?:plain|x-ndpb[wy]html|(?:x-)?csv' +
-    '|x?html?|xml))$',
+    '^(?:application\\/(json|xml))|' +
+    '(?:text\\/(?:plain|x-ndpb[wy]html|(?:x-)?csv|' +
+    'x?html?|xml))$',
     'i'
 )
 const REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION =
@@ -118,6 +119,16 @@ const VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
 )
 // endregion
 // region helper
+/**
+ * Generates properties for nested text input to edit file name.
+ * @param prototype - Base properties to extend from.
+ * @param properties - Actual properties to derive from.
+ * @param properties.name - Name of filename input field.
+ * @param properties.value - Current edited file value.
+ * @param properties.value.name - Current edited filename.
+ *
+ * @returns Input properties.
+ */
 export const preserveStaticFileBaseNameInputGenerator:Properties[
     'generateFileNameInputProperties'
 ] = (
@@ -135,6 +146,7 @@ export const preserveStaticFileBaseNameInputGenerator:Properties[
 /**
  * Determines which type of file we have to present.
  * @param contentType - File type to derive representation type from.
+ *
  * @returns Nothing.
  */
 export const determineRepresentationType = (
@@ -159,6 +171,15 @@ export const determineRepresentationType = (
 
     return 'binary'
 }
+/**
+ * Derives validation state from provided properties and state.
+ * @param properties - Current component properties.
+ * @param invalidName - Determines if edited file name is invalid or not.
+ * @param currentState - Current component state.
+ *
+ * @returns Boolean indicating Whether component is in an aggregated valid or
+ * invalid state.
+ */
 export const determineValidationState = <P extends DefaultProperties>(
     properties:P, invalidName:boolean, currentState:ModelState
 ):boolean => determineBaseValidationState<P>(
@@ -207,11 +228,33 @@ export const determineValidationState = <P extends DefaultProperties>(
         )
     }
 )
+/// region data transformer
+/**
+ * Derive base46 string from given file value.
+ * @param value - File to derive string from.
+ *
+ * @returns A promise holding base64 string.
+ */
+export const deriveBase64String = (value:FileValue):Promise<string> =>
+    typeof Blob === 'undefined' ?
+        Promise.resolve(
+            (value.toString as unknown as (_encoding:string) => string)(
+                'base64'
+            )
+        ) :
+        blobToBase64String(value.blob as Blob)
+/**
+ * Read text from given binary data with given encoding.
+ * @param blob - Binary data object.
+ * @param encoding - Encoding for reading file correctly.
+ *
+ * @returns A promise holding parsed text as string.
+ **/
 export const readBinaryDataIntoText = (
     blob:Blob, encoding = 'utf-8'
 ):Promise<string> =>
     new Promise<string>((
-        resolve:(_value:string) => void, reject:(_reason:Error) => void
+        resolve:(value:string) => void, reject:(reason:Error) => void
     ):void => {
         const fileReader:FileReader = new FileReader()
 
@@ -240,6 +283,7 @@ export const readBinaryDataIntoText = (
                 encoding
         )
     })
+/// endregion
 // endregion
 /* eslint-disable jsdoc/require-description-complete-sentence */
 /**
@@ -678,78 +722,49 @@ export const FileInputInner = function(
     // endregion
     useEffect(():void => {
         (async ():Promise<void> => {
-            let valueChanged:null|Partial<FileValue> = null
-            if (!properties.value?.source)
-                if (
-                    properties.value?.blob &&
-                    properties.value.blob instanceof Blob
-                )
-                    // Derive missing source from given blob.
-                    valueChanged = {
-                        source: TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
-                            properties.value.blob.type
-                        ) ?
-                            await readBinaryDataIntoText(
-                                properties.value.blob
-                            ) :
-                            typeof Blob === 'undefined' ?
-                                (properties.value.toString as
-                                    unknown as
-                                    (_encoding:string) => string
-                                )('base64') :
-                                await blobToBase64String(properties.value.blob)
-                    }
-                else if (
-                    properties.value?.url && representationType === 'text'
-                )
-                    // Derive missing source from given data url.
-                    valueChanged = {
-                        source: await (
-                            properties.value.url?.startsWith('data:') ?
-                                dataURLToBlob(properties.value.url) :
-                                (await fetch(properties.value.url))
-                        ).text()
-                    }
-
+            const valueChanged:Partial<FileValue> = {}
             if (properties.value?.source) {
-                if (!properties.value.blob)
+                if (!properties.value.blob) {
                     // Derive missing blob from given source.
                     if (properties.value.url?.startsWith('data:'))
-                        valueChanged = {
-                            blob: dataURLToBlob(properties.value.source)
-                        }
+                        valueChanged.blob =
+                            dataURLToBlob(properties.value.source)
                     else if (properties.sourceToBlobOptions)
-                        valueChanged = {
-                            blob: new Blob(
-                                [properties.value.source],
-                                properties.sourceToBlobOptions
-                            )
-                        }
-
-                if (!properties.value.url && properties.value.blob?.type) {
+                        valueChanged.blob = new Blob(
+                            [properties.value.source],
+                            properties.sourceToBlobOptions
+                        )
+                } else if (
+                    !properties.value.url && properties.value.blob?.type
+                )
                     /*
                         Try to derive missing encoded base64 url from given
-                        source.
+                        blob or plain source.
                     */
-                    let source = properties.value.source
-                    if (TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
-                        properties.value.blob.type
-                    ))
-                        try {
-                            source = btoa(properties.value.source)
-                        } catch (error) {
-                            console.warn(error)
-                        }
+                    valueChanged.url =
+                        `data:${properties.value.blob.type};` +
+                        `charset=${properties.encoding};base64,` +
+                        await deriveBase64String(properties.value)
+            } else if (
+                properties.value?.blob && properties.value.blob instanceof Blob
+            )
+                // Derive missing source from given blob.
+                valueChanged.source = await (
+                    representationType === 'text' ?
+                        readBinaryDataIntoText(
+                            properties.value.blob, properties.encoding
+                        ) :
+                        deriveBase64String(properties.value)
+                )
+            else if (properties.value?.url && representationType === 'text')
+                // Derive missing source from given data url.
+                valueChanged.source = await (
+                    properties.value.url?.startsWith('data:') ?
+                        dataURLToBlob(properties.value.url) :
+                        (await fetch(properties.value.url))
+                ).text()
 
-                    valueChanged = {
-                        url:
-                            `data:${properties.value.blob.type};base64,` +
-                            source
-                    }
-                }
-            }
-
-            if (valueChanged)
+            if (Object.keys(valueChanged).length > 0)
                 onChangeValue(valueChanged, undefined, undefined, true)
         })()
             .catch(console.warn)
