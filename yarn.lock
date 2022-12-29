@@ -4676,9 +4676,9 @@ doctrine@^3.0.0:
     esutils "^2.0.2"
 
 documentation-website@*:
-  version "1.0.289"
-  resolved "https://registry.yarnpkg.com/documentation-website/-/documentation-website-1.0.289.tgz#573246949efff554d562a80a724d911f5e85f4d3"
-  integrity sha512-c76mZJqhvA1PzVvpNvuUFdBW4GE5qx5GGJH2pdd2Po/1tNxnWrI2xKeyOAFXE72ar5R75RzNIqrTcIRW/CL6Gg==
+  version "1.0.290"
+  resolved "https://registry.yarnpkg.com/documentation-website/-/documentation-website-1.0.290.tgz#eab2effce0d91efbba3f4c7c61262c37f0c828bb"
+  integrity sha512-1orwSTlLUl5Ia10QhBl3/Uz+ht2EPQa79cQhrqOIZxlmy8DXg8CqEDJslx6lulMn/y2q+G3y40fBqvB0AQ1KRg==
 
 dom-align@^1.7.0:
   version "1.12.4"
@@ -8269,9 +8269,9 @@ react-dom@*:
     scheduler "^0.23.0"
 
 react-generic-dummy@*:
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/react-generic-dummy/-/react-generic-dummy-0.0.13.tgz#72a4c3e78a5c90bc6426749d1653f60abcd1a61c"
-  integrity sha512-RABjGh1ulg24qhGJZ/4jdmx6hmBnXPhptq8XG3ojAYT5OeDsmZibfDDYRbtwuFDYpvNiIW7swnCg5auGJ48yRg==
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/react-generic-dummy/-/react-generic-dummy-0.0.14.tgz#3e31b9959e354cf0fc487a43b451b3c470204beb"
+  integrity sha512-61tvsf6HfA571Uu+orOWZa/lmGYzRYFrRz/YX79krFQOhXX9Om5x1bQQaqJZ+UZvqVuTrbdhWQgbUxX9OYvRaQ==
 
 react-is@^16.12.0, react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
