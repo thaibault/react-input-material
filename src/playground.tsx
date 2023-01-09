@@ -417,7 +417,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 required
             />
             <GenericInput
-                initialValue="false"
+                initialValue={false}
                 labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
                 model={useMemorizedValue({
                     declaration: 'selection',
@@ -432,10 +432,32 @@ const Application:FunctionComponent = ():ReactElement => {
             <hr/>
 
             <GenericInput
-                declaration="selection"
+                declaration="numberSelection"
                 description="input11Description"
-                initialValue="b"
+                initialValue={2}
+                selection={useMemorizedValue([1, 2, 3])}
                 name="input11"
+                onChange={onChange}
+                required
+            />
+            <GenericInput
+                model={useMemorizedValue({
+                    declaration: 'numberSelection',
+                    description: 'input11ModelDescription',
+                    name: 'input11Model',
+                    selection: [1, 2, 3],
+                    type: 'number'
+                })}
+                onChange={onChange}
+            />
+
+            <hr/>
+
+            <GenericInput
+                declaration="selection"
+                description="input12Description"
+                initialValue="b"
+                name="input12"
                 onChange={onChange}
                 selection={useMemorizedValue({a: 'A', b: 'B', c: 'C'})}
                 required
@@ -444,8 +466,8 @@ const Application:FunctionComponent = ():ReactElement => {
                 initialValue="b"
                 model={useMemorizedValue({
                     declaration: 'selection',
-                    description: 'input11ModelDescription',
-                    name: 'input11Model',
+                    description: 'input12ModelDescription',
+                    name: 'input12Model',
                     nullable: false,
                     selection: {a: 'A', b: 'B', c: 'C'}
                 })}
@@ -455,10 +477,10 @@ const Application:FunctionComponent = ():ReactElement => {
             <hr/>
 
             <GenericInput
-                description="input12Description"
-                name="input12"
+                description="input13Description"
+                name="input13"
                 onChange={onChange}
-                placeholder="input12Placeholder"
+                placeholder="input13Placeholder"
                 selection={useMemorizedValue(
                     ['hans hans', 'peter peter', 'klaus']
                 )}
@@ -468,12 +490,12 @@ const Application:FunctionComponent = ():ReactElement => {
                 initialValue="peter"
                 model={useMemorizedValue({
                     declaration: 'selection',
-                    description: 'input12ModelDescription',
-                    name: 'input12Model',
+                    description: 'input13ModelDescription',
+                    name: 'input13Model',
                     nullable: false
                 })}
                 onChange={onChange}
-                placeholder="input12ModelPlaceholder"
+                placeholder="input13ModelPlaceholder"
                 searchSelection
                 suggestionCreator={useMemorizedValue(
                     Tools.debounce<Array<string>>(
@@ -502,11 +524,11 @@ const Application:FunctionComponent = ():ReactElement => {
             <hr/>
 
             <GenericInput
-                description="input13Description"
+                description="input14Description"
                 default={'a'}
-                name="input13"
+                name="input14"
                 onChange={onChange}
-                placeholder="input13Placeholder"
+                placeholder="input14Placeholder"
                 searchSelection
                 selection={useMemorizedValue(
                     {a: 'hans', b: 'hans', c: 'klaus'}
@@ -516,12 +538,12 @@ const Application:FunctionComponent = ():ReactElement => {
                 initialValue="peter"
                 model={useMemorizedValue({
                     declaration: 'selection',
-                    description: 'input13ModelDescription',
-                    name: 'input13Model',
+                    description: 'input14ModelDescription',
+                    name: 'input14Model',
                     nullable: false
                 })}
                 onChange={onChange}
-                placeholder="input13ModelPlaceholder"
+                placeholder="input14ModelPlaceholder"
                 suggestionCreator={useMemorizedValue(
                     async ({query}:SuggestionCreatorOptions<InputProperties<
                         string
@@ -539,6 +561,7 @@ const Application:FunctionComponent = ():ReactElement => {
                         for (const [key, value] of Object.entries(selection))
                             if (!query || value.includes(query))
                                 result[key] = value
+
                         return result
                     }
                 )}
@@ -584,7 +607,7 @@ const Application:FunctionComponent = ():ReactElement => {
 
             <GenericInput
                 declaration="text"
-                description="input14Description"
+                description="input15Description"
                 editor="text"
                 initialValue="a"
                 name="input14"
@@ -601,39 +624,12 @@ const Application:FunctionComponent = ():ReactElement => {
                 initialValue="a"
                 model={useMemorizedValue({
                     declaration: 'text',
-                    description: 'input14ModelDescription',
-                    name: 'input14Model',
-                    nullable: false
-                })}
-                onChange={onChange}
-                rows={2}
-            />
-
-            <hr/>
-
-            <GenericInput
-                declaration="code"
-                description="input15Description"
-                disabled
-                editor="code"
-                initialValue="const value = 2"
-                name="input15"
-                onChange={onChange}
-                rows={2}
-                selectableEditor
-            />
-            <GenericInput
-                editor="code"
-                initialValue="const value = 2"
-                model={useMemorizedValue({
-                    declaration: 'code',
                     description: 'input15ModelDescription',
                     name: 'input15Model',
                     nullable: false
                 })}
                 onChange={onChange}
-                rows={6}
-                selectableEditor
+                rows={2}
             />
 
             <hr/>
@@ -641,16 +637,17 @@ const Application:FunctionComponent = ():ReactElement => {
             <GenericInput
                 declaration="code"
                 description="input16Description"
+                disabled
                 editor="code"
-                maximumLength={10}
+                initialValue="const value = 2"
                 name="input16"
                 onChange={onChange}
-                required
                 rows={2}
                 selectableEditor
             />
             <GenericInput
                 editor="code"
+                initialValue="const value = 2"
                 model={useMemorizedValue({
                     declaration: 'code',
                     description: 'input16ModelDescription',
@@ -665,10 +662,36 @@ const Application:FunctionComponent = ():ReactElement => {
             <hr/>
 
             <GenericInput
-                declaration="richtext(raw)"
+                declaration="code"
                 description="input17Description"
-                editor="richtext(raw)"
+                editor="code"
+                maximumLength={10}
                 name="input17"
+                onChange={onChange}
+                required
+                rows={2}
+                selectableEditor
+            />
+            <GenericInput
+                editor="code"
+                model={useMemorizedValue({
+                    declaration: 'code',
+                    description: 'input17ModelDescription',
+                    name: 'input17Model',
+                    nullable: false
+                })}
+                onChange={onChange}
+                rows={6}
+                selectableEditor
+            />
+
+            <hr/>
+
+            <GenericInput
+                declaration="richtext(raw)"
+                description="input18Description"
+                editor="richtext(raw)"
+                name="input18"
                 onChange={onChange}
                 placeholder="Hello Mr. Smith,<br><br>this is a Placeholder."
                 required
@@ -680,9 +703,9 @@ const Application:FunctionComponent = ():ReactElement => {
                 initialValue="Hello Mr. Smith,<br><br>how are you?"
                 model={useMemorizedValue({
                     declaration: 'richtext(simple)',
-                    description: 'input17ModelDescription',
+                    description: 'input18ModelDescription',
                     mutable: false,
-                    name: 'input17Model',
+                    name: 'input18Model',
                     nullable: false
                 })}
                 onChange={onChange}
@@ -694,10 +717,10 @@ const Application:FunctionComponent = ():ReactElement => {
 
             <GenericInput<number>
                 declaration="Number"
-                description="input18Description"
+                description="input19Description"
                 maximum={200000}
                 minimum={10}
-                name="input18"
+                name="input19"
                 onChange={onChange}
                 placeholder="100000"
                 required
@@ -707,10 +730,10 @@ const Application:FunctionComponent = ():ReactElement => {
                 initialValue={100000}
                 model={useMemorizedValue({
                     declaration: 'Number',
-                    description: 'input18ModelDescription',
+                    description: 'input19ModelDescription',
                     maximum: 200000,
                     minimum: 10,
-                    name: 'input18Model',
+                    name: 'input19Model',
                     nullable: false,
                     type: 'number'
                 })}
@@ -721,10 +744,10 @@ const Application:FunctionComponent = ():ReactElement => {
 
             <GenericInput<number>
                 declaration="Number"
-                description="input19Description"
+                description="input20Description"
                 maximum={200000}
                 minimum={10}
-                name="input19"
+                name="input20"
                 onChange={onChange}
                 placeholder="100.000"
                 required
@@ -734,9 +757,9 @@ const Application:FunctionComponent = ():ReactElement => {
                 initialValue={100000.01}
                 model={useMemorizedValue({
                     declaration: 'Number',
-                    description: 'input19ModelDescription',
+                    description: 'input20ModelDescription',
                     maximum: 200000,
-                    name: 'input19Model',
+                    name: 'input20Model',
                     nullable: false,
                     type: 'float'
                 })}
@@ -751,11 +774,11 @@ const Application:FunctionComponent = ():ReactElement => {
 
             <GenericInput<number>
                 declaration="Number"
-                description="input20Description"
+                description="input21Description"
                 maximum={200000}
                 minimum={10}
                 minimumText="Please at least ${formatValue(minimum)}."
-                name="input20"
+                name="input21"
                 onChange={onChange}
                 placeholder="100.000"
                 required
@@ -765,10 +788,10 @@ const Application:FunctionComponent = ():ReactElement => {
                 initialValue={100000.01}
                 model={useMemorizedValue({
                     declaration: 'Number',
-                    description: 'input20ModelDescription',
+                    description: 'input21ModelDescription',
                     maximum: 200000,
                     minimum: 10,
-                    name: 'input20Model',
+                    name: 'input21Model',
                     nullable: false,
                     type: 'currency'
                 })}
