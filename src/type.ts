@@ -147,7 +147,7 @@ export interface CommonBaseModel {
     minimum:number|string
     minimumLength:number
     name:string
-    selection?:SelectProps['options']
+    selection?:Array<boolean|number>|SelectProps['options']
     trim:boolean
     type:string
     value?:unknown

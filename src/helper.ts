@@ -515,7 +515,9 @@ export function getValueFromSelection<T>(
  */
 export function normalizeSelection(
     selection?:(
-        Array<[string, string]>|NormalizedSelection|SelectProps['options']
+        Array<boolean|number> |
+        Array<[boolean|number|string, string]> |
+        NormalizedSelection|SelectProps['options']
     ),
     labels?:Array<[string, string]>|Array<string>|Mapping
 ):NormalizedSelection|undefined {
