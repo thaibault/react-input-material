@@ -172,9 +172,9 @@ const Application:FunctionComponent = ():ReactElement => {
                 name="Controlled"
                 onChange={onChange}
                 onChangeValue={onChangeValue1}
+                triggerInitialPropertiesConsolidation={true}
                 value={value1}
             />
-
             <GenericInput onChange={onChange} />
             <GenericInput
                 name="UnControlled"

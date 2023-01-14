@@ -200,6 +200,7 @@ export interface BaseProperties extends CommonBaseModel, ModelState {
     styles:Mapping
     themeConfiguration:ThemeProviderProps['options']
     tooltip:string|TooltipProps
+    triggerInitialPropertiesConsolidation:boolean
 }
 export type BaseProps =
     Partial<Omit<BaseProperties, 'model'>> & {model?:Partial<BaseModel>}
@@ -421,6 +422,7 @@ export const defaultModel:Model<string> = {
 export const defaultProperties:DefaultProperties<string> = {
     enforceUncontrolled: false,
     model: {...defaultModel},
+    triggerInitialPropertiesConsolidation: false,
     showDeclaration: undefined,
     showInitialValidationState: false,
     showValidationState: true,
