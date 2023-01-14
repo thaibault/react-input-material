@@ -187,6 +187,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 name="controlled"
                 onChange={onChange}
                 onChangeValue={onChangeValue2}
+                triggerInitialPropertiesConsolidation={true}
                 value={value2}
             />
             <GenericInput<number>
@@ -821,6 +822,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 onChange={onChange}
                 onChangeValue={onChangeValue5}
                 step={60}
+                triggerInitialPropertiesConsolidation={true}
                 value={value5}
             />
 
@@ -846,6 +848,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 name="controlled"
                 onChange={onChange}
                 onChangeValue={onChangeValue6}
+                triggerInitialPropertiesConsolidation={true}
                 value={value6}
             />
 
@@ -956,6 +959,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 name="controlled"
                 onChange={onChange}
                 onChangeValue={onChangeValue7}
+                triggerInitialPropertiesConsolidation={true}
                 value={value7}
             />
         </div>
