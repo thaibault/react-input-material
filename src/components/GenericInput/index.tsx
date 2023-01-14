@@ -550,6 +550,13 @@ export const GenericInputInner = function<Type = unknown>(
         }
     })
     /// endregion
+    useEffect(
+        ():void => {
+            if (properties.triggerInitialPropertiesConsolidation)
+                onChange()
+        },
+        []
+    )
     // endregion
     // region context helper
     /// region render helper
@@ -1988,7 +1995,7 @@ export const GenericInputInner = function<Type = unknown>(
 
     if (properties.hidden === undefined)
         properties.hidden = properties.name?.startsWith('password')
-    // region synchronize properties into state where values are not controlled
+    /// region synchronize properties into state where values are not controlled
     if (!Tools.equals(properties.cursor, cursor))
         setCursor(properties.cursor)
     if (properties.editorIsActive !== editorState.editorIsActive)
@@ -2022,7 +2029,7 @@ export const GenericInputInner = function<Type = unknown>(
         setValueState = wrapStateSetter<ValueState<Type, ModelState>>(
             setValueState, currentValueState
         )
-    // endregion
+    /// endregion
     // endregion
     // region export references
     useImperativeHandle(
