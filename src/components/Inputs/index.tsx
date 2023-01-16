@@ -83,6 +83,8 @@ const getPrototype = function<T, P extends InputsPropertiesItem<T>>(
     return {
         ...defaultProperties as unknown as Partial<P>,
         className: CSS_CLASS_NAMES.inputs__item__input,
+        triggerInitialPropertiesConsolidation:
+            properties.triggerInitialPropertiesConsolidation,
         ...(properties.default && properties.default.length > 0 ?
             properties.default[properties.default.length - 1] :
             {}

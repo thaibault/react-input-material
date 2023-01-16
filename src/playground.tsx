@@ -175,7 +175,11 @@ const Application:FunctionComponent = ():ReactElement => {
                 triggerInitialPropertiesConsolidation={true}
                 value={value1}
             />
-            <GenericInput onChange={onChange} />
+
+            <GenericInput
+                inputProperties={useMemorizedValue({outlined: true})}
+                onChange={onChange}
+            />
             <GenericInput
                 name="UnControlled"
                 onChange={onChange}
@@ -187,6 +191,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 name="controlled"
                 onChange={onChange}
                 onChangeValue={onChangeValue2}
+                triggerInitialPropertiesConsolidation={true}
                 value={value2}
             />
             <GenericInput<number>
@@ -232,6 +237,7 @@ const Application:FunctionComponent = ():ReactElement => {
             />
             <GenericInput<string>
                 initialValue="1970-01-01T08:00:00.000Z"
+                inputProperties={useMemorizedValue({outlined: true})}
                 model={useMemorizedValue({name: 'input2Model', type: 'time'})}
                 onChange={onChange}
                 step={60}
@@ -821,6 +827,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 onChange={onChange}
                 onChangeValue={onChangeValue5}
                 step={60}
+                triggerInitialPropertiesConsolidation={true}
                 value={value5}
             />
 
@@ -846,6 +853,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 name="controlled"
                 onChange={onChange}
                 onChangeValue={onChangeValue6}
+                triggerInitialPropertiesConsolidation={true}
                 value={value6}
             />
 
@@ -956,6 +964,7 @@ const Application:FunctionComponent = ():ReactElement => {
                 name="controlled"
                 onChange={onChange}
                 onChangeValue={onChangeValue7}
+                triggerInitialPropertiesConsolidation={true}
                 value={value7}
             />
         </div>

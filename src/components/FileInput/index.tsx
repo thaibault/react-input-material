@@ -769,6 +769,13 @@ export const FileInputInner = function(
         })()
             .catch(console.warn)
     })
+    useEffect(
+        ():void => {
+            if (properties.triggerInitialPropertiesConsolidation)
+                onChange()
+        },
+        []
+    )
     // region render
     const representationType:RepresentationType =
         properties.value?.blob?.type ?
@@ -779,6 +786,8 @@ export const FileInputInner = function(
         properties.showValidationState &&
         (properties.showInitialValidationState || properties.visited)
     )
+
+    const {triggerInitialPropertiesConsolidation} = properties
 
     return <WrapConfigurations
         strict={FileInput.strict}
@@ -889,10 +898,13 @@ export const FileInputInner = function(
                                 {
                                     disabled: properties.disabled,
                                     value: properties.value?.name,
+
                                     ...defaultFileNameInputProperties,
+
+                                    default: properties.value.name,
                                     model: properties.model.fileName,
                                     onChangeValue: onChangeValue,
-                                    default: properties.value.name
+                                    triggerInitialPropertiesConsolidation
                                 },
                                 properties as
                                     Omit<Properties, 'value'> &

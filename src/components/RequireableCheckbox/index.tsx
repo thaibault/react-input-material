@@ -28,6 +28,7 @@ import {
     MutableRefObject,
     ReactElement,
     SyntheticEvent,
+    useEffect,
     useImperativeHandle,
     useRef,
     useState
@@ -141,6 +142,13 @@ export const RequireableCheckboxInner = function(
         return result as Properties
     }
     // endregion
+    useEffect(
+        ():void => {
+            if (properties.triggerInitialPropertiesConsolidation)
+                onChange()
+        },
+        []
+    )
     // region event handler
     /**
      * Triggered on blur events.
