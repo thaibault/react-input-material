@@ -175,7 +175,11 @@ const Application:FunctionComponent = ():ReactElement => {
                 triggerInitialPropertiesConsolidation={true}
                 value={value1}
             />
-            <GenericInput onChange={onChange} />
+
+            <GenericInput
+                inputProperties={useMemorizedValue({outlined: true})}
+                onChange={onChange}
+            />
             <GenericInput
                 name="UnControlled"
                 onChange={onChange}
@@ -233,6 +237,7 @@ const Application:FunctionComponent = ():ReactElement => {
             />
             <GenericInput<string>
                 initialValue="1970-01-01T08:00:00.000Z"
+                inputProperties={useMemorizedValue({outlined: true})}
                 model={useMemorizedValue({name: 'input2Model', type: 'time'})}
                 onChange={onChange}
                 step={60}
