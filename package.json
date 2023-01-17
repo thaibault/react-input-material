@@ -31,7 +31,8 @@
     "dist/material-fixes.css",
     "dist/testHelper.d.ts",
     "dist/testHelper.js",
-    "dist/type.d.ts"
+    "dist/type.d.ts",
+    "dist/type.js"
   ],
   "repository": {
     "type": "git",
@@ -281,7 +282,8 @@
           "./index.ts"
         ],
         "material-fixes": "./material-fixes",
-        "testHelper": "./testHelper"
+        "testHelper": "./testHelper",
+        "type": "./type"
       },
       "supportedBrowsers": [
         "IE >= 11",
