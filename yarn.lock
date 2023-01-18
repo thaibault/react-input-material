@@ -8287,9 +8287,9 @@ react-dom@*:
     scheduler "^0.23.0"
 
 react-generic-dummy@*:
-  version "0.0.18"
-  resolved "https://registry.yarnpkg.com/react-generic-dummy/-/react-generic-dummy-0.0.18.tgz#aa20ef72f7c1cf649e72040aa76a47cacef2b447"
-  integrity sha512-2BrfMnDwUQvY/RTHXl4NHTxA7tPx15Cp8V6EOmyxYnLfh6cHACAfJR1ZFfU1NaKCtLuF7//UoImpnzx/OM6eWg==
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/react-generic-dummy/-/react-generic-dummy-0.0.20.tgz#474a7057be47435925afb2a7bc8474f966208392"
+  integrity sha512-pUvatwYBL8On2FHh2ms+ANLeOz/JeQ3g3zyeDW2cDA6Sb135qIgYuauGh8deto5AITIQwdDWLPxFTPBt2GxMgw==
 
 react-is@^16.12.0, react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
