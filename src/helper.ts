@@ -517,7 +517,8 @@ export function normalizeSelection(
     selection?:(
         Array<boolean|number> |
         Array<[boolean|number|string, string]> |
-        NormalizedSelection|SelectProps['options']
+        NormalizedSelection |
+        SelectProps['options']
     ),
     labels?:Array<[string, string]>|Array<string>|Mapping
 ):NormalizedSelection|undefined {
@@ -632,9 +633,9 @@ export function normalizeSelection(
                 (labelMapping.get(second as string) ?? 0)
         )
     } else if (!selectionIsOrdered)
-        // Sort alphabetically.
+        // Sort alphabetically by labels.
         selection = (selection as NormalizedSelection).sort(
-            ({value: first}, {value: second}):number =>
+            ({label: first}, {label: second}):number =>
                 (first as string).localeCompare(second as string)
         )
     // endregion
