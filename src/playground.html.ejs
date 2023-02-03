@@ -19,7 +19,49 @@
         <meta http-equiv="expires" content="0">
         <meta http-equiv="pragma" content="no-cache">
         <title>playground</title>
-        <!--region polyfills-->
+        <!--region style-->
+        <link rel="stylesheet" href="/@rmwc/icon/icon.css">
+        <!--region tabs-->
+        <link rel="stylesheet" href="/@material/tab-bar/dist/mdc.tab-bar.css">
+        <link rel="stylesheet" href="/@material/tab/dist/mdc.tab.css">
+        <link rel="stylesheet" href="/@material/tab-scroller/dist/mdc.tab-scroller.css">
+        <link rel="stylesheet" href="/@material/tab-indicator/dist/mdc.tab-indicator.css">
+        <link rel="stylesheet" href="/@material/ripple/dist/mdc.ripple.css">
+        <!--endregion-->
+        <style>
+            .file-input,
+            .generic-input {
+                margin-bottom: 20px;
+            }
+
+            .playground__inputs {
+                float: left;
+                width: 500px;
+            }
+
+            .playground__inputs__generic-animate .generic-animate-appear-active,
+            .playground__inputs__generic-animate .generic-animate-enter-active,
+            .playground__inputs__generic-animate .generic-animate-exit-active {
+                transition: opacity 2000ms ease-in !important;
+            }
+
+            .playground__outputs {
+                height: -webkit-fill-available;
+                margin-left: 500px;
+                overflow: auto;
+                position: fixed;
+            }
+
+            <%-
+                require('material-icons/iconfont/material-icons.css')
+                    .replace(
+                        /(url\()"?(?:\.\/)?(material-icons\.[^.")]+)"?(\))/g,
+                        '$1material-icons/iconfont/$2$3'
+                    )
+            %>
+        </style>
+        <!--endregion-->
+        <!--region polyfill-->
         <%_
             const features = new Set([
                 /*
@@ -87,38 +129,6 @@
         <script src="https://polyfill.io/v3/polyfill.js?features=<%- encodeURIComponent(Array.from(features).sort().join(',')) %>"></script>
         <!--endregion-->
     </head>
-    <style>
-        .file-input,
-        .generic-input {
-            margin-bottom: 20px;
-        }
-
-        .playground__inputs {
-            float: left;
-            width: 500px;
-        }
-
-        .playground__inputs__generic-animate .generic-animate-appear-active,
-        .playground__inputs__generic-animate .generic-animate-enter-active,
-        .playground__inputs__generic-animate .generic-animate-exit-active {
-            transition: opacity 2000ms ease-in !important;
-        }
-
-        .playground__outputs {
-            height: -webkit-fill-available;
-            margin-left: 500px;
-            overflow: auto;
-            position: fixed;
-        }
-
-        <%-
-            require('material-icons/iconfont/material-icons.css')
-                .replace(
-                    /(url\()"?(?:\.\/)?(material-icons\.[^.")]+)"?(\))/g,
-                    '$1material-icons/iconfont/$2$3'
-                )
-        %>
-    </style>
     <body class="no-javascript playground">
         <application></application>
     </body>

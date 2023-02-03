@@ -1878,6 +1878,56 @@
     "@material/rtl" "^8.0.0"
     "@material/theme" "^8.0.0"
 
+"@material/tab-bar@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@material/tab-bar/-/tab-bar-8.0.0.tgz#bd15bf5aa5fc3efad65cc3a8a6fa44520c15b60d"
+  integrity sha512-m2zl7wp9zGaFbUGBdksF9Wq3lSY21FNhpiIlNxrqCwTMdAYPOIvjYaQD/kW/bpHEjqu8Anqyr3ovP9XdnbA3uQ==
+  dependencies:
+    "@material/animation" "^8.0.0"
+    "@material/base" "^8.0.0"
+    "@material/density" "^8.0.0"
+    "@material/feature-targeting" "^8.0.0"
+    "@material/tab" "^8.0.0"
+    "@material/tab-scroller" "^8.0.0"
+    tslib "^1.9.3"
+
+"@material/tab-indicator@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@material/tab-indicator/-/tab-indicator-8.0.0.tgz#5b2c55dab0c792bb7fdc7b0e30aa3391ee62a436"
+  integrity sha512-2s3zjUtVvJ9pLP514mf83ZZFsy/CqNdwLE7ZU4sw27+ki1zqsgUmLPiWDAfmFyrN1Rvw2Tit3ZGuNJ7xFbAs3A==
+  dependencies:
+    "@material/animation" "^8.0.0"
+    "@material/base" "^8.0.0"
+    "@material/feature-targeting" "^8.0.0"
+    "@material/theme" "^8.0.0"
+    tslib "^1.9.3"
+
+"@material/tab-scroller@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@material/tab-scroller/-/tab-scroller-8.0.0.tgz#68cbfbd1fd1bc49a5426d2e08a054c33eb4aa243"
+  integrity sha512-fB/8lamANa/L3rNSkf7kB+GEnpH9vW1UQ9QtXe1K4Lr2UlCO1L3aV2HvOV53Ga4w25CcLUSypF3AxBzngb012Q==
+  dependencies:
+    "@material/animation" "^8.0.0"
+    "@material/base" "^8.0.0"
+    "@material/dom" "^8.0.0"
+    "@material/feature-targeting" "^8.0.0"
+    "@material/tab" "^8.0.0"
+    tslib "^1.9.3"
+
+"@material/tab@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@material/tab/-/tab-8.0.0.tgz#a4c79c43cd61d1f3681e5279b9d7c8a5d22855a0"
+  integrity sha512-AQ/7EJpKG6Pz+s3XGwWXWZxEgjM6U3xZfKFgL8l8yGQtnyY24sJHbIrCmuS2HQ74DfkZg8FElovuSLOJ6yypVg==
+  dependencies:
+    "@material/base" "^8.0.0"
+    "@material/feature-targeting" "^8.0.0"
+    "@material/ripple" "^8.0.0"
+    "@material/rtl" "^8.0.0"
+    "@material/tab-indicator" "^8.0.0"
+    "@material/theme" "^8.0.0"
+    "@material/typography" "^8.0.0"
+    tslib "^1.9.3"
+
 "@material/textfield@^8.0.0":
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/@material/textfield/-/textfield-8.0.0.tgz#82cb0204b8f9c3ad6ac1d667b1d749beaddbfc82"
@@ -2117,6 +2167,20 @@
     "@rmwc/list" "^8.0.4"
     "@rmwc/menu" "^8.0.4"
     "@rmwc/notched-outline" "^8.0.4"
+    "@rmwc/ripple" "^8.0.4"
+    "@rmwc/types" "^8.0.4"
+
+"@rmwc/tabs@*":
+  version "8.0.4"
+  resolved "https://registry.yarnpkg.com/@rmwc/tabs/-/tabs-8.0.4.tgz#7741494e0821e7698f7517c810b751ad03d2dded"
+  integrity sha512-aFiXhliW8T7E89YVF6Ht0nD31TpwkNrWTeV/getI3AYvDcU+xU4Yu7vBSgwWZUWfQY9hiYHBsjuDowaW5tEzFw==
+  dependencies:
+    "@material/tab" "^8.0.0"
+    "@material/tab-bar" "^8.0.0"
+    "@material/tab-indicator" "^8.0.0"
+    "@material/tab-scroller" "^8.0.0"
+    "@rmwc/base" "^8.0.4"
+    "@rmwc/icon" "^8.0.4"
     "@rmwc/ripple" "^8.0.4"
     "@rmwc/types" "^8.0.4"
 
