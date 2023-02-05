@@ -78,6 +78,7 @@
     "@rmwc/icon-button": "*",
     "@rmwc/menu": "*",
     "@rmwc/select": "*",
+    "@rmwc/tabs": "*",
     "@rmwc/textfield": "*",
     "@rmwc/theme": "*",
     "@rmwc/tooltip": "*",
