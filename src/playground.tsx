@@ -28,7 +28,7 @@ import {
     useState
 } from 'react'
 import {createRoot} from 'react-dom/client'
-import {Tab, TabBar} from '@rmwc/tabs'
+import {Tab, TabBar, TabBarOnActivateEventT} from '@rmwc/tabs'
 
 import {
     preserveStaticFileBaseNameInputGenerator
@@ -128,7 +128,7 @@ const Application:FunctionComponent = ():ReactElement => {
             <TabBar
                 activeTabIndex={activeTabIndex}
                 className="playground__inputs__tab-bar"
-                onActivate={(event:Event):void => {
+                onActivate={(event:TabBarOnActivateEventT):void => {
                     if (event.detail.index !== activeTabIndex)
                         setActiveTabIndex(event.detail.index)
                 }}
@@ -165,7 +165,8 @@ const Application:FunctionComponent = ():ReactElement => {
                         value?.blob ?
                             <ul>
                                 <li>
-                                    Expected encoding for text based files: latin1
+                                    Expected encoding for text based files:
+                                    latin1
                                 </li>
                                 {(value.blob as File).lastModified ?
                                     <li>
@@ -174,7 +175,8 @@ const Application:FunctionComponent = ():ReactElement => {
                                             '${mediumDay}.${mediumMonth}.' +
                                             '${fullYear}',
                                             new Date(
-                                                (value.blob as File).lastModified
+                                                (value.blob as File)
+                                                    .lastModified
                                             )
                                         )}
                                     </li> :
@@ -260,7 +262,9 @@ const Application:FunctionComponent = ():ReactElement => {
                 <hr/>
 
                 <GenericInput<number>
-                    default={new Date('2025-01-01T00:00:00.000Z').getTime() / 1000}
+                    default={
+                        new Date('2025-01-01T00:00:00.000Z').getTime() / 1000
+                    }
                     name="input2"
                     onChange={onChange}
                     type="date"
@@ -268,7 +272,9 @@ const Application:FunctionComponent = ():ReactElement => {
                 <GenericInput<string>
                     initialValue="1970-01-01T08:00:00.000Z"
                     inputProperties={useMemorizedValue({outlined: true})}
-                    model={useMemorizedValue({name: 'input2Model', type: 'time'})}
+                    model={useMemorizedValue({
+                        name: 'input2Model', type: 'time'
+                    })}
                     onChange={onChange}
                     step={60}
                 />
@@ -402,7 +408,9 @@ const Application:FunctionComponent = ():ReactElement => {
                 />
                 <GenericInput
                     initialValue="A"
-                    labels={useMemorizedValue(['Label A', 'Label B', 'Label C'])}
+                    labels={useMemorizedValue([
+                        'Label A', 'Label B', 'Label C'
+                    ])}
                     model={useMemorizedValue({
                         declaration: 'selection',
                         description: 'input8ModelDescription',
@@ -541,16 +549,17 @@ const Application:FunctionComponent = ():ReactElement => {
                                 if (!query || query.length < 3)
                                     return []
 
-                                return Tools.timeout(2000).then(():Array<string> =>
-                                    [
-                                        'hans with veeeeeeeeeeeeeeeery ' +
-                                        'loooooooooooooooong second name',
-                                        'peter',
-                                        'klaus'
-                                    ].filter((name:string):boolean =>
-                                        !query || name.includes(query)
+                                return Tools.timeout(2000)
+                                    .then(():Array<string> =>
+                                        [
+                                            'hans with veeeeeeeeeeeeeeeery ' +
+                                            'loooooooooooooooong second name',
+                                            'peter',
+                                            'klaus'
+                                        ].filter((name:string):boolean =>
+                                            !query || name.includes(query)
+                                        )
                                     )
-                                )
                             }) as UnknownFunction,
                             1000
                         )
@@ -594,7 +603,9 @@ const Application:FunctionComponent = ():ReactElement => {
                             }
 
                             const result:Mapping = {}
-                            for (const [key, value] of Object.entries(selection))
+                            for (const [key, value] of Object.entries(
+                                selection
+                            ))
                                 if (!query || value.includes(query))
                                     result[key] = value
 
@@ -982,12 +993,16 @@ const Application:FunctionComponent = ():ReactElement => {
                 <hr/>
 
                 <RequireableCheckbox
-                    default disabled name="checkbox2" onChange={onChange} required
+                    default
+                    disabled
+                    name="checkbox2"
+                    onChange={onChange}
+                    required
                 />
                 <RequireableCheckbox
-                    model={useMemorizedValue(
-                        {name: 'checkbox2Model', mutable: false, nullable: false}
-                    )}
+                    model={useMemorizedValue({
+                        name: 'checkbox2Model', mutable: false, nullable: false
+                    })}
                     onChange={onChange}
                 />
 
