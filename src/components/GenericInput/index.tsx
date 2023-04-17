@@ -157,17 +157,16 @@ const plusToXAnimation:null|typeof PlusToXAnimation = isBrowser ?
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region code editor configuration
-export const ACEEditorOptions = {
-    basePath: '/node_modules/ace-builds/src-noconflict/',
-    useWorker: false
-}
 const CodeEditor = lazy<typeof CodeEditorType>(
     async ():Promise<{default:typeof CodeEditorType}> => {
-        const {config} = await import('ace-builds')
-        for (const [name, value] of Object.entries(ACEEditorOptions))
-            config.set(name, value)
+        const basePath = '/ace-builds/src-min-noconflict/'
 
-        return await import('react-ace')
+        const result = await import('react-ace')
+
+        await eval(`import('${basePath}mode-javascript.js')`)
+        await eval(`import('${basePath}theme-github.js')`)
+
+        return result
     }
 )
 // endregion
@@ -177,7 +176,7 @@ declare const UTC_BUILD_TIMESTAMP:number|undefined
 const CURRENT_UTC_BUILD_TIMESTAMP =
     typeof UTC_BUILD_TIMESTAMP === 'undefined' ? 1 : UTC_BUILD_TIMESTAMP
 let richTextEditorLoadedOnce = false
-const tinymceBasePath = '/node_modules/tinymce/'
+const tinymceBasePath = '/tinymce/'
 export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
     /* eslint-disable camelcase */
     // region paths
