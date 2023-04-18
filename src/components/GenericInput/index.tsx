@@ -157,16 +157,21 @@ const plusToXAnimation:null|typeof PlusToXAnimation = isBrowser ?
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region code editor configuration
+const ACE_BASE_PATH = '/ace-builds/src-min-noconflict/'
+export const ACEEditorOptions = {
+    basePath: ACE_BASE_PATH,
+    modePath: ACE_BASE_PATH,
+    themePath: ACE_BASE_PATH,
+    workerPath: ACE_BASE_PATH,
+    useWorker: false
+}
 const CodeEditor = lazy<typeof CodeEditorType>(
     async ():Promise<{default:typeof CodeEditorType}> => {
-        const basePath = '/ace-builds/src-min-noconflict/'
+        const {config} = await import('ace-builds')
+        for (const [name, value] of Object.entries(ACEEditorOptions))
+            config.set(name, value)
 
-        const result = await import('react-ace')
-
-        await eval(`import('${basePath}mode-javascript.js')`)
-        await eval(`import('${basePath}theme-github.js')`)
-
-        return result
+        return await import('react-ace')
     }
 )
 // endregion
@@ -2398,6 +2403,9 @@ export const GenericInputInner = function<Type = unknown>(
                                                 CodeEditorProps
                                             }
                                             className="mdc-text-field__input"
+                                            editorProps={{
+                                                basePath: '/ace-builds/src-min-noconflict/'
+                                            }}
                                             mode={(
                                                 properties.editor.startsWith(
                                                     'code('
