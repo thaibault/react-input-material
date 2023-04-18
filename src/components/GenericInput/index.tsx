@@ -2403,9 +2403,6 @@ export const GenericInputInner = function<Type = unknown>(
                                                 CodeEditorProps
                                             }
                                             className="mdc-text-field__input"
-                                            editorProps={{
-                                                basePath: '/ace-builds/src-min-noconflict/'
-                                            }}
                                             mode={(
                                                 properties.editor.startsWith(
                                                     'code('
