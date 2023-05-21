@@ -29,8 +29,6 @@
     "dist/index.d.ts",
     "dist/index.js",
     "dist/material-fixes.css",
-    "dist/testHelper.d.ts",
-    "dist/testHelper.js",
     "dist/type.d.ts",
     "dist/type.js"
   ],
@@ -64,7 +62,7 @@
     "update:documentation": "documentation-website",
     "watch": "weboptimizer build --watch"
   },
-  "runkitExample": "require('@babel/runtime/package.json')\n\nglobalThis.window = globalThis\n\nconst {GenericAnimate} = require('react-input-material')\n\nGenericAnimate.webComponentAdapterWrappedis",
+  "runkitExample": "require('@babel/runtime/package.json')\n\nglobalThis.window = globalThis\n\nconst {GenericInput} = require('react-input-material')\n\nGenericInput.webComponentAdapterWrapped",
   "devDependencies": {
     "@babel/eslint-parser": "*",
     "@babel/plugin-transform-proto-to-assign": "*",
@@ -118,7 +116,9 @@
     "react": ">=17",
     "react-ace": "*",
     "react-dom": "*",
+    "react-generic-animate": "*",
     "react-generic-dummy": "*",
+    "react-generic-tools": "*",
     "react-transition-group": "*",
     "react-useanimations": "*",
     "style-loader": "*",
@@ -145,15 +145,12 @@
     "@tinymce/tinymce-react": "*",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "@types/react-transition-group": "*",
     "blob-util": "*",
     "clientnode": "*",
     "material-icons": "*",
     "react": "*",
     "react-ace": "*",
     "react-dom": "*",
-    "react-transition-group": "*",
-    "react-useanimations": "*",
     "tslib": "*"
   },
   "peerDependenciesMeta": {
@@ -265,7 +262,6 @@
       "entry": {
         "./components/FileInput/import": "./components/FileInput/import.module",
         "./components/FileInput/index": "./components/FileInput/index",
-        "./components/GenericAnimate/index": "./components/GenericAnimate/index",
         "./components/GenericInput/import": "./components/GenericInput/import.module",
         "./components/GenericInput/index": "./components/GenericInput/index",
         "./components/Inputs/import.module": "./components/Inputs/import.module",
@@ -283,7 +279,6 @@
           "./index.ts"
         ],
         "material-fixes": "./material-fixes",
-        "testHelper": "./testHelper",
         "type": "./type"
       },
       "supportedBrowsers": [

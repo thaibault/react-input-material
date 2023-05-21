@@ -19,6 +19,7 @@
 // region imports
 import Tools from 'clientnode'
 import {Mapping} from 'clientnode/type'
+import {GenericEvent} from 'react-generic-tools/type'
 import {
     createRef,
     ForwardedRef,
@@ -61,7 +62,6 @@ import {
     defaultInputsProperties,
     DefaultInputsProperties,
     defaultProperties,
-    GenericEvent,
     inputsPropertyTypes as propertyTypes,
     inputsRenderProperties as renderProperties,
     InputProps,

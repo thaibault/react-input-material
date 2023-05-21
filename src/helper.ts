@@ -20,7 +20,7 @@
 import Tools from 'clientnode'
 import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 import {FirstParameter, Mapping, ValueOf} from 'clientnode/type'
-import {ReactNode, useMemo, useState} from 'react'
+import {ReactNode, useState} from 'react'
 import {SelectProps} from '@rmwc/select'
 
 import {
@@ -103,7 +103,7 @@ export const deriveMissingPropertiesFromState = <
  * @returns Wrapped given method.
  */
 export const wrapStateSetter = <Type = unknown>(
-    setValueState:(_value:Type|((_value:Type) => Type)) => void,
+    setValueState:(value:Type|((value:Type) => Type)) => void,
     currentValueState:Type
 ):ReturnType<typeof useState>[1] =>
         (
@@ -147,13 +147,13 @@ export const triggerCallbackIfExists =
             if (synchronous)
                 (properties[name as keyof P] as
                     unknown as
-                    (..._parameters:Array<unknown>) => void
+                    (...parameters:Array<unknown>) => void
                 )(...parameters)
             else
                 void Tools.timeout(() =>
                     (properties[name as keyof P] as
                         unknown as
-                        (..._parameters:Array<unknown>) => void
+                        (...parameters:Array<unknown>) => void
                     )(...parameters)
                 )
     }
@@ -730,19 +730,6 @@ export function formatValue<
 
     return String(value)
 }
-// endregion
-// region hooks
-/**
- * Custom hook to memorize any values with a default empty array. Useful if
- * using previous constant complex object within a render function.
- * @param value - Value to memorize.
- * @param dependencies - Optional dependencies when to update given value.
- *
- * @returns Given cached value.
- */
-export const useMemorizedValue = <T = unknown>(
-    value:T, ...dependencies:Array<unknown>
-):T => useMemo(():T => value, dependencies)
 // endregion
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:

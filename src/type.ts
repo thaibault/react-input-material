@@ -38,18 +38,16 @@ import {
     FocusEvent,
     ForwardRefExoticComponent,
     FunctionComponent,
-    FunctionComponentElement,
     KeyboardEvent,
     MouseEvent,
     MutableRefObject,
     ReactElement,
     ReactNode,
     RefAttributes,
-    Requireable,
-    SyntheticEvent
+    Requireable
 } from 'react'
+import {GenericEvent} from 'react-generic-tools/type'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
-import {TransitionProps} from 'react-transition-group/Transition'
 
 import {
     EditorOptions as RawTinyMCEOptions, Editor as RichTextEditor
@@ -77,65 +75,11 @@ import {
 } from '@tinymce/tinymce-react'
 // endregion
 // region exports
-/// region animate
-export type GenericAnimateProps =
-    Partial<TransitionProps<HTMLElement|undefined>>
-
-export interface GenericAnimateComponent<Type> extends
-    Omit<ForwardRefExoticComponent<GenericAnimateProps>, 'propTypes'>,
-    StaticBaseWebComponent<Type>
-{
-    (props:(
-        GenericAnimateProps & RefAttributes<HTMLDivElement|HTMLSpanElement>
-    )):ReactElement
-}
-/// endregion
 /// region generic
-export interface GenericEvent<T = unknown> extends SyntheticEvent {
-    detail?:T
-}
-export interface TestHookWrapper<
-    P extends Array<unknown> = Array<unknown>,
-    WP extends {children:FunctionComponentElement<{parameters:P}>} = {
-        children:FunctionComponentElement<{parameters:P}>
-    }
-> {
-    component:FunctionComponent<WP>
-    properties?:WP
-}
-export interface TestHookResult<
-    R = unknown, P extends Array<unknown> = Array<unknown>
-> {
-    result:{value:R}
-    render:(...parameters:P) => void
-}
-export interface HookOptions<
-    P extends Array<unknown> = Array<unknown>,
-    WP extends {children:FunctionComponentElement<{parameters:P}>} = {
-        children:FunctionComponentElement<{parameters:P}>
-    }
-> {
-    parameters:P,
-    wrapper?:null|TestHookWrapper<P, WP>,
-    flush?:boolean
-}
-export interface TestEnvironment {
-    container:HTMLDivElement|null
-    render:<T = HTMLElement>(component:ReactElement) => null|T
-    runHook:<
-        R = unknown,
-        P extends Array<unknown> = Array<unknown>,
-        WP extends {children:FunctionComponentElement<{parameters:P}>} = {
-            children:FunctionComponentElement<{parameters:P}>
-        }
-    >(hook:(...parameters:P) => R, options:Partial<HookOptions<P, WP>>) =>
-        TestHookResult<R, P>
-}
 export interface CursorState {
     end:number
     start:number
 }
-export type Renderable = Array<ReactElement|string>|ReactElement|string
 //// region model
 export interface CommonBaseModel {
     declaration:string

@@ -17,9 +17,7 @@
     endregion
 */
 // region imports
-import {FunctionComponent, ReactElement, StrictMode} from 'react'
-
-import {Renderable} from '../type'
+import {FunctionComponent, ReactElement, ReactNode, StrictMode} from 'react'
 // endregion
 /**
  * Generic strict wrapper component.
@@ -31,7 +29,7 @@ import {Renderable} from '../type'
  * @returns React component.
  */
 export const WrapStrict:FunctionComponent<{
-    children:Renderable
+    children:ReactNode
     strict:boolean
 }> = ({children, strict}):ReactElement =>
     strict ? <StrictMode>{children}</StrictMode> : <>{children}</>

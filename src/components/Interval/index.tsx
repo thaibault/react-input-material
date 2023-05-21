@@ -19,6 +19,7 @@
 // region imports
 import Tools from 'clientnode'
 import {Mapping} from 'clientnode/type'
+import {GenericEvent} from 'react-generic-tools/type'
 import {Icon} from '@rmwc/icon'
 import {IconOptions} from '@rmwc/types'
 import {
@@ -45,7 +46,6 @@ import {
 } from '../../helper'
 import {
     defaultIntervalProperties as defaultProperties,
-    GenericEvent,
     InputProps,
     InputProperties,
     InputAdapterWithReferences,

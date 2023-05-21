@@ -17,9 +17,9 @@
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
 import {AnyFunction} from 'clientnode/type'
 import {testEach} from 'clientnode/testHelper'
+import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
 import GenericInput, {suggestionMatches} from '../components/GenericInput'
-import prepareTestEnvironment from '../testHelper'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 

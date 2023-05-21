@@ -17,31 +17,17 @@
     endregion
 */
 // region imports
+import {Tab, TabBar, TabBarOnActivateEventT} from '@rmwc/tabs'
 import Tools from 'clientnode'
 import {Mapping, UnknownFunction} from 'clientnode/type'
-import {
-    FunctionComponent,
-    KeyboardEvent,
-    ReactElement,
-    ReactNode,
-    useEffect,
-    useState
-} from 'react'
+import {KeyboardEvent, ReactElement, ReactNode, useState} from 'react'
 import {createRoot} from 'react-dom/client'
-import {Tab, TabBar, TabBarOnActivateEventT} from '@rmwc/tabs'
+import {useMemorizedValue} from 'react-generic-tools'
 
+import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
 import {
-    preserveStaticFileBaseNameInputGenerator
-} from './components/FileInput'
-import {
-    FileInput,
-    GenericAnimate,
-    GenericInput,
-    Inputs,
-    Interval,
-    RequireableCheckbox
+    FileInput, GenericInput, Inputs, Interval, RequireableCheckbox
 } from './index'
-import {useMemorizedValue} from './helper'
 import {
     CheckboxProps,
     FileInputProps,
@@ -56,7 +42,7 @@ import {
 Tools.locales.push('de-DE')
 GenericInput.transformer.currency.format!.final.options = {currency: 'EUR'}
 
-const Application:FunctionComponent = ():ReactElement => {
+const Application = () => {
     const [selectedState, setSelectedState] = useState<unknown>()
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
 
@@ -64,11 +50,6 @@ const Application:FunctionComponent = ():ReactElement => {
         useMemorizedValue<(properties:{model:unknown}) => void>(
             ({model}):void => setSelectedState(model)
         )
-
-    const [fadeState, setFadeState] = useState<boolean>(false)
-    useEffect(():(() => void) => Tools.timeout(
-        ():void => setFadeState((value:boolean):boolean => !value), 2 * 1000
-    ).clear)
     // region controlled state
     const [value1, setValue1] = useState<FileValue|null>({
         blob: new Blob(['test'], {type: 'text/plain'}),
@@ -862,7 +843,7 @@ const Application:FunctionComponent = ():ReactElement => {
                     onChange={onChange}
                     showInitialValidationState
                 >
-                    {useMemorizedValue(({properties}):ReactElement =>
+                    {useMemorizedValue(({properties}) =>
                         <FileInput {...properties as FileInputProps} />
                     )}
                 </Inputs>
@@ -884,7 +865,7 @@ const Application:FunctionComponent = ():ReactElement => {
                     onChange={onChange}
                     showInitialValidationState
                 >
-                    {useMemorizedValue(({properties}):ReactElement =>
+                    {useMemorizedValue(({properties}) =>
                         <RequireableCheckbox {...properties} />
                     )}
                 </Inputs>
@@ -903,7 +884,7 @@ const Application:FunctionComponent = ():ReactElement => {
                     onChange={onChange}
                     showInitialValidationState
                 >
-                    {useMemorizedValue(({properties}):ReactElement =>
+                    {useMemorizedValue(({properties}) =>
                         <Interval {...properties as IntervalProps} />
                     )}
                 </Inputs>
@@ -944,23 +925,6 @@ const Application:FunctionComponent = ():ReactElement => {
                     step={60}
                     triggerInitialPropertiesConsolidation={true}
                     value={value5}
-                />
-            </div>
-            {/* endregion */}
-            {/* region animate */}
-            <div
-                className="playground__inputs__animate"
-                style={{
-                    display: activeTabIndex === 4 ? 'block' : 'none',
-                    height: '50px'
-                }}
-            >
-                <GenericAnimate in={fadeState} timeout={2000}>
-                    Fade it!
-                </GenericAnimate>
-                <br/>
-                <GenericAnimate
-                    children="Fade it!" in={!fadeState} timeout={2000}
                 />
             </div>
             {/* endregion */}

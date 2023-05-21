@@ -15,9 +15,9 @@
 */
 // region imports
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
+import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
 import RequireableCheckbox from '../components/RequireableCheckbox'
-import prepareTestEnvironment from '../testHelper'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 
