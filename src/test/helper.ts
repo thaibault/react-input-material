@@ -17,17 +17,17 @@
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
 import {testEach} from 'clientnode/testHelper'
 import {Mapping} from 'clientnode/type'
+import {useMemorizedValue} from 'react-generic-tools'
+import prepareTestEnvironment from 'react-generic-tools/testHelper'
+import {TestHookResult} from 'react-generic-tools/type'
 
 import {
     determineInitialValue,
     getLabelAndValues,
     getRepresentationFromValueSelection,
     getValueFromSelection,
-    normalizeSelection,
-    useMemorizedValue
+    normalizeSelection
 } from '../helper'
-import prepareTestEnvironment from '../testHelper'
-import {TestHookResult} from '../type'
 // endregion
 const {runHook} = prepareTestEnvironment(beforeEach, afterEach)
 

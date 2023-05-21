@@ -17,7 +17,6 @@
     endregion
 */
 export {FileInput} from './components/FileInput'
-export {GenericAnimate} from './components/GenericAnimate'
 export {GenericInput} from './components/GenericInput'
 export {Inputs} from './components/Inputs'
 export {Interval} from './components/Interval'

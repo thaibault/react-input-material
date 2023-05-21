@@ -18,7 +18,6 @@
 */
 // region imports
 import {Ace as CodeEditorNamespace} from 'ace-builds'
-
 import Tools from 'clientnode'
 import {EvaluationResult, Mapping} from 'clientnode/type'
 
@@ -41,6 +40,8 @@ import {
     useState
 } from 'react'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
+import GenericAnimate from 'react-generic-animate'
+import {GenericEvent} from 'react-generic-tools/type'
 import Dummy from 'react-generic-dummy'
 import {TransitionProps} from 'react-transition-group/Transition'
 import UseAnimationsType from 'react-useanimations'
@@ -71,8 +72,6 @@ import {
 import {
     EventHandler as RichTextEventHandler
 } from '@tinymce/tinymce-react/lib/cjs/main/ts/Events'
-
-import GenericAnimate from '../GenericAnimate'
 /*
 "namedExport" version of css-loader:
 
@@ -112,7 +111,6 @@ import {
     DefaultInputProperties as DefaultProperties,
     defaultInputProperties as defaultProperties,
     EditorState,
-    GenericEvent,
     InputAdapter as Adapter,
     InputAdapterWithReferences as AdapterWithReferences,
     InputDataTransformation,
@@ -125,7 +123,6 @@ import {
     InputModel as Model,
     NativeInputType,
     NormalizedSelection,
-    Renderable,
     GenericInputComponent,
     InputTablePosition as TablePosition,
     InputValueState as ValueState,
@@ -823,12 +820,12 @@ export const GenericInputInner = function<Type = unknown>(
      * @returns Wrapped component.
      */
     const wrapAnimationConditionally = (
-        content:Renderable,
+        content:ReactNode,
         propertiesOrInCondition:(
             boolean|Partial<TransitionProps<HTMLElement|undefined>>
         ) = {},
         condition = true
-    ):Renderable => {
+    ):ReactNode => {
         if (typeof propertiesOrInCondition === 'boolean')
             return condition ?
                 <GenericAnimate in={propertiesOrInCondition}>
