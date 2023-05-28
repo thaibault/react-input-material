@@ -189,29 +189,31 @@ export const determineValidationState = <P extends DefaultProperties>(
         invalidMaximumSize: ():boolean => (
             typeof properties.model.maximumSize === 'number' &&
             properties.model.maximumSize <
-                (properties.model.value?.blob?.size || 0)
+                ((properties.model.value?.blob as Blob)?.size || 0)
         ),
         invalidMinimumSize: ():boolean => (
             typeof properties.model.minimumSize === 'number' &&
             properties.model.minimumSize >
-                (properties.model.value?.blob?.size || 0)
+                ((properties.model.value?.blob as Blob)?.size || 0)
         ),
         invalidName: ():boolean => invalidName,
         invalidContentTypePattern: ():boolean => (
-            typeof properties.model.value?.blob?.type === 'string' &&
+            typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
             ([] as Array<null|RegExp|string>)
                 .concat(properties.model.contentTypeRegularExpressionPattern)
                 .some((expression:null|RegExp|string):boolean =>
                     typeof expression === 'string' &&
                     !(new RegExp(expression))
-                        .test(properties.model.value!.blob!.type!) ||
+                        .test((properties.model.value!.blob as Blob).type) ||
                     expression !== null &&
                     typeof expression === 'object' &&
-                    !expression.test(properties.model.value!.blob!.type!)
+                    !expression.test(
+                        (properties.model.value!.blob as Blob).type
+                    )
                 )
         ),
         invalidInvertedContentTypePattern: ():boolean => (
-            typeof properties.model.value?.blob?.type === 'string' &&
+            typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
             ([] as Array<null|RegExp|string>)
                 .concat(
                     properties.model
@@ -220,10 +222,12 @@ export const determineValidationState = <P extends DefaultProperties>(
                 .some((expression:null|RegExp|string):boolean =>
                     typeof expression === 'string' &&
                     (new RegExp(expression))
-                        .test(properties.model.value!.blob!.type!) ||
+                        .test((properties.model.value!.blob as Blob).type) ||
                     expression !== null &&
                     typeof expression === 'object' &&
-                    expression.test(properties.model.value!.blob!.type!)
+                    expression.test(
+                        (properties.model.value!.blob as Blob).type
+                    )
                 )
         )
     }
@@ -735,14 +739,15 @@ export const FileInputInner = function(
                             properties.sourceToBlobOptions
                         )
                 } else if (
-                    !properties.value.url && properties.value.blob?.type
+                    !properties.value.url &&
+                    (properties.value.blob as Blob)?.type
                 )
                     /*
                         Try to derive missing encoded base64 url from given
                         blob or plain source.
                     */
                     valueChanged.url =
-                        `data:${properties.value.blob.type};` +
+                        `data:${(properties.value.blob as Blob).type};` +
                         `charset=${properties.encoding};base64,` +
                         await deriveBase64String(properties.value)
             } else if (
@@ -778,8 +783,10 @@ export const FileInputInner = function(
     )
     // region render
     const representationType:RepresentationType =
-        properties.value?.blob?.type ?
-            determineRepresentationType(properties.value.blob.type) :
+        (properties.value?.blob as Blob)?.type ?
+            determineRepresentationType(
+                (properties.value!.blob as Blob).type
+            ) :
             'binary'
     const invalid:boolean = (
         properties.invalid &&
@@ -818,7 +825,7 @@ export const FileInputInner = function(
                             <video autoPlay loop muted>
                                 <source
                                     src={properties.value.url}
-                                    type={properties.value.blob!.type}
+                                    type={(properties.value.blob as Blob).type}
                                 />
                             </video> :
                             representationType === 'renderableText' ?
@@ -828,10 +835,10 @@ export const FileInputInner = function(
                                     ]]
                                         .concat(
                                             ['text/html', 'text/plain']
-                                                .includes(
-                                                    properties.value.blob!
-                                                        .type!
-                                                ) ?
+                                                .includes((
+                                                    properties.value.blob as
+                                                        Blob
+                                                ).type) ?
                                                 CSS_CLASS_NAMES[
                                                     'file-input__iframe-' +
                                                     'wrapper--padding'
@@ -982,10 +989,13 @@ export const FileInputInner = function(
                                             href={properties.value.url}
                                             ref={downloadLinkReference}
                                             target="_blank"
-                                            {...(properties.value.blob?.type ?
-                                                {type:
-                                                    properties.value.blob.type
-                                                } :
+                                            {...((
+                                                properties.value.blob as Blob
+                                            )?.type ?
+                                                {type: (
+                                                    properties.value.blob as
+                                                        Blob
+                                                ).type} :
                                                 {}
                                             )}
                                         >{properties.downloadButton}</a>
