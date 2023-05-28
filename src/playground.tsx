@@ -164,11 +164,15 @@ const Application = () => {
                                     ''
                                 }
                                 {(value.blob as File).type ?
-                                    <li>Mime-Typ: {value.blob.type}</li> :
+                                    <li>
+                                        Mime-Typ: {(value.blob as Blob).type}
+                                    </li> :
                                     ''
                                 }
                                 {typeof (value.blob as File).size === 'number' ?
-                                    <li>Size: {value.blob.size}</li> :
+                                    <li>
+                                        Size: {(value.blob as Blob).size}
+                                    </li> :
                                     ''
                                 }
                             </ul> :

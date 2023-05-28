@@ -799,8 +799,9 @@ export const defaultInputProperties:DefaultInputProperties = {
 /// region file-input
 export type FileRepresentationType =
     'binary'|'image'|'renderableText'|'text'|'video'
+export type BlobType = Blob|Buffer|string
 export interface FileValue {
-    blob?:Partial<Blob>|null
+    blob?:null|Partial<BlobType>
     hash?:null|string
     name?:null|string
     source?:null|string
