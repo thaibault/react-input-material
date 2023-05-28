@@ -8658,9 +8658,9 @@ react-dom@*:
     scheduler "^0.23.0"
 
 react-generic-animate@*:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/react-generic-animate/-/react-generic-animate-0.0.4.tgz#8a6cf35f4b96771e8a1fc3e4a074b32fceee0d1e"
-  integrity sha512-B1MlenxW0teT/dfycPI6JOXAu7BR6DhSH2sTx53AwrwyitoCAzDAaln98mMD9w8dSWS93fXNIVoSWOjCFxiP6A==
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/react-generic-animate/-/react-generic-animate-0.0.5.tgz#37d591106397ea9c79ca76349ea17720bcc156ff"
+  integrity sha512-A3N6GEvHeBdr5lC5d83uWbOqpLTR0skN3Iqw3qwqlmhIW+w/iEl/leNU+VRQ/cmaIKQAWQOkpsW2YzOrE6onmw==
 
 react-generic-dummy@*:
   version "0.0.37"
