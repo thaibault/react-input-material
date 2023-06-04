@@ -807,8 +807,8 @@ export interface FileValue {
     source?:null|string
     url?:null|string
 }
-export interface FileInputValueState extends
-    ValueState<FileValue, FileInputModelState>
+export interface FileInputValueState<Type = FileValue> extends
+    ValueState<Type, FileInputModelState>
 {
     attachBlobProperty:boolean
 }
@@ -821,7 +821,7 @@ export interface FileInputModelState extends ModelState {
 
     invalidName:boolean
 }
-export interface FileInputModel extends Model<FileValue> {
+export interface FileInputModel<Type = FileValue> extends Model<Type> {
     contentTypeRegularExpressionPattern:Array<RegExp|string>|null|RegExp|string
     invertedContentTypeRegularExpressionPattern:(
         Array<RegExp|string>|null|RegExp|string
@@ -835,16 +835,16 @@ export interface FileInputModel extends Model<FileValue> {
     state:FileInputModelState
 }
 
-export interface FileInputChildrenOptions<P> {
+export interface FileInputChildrenOptions<P, Type = FileValue> {
     declaration:string
     invalid:boolean
     properties:P
-    value?:FileValue|null
+    value?:null|Type
 }
-export interface FileInputProperties extends
-    Properties<FileValue>, FileInputModelState
+export interface FileInputProperties<Type = FileValue> extends
+    Properties<Type>, FileInputModelState
 {
-    children:(options:FileInputChildrenOptions<this>) => null|ReactElement
+    children:(options:FileInputChildrenOptions<this, Type>) => null|ReactNode
 
     contentTypePattern:Array<RegExp|string>|null|RegExp|string
     invertedContentTypePattern:Array<RegExp|string>|null|RegExp|string
@@ -868,7 +868,7 @@ export interface FileInputProperties extends
 
     media:CardMediaProps
 
-    model:FileInputModel
+    model:FileInputModel<Type>
 
     outlined:boolean
 
@@ -877,24 +877,24 @@ export interface FileInputProperties extends
         type?:string
     }
 }
-export type FileInputProps =
-    Partial<Omit<FileInputProperties, 'model'>> &
-    {model?:Partial<FileInputModel>}
+export type FileInputProps<Type = FileValue> =
+    Partial<Omit<FileInputProperties<Type>, 'model'>> &
+    {model?:Partial<FileInputModel<Type>>}
 
-export type DefaultFileInputProperties =
-    Omit<FileInputProps, 'model'> & {model:FileInputModel}
+export type DefaultFileInputProperties<Type = FileValue> =
+    Omit<FileInputProps<Type>, 'model'> & {model:FileInputModel<Type>}
 
 export type FileInputPropertyTypes = {
     [key in keyof FileInputProperties]:ValueOf<typeof PropertyTypes>
 }
 
-export interface FileInputState extends State<FileValue> {
+export interface FileInputState<Type = FileValue> extends State<Type> {
     modelState:FileInputModelState
 }
 
-export type FileInputAdapter = ComponentAdapter<
-    FileInputProperties, Omit<FileInputState, 'value'> &
-    {value?:FileValue|null}
+export type FileInputAdapter<Type = FileValue> = ComponentAdapter<
+    FileInputProperties<Type>, Omit<FileInputState<Type>, 'value'> &
+    {value?:Type|null}
 >
 export interface FileInputAdapterWithReferences extends FileInputAdapter {
     references:{
