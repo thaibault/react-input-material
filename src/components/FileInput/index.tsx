@@ -86,7 +86,7 @@ import {
     InputProperties,
     InputProps,
     FileRepresentationType as RepresentationType,
-    FileInputComponent
+    FileInputComponent, FileInputModel
 } from '../../type'
 // endregion
 // region constants
@@ -180,58 +180,63 @@ export const determineRepresentationType = (
  * @returns Boolean indicating Whether component is in an aggregated valid or
  * invalid state.
  */
-export const determineValidationState = <P extends DefaultProperties>(
-    properties:P, invalidName:boolean, currentState:ModelState
-):boolean => determineBaseValidationState<P>(
-    properties,
-    currentState,
-    {
-        invalidMaximumSize: ():boolean => (
-            typeof properties.model.maximumSize === 'number' &&
-            properties.model.maximumSize <
-                ((properties.model.value?.blob as Blob)?.size || 0)
-        ),
-        invalidMinimumSize: ():boolean => (
-            typeof properties.model.minimumSize === 'number' &&
-            properties.model.minimumSize >
-                ((properties.model.value?.blob as Blob)?.size || 0)
-        ),
-        invalidName: ():boolean => invalidName,
-        invalidContentTypePattern: ():boolean => (
-            typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
-            ([] as Array<null|RegExp|string>)
-                .concat(properties.model.contentTypeRegularExpressionPattern)
-                .some((expression:null|RegExp|string):boolean =>
-                    typeof expression === 'string' &&
-                    !(new RegExp(expression))
-                        .test((properties.model.value!.blob as Blob).type) ||
-                    expression !== null &&
-                    typeof expression === 'object' &&
-                    !expression.test(
-                        (properties.model.value!.blob as Blob).type
-                    )
+export const determineValidationState = <
+    Type extends FileValue = FileValue,
+    P extends DefaultProperties<Type> = DefaultProperties<Type>
+>(properties:P, invalidName:boolean, currentState:ModelState):boolean => {
+    const invalidMaximumSize = ():boolean => (
+        typeof properties.model.maximumSize === 'number' &&
+        properties.model.maximumSize <
+        ((properties.model.value?.blob as Blob)?.size || 0)
+    )
+    const invalidMinimumSize = ():boolean => (
+        typeof properties.model.minimumSize === 'number' &&
+        properties.model.minimumSize >
+        ((properties.model.value?.blob as Blob)?.size || 0)
+    )
+    const invalidContentTypePattern = ():boolean => (
+        typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
+        ([] as Array<null|RegExp|string>)
+            .concat(properties.model.contentTypeRegularExpressionPattern)
+            .some((expression:null|RegExp|string):boolean =>
+                typeof expression === 'string' &&
+                !(new RegExp(expression))
+                    .test((properties.model.value!.blob as Blob).type) ||
+                expression !== null &&
+                typeof expression === 'object' &&
+                !expression.test(
+                    (properties.model.value!.blob as Blob).type
                 )
-        ),
-        invalidInvertedContentTypePattern: ():boolean => (
-            typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
-            ([] as Array<null|RegExp|string>)
-                .concat(
-                    properties.model
-                        .invertedContentTypeRegularExpressionPattern
-                )
-                .some((expression:null|RegExp|string):boolean =>
-                    typeof expression === 'string' &&
-                    (new RegExp(expression))
-                        .test((properties.model.value!.blob as Blob).type) ||
-                    expression !== null &&
-                    typeof expression === 'object' &&
-                    expression.test(
-                        (properties.model.value!.blob as Blob).type
-                    )
-                )
-        )
-    }
-)
+            )
+    )
+    const invalidInvertedContentTypePattern = ():boolean => (
+        typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
+        ([] as Array<null|RegExp|string>)
+            .concat(
+                properties.model.invertedContentTypeRegularExpressionPattern
+            )
+            .some((expression:null|RegExp|string):boolean =>
+                typeof expression === 'string' &&
+                (new RegExp(expression))
+                    .test((properties.model.value!.blob as Blob).type) ||
+                expression !== null &&
+                typeof expression === 'object' &&
+                expression.test((properties.model.value!.blob as Blob).type)
+            )
+    )
+
+    return determineBaseValidationState<P>(
+        properties,
+        currentState,
+        {
+            invalidMaximumSize,
+            invalidMinimumSize,
+            invalidName: ():boolean => invalidName,
+            invalidContentTypePattern,
+            invalidInvertedContentTypePattern
+        }
+    )
+}
 /// region data transformer
 /**
  * Derive base46 string from given file value.
@@ -239,14 +244,16 @@ export const determineValidationState = <P extends DefaultProperties>(
  *
  * @returns A promise holding base64 string.
  */
-export const deriveBase64String = (value:FileValue):Promise<string> =>
-    typeof Blob === 'undefined' ?
-        Promise.resolve(
-            (value.toString as unknown as (_encoding:string) => string)(
-                'base64'
-            )
-        ) :
-        blobToBase64String(value.blob as Blob)
+export const deriveBase64String = <Type extends FileValue = FileValue>(
+    value:Type
+):Promise<string> =>
+        typeof Blob === 'undefined' ?
+            Promise.resolve(
+                (value.toString as unknown as (_encoding:string) => string)(
+                    'base64'
+                )
+            ) :
+            blobToBase64String(value.blob as Blob)
 /**
  * Read text from given binary data with given encoding.
  * @param blob - Binary data object.
@@ -316,8 +323,8 @@ export const readBinaryDataIntoText = (
  *
  * @returns React elements.
  */
-export const FileInputInner = function(
-    props:Props, reference?:ForwardedRef<Adapter>
+export const FileInputInner = function<Type extends FileValue = FileValue>(
+    props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
 ):ReactElement {
     // region property aggregation
     /**
@@ -326,13 +333,16 @@ export const FileInputInner = function(
      *
      * @returns External properties object.
      */
-    const getConsolidatedProperties = (properties:Props):Properties => {
-        const result:DefaultProperties =
-            mapPropertiesIntoModel<Props, DefaultProperties>(
-                properties, FileInput.defaultProperties.model
+    const getConsolidatedProperties = (properties:Props<Type>):Properties<
+        Type
+    > => {
+        const result:DefaultProperties<Type> =
+            mapPropertiesIntoModel<Props<Type>, DefaultProperties<Type>>(
+                properties,
+                FileInput.defaultProperties.model as FileInputModel<Type>
             )
 
-        determineValidationState(
+        determineValidationState<Type>(
             result,
             // TODO not available
             false
@@ -345,7 +355,9 @@ export const FileInputInner = function(
             result.model.state
         )
 
-        return getBaseConsolidatedProperties<Props, Properties>(result)
+        return getBaseConsolidatedProperties<Props<Type>, Properties<Type>>(
+            result
+        )
     }
     // endregion
     // region event handler
@@ -356,8 +368,8 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onBlur = (event:SyntheticEvent):void => setValueState((
-        oldValueState:ValueState
-    ):ValueState => {
+        oldValueState:ValueState<Type>
+    ):ValueState<Type> => {
         let changed = false
 
         if (oldValueState.modelState.focused) {
@@ -373,7 +385,7 @@ export const FileInputInner = function(
         if (changed) {
             onChange(event)
 
-            triggerCallbackIfExists<Properties>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeState',
                 controlled,
@@ -383,7 +395,7 @@ export const FileInputInner = function(
             )
         }
 
-        triggerCallbackIfExists<Properties>(
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'blur', controlled, event, properties
         )
 
@@ -403,13 +415,14 @@ export const FileInputInner = function(
             properties.model.fileName =
                 nameInputReference.current.properties.model
 
-        const consolidatedProperties:Properties = getConsolidatedProperties(
-            /*
-                Workaround since "Type" isn't identified as subset of
-                "RecursivePartial<Type>" yet.
-            */
-            properties as unknown as Props
-        )
+        const consolidatedProperties:Properties<Type> =
+            getConsolidatedProperties(
+                /*
+                    Workaround since "Type" isn't identified as subset of
+                    "RecursivePartial<Type>" yet.
+                */
+                properties as unknown as Props<Type>
+            )
         // NOTE: Avoid recursive merging of deprecated value properties.
         delete properties.model.value
         delete properties.value
@@ -418,7 +431,7 @@ export const FileInputInner = function(
 
         Tools.extend(true, properties, consolidatedProperties)
 
-        triggerCallbackIfExists<Properties>(
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'change', controlled, properties, event
         )
     }
@@ -434,7 +447,7 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onChangeValue = (
-        eventSourceOrName:FileValue|null|string|SyntheticEvent,
+        eventSourceOrName:null|Partial<Type>|string|SyntheticEvent,
         event?:SyntheticEvent|undefined,
         inputProperties?:InputProperties<string>|undefined,
         attachBlobProperty = false
@@ -454,7 +467,7 @@ export const FileInputInner = function(
                 const blob:File =
                     (event.target as unknown as {files:FileList}).files[0]
 
-                properties.value = {blob, name: blob.name}
+                properties.value = {blob, name: blob.name} as unknown as Type
 
                 properties.value.name =
                     properties.generateFileNameInputProperties(
@@ -467,15 +480,15 @@ export const FileInputInner = function(
                             default: properties.value.name
                         },
                         properties as
-                            Omit<Properties, 'value'> &
-                            {value:FileValue & {name:string}}
+                            Omit<Properties<Type>, 'value'> &
+                            {value:Type & {name:string}}
                     )?.value ||
                     blob.name
             } else
                 return
         }
 
-        setValueState((oldValueState:ValueState):ValueState => {
+        setValueState((oldValueState:ValueState<Type>):ValueState<Type> => {
             if (eventSourceOrName === null)
                 properties.value = eventSourceOrName
             else if (typeof eventSourceOrName === 'string')
@@ -485,25 +498,25 @@ export const FileInputInner = function(
                 */
                 properties.value = {
                     ...oldValueState.value, name: eventSourceOrName
-                }
+                } as Type
             else if (
-                typeof (eventSourceOrName as FileValue).source === 'string' ||
-                typeof (eventSourceOrName as FileValue).url === 'string'
+                typeof (eventSourceOrName as Type).source === 'string' ||
+                typeof (eventSourceOrName as Type).url === 'string'
             )
                 if (attachBlobProperty)
                     properties.value = {
                         ...oldValueState.value, ...eventSourceOrName
-                    }
+                    } as Type
                 else
-                    properties.value = eventSourceOrName as FileValue
+                    properties.value = eventSourceOrName as Type
 
             if (Tools.equals(oldValueState.value, properties.value))
                 return oldValueState
 
             let stateChanged = false
 
-            const result:ValueState = {
-                ...oldValueState, value: properties.value as FileValue|null
+            const result:ValueState<Type> = {
+                ...oldValueState, value: properties.value as null|Type
             }
 
             if (oldValueState.modelState.pristine) {
@@ -514,14 +527,14 @@ export const FileInputInner = function(
 
             onChange(event)
 
-            if (determineValidationState(
-                properties as unknown as DefaultProperties,
+            if (determineValidationState<Type>(
+                properties,
                 nameInputReference.current?.properties?.invalid || false,
                 oldValueState.modelState
             ))
                 stateChanged = true
 
-            triggerCallbackIfExists<Properties>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeValue',
                 controlled,
@@ -533,7 +546,7 @@ export const FileInputInner = function(
             if (stateChanged) {
                 result.modelState = properties.model.state
 
-                triggerCallbackIfExists<Properties>(
+                triggerCallbackIfExists<Properties<Type>>(
                     properties,
                     'changeState',
                     controlled,
@@ -557,7 +570,7 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onClick = (event:ReactMouseEvent):void => {
-        triggerCallbackIfExists<Properties>(
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'click', controlled, event, properties
         )
 
@@ -570,7 +583,7 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
-        triggerCallbackIfExists<Properties>(
+        triggerCallbackIfExists<Properties<Type>>(
             properties, 'focus', controlled, event, properties
         )
 
@@ -583,7 +596,7 @@ export const FileInputInner = function(
      * @returns Nothing.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
-        setValueState((oldValueState:ValueState):ValueState => {
+        setValueState((oldValueState:ValueState<Type>):ValueState<Type> => {
             let changedState = false
 
             if (!oldValueState.modelState.focused) {
@@ -597,14 +610,14 @@ export const FileInputInner = function(
                 changedState = true
             }
 
-            let result:ValueState = oldValueState
+            let result:ValueState<Type> = oldValueState
 
             if (changedState) {
                 onChange(event)
 
                 result = {...oldValueState, modelState: properties.model.state}
 
-                triggerCallbackIfExists<Properties>(
+                triggerCallbackIfExists<Properties<Type>>(
                     properties,
                     'changeState',
                     controlled,
@@ -614,7 +627,7 @@ export const FileInputInner = function(
                 )
             }
 
-            triggerCallbackIfExists<Properties>(
+            triggerCallbackIfExists<Properties<Type>>(
                 properties, 'touch', controlled, event, properties
             )
 
@@ -634,24 +647,26 @@ export const FileInputInner = function(
     const uploadButtonReference:MutableRefObject<HTMLDivElement|null> =
         useRef<HTMLDivElement>(null)
     /// endregion
-    const givenProps:Props = translateKnownSymbols(props)
+    const givenProps:Props<Type> = translateKnownSymbols(props)
 
-    const initialValue:FileValue|null = determineInitialValue<FileValue>(
-        givenProps, FileInput.defaultProperties.model.default
+    const initialValue:null|Type = determineInitialValue<Type>(
+        givenProps, FileInput.defaultProperties.model.default as Type
     )
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:Props = Tools.extend(
-        true, Tools.copy(FileInput.defaultProperties), givenProps
+    const givenProperties:Props<Type> = Tools.extend(
+        true,
+        Tools.copy(FileInput.defaultProperties as DefaultProperties<Type>),
+        givenProps
     )
     /*
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
     */
-    let [valueState, setValueState] = useState<ValueState>({
+    let [valueState, setValueState] = useState<ValueState<Type>>({
         attachBlobProperty: false,
         modelState: {...FileInput.defaultModelState},
         value: initialValue
@@ -667,7 +682,8 @@ export const FileInputInner = function(
 
     deriveMissingPropertiesFromState(givenProperties, valueState)
 
-    const properties:Properties = getConsolidatedProperties(givenProperties)
+    const properties:Properties<Type> =
+        getConsolidatedProperties(givenProperties)
 
     /*
         NOTE: We have to merge asynchronous determined missing value properties
@@ -676,13 +692,13 @@ export const FileInputInner = function(
     */
     if (valueState.attachBlobProperty && valueState.value)
         properties.value =
-            Tools.extend<FileValue>(true, valueState.value, properties.value!)
+            Tools.extend<Type>(true, valueState.value, properties.value!)
 
     /// region synchronize uncontrolled properties into state
-    const currentValueState:ValueState = {
+    const currentValueState:ValueState<Type> = {
         attachBlobProperty: false,
         modelState: properties.model.state,
-        value: properties.value as FileValue|null
+        value: properties.value as null|Type
     }
     /*
         NOTE: If value is controlled only trigger/save state changes when model
@@ -696,11 +712,11 @@ export const FileInputInner = function(
         setValueState(currentValueState)
     if (controlled)
         setValueState =
-            wrapStateSetter<ValueState>(setValueState, currentValueState)
+            wrapStateSetter<ValueState<Type>>(setValueState, currentValueState)
     /// endregion
     useImperativeHandle(
         reference,
-        ():Adapter & {
+        ():Adapter<Type> & {
             references:{
                 deleteButtonReference:MutableRefObject<HTMLButtonElement|null>,
                 downloadLinkReference:MutableRefObject<HTMLAnchorElement|null>,
@@ -726,7 +742,7 @@ export const FileInputInner = function(
     // endregion
     useEffect(():void => {
         (async ():Promise<void> => {
-            const valueChanged:Partial<FileValue> = {}
+            const valueChanged:Partial<Type> = {}
             if (properties.value?.source) {
                 if (!properties.value.blob) {
                     // Derive missing blob from given source.
@@ -914,8 +930,8 @@ export const FileInputInner = function(
                                     triggerInitialPropertiesConsolidation
                                 },
                                 properties as
-                                    Omit<Properties, 'value'> &
-                                    {value:FileValue & {name:string}}
+                                    Omit<Properties<Type>, 'value'> &
+                                    {value:Type & {name:string}}
                             )}
                         /> :
                         ''
@@ -1030,10 +1046,10 @@ FileInputInner.displayName = 'FileInput'
  *
  * @returns React elements.
  */
-export const FileInput:FileInputComponent<typeof FileInputInner> =
+export const FileInput:FileInputComponent<FileValue, typeof FileInputInner> =
     memorize(forwardRef(FileInputInner)) as
         unknown as
-        FileInputComponent<typeof FileInputInner>
+        FileInputComponent<FileValue, typeof FileInputInner>
 // region static properties
 /// region web-component hints
 FileInput.wrapped = FileInputInner

@@ -81,7 +81,7 @@ export interface CursorState {
     start:number
 }
 //// region model
-export interface CommonBaseModel {
+export interface CommonBaseModel<Type = unknown> {
     declaration:string
     default:unknown
     description:string
@@ -94,7 +94,7 @@ export interface CommonBaseModel {
     selection?:Array<boolean|number>|SelectProps['options']
     trim:boolean
     type:string
-    value?:unknown
+    value?:null|Type
 }
 export interface ModelState {
     dirty:boolean
@@ -107,7 +107,7 @@ export interface ModelState {
     valid:boolean
     visited:boolean
 }
-export interface BaseModel extends CommonBaseModel {
+export interface BaseModel<T = unknown> extends CommonBaseModel<T> {
     invertedRegularExpressionPattern:Array<RegExp|string>|null|RegExp|string
     mutable:boolean
     nullable:boolean
@@ -115,23 +115,23 @@ export interface BaseModel extends CommonBaseModel {
     state:ModelState
     writable:boolean
 }
-export interface CommonModel<T = unknown> extends CommonBaseModel {
+export interface CommonModel<T = unknown> extends CommonBaseModel<T> {
     default:null|T
-    value?:null|T
 }
-export interface Model<T = unknown> extends BaseModel {
+export interface Model<T = unknown> extends BaseModel<T> {
     default:null|T
-    value?:null|T
 }
 //// endregion
-export interface BaseProperties extends CommonBaseModel, ModelState {
+export interface BaseProperties<T = unknown>
+    extends
+CommonBaseModel<T>, ModelState {
     className:string
     disabled:boolean
     enforceUncontrolled:boolean
     id:string
     initialValue:unknown
     label:string
-    model:BaseModel
+    model:BaseModel<T>
     name:string
     required:boolean
     requiredText:string
@@ -146,13 +146,13 @@ export interface BaseProperties extends CommonBaseModel, ModelState {
     tooltip:string|TooltipProps
     triggerInitialPropertiesConsolidation:boolean
 }
-export type BaseProps =
-    Partial<Omit<BaseProperties, 'model'>> & {model?:Partial<BaseModel>}
+export type BaseProps<T = unknown> =
+    Partial<Omit<BaseProperties<T>, 'model'>> & {model?:Partial<BaseModel<T>>}
 
-export type DefaultBaseProperties =
-    Omit<BaseProps, 'model'> & {model:BaseModel}
+export type DefaultBaseProperties<T = unknown> =
+    Omit<BaseProps<T>, 'model'> & {model:BaseModel<T>}
 
-export interface TypedProperties<T = unknown> extends BaseProperties {
+export interface TypedProperties<T = unknown> extends BaseProperties<T> {
     initialValue:null|T
     model:Model<T>
     onBlur:(event:GenericEvent|undefined, properties:this) => void
@@ -191,7 +191,7 @@ export interface EditorState {
 }
 //// endregion
 export interface StaticWebComponent<
-    Type, MS = ModelState, DP = DefaultProperties
+    Type, MS = ModelState, DP = DefaultProperties<Type>
 > extends StaticBaseWebComponent<Type> {
     defaultModelState:MS
     defaultProperties:DP
@@ -199,21 +199,22 @@ export interface StaticWebComponent<
 }
 
 export type StaticComponent<
-    Type, P = Props, MS = ModelState, DP = DefaultProperties
+    Type, P = Props, MS = ModelState, DP = DefaultProperties<Type>
 > = Omit<ComponentClass<P>, 'propTypes'> & StaticWebComponent<Type, MS, DP>
 export type StaticFunctionComponent<
-    Type, P = Props, MS = ModelState, DP = DefaultProperties
+    Type, P = Props, MS = ModelState, DP = DefaultProperties<Type>
 > = Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<Type, P, MS, DP>
 
 export interface InputComponent<
-    Type,
-    P = Props,
+    ValueType,
+    ComponentType,
+    P = Props<ValueType>,
     MS = ModelState,
-    DP = DefaultProperties,
+    DP = DefaultProperties<ValueType>,
     A = ComponentAdapter<P>
 > extends
     Omit<ForwardRefExoticComponent<P>, 'propTypes'>,
-    StaticWebComponent<Type, MS, DP>
+    StaticWebComponent<ComponentType, MS, DP>
 {
     (props:P & RefAttributes<A>):ReactElement
 }
@@ -363,7 +364,7 @@ export const defaultModel:Model<string> = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultProperties:DefaultProperties<string> = {
+export const defaultProperties:DefaultProperties = {
     enforceUncontrolled: false,
     model: {...defaultModel},
     triggerInitialPropertiesConsolidation: false,
@@ -391,8 +392,9 @@ export type CheckboxState = State<boolean>
 export type CheckboxAdapter =
     ComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
 
-export type CheckboxComponent<Type> = InputComponent<
-    Type,
+export type CheckboxComponent<ComponentType> = InputComponent<
+    boolean,
+    ComponentType,
     CheckboxProps,
     CheckboxModelState,
     DefaultCheckboxProperties,
@@ -863,7 +865,7 @@ export interface FileInputProperties<Type = FileValue> extends
 
     generateFileNameInputProperties:(
         prototype:InputProps<string>,
-        properties:this & {value:FileValue & {name:string}}
+        properties:this & {value:Type & {name:string}}
     ) => InputProps<string>
 
     media:CardMediaProps
@@ -906,12 +908,13 @@ export interface FileInputAdapterWithReferences extends FileInputAdapter {
     }
 }
 
-export type FileInputComponent<Type> = InputComponent<
-    Type,
-    FileInputProps,
+export type FileInputComponent<ValueType, ComponentType> = InputComponent<
+    ValueType,
+    ComponentType,
+    FileInputProps<ValueType>,
     FileInputModelState,
-    DefaultFileInputProperties,
-    FileInputAdapter
+    DefaultFileInputProperties<ValueType>,
+    FileInputAdapter<ValueType>
 >
 //// region constants
 export const fileInputModelStatePropertyTypes:{
@@ -1264,8 +1267,9 @@ export interface IntervalAdapterWithReferences extends IntervalAdapter {
     }
 }
 
-export type IntervalComponent<Type> = InputComponent<
-    Type,
+export type IntervalComponent<ComponentType> = InputComponent<
+    IntervalConfiguration|IntervalValue|null,
+    ComponentType,
     IntervalProps,
     IntervalModelState,
     DefaultIntervalProperties,

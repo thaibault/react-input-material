@@ -134,10 +134,13 @@ export const IntervalInner = function(
         default property object untouched for unchanged usage in other
         instances.
     */
-    const properties:Omit<Props, 'value'> & {value:Properties['value']} =
+    type StrictProps = Omit<Props, 'value'> & {value:Properties['value']}
+    const properties:StrictProps =
         Tools.extend(
-            true, Tools.copy(Interval.defaultProperties), givenProps
-        ) as Properties
+            true,
+            Tools.copy(Interval.defaultProperties as StrictProps),
+            givenProps as StrictProps
+        )
 
     let endProperties:InputProps<number> = properties.value?.end || {}
     const iconProperties:IconOptions = typeof properties.icon === 'string' ?
