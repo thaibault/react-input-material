@@ -8653,9 +8653,9 @@ react-generic-dummy@*:
   integrity sha512-/7PJp6Ly/xwC9iNxbbB3PdSJQwaWQltzHtMaMShefeilfZwdnkZpl9NXeAwB63jb7qTRWsMGXNZFBvqYe97X4g==
 
 react-generic-tools@*:
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/react-generic-tools/-/react-generic-tools-0.0.11.tgz#f85abf16ce8d35c088e3c0590e3abb429ae711d3"
-  integrity sha512-B9/aLnt5oaYAeLkZr0cqQJrWZbCASlZ5fBcFzmZ2MnupoUwBrZUVjow4/I7X3xOVNPnBtfZ6fNn+a5/ge4dISA==
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/react-generic-tools/-/react-generic-tools-0.0.12.tgz#18147462fdbf0a18202c947c50202a727b5f6de8"
+  integrity sha512-aEjGzTCACe4e44BweXsLoL3iJMlAcpvvMIswuBRjZcNtAV+l6NWKueWslfuAn0fH1w4N+9FKHz4Amx7/hb7h1w==
 
 react-is@^16.12.0, react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
