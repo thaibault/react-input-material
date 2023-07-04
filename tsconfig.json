@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "declaration": true,
         "declarationDir": "dist/"
     },
     "extends": "./node_modules/weboptimizer/tsconfigApplication.json",
