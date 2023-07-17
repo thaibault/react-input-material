@@ -96,7 +96,7 @@ const inputPropertiesToValues = function<
 >(inputProperties:Array<P>|null):Array<T|null|undefined>|null {
     return Array.isArray(inputProperties) ?
         inputProperties.map(({model, value}):null|T|undefined =>
-            typeof value === undefined ? model?.value : value
+            typeof value === 'undefined' ? model?.value : value
         ) :
         inputProperties
 }

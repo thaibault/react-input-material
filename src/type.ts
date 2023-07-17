@@ -1105,7 +1105,7 @@ export interface InputsProperties<
     model:InputsModel<T, P>
 
     onChangeValue:(
-        values:Array<null|T>|null, event:GenericEvent|unknown, properties:this
+        values:Array<null|T>|null, event:unknown, properties:this
     ) => void
 
     value:Array<P>|null

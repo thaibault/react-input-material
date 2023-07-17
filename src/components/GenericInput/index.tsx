@@ -132,7 +132,7 @@ import {
 declare const TARGET_TECHNOLOGY:string
 
 const isBrowser =
-    !(TARGET_TECHNOLOGY === 'node' || typeof window === undefined)
+    !(TARGET_TECHNOLOGY === 'node' || typeof window === 'undefined')
 /* eslint-disable @typescript-eslint/no-var-requires */
 const GivenRichTextEditorComponent:typeof RichTextEditorComponent =
     isBrowser && RichTextEditorComponent ?
@@ -411,8 +411,7 @@ export const GenericInputInner = function<Type = unknown>(
                         )
                 }
             } else if (inputReference.current) {
-                // eslint-disable-next-line @typescript-eslint/no-extra-semi
-                ;(
+                (
                     inputReference.current as
                         HTMLInputElement|HTMLTextAreaElement
                 ).setSelectionRange(
