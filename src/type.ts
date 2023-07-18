@@ -80,6 +80,7 @@ export interface CursorState {
     end:number
     start:number
 }
+export type TypeSpecification = Array<string>|string
 //// region model
 export interface CommonBaseModel<Type = unknown> {
     declaration:string
@@ -93,7 +94,7 @@ export interface CommonBaseModel<Type = unknown> {
     name:string
     selection?:Array<boolean|number>|SelectProps['options']
     trim:boolean
-    type:string
+    type:TypeSpecification
     value?:null|Type
 }
 export interface ModelState {

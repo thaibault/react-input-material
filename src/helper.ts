@@ -36,6 +36,7 @@ import {
     ModelState,
     NormalizedSelection,
     Transformer,
+    TypeSpecification,
     ValueState
 } from './type'
 // endregion
@@ -206,7 +207,7 @@ export function determineInitialRepresentation<
         if (typeof candidate === 'string')
             return candidate
 
-        return formatValue<T, P & {type:string}>(
+        return formatValue<T, P & {type:TypeSpecification}>(
             {
                 ...properties,
                 type: (
