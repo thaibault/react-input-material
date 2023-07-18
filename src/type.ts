@@ -151,7 +151,13 @@ CommonBaseModel<T>, ModelState {
     triggerInitialPropertiesConsolidation:boolean
 }
 export type BaseProps<T = unknown> =
-    Partial<Omit<BaseProperties<T>, 'model'>> & {model?:Partial<BaseModel<T>>}
+    Partial<Omit<BaseProperties<T>, 'model'>> &
+    {
+        model?:Partial<
+            Omit<BaseModel<T>, 'state'> &
+            {state:Partial<ModelState>}
+        >
+    }
 
 export type DefaultBaseProperties<T = unknown> =
     Omit<BaseProps<T>, 'model'> & {model:BaseModel<T>}
@@ -176,7 +182,13 @@ export interface TypedProperties<T = unknown> extends BaseProperties<T> {
 }
 export type Properties<T = unknown> = TypedProperties<T> & CommonModel<T>
 export type Props<T = unknown> =
-    Partial<Omit<Properties<T>, 'model'>> & {model?:Partial<Model<T>>}
+    Partial<Omit<Properties<T>, 'model'>> &
+    {
+        model?:Partial<
+            Omit<Model<T>, 'state'> &
+            {state:Partial<ModelState>}
+        >
+    }
 
 export type DefaultProperties<T = unknown> =
     Omit<Props<T>, 'model'> & {model:Model<T>}
@@ -598,7 +610,12 @@ export interface InputProperties<T = unknown> extends
 }
 export type InputProps<T = unknown> =
     Partial<Omit<InputProperties<T>, 'model'>> &
-    {model?:Partial<InputModel<T>>}
+    {
+        model?:Partial<
+            Omit<InputModel<T>, 'state'> &
+            {state:Partial<InputModelState>}
+        >
+    }
 
 export type DefaultInputProperties<T = string> =
     Omit<InputProps<T>, 'model'> & {model:InputModel<T>}
@@ -885,7 +902,12 @@ export interface FileInputProperties<Type = FileValue> extends
 }
 export type FileInputProps<Type = FileValue> =
     Partial<Omit<FileInputProperties<Type>, 'model'>> &
-    {model?:Partial<FileInputModel<Type>>}
+    {
+        model?:Partial<
+            Omit<FileInputModel<Type>, 'state'> &
+            {state:Partial<FileInputModelState>}
+        >
+    }
 
 export type DefaultFileInputProperties<Type = FileValue> =
     Omit<FileInputProps<Type>, 'model'> & {model:FileInputModel<Type>}
@@ -1121,7 +1143,10 @@ export type InputsProps<
 > =
     Partial<Omit<InputsProperties<T, P>, 'model'|'value'>> &
     {
-        model?:Partial<InputsModel<T, P>>
+        model?:Partial<
+            Omit<InputsModel<T, P>, 'state'> &
+            {state:Partial<InputsModelState>}
+        >
         value?:Array<Partial<P>>|Array<null|T|undefined>|null
     }
 
