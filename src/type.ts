@@ -98,14 +98,18 @@ export interface CommonBaseModel<Type = unknown> {
 }
 export interface ModelState {
     dirty:boolean
-    focused:boolean
-    invalid:boolean
-    invalidRequired:boolean
     pristine:boolean
+
     touched:boolean
     untouched:boolean
-    valid:boolean
+
+    focused:boolean
     visited:boolean
+
+    invalid:boolean
+    valid:boolean
+
+    invalidRequired:boolean
 }
 export interface BaseModel<T = unknown> extends CommonBaseModel<T> {
     invertedRegularExpressionPattern:Array<RegExp|string>|null|RegExp|string
