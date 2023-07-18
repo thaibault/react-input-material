@@ -2268,7 +2268,7 @@ export const GenericInputInner = function<Type = unknown>(
             constraints.rows = properties.rows
     } else if ([
         'date', 'datetime-local', 'time', 'time-local'
-    ].includes(properties.type)) {
+    ].includes(properties.type as string)) {
         constraints.step = properties.step
 
         if (properties.maximum !== Infinity)
