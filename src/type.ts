@@ -124,12 +124,15 @@ export interface ModelState {
     invalidRequired:boolean
 }
 export interface BaseModel<T = unknown> extends CommonBaseModel<T> {
-    invertedRegularExpressionPattern:Array<RegExp|string>|null|RegExp|string
+    regularExpressionPattern?:Array<RegExp|string>|RegExp|string
+    invertedRegularExpressionPattern?:Array<RegExp|string>|RegExp|string
+
     mutable:boolean
-    nullable:boolean
-    regularExpressionPattern:Array<RegExp|string>|null|RegExp|string
-    state:ModelState
     writable:boolean
+
+    nullable:boolean
+
+    state:ModelState
 }
 export interface CommonModel<T = unknown> extends CommonBaseModel<T> {
     default:null|T
@@ -143,29 +146,41 @@ export interface BaseProperties<T = unknown>
     extends
 CommonBaseModel<T>, ModelState {
     className:string
+    // NOTE: We want to avoid a collision with html's native "style" property.
+    styles:Mapping
+    themeConfiguration:ThemeProviderProps['options']
+
     disabled:boolean
+
     enforceUncontrolled:boolean
+
     id:string
-    initialValue:unknown
     label:string
-    model:BaseModel<T>
     name:string
+
+    initialValue:unknown
+
+    model:BaseModel<T>
+
     required:boolean
     requiredText:string
+
     ripple:RipplePropT
+
     rootProps:Mapping<boolean|number|string>
     /*
         NOTE: selection allows more options than when configuring via "model"
         to be aligned to backend view of selections.
      */
     selection:Selection
+
     showDeclaration:boolean
+
     showInitialValidationState:boolean
     showValidationState:boolean
-    // NOTE: We want to avoid a collision with html's native "style" property.
-    styles:Mapping
-    themeConfiguration:ThemeProviderProps['options']
+
     tooltip:string|TooltipProps
+
     triggerInitialPropertiesConsolidation:boolean
 }
 export type BaseProps<T = unknown> =
@@ -182,7 +197,9 @@ export type DefaultBaseProperties<T = unknown> =
 
 export interface TypedProperties<T = unknown> extends BaseProperties<T> {
     initialValue:null|T
+
     model:Model<T>
+
     onBlur:(event:GenericEvent|undefined, properties:this) => void
     onChange:(properties:this, event?:GenericEvent) => void
     onChangeShowDeclaration:(
@@ -329,7 +346,11 @@ export const modelPropertyTypes:ValidationMapping = {
 export const propertyTypes:ValidationMapping = {
     ...baseModelPropertyTypes,
     ...modelStatePropertyTypes,
+
     className: string,
+    styles: object,
+    themeConfiguration: object,
+
     disabled: boolean,
     enforceUncontrolled: boolean,
     initialValue: any,
@@ -337,6 +358,7 @@ export const propertyTypes:ValidationMapping = {
     model: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
         modelPropertyTypes
     ),
+
     onChange: func,
     onChangeValue: func,
     onChangeShowDeclaration: func,
@@ -344,15 +366,19 @@ export const propertyTypes:ValidationMapping = {
     onClick: func,
     onFocus: func,
     onTouch: func,
+
     required: boolean,
     requiredText: string,
+
     ripple: oneOfType([boolean, object]),
+
     rootProps: object,
+
     showDeclaration: oneOfType([boolean, symbol]),
+
     showInitialValidationState: boolean,
     showValidationState: boolean,
-    styles: object,
-    themeConfiguration: object,
+
     /*
         NOTE: Not yet working:
         tooltip?:string|TooltipProps
@@ -362,37 +388,49 @@ export const propertyTypes:ValidationMapping = {
 }
 export const defaultModelState:ModelState = {
     dirty: false,
+    pristine: true,
+
     focused: false,
+    visited: false,
+
     invalid: false,
     invalidRequired: false,
-    pristine: true,
-    touched: false,
-    untouched: true,
     valid: true,
-    visited: false
+
+    touched: false,
+    untouched: true
 } as const
 export const defaultModel:Model<string> = {
     declaration: '',
-    default: null,
     description: '',
-    emptyEqualsNull: true,
-    invertedRegularExpressionPattern: null,
-    maximum: Infinity,
-    maximumLength: -1,
-    minimum: -Infinity,
-    minimumLength: 0,
-    mutable: true,
     name: 'NO_NAME_DEFINED',
-    nullable: true,
-    regularExpressionPattern: null,
-    state: {...defaultModelState},
-    trim: true,
-    type: 'string',
+
+    default: null,
+    emptyEqualsNull: true,
+
+    regularExpressionPattern: undefined,
+    invertedRegularExpressionPattern: undefined,
+
+    maximum: Infinity,
+    minimum: -Infinity,
+
+    maximumLength: -1,
+    minimumLength: 0,
+
+    mutable: true,
     /*
         NOTE: We do not want to shadow "default" here:
         value: null,
     */
-    writable: true
+    writable: true,
+
+    nullable: true,
+
+    state: {...defaultModelState},
+
+    trim: true,
+
+    type: 'string'
 } as const
 /*
     NOTE: Avoid setting any properties already defined in model here since they
@@ -400,11 +438,16 @@ export const defaultModel:Model<string> = {
 */
 export const defaultProperties:DefaultProperties = {
     enforceUncontrolled: false,
+
     model: {...defaultModel},
+
     triggerInitialPropertiesConsolidation: false,
+
     showDeclaration: undefined,
+
     showInitialValidationState: false,
     showValidationState: true,
+
     requiredText: 'Please fill this field.'
 } as const
 //// endregion

@@ -277,32 +277,24 @@ export function determineValidationState<T>(
 
             invalidInvertedPattern: ():boolean => (
                 typeof properties.model.value === 'string' &&
-                ([] as Array<null|RegExp|string>)
-                    .concat(properties.model.invertedRegularExpressionPattern)
-                    .some((expression:null|RegExp|string):boolean =>
-                        typeof expression === 'string' &&
+                Boolean(properties.model.invertedRegularExpressionPattern) &&
+                ([] as Array<RegExp|string>)
+                    .concat(properties.model.invertedRegularExpressionPattern!)
+                    .some((expression:RegExp|string):boolean =>
                         (new RegExp(expression)).test(
                             properties.model.value as unknown as string
-                        ) ||
-                        expression !== null &&
-                        typeof expression === 'object' &&
-                        expression
-                            .test(properties.model.value as unknown as string)
+                        )
                     )
             ),
             invalidPattern: ():boolean => (
                 typeof properties.model.value === 'string' &&
-                ([] as Array<null|RegExp|string>)
-                    .concat(properties.model.regularExpressionPattern)
-                    .some((expression:null|RegExp|string):boolean =>
-                        typeof expression === 'string' &&
+                Boolean(properties.model.regularExpressionPattern) &&
+                ([] as Array<RegExp|string>)
+                    .concat(properties.model.regularExpressionPattern!)
+                    .some((expression:RegExp|string):boolean =>
                         !(new RegExp(expression)).test(
                             properties.model.value as unknown as string
-                        ) ||
-                        expression !== null &&
-                        typeof expression === 'object' &&
-                        !expression
-                            .test(properties.model.value as unknown as string)
+                        )
                     )
             )
         }
