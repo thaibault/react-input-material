@@ -142,11 +142,13 @@ export const IntervalInner = function(
             givenProps as StrictProps
         )
 
-    let endProperties:InputProps<number> = properties.value?.end || {}
+    let endProperties:InputProps<number> =
+        properties.value?.end as InputProps<number> || {}
     const iconProperties:IconOptions = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
         properties.icon!
-    let startProperties:InputProps<number> = properties.value?.start || {}
+    let startProperties:InputProps<number> =
+        properties.value?.start as InputProps<number> || {}
 
     /*
         NOTE: Sometimes we need real given properties or derived (default
