@@ -126,6 +126,7 @@ import {
     GenericInputComponent,
     InputTablePosition as TablePosition,
     InputValueState as ValueState,
+    Selection,
     TinyMCEOptions
 } from '../../type'
 
@@ -1942,7 +1943,9 @@ export const GenericInputInner = function<Type = unknown>(
         useState<AbortController|Properties['selection']>()
     if (givenProperties.selection || givenProperties.model?.selection)
         selection =
-            givenProperties.selection || givenProperties.model?.selection
+            givenProperties.selection ||
+            givenProperties.model?.selection as
+                Selection
 
     const normalizedSelection:NormalizedSelection|undefined =
         selection instanceof AbortController ?

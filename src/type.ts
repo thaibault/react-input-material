@@ -82,6 +82,17 @@ export interface CursorState {
 }
 export type TypeSpecification = Array<string>|string
 //// region model
+export interface BaseSelectionMapping {
+    label:string
+    /*
+        NOTE: Databases may support any value here but the current selection
+        input does not allow this via typescript but seems to work with any
+        value.
+     */
+    value:unknown
+}
+export type BaseSelection =
+    Array<BaseSelectionMapping>|Array<unknown>|Mapping<unknown>
 export interface CommonBaseModel<Type = unknown> {
     declaration:string
     default:unknown
@@ -92,7 +103,7 @@ export interface CommonBaseModel<Type = unknown> {
     minimum:number|string
     minimumLength:number
     name:string
-    selection?:Array<boolean|number>|SelectProps['options']
+    selection?:BaseSelection
     trim:boolean
     type:TypeSpecification
     value?:null|Type
@@ -127,6 +138,7 @@ export interface Model<T = unknown> extends BaseModel<T> {
     default:null|T
 }
 //// endregion
+export type Selection = Array<boolean|number>|SelectProps['options']
 export interface BaseProperties<T = unknown>
     extends
 CommonBaseModel<T>, ModelState {
@@ -142,6 +154,11 @@ CommonBaseModel<T>, ModelState {
     requiredText:string
     ripple:RipplePropT
     rootProps:Mapping<boolean|number|string>
+    /*
+        NOTE: selection allows more options than when configuring via "model"
+        to be aligned to backend view of selections.
+     */
+    selection:Selection
     showDeclaration:boolean
     showInitialValidationState:boolean
     showValidationState:boolean
@@ -1236,8 +1253,8 @@ export interface IntervalValue {
 }
 
 export interface IntervalConfiguration {
-    end:InputProps<number>
-    start:InputProps<number>
+    end:InputModel<number>|InputProps<number>
+    start:InputModel<number>|InputProps<number>
 }
 
 export type IntervalModelState = ModelState
