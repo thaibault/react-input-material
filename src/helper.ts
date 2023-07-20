@@ -445,7 +445,7 @@ export function getLabelAndValues(selection?:NormalizedSelection):[
         const values:Array<unknown> = []
 
         for (const value of selection)
-            if (typeof (value as {label:string})?.label === 'string') {
+            if (typeof (value as {label?:string})?.label === 'string') {
                 labels.push((value as {label:string}).label)
                 values.push((value as {value:unknown}).value)
             }
@@ -545,12 +545,11 @@ export function normalizeSelection(
                         return (labels as Array<string>)[index]
             // Map boolean values to their string representation.
             } else if (
-                (value as unknown as boolean) === true &&
-                (labels as {true:string}).true
+                (value as unknown) === true && (labels as {true:string}).true
             )
                 return (labels as {true:string}).true
             else if (
-                (value as unknown as boolean) === false &&
+                (value as unknown) === false &&
                 (labels as {false:string}).false
             )
                 return (labels as {false:string}).false

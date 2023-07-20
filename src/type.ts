@@ -98,9 +98,9 @@ export interface CommonBaseModel<Type = unknown> {
     default:unknown
     description:string
     emptyEqualsNull:boolean
-    maximum:number|string
+    maximum:number
     maximumLength:number
-    minimum:number|string
+    minimum:number
     minimumLength:number
     name:string
     selection?:BaseSelection
