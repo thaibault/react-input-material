@@ -2058,7 +2058,7 @@ export const GenericInputInner = function<Type = unknown>(
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     > = {
         /*
-            NOTE: If not set label with unalowed symbols will automatically
+            NOTE: If not set label with unallowed symbols will automatically
             used.
         */
         id,

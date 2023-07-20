@@ -28,27 +28,41 @@
         <link rel="stylesheet" href="../node_modules/@material/ripple/dist/mdc.ripple.css">
         <!--endregion-->
         <style>
-            .file-input,
-            .generic-input {
-                margin-bottom: 20px;
+            .tab-bar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 1;
+
+                width: 100%;
+
+                background-color: white;
+                box-shadow: 0 8px 11px -2px rgba(0, 0, 0, .2);
+            }
+
+            .playground {
+                display: flex;
+                flex-direction: row;
+                gap: 20px;
+                margin-top: 70px;
             }
 
             .playground__inputs {
-                float: left;
-                width: 500px;
-            }
-
-            .playground__inputs__generic-animate .generic-animate-appear-active,
-            .playground__inputs__generic-animate .generic-animate-enter-active,
-            .playground__inputs__generic-animate .generic-animate-exit-active {
-                transition: opacity 2000ms ease-in !important;
+                flex-grow: 1;
             }
 
             .playground__outputs {
-                height: -webkit-fill-available;
-                margin-left: 500px;
+
+            }
+
+            .playground__outputs__bar {
                 overflow: auto;
                 position: fixed;
+            }
+
+            .file-input,
+            .generic-input {
+                margin-bottom: 20px;
             }
 
             <%-
@@ -128,7 +142,7 @@
         <script src="https://polyfill.io/v3/polyfill.js?features=<%- encodeURIComponent(Array.from(features).sort().join(',')) %>"></script>
         <!--endregion-->
     </head>
-    <body class="no-javascript playground">
+    <body class="no-javascript">
         <application></application>
     </body>
 <html>
