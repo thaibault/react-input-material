@@ -566,13 +566,9 @@ export const GenericInputInner = function<Type = unknown>(
             const handler = (
                 event:ReactKeyboardEvent|ReactMouseEvent
             ):void => {
-                if (
-                    typeof (event as ReactKeyboardEvent).keyCode ===
-                        'number' &&
-                    ![Tools.keyCode.ENTER, Tools.keyCode.SPACE].includes(
-                        (event as ReactKeyboardEvent).keyCode
-                    )
-                )
+                if (!['Enter', 'Space'].includes(
+                    (event as ReactKeyboardEvent).code
+                ))
                     return
 
                 event.preventDefault()
@@ -614,13 +610,9 @@ export const GenericInputInner = function<Type = unknown>(
             const handler = (
                 event:ReactKeyboardEvent|ReactMouseEvent
             ):void => {
-                if (
-                    typeof (event as ReactKeyboardEvent).keyCode ===
-                        'number' &&
-                    ![Tools.keyCode.ENTER, Tools.keyCode.SPACE].includes(
-                        (event as ReactKeyboardEvent).keyCode
-                    )
-                )
+                if (!['Enter', 'Space'].includes(
+                    (event as ReactKeyboardEvent).code
+                ))
                     return
 
                 event.preventDefault()
@@ -1435,12 +1427,9 @@ export const GenericInputInner = function<Type = unknown>(
         event?:ReactKeyboardEvent|ReactMouseEvent
     ):void => {
         if (event) {
-            if (
-                typeof (event as ReactKeyboardEvent).keyCode === 'number' &&
-                ![Tools.keyCode.ENTER, Tools.keyCode.SPACE].includes(
-                    (event as ReactKeyboardEvent).keyCode
-                )
-            )
+            if (!['Enter', 'Space'].includes(
+                (event as ReactKeyboardEvent).code
+            ))
                 return
 
             event.preventDefault()
@@ -2676,7 +2665,7 @@ GenericInput.renderProperties = renderProperties
 GenericInput.strict = false
 GenericInput.transformer = {
     boolean: {
-        parse: (value:number|string):boolean =>
+        parse: (value:boolean|number|string):boolean =>
             typeof value === 'boolean' ?
                 value :
                 new Map<number|string, boolean>([
