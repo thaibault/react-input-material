@@ -566,9 +566,12 @@ export const GenericInputInner = function<Type = unknown>(
             const handler = (
                 event:ReactKeyboardEvent|ReactMouseEvent
             ):void => {
-                if (!['Enter', 'Space'].includes(
-                    (event as ReactKeyboardEvent).code
-                ))
+                if (
+                    (event as ReactKeyboardEvent).code &&
+                    !['Enter', 'Space'].includes(
+                        (event as ReactKeyboardEvent).code
+                    )
+                )
                     return
 
                 event.preventDefault()
@@ -610,9 +613,12 @@ export const GenericInputInner = function<Type = unknown>(
             const handler = (
                 event:ReactKeyboardEvent|ReactMouseEvent
             ):void => {
-                if (!['Enter', 'Space'].includes(
-                    (event as ReactKeyboardEvent).code
-                ))
+                if (
+                    (event as ReactKeyboardEvent).code &&
+                    !['Enter', 'Space'].includes(
+                        (event as ReactKeyboardEvent).code
+                    )
+                )
                     return
 
                 event.preventDefault()
@@ -1427,9 +1433,12 @@ export const GenericInputInner = function<Type = unknown>(
         event?:ReactKeyboardEvent|ReactMouseEvent
     ):void => {
         if (event) {
-            if (!['Enter', 'Space'].includes(
-                (event as ReactKeyboardEvent).code
-            ))
+            if (
+                (event as ReactKeyboardEvent).code &&
+                !['Enter', 'Space'].includes(
+                    (event as ReactKeyboardEvent).code
+                )
+            )
                 return
 
             event.preventDefault()

@@ -25,6 +25,7 @@
         <link rel="stylesheet" href="../node_modules/@material/tab/dist/mdc.tab.css">
         <link rel="stylesheet" href="../node_modules/@material/tab-scroller/dist/mdc.tab-scroller.css">
         <link rel="stylesheet" href="../node_modules/@material/tab-indicator/dist/mdc.tab-indicator.css">
+
         <link rel="stylesheet" href="../node_modules/@material/ripple/dist/mdc.ripple.css">
         <!--endregion-->
         <style>
@@ -40,6 +41,10 @@
                 box-shadow: 0 8px 11px -2px rgba(0, 0, 0, .2);
             }
 
+            .mdc-tab-bar {
+                display: flex;
+            }
+
             .playground {
                 display: flex;
                 flex-direction: row;
@@ -51,13 +56,15 @@
                 flex-grow: 1;
             }
 
-            .playground__outputs {
-
+            .playground__outputs__bar {
+                visibility: hidden;
             }
 
-            .playground__outputs__bar {
+            .playground__outputs__content {
                 overflow: auto;
                 position: fixed;
+                top: 70px;
+                z-index: 1;
             }
 
             .file-input,

@@ -9,13 +9,15 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
  endregion */
-@import "./components/FileInput/import.module";
+@import "react-generic-animate/index.compiled.css";
+
+@import "./components/FileInput/import.module.css";
 /*
     Included in File Input:
 
     @import "./components/GenericInput/import.module";
 */
-@import "./components/RequireableCheckbox/import.module";
+@import "./components/RequireableCheckbox/import.module.css";
 
 @import "./material-fixes.css";
 /* region vim modline

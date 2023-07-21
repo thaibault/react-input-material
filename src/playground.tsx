@@ -160,13 +160,17 @@ const Application = () => {
                                     }
                                     {(value.blob as File).type ?
                                         <li>
-                                            Mime-Typ: {(value.blob as Blob).type}
+                                            Mime-Typ:
+                                            {(value.blob as Blob).type}
                                         </li> :
                                         ''
                                     }
-                                    {typeof (value.blob as File).size === 'number' ?
+                                    {(typeof (value.blob as File).size ===
+                                        'number'
+                                    ) ?
                                         <li>
-                                            Size: {(value.blob as Blob).size}
+                                            Size:
+                                            {(value.blob as Blob).size}
                                         </li> :
                                         ''
                                     }
@@ -243,7 +247,9 @@ const Application = () => {
 
                     <Input<number>
                         default={
-                            new Date('2025-01-01T00:00:00.000Z').getTime() / 1000
+                            new Date('2025-01-01T00:00:00.000Z')
+                                .getTime() /
+                            1000
                         }
                         name="input2"
                         onChange={onChange}
@@ -523,17 +529,18 @@ const Application = () => {
                         searchSelection
                         suggestionCreator={useMemorizedValue(
                             Tools.debounce<Array<string>>(
-                                (({query}:SuggestionCreatorOptions<InputProperties<
-                                    string
-                                >>):Array<string>|Promise<Array<string>> => {
+                                (({query}:SuggestionCreatorOptions<
+                                    InputProperties<string>
+                                >):Array<string>|Promise<Array<string>> => {
                                     if (!query || query.length < 3)
                                         return []
 
                                     return Tools.timeout(2000)
                                         .then(():Array<string> =>
                                             [
-                                                'hans with veeeeeeeeeeeeeeeery ' +
-                                                'loooooooooooooooong second name',
+                                                'hans with veeeeeeeeeeeeeeee' +
+                                                'ry loooooooooooooooong ' +
+                                                'second name',
                                                 'peter',
                                                 'klaus'
                                             ].filter((name:string):boolean =>
@@ -570,9 +577,9 @@ const Application = () => {
                         onChange={onChange}
                         placeholder="input14ModelPlaceholder"
                         suggestionCreator={useMemorizedValue(
-                            async ({query}:SuggestionCreatorOptions<InputProperties<
-                                string
-                            >>):Promise<Mapping> => {
+                            async ({query}:SuggestionCreatorOptions<
+                                InputProperties<string>
+                            >):Promise<Mapping> => {
                                 await Tools.timeout(500)
 
                                 const selection:Mapping = {
@@ -720,7 +727,9 @@ const Application = () => {
                         editor="richtext(raw)"
                         name="input18"
                         onChange={onChange}
-                        placeholder="Hello Mr. Smith,<br><br>this is a Placeholder."
+                        placeholder={
+                            'Hello Mr. Smith,<br><br>this is a Placeholder.'
+                        }
                         required
                         rows={2}
                         selectableEditor
@@ -791,10 +800,12 @@ const Application = () => {
                             type: 'float'
                         })}
                         onChange={onChange}
-                        transformer={useMemorizedValue({format: {final: {options: {
-                            maximumFractionDigits: 20,
-                            minimumFractionDigits: 2
-                        }}}})}
+                        transformer={useMemorizedValue({
+                            format: {final: {options: {
+                                maximumFractionDigits: 20,
+                                minimumFractionDigits: 2
+                            }}}}
+                        )}
                     />
 
                     <hr/>
@@ -833,7 +844,11 @@ const Application = () => {
                 >
                     <Inputs<FileValue, FileInputProps>
                         createItem={useMemorizedValue(
-                            ({index, item, properties: {name}}):FileInputProps =>
+                            ({
+                                index,
+                                item,
+                                properties: {name}
+                            }):FileInputProps =>
                                 ({...item, name: `${name}-${index + 1}`})
                         )}
                         model={useMemorizedValue({
@@ -964,7 +979,9 @@ const Application = () => {
                     />
                     <RequireableCheckbox
                         model={useMemorizedValue({
-                            name: 'checkbox2Model', mutable: false, nullable: false
+                            name: 'checkbox2Model',
+                            mutable: false,
+                            nullable: false
                         })}
                         onChange={onChange}
                     />
@@ -995,7 +1012,14 @@ const Application = () => {
 
             {selectedState ?
                 <div className="playground__outputs">
+                    {/*
+                        Add on version as a hidden spacer and one fixed version
+                         visible independently from current scroll position.
+                     */}
                     <pre className="playground__outputs__bar">
+                        {Tools.represent(selectedState)}
+                    </pre>
+                    <pre className="playground__outputs__content">
                         {Tools.represent(selectedState)}
                     </pre>
                 </div> :
