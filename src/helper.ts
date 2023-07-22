@@ -483,11 +483,11 @@ export function getRepresentationFromValueSelection(
  */
 export function getValueFromSelection<T>(
     label:ReactNode|string, selection:NormalizedSelection
-):null|T {
+):T {
     if (Array.isArray(selection))
         for (const value of selection) {
             if (
-                typeof (value as {label:string})?.label === 'string' &&
+                typeof (value as {label?:null|string})?.label === 'string' &&
                 (value as {label:string}).label === label
             )
                 return (value as unknown as {value:T}).value
@@ -501,7 +501,7 @@ export function getValueFromSelection<T>(
                 return (value as unknown as {value:T}).value
         }
 
-    return null
+    return null as T
 }
 /**
  * Normalize given selection. NOTE: It is important to have an ordered list
@@ -656,9 +656,9 @@ export const parseValue =
         InputType = T
     >(
         configuration:P,
-        value:null|InputType,
+        value:InputType|undefined,
         transformer:InputDataTransformation
-    ):null|T => {
+    ):T => {
         if (configuration.model.trim && typeof value === 'string')
             (value as string) = value.trim().replace(/ +\n/g, '\\n')
 
@@ -666,9 +666,9 @@ export const parseValue =
             configuration.model.emptyEqualsNull &&
             value as unknown as string === ''
         )
-            return null
+            return null as T
 
-        let result:null|T = value as unknown as null|T
+        let result = value as unknown as T
         if (
             ![null, undefined].includes(value as null) &&
             transformer[
@@ -681,10 +681,10 @@ export const parseValue =
                 ]!.parse as
                     unknown as
                     DataTransformSpecification<T, InputType>['parse']
-            )!(value as InputType, configuration, transformer)
+            )!(value!, configuration, transformer)
 
         if (typeof result === 'number' && isNaN(result))
-            return null
+            return null as T
 
         return result
     }

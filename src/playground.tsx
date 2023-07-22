@@ -53,12 +53,12 @@ const Application = () => {
             }
         )
     // region controlled state
-    const [value1, setValue1] = useState<FileValue|null>({
+    const [value1, setValue1] = useState<FileValue|undefined>({
         blob: new Blob(['test'], {type: 'text/plain'}),
         name: 'test.txt'
     })
     const onChangeValue1 =
-        useMemorizedValue<(value:FileValue|null) => void>(setValue1)
+        useMemorizedValue<(value?:FileValue) => void>(setValue1)
 
     const [value2, setValue2] = useState<null|string>('')
     const onChangeValue2 =
@@ -88,9 +88,9 @@ const Application = () => {
     const onChangeValue5 =
         useMemorizedValue<(value:IntervalValue|null) => void>(setValue5)
 
-    const [value6, setValue6] = useState<boolean|null>(false)
+    const [value6, setValue6] = useState<boolean>(false)
     const onChangeValue6 =
-        useMemorizedValue<(value:boolean|null) => void>(setValue6)
+        useMemorizedValue<(value:boolean) => void>(setValue6)
 
     const [value7, setValue7] =
         useState<Array<null|string>|null>(['first item'])
@@ -165,13 +165,8 @@ const Application = () => {
                                         </li> :
                                         ''
                                     }
-                                    {(typeof (value.blob as File).size ===
-                                        'number'
-                                    ) ?
-                                        <li>
-                                            Size:
-                                            {(value.blob as Blob).size}
-                                        </li> :
+                                    {value.blob instanceof Blob ?
+                                        <li>Size: {value.blob.size}</li> :
                                         ''
                                     }
                                 </ul> :
@@ -196,24 +191,24 @@ const Application = () => {
                         inputProperties={useMemorizedValue({outlined: true})}
                         onChange={onChange}
                     />
-                    <Input<string>
+                    <Input<null|string>
                         name="UnControlled"
                         onChange={onChange}
                         onChangeValue={onChangeValue2}
                         enforceUncontrolled={true}
                         value={value2}
                     />
-                    <Input<string>
+                    <Input<null|string>
                         name="controlled"
                         onChange={onChange}
                         onChangeValue={onChangeValue2}
                         triggerInitialPropertiesConsolidation={true}
                         value={value2}
                     />
-                    <Input<number>
+                    <Input<null|number>
                         name="controlled"
                         onChange={useMemorizedValue((
-                            properties:InputProperties<number>
+                            properties:InputProperties<null|number>
                         ) => {
                             onChange(properties)
                             onChangeValue3({
@@ -600,10 +595,10 @@ const Application = () => {
                             }
                         )}
                     />
-                    <Input<string>
+                    <Input<null|string>
                         name="controlled"
                         onChange={useMemorizedValue(
-                            (properties:InputProperties<string>):void => {
+                            (properties:InputProperties<null|string>) => {
                                 onChangeValue4({
                                     representation: properties.representation,
                                     value: properties.value
@@ -618,10 +613,10 @@ const Application = () => {
                         )}
                         value={value4.value}
                     />
-                    <Input<string>
+                    <Input<null|string>
                         name="controlled"
                         onChange={useMemorizedValue(
-                            (properties:InputProperties<string>):void => {
+                            (properties:InputProperties<null|string>) => {
                                 onChangeValue4({
                                     representation: properties.representation,
                                     value: properties.value

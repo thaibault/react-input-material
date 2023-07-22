@@ -1160,7 +1160,7 @@ export const GenericInputInner = function<Type = unknown>(
             )
 
         result.model.value = parseValue<Type>(
-            result, result.model.value as null|Type, transformer
+            result, result.model.value, transformer
         )
 
         determineValidationState<Type>(result, result.model.state)
@@ -1317,7 +1317,7 @@ export const GenericInputInner = function<Type = unknown>(
             )
             if (candidate === null) {
                 properties.value = parseValue<Type>(
-                    properties, properties.value as null|Type, transformer
+                    properties, properties.value, transformer
                 )
                 properties.representation = formatValue<Type>(
                     properties, properties.value, transformer
@@ -1477,7 +1477,7 @@ export const GenericInputInner = function<Type = unknown>(
      * @returns Nothing.
      */
     const onChangeValue = (
-        eventOrValue:GenericEvent|null|Type,
+        eventOrValue:GenericEvent|Type,
         editorInstance?:RichTextEditor,
         selectedIndex = -1
     ):void => {
@@ -1490,10 +1490,10 @@ export const GenericInputInner = function<Type = unknown>(
                 (eventOrValue as GenericEvent).detail as HTMLInputElement
             if (target)
                 properties.value = typeof target.value === 'undefined' ?
-                    null :
-                    target.value as unknown as Type
+                    null as Type :
+                    target.value as Type
             else
-                properties.value = eventOrValue as null|Type
+                properties.value = eventOrValue as Type
         } else
             properties.value = eventOrValue
 
@@ -1624,7 +1624,7 @@ export const GenericInputInner = function<Type = unknown>(
                 })
 
                 if (selectedIndex === -1) {
-                    const result:null|Type = getValueFromSelection<Type>(
+                    const result:Type = getValueFromSelection<Type>(
                         properties.representation, normalizeSelection(results)!
                     )
 
@@ -1633,7 +1633,7 @@ export const GenericInputInner = function<Type = unknown>(
                     else
                         properties.value = parseValue<Type>(
                             properties,
-                            properties.representation as unknown as null|Type,
+                            properties.representation as unknown as Type,
                             transformer
                         )
                 }
@@ -1700,7 +1700,7 @@ export const GenericInputInner = function<Type = unknown>(
                 else
                     properties.value = parseValue<Type>(
                         properties,
-                        properties.representation as unknown as null|Type,
+                        properties.representation as unknown as Type,
                         transformer
                     )
             }

@@ -95,7 +95,7 @@ export type BaseSelection =
     Array<BaseSelectionMapping>|Array<unknown>|Mapping<unknown>
 export interface CommonBaseModel<Type = unknown> {
     declaration:string
-    default:unknown
+    default?:Type
     description:string
     emptyEqualsNull:boolean
     maximum:number
@@ -106,7 +106,7 @@ export interface CommonBaseModel<Type = unknown> {
     selection?:BaseSelection
     trim:boolean
     type:TypeSpecification
-    value?:null|Type
+    value?:Type
 }
 export interface ModelState {
     dirty:boolean
@@ -133,12 +133,6 @@ export interface BaseModel<T = unknown> extends CommonBaseModel<T> {
     nullable:boolean
 
     state:ModelState
-}
-export interface CommonModel<T = unknown> extends CommonBaseModel<T> {
-    default:null|T
-}
-export interface Model<T = unknown> extends BaseModel<T> {
-    default:null|T
 }
 //// endregion
 export type Selection = Array<boolean|number>|SelectProps['options']
@@ -198,7 +192,7 @@ export type DefaultBaseProperties<T = unknown> =
 export interface TypedProperties<T = unknown> extends BaseProperties<T> {
     initialValue:null|T
 
-    model:Model<T>
+    model:BaseModel<T>
 
     onBlur:(event:GenericEvent|undefined, properties:this) => void
     onChange:(properties:this, event?:GenericEvent) => void
@@ -209,24 +203,24 @@ export interface TypedProperties<T = unknown> extends BaseProperties<T> {
         state:ModelState, event:GenericEvent|undefined, properties:this
     ) => void
     onChangeValue:(
-        value:null|T, event:GenericEvent|undefined, properties:this
+        value:T, event:GenericEvent|undefined, properties:this
     ) => void
     onClick:(event:MouseEvent, properties:this) => void
     onFocus:(event:FocusEvent, properties:this) => void
     onTouch:(event:GenericEvent, properties:this) => void
 }
-export type Properties<T = unknown> = TypedProperties<T> & CommonModel<T>
+export type Properties<T = unknown> = TypedProperties<T> & CommonBaseModel<T>
 export type Props<T = unknown> =
     Partial<Omit<Properties<T>, 'model'>> &
     {
         model?:Partial<
-            Omit<Model<T>, 'state'> &
+            Omit<BaseModel<T>, 'state'> &
             {state:Partial<ModelState>}
         >
     }
 
 export type DefaultProperties<T = unknown> =
-    Omit<Props<T>, 'model'> & {model:Model<T>}
+    Omit<Props<T>, 'model'> & {model:BaseModel<T>}
 //// region state
 export interface State<T = unknown> {
     modelState?:ModelState
@@ -400,12 +394,11 @@ export const defaultModelState:ModelState = {
     touched: false,
     untouched: true
 } as const
-export const defaultModel:Model<string> = {
+export const defaultModel:BaseModel<string> = {
     declaration: '',
     description: '',
     name: 'NO_NAME_DEFINED',
 
-    default: null,
     emptyEqualsNull: true,
 
     regularExpressionPattern: undefined,
@@ -457,7 +450,7 @@ export interface CheckboxProperties extends Properties<boolean> {
     checked:boolean
     id:string
 }
-export type CheckboxModel = Model<boolean>
+export type CheckboxModel = BaseModel<boolean>
 export type CheckboxModelState = ModelState
 export type CheckboxValueState = ValueState<boolean, CheckboxModelState>
 export type CheckboxProps =
@@ -565,7 +558,7 @@ export interface InputModelState extends ModelState {
     invalidInvertedPattern:boolean
     invalidPattern:boolean
 }
-export interface InputModel<T = unknown> extends Model<T> {
+export interface InputModel<T = unknown> extends BaseModel<T> {
     state:InputModelState
 }
 export interface InputValueState<T = unknown, MS = ModelState> extends
@@ -885,11 +878,11 @@ export type FileRepresentationType =
     'binary'|'image'|'renderableText'|'text'|'video'
 export type BlobType = Blob|Buffer|string
 export interface FileValue {
-    blob?:null|Partial<BlobType>
-    hash?:null|string
-    name?:null|string
-    source?:null|string
-    url?:null|string
+    blob?:Partial<BlobType>
+    hash?:string
+    name?:string
+    source?:string
+    url?:string
 }
 export interface FileInputValueState<Type = FileValue> extends
     ValueState<Type, FileInputModelState>
@@ -905,7 +898,7 @@ export interface FileInputModelState extends ModelState {
 
     invalidName:boolean
 }
-export interface FileInputModel<Type = FileValue> extends Model<Type> {
+export interface FileInputModel<Type = FileValue> extends BaseModel<Type> {
     contentTypeRegularExpressionPattern:Array<RegExp|string>|null|RegExp|string
     invertedContentTypeRegularExpressionPattern:(
         Array<RegExp|string>|null|RegExp|string
@@ -1053,7 +1046,7 @@ export const defaultFileInputModelState:FileInputModelState = {
     invalidName: false
 } as const
 export const defaultFileInputModel:FileInputModel = {
-    ...defaultModel as Model<FileValue>,
+    ...defaultModel as BaseModel<FileValue>,
 
     contentTypeRegularExpressionPattern: /^.+\/.+$/,
     invertedContentTypeRegularExpressionPattern: null,
@@ -1158,7 +1151,7 @@ export interface InputsModelState extends ModelState {
     invalidMinimumNumber:boolean
 }
 export interface InputsModel<T, P extends InputsPropertiesItem<T>> extends
-    Model<Array<P>>
+    BaseModel<Array<P>>
 {
     maximumNumber:number
     minimumNumber:number
@@ -1192,10 +1185,10 @@ export interface InputsProperties<
     model:InputsModel<T, P>
 
     onChangeValue:(
-        values:Array<null|T>|null, event:unknown, properties:this
+        values:Array<T>|null, event:unknown, properties:this
     ) => void
 
-    value:Array<P>|null
+    value?:Array<P>
 
     writable:boolean
 }
