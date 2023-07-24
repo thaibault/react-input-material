@@ -233,26 +233,26 @@ export function determineInitialRepresentation<
  */
 export const determineInitialValue = <Type = unknown>(
     properties:BaseProps,
-    defaultValue?:null|Type,
-    alternateValue?:null|Type
+    defaultValue?:Type,
+    alternateValue?:Type
 ):null|Type => {
     if (alternateValue !== undefined)
         return alternateValue
 
     if (properties.value !== undefined)
-        return properties.value as null|Type
+        return properties.value as Type
 
     if (properties.model?.value !== undefined)
-        return properties.model.value as null|Type
+        return properties.model.value as Type
 
     if (properties.initialValue !== undefined)
-        return Tools.copy(properties.initialValue as null|Type)
+        return Tools.copy(properties.initialValue as Type)
 
     if (properties.default !== undefined)
-        return Tools.copy(properties.default as null|Type)
+        return Tools.copy(properties.default as Type)
 
     if (properties.model?.default !== undefined)
-        return Tools.copy(properties.model.default as null|Type)
+        return Tools.copy(properties.model.default as Type)
 
     if (defaultValue !== undefined)
         return defaultValue

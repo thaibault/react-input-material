@@ -42,9 +42,14 @@ import {
 Tools.locales.push('de-DE')
 Input.transformer.currency.format!.final.options = {currency: 'EUR'}
 
+const SECTIONS = [
+    'file-input', 'input', 'inputs', 'interval', 'requireable-checkbox'
+] as const
+
 const Application = () => {
     const [selectedState, setSelectedState] = useState<unknown>()
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
+    const activeSection = SECTIONS[activeTabIndex]
 
     const onChange:((properties:{model:unknown}) => void) =
         useMemorizedValue<(properties:{model:unknown}) => void>(
@@ -102,16 +107,14 @@ const Application = () => {
         <div className="tab-bar">
             <TabBar
                 activeTabIndex={activeTabIndex}
-                onActivate={(event:TabBarOnActivateEventT):void => {
+                onActivate={(event:TabBarOnActivateEventT) => {
                     if (event.detail.index !== activeTabIndex)
                         setActiveTabIndex(event.detail.index)
                 }}
             >
-                <Tab>file-input</Tab>
-                <Tab>input</Tab>
-                <Tab>inputs</Tab>
-                <Tab>interval</Tab>
-                <Tab>requireable-checkbox</Tab>
+                {SECTIONS.map((name) =>
+                    <Tab>{name}</Tab>)
+                }
             </TabBar>
         </div>
         {/* endregion */}
@@ -120,7 +123,11 @@ const Application = () => {
                 {/* region file-input */}
                 <div
                     className="playground__inputs__file-input"
-                    style={{display: activeTabIndex === 0 ? 'block' : 'none'}}
+                    style={{
+                        display: activeSection === 'file-input' ?
+                            'block' :
+                            'none'
+                    }}
                 >
                     <FileInput onChange={onChange} />
                     <FileInput
@@ -185,7 +192,11 @@ const Application = () => {
                 {/* region input */}
                 <div
                     className="playground__inputs__input"
-                    style={{display: activeTabIndex === 1 ? 'block' : 'none'}}
+                    style={{
+                        display: activeSection === 'input' ?
+                            'block' :
+                            'none'
+                    }}
                 >
                     <Input<string>
                         inputProperties={useMemorizedValue({outlined: true})}
@@ -835,7 +846,11 @@ const Application = () => {
                 {/* region inputs */}
                 <div
                     className="playground__inputs__inputs"
-                    style={{display: activeTabIndex === 2 ? 'block' : 'none'}}
+                    style={{
+                        display: activeSection === 'inputs' ?
+                            'block' :
+                            'none'
+                    }}
                 >
                     <Inputs<FileValue, FileInputProps>
                         createItem={useMemorizedValue(
@@ -878,7 +893,9 @@ const Application = () => {
                             <RequireableCheckbox {...properties} />
                         )}
                     </Inputs>
-                    <Inputs<IntervalConfiguration|IntervalValue, IntervalProps>
+                    <Inputs<
+                        IntervalConfiguration|IntervalValue|null, IntervalProps
+                    >
                         createItem={useMemorizedValue(
                             ({index, item, properties: {name}}):IntervalProps =>
                                 ({...item, name: `${name}-${index + 1}`})
@@ -909,7 +926,10 @@ const Application = () => {
                 {/* region interval */}
                 <div
                     className="playground__inputs__interval"
-                    style={{display: activeTabIndex === 3 ? 'block' : 'none'}}
+                    style={{
+                        display: activeSection === 'interval' ?
+                            'block' : 'none'
+                    }}
                 >
                     <Interval
                         onChange={onChange}
@@ -940,7 +960,11 @@ const Application = () => {
                 {/* region requireable-checkbox */}
                 <div
                     className="playground__inputs__requireable-checkbox"
-                    style={{display: activeTabIndex === 5 ? 'block' : 'none'}}
+                    style={{
+                        display: activeSection === 'requireable-checkbox' ?
+                            'block' :
+                            'none'
+                    }}
                 >
                     <RequireableCheckbox onChange={onChange} />
                     <RequireableCheckbox

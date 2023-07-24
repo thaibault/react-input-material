@@ -27,6 +27,7 @@ import {
     memo as memorize,
     MutableRefObject,
     ReactElement,
+    ReactNode,
     useImperativeHandle,
     useEffect,
     useState
@@ -93,10 +94,10 @@ const getPrototype = function<T, P extends InputsPropertiesItem<T>>(
 }
 const inputPropertiesToValues = function<
     T, P extends InputsPropertiesItem<T>
->(inputProperties:Array<P>|null):Array<T|null|undefined>|null {
+>(inputProperties:Array<P>|null):Array<T>|null {
     return Array.isArray(inputProperties) ?
-        inputProperties.map(({model, value}):null|T|undefined =>
-            typeof value === 'undefined' ? model?.value : value
+        inputProperties.map(({model, value}):T =>
+            typeof value === 'undefined' ? model?.value as T : value
         ) :
         inputProperties
 }
@@ -117,23 +118,28 @@ const getModelState = function<T, P extends InputsPropertiesItem<T>>(
     const valid:boolean = validMaximumNumber && validMinimumNumber
 
     return {
-        dirty: properties.some(unpack('dirty')),
-        focused: properties.some(unpack('focused')),
         invalid: !valid || properties.some(unpack('invalid', true)),
+        valid: valid && properties.every(unpack('valid')),
+
         invalidMaximumNumber: !validMaximumNumber,
         invalidMinimumNumber: !validMinimumNumber,
+
         invalidRequired: properties.some(unpack('invalidRequired')),
+
+        dirty: properties.some(unpack('dirty')),
         pristine: properties.every(unpack('pristine', true)),
+
         touched: properties.some(unpack('touched')),
         untouched: properties.every(unpack('untouched', true)),
-        valid: valid && properties.every(unpack('valid')),
+
+        focused: properties.some(unpack('focused')),
         visited: properties.some(unpack('visited'))
     }
 }
 const getExternalProperties = function<T, P extends InputsPropertiesItem<T>>(
     properties:InputsProperties<T, P>
 ):InputsProperties<T, P> {
-    const modelState:ModelState = getModelState<T, P>(properties)
+    const modelState = getModelState<T, P>(properties)
 
     return {
         ...properties,
@@ -202,12 +208,12 @@ export const InputsInner = function<
         }
     })
 
-    let [values, setValues] = useState<Array<null|T|undefined>|null>(
+    let [values, setValues] = useState<Array<T>|null>(
         inputPropertiesToValues<T, P>(
-            determineInitialValue<Array<P>>(
+            determineInitialValue<Array<P>|null>(
                 givenProps,
                 Tools.copy(Inputs.defaultProperties.model?.default) as
-                    Array<P>|null|undefined
+                    Array<P>|null
             ) ||
             null
         )
@@ -256,15 +262,13 @@ export const InputsInner = function<
         )
 
     const triggerOnChange = (
-        values:Array<null|T|undefined>|null,
+        values?:Array<T>|null,
         event?:GenericEvent,
         inputProperties?:Partial<P>,
         index?:number
     ):void => {
         if (values)
-            properties.value = values.map((
-                _:null|T|undefined, index:number
-            ):P =>
+            properties.value = values.map((_:T, index):P =>
                 references[index]?.current?.properties ||
                 (properties.value as Array<P>)[index]
             )
@@ -296,16 +300,16 @@ export const InputsInner = function<
         )
     }
     const triggerOnChangeValue = (
-        values:Array<null|T|undefined>|null,
-        event?:GenericEvent,
-        value?:null|T,
+        values:Array<T>|null,
+        event:GenericEvent|undefined,
+        value:T,
         index?:number
-    ):Array<null|T|undefined>|null => {
+    ):Array<T>|null => {
         if (values === null)
             values = []
 
         if (typeof index === 'number')
-            if (value === undefined)
+            if (value === null)
                 values.splice(index, 1)
             else
                 values[index] = value
@@ -364,12 +368,11 @@ export const InputsInner = function<
                         inputProperties,
                         index
                     ),
-                onChangeValue: (value:null|T, event?:GenericEvent):void =>
-                    setValues((
-                        values:Array<null|T|undefined>|null
-                    ):Array<null|T|undefined>|null =>
+                onChangeValue: (value:T, event?:GenericEvent) => {
+                    setValues((values:Array<T>|null):Array<T>|null =>
                         triggerOnChangeValue(values, event, value, index)
-                    ),
+                    )
+                },
                 ref: reference
             },
             (
@@ -405,8 +408,7 @@ export const InputsInner = function<
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValues =
-            createDummyStateSetter<Array<null|T|undefined>|null>(values)
+        setValues = createDummyStateSetter<Array<T>|null>(values)
 
     properties.invalidMaximumNumber =
         properties.model.state.invalidMaximumNumber =
@@ -427,8 +429,8 @@ export const InputsInner = function<
     )
 
     const add = (event?:GenericEvent):void => setValues((
-        values:Array<null|T|undefined>|null
-    ):Array<null|T|undefined> => {
+        values:Array<T>|null
+    ):Array<T>|null => {
         const newProperties:Partial<P> = properties.createPrototype({
             index: values?.length || 0,
             item: getPrototype<T, P>(properties),
@@ -439,11 +441,11 @@ export const InputsInner = function<
 
         triggerOnChange(values, event, newProperties)
 
-        const result:Array<null|T|undefined> = triggerOnChangeValue(
+        const result = triggerOnChangeValue(
             values,
             event,
-            newProperties.value ?? newProperties.model?.value ?? null
-        ) as Array<null|T|undefined>
+            (newProperties.value ?? newProperties.model?.value ?? null) as T
+        )
 
         /**
          * NOTE: new Properties are not yet consolidated by nested input
@@ -454,10 +456,8 @@ export const InputsInner = function<
         return result
     })
     const createRemove = (index:number) => (event?:GenericEvent):void =>
-        setValues((
-            values:Array<null|T|undefined>|null
-        ):Array<null|T|undefined>|null => {
-            values = triggerOnChangeValue(values, event, undefined, index)
+        setValues((values:Array<T>|null):Array<T>|null => {
+            values = triggerOnChangeValue(values, event, null as T, index)
             triggerOnChange(values, event, undefined, index)
             return values
         })
@@ -470,7 +470,7 @@ export const InputsInner = function<
     />
     const renderInput = (
         inputProperties:Partial<P>, index:number
-    ):ReactElement =>
+    ):ReactNode =>
         Tools.isFunction(properties.children) ?
             properties.children({
                 index,
@@ -496,9 +496,9 @@ export const InputsInner = function<
             style={properties.styles}
         >
             {properties.value ?
-                (properties.value).map((
-                    inputProperties:P, index:number
-                ):ReactElement =>
+                properties.value.map((
+                    inputProperties:P, index
+                ):ReactNode =>
                     <div className={CSS_CLASS_NAMES.inputs__item} key={index}>
                         {renderInput(inputProperties, index)}
 

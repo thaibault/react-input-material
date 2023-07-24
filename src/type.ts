@@ -95,17 +95,24 @@ export type BaseSelection =
     Array<BaseSelectionMapping>|Array<unknown>|Mapping<unknown>
 export interface CommonBaseModel<Type = unknown> {
     declaration:string
-    default?:Type
     description:string
-    emptyEqualsNull:boolean
-    maximum:number
-    maximumLength:number
-    minimum:number
-    minimumLength:number
     name:string
+
+    default?:Type
+
+    emptyEqualsNull:boolean
+
+    maximum:number
+    minimum:number
+
+    maximumLength:number
+    minimumLength:number
+
     selection?:BaseSelection
-    trim:boolean
     type:TypeSpecification
+
+    trim:boolean
+
     value?:Type
 }
 export interface ModelState {
@@ -152,7 +159,7 @@ CommonBaseModel<T>, ModelState {
     label:string
     name:string
 
-    initialValue:unknown
+    initialValue:T
 
     model:BaseModel<T>
 
@@ -190,11 +197,12 @@ export type DefaultBaseProperties<T = unknown> =
     Omit<BaseProps<T>, 'model'> & {model:BaseModel<T>}
 
 export interface TypedProperties<T = unknown> extends BaseProperties<T> {
-    initialValue:null|T
+    initialValue:T
 
     model:BaseModel<T>
 
     onBlur:(event:GenericEvent|undefined, properties:this) => void
+
     onChange:(properties:this, event?:GenericEvent) => void
     onChangeShowDeclaration:(
         show:boolean, event:GenericEvent|undefined, properties:this
@@ -205,11 +213,13 @@ export interface TypedProperties<T = unknown> extends BaseProperties<T> {
     onChangeValue:(
         value:T, event:GenericEvent|undefined, properties:this
     ) => void
+
     onClick:(event:MouseEvent, properties:this) => void
     onFocus:(event:FocusEvent, properties:this) => void
     onTouch:(event:GenericEvent, properties:this) => void
 }
-export type Properties<T = unknown> = TypedProperties<T> & CommonBaseModel<T>
+export type Properties<T = unknown> =
+    TypedProperties<T> & CommonBaseModel<T>
 export type Props<T = unknown> =
     Partial<Omit<Properties<T>, 'model'>> &
     {
@@ -1126,14 +1136,14 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 export interface InputsPropertiesItem<T, TS = unknown> {
     model?:{
         state?:TS
-        value?:null|T
+        value?:T
     }
-    value?:null|T
+    value?:T
 }
 export interface InputsCreateOptions<T, IP> {
     index:number
     properties:IP
-    values:Array<null|T|undefined>|null
+    values?:Array<T>|null
 }
 export interface InputsCreateItemOptions<
     T, P extends InputsPropertiesItem<T>, IP
@@ -1151,7 +1161,7 @@ export interface InputsModelState extends ModelState {
     invalidMinimumNumber:boolean
 }
 export interface InputsModel<T, P extends InputsPropertiesItem<T>> extends
-    BaseModel<Array<P>>
+    BaseModel<Array<P>|null>
 {
     maximumNumber:number
     minimumNumber:number
@@ -1170,11 +1180,11 @@ export interface InputsChildrenOptions<
 }
 export interface InputsProperties<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
-> extends InputsModelState, Omit<Properties<Array<P>>, 'onChangeValue'> {
+> extends InputsModelState, Omit<Properties<Array<P>|null>, 'onChangeValue'> {
     addIcon:IconOptions
     removeIcon:IconOptions
 
-    children:(options:InputsChildrenOptions<T, P, this>) => ReactElement
+    children:(options:InputsChildrenOptions<T, P, this>) => ReactNode
 
     createItem:(options:InputsCreateItemOptions<T, P, this>) => P
     createPrototype:(options:InputsCreatePrototypeOptions<T, P, this>) => P
@@ -1188,7 +1198,7 @@ export interface InputsProperties<
         values:Array<T>|null, event:unknown, properties:this
     ) => void
 
-    value?:Array<P>
+    value:Array<P>|null
 
     writable:boolean
 }
@@ -1201,7 +1211,7 @@ export type InputsProps<
             Omit<InputsModel<T, P>, 'state'> &
             {state:Partial<InputsModelState>}
         >
-        value?:Array<Partial<P>>|Array<null|T|undefined>|null
+        value?:Array<Partial<P>>|Array<T>|null
     }
 
 export type DefaultInputsProperties<
@@ -1289,8 +1299,8 @@ export interface IntervalValue {
 }
 
 export interface IntervalConfiguration {
-    end:InputModel<number>|InputProps<number>
-    start:InputModel<number>|InputProps<number>
+    end:InputModel<null|number>|InputProps<null|number>
+    start:InputModel<null|number>|InputProps<null|number>
 }
 
 export type IntervalModelState = ModelState
@@ -1298,13 +1308,13 @@ export interface IntervalModel {
     name:string
     state:IntervalModelState
     value:{
-        end:InputModel<number>
-        start:InputModel<number>
+        end:InputModel<null|number>
+        start:InputModel<null|number>
     }
 }
 
 export interface IntervalProperties extends Omit<
-    InputProperties<number>,
+    InputProperties<null|number>,
     'icon'|'model'|'onChange'|'onChangeValue'|'value'
 > {
     icon:IconOptions
@@ -1312,17 +1322,18 @@ export interface IntervalProperties extends Omit<
     model:IntervalModel
 
     onChange:(properties:this, event?:GenericEvent) => void
-    onChangeValue:(value:null|IntervalValue, event?:GenericEvent) => void
+    onChangeValue:(value:IntervalValue|null, event?:GenericEvent) => void
 
     value:IntervalConfiguration
 }
 export type IntervalProps =
     Omit<
-        InputProps<number>, 'icon'|'model'|'onChange'|'onChangeValue'|'value'
+        InputProps<null|number>,
+        'icon'|'model'|'onChange'|'onChangeValue'|'value'
     > &
     Partial<{
-        end:InputProps<number>
-        start:InputProps<number>
+        end:InputProps<null|number>
+        start:InputProps<null|number>
 
         icon:IntervalProperties['icon']
 
@@ -1345,8 +1356,8 @@ export type IntervalAdapter =
     ComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
 export interface IntervalAdapterWithReferences extends IntervalAdapter {
     references:{
-        end:MutableRefObject<InputAdapterWithReferences<number>|null>
-        start:MutableRefObject<InputAdapterWithReferences<number>|null>
+        end:MutableRefObject<InputAdapterWithReferences<null|number>|null>
+        start:MutableRefObject<InputAdapterWithReferences<null|number>|null>
     }
 }
 
