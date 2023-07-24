@@ -447,9 +447,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      * @returns Nothing.
      */
     const onChangeValue = (
-        eventSourceOrName:null|Partial<Type>|string|SyntheticEvent,
-        event?:SyntheticEvent|undefined,
-        inputProperties?:InputProperties<string>|undefined,
+        eventSourceOrName?:Partial<Type>|string|SyntheticEvent,
+        event?:SyntheticEvent,
+        inputProperties?:InputProperties<string>,
         attachBlobProperty = false
     ):void => {
         if (!(properties.model.mutable && properties.model.writable))
@@ -489,7 +489,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         }
 
         setValueState((oldValueState:ValueState<Type>):ValueState<Type> => {
-            if (eventSourceOrName === null)
+            if (typeof eventSourceOrName === 'undefined')
                 properties.value = eventSourceOrName
             else if (typeof eventSourceOrName === 'string')
                 /*
@@ -555,7 +555,6 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                     properties
                 )
             }
-
 
             if (attachBlobProperty)
                 result.attachBlobProperty = true
@@ -977,17 +976,15 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                         }
                         {properties.value ?
                             <>
-                                {!properties.disabled ?
+                                {properties.disabled ?
+                                    '' :
                                     <CardActionButton
-                                        onClick={
-                                            ():void => onChangeValue(null)
-                                        }
+                                        onClick={() => onChangeValue()}
                                         ref={deleteButtonReference}
                                         ripple={properties.ripple}
                                     >
                                         {properties.deleteButton}
-                                    </CardActionButton> :
-                                    ''
+                                    </CardActionButton>
                                 }
                                 {properties.value.url ?
                                     <CardActionButton

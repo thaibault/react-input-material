@@ -42,9 +42,14 @@ import {
 Tools.locales.push('de-DE')
 Input.transformer.currency.format!.final.options = {currency: 'EUR'}
 
+const SECTIONS = [
+    'file-input', 'input', 'inputs', 'interval', 'requireable-checkbox'
+] as const
+
 const Application = () => {
     const [selectedState, setSelectedState] = useState<unknown>()
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
+    const activeSection = SECTIONS[activeTabIndex]
 
     const onChange:((properties:{model:unknown}) => void) =
         useMemorizedValue<(properties:{model:unknown}) => void>(
@@ -53,12 +58,12 @@ const Application = () => {
             }
         )
     // region controlled state
-    const [value1, setValue1] = useState<FileValue|null>({
+    const [value1, setValue1] = useState<FileValue|undefined>({
         blob: new Blob(['test'], {type: 'text/plain'}),
         name: 'test.txt'
     })
     const onChangeValue1 =
-        useMemorizedValue<(value:FileValue|null) => void>(setValue1)
+        useMemorizedValue<(value?:FileValue) => void>(setValue1)
 
     const [value2, setValue2] = useState<null|string>('')
     const onChangeValue2 =
@@ -88,9 +93,9 @@ const Application = () => {
     const onChangeValue5 =
         useMemorizedValue<(value:IntervalValue|null) => void>(setValue5)
 
-    const [value6, setValue6] = useState<boolean|null>(false)
+    const [value6, setValue6] = useState<boolean>(false)
     const onChangeValue6 =
-        useMemorizedValue<(value:boolean|null) => void>(setValue6)
+        useMemorizedValue<(value:boolean) => void>(setValue6)
 
     const [value7, setValue7] =
         useState<Array<null|string>|null>(['first item'])
@@ -102,16 +107,14 @@ const Application = () => {
         <div className="tab-bar">
             <TabBar
                 activeTabIndex={activeTabIndex}
-                onActivate={(event:TabBarOnActivateEventT):void => {
+                onActivate={(event:TabBarOnActivateEventT) => {
                     if (event.detail.index !== activeTabIndex)
                         setActiveTabIndex(event.detail.index)
                 }}
             >
-                <Tab>file-input</Tab>
-                <Tab>input</Tab>
-                <Tab>inputs</Tab>
-                <Tab>interval</Tab>
-                <Tab>requireable-checkbox</Tab>
+                {SECTIONS.map((name) =>
+                    <Tab>{name}</Tab>)
+                }
             </TabBar>
         </div>
         {/* endregion */}
@@ -120,7 +123,11 @@ const Application = () => {
                 {/* region file-input */}
                 <div
                     className="playground__inputs__file-input"
-                    style={{display: activeTabIndex === 0 ? 'block' : 'none'}}
+                    style={{
+                        display: activeSection === 'file-input' ?
+                            'block' :
+                            'none'
+                    }}
                 >
                     <FileInput onChange={onChange} />
                     <FileInput
@@ -165,13 +172,8 @@ const Application = () => {
                                         </li> :
                                         ''
                                     }
-                                    {(typeof (value.blob as File).size ===
-                                        'number'
-                                    ) ?
-                                        <li>
-                                            Size:
-                                            {(value.blob as Blob).size}
-                                        </li> :
+                                    {value.blob instanceof Blob ?
+                                        <li>Size: {value.blob.size}</li> :
                                         ''
                                     }
                                 </ul> :
@@ -190,30 +192,34 @@ const Application = () => {
                 {/* region input */}
                 <div
                     className="playground__inputs__input"
-                    style={{display: activeTabIndex === 1 ? 'block' : 'none'}}
+                    style={{
+                        display: activeSection === 'input' ?
+                            'block' :
+                            'none'
+                    }}
                 >
                     <Input<string>
                         inputProperties={useMemorizedValue({outlined: true})}
                         onChange={onChange}
                     />
-                    <Input<string>
+                    <Input<null|string>
                         name="UnControlled"
                         onChange={onChange}
                         onChangeValue={onChangeValue2}
                         enforceUncontrolled={true}
                         value={value2}
                     />
-                    <Input<string>
+                    <Input<null|string>
                         name="controlled"
                         onChange={onChange}
                         onChangeValue={onChangeValue2}
                         triggerInitialPropertiesConsolidation={true}
                         value={value2}
                     />
-                    <Input<number>
+                    <Input<null|number>
                         name="controlled"
                         onChange={useMemorizedValue((
-                            properties:InputProperties<number>
+                            properties:InputProperties<null|number>
                         ) => {
                             onChange(properties)
                             onChangeValue3({
@@ -600,10 +606,10 @@ const Application = () => {
                             }
                         )}
                     />
-                    <Input<string>
+                    <Input<null|string>
                         name="controlled"
                         onChange={useMemorizedValue(
-                            (properties:InputProperties<string>):void => {
+                            (properties:InputProperties<null|string>) => {
                                 onChangeValue4({
                                     representation: properties.representation,
                                     value: properties.value
@@ -618,10 +624,10 @@ const Application = () => {
                         )}
                         value={value4.value}
                     />
-                    <Input<string>
+                    <Input<null|string>
                         name="controlled"
                         onChange={useMemorizedValue(
-                            (properties:InputProperties<string>):void => {
+                            (properties:InputProperties<null|string>) => {
                                 onChangeValue4({
                                     representation: properties.representation,
                                     value: properties.value
@@ -840,7 +846,11 @@ const Application = () => {
                 {/* region inputs */}
                 <div
                     className="playground__inputs__inputs"
-                    style={{display: activeTabIndex === 2 ? 'block' : 'none'}}
+                    style={{
+                        display: activeSection === 'inputs' ?
+                            'block' :
+                            'none'
+                    }}
                 >
                     <Inputs<FileValue, FileInputProps>
                         createItem={useMemorizedValue(
@@ -883,7 +893,9 @@ const Application = () => {
                             <RequireableCheckbox {...properties} />
                         )}
                     </Inputs>
-                    <Inputs<IntervalConfiguration|IntervalValue, IntervalProps>
+                    <Inputs<
+                        IntervalConfiguration|IntervalValue|null, IntervalProps
+                    >
                         createItem={useMemorizedValue(
                             ({index, item, properties: {name}}):IntervalProps =>
                                 ({...item, name: `${name}-${index + 1}`})
@@ -914,7 +926,10 @@ const Application = () => {
                 {/* region interval */}
                 <div
                     className="playground__inputs__interval"
-                    style={{display: activeTabIndex === 3 ? 'block' : 'none'}}
+                    style={{
+                        display: activeSection === 'interval' ?
+                            'block' : 'none'
+                    }}
                 >
                     <Interval
                         onChange={onChange}
@@ -945,7 +960,11 @@ const Application = () => {
                 {/* region requireable-checkbox */}
                 <div
                     className="playground__inputs__requireable-checkbox"
-                    style={{display: activeTabIndex === 5 ? 'block' : 'none'}}
+                    style={{
+                        display: activeSection === 'requireable-checkbox' ?
+                            'block' :
+                            'none'
+                    }}
                 >
                     <RequireableCheckbox onChange={onChange} />
                     <RequireableCheckbox
@@ -1014,7 +1033,7 @@ const Application = () => {
                 <div className="playground__outputs">
                     {/*
                         Add on version as a hidden spacer and one fixed version
-                         visible independently from current scroll position.
+                        visible independently from current scroll position.
                      */}
                     <pre className="playground__outputs__bar">
                         {Tools.represent(selectedState)}
