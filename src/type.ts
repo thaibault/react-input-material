@@ -574,7 +574,7 @@ export interface InputModel<T = unknown> extends BaseModel<T> {
 export interface InputValueState<T = unknown, MS = ModelState> extends
     ValueState<T, MS>
 {
-    representation?:ReactNode|string
+    representation?:ReactNode
 }
 export type NativeInputType = (
     'date' |
@@ -634,20 +634,30 @@ export interface InputProperties<T = unknown> extends
         'richtext(advanced)'
     )
     editorIsActive:boolean
+
     hidden:boolean
+
     icon:string|(IconOptions & {tooltip?:string|TooltipProps})
+    trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
+
     inputProperties:Partial<
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     >
     inputProps:Mapping<boolean|number|string>
+
     invertedPattern:Array<RegExp|string>|null|RegExp|string
     invertedPatternText:string
+
     labels:Array<[string, string]>|Array<string>|Mapping
+
     maximumLengthText:string
-    maximumText:string
     minimumLengthText:string
+
+    maximumText:string
     minimumText:string
+
     model:InputModel<T>
+
     onChangeEditorIsActive:(
         isActive:boolean, event:MouseEvent|undefined, properties:this
     ) => void
@@ -655,19 +665,26 @@ export interface InputProperties<T = unknown> extends
     onKeyUp:(event:KeyboardEvent, properties:this) => void
     onSelect:(event:GenericEvent, properties:this) => void
     onSelectionChange:(event:GenericEvent, properties:this) => void
+
     outlined:boolean
+
     pattern:Array<RegExp|string>|null|RegExp|string
     patternText:string
+
     placeholder:string
     representation:ReactNode|string
+
     rows:number
+
     searchSelection:boolean
     selectableEditor:boolean
+
     step:number
+
     suggestionCreator?:(options:SuggestionCreatorOptions<this>) =>
         InputProperties['selection']|Promise<InputProperties['selection']>
     suggestSelection:boolean
-    trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
+
     transformer:RecursivePartial<DataTransformSpecification<
         T, Date|number|string
     >>
