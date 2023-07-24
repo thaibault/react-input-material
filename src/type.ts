@@ -35,9 +35,11 @@ import PropertyTypes, {
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
 import {
     ComponentClass,
+    ElementType,
     FocusEvent,
     ForwardRefExoticComponent,
     FunctionComponent,
+    HTMLProps,
     KeyboardEvent,
     MouseEvent,
     MutableRefObject,
@@ -61,6 +63,7 @@ import {
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
+import {ComponentProps as RMWCComponentProps} from '@rmwc/types'
 import {CardMediaProps} from '@rmwc/card'
 import {MenuApi} from '@rmwc/menu'
 import {
@@ -945,7 +948,9 @@ export interface FileInputChildrenOptions<P, Type = FileValue> {
     properties:P
     value?:null|Type
 }
-export interface FileInputProperties<Type = FileValue> extends
+export interface FileInputProperties<
+    Type = FileValue, MediaTag extends ElementType = 'div'
+> extends
     Properties<Type>, FileInputModelState
 {
     children:(options:FileInputChildrenOptions<this, Type>) => null|ReactNode
@@ -970,7 +975,7 @@ export interface FileInputProperties<Type = FileValue> extends
         properties:this & {value:Type & {name:string}}
     ) => InputProps<string>
 
-    media:CardMediaProps
+    media:RMWCComponentProps<CardMediaProps, HTMLProps<HTMLElement>, MediaTag>
 
     model:FileInputModel<Type>
 
