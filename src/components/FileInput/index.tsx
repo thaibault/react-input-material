@@ -71,7 +71,7 @@ import {
     InputAdapter,
     InputProperties,
     FileRepresentationType as RepresentationType,
-    FileInputComponent, FileInputModel
+    FileInputComponent, FileInputModel, DefaultFileInputProperties
 } from '../../type'
 
 export {
@@ -321,8 +321,10 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
 
             onChange(event)
 
-            if (determineValidationState<Type>(
-                properties,
+            if (determineValidationState<
+                Type, DefaultFileInputProperties<Type>
+            >(
+                properties as DefaultFileInputProperties<Type>,
                 nameInputReference.current?.properties?.invalid || false,
                 oldValueState.modelState
             ))
