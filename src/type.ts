@@ -1020,14 +1020,14 @@ export interface FileInputAdapterWithReferences extends FileInputAdapter {
     }
 }
 
-export type FileInputComponent<ValueType, ComponentType> = InputComponent<
-    ValueType,
-    ComponentType,
-    FileInputProps<ValueType>,
-    FileInputModelState,
-    DefaultFileInputProperties<ValueType>,
-    FileInputAdapter<ValueType>
->
+export interface FileInputComponent<Type> extends
+    Omit<ForwardRefExoticComponent<FileInputProps>, 'propTypes'>,
+    StaticWebComponent<Type, FileInputModelState, DefaultFileInputProperties>
+{
+    <T = string>(
+        props:FileInputProps<T> & RefAttributes<FileInputAdapter<T>>
+    ):ReactElement
+}
 //// region constants
 export const fileInputModelStatePropertyTypes:{
     [key in keyof FileInputModelState]:Requireable<boolean|symbol>

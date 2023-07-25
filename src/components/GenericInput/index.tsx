@@ -26,7 +26,6 @@ import {
     forwardRef,
     ForwardedRef,
     KeyboardEvent as ReactKeyboardEvent,
-    lazy,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
     MutableRefObject,
@@ -44,9 +43,6 @@ import GenericAnimate from 'react-generic-animate'
 import {GenericEvent} from 'react-generic-tools/type'
 import Dummy from 'react-generic-dummy'
 import {TransitionProps} from 'react-transition-group/Transition'
-import UseAnimationsType from 'react-useanimations'
-import LockAnimation from 'react-useanimations/lib/lock'
-import PlusToXAnimation from 'react-useanimations/lib/plusToX'
 
 import {Editor as RichTextEditor} from 'tinymce'
 
@@ -72,27 +68,13 @@ import {
 import {
     EventHandler as RichTextEventHandler
 } from '@tinymce/tinymce-react/lib/cjs/main/ts/Events'
-/*
-"namedExport" version of css-loader:
 
-import {
-    genericInputSuggestionsSuggestionClassName,
-    genericInputSuggestionsSuggestionMarkClassName,
-    genericInputClassName,
-    genericInputCustomClassName,
-    genericInputEditorLabelClassName,
-    genericInputSuggestionsClassName,
-    genericInputSuggestionsPendingClassName
-} from './style.module'
- */
-import cssClassNames from './style.module'
 import WrapConfigurations from '../WrapConfigurations'
 import WrapTooltip from '../WrapTooltip'
 import {
     deriveMissingPropertiesFromState as deriveMissingBasePropertiesFromState,
     determineInitialValue,
     determineInitialRepresentation,
-    determineValidationState as determineBaseValidationState,
     formatValue,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     getLabelAndValues,
@@ -130,214 +112,21 @@ import {
     TinyMCEOptions
 } from '../../type'
 
+import {
+    CodeEditor,
+    CSS_CLASS_NAMES,
+    determineValidationState,
+    GivenRichTextEditorComponent,
+    lockAnimation,
+    plusToXAnimation,
+    preventEnterKeyPropagation,
+    suggestionMatches,
+    TINYMCE_DEFAULT_OPTIONS,
+    UseAnimations
+} from './helper'
 import TRANSFORMER from './transformer'
-
-declare const TARGET_TECHNOLOGY:string
-
-const isBrowser =
-    !(TARGET_TECHNOLOGY === 'node' || typeof window === 'undefined')
-/* eslint-disable @typescript-eslint/no-var-requires */
-const GivenRichTextEditorComponent:typeof RichTextEditorComponent =
-    isBrowser && RichTextEditorComponent ?
-        RichTextEditorComponent :
-        Dummy as unknown as typeof RichTextEditorComponent
-const UseAnimations:null|typeof Dummy|typeof UseAnimationsType = isBrowser ?
-    (require('react-useanimations') as
-        {default:null|typeof Dummy|typeof UseAnimationsType}
-    )?.default : null
-const lockAnimation:null|typeof LockAnimation = isBrowser ?
-    (require('react-useanimations/lib/lock') as
-        {default:null|typeof LockAnimation}
-    )?.default : null
-const plusToXAnimation:null|typeof PlusToXAnimation = isBrowser ?
-    (require('react-useanimations/lib/plusToX') as
-        {default:null|typeof PlusToXAnimation}
-    )?.default : null
-/* eslint-enable @typescript-eslint/no-var-requires */
 // endregion
-const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
-// region code editor configuration
-const ACE_BASE_PATH = '/ace-builds/src-min-noconflict/'
-export const ACEEditorOptions = {
-    basePath: ACE_BASE_PATH,
-    modePath: ACE_BASE_PATH,
-    themePath: ACE_BASE_PATH,
-    workerPath: ACE_BASE_PATH,
-    useWorker: false
-}
-const CodeEditor = lazy<typeof CodeEditorType>(
-    async ():Promise<{default:typeof CodeEditorType}> => {
-        const {config} = await import('ace-builds')
-        for (const [name, value] of Object.entries(ACEEditorOptions))
-            config.set(name, value)
-
-        return await import('react-ace')
-    }
-)
-// endregion
-// region rich text editor configuration
-declare const UTC_BUILD_TIMESTAMP:number|undefined
-// NOTE: Could be set via module bundler environment variables.
-const CURRENT_UTC_BUILD_TIMESTAMP =
-    typeof UTC_BUILD_TIMESTAMP === 'undefined' ? 1 : UTC_BUILD_TIMESTAMP
-let richTextEditorLoadedOnce = false
-const tinymceBasePath = '/tinymce/'
-export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
-    /* eslint-disable camelcase */
-    // region paths
-    base_url: tinymceBasePath,
-    skin_url: `${tinymceBasePath}skins/ui/oxide`,
-    theme_url: `${tinymceBasePath}themes/silver/theme.min.js`,
-    // endregion
-    allow_conditional_comments: false,
-    allow_script_urls: false,
-    body_class: 'mdc-text-field__input',
-    branding: false,
-    cache_suffix: `?version=${CURRENT_UTC_BUILD_TIMESTAMP}`,
-    contextmenu: [],
-    document_base_url: '/',
-    element_format: 'xhtml',
-    entity_encoding: 'raw',
-    fix_list_elements: true,
-    hidden_input: false,
-    icon: 'material',
-    invalid_elements: 'em',
-    invalid_styles: 'color font-size line-height',
-    keep_styles: false,
-    menubar: false,
-    /* eslint-disable max-len */
-    plugins: [
-        'fullscreen',
-        'link',
-        'code',
-        'nonbreaking',
-        'searchreplace',
-        'visualblocks'
-    ],
-    /* eslint-enable max-len */
-    relative_urls: false,
-    remove_script_host: false,
-    remove_trailing_brs: true,
-    schema: 'html5',
-    toolbar1: `
-        cut copy paste |
-        undo redo removeformat |
-        styleselect formatselect fontselect fontsizeselect |
-        searchreplace visualblocks fullscreen code
-    `.trim(),
-    toolbar2: `
-        alignleft aligncenter alignright alignjustify outdent indent |
-        link nonbreaking bullist numlist bold italic underline strikethrough
-    `.trim(),
-    trim: true
-    /* eslint-enable camelcase */
-}
-// endregion
-// region static helper
-/**
- * Derives validation state from provided properties and state.
- * @param properties - Current component properties.
- * @param currentState - Current component state.
- *
- * @returns Boolean indicating whether component is in an aggregated valid or
- * invalid state.
- */
-export function determineValidationState<T>(
-    properties:DefaultProperties<T>, currentState:Partial<ModelState>
-):boolean {
-    return determineBaseValidationState<
-        DefaultProperties<T>, Partial<ModelState>
-    >(
-        properties,
-        currentState,
-        {
-            invalidMaximum: ():boolean => (
-                typeof properties.model.maximum === 'number' &&
-                typeof properties.model.value === 'number' &&
-                !isNaN(properties.model.value) &&
-                properties.model.maximum >= 0 &&
-                properties.model.maximum < properties.model.value
-            ),
-            invalidMinimum: ():boolean => (
-                typeof properties.model.minimum === 'number' &&
-                typeof properties.model.value === 'number' &&
-                !isNaN(properties.model.value) &&
-                properties.model.value < properties.model.minimum
-            ),
-
-            invalidMaximumLength: ():boolean => (
-                typeof properties.model.maximumLength === 'number' &&
-                typeof properties.model.value === 'string' &&
-                properties.model.maximumLength >= 0 &&
-                properties.model.maximumLength < properties.model.value.length
-            ),
-            invalidMinimumLength: ():boolean => (
-                typeof properties.model.minimumLength === 'number' &&
-                typeof properties.model.value === 'string' &&
-                properties.model.value.length < properties.model.minimumLength
-            ),
-
-            invalidInvertedPattern: ():boolean => (
-                typeof properties.model.value === 'string' &&
-                Boolean(properties.model.invertedRegularExpressionPattern) &&
-                ([] as Array<RegExp|string>)
-                    .concat(properties.model.invertedRegularExpressionPattern!)
-                    .some((expression:RegExp|string):boolean =>
-                        (new RegExp(expression)).test(
-                            properties.model.value as unknown as string
-                        )
-                    )
-            ),
-            invalidPattern: ():boolean => (
-                typeof properties.model.value === 'string' &&
-                Boolean(properties.model.regularExpressionPattern) &&
-                ([] as Array<RegExp|string>)
-                    .concat(properties.model.regularExpressionPattern!)
-                    .some((expression:RegExp|string):boolean =>
-                        !(new RegExp(expression)).test(
-                            properties.model.value as unknown as string
-                        )
-                    )
-            )
-        }
-    )
-}
-/**
- * Avoid propagating the enter key event since this usually sends a form which
- * is not intended when working in a text field.
- * @param event - Keyboard event.
- *
- * @returns Nothing.
- */
-export function preventEnterKeyPropagation(event:ReactKeyboardEvent):void {
-    if (Tools.keyCode.ENTER === event.keyCode)
-        event.stopPropagation()
-}
-/**
- * Indicates whether a provided query is matching currently provided
- * suggestion.
- * @param suggestion - Candidate to match again.
- * @param query - Search query to check for matching.
- *
- * @returns Boolean result whether provided suggestion matches given query or
- * not.
- */
-export function suggestionMatches(
-    suggestion:string, query?:null|string
-):boolean {
-    if (query) {
-        suggestion = suggestion.toLowerCase()
-
-        return query
-            .replace(/  +/g, ' ')
-            .toLowerCase()
-            .split(' ')
-            .every((part:string):boolean => suggestion.includes(part))
-    }
-
-    return false
-}
-// endregion
+let RICH_TEXT_EDITOR_LOADER_ONCE = false
 /* eslint-disable jsdoc/require-description-complete-sentence */
 /**
  * Generic input wrapper component which automatically determines a useful
@@ -366,7 +155,7 @@ export function suggestionMatches(
 export const GenericInputInner = function<Type = unknown>(
     props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
 ):ReactElement {
-    const id:string = useId()
+    const id = useId()
 /* eslint-enable jsdoc/require-description-complete-sentence */
     // region live-cycle
     /// region text-editor selection synchronisation
@@ -375,7 +164,7 @@ export const GenericInputInner = function<Type = unknown>(
      * state if editor has been switched.
      * @returns Nothing.
      */
-    useEffect(():void => {
+    useEffect(() => {
         if (selectionIsUnstable || editorState.selectionIsUnstable)
             if (properties.editorIsActive) {
                 /*
@@ -426,7 +215,7 @@ export const GenericInputInner = function<Type = unknown>(
      * with input element.
      * @returns Nothing.
      */
-    useEffect(():void => {
+    useEffect(() => {
         if (inputReference.current) {
             const determinedInputProps:Mapping<boolean|number|string> = {}
             const propsToRemove:Array<string> = []
@@ -493,7 +282,7 @@ export const GenericInputInner = function<Type = unknown>(
      * opening and hidden state.
      * @returns Nothing.
      */
-    useEffect(():void => {
+    useEffect(() => {
         if (useSelection) {
             const selectionWrapper:HTMLElement|null|undefined =
                 wrapperReference.current?.querySelector(
@@ -546,7 +335,7 @@ export const GenericInputInner = function<Type = unknown>(
     })
     /// endregion
     useEffect(
-        ():void => {
+        () => {
             if (properties.triggerInitialPropertiesConsolidation)
                 onChange()
         },
@@ -2113,7 +1902,7 @@ export const GenericInputInner = function<Type = unknown>(
                 if (!richTextEditorInstance.current)
                     return
 
-                richTextEditorLoadedOnce = true
+                RICH_TEXT_EDITOR_LOADER_ONCE = true
 
                 if (
                     properties.editorIsActive &&
@@ -2496,7 +2285,7 @@ export const GenericInputInner = function<Type = unknown>(
                     </div>
                 ],
                 isAdvancedEditor,
-                richTextEditorLoadedOnce ||
+                RICH_TEXT_EDITOR_LOADER_ONCE ||
                 properties.editor.startsWith('code')
             )}
             {wrapAnimationConditionally(
@@ -2617,7 +2406,7 @@ export const GenericInputInner = function<Type = unknown>(
                     />
                 </div>,
                 !(isAdvancedEditor || useSelection),
-                richTextEditorLoadedOnce ||
+                RICH_TEXT_EDITOR_LOADER_ONCE ||
                 properties.editor.startsWith('code')
             )}
         </div>
@@ -2644,10 +2433,9 @@ GenericInputInner.displayName = 'GenericInput'
  *
  * @returns React elements.
  */
-export const GenericInput:GenericInputComponent<typeof GenericInputInner> =
-    memorize(forwardRef(GenericInputInner)) as
-        unknown as
-        GenericInputComponent<typeof GenericInputInner>
+export const GenericInput = memorize(forwardRef(GenericInputInner)) as
+    unknown as
+    GenericInputComponent<typeof GenericInputInner>
 // region static properties
 /// region web-component hints
 GenericInput.wrapped = GenericInputInner

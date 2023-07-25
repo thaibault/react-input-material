@@ -17,9 +17,8 @@
     endregion
 */
 // region imports
-import {blobToBase64String, dataURLToBlob} from 'blob-util'
+import {dataURLToBlob} from 'blob-util'
 import Tools from 'clientnode'
-import {Mapping} from 'clientnode/type'
 import {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
@@ -46,24 +45,11 @@ import {CircularProgress} from '@rmwc/circular-progress'
 import {Theme} from '@rmwc/theme'
 import {Typography} from '@rmwc/typography'
 
-/*
-"namedExport" version of css-loader:
-
-import {
-    fileInputClassName,
-    fileInputDownloadClassName,
-    fileInputIframeWrapperPaddingClassName,
-    fileInputNativeClassName,
-    fileInputTextRepresentationClassName
-} from './style.module'
-*/
-import cssClassNames from './style.module'
 import GenericInput from '../GenericInput'
 import {WrapConfigurations} from '../WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
     determineInitialValue,
-    determineValidationState as determineBaseValidationState,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
     translateKnownSymbols,
@@ -84,217 +70,25 @@ import {
     fileInputPropertyTypes as propertyTypes,
     InputAdapter,
     InputProperties,
-    InputProps,
     FileRepresentationType as RepresentationType,
     FileInputComponent, FileInputModel
 } from '../../type'
-// endregion
-// region constants
-const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
-/*
-    NOTE: Caused by a bug transpiling regular expression which ignores needed
-    escape sequences for "/" when using the nativ regular expression type.
-*/
-const IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
-    '^image\\/(?:p?jpe?g|png|svg(?:\\+xml)?|vnd\\.microsoft\\.icon|gif|tiff|' +
-    'webp|vnd\\.wap\\.wbmp|x-(?:icon|jng|ms-bmp))$',
-    'i'
-)
-const TEXT_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
-    '^(?:application\\/(json|xml))|' +
-    '(?:text\\/(?:plain|x-ndpb[wy]html|(?:x-)?csv|' +
-    'x?html?|xml))$',
-    'i'
-)
-const REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION =
-    // Plain version:
-    /^text\/plain$/i
-    // Rendered version:
-    // /^(application\/xml)|(text\/(plain|x?html?|xml))$/i
-const VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
-    '^video\\/(?:(?:x-)?(?:x-)?webm|3gpp|mp2t|mp4|mpeg|quicktime|(?:x-)?flv' +
-    '|(?:x-)?m4v|(?:x-)mng|x-ms-as|x-ms-wmv|x-msvideo)' +
-    '|(?:application\\/(?:x-)?shockwave-flash)$',
-    'i'
-)
-// endregion
-// region helper
-/**
- * Generates properties for nested text input to edit file name.
- * @param prototype - Base properties to extend from.
- * @param properties - Actual properties to derive from.
- * @param properties.name - Name of filename input field.
- * @param properties.value - Current edited file value.
- * @param properties.value.name - Current edited filename.
- *
- * @returns Input properties.
- */
-export const preserveStaticFileBaseNameInputGenerator:Properties[
-    'generateFileNameInputProperties'
-] = (
-    prototype:InputProps<string>, {name, value: {name: fileName}}
-):InputProps<string> => ({
-    ...prototype,
-    disabled: true,
-    value:
-        name +
-        (fileName?.includes('.') ?
-            fileName.substring(fileName.lastIndexOf('.')) :
-            ''
-        )
-})
-/**
- * Determines which type of file we have to present.
- * @param contentType - File type to derive representation type from.
- *
- * @returns Nothing.
- */
-export const determineRepresentationType = (
-    contentType:string
-):RepresentationType => {
-    contentType = contentType.replace(/; *charset=.+$/, '')
 
-    if (TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType)) {
-        if (REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
-            contentType
-        ))
-            return 'renderableText'
+export {
+    IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION,
+    TEXT_CONTENT_TYPE_REGULAR_EXPRESSION,
+    REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION,
+    VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION,
 
-        return 'text'
-    }
-
-    if (IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType))
-        return 'image'
-
-    if (VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType))
-        return 'video'
-
-    return 'binary'
-}
-/**
- * Derives validation state from provided properties and state.
- * @param properties - Current component properties.
- * @param invalidName - Determines if edited file name is invalid or not.
- * @param currentState - Current component state.
- *
- * @returns Boolean indicating Whether component is in an aggregated valid or
- * invalid state.
- */
-export const determineValidationState = <
-    Type extends FileValue = FileValue,
-    P extends DefaultProperties<Type> = DefaultProperties<Type>
->(properties:P, invalidName:boolean, currentState:ModelState):boolean => {
-    const invalidMaximumSize = ():boolean => (
-        typeof properties.model.maximumSize === 'number' &&
-        properties.model.maximumSize <
-        ((properties.model.value?.blob as Blob)?.size || 0)
-    )
-    const invalidMinimumSize = ():boolean => (
-        typeof properties.model.minimumSize === 'number' &&
-        properties.model.minimumSize >
-        ((properties.model.value?.blob as Blob)?.size || 0)
-    )
-    const invalidContentTypePattern = ():boolean => (
-        typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
-        ([] as Array<null|RegExp|string>)
-            .concat(properties.model.contentTypeRegularExpressionPattern)
-            .some((expression:null|RegExp|string):boolean =>
-                typeof expression === 'string' &&
-                !(new RegExp(expression))
-                    .test((properties.model.value!.blob as Blob).type) ||
-                expression !== null &&
-                typeof expression === 'object' &&
-                !expression.test(
-                    (properties.model.value!.blob as Blob).type
-                )
-            )
-    )
-    const invalidInvertedContentTypePattern = ():boolean => (
-        typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
-        ([] as Array<null|RegExp|string>)
-            .concat(
-                properties.model.invertedContentTypeRegularExpressionPattern
-            )
-            .some((expression:null|RegExp|string):boolean =>
-                typeof expression === 'string' &&
-                (new RegExp(expression))
-                    .test((properties.model.value!.blob as Blob).type) ||
-                expression !== null &&
-                typeof expression === 'object' &&
-                expression.test((properties.model.value!.blob as Blob).type)
-            )
-    )
-
-    return determineBaseValidationState<P>(
-        properties,
-        currentState,
-        {
-            invalidMaximumSize,
-            invalidMinimumSize,
-            invalidName: ():boolean => invalidName,
-            invalidContentTypePattern,
-            invalidInvertedContentTypePattern
-        }
-    )
-}
-/// region data transformer
-/**
- * Derive base46 string from given file value.
- * @param value - File to derive string from.
- *
- * @returns A promise holding base64 string.
- */
-export const deriveBase64String = <Type extends FileValue = FileValue>(
-    value:Type
-):Promise<string> =>
-        typeof Blob === 'undefined' ?
-            Promise.resolve(
-                (value.toString as unknown as (_encoding:string) => string)(
-                    'base64'
-                )
-            ) :
-            blobToBase64String(value.blob as Blob)
-/**
- * Read text from given binary data with given encoding.
- * @param blob - Binary data object.
- * @param encoding - Encoding for reading file correctly.
- *
- * @returns A promise holding parsed text as string.
- **/
-export const readBinaryDataIntoText = (
-    blob:Blob, encoding = 'utf-8'
-):Promise<string> =>
-    new Promise<string>((
-        resolve:(value:string) => void, reject:(reason:Error) => void
-    ):void => {
-        const fileReader:FileReader = new FileReader()
-
-        fileReader.onload = (event:Event):void => {
-            let content:string =
-                (event.target as unknown as {result:string}).result
-            // Remove preceding BOM.
-            if (
-                content.length &&
-                encoding.endsWith('-sig') &&
-                content.charCodeAt(0) === 0xFEFF
-            )
-                content = content.slice(1)
-            // Normalize line endings to unix format.
-            content = content.replace(/\r\n/g, '\n')
-            resolve(content)
-        }
-
-        fileReader.onabort = ():void => reject(new Error('abort'))
-        fileReader.onerror = ():void => reject(new Error())
-
-        fileReader.readAsText(
-            blob,
-            encoding.endsWith('-sig') ?
-                encoding.substring(0, encoding.length - '-sig'.length) :
-                encoding
-        )
-    })
-/// endregion
+    preserveStaticFileBaseNameInputGenerator
+} from './helper'
+import {
+    CSS_CLASS_NAMES,
+    determineRepresentationType,
+    determineValidationState,
+    deriveBase64String,
+    readBinaryDataIntoText
+} from './helper'
 // endregion
 /* eslint-disable jsdoc/require-description-complete-sentence */
 /**
@@ -1043,10 +837,9 @@ FileInputInner.displayName = 'FileInput'
  *
  * @returns React elements.
  */
-export const FileInput:FileInputComponent<FileValue, typeof FileInputInner> =
-    memorize(forwardRef(FileInputInner)) as
-        unknown as
-        FileInputComponent<FileValue, typeof FileInputInner>
+export const FileInput = memorize(forwardRef(FileInputInner)) as
+    unknown as
+    FileInputComponent<typeof FileInputInner>
 // region static properties
 /// region web-component hints
 FileInput.wrapped = FileInputInner
