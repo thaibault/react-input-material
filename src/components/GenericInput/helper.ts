@@ -17,7 +17,6 @@
     endregion
 */
 // region imports
-import Tools from 'clientnode'
 import {Mapping} from 'clientnode/type'
 import {lazy, KeyboardEvent} from 'react'
 import CodeEditorType from 'react-ace'
@@ -230,7 +229,7 @@ export function determineValidationState<T>(
  * @returns Nothing.
  */
 export function preventEnterKeyPropagation(event:KeyboardEvent) {
-    if (Tools.keyCode.ENTER === event.keyCode)
+    if (event.code === 'Enter')
         event.stopPropagation()
 }
 /**
