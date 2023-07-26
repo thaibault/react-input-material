@@ -41,6 +41,7 @@ import {
     InputProps,
     FileRepresentationType as RepresentationType, FileInputProperties
 } from '../../type'
+import {ElementType} from 'react'
 // endregion
 // region constants
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
@@ -81,20 +82,21 @@ export const VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
  *
  * @returns Input properties.
  */
-export const preserveStaticFileBaseNameInputGenerator:(
-    FileInputProperties['generateFileNameInputProperties']
-) = (
-    prototype:InputProps<string>, {name, value}
-):InputProps<string> => ({
-    ...prototype,
-    disabled: true,
-    value:
-        name +
-        (value?.name?.includes('.') ?
-            value.name.substring(value.name.lastIndexOf('.')) :
-            ''
-        )
-})
+export const preserveStaticFileBaseNameInputGenerator = <
+    Type extends FileValue = FileValue, MediaTag extends ElementType = 'div'
+>(
+        prototype:InputProps<string>,
+        {name, value}:FileInputProperties<Type, MediaTag>
+    ):InputProps<string> => ({
+        ...prototype,
+        disabled: true,
+        value:
+            name +
+            (value?.name?.includes('.') ?
+                value.name.substring(value.name.lastIndexOf('.')) :
+                ''
+            )
+    })
 /**
  * Determines which type of file we have to present.
  * @param contentType - File type to derive representation type from.
