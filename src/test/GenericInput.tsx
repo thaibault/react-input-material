@@ -19,7 +19,9 @@ import {AnyFunction} from 'clientnode/type'
 import {testEach} from 'clientnode/testHelper'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
-import GenericInput, {suggestionMatches} from '../components/GenericInput'
+import GenericInput from '../components/GenericInput'
+import {suggestionMatches} from '../components/GenericInput/helper'
+
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 

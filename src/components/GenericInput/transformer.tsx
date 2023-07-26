@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module transformers */
+/** @module transformer */
 'use strict'
 /* !
     region header
