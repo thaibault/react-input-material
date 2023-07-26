@@ -914,9 +914,9 @@ export interface FileValue {
     source?:string
     url?:string
 }
-export interface FileInputValueState<Type = FileValue> extends
-    ValueState<Type, FileInputModelState>
-{
+export interface FileInputValueState<
+    Type extends FileValue = FileValue
+> extends ValueState<Type, FileInputModelState> {
     attachBlobProperty:boolean
 }
 
@@ -928,7 +928,9 @@ export interface FileInputModelState extends ModelState {
 
     invalidName:boolean
 }
-export interface FileInputModel<Type = FileValue> extends BaseModel<Type> {
+export interface FileInputModel<
+    Type extends FileValue = FileValue
+> extends BaseModel<Type> {
     contentTypeRegularExpressionPattern:Array<RegExp|string>|null|RegExp|string
     invertedContentTypeRegularExpressionPattern:(
         Array<RegExp|string>|null|RegExp|string
@@ -942,18 +944,20 @@ export interface FileInputModel<Type = FileValue> extends BaseModel<Type> {
     state:FileInputModelState
 }
 
-export interface FileInputChildrenOptions<P, Type = FileValue> {
+export interface FileInputChildrenOptions<
+    P, Type extends FileValue = FileValue
+> {
     declaration:string
     invalid:boolean
     properties:P
     value?:null|Type
 }
 export interface FileInputProperties<
-    Type = FileValue, MediaTag extends ElementType = 'div'
-> extends
-    Properties<Type>, FileInputModelState
-{
-    children:(options:FileInputChildrenOptions<this, Type>) => null|ReactNode
+    Type extends FileValue = FileValue, MediaTag extends ElementType = 'div'
+> extends Properties<Type>, FileInputModelState {
+    children:(options:FileInputChildrenOptions<
+        FileInputProperties<Type, MediaTag>, Type
+    >) => ReactNode
 
     contentTypePattern:Array<RegExp|string>|null|RegExp|string
     invertedContentTypePattern:Array<RegExp|string>|null|RegExp|string
@@ -963,16 +967,16 @@ export interface FileInputProperties<
     maximumSizeText:string
     minimumSizeText:string
 
-    deleteButton:ReactElement|string
-    downloadButton:ReactElement|string
-    editButton:ReactElement|string
-    newButton:ReactElement|string
+    deleteButton:ReactNode
+    downloadButton:ReactNode
+    editButton:ReactNode
+    newButton:ReactNode
 
     encoding:string
 
     generateFileNameInputProperties:(
         prototype:InputProps<string>,
-        properties:this & {value:Type & {name:string}}
+        properties:FileInputProperties<Type, MediaTag>
     ) => InputProps<string>
 
     media:RMWCComponentProps<CardMediaProps, HTMLProps<HTMLElement>, MediaTag>
@@ -986,7 +990,7 @@ export interface FileInputProperties<
         type?:string
     }
 }
-export type FileInputProps<Type = FileValue> =
+export type FileInputProps<Type extends FileValue = FileValue> =
     Partial<Omit<FileInputProperties<Type>, 'model'>> &
     {
         model?:Partial<
@@ -995,21 +999,24 @@ export type FileInputProps<Type = FileValue> =
         >
     }
 
-export type DefaultFileInputProperties<Type = FileValue> =
+export type DefaultFileInputProperties<Type extends FileValue = FileValue> =
     Omit<FileInputProps<Type>, 'model'> & {model:FileInputModel<Type>}
 
 export type FileInputPropertyTypes = {
     [key in keyof FileInputProperties]:ValueOf<typeof PropertyTypes>
 }
 
-export interface FileInputState<Type = FileValue> extends State<Type> {
+export interface FileInputState<
+    Type extends FileValue = FileValue
+> extends State<Type> {
     modelState:FileInputModelState
 }
 
-export type FileInputAdapter<Type = FileValue> = ComponentAdapter<
-    FileInputProperties<Type>, Omit<FileInputState<Type>, 'value'> &
-    {value?:Type|null}
->
+export type FileInputAdapter<Type extends FileValue = FileValue> =
+    ComponentAdapter<
+        FileInputProperties<Type>, Omit<FileInputState<Type>, 'value'> &
+        {value?:null|Type}
+    >
 export interface FileInputAdapterWithReferences extends FileInputAdapter {
     references:{
         deleteButtonReference:MutableRefObject<HTMLButtonElement|null>
@@ -1024,7 +1031,7 @@ export interface FileInputComponent<Type> extends
     Omit<ForwardRefExoticComponent<FileInputProps>, 'propTypes'>,
     StaticWebComponent<Type, FileInputModelState, DefaultFileInputProperties>
 {
-    <T = string>(
+    <T extends FileValue = FileValue>(
         props:FileInputProps<T> & RefAttributes<FileInputAdapter<T>>
     ):ReactElement
 }

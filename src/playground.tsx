@@ -20,7 +20,7 @@
 import {Tab, TabBar, TabBarOnActivateEventT} from '@rmwc/tabs'
 import Tools from 'clientnode'
 import {Mapping, UnknownFunction} from 'clientnode/type'
-import {ReactElement, ReactNode, useState} from 'react'
+import {ReactNode, useState} from 'react'
 import {createRoot} from 'react-dom/client'
 import {useMemorizedValue} from 'react-generic-tools'
 
@@ -29,7 +29,7 @@ import {
     FileInput, GenericInput as Input, Inputs, Interval, RequireableCheckbox
 } from './index'
 import {
-    CheckboxProps,
+    CheckboxProps, FileInputChildrenOptions, FileInputProperties,
     FileInputProps,
     FileValue,
     InputProperties,
@@ -102,6 +102,7 @@ const Application = () => {
     const onChangeValue7 =
         useMemorizedValue<(values:Array<null|string>|null) => void>(setValue7)
     // endregion
+
     return (<>
         {/* region navigation */}
         <div className="tab-bar">
@@ -131,12 +132,10 @@ const Application = () => {
                 >
                     <FileInput onChange={onChange} />
                     <FileInput
-                        default={useMemorizedValue(
-                            {
-                                blob: {type: 'image/png'},
-                                url: 'https://via.placeholder.com/150'
-                            }
-                        )}
+                        default={useMemorizedValue({
+                            blob: {type: 'image/png'},
+                            url: 'https://via.placeholder.com/150'
+                        })}
                         encoding="latin1"
                         generateFileNameInputProperties={
                             preserveStaticFileBaseNameInputGenerator
@@ -144,7 +143,9 @@ const Application = () => {
                         name="UnControlled"
                         onChange={onChange}
                     >
-                        {useMemorizedValue(({value}):null|ReactElement =>
+                        {useMemorizedValue(({value}:FileInputChildrenOptions<
+                            FileInputProperties
+                        >):ReactNode =>
                             value?.blob ?
                                 <ul>
                                     <li>
@@ -177,7 +178,7 @@ const Application = () => {
                                         ''
                                     }
                                 </ul> :
-                                null
+                                ''
                         )}
                     </FileInput>
                     <FileInput

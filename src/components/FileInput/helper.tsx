@@ -37,10 +37,9 @@ import {
 import {
     DefaultFileInputProperties as DefaultProperties,
     FileInputModelState as ModelState,
-    FileInputProperties as Properties,
     FileValue,
     InputProps,
-    FileRepresentationType as RepresentationType
+    FileRepresentationType as RepresentationType, FileInputProperties
 } from '../../type'
 // endregion
 // region constants
@@ -79,21 +78,20 @@ export const VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
  * @param properties - Actual properties to derive from.
  * @param properties.name - Name of filename input field.
  * @param properties.value - Current edited file value.
- * @param properties.value.name - Current edited filename.
  *
  * @returns Input properties.
  */
-export const preserveStaticFileBaseNameInputGenerator:Properties[
-    'generateFileNameInputProperties'
-] = (
-    prototype:InputProps<string>, {name, value: {name: fileName}}
+export const preserveStaticFileBaseNameInputGenerator:(
+    FileInputProperties['generateFileNameInputProperties']
+) = (
+    prototype:InputProps<string>, {name, value}
 ):InputProps<string> => ({
     ...prototype,
     disabled: true,
     value:
         name +
-        (fileName?.includes('.') ?
-            fileName.substring(fileName.lastIndexOf('.')) :
+        (value?.name?.includes('.') ?
+            value.name.substring(value.name.lastIndexOf('.')) :
             ''
         )
 })

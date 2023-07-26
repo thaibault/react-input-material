@@ -92,7 +92,7 @@ import {
 // endregion
 /* eslint-disable jsdoc/require-description-complete-sentence */
 /**
- * Validateable checkbox wrapper component.
+ * Validatable checkbox wrapper component.
  * @property static:displayName - Descriptive name for component to show in web
  * developer tools.
  *
