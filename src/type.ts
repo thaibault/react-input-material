@@ -192,7 +192,7 @@ export type BaseProps<T = unknown> =
     {
         model?:Partial<
             Omit<BaseModel<T>, 'state'> &
-            {state:Partial<ModelState>}
+            {state?:Partial<ModelState>}
         >
     }
 
@@ -228,7 +228,7 @@ export type Props<T = unknown> =
     {
         model?:Partial<
             Omit<BaseModel<T>, 'state'> &
-            {state:Partial<ModelState>}
+            {state?:Partial<ModelState>}
         >
     }
 
@@ -697,7 +697,7 @@ export type InputProps<T = unknown> =
     {
         model?:Partial<
             Omit<InputModel<T>, 'state'> &
-            {state:Partial<InputModelState>}
+            {state?:Partial<InputModelState>}
         >
     }
 
@@ -995,7 +995,7 @@ export type FileInputProps<Type extends FileValue = FileValue> =
     {
         model?:Partial<
             Omit<FileInputModel<Type>, 'state'> &
-            {state:Partial<FileInputModelState>}
+            {state?:Partial<FileInputModelState>}
         >
     }
 
@@ -1238,7 +1238,7 @@ export type InputsProps<
     {
         model?:Partial<
             Omit<InputsModel<T, P>, 'state'> &
-            {state:Partial<InputsModelState>}
+            {state?:Partial<InputsModelState>}
         >
         value?:Array<Partial<P>>|Array<T>|null
     }
