@@ -574,6 +574,9 @@ export interface InputModelState extends ModelState {
 export interface InputModel<T = unknown> extends BaseModel<T> {
     state:InputModelState
 }
+export type PartialInputModel<T = unknown> =
+    Partial<Omit<InputModel<T>, 'state'>> &
+    {state?:Partial<InputModelState>}
 export interface InputValueState<T = unknown, MS = ModelState> extends
     ValueState<T, MS>
 {
@@ -694,12 +697,7 @@ export interface InputProperties<T = unknown> extends
 }
 export type InputProps<T = unknown> =
     Partial<Omit<InputProperties<T>, 'model'>> &
-    {
-        model?:Partial<
-            Omit<InputModel<T>, 'state'> &
-            {state?:Partial<InputModelState>}
-        >
-    }
+    {model?:PartialInputModel<T>}
 
 export type DefaultInputProperties<T = string> =
     Omit<InputProps<T>, 'model'> & {model:InputModel<T>}
@@ -993,10 +991,13 @@ export interface FileInputProperties<
 export type FileInputProps<Type extends FileValue = FileValue> =
     Partial<Omit<FileInputProperties<Type>, 'model'>> &
     {
-        model?:Partial<
-            Omit<FileInputModel<Type>, 'state'> &
-            {state?:Partial<FileInputModelState>}
-        >
+        model?:(
+            Partial<Omit<FileInputModel<Type>, 'fileName'|'state'>> &
+            {
+                fileName?:PartialInputModel<string>
+                state?:Partial<FileInputModelState>
+            }
+        )
     }
 
 export type DefaultFileInputProperties<Type extends FileValue = FileValue> =
