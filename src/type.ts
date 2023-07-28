@@ -626,31 +626,33 @@ export interface SuggestionCreatorOptions<P> {
     properties:P
     query:string
 }
+/*
+    plain -> input field
+    text -> textarea
+    richtext(raw) -> texteditor without formatting
+    richtext(simple) -> texteditor with semantic text modifications
+    richtext(normal) -> texteditor with additional text formatting
+    richtext(advanced) -> texteditor with advanced text formatting
+*/
+export type Editor = (
+    'code' |
+    'code(css)' |
+    'code(script)' |
+    'plain' |
+    'text' |
+    'richtext(raw)' |
+    'richtext(simple)' |
+    'richtext(normal)' |
+    'richtext(advanced)'
+)
 export interface InputProperties<T = unknown> extends
     InputModelState, Properties<T>
 {
     align:'end'|'start'
     children:(options:InputChildrenOptions<this, T>) => null|ReactElement
     cursor:CursorState
-    /*
-        plain -> input field
-        text -> textarea
-        richtext(raw) -> texteditor without formatting
-        richtext(simple) -> texteditor with semantic text modifications
-        richtext(normal) -> texteditor with additional text formatting
-        richtext(advanced) -> texteditor with advanced text formatting
-     */
-    editor:(
-        'code' |
-        'code(css)' |
-        'code(script)' |
-        'plain' |
-        'text' |
-        'richtext(raw)' |
-        'richtext(simple)' |
-        'richtext(normal)' |
-        'richtext(advanced)'
-    )
+
+    editor:Editor
     editorIsActive:boolean
 
     hidden:boolean
