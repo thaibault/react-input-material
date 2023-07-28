@@ -191,10 +191,10 @@ CommonBaseModel<T>, ModelState {
 export type BaseProps<T = unknown> =
     Partial<Omit<BaseProperties<T>, 'model'>> &
     {
-        model?:Partial<
-            Omit<BaseModel<T>, 'state'> &
+        model?:(
+            Partial<Omit<BaseModel<T>, 'state'>> &
             {state?:Partial<ModelState>}
-        >
+        )
     }
 
 export type DefaultBaseProperties<T = unknown> =
@@ -227,10 +227,10 @@ export type Properties<T = unknown> =
 export type Props<T = unknown> =
     Partial<Omit<Properties<T>, 'model'>> &
     {
-        model?:Partial<
-            Omit<BaseModel<T>, 'state'> &
+        model?:(
+            Partial<Omit<BaseModel<T>, 'state'>> &
             {state?:Partial<ModelState>}
-        >
+        )
     }
 
 export type DefaultProperties<T = unknown> =
@@ -475,7 +475,12 @@ export type CheckboxModelState = ModelState
 export type CheckboxValueState = ValueState<boolean, CheckboxModelState>
 export type CheckboxProps =
     Partial<Omit<CheckboxProperties, 'model'>> &
-    {model?:Partial<CheckboxModel>}
+    {
+        model?:(
+            Partial<Omit<CheckboxModel, 'state'>> &
+            {state?:Partial<CheckboxModelState>}
+        )
+    }
 export type DefaultCheckboxProperties =
     Omit<CheckboxProps, 'model'> & {model:CheckboxModel}
 export type CheckboxState = State<boolean>
@@ -1372,7 +1377,10 @@ export type IntervalProps =
 
         icon:IntervalProperties['icon']
 
-        model:IntervalProperties['model']
+        model:(
+            Partial<Omit<IntervalProperties['model'], 'state'>> &
+            {state?:Partial<IntervalModelState>}
+        )
 
         onChange:IntervalProperties['onChange']
         onChangeValue:IntervalProperties['onChangeValue']
