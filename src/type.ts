@@ -133,9 +133,10 @@ export interface ModelState {
 
     invalidRequired:boolean
 }
+export type Pattern = Array<RegExp|string>|RegExp|string
 export interface BaseModel<T = unknown> extends CommonBaseModel<T> {
-    regularExpressionPattern?:Array<RegExp|string>|RegExp|string
-    invertedRegularExpressionPattern?:Array<RegExp|string>|RegExp|string
+    regularExpressionPattern?:Pattern
+    invertedRegularExpressionPattern?:Pattern
 
     mutable:boolean
     writable:boolean
@@ -278,10 +279,13 @@ export interface InputComponent<
 }
 //// region constants
 export const baseModelPropertyTypes:ValidationMapping = {
-    declaration: string,
-    default: any,
-    description: string,
     name: string,
+
+    declaration: string,
+    description: string,
+
+    default: any,
+
     selection: oneOfType([
         arrayOf(oneOfType([
             arrayOf(oneOfType([number, string])),
@@ -311,6 +315,7 @@ export const baseModelPropertyTypes:ValidationMapping = {
         ])
     */
     type: string,
+
     value: any
 } as const
 export const modelStatePropertyTypes:{
@@ -359,7 +364,9 @@ export const propertyTypes:ValidationMapping = {
     themeConfiguration: object,
 
     disabled: boolean,
+
     enforceUncontrolled: boolean,
+
     initialValue: any,
     inputProperties: object,
     model: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
@@ -929,10 +936,8 @@ export interface FileInputModelState extends ModelState {
 export interface FileInputModel<
     Type extends FileValue = FileValue
 > extends BaseModel<Type> {
-    contentTypeRegularExpressionPattern:Array<RegExp|string>|null|RegExp|string
-    invertedContentTypeRegularExpressionPattern:(
-        Array<RegExp|string>|null|RegExp|string
-    )
+    contentTypeRegularExpressionPattern?:Pattern
+    invertedContentTypeRegularExpressionPattern?:Pattern
 
     maximumSize:number
     minimumSize:number
@@ -1089,7 +1094,7 @@ export const defaultFileInputModel:FileInputModel = {
     ...defaultModel as BaseModel<FileValue>,
 
     contentTypeRegularExpressionPattern: /^.+\/.+$/,
-    invertedContentTypeRegularExpressionPattern: null,
+    invertedContentTypeRegularExpressionPattern: undefined,
 
     fileName: {
         ...defaultInputModel,
