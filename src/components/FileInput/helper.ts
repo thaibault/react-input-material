@@ -149,10 +149,11 @@ export const determineValidationState = <
         ((properties.model.value?.blob as Blob)?.size || 0)
     )
     const invalidContentTypePattern = ():boolean => (
+        Boolean(properties.model.contentTypeRegularExpressionPattern) &&
         typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
-        ([] as Array<null|RegExp|string>)
-            .concat(properties.model.contentTypeRegularExpressionPattern)
-            .some((expression:null|RegExp|string):boolean =>
+        ([] as Array<RegExp|string>)
+            .concat(properties.model.contentTypeRegularExpressionPattern!)
+            .some((expression:RegExp|string):boolean =>
                 typeof expression === 'string' &&
                 !(new RegExp(expression))
                     .test((properties.model.value!.blob as Blob).type) ||
@@ -164,12 +165,15 @@ export const determineValidationState = <
             )
     )
     const invalidInvertedContentTypePattern = ():boolean => (
+        Boolean(
+            properties.model.invertedContentTypeRegularExpressionPattern
+        ) &&
         typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
-        ([] as Array<null|RegExp|string>)
+        ([] as Array<RegExp|string>)
             .concat(
-                properties.model.invertedContentTypeRegularExpressionPattern
+                properties.model.invertedContentTypeRegularExpressionPattern!
             )
-            .some((expression:null|RegExp|string):boolean =>
+            .some((expression:RegExp|string):boolean =>
                 typeof expression === 'string' &&
                 (new RegExp(expression))
                     .test((properties.model.value!.blob as Blob).type) ||
