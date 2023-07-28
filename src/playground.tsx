@@ -58,12 +58,12 @@ const Application = () => {
             }
         )
     // region controlled state
-    const [value1, setValue1] = useState<FileValue|undefined>({
+    const [value1, setValue1] = useState<FileValue|null|undefined>({
         blob: new Blob(['test'], {type: 'text/plain'}),
         name: 'test.txt'
     })
     const onChangeValue1 =
-        useMemorizedValue<(value?:FileValue) => void>(setValue1)
+        useMemorizedValue<(value?:FileValue|null) => void>(setValue1)
 
     const [value2, setValue2] = useState<null|string>('')
     const onChangeValue2 =
@@ -853,7 +853,7 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    <Inputs<FileValue, FileInputProps>
+                    <Inputs<FileValue|null, FileInputProps>
                         createItem={useMemorizedValue(
                             ({
                                 index,

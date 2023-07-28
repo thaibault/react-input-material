@@ -942,7 +942,7 @@ export interface FileInputModelState extends ModelState {
 }
 export interface FileInputModel<
     Type extends FileValue = FileValue
-> extends BaseModel<Type> {
+> extends BaseModel<null|Type> {
     contentTypeRegularExpressionPattern?:Pattern
     invertedContentTypeRegularExpressionPattern?:Pattern
 
@@ -964,7 +964,7 @@ export interface FileInputChildrenOptions<
 }
 export interface FileInputProperties<
     Type extends FileValue = FileValue, MediaTag extends ElementType = 'div'
-> extends Properties<Type>, FileInputModelState {
+> extends Properties<null|Type>, FileInputModelState {
     children:(options:FileInputChildrenOptions<
         FileInputProperties<Type, MediaTag>, Type
     >) => ReactNode
