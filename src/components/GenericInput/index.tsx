@@ -125,6 +125,9 @@ import {
     UseAnimations
 } from './helper'
 import TRANSFORMER from './transformer'
+
+export * from './helper'
+export const INPUT_TRANSFORMER = TRANSFORMER
 // endregion
 let RICH_TEXT_EDITOR_LOADER_ONCE = false
 /* eslint-disable jsdoc/require-description-complete-sentence */
