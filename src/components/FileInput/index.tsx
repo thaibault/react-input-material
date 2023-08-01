@@ -89,6 +89,8 @@ import {
     deriveBase64String,
     readBinaryDataIntoText
 } from './helper'
+
+export * from './helper'
 // endregion
 /* eslint-disable jsdoc/require-description-complete-sentence */
 /**
