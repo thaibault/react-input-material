@@ -284,9 +284,11 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                 return
         }
 
+
         setValueState((oldValueState:ValueState<Type>):ValueState<Type> => {
             if (typeof eventSourceOrName === 'undefined')
-                properties.value = eventSourceOrName
+                // NOTE: Mark file as deleted.
+                properties.value = null
             else if (typeof eventSourceOrName === 'string')
                 /*
                     NOTE: A name can only be changed if a blob is available
