@@ -576,11 +576,13 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                 )
             else if (properties.value?.url && representationType === 'text')
                 // Derive missing source from given data url.
-                valueChanged.source = await (
-                    properties.value.url?.startsWith('data:') ?
+                valueChanged.source = await readBinaryDataIntoText(
+                    await (properties.value.url?.startsWith('data:') ?
                         dataURLToBlob(properties.value.url) :
-                        (await fetch(properties.value.url))
-                ).text()
+                        (await fetch(properties.value.url)).blob()
+                    ),
+                    properties.encoding
+                )
 
             if (Object.keys(valueChanged).length > 0)
                 onChangeValue(valueChanged, undefined, undefined, true)
