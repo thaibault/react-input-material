@@ -567,6 +567,11 @@ export type InputDataTransformation =
         NativeInputType, 'date'|'datetime-local'|'time'|'number'
     >]?:DataTransformSpecification<unknown>}
 //// endregion
+export type InputSelection =
+    Array<boolean|number> |
+    Array<[boolean|number|string, string]> |
+    NormalizedSelection |
+    SelectProps['options']
 export type NormalizedSelection =
     Array<Omit<FormattedSelectionOption, 'value'> & {value:unknown}>
 export interface InputTablePosition {

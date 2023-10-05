@@ -21,7 +21,6 @@ import Tools from 'clientnode'
 import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 import {FirstParameter, Mapping, ValueOf} from 'clientnode/type'
 import {ReactNode, useState} from 'react'
-import {SelectProps} from '@rmwc/select'
 
 import {
     BaseModel,
@@ -33,6 +32,7 @@ import {
     FormatSpecifications,
     InputDataTransformation,
     InputProperties,
+    InputSelection,
     ModelState,
     NormalizedSelection,
     Transformer,
@@ -513,12 +513,7 @@ export function getValueFromSelection<T>(
  * @returns Determined normalized sorted selection configuration.
  */
 export function normalizeSelection(
-    selection?:(
-        Array<boolean|number> |
-        Array<[boolean|number|string, string]> |
-        NormalizedSelection |
-        SelectProps['options']
-    ),
+    selection?:InputSelection,
     labels?:Array<[string, string]>|Array<string>|Mapping
 ):NormalizedSelection|undefined {
     if (!selection) {
