@@ -63,8 +63,7 @@ endregion */
     padding: 0 15px;
     width: 620px;
 
-    overflow-x: hidden;
-    overflow-y: scroll;
+    overflow: hidden scroll;
     /* Hide scrollbar for IE and Edge */
     -ms-overflow-style: none;
     /* Hide scrollbar for Firefox */
