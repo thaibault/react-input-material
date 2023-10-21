@@ -1551,7 +1551,7 @@ export const GenericInputInner = function<Type = unknown>(
         if (
             !properties.disabled &&
             useSuggestions &&
-            Tools.keyCode.DOWN === event.keyCode &&
+            'Down' === event.code &&
             event.target === inputReference.current
         )
             suggestionMenuAPIReference.current?.focusItemAtIndex(0)
@@ -1579,7 +1579,7 @@ export const GenericInputInner = function<Type = unknown>(
      */
     const onKeyUp = (event:ReactKeyboardEvent):void => {
         // NOTE: Avoid breaking password-filler on non textarea fields!
-        if (event.keyCode) {
+        if (event.code) {
             onSelectionChange(event)
 
             triggerCallbackIfExists<Properties<Type>>(
@@ -2116,10 +2116,7 @@ export const GenericInputInner = function<Type = unknown>(
                             Avoid scrolling page interactions when navigating
                             through option.
                         */
-                        if (!(
-                            properties.disabled ||
-                            event.keyCode === Tools.keyCode.TAB
-                        ))
+                        if (!(properties.disabled || event.code === 'Tab'))
                             event.preventDefault()
                     }}
                     options={normalizedSelection as SelectProps['options']}
