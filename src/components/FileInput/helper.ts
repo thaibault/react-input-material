@@ -93,7 +93,8 @@ export const preserveStaticFileBaseNameInputGenerator = <
         value:
             name +
             (value?.name?.includes('.') ?
-                value.name.substring(value.name.lastIndexOf('.')) :
+                value.name.substring(value.name.lastIndexOf('.'))
+                    .toLowerCase() :
                 ''
             )
     })
