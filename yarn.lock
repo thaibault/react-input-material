@@ -8750,14 +8750,14 @@ react-dom@*:
     scheduler "^0.23.0"
 
 react-generic-animate@*:
-  version "0.0.22"
-  resolved "https://registry.yarnpkg.com/react-generic-animate/-/react-generic-animate-0.0.22.tgz#2c64f73e099a7a5b0e1166f7c1314bd46ed1da39"
-  integrity sha512-pnpxdQZShbCkR0fzFfE6uD7xHPSr+w4J0936hx+kduUvaJe9iv4NS50UzISiukt0XbDcDXjjyyWuzsWIz9YNvQ==
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/react-generic-animate/-/react-generic-animate-0.0.23.tgz#34b898abce60e2f0a3fc57a37e7d62391a810e0b"
+  integrity sha512-UorWgV2jK+06qIYSuChibzyh/AmYuaQVmpc40EtDaxoy9n87Ndxoe7oWzEW2+ADx4Iq7CW7hzzTCJJSZtdaHiQ==
 
 react-generic-dummy@*:
-  version "0.0.53"
-  resolved "https://registry.yarnpkg.com/react-generic-dummy/-/react-generic-dummy-0.0.53.tgz#59bb03c5fb82a1f831577aadbec4e42480aab966"
-  integrity sha512-aeWTrgz9Tv5U8rjMCPZ9aFZ8H56XrYlaApJpG13VSVPixPwSP4g5/5FrUHtQwIznJYNAS5dIT9igt2Zit3EZKg==
+  version "0.0.54"
+  resolved "https://registry.yarnpkg.com/react-generic-dummy/-/react-generic-dummy-0.0.54.tgz#83e0491ed180274985cf70eb50952f7cec3b6bb4"
+  integrity sha512-5KTWlB+G+k4DN+YxTg30L99PKPebPzg3BWQPi+zEkwxDU/XznRdd5PzOuEuQWeEHZzg1zFsdrYWzY3GtG1KjaA==
 
 react-generic-tools@*:
   version "0.0.25"
