@@ -280,8 +280,8 @@ export const TRANSFORMER:InputDataTransformation = {
     },
     /*
         NOTE: Daylight saving time should not make a difference since times
-        will always be saved on zero unix timestamp where no daylight saving
-        time rules existing.
+        will always be based on zero unix timestamp (1/1/1970 where no daylight
+        saving time rule existed.
     */
     'time-local': {
         format: {
