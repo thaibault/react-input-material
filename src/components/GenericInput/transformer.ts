@@ -113,11 +113,9 @@ export const TRANSFORMER:InputDataTransformation = {
             return formattedValue.substring(0, formattedValue.indexOf('T'))
         }}},
         /*
-         * Converts strings into unix timestamps.
-         * @param value - Value to interpret.
-         *
-         * @returns Normalized unix time stamp.
-         */
+            Converts date or strings into unix timestamps (numbers will not be
+            changed).
+        */
         parse: (value:Date|number|string):number => {
             if (typeof value === 'number')
                 return value
@@ -137,7 +135,7 @@ export const TRANSFORMER:InputDataTransformation = {
             return parsedDate / 1000
         }
     },
-    // TODO test
+    // TODO respect local to utc conversion
     'date-local': {
         format: {final: {transform: (
             value:Date|number|string,
@@ -256,53 +254,57 @@ export const TRANSFORMER:InputDataTransformation = {
     },
     time: {
         format: {
-            final: {transform: (
-                value:Date|number|string,
-                configuration:DefaultProperties<number>,
-                transformer:InputDataTransformation
-            ):string => {
-                if (typeof value !== 'number')
-                    if (transformer.time.parse)
-                        value = transformer.time.parse(
-                            value, configuration, transformer
-                        )
-                    else {
-                        const parsedDate:number = value instanceof Date ?
-                            value.getTime() / 1000 :
-                            Date.parse(value)
-                        if (isNaN(parsedDate)) {
-                            const parsedFloat:number =
-                                parseFloat(value as string)
-                            value = isNaN(parsedFloat) ? 0 : parsedFloat
-                        } else
-                            value = parsedDate / 1000
-                    }
+            final: {
+                // Converts given date representation into utc iso time string.
+                transform: (
+                    value:Date|number|string,
+                    configuration:DefaultProperties<number>,
+                    transformer:InputDataTransformation
+                ):string => {
+                    if (typeof value !== 'number')
+                        if (transformer.time.parse)
+                            value = transformer.time.parse(
+                                value, configuration, transformer
+                            )
+                        else {
+                            const parsedDate:number = value instanceof Date ?
+                                value.getTime() / 1000 :
+                                Date.parse(value)
+                            if (isNaN(parsedDate)) {
+                                const parsedFloat:number =
+                                    parseFloat(value as string)
+                                value = isNaN(parsedFloat) ? 0 : parsedFloat
+                            } else
+                                value = parsedDate / 1000
+                        }
 
-                if (value === Infinity)
-                    return 'Infinitely far in the future'
-                if (value === -Infinity)
-                    return 'Infinitely early in the past'
-                if (!isFinite(value))
-                    return ''
+                    if (value === Infinity)
+                        return 'Infinitely far in the future'
+                    if (value === -Infinity)
+                        return 'Infinitely early in the past'
+                    if (!isFinite(value))
+                        return ''
 
-                let formattedValue:string =
-                    (new Date(Math.round(value * 1000))).toISOString()
+                    let formattedValue:string =
+                        (new Date(Math.round(value * 1000))).toISOString()
 
-                formattedValue = formattedValue.substring(
-                    formattedValue.indexOf('T') + 1, formattedValue.length - 1
-                )
-
-                if (
-                    configuration.step &&
-                    configuration.step >= 60 &&
-                    (configuration.step % 60) === 0
-                )
-                    return formattedValue.substring(
-                        0, formattedValue.lastIndexOf(':')
+                    formattedValue = formattedValue.substring(
+                        formattedValue.indexOf('T') + 1,
+                        formattedValue.length - 1
                     )
 
-                return formattedValue
-            }}
+                    if (
+                        configuration.step &&
+                        configuration.step >= 60 &&
+                        (configuration.step % 60) === 0
+                    )
+                        return formattedValue.substring(
+                            0, formattedValue.lastIndexOf(':')
+                        )
+
+                    return formattedValue
+                }
+            }
         },
         parse: (value:Date|number|string):number => {
             if (typeof value === 'number')
