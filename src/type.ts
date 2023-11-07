@@ -300,6 +300,7 @@ export const baseModelPropertyTypes:ValidationMapping = {
         type: oneOf([
             'color',
             'date',
+            'date-local',
             'datetime-local',
             'email',
             'month',
@@ -553,6 +554,7 @@ export type InputDataTransformation =
         currency:DataTransformSpecification<number, string>
 
         date:DataTransformSpecification<number, Date|number|string>
+        'date-local':DataTransformSpecification<number, Date|number|string>
         'datetime-local':DataTransformSpecification<number, Date|number|string>
         time:DataTransformSpecification<number, Date|number|string>
         'time-local':DataTransformSpecification<number, Date|number|string>
@@ -564,7 +566,7 @@ export type InputDataTransformation =
         string?:DataTransformSpecification<unknown>
     } &
     {[key in Exclude<
-        NativeInputType, 'date'|'datetime-local'|'time'|'number'
+        NativeInputType, 'date'|'date-local'|'datetime-local'|'time'|'number'
     >]?:DataTransformSpecification<unknown>}
 //// endregion
 export type InputSelection =
@@ -601,6 +603,7 @@ export interface InputValueState<T = unknown, MS = ModelState> extends
 }
 export type NativeInputType = (
     'date' |
+    'date-local' |
     'datetime-local' |
     'month' |
     'number' |

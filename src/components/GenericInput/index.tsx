@@ -2054,7 +2054,7 @@ export const GenericInputInner = function<Type = unknown>(
         if (properties.editor !== 'plain')
             constraints.rows = properties.rows
     } else if ([
-        'date', 'datetime-local', 'time', 'time-local'
+        'date', 'date-local', 'datetime-local', 'time', 'time-local'
     ].includes(properties.type as string)) {
         constraints.step = properties.step
 

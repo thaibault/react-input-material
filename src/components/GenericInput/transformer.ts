@@ -112,6 +112,12 @@ export const TRANSFORMER:InputDataTransformation = {
 
             return formattedValue.substring(0, formattedValue.indexOf('T'))
         }}},
+        /*
+         * Converts strings into unix timestamps.
+         * @param value - Value to interpret.
+         *
+         * @returns Normalized unix time stamp.
+         */
         parse: (value:Date|number|string):number => {
             if (typeof value === 'number')
                 return value
@@ -126,6 +132,62 @@ export const TRANSFORMER:InputDataTransformation = {
                     return 0
 
                 return parsedFloat
+            }
+
+            return parsedDate / 1000
+        }
+    },
+    // TODO test
+    'date-local': {
+        format: {final: {transform: (
+            value:Date|number|string,
+            configuration:DefaultProperties<number>,
+            transformer:InputDataTransformation
+        ):string => {
+            if (typeof value !== 'number')
+                if (transformer['date-local'].parse)
+                    value = transformer['date-local'].parse(
+                        value, configuration, transformer
+                    )
+                else {
+                    const parsedDate:number = value instanceof Date ?
+                        value.getTime() / 1000 :
+                        Date.parse(value)
+                    if (isNaN(parsedDate)) {
+                        const parsedFloat:number = parseFloat(value as string)
+                        value = isNaN(parsedFloat) ? 0 : parsedFloat
+                    } else
+                        value = parsedDate / 1000
+                }
+
+            if (value === Infinity)
+                return 'Infinitely far in the future'
+            if (value === -Infinity)
+                return 'Infinitely early in the past'
+            if (!isFinite(value))
+                return ''
+
+            const formattedValue:string =
+                (new Date(Math.round(value * 1000))).toISOString()
+
+            return formattedValue.substring(0, formattedValue.indexOf('T'))
+        }}},
+        parse: (value:Date|number|string):number => {
+            if (typeof value === 'number')
+                return value
+
+            if (value instanceof Date)
+                return value.getTime() / 1000
+
+            const parsedDate:number = Date.parse(value)
+            if (isNaN(parsedDate)) {
+                const parsedFloat:number = parseFloat(value)
+                if (isNaN(parsedFloat))
+                    return 0
+
+                // TODO respect time shift for utc
+                return parsedFloat
+                // + new Date().getTimezoneOffset() * 60 * 1000
             }
 
             return parsedDate / 1000
@@ -189,7 +251,8 @@ export const TRANSFORMER:InputDataTransformation = {
             }
 
             return parsedDate / 1000
-        }
+        },
+        type: 'date'
     },
     time: {
         format: {
