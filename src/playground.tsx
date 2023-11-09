@@ -58,49 +58,52 @@ const Application = () => {
             }
         )
     // region controlled state
-    const [value1, setValue1] = useState<FileValue|null|undefined>({
-        blob: new Blob(['test'], {type: 'text/plain'}),
-        name: 'test.txt'
-    })
+    const [fileInputValue, setFileInputValue] =
+        useState<FileValue|null|undefined>({
+            blob: new Blob(['test'], {type: 'text/plain'}),
+            name: 'test.txt'
+        })
     const onChangeValue1 =
-        useMemorizedValue<(value?:FileValue|null) => void>(setValue1)
+        useMemorizedValue<(value?:FileValue|null) => void>(setFileInputValue)
 
-    const [value2, setValue2] = useState<null|string>('')
-    const onChangeValue2 =
-        useMemorizedValue<(value:null|string) => void>(setValue2)
+    const [inputValue1, setInputValue1] = useState<null|string>('')
+    const onChangeInputValue1 =
+        useMemorizedValue<(value:null|string) => void>(setInputValue1)
 
     type FloatValueState = {
         representation:ReactNode|string
         value?:null|number
     }
-    const [value3, setValue3] = useState<FloatValueState>({
+    const [inputValue2, setInputValue2] = useState<FloatValueState>({
         value: 1234.34, representation: '1.234,34'
     })
-    const onChangeValue3 =
-        useMemorizedValue<(value:FloatValueState) => void>(setValue3)
+    const onChangeInputValue2 =
+        useMemorizedValue<(value:FloatValueState) => void>(setInputValue2)
 
     type SelectionValueType = {
         representation:ReactNode|string
         value?:null|string
     }
-    const [value4, setValue4] =
+    const [inputValue3, setInputValue3] =
         useState<SelectionValueType>({representation: 'klaus', value: 'b'})
-    const onChangeValue4 =
-        useMemorizedValue<(value:SelectionValueType) => void>(setValue4)
+    const onChangeInputValue3 =
+        useMemorizedValue<(value:SelectionValueType) => void>(setInputValue3)
 
-    const [value5, setValue5] =
+    const [inputValue4, setInputValue4] =
         useState<IntervalValue|null>({end: 120, start: 60})
-    const onChangeValue5 =
-        useMemorizedValue<(value:IntervalValue|null) => void>(setValue5)
+    const onChangeInputValue4 =
+        useMemorizedValue<(value:IntervalValue|null) => void>(setInputValue4)
 
-    const [value6, setValue6] = useState<boolean>(false)
-    const onChangeValue6 =
-        useMemorizedValue<(value:boolean) => void>(setValue6)
+    const [inputValue5, setInputValue5] = useState<boolean>(false)
+    const onChangeInputValue5 =
+        useMemorizedValue<(value:boolean) => void>(setInputValue5)
 
-    const [value7, setValue7] =
+    const [inputValue6, setInputValue6] =
         useState<Array<null|string>|null>(['first item'])
-    const onChangeValue7 =
-        useMemorizedValue<(values:Array<null|string>|null) => void>(setValue7)
+    const onChangeInputValue6 =
+        useMemorizedValue<(values:Array<null|string>|null) => void>(
+            setInputValue6
+        )
     // endregion
 
     return (<>
@@ -186,7 +189,7 @@ const Application = () => {
                         onChange={onChange}
                         onChangeValue={onChangeValue1}
                         triggerInitialPropertiesConsolidation={true}
-                        value={value1}
+                        value={fileInputValue}
                     />
                 </div>
                 {/* endregion */}
@@ -206,16 +209,16 @@ const Application = () => {
                     <Input<null|string>
                         name="UnControlled"
                         onChange={onChange}
-                        onChangeValue={onChangeValue2}
+                        onChangeValue={onChangeInputValue1}
                         enforceUncontrolled={true}
-                        value={value2}
+                        value={inputValue1}
                     />
                     <Input<null|string>
                         name="controlled"
                         onChange={onChange}
-                        onChangeValue={onChangeValue2}
+                        onChangeValue={onChangeInputValue1}
                         triggerInitialPropertiesConsolidation={true}
-                        value={value2}
+                        value={inputValue1}
                     />
                     <Input<null|number>
                         name="controlled"
@@ -223,14 +226,14 @@ const Application = () => {
                             properties:InputProperties<null|number>
                         ) => {
                             onChange(properties)
-                            onChangeValue3({
+                            onChangeInputValue2({
                                 representation: properties.representation,
                                 value: properties.value
                             })
                         })}
-                        representation={value3.representation}
+                        representation={inputValue2.representation}
                         type="float"
-                        value={value3.value}
+                        value={inputValue2.value}
                     />
 
                     <hr/>
@@ -611,37 +614,37 @@ const Application = () => {
                         name="controlled"
                         onChange={useMemorizedValue(
                             (properties:InputProperties<null|string>) => {
-                                onChangeValue4({
+                                onChangeInputValue3({
                                     representation: properties.representation,
                                     value: properties.value
                                 })
                                 onChange(properties)
                             }
                         )}
-                        representation={value4.representation}
+                        representation={inputValue3.representation}
                         searchSelection
                         selection={useMemorizedValue(
                             {a: 'hans', b: 'peter', c: 'klaus'}
                         )}
-                        value={value4.value}
+                        value={inputValue3.value}
                     />
                     <Input<null|string>
                         name="controlled"
                         onChange={useMemorizedValue(
                             (properties:InputProperties<null|string>) => {
-                                onChangeValue4({
+                                onChangeInputValue3({
                                     representation: properties.representation,
                                     value: properties.value
                                 })
                                 onChange(properties)
                             }
                         )}
-                        representation={value4.representation}
+                        representation={inputValue3.representation}
                         suggestSelection
                         selection={useMemorizedValue(
                             {a: 'hans', b: 'peter', c: 'klaus'}
                         )}
-                        value={value4.value}
+                        value={inputValue3.value}
                     />
 
                     <hr/>
@@ -918,9 +921,9 @@ const Application = () => {
                     <Inputs
                         name="controlled"
                         onChange={onChange}
-                        onChangeValue={onChangeValue7}
+                        onChangeValue={onChangeInputValue6}
                         triggerInitialPropertiesConsolidation={true}
-                        value={value7}
+                        value={inputValue6}
                     />
                 </div>
                 {/* endregion */}
@@ -951,10 +954,10 @@ const Application = () => {
                         name="controlled"
                         default={120}
                         onChange={onChange}
-                        onChangeValue={onChangeValue5}
+                        onChangeValue={onChangeInputValue4}
                         step={60}
                         triggerInitialPropertiesConsolidation={true}
-                        value={value5}
+                        value={inputValue4}
                     />
                 </div>
                 {/* endregion */}
@@ -971,9 +974,9 @@ const Application = () => {
                     <RequireableCheckbox
                         name="controlled"
                         onChange={onChange}
-                        onChangeValue={onChangeValue6}
+                        onChangeValue={onChangeInputValue5}
                         triggerInitialPropertiesConsolidation={true}
-                        value={value6}
+                        value={inputValue5}
                     />
 
                     <hr/>
