@@ -23,6 +23,29 @@ import {
     DefaultInputProperties as DefaultProperties, InputDataTransformation
 } from '../../type'
 // endregion
+const convertEdgeValueToString = (value:Date|number|string):null|string => {
+    if (value === Infinity)
+        return 'Infinitely far in the future'
+
+    if (value === -Infinity)
+        return 'Infinitely early in the past'
+
+    if (!isFinite(value as number))
+        return ''
+
+    return null
+}
+const utcSecondsToISOString = (value:number):string =>
+    (new Date(Math.round(value * 1000))).toISOString()
+const normalizeDateRepresentation = (
+    value:Date|number|string
+):number|string => {
+    if (value instanceof Date)
+        return value.getTime() / 1000
+
+    return value
+}
+
 export const TRANSFORMER:InputDataTransformation = {
     boolean: {
         parse: (value:boolean|number|string):boolean =>
@@ -87,26 +110,24 @@ export const TRANSFORMER:InputDataTransformation = {
                         date: {...transformer.date, useISOString: false}
                     },
                     configuration
-                )
+                ) as number
 
-            if (value === Infinity)
-                return 'Infinitely far in the future'
-            if (value === -Infinity)
-                return 'Infinitely early in the past'
-            if (!isFinite(value as number))
-                return ''
+            const edgeValueDesciption = convertEdgeValueToString(value)
+            if (typeof edgeValueDesciption === 'string')
+                return edgeValueDesciption
 
-            const formattedValue:string =
-                (new Date(Math.round(value as number * 1000))).toISOString()
-
+            const formattedValue = utcSecondsToISOString(value)
+            /*
+                NOTE: This is only needed since the browser input support does
+                not expect to adapt more specific than seconds.
+            */
             return formattedValue.substring(0, formattedValue.lastIndexOf('.'))
         }}},
         parse: (
             value:Date|number|string,
             {date: {useISOString}}:InputDataTransformation
         ):number|string => {
-            if (value instanceof Date)
-                value = value.getTime() / 1000
+            value = normalizeDateRepresentation(value)
 
             if (typeof value === 'string') {
                 let parsedDate = Date.parse(`${value}:00.000Z`)
@@ -130,7 +151,7 @@ export const TRANSFORMER:InputDataTransformation = {
                 value = 0
 
             return useISOString ?
-                new Date(value as number * 1000).toISOString() :
+                utcSecondsToISOString(value as number) :
                 value
         },
         type: 'datetime-local'
@@ -152,24 +173,21 @@ export const TRANSFORMER:InputDataTransformation = {
                     configuration
                 ) as number
 
-            if (value === Infinity)
-                return 'Infinitely far in the future'
-            if (value === -Infinity)
-                return 'Infinitely early in the past'
-            if (!isFinite(value))
-                return ''
+            const edgeValueDesciption = convertEdgeValueToString(value)
+            if (typeof edgeValueDesciption === 'string')
+                return edgeValueDesciption
 
-            const formattedValue:string = new Date(
-                (value + new Date().getTimezoneOffset() * 60) * 1000
-            ).toISOString()
+            const formattedValue:string = utcSecondsToISOString(
+                value + new Date().getTimezoneOffset() * 60
+            )
 
             return formattedValue.substring(0, formattedValue.lastIndexOf('.'))
         }}},
         parse: (
-            value:Date|number|string, transformation:InputDataTransformation
+            value:Date|number|string,
+            {date: {useISOString}}:InputDataTransformation
         ):number|string => {
-            if (value instanceof Date)
-                value = value.getTime() / 1000
+            value = normalizeDateRepresentation(value)
 
             if (typeof value === 'string') {
                 let parsedDate = Date.parse(`${value}:00.000Z`)
@@ -198,8 +216,8 @@ export const TRANSFORMER:InputDataTransformation = {
             if (isNaN(value as number))
                 value = 0
 
-            return transformation.date.useISOString ?
-                new Date(value as number * 1000).toISOString() :
+            return useISOString ?
+                utcSecondsToISOString(value as number) :
                 value
         }
     },
@@ -283,10 +301,21 @@ export const TRANSFORMER:InputDataTransformation = {
             transformer:InputDataTransformation,
             configuration:DefaultProperties<number|string>
         ):string => {
-            let formattedValue =
-                transformer.datetime.format!.final.transform!(
-                    value, transformer, configuration
-                )
+            if (typeof value !== 'number')
+                value = transformer.datetime.parse!(
+                    value,
+                    {
+                        ...transformer,
+                        date: {...transformer.date, useISOString: false}
+                    },
+                    configuration
+                ) as number
+
+            const edgeValueDesciption = convertEdgeValueToString(value)
+            if (typeof edgeValueDesciption === 'string')
+                return edgeValueDesciption
+
+            let formattedValue = utcSecondsToISOString(value)
 
             const index = formattedValue.indexOf('T')
             if (index === -1)
@@ -312,8 +341,7 @@ export const TRANSFORMER:InputDataTransformation = {
             value:Date|number|string,
             {date: {useISOString}}:InputDataTransformation
         ):number|string => {
-            if (value instanceof Date)
-                value = value.getTime() / 1000
+            value = normalizeDateRepresentation(value)
 
             if (typeof value === 'string') {
                 const parsedDate:number = Date.parse(value)
@@ -342,9 +370,10 @@ export const TRANSFORMER:InputDataTransformation = {
                     value = parsedDate / 1000
             }
 
-            return isNaN(value) ?
-                0 :
-                useISOString ? new Date(value * 1000).toISOString() : value
+            if (isNaN(value))
+                value = 0
+
+            return useISOString ? utcSecondsToISOString(value) : value
         }
     },
     /*
@@ -372,16 +401,14 @@ export const TRANSFORMER:InputDataTransformation = {
                     configuration
                 ) as number
 
-            if (value === Infinity)
-                return 'Infinitely far in the future'
-            if (value === -Infinity)
-                return 'Infinitely early in the past'
-            if (!isFinite(value))
-                return ''
+            const edgeValueDesciption = convertEdgeValueToString(value)
+            if (typeof edgeValueDesciption === 'string')
+                return edgeValueDesciption
 
             const dateTime = new Date(
-                (value + new Date().getTimezoneOffset() * 60) * 1000
+                (value/* + new Date().getTimezoneOffset() * 60*/) * 1000
             )
+
             const hours:number = dateTime.getHours()
             const minutes:number = dateTime.getMinutes()
 
@@ -410,10 +437,10 @@ export const TRANSFORMER:InputDataTransformation = {
             time shift is taken into account.
         */
         parse: (
-            value:Date|number|string, transformation:InputDataTransformation
+            value:Date|number|string,
+            {date: {useISOString}}:InputDataTransformation
         ):number|string => {
-            if (value instanceof Date)
-                return value.getTime() / 1000
+            value = normalizeDateRepresentation(value)
 
             if (typeof value === 'string') {
                 const parsedDate:number = Date.parse(value)
@@ -444,9 +471,10 @@ export const TRANSFORMER:InputDataTransformation = {
                     value = parsedDate / 1000
             }
 
-            return transformation.date.useISOString ?
-                new Date(value * 1000).toISOString() :
-                value
+            if (isNaN(value))
+                value = 0
+
+            return useISOString ? utcSecondsToISOString(value) : value
         },
         type: 'time'
     },

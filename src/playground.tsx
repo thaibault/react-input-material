@@ -584,7 +584,6 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    {/*
                     <Input<number>
                         default={
                             new Date('2025-01-01T00:00:00.000Z')
@@ -594,7 +593,6 @@ const Application = () => {
                         onChange={onChange}
                         type="date"
                     />
-                    */}
                     <Input<string>
                         initialValue="2025-01-01T00:00:00.000Z"
                         inputProperties={useMemorizedValue({outlined: true})}
@@ -603,23 +601,23 @@ const Application = () => {
                         })}
                         onChange={onChange}
                     />
-                    {/*
 
                     <hr/>
 
                     <Input<number>
-                        default={120}
+                        default={
+                            new Date('2025-01-01T00:00:00.000Z')
+                                .getTime() / 1000
+                        }
                         name="timeInput2"
                         onChange={onChange}
-                        type="datetime"
+                        type="date-local"
                     />
-                    <Input<Date>
+                    <Input<string>
+                        initialValue="2025-01-01T00:00:00.000Z"
+                        inputProperties={useMemorizedValue({outlined: true})}
                         model={useMemorizedValue({
-                            default: new Date(120 * 1000),
-                            maximum: 3600,
-                            minimum: 60,
-                            name: 'timeInput2Model',
-                            type: 'datetime'
+                            name: 'timeInput2Model', type: 'date-local'
                         })}
                         onChange={onChange}
                     />
@@ -630,6 +628,25 @@ const Application = () => {
                         default={120}
                         name="timeInput3"
                         onChange={onChange}
+                        type="datetime"
+                    />
+                    <Input<Date>
+                        model={useMemorizedValue({
+                            default: new Date(120 * 1000),
+                            maximum: 3600,
+                            minimum: 60,
+                            name: 'timeInput3Model',
+                            type: 'datetime'
+                        })}
+                        onChange={onChange}
+                    />
+
+                    <hr/>
+
+                    <Input<number>
+                        default={120}
+                        name="timeInput4"
+                        onChange={onChange}
                         type="datetime-local"
                     />
                     <Input<Date|number>
@@ -637,7 +654,7 @@ const Application = () => {
                             default: new Date(120 * 1000),
                             maximum: 3600,
                             minimum: 60,
-                            name: 'timeInput3Model',
+                            name: 'timeInput4Model',
                             type: 'datetime-local'
                         })}
                         onChange={onChange}
@@ -647,7 +664,7 @@ const Application = () => {
 
                     <Input<number>
                         default={120}
-                        name="timeInput4"
+                        name="timeInput5"
                         onChange={onChange}
                         type="time"
                     />
@@ -656,7 +673,7 @@ const Application = () => {
                             default: new Date(60 * 1000),
                             maximum: 3600,
                             minimum: 60,
-                            name: 'timeInput4Model',
+                            name: 'timeInput5Model',
                             type: 'time'
                         })}
                         onChange={onChange}
@@ -666,7 +683,7 @@ const Application = () => {
 
                     <Input<number>
                         default={120}
-                        name="timeInput4"
+                        name="timeInput6"
                         onChange={onChange}
                         type="time-local"
                     />
@@ -675,12 +692,28 @@ const Application = () => {
                             default: new Date(60 * 1000),
                             maximum: 3600,
                             minimum: 60,
-                            name: 'timeInput4Model',
+                            name: 'timeInput6Model',
                             type: 'time-local'
                         })}
                         onChange={onChange}
                     />
-                    */}
+
+                    <hr/>
+
+                    <Input<string>
+                        initialValue="1970-01-01T00:20:00.000Z"
+                        inputProperties={useMemorizedValue({outlined: true})}
+                        model={useMemorizedValue({
+                            name: 'timeInput7Model', type: 'time-local'
+                        })}
+                        onChange={onChange}
+                    />
+                    <Input<string>
+                        default="00:20:00"
+                        name="timeInput7"
+                        onChange={onChange}
+                        type="time-local"
+                    />
                 </div>
                 {/* endregion */}
                 {/* region selection-input */}

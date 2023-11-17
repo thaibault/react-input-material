@@ -134,8 +134,8 @@ describe('GenericInput', ():void => {
         TRANSFORMER['datetime-local'].format!.final.transform!,
 
         ['1969-12-31T23:00:00', 0],
-        ['1969-12-31T23:00:00', 10],
-        ['1969-12-31T23:00:00', 60 ** 2 * 24],
+        ['1969-12-31T23:00:10', 10],
+        ['1970-01-01T23:00:00', 60 ** 2 * 24],
         ['Infinitely far in the future', Infinity],
         ['Infinitely early in the past', -Infinity],
         ['', NaN]
