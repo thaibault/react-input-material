@@ -105,6 +105,7 @@
     "identity-obj-proxy": "*",
     "jest": "*",
     "jsdoc": "*",
+    "material-components-web": "^14.0.0",
     "material-icons": "*",
     "mini-css-extract-plugin": "*",
     "postcss": "*",
@@ -147,6 +148,7 @@
     "@types/react-dom": "*",
     "blob-util": "*",
     "clientnode": "*",
+    "material-components-web": "^14.0.0",
     "material-icons": "*",
     "react": "*",
     "react-ace": "*",
@@ -203,6 +205,9 @@
       "optional": true
     },
     "clientnode": {
+      "optional": true
+    },
+    "material-components-web": {
       "optional": true
     },
     "material-icons": {
