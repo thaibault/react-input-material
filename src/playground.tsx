@@ -584,43 +584,103 @@ const Application = () => {
                             'none'
                     }}
                 >
+                    {/*
                     <Input<number>
                         default={
                             new Date('2025-01-01T00:00:00.000Z')
                                 .getTime() / 1000
                         }
-                        name="input2"
+                        name="timeInput1"
                         onChange={onChange}
                         type="date"
                     />
+                    */}
                     <Input<string>
-                        initialValue="1970-01-01T08:00:00.000Z"
+                        initialValue="2025-01-01T00:00:00.000Z"
                         inputProperties={useMemorizedValue({outlined: true})}
                         model={useMemorizedValue({
-                            name: 'input2Model', type: 'time'
+                            name: 'timeInput1Model', type: 'date'
                         })}
                         onChange={onChange}
-                        step={60}
+                    />
+                    {/*
+
+                    <hr/>
+
+                    <Input<number>
+                        default={120}
+                        name="timeInput2"
+                        onChange={onChange}
+                        type="datetime"
+                    />
+                    <Input<Date>
+                        model={useMemorizedValue({
+                            default: new Date(120 * 1000),
+                            maximum: 3600,
+                            minimum: 60,
+                            name: 'timeInput2Model',
+                            type: 'datetime'
+                        })}
+                        onChange={onChange}
                     />
 
                     <hr/>
 
                     <Input<number>
                         default={120}
-                        name="input3"
+                        name="timeInput3"
                         onChange={onChange}
                         type="datetime-local"
+                    />
+                    <Input<Date|number>
+                        model={useMemorizedValue({
+                            default: new Date(120 * 1000),
+                            maximum: 3600,
+                            minimum: 60,
+                            name: 'timeInput3Model',
+                            type: 'datetime-local'
+                        })}
+                        onChange={onChange}
+                    />
+
+                    <hr/>
+
+                    <Input<number>
+                        default={120}
+                        name="timeInput4"
+                        onChange={onChange}
+                        type="time"
                     />
                     <Input<Date|number>
                         model={useMemorizedValue({
                             default: new Date(60 * 1000),
                             maximum: 3600,
                             minimum: 60,
-                            name: 'input3Model',
+                            name: 'timeInput4Model',
+                            type: 'time'
+                        })}
+                        onChange={onChange}
+                    />
+
+                    <hr/>
+
+                    <Input<number>
+                        default={120}
+                        name="timeInput4"
+                        onChange={onChange}
+                        type="time-local"
+                    />
+                    <Input<Date|number>
+                        model={useMemorizedValue({
+                            default: new Date(60 * 1000),
+                            maximum: 3600,
+                            minimum: 60,
+                            name: 'timeInput4Model',
                             type: 'time-local'
                         })}
                         onChange={onChange}
                     />
+                    */}
                 </div>
                 {/* endregion */}
                 {/* region selection-input */}

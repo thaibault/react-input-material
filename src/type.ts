@@ -298,10 +298,18 @@ export const baseModelPropertyTypes:ValidationMapping = {
     /*
         NOTE: Also not yet working:
         type: oneOf([
-            'color',
             'date',
             'date-local',
+
+            'datetime',
             'datetime-local',
+
+            'time',
+            'time-local',
+
+            'week',
+
+            'color',
             'email',
             'month',
             'number',
@@ -309,10 +317,7 @@ export const baseModelPropertyTypes:ValidationMapping = {
             'range',
             'search',
             'text',
-            'time',
-            'time-local',
-            'url',
-            'week'
+            'url'
         ])
     */
     type: string,
@@ -525,8 +530,8 @@ export const defaultCheckboxProperties:DefaultCheckboxProperties = {
 //// region data transformation
 export type Transformer<T = unknown> = (
     value:T,
-    configuration:DefaultInputProperties<T>,
-    transformer:InputDataTransformation
+    transformer:InputDataTransformation,
+    configuration:DefaultInputProperties<T>
 ) => string
 export interface FormatSpecification<T = unknown> {
     options?:PlainObject
@@ -542,10 +547,15 @@ export interface DataTransformSpecification<
     format?:FormatSpecifications<T>
     parse?:(
         value:InputType,
-        configuration:DefaultInputProperties<T>,
-        transformer:InputDataTransformation
+        transformer:InputDataTransformation,
+        configuration:DefaultInputProperties<T>
     ) => T
-    type?:NativeInputType
+    type?:NativeInputType,
+}
+export interface DateTransformSpecification
+    extends
+DataTransformSpecification<number|string, Date|number|string> {
+    useISOString:boolean
 }
 export type InputDataTransformation =
     {
@@ -553,11 +563,20 @@ export type InputDataTransformation =
 
         currency:DataTransformSpecification<number, string>
 
-        date:DataTransformSpecification<number, Date|number|string>
-        'date-local':DataTransformSpecification<number, Date|number|string>
-        'datetime-local':DataTransformSpecification<number, Date|number|string>
-        time:DataTransformSpecification<number, Date|number|string>
-        'time-local':DataTransformSpecification<number, Date|number|string>
+        date:DateTransformSpecification
+        'date-local':DataTransformSpecification<
+            number|string, Date|number|string
+        >
+
+        datetime:DataTransformSpecification<number|string, Date|number|string>
+        'datetime-local':DataTransformSpecification<
+            number|string, Date|number|string
+        >
+
+        time:DataTransformSpecification<number|string, Date|number|string>
+        'time-local':DataTransformSpecification<
+            number|string, Date|number|string
+        >
 
         float:DataTransformSpecification<number, string>
         integer:DataTransformSpecification<number, string>
@@ -566,7 +585,13 @@ export type InputDataTransformation =
         string?:DataTransformSpecification<unknown>
     } &
     {[key in Exclude<
-        NativeInputType, 'date'|'date-local'|'datetime-local'|'time'|'number'
+        NativeInputType,
+        (
+            'date' | 'date-local' |
+            'datetime' | 'datetime-local' |
+            'time' | 'time-local' |
+            'number'
+        )
     >]?:DataTransformSpecification<unknown>}
 //// endregion
 export type InputSelection =
@@ -603,22 +628,23 @@ export interface InputValueState<T = unknown, MS = ModelState> extends
 }
 export type NativeInputType = (
     'date' |
-    'date-local' |
     'datetime-local' |
+    'time' |
+    'week' |
     'month' |
     'number' |
     'range' |
-    'text' |
-    'time' |
-    'week'
+    'text'
 )
 export type GenericInputType = (
+    'date-local' |
+    'datetime' |
+    'time-local' |
     'boolean' |
     'currency' |
     'float' |
     'integer' |
     'string' |
-    'time-local' |
     NativeInputType
 )
 export interface InputChildrenOptions<P, T> {
