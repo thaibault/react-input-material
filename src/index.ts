@@ -17,7 +17,7 @@
     endregion
 */
 export {FileInput} from './components/FileInput'
-export {GenericInput} from './components/GenericInput'
+export {TextInput} from './components/TextInput'
 export {Inputs} from './components/Inputs'
 export {Interval} from './components/Interval'
 export {RequireableCheckbox} from './components/RequireableCheckbox'

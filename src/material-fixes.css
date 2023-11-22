@@ -9,7 +9,7 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
-.generic-input {
+.text-input {
     & label,
     & .mdc-form-field {
         width: 100%;
@@ -47,9 +47,14 @@ endregion */
         & .mdc-select__menu {
             width: 100%;
         }
+    }
 
-        & .mdc-select-helper-text {
-            color: rgb(0 0 0 / 60%);
+    & .mdc-select-helper-text {
+        color: rgb(0 0 0 / 60%);
+        margin-left: 0;
+
+        & .material-icons {
+            font-size: 1rem;
         }
     }
 
@@ -62,6 +67,10 @@ endregion */
         & + .mdc-text-field-helper-line {
             padding-left: 0;
             padding-right: 0;
+
+            & .material-icons {
+                font-size: 1rem;
+            }
         }
     }
 }

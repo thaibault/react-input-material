@@ -676,7 +676,7 @@ export const parseValue =
                 ]!.parse as
                     unknown as
                     DataTransformSpecification<T, InputType>['parse']
-            )!(value!, configuration, transformer)
+            )!(value!, transformer, configuration)
 
         if (typeof result === 'number' && isNaN(result))
             return null as T
@@ -718,7 +718,7 @@ export function formatValue<
             format[methodName]?.transform || format.final?.transform
 
         if (transformer)
-            return transformer(value as T, configuration, transformerMapping)
+            return transformer(value as T, transformerMapping, configuration)
     }
 
     return String(value)

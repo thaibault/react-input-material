@@ -26,7 +26,7 @@ import {useMemorizedValue} from 'react-generic-tools'
 
 import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
 import {
-    FileInput, GenericInput as Input, Inputs, Interval, RequireableCheckbox
+    FileInput, TextInput, Inputs, Interval, RequireableCheckbox
 } from './index'
 import {
     CheckboxProps, FileInputChildrenOptions, FileInputProperties,
@@ -38,12 +38,21 @@ import {
     IntervalValue,
     SuggestionCreatorOptions
 } from './type'
+import {CircularProgress} from '@rmwc/circular-progress'
 // endregion
 Tools.locales.push('de-DE')
-Input.transformer.currency.format!.final.options = {currency: 'EUR'}
+TextInput.transformer.currency.format!.final.options = {currency: 'EUR'}
 
 const SECTIONS = [
-    'file-input', 'input', 'inputs', 'interval', 'requireable-checkbox'
+    'file-input',
+    'simple-input',
+    'number-input',
+    'text-input',
+    'time-input',
+    'selection-input',
+    'inputs',
+    'interval',
+    'requireable-checkbox'
 ] as const
 
 const Application = () => {
@@ -58,49 +67,52 @@ const Application = () => {
             }
         )
     // region controlled state
-    const [value1, setValue1] = useState<FileValue|null|undefined>({
-        blob: new Blob(['test'], {type: 'text/plain'}),
-        name: 'test.txt'
-    })
+    const [fileInputValue, setFileInputValue] =
+        useState<FileValue|null|undefined>({
+            blob: new Blob(['test'], {type: 'text/plain'}),
+            name: 'test.txt'
+        })
     const onChangeValue1 =
-        useMemorizedValue<(value?:FileValue|null) => void>(setValue1)
+        useMemorizedValue<(value?:FileValue|null) => void>(setFileInputValue)
 
-    const [value2, setValue2] = useState<null|string>('')
-    const onChangeValue2 =
-        useMemorizedValue<(value:null|string) => void>(setValue2)
+    const [inputValue1, setInputValue1] = useState<null|string>('')
+    const onChangeInputValue1 =
+        useMemorizedValue<(value:null|string) => void>(setInputValue1)
 
     type FloatValueState = {
         representation:ReactNode|string
         value?:null|number
     }
-    const [value3, setValue3] = useState<FloatValueState>({
+    const [numberValue, setNumberValue] = useState<FloatValueState>({
         value: 1234.34, representation: '1.234,34'
     })
-    const onChangeValue3 =
-        useMemorizedValue<(value:FloatValueState) => void>(setValue3)
+    const onChangeNumberValue =
+        useMemorizedValue<(value:FloatValueState) => void>(setNumberValue)
 
     type SelectionValueType = {
         representation:ReactNode|string
         value?:null|string
     }
-    const [value4, setValue4] =
+    const [selectionInput, setSelectionInput] =
         useState<SelectionValueType>({representation: 'klaus', value: 'b'})
-    const onChangeValue4 =
-        useMemorizedValue<(value:SelectionValueType) => void>(setValue4)
+    const onChangeInputValue3 =
+        useMemorizedValue<(value:SelectionValueType) => void>(setSelectionInput)
 
-    const [value5, setValue5] =
+    const [inputValue4, setInputValue4] =
         useState<IntervalValue|null>({end: 120, start: 60})
-    const onChangeValue5 =
-        useMemorizedValue<(value:IntervalValue|null) => void>(setValue5)
+    const onChangeInputValue4 =
+        useMemorizedValue<(value:IntervalValue|null) => void>(setInputValue4)
 
-    const [value6, setValue6] = useState<boolean>(false)
-    const onChangeValue6 =
-        useMemorizedValue<(value:boolean) => void>(setValue6)
+    const [inputValue5, setInputValue5] = useState<boolean>(false)
+    const onChangeInputValue5 =
+        useMemorizedValue<(value:boolean) => void>(setInputValue5)
 
-    const [value7, setValue7] =
+    const [inputValue6, setInputValue6] =
         useState<Array<null|string>|null>(['first item'])
-    const onChangeValue7 =
-        useMemorizedValue<(values:Array<null|string>|null) => void>(setValue7)
+    const onChangeInputValue6 =
+        useMemorizedValue<(values:Array<null|string>|null) => void>(
+            setInputValue6
+        )
     // endregion
 
     return (<>
@@ -114,7 +126,7 @@ const Application = () => {
                 }}
             >
                 {SECTIONS.map((name) =>
-                    <Tab>{name}</Tab>)
+                    <Tab key={name}>{name}</Tab>)
                 }
             </TabBar>
         </div>
@@ -186,106 +198,502 @@ const Application = () => {
                         onChange={onChange}
                         onChangeValue={onChangeValue1}
                         triggerInitialPropertiesConsolidation={true}
-                        value={value1}
+                        value={fileInputValue}
                     />
                 </div>
                 {/* endregion */}
-                {/* region input */}
+                {/* region simple-input */}
                 <div
-                    className="playground__inputs__input"
+                    className="playground__inputs__simple-input"
                     style={{
-                        display: activeSection === 'input' ?
+                        display: activeSection === 'simple-input' ?
                             'block' :
                             'none'
                     }}
                 >
-                    <Input<string>
+                    <TextInput<string>
                         inputProperties={useMemorizedValue({outlined: true})}
                         onChange={onChange}
                     />
-                    <Input<null|string>
+                    <TextInput<null|string>
                         name="UnControlled"
                         onChange={onChange}
-                        onChangeValue={onChangeValue2}
+                        onChangeValue={onChangeInputValue1}
                         enforceUncontrolled={true}
-                        value={value2}
+                        value={inputValue1}
                     />
-                    <Input<null|string>
+                    <TextInput<null|string>
                         name="controlled"
                         onChange={onChange}
-                        onChangeValue={onChangeValue2}
+                        onChangeValue={onChangeInputValue1}
                         triggerInitialPropertiesConsolidation={true}
-                        value={value2}
-                    />
-                    <Input<null|number>
-                        name="controlled"
-                        onChange={useMemorizedValue((
-                            properties:InputProperties<null|number>
-                        ) => {
-                            onChange(properties)
-                            onChangeValue3({
-                                representation: properties.representation,
-                                value: properties.value
-                            })
-                        })}
-                        representation={value3.representation}
-                        type="float"
-                        value={value3.value}
+                        value={inputValue1}
                     />
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="This text can be seen initially."
                         inputProps={{
                             ariaChecked: false,
                             ariaDescription: 'test'
                         }}
-                        name="input1"
+                        name="simpleInput1"
                         onChange={onChange}
                         showDeclaration={true}
                     />
-                    <Input<string>
-                        model={useMemorizedValue({name: 'input1Model'})}
+                    <TextInput<string>
+                        model={useMemorizedValue({name: 'simpleInput1Model'})}
                         onChange={onChange}
                     />
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<string>
+                        declaration="Disabled"
+                        disabled
+                        initialValue="value4"
+                        name="simpleInput2"
+                        onChange={onChange}
+                    />
+                    <TextInput<string>
+                        model={useMemorizedValue({
+                            declaration: 'Disabled',
+                            default: 'value2Model',
+                            mutable: false,
+                            name: 'simpleInput2Model'
+                        })}
+                        onChange={onChange}
+                    />
+
+                    <hr/>
+
+                    <TextInput<string>
+                        declaration="placeholder"
+                        name="simpleInput3"
+                        onChange={onChange}
+                        placeholder="100.000,00"
+                        required
+                        showValidationState={false}
+                        trailingIcon="clear_preset"
+                    />
+                    <TextInput<string>
+                        default="simpleValue3Model"
+                        icon="backup"
+                        model={useMemorizedValue({
+                            declaration: 'placeholder',
+                            name: 'simpleInput3Model',
+                            nullable: false
+                        })}
+                        onChange={onChange}
+                        placeholder="simpleInput3Model"
+                        trailingIcon="clear_preset"
+                    />
+
+                    <hr/>
+
+                    <TextInput<string>
+                        declaration="pattern"
+                        description="simpleInput4Description"
+                        icon="search"
+                        initialValue="only a`s allowed"
+                        name="input6"
+                        onChange={onChange}
+                        pattern="^a+$"
+                        placeholder="simpleInput4Placeholder"
+                    />
+                    <TextInput<string>
+                        initialValue="has a`s and b`s"
+                        model={useMemorizedValue({
+                            declaration: 'pattern',
+                            description: 'simpleInput4ModelDescription',
+                            regularExpressionPattern: ['.*a+.*', /.*b+(.*)/]
+                        })}
+                        name="simpleInput4Model"
+                        onChange={onChange}
+                        placeholder="simpleInput4ModelPlaceholder"
+                        trailingIcon="search"
+                    />
+
+                    <hr/>
+
+                    <TextInput<string>
+                        declaration="password"
+                        description="simpleInput5Description"
+                        icon="search"
+                        initialValue="hans"
+                        name="simpleInput5"
+                        onChange={onChange}
+                        pattern="a+"
+                        placeholder="simpleInput5Placeholder"
+                        tooltip="Please type in your password."
+                        trailingIcon="password_preset"
+                    />
+                    <TextInput<string>
+                        initialValue="hans"
+                        model={useMemorizedValue({
+                            declaration: 'password',
+                            description: 'simpleInput5ModelDescription',
+                            regularExpressionPattern: 'a+'
+                        })}
+                        name="simpleInput5Model"
+                        onChange={onChange}
+                        placeholder="simpleInput5ModelPlaceholder"
+                        trailingIcon="password_preset"
+                    />
+                </div>
+                {/* endregion */}
+                {/* region number-input */}
+                <div
+                    className="playground__inputs__number-input"
+                    style={{
+                        display: activeSection === 'number-input' ?
+                            'block' :
+                            'none'
+                    }}
+                >
+                    <TextInput<null|number>
+                        name="controlled"
+                        onChange={useMemorizedValue((
+                            properties:InputProperties<null|number>
+                        ) => {
+                            onChange(properties)
+                            onChangeNumberValue({
+                                representation: properties.representation,
+                                value: properties.value
+                            })
+                        })}
+                        representation={numberValue.representation}
+                        type="float"
+                        value={numberValue.value}
+                    />
+
+                    <hr/>
+
+                    <TextInput<number>
+                        declaration="Number"
+                        description="numberInput1Description"
+                        maximum={200000}
+                        minimum={10}
+                        name="numberInput1"
+                        onChange={onChange}
+                        placeholder="100000"
+                        required
+                        type="number"
+                    />
+                    <TextInput<number>
+                        initialValue={100000}
+                        model={useMemorizedValue({
+                            declaration: 'Number',
+                            description: 'numberInput1ModelDescription',
+                            maximum: 200000,
+                            minimum: 10,
+                            name: 'numberInput1Model',
+                            nullable: false,
+                            type: 'number'
+                        })}
+                        onChange={onChange}
+                    />
+
+                    <hr/>
+
+                    <TextInput<number>
+                        declaration="Number"
+                        description="numberInput2Description"
+                        maximum={200000}
+                        minimum={10}
+                        name="numberInput2"
+                        onChange={onChange}
+                        placeholder="100.000"
+                        required
+                        type="integer"
+                    />
+                    <TextInput<number>
+                        initialValue={100000.01}
+                        model={useMemorizedValue({
+                            declaration: 'Number',
+                            description: 'numberInput2ModelDescription',
+                            maximum: 200000,
+                            name: 'numberInput2Model',
+                            nullable: false,
+                            type: 'float'
+                        })}
+                        onChange={onChange}
+                        transformer={useMemorizedValue({
+                            format: {final: {options: {
+                                maximumFractionDigits: 20,
+                                minimumFractionDigits: 2
+                            }}}}
+                        )}
+                    />
+
+                    <hr/>
+
+                    <TextInput<number>
+                        declaration="Number"
+                        description="numberInput3Description"
+                        maximum={200000}
+                        minimum={10}
+                        minimumText="Please at least ${formatValue(minimum)}."
+                        name="numberInput3"
+                        onChange={onChange}
+                        placeholder="100.000"
+                        required
+                        type="currency"
+                    />
+                    <TextInput<number>
+                        initialValue={100000.01}
+                        model={useMemorizedValue({
+                            declaration: 'Number',
+                            description: 'numberInput3ModelDescription',
+                            maximum: 200000,
+                            minimum: 10,
+                            name: 'numberInput3Model',
+                            nullable: false,
+                            type: 'currency'
+                        })}
+                        onChange={onChange}
+                    />
+                </div>
+                {/* endregion */}
+                {/* region text-input */}
+                <div
+                    className="playground__inputs__text-input"
+                    style={{
+                        display: activeSection === 'text-input' ?
+                            'block' :
+                            'none'
+                    }}
+                >
+                    <TextInput<string>
+                        declaration="text"
+                        description="textInput1Description"
+                        editor="text"
+                        initialValue="a"
+                        name="textInput1"
+                        onChange={onChange}
+                        required
+                        rows={3}
+                        themeConfiguration={useMemorizedValue({
+                            primary: 'yellow',
+                            secondary: 'blue'
+                        })}
+                    />
+                    <TextInput<string>
+                        editor="text"
+                        initialValue="a"
+                        model={useMemorizedValue({
+                            declaration: 'text',
+                            description: 'textInput1ModelDescription',
+                            name: 'textInput1Model',
+                            nullable: false
+                        })}
+                        onChange={onChange}
+                        rows={2}
+                    />
+
+                    <hr/>
+
+                    <TextInput<string>
+                        declaration="code"
+                        description="textInput2Description"
+                        disabled
+                        editor="code"
+                        initialValue="const value = 2"
+                        name="textInput2"
+                        onChange={onChange}
+                        rows={2}
+                        selectableEditor
+                    />
+                    <TextInput<string>
+                        editor="code"
+                        initialValue="const value = 2"
+                        model={useMemorizedValue({
+                            declaration: 'code',
+                            description: 'textInput2ModelDescription',
+                            name: 'textInput2Model',
+                            nullable: false
+                        })}
+                        onChange={onChange}
+                        rows={6}
+                        selectableEditor
+                    />
+
+                    <hr/>
+
+                    <TextInput<string>
+                        declaration="code"
+                        description="textInput3Description"
+                        editor="code"
+                        maximumLength={10}
+                        name="textInput3"
+                        onChange={onChange}
+                        required
+                        rows={2}
+                        selectableEditor
+                    />
+                    <TextInput<string>
+                        editor="code"
+                        model={useMemorizedValue({
+                            declaration: 'code',
+                            description: 'textInput3ModelDescription',
+                            name: 'textInput3Model',
+                            nullable: false
+                        })}
+                        onChange={onChange}
+                        rows={6}
+                        selectableEditor
+                    />
+
+                    <hr/>
+
+                    <TextInput<string>
+                        declaration="richtext(raw)"
+                        description="textInput4Description"
+                        editor="richtext(raw)"
+                        name="textInput4"
+                        onChange={onChange}
+                        placeholder={
+                            'Hello Mr. Smith,<br><br>this is a Placeholder.'
+                        }
+                        required
+                        rows={2}
+                        selectableEditor
+                    />
+                    <TextInput<string>
+                        editor="richtext(simple)"
+                        initialValue="Hello Mr. Smith,<br><br>how are you?"
+                        model={useMemorizedValue({
+                            declaration: 'richtext(simple)',
+                            description: 'textInput4ModelDescription',
+                            mutable: false,
+                            name: 'textInput4Model',
+                            nullable: false
+                        })}
+                        onChange={onChange}
+                        rows={6}
+                        selectableEditor
+                    />
+                </div>
+                {/* endregion */}
+                {/* region time-input */}
+                <div
+                    className="playground__inputs__time-input"
+                    style={{
+                        display: activeSection === 'time-input' ?
+                            'block' :
+                            'none'
+                    }}
+                >
+                    <TextInput<number>
                         default={
                             new Date('2025-01-01T00:00:00.000Z')
-                                .getTime() /
-                            1000
+                                .getTime() / 1000
                         }
-                        name="input2"
+                        name="timeInput1"
                         onChange={onChange}
                         type="date"
                     />
-                    <Input<string>
-                        initialValue="1970-01-01T08:00:00.000Z"
+                    <TextInput<string>
+                        initialValue="2025-01-01T00:00:00.000Z"
                         inputProperties={useMemorizedValue({outlined: true})}
                         model={useMemorizedValue({
-                            name: 'input2Model', type: 'time'
+                            name: 'timeInput1Model', type: 'date'
                         })}
                         onChange={onChange}
-                        step={60}
                     />
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<number>
+                        default={
+                            new Date('2025-01-01T00:00:00.000Z')
+                                .getTime() / 1000
+                        }
+                        name="timeInput2"
+                        onChange={onChange}
+                        type="date-local"
+                    />
+                    <TextInput<string>
+                        initialValue="2025-01-01T00:00:00.000Z"
+                        inputProperties={useMemorizedValue({outlined: true})}
+                        model={useMemorizedValue({
+                            name: 'timeInput2Model', type: 'date-local'
+                        })}
+                        onChange={onChange}
+                    />
+
+                    <hr/>
+
+                    <TextInput<number>
                         default={120}
-                        name="input3"
+                        name="timeInput3"
+                        onChange={onChange}
+                        type="datetime"
+                    />
+                    <TextInput<Date>
+                        model={useMemorizedValue({
+                            default: new Date(120 * 1000),
+                            maximum: 3600,
+                            minimum: 60,
+                            name: 'timeInput3Model',
+                            type: 'datetime'
+                        })}
+                        onChange={onChange}
+                    />
+
+                    <hr/>
+
+                    <TextInput<number>
+                        default={120}
+                        name="timeTextInput4"
                         onChange={onChange}
                         type="datetime-local"
                     />
-                    <Input<Date|number>
+                    <TextInput<Date|number>
+                        model={useMemorizedValue({
+                            default: new Date(120 * 1000),
+                            maximum: 3600,
+                            minimum: 60,
+                            name: 'timeInput4Model',
+                            type: 'datetime-local'
+                        })}
+                        onChange={onChange}
+                    />
+
+                    <hr/>
+
+                    <TextInput<number>
+                        default={120}
+                        name="timeInput5"
+                        onChange={onChange}
+                        type="time"
+                    />
+                    <TextInput<Date|number>
                         model={useMemorizedValue({
                             default: new Date(60 * 1000),
                             maximum: 3600,
                             minimum: 60,
-                            name: 'input3Model',
+                            name: 'timeInput5Model',
+                            type: 'time'
+                        })}
+                        onChange={onChange}
+                    />
+
+                    <hr/>
+
+                    <TextInput<number>
+                        default={120}
+                        name="timeInput6"
+                        onChange={onChange}
+                        type="time-local"
+                    />
+                    <TextInput<Date|number>
+                        model={useMemorizedValue({
+                            default: new Date(60 * 1000),
+                            maximum: 3600,
+                            minimum: 60,
+                            name: 'timeInput6Model',
                             type: 'time-local'
                         })}
                         onChange={onChange}
@@ -293,121 +701,51 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
-                        declaration="Disabled"
-                        disabled
-                        initialValue="value4"
-                        name="input4"
-                        onChange={onChange}
-                    />
-                    <Input<string>
+                    <TextInput<string>
+                        initialValue="1970-01-01T00:20:00.000Z"
+                        inputProperties={useMemorizedValue({outlined: true})}
                         model={useMemorizedValue({
-                            declaration: 'Disabled',
-                            default: 'value4Model',
-                            mutable: false,
-                            name: 'input4Model'
+                            name: 'timeInput7Model', type: 'time-local'
                         })}
                         onChange={onChange}
                     />
-
-                    <hr/>
-
-                    <Input<string>
-                        declaration="placeholder"
-                        name="input5"
+                    <TextInput<string>
+                        default="00:20:00"
+                        name="timeInput7"
                         onChange={onChange}
-                        placeholder="100.000,00"
-                        required
-                        showValidationState={false}
-                        trailingIcon="clear_preset"
+                        type="time-local"
                     />
-                    <Input<string>
-                        default="value5Model"
-                        icon="backup"
-                        model={useMemorizedValue({
-                            declaration: 'placeholder',
-                            name: 'input5Model',
-                            nullable: false
-                        })}
-                        onChange={onChange}
-                        placeholder="input5Model"
-                        trailingIcon="clear_preset"
-                    />
-
-                    <hr/>
-
-                    <Input<string>
-                        declaration="pattern"
-                        description="input6Description"
-                        icon="search"
-                        initialValue="only a`s allowed"
-                        name="input6"
-                        onChange={onChange}
-                        pattern="^a+$"
-                        placeholder="input6Placeholder"
-                    />
-                    <Input<string>
-                        initialValue="has a`s and b`s"
-                        model={useMemorizedValue({
-                            declaration: 'pattern',
-                            description: 'input6ModelDescription',
-                            regularExpressionPattern: ['.*a+.*', /.*b+(.*)/]
-                        })}
-                        name="input6Model"
-                        onChange={onChange}
-                        placeholder="input6ModelPlaceholder"
-                        trailingIcon="search"
-                    />
-
-                    <hr/>
-
-                    <Input<string>
-                        declaration="password"
-                        description="input7Description"
-                        icon="search"
-                        initialValue="hans"
-                        name="passwordInput7"
-                        onChange={onChange}
-                        pattern="a+"
-                        placeholder="input7Placeholder"
-                        tooltip="Please type in your password."
-                        trailingIcon="password_preset"
-                    />
-                    <Input<string>
-                        initialValue="hans"
-                        model={useMemorizedValue({
-                            declaration: 'password',
-                            description: 'input7ModelDescription',
-                            regularExpressionPattern: 'a+'
-                        })}
-                        name="passwordInput7Model"
-                        onChange={onChange}
-                        placeholder="input7ModelPlaceholder"
-                        trailingIcon="password_preset"
-                    />
-
-                    <hr/>
-
-                    <Input<string>
+                </div>
+                {/* endregion */}
+                {/* region selection-input */}
+                <div
+                    className="playground__inputs__selection-input"
+                    style={{
+                        display: activeSection === 'selection-input' ?
+                            'block' :
+                            'none'
+                    }}
+                >
+                    <TextInput<string>
                         declaration="selection"
-                        description="input8Description"
+                        description="selectionInput1Description"
                         labels={useMemorizedValue(
                             [['C', 'LC'], ['D', 'LD'], ['A', 'LA'], ['B', 'LB']]
                         )}
-                        name="input8"
+                        name="selectionInput1"
                         onChange={onChange}
                         required
                         selection={useMemorizedValue(['A', 'B', 'C'])}
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="A"
                         labels={useMemorizedValue([
                             'Label A', 'Label B', 'Label C'
                         ])}
                         model={useMemorizedValue({
                             declaration: 'selection',
-                            description: 'input8ModelDescription',
-                            name: 'input8Model',
+                            description: 'selectionInput1ModelDescription',
+                            name: 'selectionInput1Model',
                             mutable: false,
                             nullable: false,
                             selection: ['A', 'B', 'C']
@@ -417,49 +755,49 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<boolean>
+                    <TextInput<boolean>
                         declaration="selection"
-                        description="input9Description"
+                        description="selectionInput2Description"
                         initialValue={true}
-                        name="input9"
+                        name="selectionInput2"
                         onChange={onChange}
-                        placeholder="input9Placeholder"
+                        placeholder="selectionInput2Placeholder"
                         type="boolean"
                         required
                     />
-                    <Input<boolean>
+                    <TextInput<boolean>
                         disabled
                         initialValue={false}
                         labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
                         model={useMemorizedValue({
                             declaration: 'selection',
-                            description: 'input9ModelDescription',
+                            description: 'selectionInput2ModelDescription',
                             name: 'input9Model',
                             nullable: false,
                             type: 'boolean'
                         })}
                         onChange={onChange}
-                        placeholder="input9ModelPlaceholder"
+                        placeholder="selectionInput2ModelPlaceholder"
                     />
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="selection"
-                        description="input10Description"
+                        description="selectionInput3Description"
                         initialValue="true"
                         labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
-                        name="input10"
+                        name="selectionInput3"
                         onChange={onChange}
                         required
                     />
-                    <Input<boolean>
+                    <TextInput<boolean>
                         initialValue={false}
                         labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
                         model={useMemorizedValue({
                             declaration: 'selection',
-                            description: 'input10ModelDescription',
-                            name: 'input10Model',
+                            description: 'selectionInput3ModelDescription',
+                            name: 'selectionInput3Model',
                             nullable: false,
                             type: 'boolean'
                         })}
@@ -468,20 +806,20 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<number>
                         declaration="numberSelection"
-                        description="input11Description"
+                        description="selectionInput4Description"
                         initialValue={2}
                         selection={useMemorizedValue([1, 2, 3])}
-                        name="input11"
+                        name="selectionInput4"
                         onChange={onChange}
                         required
                     />
-                    <Input<number>
+                    <TextInput<number>
                         model={useMemorizedValue({
                             declaration: 'numberSelection',
-                            description: 'input11ModelDescription',
-                            name: 'input11Model',
+                            description: 'selectionInput4ModelDescription',
+                            name: 'selectionInput4Model',
                             selection: [1, 2, 3],
                             type: 'number'
                         })}
@@ -490,21 +828,21 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="selection"
-                        description="input12Description"
+                        description="selectionInput5Description"
                         initialValue="b"
-                        name="input12"
+                        name="selectionInput5"
                         onChange={onChange}
                         selection={useMemorizedValue({a: 'A', b: 'B', c: 'C'})}
                         required
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="b"
                         model={useMemorizedValue({
                             declaration: 'selection',
-                            description: 'input12ModelDescription',
-                            name: 'input12Model',
+                            description: 'selectionInput5ModelDescription',
+                            name: 'selectionInput5Model',
                             nullable: false,
                             selection: {a: 'A', b: 'B', c: 'C'}
                         })}
@@ -513,26 +851,26 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
-                        description="input13Description"
-                        name="input13"
+                    <TextInput<string>
+                        description="selectionInput6Description"
+                        name="selectionInput6"
                         onChange={onChange}
-                        placeholder="input13Placeholder"
+                        placeholder="selectionInput6Placeholder"
                         selection={useMemorizedValue(
                             ['hans hans', 'peter peter', 'klaus']
                         )}
                         suggestSelection
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="peter"
                         model={useMemorizedValue({
                             declaration: 'selection',
-                            description: 'input13ModelDescription',
-                            name: 'input13Model',
+                            description: 'selectionInput6ModelDescription',
+                            name: 'selectionInput6Model',
                             nullable: false
                         })}
                         onChange={onChange}
-                        placeholder="input13ModelPlaceholder"
+                        placeholder="selectionInput6ModelPlaceholder"
                         searchSelection
                         suggestionCreator={useMemorizedValue(
                             Tools.debounce<Array<string>>(
@@ -562,27 +900,27 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
-                        description="input14Description"
+                    <TextInput<string>
+                        description="selectionInput7Description"
                         default={'a'}
-                        name="input14"
+                        name="selectionInput7"
                         onChange={onChange}
-                        placeholder="input14Placeholder"
+                        placeholder="selectionInput7Placeholder"
                         searchSelection
                         selection={useMemorizedValue(
                             {a: 'hans', b: 'hans', c: 'klaus'}
                         )}
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="peter"
                         model={useMemorizedValue({
                             declaration: 'selection',
-                            description: 'input14ModelDescription',
-                            name: 'input14Model',
+                            description: 'selectionInput7ModelDescription',
+                            name: 'selectionInput7Model',
                             nullable: false
                         })}
                         onChange={onChange}
-                        placeholder="input14ModelPlaceholder"
+                        placeholder="selectionInput7ModelPlaceholder"
                         suggestionCreator={useMemorizedValue(
                             async ({query}:SuggestionCreatorOptions<
                                 InputProperties<string>
@@ -591,7 +929,7 @@ const Application = () => {
 
                                 const selection:Mapping = {
                                     a: 'hans with veeeeeeeeeeeeeeeery ' +
-                                       'loooooooooooooooong second name',
+                                        'loooooooooooooooong second name',
                                     b: 'peter',
                                     c: 'klaus'
                                 }
@@ -607,240 +945,41 @@ const Application = () => {
                             }
                         )}
                     />
-                    <Input<null|string>
+                    <TextInput<null|string>
                         name="controlled"
                         onChange={useMemorizedValue(
                             (properties:InputProperties<null|string>) => {
-                                onChangeValue4({
+                                onChangeInputValue3({
                                     representation: properties.representation,
                                     value: properties.value
                                 })
                                 onChange(properties)
                             }
                         )}
-                        representation={value4.representation}
+                        representation={selectionInput.representation}
                         searchSelection
                         selection={useMemorizedValue(
                             {a: 'hans', b: 'peter', c: 'klaus'}
                         )}
-                        value={value4.value}
+                        value={selectionInput.value}
                     />
-                    <Input<null|string>
+                    <TextInput<null|string>
                         name="controlled"
                         onChange={useMemorizedValue(
                             (properties:InputProperties<null|string>) => {
-                                onChangeValue4({
+                                onChangeInputValue3({
                                     representation: properties.representation,
                                     value: properties.value
                                 })
                                 onChange(properties)
                             }
                         )}
-                        representation={value4.representation}
+                        representation={selectionInput.representation}
                         suggestSelection
                         selection={useMemorizedValue(
                             {a: 'hans', b: 'peter', c: 'klaus'}
                         )}
-                        value={value4.value}
-                    />
-
-                    <hr/>
-
-                    <Input<string>
-                        declaration="text"
-                        description="input15Description"
-                        editor="text"
-                        initialValue="a"
-                        name="input14"
-                        onChange={onChange}
-                        required
-                        rows={3}
-                        themeConfiguration={useMemorizedValue({
-                            primary: 'yellow',
-                            secondary: 'blue'
-                        })}
-                    />
-                    <Input<string>
-                        editor="text"
-                        initialValue="a"
-                        model={useMemorizedValue({
-                            declaration: 'text',
-                            description: 'input15ModelDescription',
-                            name: 'input15Model',
-                            nullable: false
-                        })}
-                        onChange={onChange}
-                        rows={2}
-                    />
-
-                    <hr/>
-
-                    <Input<string>
-                        declaration="code"
-                        description="input16Description"
-                        disabled
-                        editor="code"
-                        initialValue="const value = 2"
-                        name="input16"
-                        onChange={onChange}
-                        rows={2}
-                        selectableEditor
-                    />
-                    <Input<string>
-                        editor="code"
-                        initialValue="const value = 2"
-                        model={useMemorizedValue({
-                            declaration: 'code',
-                            description: 'input16ModelDescription',
-                            name: 'input16Model',
-                            nullable: false
-                        })}
-                        onChange={onChange}
-                        rows={6}
-                        selectableEditor
-                    />
-
-                    <hr/>
-
-                    <Input<string>
-                        declaration="code"
-                        description="input17Description"
-                        editor="code"
-                        maximumLength={10}
-                        name="input17"
-                        onChange={onChange}
-                        required
-                        rows={2}
-                        selectableEditor
-                    />
-                    <Input<string>
-                        editor="code"
-                        model={useMemorizedValue({
-                            declaration: 'code',
-                            description: 'input17ModelDescription',
-                            name: 'input17Model',
-                            nullable: false
-                        })}
-                        onChange={onChange}
-                        rows={6}
-                        selectableEditor
-                    />
-
-                    <hr/>
-
-                    <Input<string>
-                        declaration="richtext(raw)"
-                        description="input18Description"
-                        editor="richtext(raw)"
-                        name="input18"
-                        onChange={onChange}
-                        placeholder={
-                            'Hello Mr. Smith,<br><br>this is a Placeholder.'
-                        }
-                        required
-                        rows={2}
-                        selectableEditor
-                    />
-                    <Input<string>
-                        editor="richtext(simple)"
-                        initialValue="Hello Mr. Smith,<br><br>how are you?"
-                        model={useMemorizedValue({
-                            declaration: 'richtext(simple)',
-                            description: 'input18ModelDescription',
-                            mutable: false,
-                            name: 'input18Model',
-                            nullable: false
-                        })}
-                        onChange={onChange}
-                        rows={6}
-                        selectableEditor
-                    />
-
-                    <hr/>
-
-                    <Input<number>
-                        declaration="Number"
-                        description="input19Description"
-                        maximum={200000}
-                        minimum={10}
-                        name="input19"
-                        onChange={onChange}
-                        placeholder="100000"
-                        required
-                        type="number"
-                    />
-                    <Input<number>
-                        initialValue={100000}
-                        model={useMemorizedValue({
-                            declaration: 'Number',
-                            description: 'input19ModelDescription',
-                            maximum: 200000,
-                            minimum: 10,
-                            name: 'input19Model',
-                            nullable: false,
-                            type: 'number'
-                        })}
-                        onChange={onChange}
-                    />
-
-                    <hr/>
-
-                    <Input<number>
-                        declaration="Number"
-                        description="input20Description"
-                        maximum={200000}
-                        minimum={10}
-                        name="input20"
-                        onChange={onChange}
-                        placeholder="100.000"
-                        required
-                        type="integer"
-                    />
-                    <Input<number>
-                        initialValue={100000.01}
-                        model={useMemorizedValue({
-                            declaration: 'Number',
-                            description: 'input20ModelDescription',
-                            maximum: 200000,
-                            name: 'input20Model',
-                            nullable: false,
-                            type: 'float'
-                        })}
-                        onChange={onChange}
-                        transformer={useMemorizedValue({
-                            format: {final: {options: {
-                                maximumFractionDigits: 20,
-                                minimumFractionDigits: 2
-                            }}}}
-                        )}
-                    />
-
-                    <hr/>
-
-                    <Input<number>
-                        declaration="Number"
-                        description="input21Description"
-                        maximum={200000}
-                        minimum={10}
-                        minimumText="Please at least ${formatValue(minimum)}."
-                        name="input21"
-                        onChange={onChange}
-                        placeholder="100.000"
-                        required
-                        type="currency"
-                    />
-                    <Input<number>
-                        initialValue={100000.01}
-                        model={useMemorizedValue({
-                            declaration: 'Number',
-                            description: 'input21ModelDescription',
-                            maximum: 200000,
-                            minimum: 10,
-                            name: 'input21Model',
-                            nullable: false,
-                            type: 'currency'
-                        })}
-                        onChange={onChange}
+                        value={selectionInput.value}
                     />
                 </div>
                 {/* endregion */}
@@ -904,7 +1043,15 @@ const Application = () => {
                         model={useMemorizedValue({
                             default: [{
                                 name: 'inputs3-1',
-                                type: 'date'
+                                type: 'time',
+                                value: {
+                                    start: {
+                                        default: 0
+                                    },
+                                    end: {
+                                        default: 0
+                                    }
+                                }
                             }],
                             name: 'inputs3'
                         })}
@@ -918,9 +1065,9 @@ const Application = () => {
                     <Inputs
                         name="controlled"
                         onChange={onChange}
-                        onChangeValue={onChangeValue7}
+                        onChangeValue={onChangeInputValue6}
                         triggerInitialPropertiesConsolidation={true}
-                        value={value7}
+                        value={inputValue6}
                     />
                 </div>
                 {/* endregion */}
@@ -951,10 +1098,10 @@ const Application = () => {
                         name="controlled"
                         default={120}
                         onChange={onChange}
-                        onChangeValue={onChangeValue5}
+                        onChangeValue={onChangeInputValue4}
                         step={60}
                         triggerInitialPropertiesConsolidation={true}
-                        value={value5}
+                        value={inputValue4}
                     />
                 </div>
                 {/* endregion */}
@@ -971,9 +1118,9 @@ const Application = () => {
                     <RequireableCheckbox
                         name="controlled"
                         onChange={onChange}
-                        onChangeValue={onChangeValue6}
+                        onChangeValue={onChangeInputValue5}
                         triggerInitialPropertiesConsolidation={true}
-                        value={value6}
+                        value={inputValue5}
                     />
 
                     <hr/>

@@ -32,7 +32,7 @@ import {
     useState
 } from 'react'
 
-import GenericInput from '../GenericInput'
+import TextInput from '../TextInput'
 /*
 "namedExport" version of css-loader:
 
@@ -397,9 +397,9 @@ export const IntervalInner = function(
             data-name={properties.name}
             style={properties.styles}
         >
-            <GenericInput {...startProperties} ref={startInputReference} />
+            <TextInput {...startProperties} ref={startInputReference} />
             <Icon icon={iconProperties} />
-            <GenericInput {...endProperties} ref={endInputReference} />
+            <TextInput {...endProperties} ref={endInputReference} />
         </div>
     </WrapConfigurations>
 }

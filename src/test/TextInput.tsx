@@ -19,15 +19,20 @@ import {AnyFunction} from 'clientnode/type'
 import {testEach} from 'clientnode/testHelper'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
-import GenericInput from '../components/GenericInput'
-import {suggestionMatches} from '../components/GenericInput/helper'
+import TextInput, {suggestionMatches} from '../components/TextInput'
 
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 
-GenericInput.locales = ['en-US']
+TextInput.locales = ['en-US']
 
-describe('GenericInput', ():void => {
+const TRANSFORMER = TextInput.transformer
+const TIMESTAMP_TRANSFORMER = {
+    ...TextInput.transformer,
+    date: {...TextInput.transformer.date, useISOString: false}
+}
+
+describe('TextInput', ():void => {
     testEach<typeof suggestionMatches>(
         'suggestionMatches',
         suggestionMatches,
@@ -44,7 +49,7 @@ describe('GenericInput', ():void => {
     )
     testEach<AnyFunction>(
         'transformer.boolean.parse',
-        GenericInput.transformer.boolean.parse!,
+        TRANSFORMER.boolean.parse!,
 
         [false, false],
         [true, true],
@@ -56,9 +61,10 @@ describe('GenericInput', ():void => {
         [true, null]
     )
 
+    // TODO add missing transformer
     testEach<AnyFunction>(
         'transformer.currency.format.final.transform',
-        GenericInput.transformer.currency.format!.final.transform!,
+        TRANSFORMER.currency.format!.final.transform!,
 
         ...([
             ['$0.00', 0],
@@ -70,12 +76,12 @@ describe('GenericInput', ():void => {
             ['- Infinity USD', -Infinity],
             ['unknown', NaN]
         ].map((item:Array<unknown>):Array<unknown> =>
-            item.concat({}, GenericInput.transformer)
+            item.concat(TextInput.transformer)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
+
     testEach<AnyFunction>(
-        'transformer.currency.parse',
-        GenericInput.transformer.currency.parse!,
+        'transformer.currency.parse', TRANSFORMER.currency.parse!,
 
         ...([
             [1, 1],
@@ -86,24 +92,29 @@ describe('GenericInput', ():void => {
             [1.1, '1.1 $'],
             [1.1, '1.1']
         ].map((item:Array<unknown>):Array<unknown> =>
-            item.concat({}, GenericInput.transformer)
+            item.concat(TRANSFORMER, {maximum: Infinity, minimum: -Infinity})
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
     testEach<AnyFunction>(
         'transformer.date.format.final.transform',
-        GenericInput.transformer.date.format!.final.transform!,
+        TRANSFORMER.date.format!.final.transform!,
 
-        ['1970-01-01', 0],
-        ['1970-01-01', 10],
-        ['1970-01-02', 60 ** 2 * 24],
-        ['Infinitely far in the future', Infinity],
-        ['Infinitely early in the past', -Infinity],
-        ['', NaN]
+        ...([
+            ['1970-01-01', 0],
+            ['1970-01-01', 10],
+            ['1970-01-02', 60 ** 2 * 24],
+            ['Infinitely far in the future', Infinity],
+            ['Infinitely early in the past', -Infinity],
+            ['', NaN]
+        ].map((item:Array<unknown>):Array<unknown> =>
+            item.concat(TextInput.transformer)
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
+
     testEach<AnyFunction>(
         'transformer.date.parse',
-        GenericInput.transformer.date.parse!,
+        TIMESTAMP_TRANSFORMER.date.parse!,
 
         ...([
             [1, 1],
@@ -114,62 +125,84 @@ describe('GenericInput', ():void => {
             [1.1, '1.1 f'],
             [8 * 60 ** 2, '1970-01-01T08:00:00.000Z']
         ].map((item:Array<unknown>):Array<unknown> =>
-            item.concat({}, GenericInput.transformer)
+            item.concat(TIMESTAMP_TRANSFORMER)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
     testEach<AnyFunction>(
         'transformer.datetime-local.format.final.transform',
-        GenericInput.transformer['datetime-local'].format!.final.transform!,
+        TRANSFORMER['datetime-local'].format!.final.transform!,
 
-        ['1970-01-01T00:00:00.000', 0],
-        ['1970-01-01T00:00:10.000', 10],
-        ['1970-01-02T00:00:00.000', 60 ** 2 * 24],
+        ['1969-12-31T23:00:00', 0],
+        ['1969-12-31T23:00:10', 10],
+        ['1970-01-01T23:00:00', 60 ** 2 * 24],
         ['Infinitely far in the future', Infinity],
         ['Infinitely early in the past', -Infinity],
         ['', NaN]
     )
     testEach<AnyFunction>(
         'transformer.datetime-local.parse',
-        GenericInput.transformer['datetime-local'].parse!,
+        TIMESTAMP_TRANSFORMER['datetime-local'].parse!,
 
         ...([
             [1, 1],
             [0, 0],
-            [1, '1 f', {}, GenericInput.transformer],
-            [0, '0 f', {}, GenericInput.transformer],
-            [1, '1 f', {}, GenericInput.transformer],
-            [1.1, '1.1 f', {}, GenericInput.transformer],
+            [1, '1 f'],
+            [0, '0 f'],
+            [1, '1 f'],
+            [1.1, '1.1 f'],
             [8 * 60 ** 2, '1970-01-01T08:00:00.000Z']
         ].map((item:Array<unknown>):Array<unknown> =>
-            item.concat({}, GenericInput.transformer)
+            item.concat(TIMESTAMP_TRANSFORMER)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
     testEach<AnyFunction>(
         'transformer.time.format.final.transform',
-        GenericInput.transformer.time.format!.final.transform!,
+        TextInput.transformer.time.format!.final.transform!,
 
-        ['00:00:00.000', 0, {}],
-        ['00:00', 0, {step: 60}],
-        ['00:00:10.000', 10, {}],
-        ['00:00', 10, {step: 120}],
-        ['00:00:00.000', 60 ** 2 * 24, {}],
-        ['00:00:00.000', 60 ** 2 * 24, {step: 61}],
-        ['00:00', 60 ** 2 * 24, {step: 60}],
-        ['00:00:20.000', 60 ** 2 * 24 + 20, {}],
-        ['00:10:00.000', 10 * 60, {}],
-        ['10:10:00.000', 10 * 60 ** 2 + 10 * 60, {}],
-        ['10:10:00.100', 10 * 60 ** 2 + 10 * 60 + 0.1, {}],
-        ['10:10', 10 * 60 ** 2 + 10 * 60 + 0.1, {step: 60}],
-        ['08:00', Date.parse('1970-01-01T08:00:00.000Z') / 1000, {step: 60}],
-        ['Infinitely far in the future', Infinity, {}],
-        ['Infinitely early in the past', -Infinity, {}],
-        ['', NaN, {}]
+        ['00:00:00.000', 0, TextInput.transformer, {}],
+        ['00:00', 0, TextInput.transformer, {step: 60}],
+        ['00:00:10.000', 10, TextInput.transformer, {}],
+        ['00:00', 10, TextInput.transformer, {step: 120}],
+        ['00:00:00.000', 60 ** 2 * 24, TextInput.transformer, {}],
+        ['00:00:00.000', 60 ** 2 * 24, TextInput.transformer, {step: 61}],
+        ['00:00', 60 ** 2 * 24, TextInput.transformer, {step: 60}],
+        ['00:00:20.000', 60 ** 2 * 24 + 20, TextInput.transformer, {}],
+        ['00:10:00.000', 10 * 60, TextInput.transformer, {}],
+        ['10:10:00.000', 10 * 60 ** 2 + 10 * 60, TextInput.transformer, {}],
+        [
+            '10:10:00.100',
+            10 * 60 ** 2 + 10 * 60 + 0.1,
+            TextInput.transformer,
+            {}
+        ],
+        [
+            '10:10',
+            10 * 60 ** 2 + 10 * 60 + 0.1,
+            TextInput.transformer,
+            {step: 60}
+        ],
+        [
+            '08:00',
+            Date.parse('1970-01-01T08:00:00.000Z') / 1000,
+            TextInput.transformer,
+            {step: 60}
+        ],
+        [
+            'Infinitely far in the future', Infinity, TextInput.transformer, {}
+        ],
+        [
+            'Infinitely early in the past',
+            -Infinity,
+            TextInput.transformer,
+            {}
+        ],
+        ['', NaN, TextInput.transformer, {}]
     )
     testEach<AnyFunction>(
         'transformer.time.parse',
-        GenericInput.transformer.time.parse!,
+        TIMESTAMP_TRANSFORMER.time.parse!,
 
         ...([
             [1, 1],
@@ -183,7 +216,7 @@ describe('GenericInput', ():void => {
             [10 * 60 ** 2 + 10 * 60 + 10.1, '10:10:10.10'],
             [8 * 60 ** 2, '1970-01-01T08:00:00.000Z']
         ].map((item:Array<unknown>):Array<unknown> =>
-            item.concat({}, GenericInput.transformer)
+            item.concat(TIMESTAMP_TRANSFORMER)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
@@ -194,18 +227,19 @@ describe('GenericInput', ():void => {
     */
     testEach<AnyFunction>(
         'transformer.time-local.format.final.transform',
-        GenericInput.transformer['time-local'].format!.final.transform!,
+        TRANSFORMER['time-local'].format!.final.transform!,
 
         [
             // E.g. will result in 9 o'clock in germany.
             `0${new Date('1970-01-01T08:00:00.000Z').getHours()}:00`,
             Date.parse('1970-01-01T08:00:00.000Z') / 1000,
+            TRANSFORMER,
             {step: 60}
         ]
     )
     testEach<AnyFunction>(
         'transformer.time-local.parse',
-        GenericInput.transformer['time-local'].parse!,
+        TIMESTAMP_TRANSFORMER['time-local'].parse!,
 
         ...([
             [
@@ -218,21 +252,21 @@ describe('GenericInput', ():void => {
                 '09:00'
             ]
         ].map((item:Array<unknown>):Array<unknown> =>
-            item.concat({}, GenericInput.transformer)
+            item.concat(TIMESTAMP_TRANSFORMER)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
     // TODO
     test('render', ():void => {
-        expect(render(<GenericInput/>)).toBeDefined()
+        expect(render(<TextInput/>)).toBeDefined()
 
-        expect(render(<GenericInput/>)!.querySelector('input')).toBeDefined()
+        expect(render(<TextInput/>)!.querySelector('input')).toBeDefined()
 
-        expect(render(<GenericInput/>)!.getAttribute('class'))
+        expect(render(<TextInput/>)!.getAttribute('class'))
             .toStrictEqual('generic-input')
 
         expect(
-            render(<GenericInput name="test"/>)!.querySelector('[name="test"]')
+            render(<TextInput name="test"/>)!.querySelector('[name="test"]')
         ).not.toStrictEqual(null)
     })
 })
