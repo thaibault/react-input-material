@@ -31,8 +31,9 @@ const TIMESTAMP_TRANSFORMER = {
     ...TextInput.transformer,
     date: {...TextInput.transformer.date, useISOString: false}
 }
+const TIMEZONE_OFFSET_IN_SECONDS = -1 * new Date().getTimezoneOffset() * 60
 
-describe('TextInput', ():void => {
+describe('TextInput', () => {
     testEach<typeof suggestionMatches>(
         'suggestionMatches',
         suggestionMatches,
@@ -133,9 +134,9 @@ describe('TextInput', ():void => {
         'transformer.datetime-local.format.final.transform',
         TRANSFORMER['datetime-local'].format!.final.transform!,
 
-        ['1969-12-31T23:00:00', 0],
-        ['1969-12-31T23:00:10', 10],
-        ['1970-01-01T23:00:00', 60 ** 2 * 24],
+        ['1970-01-01T00:00:00', TIMEZONE_OFFSET_IN_SECONDS],
+        ['1970-01-01T00:00:10', 10 + TIMEZONE_OFFSET_IN_SECONDS],
+        ['1970-01-02T00:00:00', 60 ** 2 * 24 + TIMEZONE_OFFSET_IN_SECONDS],
         ['Infinitely far in the future', Infinity],
         ['Infinitely early in the past', -Infinity],
         ['', NaN]
