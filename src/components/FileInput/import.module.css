@@ -17,7 +17,7 @@ CSS Modules:
 
 @import "@rmwc/card/styles";
 
-Imported by GenericInput
+Imported by TextInput
 
 @import "@rmwc/circular-progress/styles";
 
@@ -30,7 +30,7 @@ Plain CSS:
 @import "@material/button/dist/mdc.button.css";
 @import "@material/card/dist/mdc.card.css";
 
-@import "../GenericInput/import.module";
+@import "../TextInput/import.module";
 /* endregion */
 .file-input {
     /*

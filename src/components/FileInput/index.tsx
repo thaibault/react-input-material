@@ -45,7 +45,7 @@ import {CircularProgress} from '@rmwc/circular-progress'
 import {Theme} from '@rmwc/theme'
 import {Typography} from '@rmwc/typography'
 
-import GenericInput from '../GenericInput'
+import TextInput from '../TextInput'
 import {WrapConfigurations} from '../WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
@@ -716,7 +716,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                         ''
                     }
                     {properties.value ?
-                        <GenericInput
+                        <TextInput
                             ref={nameInputReference}
                             {...properties.generateFileNameInputProperties(
                                 {

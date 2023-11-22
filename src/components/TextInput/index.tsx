@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module GenericInput */
+/** @module TextInput */
 'use strict'
 /* !
     region header
@@ -105,7 +105,7 @@ import {
     InputModel as Model,
     NativeInputType,
     NormalizedSelection,
-    GenericInputComponent,
+    TextInputComponent,
     InputTablePosition as TablePosition,
     InputValueState as ValueState,
     Selection,
@@ -125,6 +125,7 @@ import {
     UseAnimations
 } from './helper'
 import TRANSFORMER from './transformer'
+import {IconButtonOnChangeEventT} from '@rmwc/icon-button/lib/icon-button'
 
 export * from './helper'
 export const INPUT_TRANSFORMER = TRANSFORMER
@@ -132,7 +133,7 @@ export const INPUT_TRANSFORMER = TRANSFORMER
 let RICH_TEXT_EDITOR_LOADER_ONCE = false
 /* eslint-disable jsdoc/require-description-complete-sentence */
 /**
- * Generic input wrapper component which automatically determines a useful
+ * Generic text input wrapper component which automatically determines a useful
  * input field depending on given model specification.
  *
  * Dataflow:
@@ -155,7 +156,7 @@ let RICH_TEXT_EDITOR_LOADER_ONCE = false
  *
  * @returns React elements.
  */
-export const GenericInputInner = function<Type = unknown>(
+export const TextInputInner = function<Type = unknown>(
     props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
 ):ReactElement {
     const id = useId()
@@ -374,7 +375,7 @@ export const GenericInputInner = function<Type = unknown>(
                 onChangeValue(parseValue<Type>(
                     properties,
                     properties.default as Type,
-                    GenericInput.transformer
+                    TextInput.transformer
                 ))
             }
 
@@ -513,17 +514,14 @@ export const GenericInputInner = function<Type = unknown>(
         </GenericAnimate>
         <GenericAnimate in={Boolean(properties.declaration)}>
             <IconButton
-                icon={{
-                    'aria-expanded':
-                        properties.showDeclaration ? 'true' : 'false',
-                    // TODO make configurable
-                    'aria-label': 'declaration',
-                    icon:
-                        'more_' +
-                        (properties.showDeclaration ? 'vert' : 'horiz'),
-                    onClick: onChangeShowDeclaration,
-                    onKeyDown: onChangeShowDeclaration
-                }}
+                aria-expanded={properties.showDeclaration ? 'true' : 'false'}
+                aria-label="declaration"
+
+                checked={properties.showDeclaration}
+                // TODO make configurable
+                icon="more_vert"
+                onIcon="more_horiz"
+                onChange={onChangeShowDeclaration}
             />
         </GenericAnimate>
         <GenericAnimate
@@ -667,7 +665,7 @@ export const GenericInputInner = function<Type = unknown>(
         if (!properties.value)
             return 0
 
-        const indicatorKey = 'generic-input-selection-indicator'
+        const indicatorKey = 'text-input-selection-indicator'
         const indicatorValue = '###'
         const indicator = ` ${indicatorKey}="${indicatorValue}"`
 
@@ -762,8 +760,8 @@ export const GenericInputInner = function<Type = unknown>(
             end:string
             start:string
         } = {
-            end: '###generic-input-selection-indicator-end###',
-            start: '###generic-input-selection-indicator-start###'
+            end: '###text-input-selection-indicator-end###',
+            start: '###text-input-selection-indicator-start###'
         }
         const cursor:CursorState = {
             end: properties.cursor.end + indicator.start.length,
@@ -950,7 +948,7 @@ export const GenericInputInner = function<Type = unknown>(
         const result:DefaultProperties<Type> =
             mapPropertiesIntoModel<Props<Type>, DefaultProperties<Type>>(
                 properties,
-                GenericInput.defaultProperties.model as unknown as Model<Type>
+                TextInput.defaultProperties.model as unknown as Model<Type>
             )
 
         result.model.value = parseValue<Type>(
@@ -1223,26 +1221,11 @@ export const GenericInputInner = function<Type = unknown>(
      *
      * @returns Nothing.
      */
-    const onChangeShowDeclaration = (
-        event?:ReactKeyboardEvent|ReactMouseEvent
-    ):void => {
-        if (event) {
-            if (
-                (event as ReactKeyboardEvent).code &&
-                !['Enter', 'Space'].includes(
-                    (event as ReactKeyboardEvent).code
-                )
-            )
-                return
-
-            event.preventDefault()
-            event.stopPropagation()
-        }
-
+    const onChangeShowDeclaration = (event?:IconButtonOnChangeEventT) => {
         setShowDeclaration((value:boolean):boolean => {
             properties.showDeclaration = !value
 
-            onChange(event)
+            onChange(event as unknown as GenericEvent)
 
             triggerCallbackIfExists<Properties<Type>>(
                 properties,
@@ -1687,7 +1670,7 @@ export const GenericInputInner = function<Type = unknown>(
 
     let initialValue:null|Type = determineInitialValue<Type>(
         givenProps,
-        GenericInput.defaultProperties.model?.default as Type
+        TextInput.defaultProperties.model?.default as Type
     )
     if (initialValue instanceof Date)
         initialValue = (initialValue.getTime() / 1000) as unknown as Type
@@ -1698,7 +1681,7 @@ export const GenericInputInner = function<Type = unknown>(
     */
     const givenProperties:Props<Type> = Tools.extend<Props<Type>>(
         true,
-        Tools.copy<Props<Type>>(GenericInput.defaultProperties as Props<Type>),
+        Tools.copy<Props<Type>>(TextInput.defaultProperties as Props<Type>),
         givenProps
     )
 
@@ -1709,11 +1692,11 @@ export const GenericInputInner = function<Type = unknown>(
     const transformer:InputDataTransformation =
         givenProperties.transformer ?
             {
-                ...GenericInput.transformer,
+                ...TextInput.transformer,
                 [type]: Tools.extend<DataTransformSpecification<Type>>(
                     true,
                     Tools.copy<DataTransformSpecification<Type>>(
-                        GenericInput.transformer[type] as
+                        TextInput.transformer[type] as
                             DataTransformSpecification<Type>
                     ) ||
                     {},
@@ -1721,7 +1704,7 @@ export const GenericInputInner = function<Type = unknown>(
                         DataTransformSpecification<Type>
                 )
             } :
-            GenericInput.transformer
+            TextInput.transformer
 
     let [selection, setSelection] =
         useState<AbortController|Properties['selection']>()
@@ -1746,10 +1729,10 @@ export const GenericInputInner = function<Type = unknown>(
     */
     let [valueState, setValueState] = useState<ValueState<Type, ModelState>>(
         () => ({
-            modelState: {...GenericInput.defaultModelState},
+            modelState: {...TextInput.defaultModelState},
             representation: determineInitialRepresentation<Type>(
                 givenProperties as DefaultProperties<Type>,
-                GenericInput.defaultProperties as
+                TextInput.defaultProperties as
                     unknown as
                     DefaultProperties<Type>,
                 initialValue,
@@ -1861,7 +1844,7 @@ export const GenericInputInner = function<Type = unknown>(
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     > = {
         /*
-            NOTE: If not set label with unallowed symbols will automatically
+            NOTE: If not set label with forbidden symbols will automatically
             used.
         */
         id,
@@ -1974,7 +1957,7 @@ export const GenericInputInner = function<Type = unknown>(
                     currentRenderableSuggestions.push(
                         <MenuItem
                             className={CSS_CLASS_NAMES[
-                                'generic-input__suggestions__suggestion'
+                                'text-input__suggestions__suggestion'
                             ]}
                             key={index}
                         >
@@ -1994,7 +1977,7 @@ export const GenericInputInner = function<Type = unknown>(
                 currentRenderableSuggestions.push(
                     <MenuItem
                         className={CSS_CLASS_NAMES[
-                            'generic-input__suggestions__suggestion'
+                            'text-input__suggestions__suggestion'
                         ]}
                         key={index}
                     >
@@ -2006,7 +1989,7 @@ export const GenericInputInner = function<Type = unknown>(
                             {
                                 marker: (foundWord:string):ReactElement =>
                                     <span className={CSS_CLASS_NAMES[
-                                        'generic-input__suggestions' +
+                                        'text-input__suggestions' +
                                         '__suggestion__mark'
                                     ]}>
                                         {foundWord}
@@ -2080,15 +2063,15 @@ export const GenericInputInner = function<Type = unknown>(
     /// endregion
     /// region main markup
     return <WrapConfigurations
-        strict={GenericInput.strict}
+        strict={TextInput.strict}
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
     >
         <div
-            className={[CSS_CLASS_NAMES['generic-input']]
+            className={[CSS_CLASS_NAMES['text-input']]
                 .concat(
                     isAdvancedEditor ?
-                        CSS_CLASS_NAMES['generic-input--custom'] :
+                        CSS_CLASS_NAMES['text-input--custom'] :
                         [],
                     properties.className ?? []
                 )
@@ -2104,7 +2087,9 @@ export const GenericInputInner = function<Type = unknown>(
                 <Select
                     {...genericProperties as SelectProps}
                     {...materialProperties as SelectProps}
+
                     enhanced={true}
+
                     foundationRef={foundationReference as
                         MutableRefObject<MDCSelectFoundation|null>
                     }
@@ -2112,6 +2097,7 @@ export const GenericInputInner = function<Type = unknown>(
                         unknown as
                         (reference:HTMLSelectElement|null) => void
                     }
+
                     onChange={onChangeValue}
                     onKeyDown={(event:ReactKeyboardEvent):void => {
                         /*
@@ -2121,13 +2107,16 @@ export const GenericInputInner = function<Type = unknown>(
                         if (!(properties.disabled || event.code === 'Tab'))
                             event.preventDefault()
                     }}
+
                     options={normalizedSelection as SelectProps['options']}
+
                     rootProps={{
                         name: properties.name,
                         onClick: onClick,
                         ...properties.rootProps
                     }}
                     value={`${properties.value as unknown as string}`}
+
                     {...properties.inputProperties as SelectProps}
                 />,
                 useSelection
@@ -2149,9 +2138,7 @@ export const GenericInputInner = function<Type = unknown>(
                     >
                         <label>
                             <span className={
-                                [CSS_CLASS_NAMES[
-                                    'generic-input__editor__label'
-                                ]]
+                                [CSS_CLASS_NAMES['text-input__editor__label']]
                                     .concat(
                                         'mdc-floating-label',
                                         'mdc-floating-label--float-above'
@@ -2301,11 +2288,11 @@ export const GenericInputInner = function<Type = unknown>(
                                     anchorCorner="bottomLeft"
                                     className={
                                         CSS_CLASS_NAMES[
-                                            'generic-input__suggestions'
+                                            'text-input__suggestions'
                                         ] +
                                         ' ' +
                                         CSS_CLASS_NAMES[
-                                            'generic-input__suggestions' +
+                                            'text-input__suggestions' +
                                             '--pending'
                                         ]
                                     }
@@ -2315,21 +2302,19 @@ export const GenericInputInner = function<Type = unknown>(
                                 </MenuSurface> :
                                 <Menu
                                     anchorCorner="bottomLeft"
-                                    apiRef={(instance:MenuApi|null):void => {
+                                    apiRef={(instance:MenuApi|null) => {
                                         suggestionMenuAPIReference.current =
                                             instance
                                     }}
                                     className={CSS_CLASS_NAMES[
-                                        'generic-input__suggestions'
+                                        'text-input__suggestions'
                                     ]}
                                     focusOnOpen={false}
                                     foundationRef={
                                         suggestionMenuFoundationReference
                                     }
                                     onFocus={onFocus}
-                                    onSelect={(
-                                        event:MenuOnSelectEventT
-                                    ):void => {
+                                    onSelect={(event:MenuOnSelectEventT) => {
                                         onChangeValue(
                                             currentSuggestionValues[
                                                 event.detail.index
@@ -2417,7 +2402,7 @@ export const GenericInputInner = function<Type = unknown>(
     // endregion
 }
 // NOTE: This is useful in react dev tools.
-GenericInputInner.displayName = 'GenericInput'
+TextInputInner.displayName = 'TextInput'
 /**
  * Wrapping web component compatible react component.
  * @property static:defaultModelState - Initial model state.
@@ -2426,7 +2411,7 @@ GenericInputInner.displayName = 'GenericInput'
  * @property static:propTypes - Triggers reacts runtime property value checks.
  * @property static:strict - Indicates whether we should wrap render output in
  * reacts strict component.
- * @property static:transformer - Generic input data transformation
+ * @property static:transformer - Text input data transformation
  * specifications.
  * @property static:wrapped - Wrapped component.
  *
@@ -2435,20 +2420,20 @@ GenericInputInner.displayName = 'GenericInput'
  *
  * @returns React elements.
  */
-export const GenericInput = memorize(forwardRef(GenericInputInner)) as
+export const TextInput = memorize(forwardRef(TextInputInner)) as
     unknown as
-    GenericInputComponent<typeof GenericInputInner>
+    TextInputComponent<typeof TextInputInner>
 // region static properties
 /// region web-component hints
-GenericInput.wrapped = GenericInputInner
-GenericInput.webComponentAdapterWrapped = 'react'
+TextInput.wrapped = TextInputInner
+TextInput.webComponentAdapterWrapped = 'react'
 /// endregion
-GenericInput.defaultModelState = defaultModelState
+TextInput.defaultModelState = defaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where
     provided via "props" and should shadow a state saved valued.
 */
-GenericInput.defaultProperties = {
+TextInput.defaultProperties = {
     ...defaultProperties,
     cursor: undefined,
     model: {
@@ -2460,13 +2445,13 @@ GenericInput.defaultProperties = {
     representation: undefined,
     value: undefined
 }
-GenericInput.locales = Tools.locales
-GenericInput.propTypes = propertyTypes
-GenericInput.renderProperties = renderProperties
-GenericInput.strict = false
-GenericInput.transformer = TRANSFORMER
+TextInput.locales = Tools.locales
+TextInput.propTypes = propertyTypes
+TextInput.renderProperties = renderProperties
+TextInput.strict = false
+TextInput.transformer = TRANSFORMER
 // endregion
-export default GenericInput
+export default TextInput
 // region vim modline
 // vim: set tabstop=4 shiftwidth=4 expandtab:
 // vim: foldmethod=marker foldmarker=region,endregion:

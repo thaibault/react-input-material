@@ -19,20 +19,20 @@ import {AnyFunction} from 'clientnode/type'
 import {testEach} from 'clientnode/testHelper'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
-import GenericInput, {suggestionMatches} from '../components/GenericInput'
+import TextInput, {suggestionMatches} from '../components/TextInput'
 
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 
-GenericInput.locales = ['en-US']
+TextInput.locales = ['en-US']
 
-const TRANSFORMER = GenericInput.transformer
+const TRANSFORMER = TextInput.transformer
 const TIMESTAMP_TRANSFORMER = {
-    ...GenericInput.transformer,
-    date: {...GenericInput.transformer.date, useISOString: false}
+    ...TextInput.transformer,
+    date: {...TextInput.transformer.date, useISOString: false}
 }
 
-describe('GenericInput', ():void => {
+describe('TextInput', ():void => {
     testEach<typeof suggestionMatches>(
         'suggestionMatches',
         suggestionMatches,
@@ -76,7 +76,7 @@ describe('GenericInput', ():void => {
             ['- Infinity USD', -Infinity],
             ['unknown', NaN]
         ].map((item:Array<unknown>):Array<unknown> =>
-            item.concat(GenericInput.transformer)
+            item.concat(TextInput.transformer)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
@@ -108,7 +108,7 @@ describe('GenericInput', ():void => {
             ['Infinitely early in the past', -Infinity],
             ['', NaN]
         ].map((item:Array<unknown>):Array<unknown> =>
-            item.concat(GenericInput.transformer)
+            item.concat(TextInput.transformer)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
@@ -159,49 +159,46 @@ describe('GenericInput', ():void => {
 
     testEach<AnyFunction>(
         'transformer.time.format.final.transform',
-        GenericInput.transformer.time.format!.final.transform!,
+        TextInput.transformer.time.format!.final.transform!,
 
-        ['00:00:00.000', 0, GenericInput.transformer, {}],
-        ['00:00', 0, GenericInput.transformer, {step: 60}],
-        ['00:00:10.000', 10, GenericInput.transformer, {}],
-        ['00:00', 10, GenericInput.transformer, {step: 120}],
-        ['00:00:00.000', 60 ** 2 * 24, GenericInput.transformer, {}],
-        ['00:00:00.000', 60 ** 2 * 24, GenericInput.transformer, {step: 61}],
-        ['00:00', 60 ** 2 * 24, GenericInput.transformer, {step: 60}],
-        ['00:00:20.000', 60 ** 2 * 24 + 20, GenericInput.transformer, {}],
-        ['00:10:00.000', 10 * 60, GenericInput.transformer, {}],
-        ['10:10:00.000', 10 * 60 ** 2 + 10 * 60, GenericInput.transformer, {}],
+        ['00:00:00.000', 0, TextInput.transformer, {}],
+        ['00:00', 0, TextInput.transformer, {step: 60}],
+        ['00:00:10.000', 10, TextInput.transformer, {}],
+        ['00:00', 10, TextInput.transformer, {step: 120}],
+        ['00:00:00.000', 60 ** 2 * 24, TextInput.transformer, {}],
+        ['00:00:00.000', 60 ** 2 * 24, TextInput.transformer, {step: 61}],
+        ['00:00', 60 ** 2 * 24, TextInput.transformer, {step: 60}],
+        ['00:00:20.000', 60 ** 2 * 24 + 20, TextInput.transformer, {}],
+        ['00:10:00.000', 10 * 60, TextInput.transformer, {}],
+        ['10:10:00.000', 10 * 60 ** 2 + 10 * 60, TextInput.transformer, {}],
         [
             '10:10:00.100',
             10 * 60 ** 2 + 10 * 60 + 0.1,
-            GenericInput.transformer,
+            TextInput.transformer,
             {}
         ],
         [
             '10:10',
             10 * 60 ** 2 + 10 * 60 + 0.1,
-            GenericInput.transformer,
+            TextInput.transformer,
             {step: 60}
         ],
         [
             '08:00',
             Date.parse('1970-01-01T08:00:00.000Z') / 1000,
-            GenericInput.transformer,
+            TextInput.transformer,
             {step: 60}
         ],
         [
-            'Infinitely far in the future',
-            Infinity,
-            GenericInput.transformer,
-            {}
+            'Infinitely far in the future', Infinity, TextInput.transformer, {}
         ],
         [
             'Infinitely early in the past',
             -Infinity,
-            GenericInput.transformer,
+            TextInput.transformer,
             {}
         ],
-        ['', NaN, GenericInput.transformer, {}]
+        ['', NaN, TextInput.transformer, {}]
     )
     testEach<AnyFunction>(
         'transformer.time.parse',
@@ -261,15 +258,15 @@ describe('GenericInput', ():void => {
 
     // TODO
     test('render', ():void => {
-        expect(render(<GenericInput/>)).toBeDefined()
+        expect(render(<TextInput/>)).toBeDefined()
 
-        expect(render(<GenericInput/>)!.querySelector('input')).toBeDefined()
+        expect(render(<TextInput/>)!.querySelector('input')).toBeDefined()
 
-        expect(render(<GenericInput/>)!.getAttribute('class'))
+        expect(render(<TextInput/>)!.getAttribute('class'))
             .toStrictEqual('generic-input')
 
         expect(
-            render(<GenericInput name="test"/>)!.querySelector('[name="test"]')
+            render(<TextInput name="test"/>)!.querySelector('[name="test"]')
         ).not.toStrictEqual(null)
     })
 })

@@ -26,7 +26,7 @@ import {useMemorizedValue} from 'react-generic-tools'
 
 import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
 import {
-    FileInput, GenericInput as Input, Inputs, Interval, RequireableCheckbox
+    FileInput, TextInput, Inputs, Interval, RequireableCheckbox
 } from './index'
 import {
     CheckboxProps, FileInputChildrenOptions, FileInputProperties,
@@ -38,9 +38,10 @@ import {
     IntervalValue,
     SuggestionCreatorOptions
 } from './type'
+import {CircularProgress} from '@rmwc/circular-progress'
 // endregion
 Tools.locales.push('de-DE')
-Input.transformer.currency.format!.final.options = {currency: 'EUR'}
+TextInput.transformer.currency.format!.final.options = {currency: 'EUR'}
 
 const SECTIONS = [
     'file-input',
@@ -210,18 +211,18 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    <Input<string>
+                    <TextInput<string>
                         inputProperties={useMemorizedValue({outlined: true})}
                         onChange={onChange}
                     />
-                    <Input<null|string>
+                    <TextInput<null|string>
                         name="UnControlled"
                         onChange={onChange}
                         onChangeValue={onChangeInputValue1}
                         enforceUncontrolled={true}
                         value={inputValue1}
                     />
-                    <Input<null|string>
+                    <TextInput<null|string>
                         name="controlled"
                         onChange={onChange}
                         onChangeValue={onChangeInputValue1}
@@ -231,7 +232,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="This text can be seen initially."
                         inputProps={{
                             ariaChecked: false,
@@ -241,21 +242,21 @@ const Application = () => {
                         onChange={onChange}
                         showDeclaration={true}
                     />
-                    <Input<string>
+                    <TextInput<string>
                         model={useMemorizedValue({name: 'simpleInput1Model'})}
                         onChange={onChange}
                     />
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="Disabled"
                         disabled
                         initialValue="value4"
                         name="simpleInput2"
                         onChange={onChange}
                     />
-                    <Input<string>
+                    <TextInput<string>
                         model={useMemorizedValue({
                             declaration: 'Disabled',
                             default: 'value2Model',
@@ -267,7 +268,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="placeholder"
                         name="simpleInput3"
                         onChange={onChange}
@@ -276,7 +277,7 @@ const Application = () => {
                         showValidationState={false}
                         trailingIcon="clear_preset"
                     />
-                    <Input<string>
+                    <TextInput<string>
                         default="simpleValue3Model"
                         icon="backup"
                         model={useMemorizedValue({
@@ -291,7 +292,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="pattern"
                         description="simpleInput4Description"
                         icon="search"
@@ -301,7 +302,7 @@ const Application = () => {
                         pattern="^a+$"
                         placeholder="simpleInput4Placeholder"
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="has a`s and b`s"
                         model={useMemorizedValue({
                             declaration: 'pattern',
@@ -316,7 +317,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="password"
                         description="simpleInput5Description"
                         icon="search"
@@ -328,7 +329,7 @@ const Application = () => {
                         tooltip="Please type in your password."
                         trailingIcon="password_preset"
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="hans"
                         model={useMemorizedValue({
                             declaration: 'password',
@@ -351,7 +352,7 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    <Input<null|number>
+                    <TextInput<null|number>
                         name="controlled"
                         onChange={useMemorizedValue((
                             properties:InputProperties<null|number>
@@ -369,7 +370,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<number>
                         declaration="Number"
                         description="numberInput1Description"
                         maximum={200000}
@@ -380,7 +381,7 @@ const Application = () => {
                         required
                         type="number"
                     />
-                    <Input<number>
+                    <TextInput<number>
                         initialValue={100000}
                         model={useMemorizedValue({
                             declaration: 'Number',
@@ -396,7 +397,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<number>
                         declaration="Number"
                         description="numberInput2Description"
                         maximum={200000}
@@ -407,7 +408,7 @@ const Application = () => {
                         required
                         type="integer"
                     />
-                    <Input<number>
+                    <TextInput<number>
                         initialValue={100000.01}
                         model={useMemorizedValue({
                             declaration: 'Number',
@@ -428,7 +429,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<number>
                         declaration="Number"
                         description="numberInput3Description"
                         maximum={200000}
@@ -440,7 +441,7 @@ const Application = () => {
                         required
                         type="currency"
                     />
-                    <Input<number>
+                    <TextInput<number>
                         initialValue={100000.01}
                         model={useMemorizedValue({
                             declaration: 'Number',
@@ -464,7 +465,7 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    <Input<string>
+                    <TextInput<string>
                         declaration="text"
                         description="textInput1Description"
                         editor="text"
@@ -478,7 +479,7 @@ const Application = () => {
                             secondary: 'blue'
                         })}
                     />
-                    <Input<string>
+                    <TextInput<string>
                         editor="text"
                         initialValue="a"
                         model={useMemorizedValue({
@@ -493,7 +494,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="code"
                         description="textInput2Description"
                         disabled
@@ -504,7 +505,7 @@ const Application = () => {
                         rows={2}
                         selectableEditor
                     />
-                    <Input<string>
+                    <TextInput<string>
                         editor="code"
                         initialValue="const value = 2"
                         model={useMemorizedValue({
@@ -520,7 +521,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="code"
                         description="textInput3Description"
                         editor="code"
@@ -531,7 +532,7 @@ const Application = () => {
                         rows={2}
                         selectableEditor
                     />
-                    <Input<string>
+                    <TextInput<string>
                         editor="code"
                         model={useMemorizedValue({
                             declaration: 'code',
@@ -546,7 +547,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="richtext(raw)"
                         description="textInput4Description"
                         editor="richtext(raw)"
@@ -559,7 +560,7 @@ const Application = () => {
                         rows={2}
                         selectableEditor
                     />
-                    <Input<string>
+                    <TextInput<string>
                         editor="richtext(simple)"
                         initialValue="Hello Mr. Smith,<br><br>how are you?"
                         model={useMemorizedValue({
@@ -584,7 +585,7 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    <Input<number>
+                    <TextInput<number>
                         default={
                             new Date('2025-01-01T00:00:00.000Z')
                                 .getTime() / 1000
@@ -593,7 +594,7 @@ const Application = () => {
                         onChange={onChange}
                         type="date"
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="2025-01-01T00:00:00.000Z"
                         inputProperties={useMemorizedValue({outlined: true})}
                         model={useMemorizedValue({
@@ -604,7 +605,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<number>
                         default={
                             new Date('2025-01-01T00:00:00.000Z')
                                 .getTime() / 1000
@@ -613,7 +614,7 @@ const Application = () => {
                         onChange={onChange}
                         type="date-local"
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="2025-01-01T00:00:00.000Z"
                         inputProperties={useMemorizedValue({outlined: true})}
                         model={useMemorizedValue({
@@ -624,13 +625,13 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<number>
                         default={120}
                         name="timeInput3"
                         onChange={onChange}
                         type="datetime"
                     />
-                    <Input<Date>
+                    <TextInput<Date>
                         model={useMemorizedValue({
                             default: new Date(120 * 1000),
                             maximum: 3600,
@@ -643,13 +644,13 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<number>
                         default={120}
-                        name="timeInput4"
+                        name="timeTextInput4"
                         onChange={onChange}
                         type="datetime-local"
                     />
-                    <Input<Date|number>
+                    <TextInput<Date|number>
                         model={useMemorizedValue({
                             default: new Date(120 * 1000),
                             maximum: 3600,
@@ -662,13 +663,13 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<number>
                         default={120}
                         name="timeInput5"
                         onChange={onChange}
                         type="time"
                     />
-                    <Input<Date|number>
+                    <TextInput<Date|number>
                         model={useMemorizedValue({
                             default: new Date(60 * 1000),
                             maximum: 3600,
@@ -681,13 +682,13 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<number>
                         default={120}
                         name="timeInput6"
                         onChange={onChange}
                         type="time-local"
                     />
-                    <Input<Date|number>
+                    <TextInput<Date|number>
                         model={useMemorizedValue({
                             default: new Date(60 * 1000),
                             maximum: 3600,
@@ -700,7 +701,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="1970-01-01T00:20:00.000Z"
                         inputProperties={useMemorizedValue({outlined: true})}
                         model={useMemorizedValue({
@@ -708,7 +709,7 @@ const Application = () => {
                         })}
                         onChange={onChange}
                     />
-                    <Input<string>
+                    <TextInput<string>
                         default="00:20:00"
                         name="timeInput7"
                         onChange={onChange}
@@ -725,7 +726,7 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    <Input<string>
+                    <TextInput<string>
                         declaration="selection"
                         description="selectionInput1Description"
                         labels={useMemorizedValue(
@@ -736,7 +737,7 @@ const Application = () => {
                         required
                         selection={useMemorizedValue(['A', 'B', 'C'])}
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="A"
                         labels={useMemorizedValue([
                             'Label A', 'Label B', 'Label C'
@@ -754,7 +755,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<boolean>
+                    <TextInput<boolean>
                         declaration="selection"
                         description="selectionInput2Description"
                         initialValue={true}
@@ -764,7 +765,7 @@ const Application = () => {
                         type="boolean"
                         required
                     />
-                    <Input<boolean>
+                    <TextInput<boolean>
                         disabled
                         initialValue={false}
                         labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
@@ -781,7 +782,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="selection"
                         description="selectionInput3Description"
                         initialValue="true"
@@ -790,7 +791,7 @@ const Application = () => {
                         onChange={onChange}
                         required
                     />
-                    <Input<boolean>
+                    <TextInput<boolean>
                         initialValue={false}
                         labels={useMemorizedValue({true: 'JA', false: 'NEIN'})}
                         model={useMemorizedValue({
@@ -805,7 +806,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<number>
+                    <TextInput<number>
                         declaration="numberSelection"
                         description="selectionInput4Description"
                         initialValue={2}
@@ -814,7 +815,7 @@ const Application = () => {
                         onChange={onChange}
                         required
                     />
-                    <Input<number>
+                    <TextInput<number>
                         model={useMemorizedValue({
                             declaration: 'numberSelection',
                             description: 'selectionInput4ModelDescription',
@@ -827,7 +828,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         declaration="selection"
                         description="selectionInput5Description"
                         initialValue="b"
@@ -836,7 +837,7 @@ const Application = () => {
                         selection={useMemorizedValue({a: 'A', b: 'B', c: 'C'})}
                         required
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="b"
                         model={useMemorizedValue({
                             declaration: 'selection',
@@ -850,7 +851,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         description="selectionInput6Description"
                         name="selectionInput6"
                         onChange={onChange}
@@ -860,7 +861,7 @@ const Application = () => {
                         )}
                         suggestSelection
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="peter"
                         model={useMemorizedValue({
                             declaration: 'selection',
@@ -899,7 +900,7 @@ const Application = () => {
 
                     <hr/>
 
-                    <Input<string>
+                    <TextInput<string>
                         description="selectionInput7Description"
                         default={'a'}
                         name="selectionInput7"
@@ -910,7 +911,7 @@ const Application = () => {
                             {a: 'hans', b: 'hans', c: 'klaus'}
                         )}
                     />
-                    <Input<string>
+                    <TextInput<string>
                         initialValue="peter"
                         model={useMemorizedValue({
                             declaration: 'selection',
@@ -944,7 +945,7 @@ const Application = () => {
                             }
                         )}
                     />
-                    <Input<null|string>
+                    <TextInput<null|string>
                         name="controlled"
                         onChange={useMemorizedValue(
                             (properties:InputProperties<null|string>) => {
@@ -962,7 +963,7 @@ const Application = () => {
                         )}
                         value={selectionInput.value}
                     />
-                    <Input<null|string>
+                    <TextInput<null|string>
                         name="controlled"
                         onChange={useMemorizedValue(
                             (properties:InputProperties<null|string>) => {
@@ -1042,7 +1043,15 @@ const Application = () => {
                         model={useMemorizedValue({
                             default: [{
                                 name: 'inputs3-1',
-                                type: 'date'
+                                type: 'time',
+                                value: {
+                                    start: {
+                                        default: 0
+                                    },
+                                    end: {
+                                        default: 0
+                                    }
+                                }
                             }],
                             name: 'inputs3'
                         })}

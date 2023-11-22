@@ -23,7 +23,6 @@ endregion */
 .inputs__add__button,
 .inputs__item__remove {
     box-sizing: border-box;
-    margin: 6px;
     text-align: center;
     visibility: visible;
 }

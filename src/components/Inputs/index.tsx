@@ -35,7 +35,7 @@ import {
 import {ComponentAdapter} from 'web-component-wrapper/type'
 import {IconButton} from '@rmwc/icon-button'
 
-import GenericInput from '../GenericInput'
+import TextInput from '../TextInput'
 /*
 "namedExport" version of css-loader:
 
@@ -431,6 +431,12 @@ export const InputsInner = function<
     const add = (event?:GenericEvent):void => setValues((
         values:Array<T>|null
     ):Array<T>|null => {
+        /*
+            NOTE: This is needed since the event handler is provided to icon
+            and button component contained in rmwc's "IconButton".
+        */
+        event?.stopPropagation()
+
         const newProperties:Partial<P> = properties.createPrototype({
             index: values?.length || 0,
             item: getPrototype<T, P>(properties),
@@ -477,7 +483,7 @@ export const InputsInner = function<
                 inputsProperties: properties,
                 properties: inputProperties
             }) :
-            <GenericInput
+            <TextInput
                 {...inputProperties as InputProps<T>}
                 name={`${properties.name}-${index + 1}`}
             />

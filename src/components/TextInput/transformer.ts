@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import {GenericInput} from '.'
+import {TextInput} from '.'
 import {
     DefaultInputProperties,
     DefaultInputProperties as DefaultProperties, InputDataTransformation
@@ -79,7 +79,7 @@ export const TRANSFORMER:InputDataTransformation = {
                     return 'unknown'
 
                 return (new Intl.NumberFormat(
-                    GenericInput.locales,
+                    TextInput.locales,
                     {style: 'currency', ...format?.final.options ?? {}}
                 )).format(value)
             }
@@ -489,7 +489,7 @@ export const TRANSFORMER:InputDataTransformation = {
                     value === -Infinity ?
                         '- Infinity' :
                         (new Intl.NumberFormat(
-                            GenericInput.locales, format.final.options || {}
+                            TextInput.locales, format.final.options || {}
                         )).format(value) :
                 `${value}`
         }},
@@ -500,7 +500,7 @@ export const TRANSFORMER:InputDataTransformation = {
         ):number => {
             if (typeof value === 'string')
                 value = parseFloat(
-                    GenericInput.locales[0] === 'de-DE' ?
+                    TextInput.locales[0] === 'de-DE' ?
                         value.replace(/\./g, '').replace(/,/g, '.') :
                         value
                 )
@@ -521,7 +521,7 @@ export const TRANSFORMER:InputDataTransformation = {
             value:number, {integer: {format}}:InputDataTransformation
         ):string => (
             new Intl.NumberFormat(
-                GenericInput.locales,
+                TextInput.locales,
                 {
                     maximumFractionDigits: 0, ...(format?.final.options ?? {})
                 }
@@ -534,7 +534,7 @@ export const TRANSFORMER:InputDataTransformation = {
         ):number => {
             if (typeof value === 'string')
                 value = parseInt(
-                    GenericInput.locales[0] === 'de-DE' ?
+                    TextInput.locales[0] === 'de-DE' ?
                         value.replace(/[,.]/g, '') :
                         value
                 )

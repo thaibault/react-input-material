@@ -636,7 +636,7 @@ export type NativeInputType = (
     'range' |
     'text'
 )
-export type GenericInputType = (
+export type TextInputType = (
     'date-local' |
     'datetime' |
     'time-local' |
@@ -801,7 +801,7 @@ export interface TinyMCEOptions extends RawTinyMCEOptions {
     target?:undefined
 }
 
-export interface GenericInputComponent<Type> extends
+export interface TextInputComponent<Type> extends
     Omit<ForwardRefExoticComponent<InputProps>, 'propTypes'>,
     StaticWebComponent<Type, InputModelState, DefaultInputProperties>
 {

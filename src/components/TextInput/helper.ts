@@ -39,13 +39,13 @@ import {
 "namedExport" version of css-loader:
 
 import {
-    genericInputSuggestionsSuggestionClassName,
-    genericInputSuggestionsSuggestionMarkClassName,
-    genericInputClassName,
-    genericInputCustomClassName,
-    genericInputEditorLabelClassName,
-    genericInputSuggestionsClassName,
-    genericInputSuggestionsPendingClassName
+    textInputSuggestionsSuggestionClassName,
+    textInputSuggestionsSuggestionMarkClassName,
+    textInputClassName,
+    textInputCustomClassName,
+    textInputEditorLabelClassName,
+    textInputSuggestionsClassName,
+    textInputSuggestionsPendingClassName
 } from './style.module'
  */
 import cssClassNames from './style.module'
