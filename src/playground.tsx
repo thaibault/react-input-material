@@ -38,7 +38,6 @@ import {
     IntervalValue,
     SuggestionCreatorOptions
 } from './type'
-import {CircularProgress} from '@rmwc/circular-progress'
 // endregion
 Tools.locales.push('de-DE')
 TextInput.transformer.currency.format!.final.options = {currency: 'EUR'}

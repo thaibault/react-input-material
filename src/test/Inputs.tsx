@@ -36,16 +36,19 @@ describe('Inputs', ():void => {
         expect(Array.from(domNode.querySelectorAll('input'))).toHaveLength(1)
         expect(Array.from(domNode.querySelectorAll('.inputs__add')))
             .toHaveLength(1)
-        expect(Array.from(domNode.querySelectorAll('.inputs__item__remove')))
-            .toHaveLength(1)
+
+        expect(Array.from(
+            domNode.querySelectorAll('button.inputs__item__remove')
+        )).toHaveLength(1)
 
         domNode = render(<Inputs value={[{value: 'a'}, 'b']}/>) as
             HTMLElement
         expect(Array.from(domNode.querySelectorAll('input'))).toHaveLength(2)
         expect(Array.from(domNode.querySelectorAll('.inputs__add')))
             .toHaveLength(1)
-        expect(Array.from(domNode.querySelectorAll('.inputs__item__remove')))
-            .toHaveLength(2)
+        expect(Array.from(
+            domNode.querySelectorAll('button.inputs__item__remove')
+        )).toHaveLength(2)
 
         expect(
             render(<Inputs value={['a']}/>)!.querySelector('input')

@@ -263,7 +263,7 @@ describe('TextInput', ():void => {
         expect(render(<TextInput/>)!.querySelector('input')).toBeDefined()
 
         expect(render(<TextInput/>)!.getAttribute('class'))
-            .toStrictEqual('generic-input')
+            .toStrictEqual('text-input')
 
         expect(
             render(<TextInput name="test"/>)!.querySelector('[name="test"]')
