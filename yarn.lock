@@ -10083,9 +10083,9 @@ thunky@^1.0.2:
   integrity sha512-eHY7nBftgThBqOyHGVN+l8gF0BucP09fMo0oO/Lb0w1OF80dJv+lDVpXG60WMQvkcxAkNybKsrEIE3ZtKGmPrA==
 
 "tinymce@^6.0.0 || ^5.5.1":
-  version "6.7.3"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-6.7.3.tgz#6289c5c7ec7298a84a7890ab866d88a193fa549a"
-  integrity sha512-J7WmYIi/gt1RvZ6Ap2oQiUjzAoiS9pfV+d4GnKuZuPu8agmlAEAInNmMvMjfCNBzHv4JnZXY7qlHUAI0IuYQVA==
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-6.8.0.tgz#5704cdaa7c01c07fd63c64b0f2f390f6e6244592"
+  integrity sha512-WSQlyfW8aPkOVMmmHmSVeA5Dq4JuUZjTB+PmePJ27oQ+ruv3Zn4KSTsvSnDUrHlqygjDvRidrCB/m5nTWCC2nA==
 
 tmpl@1.0.5:
   version "1.0.5"
@@ -10375,9 +10375,9 @@ wbuf@^1.1.0, wbuf@^1.7.3:
     minimalistic-assert "^1.0.0"
 
 web-component-wrapper@*:
-  version "0.0.467"
-  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.467.tgz#6865a648b5f729680c0ee32893a6a0d98e498077"
-  integrity sha512-HCSudBUDjnnhfY5zLxB84K3ggb1EMguTYiGtnzyNLZ2GB2dtfHOuJRTKZ+KI9Fn9DWXHQF7L8FHARBJN/CFx3g==
+  version "0.0.468"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.468.tgz#6584aa36174b123a4429165d623da6939c19ede1"
+  integrity sha512-F1AIza4+fSThuhvoQrXEItraAaEhXdr80pu0PctvCwiKiKKfspGxBiuHfTEA1HdXGVTfcJFtmcDhDlU+INLlHQ==
 
 webidl-conversions@^7.0.0:
   version "7.0.0"
