@@ -150,7 +150,7 @@
     "@types/react-dom": "*",
     "blob-util": "*",
     "clientnode": "*",
-    "material-components-web": "^14.0.0",
+    "material-components-web": "*",
     "material-icons": "*",
     "react": "*",
     "react-ace": "*",
