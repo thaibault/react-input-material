@@ -20,7 +20,7 @@
 import {Tab, TabBar, TabBarOnActivateEventT} from '@rmwc/tabs'
 import Tools from 'clientnode'
 import {Mapping, UnknownFunction} from 'clientnode/type'
-import {forwardRef, ReactNode, useRef, useState} from 'react'
+import {ReactNode, useState} from 'react'
 import {createRoot} from 'react-dom/client'
 import {useMemorizedValue} from 'react-generic-tools'
 
@@ -57,12 +57,6 @@ const SECTIONS = [
 ] as const
 
 const Application = () => {
-    return <Select
-        label="Enhanced"
-        enhanced
-        options={['Cookies', 'Pizza', 'Icecream']}
-    />
-
     const [selectedState, setSelectedState] = useState<unknown>()
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
     const activeSection = SECTIONS[activeTabIndex]
