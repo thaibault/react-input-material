@@ -7655,7 +7655,7 @@ marked@^4.0.10:
   resolved "https://registry.yarnpkg.com/marked/-/marked-4.3.0.tgz#796362821b019f734054582038b116481b456cf3"
   integrity sha512-PRsaiG84bK+AMvxziE/lCFss8juXjNaWzVbN5tXAm4XjeaS9NAHhop+PjQxz2A9h8Q4M/xGmzP8vqNwy6JeK0A==
 
-material-components-web@^14.0.0:
+material-components-web@*:
   version "14.0.0"
   resolved "https://registry.yarnpkg.com/material-components-web/-/material-components-web-14.0.0.tgz#cf8a1d3b467822c41014beef7ef6a3dd38ef2368"
   integrity sha512-bfGTQQOMhlBfZYkMzXNdydotG8p/hntiln13IRVIN38F170OU/y7ONpCxUweANDEVxrMeKAupVw/4u9in+LKFA==
@@ -9075,7 +9075,7 @@ react-useanimations@*:
   dependencies:
     lottie-web "^5.5.7"
 
-react@>=17:
+react@*:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
