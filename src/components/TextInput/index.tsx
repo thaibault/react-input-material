@@ -519,8 +519,8 @@ export const TextInputInner = function<Type = unknown>(
 
                 checked={properties.showDeclaration}
                 // TODO make configurable
-                icon="more_vert"
-                onIcon="more_horiz"
+                icon="more_horiz"
+                onIcon="more_vert"
                 onChange={onChangeShowDeclaration}
             />
         </GenericAnimate>
