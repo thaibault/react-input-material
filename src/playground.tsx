@@ -38,8 +38,6 @@ import {
     IntervalValue,
     SuggestionCreatorOptions
 } from './type'
-
-import {Select} from '@rmwc/select'
 // endregion
 Tools.locales.push('de-DE')
 TextInput.transformer.currency.format!.final.options = {currency: 'EUR'}
