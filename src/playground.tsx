@@ -251,7 +251,7 @@ const Application = () => {
                     <TextInput<string>
                         declaration="Disabled"
                         disabled
-                        initialValue="value4"
+                        initialValue="value2"
                         name="simpleInput2"
                         onChange={onChange}
                     />
@@ -296,7 +296,7 @@ const Application = () => {
                         description="simpleInput4Description"
                         icon="search"
                         initialValue="only a`s allowed"
-                        name="input6"
+                        name="input4"
                         onChange={onChange}
                         pattern="^a+$"
                         placeholder="simpleInput4Placeholder"
@@ -701,18 +701,18 @@ const Application = () => {
                     <hr/>
 
                     <TextInput<string>
+                        default="00:20:00"
+                        name="timeInput7"
+                        onChange={onChange}
+                        type="time-local"
+                    />
+                    <TextInput<string>
                         initialValue="1970-01-01T00:20:00.000Z"
                         inputProperties={useMemorizedValue({outlined: true})}
                         model={useMemorizedValue({
                             name: 'timeInput7Model', type: 'time-local'
                         })}
                         onChange={onChange}
-                    />
-                    <TextInput<string>
-                        default="00:20:00"
-                        name="timeInput7"
-                        onChange={onChange}
-                        type="time-local"
                     />
                 </div>
                 {/* endregion */}
@@ -771,7 +771,7 @@ const Application = () => {
                         model={useMemorizedValue({
                             declaration: 'selection',
                             description: 'selectionInput2ModelDescription',
-                            name: 'input9Model',
+                            name: 'selectionInput2Model',
                             nullable: false,
                             type: 'boolean'
                         })}
