@@ -705,6 +705,7 @@ const Application = () => {
                         name="timeInput7"
                         onChange={onChange}
                         type="time-local"
+                        step={60}
                     />
                     <TextInput<string>
                         initialValue="1970-01-01T00:20:00.000Z"
@@ -713,6 +714,7 @@ const Application = () => {
                             name: 'timeInput7Model', type: 'time-local'
                         })}
                         onChange={onChange}
+                        step={60}
                     />
                 </div>
                 {/* endregion */}
