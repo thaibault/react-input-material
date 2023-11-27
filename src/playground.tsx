@@ -120,8 +120,13 @@ const Application = () => {
             <TabBar
                 activeTabIndex={activeTabIndex}
                 onActivate={(event:TabBarOnActivateEventT) => {
-                    if (event.detail.index !== activeTabIndex)
-                        setActiveTabIndex(event.detail.index)
+                    if (
+                        (event as {detail:{index:number}}).detail.index !==
+                            activeTabIndex
+                    )
+                        setActiveTabIndex(
+                            (event as {detail:{index:number}}).detail.index
+                        )
                 }}
             >
                 {SECTIONS.map((name) =>
