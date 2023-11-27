@@ -606,7 +606,7 @@ const Application = () => {
 
                     <TextInput<number>
                         default={
-                            new Date('2025-01-01T00:00:00.000Z')
+                            new Date('2025-01-01T23:00:00.000Z')
                                 .getTime() / 1000
                         }
                         name="timeInput2"
@@ -614,7 +614,7 @@ const Application = () => {
                         type="date-local"
                     />
                     <TextInput<string>
-                        initialValue="2025-01-01T00:00:00.000Z"
+                        initialValue="2025-01-01T23:00:00.000Z"
                         inputProperties={useMemorizedValue({outlined: true})}
                         model={useMemorizedValue({
                             name: 'timeInput2Model', type: 'date-local'
