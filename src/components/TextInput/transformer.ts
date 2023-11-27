@@ -86,11 +86,13 @@ export const TRANSFORMER:InputDataTransformation = {
         }},
         parse: (
             value:string,
-            transformer:InputDataTransformation,
+            transformation:InputDataTransformation,
             configuration:DefaultProperties<number>
         ):number =>
-            transformer.float.parse ?
-                transformer.float.parse(value, transformer, configuration) :
+            transformation.float.parse ?
+                transformation.float.parse(
+                    value, transformation, configuration
+                ) :
                 NaN,
         type: 'text'
     },
@@ -99,22 +101,22 @@ export const TRANSFORMER:InputDataTransformation = {
         // Converts given utc date representation into iso date time string.
         format: {final: {transform: (
             value:Date|number|string,
-            transformer:InputDataTransformation,
+            transformation:InputDataTransformation,
             configuration:DefaultProperties<number|string>
         ):string => {
             if (typeof value !== 'number')
-                value = transformer.datetime.parse!(
+                value = transformation.datetime.parse!(
                     value,
                     {
-                        ...transformer,
-                        date: {...transformer.date, useISOString: false}
+                        ...transformation,
+                        date: {...transformation.date, useISOString: false}
                     },
                     configuration
                 ) as number
 
-            const edgeValueDesciption = convertEdgeValueToString(value)
-            if (typeof edgeValueDesciption === 'string')
-                return edgeValueDesciption
+            const edgeValueDescription = convertEdgeValueToString(value)
+            if (typeof edgeValueDescription === 'string')
+                return edgeValueDescription
 
             const formattedValue = utcSecondsToISOString(value)
             /*
@@ -160,22 +162,22 @@ export const TRANSFORMER:InputDataTransformation = {
         // Converts given utc date representation into iso date time string.
         format: {final: {transform: (
             value:number|string,
-            transformer:InputDataTransformation,
+            transformation:InputDataTransformation,
             configuration:DefaultProperties<number|string>
         ):string => {
             if (typeof value !== 'number')
-                value = transformer['datetime-local'].parse!(
+                value = transformation['datetime-local'].parse!(
                     value,
                     {
-                        ...transformer,
-                        date: {...transformer.date, useISOString: false}
+                        ...transformation,
+                        date: {...transformation.date, useISOString: false}
                     },
                     configuration
                 ) as number
 
-            const edgeValueDesciption = convertEdgeValueToString(value)
-            if (typeof edgeValueDesciption === 'string')
-                return edgeValueDesciption
+            const edgeValueDescription = convertEdgeValueToString(value)
+            if (typeof edgeValueDescription === 'string')
+                return edgeValueDescription
 
             const formattedValue:string = utcSecondsToISOString(
                 value + new Date().getTimezoneOffset() * 60
@@ -226,12 +228,12 @@ export const TRANSFORMER:InputDataTransformation = {
         // Converts given date representation into utc iso date time string.
         format: {final: {transform: (
             value:number|string,
-            transformer:InputDataTransformation,
+            transformation:InputDataTransformation,
             configuration:DefaultProperties<number|string>
         ):string => {
             const formattedValue =
-                transformer.datetime.format!.final.transform!(
-                    value, transformer, configuration
+                transformation.datetime.format!.final.transform!(
+                    value, transformation, configuration
                 )
 
             const index = formattedValue.indexOf('T')
@@ -257,37 +259,59 @@ export const TRANSFORMER:InputDataTransformation = {
     'date-local': {
         format: {final: {transform: (
             value:number|string,
-            transformer:InputDataTransformation,
+            transformation:InputDataTransformation,
             configuration:DefaultProperties<number|string>
-        ):string => {
-            const formattedValue:string =
-                transformer['datetime-local'].format!.final.transform!(
+        ):string =>{
+            if (typeof value !== 'number')
+                value = transformation['datetime-local'].parse!(
                     value,
                     {
-                        ...transformer,
-                        date: {...transformer.date, useISOString: false}
+                        ...transformation,
+                        date: {...transformation.date, useISOString: false}
                     },
                     configuration
-                )
+                ) as number
 
-            const index = formattedValue.indexOf('T')
-            if (index === -1)
-                return formattedValue
+            const edgeValueDescription = convertEdgeValueToString(value)
+            if (typeof edgeValueDescription === 'string')
+                return edgeValueDescription
 
-            return formattedValue.substring(0, index)
+            /*
+                NOTE: We need to add timezone offset since we slice time
+                afterwards (rounding to day).
+            */
+            value -= new Date().getTimezoneOffset() * 60
+
+            const formattedValue:string = utcSecondsToISOString(value)
+            return formattedValue.substring(0, formattedValue.lastIndexOf('T'))
         }}},
         /*
             Converts date or strings into unix timestamps (numbers will not be
-            changed).
+            changed) or iso string.
         */
         parse: (
             value:Date|number|string,
             transformation:InputDataTransformation,
             configuration:DefaultInputProperties<number|string>
-        ):number|string =>
-            transformation['datetime-local'].parse!(
-                value, transformation, configuration
-            ),
+        ):number|string => {
+            value = transformation.datetime.parse!(
+                value,
+                {
+                    ...transformation,
+                    date: {...transformation.date, useISOString: false}
+                },
+                configuration
+            ) as number
+
+            const isRoundedToDay = (value % (24 * 60 ** 2)) === 0
+            // NOTE: We need to re-apply sliced time for formatting.
+            if (isRoundedToDay)
+                value += new Date().getTimezoneOffset() * 60
+
+            return transformation.date.useISOString ?
+                utcSecondsToISOString(value) :
+                value
+        },
         type: 'date'
     },
 
@@ -298,22 +322,22 @@ export const TRANSFORMER:InputDataTransformation = {
         */
         format: {final: {transform: (
             value:number|string,
-            transformer:InputDataTransformation,
+            transformation:InputDataTransformation,
             configuration:DefaultProperties<number|string>
         ):string => {
             if (typeof value !== 'number')
-                value = transformer.datetime.parse!(
+                value = transformation.datetime.parse!(
                     value,
                     {
-                        ...transformer,
-                        date: {...transformer.date, useISOString: false}
+                        ...transformation,
+                        date: {...transformation.date, useISOString: false}
                     },
                     configuration
                 ) as number
 
-            const edgeValueDesciption = convertEdgeValueToString(value)
-            if (typeof edgeValueDesciption === 'string')
-                return edgeValueDesciption
+            const edgeValueDescription = convertEdgeValueToString(value)
+            if (typeof edgeValueDescription === 'string')
+                return edgeValueDescription
 
             let formattedValue = utcSecondsToISOString(value)
 
@@ -388,22 +412,22 @@ export const TRANSFORMER:InputDataTransformation = {
         */
         format: {final: {transform: (
             value:number|string,
-            transformer:InputDataTransformation,
+            transformation:InputDataTransformation,
             configuration:DefaultProperties<number|string>
         ):string => {
             if (typeof value !== 'number')
-                value = transformer['time-local'].parse!(
+                value = transformation['time-local'].parse!(
                     value,
                     {
-                        ...transformer,
-                        date: {...transformer.date, useISOString: false}
+                        ...transformation,
+                        date: {...transformation.date, useISOString: false}
                     },
                     configuration
                 ) as number
 
-            const edgeValueDesciption = convertEdgeValueToString(value)
-            if (typeof edgeValueDesciption === 'string')
-                return edgeValueDesciption
+            const edgeValueDescription = convertEdgeValueToString(value)
+            if (typeof edgeValueDescription === 'string')
+                return edgeValueDescription
 
             const dateTime = new Date(
                 (value/* + new Date().getTimezoneOffset() * 60*/) * 1000
@@ -495,7 +519,7 @@ export const TRANSFORMER:InputDataTransformation = {
         }},
         parse: (
             value:number|string,
-            transformer:InputDataTransformation,
+            transformation:InputDataTransformation,
             {maximum, minimum}:DefaultProperties<number>
         ):number => {
             if (typeof value === 'string')
@@ -529,7 +553,7 @@ export const TRANSFORMER:InputDataTransformation = {
         }},
         parse: (
             value:number|string,
-            transformer:InputDataTransformation,
+            transformation:InputDataTransformation,
             {maximum, minimum}:DefaultProperties<number>
         ):number => {
             if (typeof value === 'string')
