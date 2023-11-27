@@ -126,6 +126,7 @@ import {
 } from './helper'
 import TRANSFORMER from './transformer'
 import {IconButtonOnChangeEventT} from '@rmwc/icon-button/lib/icon-button'
+import {ListApi} from '@rmwc/list/lib/list'
 
 export * from './helper'
 export const INPUT_TRANSFORMER = TRANSFORMER
@@ -1534,10 +1535,12 @@ export const TextInputInner = function<Type = unknown>(
         if (
             !properties.disabled &&
             useSuggestions &&
-            'Down' === event.code &&
+            'ArrowDown' === event.code &&
             event.target === inputReference.current
         )
-            suggestionMenuAPIReference.current?.focusItemAtIndex(0)
+            (
+                suggestionMenuAPIReference.current as unknown as ListApi
+            )?.focusItemAtIndex(0)
 
         /*
             NOTE: We do not want to forward keydown enter events coming from
@@ -2317,10 +2320,13 @@ export const TextInputInner = function<Type = unknown>(
                                     onSelect={(event:MenuOnSelectEventT) => {
                                         onChangeValue(
                                             currentSuggestionValues[
-                                                event.detail.index
+                                                (event as
+                                                    {detail:{index:number}}
+                                                ).detail.index
                                             ] as Type,
                                             undefined,
-                                            event.detail.index
+                                            (event as {detail:{index:number}})
+                                                .detail.index
                                         )
                                         setIsSuggestionOpen(false)
                                     }}
