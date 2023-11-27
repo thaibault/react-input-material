@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import {Tab, TabBar, TabBarOnActivateEventT} from '@rmwc/tabs'
+import {Tab, TabBar} from '@rmwc/tabs'
 import Tools from 'clientnode'
 import {Mapping, UnknownFunction} from 'clientnode/type'
 import {ReactNode, useState} from 'react'
@@ -44,13 +44,16 @@ TextInput.transformer.currency.format!.final.options = {currency: 'EUR'}
 
 const SECTIONS = [
     'file-input',
+
     'simple-input',
     'number-input',
     'text-input',
     'time-input',
     'selection-input',
+
     'inputs',
     'interval',
+
     'requireable-checkbox'
 ] as const
 
@@ -119,14 +122,9 @@ const Application = () => {
         <div className="tab-bar">
             <TabBar
                 activeTabIndex={activeTabIndex}
-                onActivate={(event:TabBarOnActivateEventT) => {
-                    if (
-                        (event as {detail:{index:number}}).detail.index !==
-                            activeTabIndex
-                    )
-                        setActiveTabIndex(
-                            (event as {detail:{index:number}}).detail.index
-                        )
+                onActivate={(event:{detail:{index:number}}) => {
+                    if (event.detail.index !== activeTabIndex)
+                        setActiveTabIndex(event.detail.index)
                 }}
             >
                 {SECTIONS.map((name) =>
@@ -206,6 +204,7 @@ const Application = () => {
                     />
                 </div>
                 {/* endregion */}
+
                 {/* region simple-input */}
                 <div
                     className="playground__inputs__simple-input"
@@ -989,6 +988,7 @@ const Application = () => {
                     />
                 </div>
                 {/* endregion */}
+
                 {/* region inputs */}
                 <div
                     className="playground__inputs__inputs"
@@ -1111,6 +1111,7 @@ const Application = () => {
                     />
                 </div>
                 {/* endregion */}
+
                 {/* region requireable-checkbox */}
                 <div
                     className="playground__inputs__requireable-checkbox"
