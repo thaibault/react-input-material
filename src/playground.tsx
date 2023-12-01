@@ -29,7 +29,9 @@ import {
     FileInput, TextInput, Inputs, Interval, RequireableCheckbox
 } from './index'
 import {
-    CheckboxProps, FileInputChildrenOptions, FileInputProperties,
+    CheckboxProps,
+    FileInputChildrenOptions,
+    FileInputProperties,
     FileInputProps,
     FileValue,
     InputProperties,
