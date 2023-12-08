@@ -75,6 +75,7 @@ import {
     InputsPropertiesItem,
     InputsProps
 } from '../../type'
+import {IconButtonOnChangeEventT} from '@rmwc/icon-button/lib/icon-button'
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region helper
@@ -428,7 +429,7 @@ export const InputsInner = function<
         })
     )
 
-    const add = (event?:GenericEvent):void => setValues((
+    const add = (event?:IconButtonOnChangeEventT):void => setValues((
         values:Array<T>|null
     ):Array<T>|null => {
         /*
@@ -445,11 +446,13 @@ export const InputsInner = function<
             values
         })
 
-        triggerOnChange(values, event, newProperties)
+        triggerOnChange(
+            values, event as unknown as GenericEvent, newProperties
+        )
 
         const result = triggerOnChangeValue(
             values,
-            event,
+            event as unknown as GenericEvent,
             (newProperties.value ?? newProperties.model?.value ?? null) as T
         )
 
@@ -461,18 +464,26 @@ export const InputsInner = function<
 
         return result
     })
-    const createRemove = (index:number) => (event?:GenericEvent):void =>
-        setValues((values:Array<T>|null):Array<T>|null => {
-            values = triggerOnChangeValue(values, event, null as T, index)
-            triggerOnChange(values, event, undefined, index)
-            return values
-        })
+    const createRemove = (index:number) =>
+        (event?:IconButtonOnChangeEventT):void =>
+            setValues((values:Array<T>|null):Array<T>|null => {
+                values = triggerOnChangeValue(
+                    values, event as unknown as GenericEvent, null as T, index
+                )
+                triggerOnChange(
+                    values, event as unknown as GenericEvent, undefined, index
+                )
+                return values
+            })
     // endregion
     // region render
     const addButton:ReactElement = <IconButton
         className={CSS_CLASS_NAMES.inputs__add__button}
+
         icon={properties.addIcon}
-        onClick={add}
+        onIcon={properties.addIcon}
+
+        onChange={add}
     />
     const renderInput = (
         inputProperties:Partial<P>, index:number
@@ -514,8 +525,11 @@ export const InputsInner = function<
                                 className={
                                     CSS_CLASS_NAMES.inputs__item__remove
                                 }
+
                                 icon={properties.removeIcon}
-                                onClick={createRemove(index)}
+                                onIcon={properties.removeIcon}
+
+                                onChange={createRemove(index)}
                             />
                         }
                     </div>
