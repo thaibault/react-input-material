@@ -1370,13 +1370,13 @@ export const defaultInputsProperties:DefaultInputsProperties = {
 /// endregion
 /// region interval
 export interface IntervalValue {
-    end?:null|number
-    start?:null|number
+    end?:null|number|string
+    start?:null|number|string
 }
 
 export interface IntervalConfiguration {
-    end:InputModel<null|number>|InputProps<null|number>
-    start:InputModel<null|number>|InputProps<null|number>
+    end:InputModel<null|number|string>|InputProps<null|number|string>
+    start:InputModel<null|number|string>|InputProps<null|number|string>
 }
 
 export type IntervalModelState = ModelState
@@ -1384,13 +1384,13 @@ export interface IntervalModel {
     name:string
     state:IntervalModelState
     value:{
-        end:InputModel<null|number>
-        start:InputModel<null|number>
+        end:InputModel<null|number|string>
+        start:InputModel<null|number|string>
     }
 }
 
 export interface IntervalProperties extends Omit<
-    InputProperties<null|number>,
+    InputProperties<null|number|string>,
     'icon'|'model'|'onChange'|'onChangeValue'|'value'
 > {
     icon:IconOptions
@@ -1404,12 +1404,12 @@ export interface IntervalProperties extends Omit<
 }
 export type IntervalProps =
     Omit<
-        InputProps<null|number>,
+        InputProps<null|number|string>,
         'icon'|'model'|'onChange'|'onChangeValue'|'value'
     > &
     Partial<{
-        end:InputProps<null|number>
-        start:InputProps<null|number>
+        end:InputProps<null|number|string>
+        start:InputProps<null|number|string>
 
         icon:IntervalProperties['icon']
 
@@ -1435,8 +1435,12 @@ export type IntervalAdapter =
     ComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
 export interface IntervalAdapterWithReferences extends IntervalAdapter {
     references:{
-        end:MutableRefObject<InputAdapterWithReferences<null|number>|null>
-        start:MutableRefObject<InputAdapterWithReferences<null|number>|null>
+        end:MutableRefObject<
+            InputAdapterWithReferences<null|number|string>|null
+        >
+        start:MutableRefObject<
+            InputAdapterWithReferences<null|number|string>|null
+        >
     }
 }
 
@@ -1457,12 +1461,14 @@ export const intervalPropertyTypes:PropertiesValidationMap = {
     }>>({
         end: oneOfType<Validator<unknown>>([
             number,
+            string,
             shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
                 inputPropertyTypes
             )
         ]),
         start: oneOfType<Validator<unknown>>([
             number,
+            string,
             shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
                 inputPropertyTypes
             )
