@@ -1053,12 +1053,8 @@ const Application = () => {
                                 name: 'inputs3-1',
                                 type: 'time',
                                 value: {
-                                    start: {
-                                        default: 0
-                                    },
-                                    end: {
-                                        default: 0
-                                    }
+                                    start: {default: 0},
+                                    end: {default: 0}
                                 }
                             }],
                             name: 'inputs3'

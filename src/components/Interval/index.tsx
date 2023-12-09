@@ -60,9 +60,17 @@ import {
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region helper
+const normalizeDateTimeToNumber = (
+    value?:null|number|string, fallbackValue = 0
+):number =>
+    typeof value === 'number' ?
+        value :
+        value ?
+            new Date(value).getTime() / 1000 :
+            fallbackValue
 const getModelState = (
-    startProperties:InputProperties<null|number>,
-    endProperties:InputProperties<null|number>
+    startProperties:InputProperties<null|number|string>,
+    endProperties:InputProperties<null|number|string>
 ):ModelState => ({
     dirty: startProperties.dirty || endProperties.dirty,
     focused: startProperties.focused || endProperties.focused,
@@ -79,8 +87,8 @@ const getModelState = (
 const getExternalProperties = (
     properties:Properties,
     iconProperties:IconOptions,
-    startProperties:InputProperties<null|number>,
-    endProperties:InputProperties<null|number>
+    startProperties:InputProperties<null|number|string>,
+    endProperties:InputProperties<null|number|string>
 ):Properties => {
     const modelState = getModelState(startProperties, endProperties)
 
@@ -123,10 +131,12 @@ export const IntervalInner = function(
         givenProps.value = {
             end: {value: givenProps.value}, start: {value: givenProps.value}
         }
-    if (typeof givenProps.value.end === 'number')
-        givenProps.value.end = {value: givenProps.value.end}
-    if (typeof givenProps.value.start === 'number')
-        givenProps.value.start = {value: givenProps.value.start}
+    if (['number', 'string'].includes(typeof givenProps.value.end))
+        givenProps.value.end = {value: givenProps.value.end as number|string}
+    if (['number', 'string'].includes(typeof givenProps.value.start))
+        givenProps.value.start = {
+            value: givenProps.value.start as number|string
+        }
     /*
         NOTE: Extend default properties with given properties while letting
         default property object untouched for unchanged usage in other
@@ -140,12 +150,13 @@ export const IntervalInner = function(
             givenProps as StrictProps
         )
 
-    let endProperties = properties.value?.end as InputProps<null|number> || {}
+    let endProperties =
+        properties.value?.end as InputProps<null|number|string> || {}
     const iconProperties:IconOptions = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
         properties.icon!
     let startProperties =
-        properties.value?.start as InputProps<null|number> || {}
+        properties.value?.start as InputProps<null|number|string> || {}
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
@@ -157,8 +168,8 @@ export const IntervalInner = function(
             givenProps.model?.value?.start?.value !== undefined ||
             givenProps.value !== undefined &&
             !(
-                givenProps.value?.start?.value === undefined &&
-                givenProps.value?.end?.value === undefined
+                (givenProps.value?.start as InputProps)?.value === undefined &&
+                (givenProps.value?.end as InputProps)?.value === undefined
             )
         ) &&
         Boolean(properties.onChange || properties.onChangeValue)
@@ -180,8 +191,8 @@ export const IntervalInner = function(
         properties.value =
             {end: {value: value.end}, start: {value: value.start}}
     const propertiesToForward =
-        Tools.mask<InputProps<null|number>>(
-            properties as unknown as InputProps<null|number>,
+        Tools.mask<InputProps<null|number|string>>(
+            properties as unknown as InputProps<null|number|string>,
             {exclude: {
                 className: true,
                 enforceUncontrolled: true,
@@ -225,35 +236,27 @@ export const IntervalInner = function(
     const startConfiguration = {...startProperties.model, ...startProperties}
 
     startProperties.maximum = Math.min(
-        typeof startConfiguration.maximum === 'number' ?
-            startConfiguration.maximum :
-            Infinity,
-        properties.value.end.value || Infinity,
-        typeof endConfiguration.maximum === 'number' ?
-            endConfiguration.maximum :
-            Infinity
+        normalizeDateTimeToNumber(startConfiguration.maximum, Infinity),
+        normalizeDateTimeToNumber(properties.value.end.value, Infinity),
+        normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
     )
-    startProperties.minimum = startConfiguration.minimum || -Infinity
+    startProperties.minimum =
+        normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
     startProperties.value = properties.value.start.value
 
-    endProperties.maximum = typeof endConfiguration.maximum === 'number' ?
-        endConfiguration.maximum :
-        Infinity
+    endProperties.maximum =
+        normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
     endProperties.minimum = Math.max(
-        typeof endConfiguration.minimum === 'number' ?
-            endConfiguration.minimum :
-            -Infinity,
-        properties.value.start.value || -Infinity,
-        typeof startConfiguration.minimum === 'number' ?
-            startConfiguration.minimum :
-            -Infinity
+        normalizeDateTimeToNumber(endConfiguration.minimum, -Infinity),
+        normalizeDateTimeToNumber(properties.value.start.value, -Infinity),
+        normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
     )
     endProperties.value = properties.value.end.value
 
     const endInputReference =
-        useRef<InputAdapterWithReferences<null|number>>(null)
+        useRef<InputAdapterWithReferences<null|number|string>>(null)
     const startInputReference=
-        useRef<InputAdapterWithReferences<null|number>>(null)
+        useRef<InputAdapterWithReferences<null|number|string>>(null)
 
     const valueState:Value = {
         end: properties.value.end.value,
@@ -273,9 +276,9 @@ export const IntervalInner = function(
                 properties as Properties,
                 iconProperties,
                 startInputReference.current?.properties ||
-                properties.value.start as InputProperties<null|number>,
+                properties.value.start as InputProperties<null|number|string>,
                 endInputReference.current?.properties ||
-                properties.value.end as InputProperties<null|number>
+                properties.value.end as InputProperties<null|number|string>
             ),
             references: {end: endInputReference, start: startInputReference},
             state: controlled ? {} : {value: valueState}
@@ -284,14 +287,19 @@ export const IntervalInner = function(
     // region attach event handler
     if (properties.onChange) {
         endProperties.onChange = (
-            inputProperties:InputProperties<null|number>, event?:GenericEvent
+            inputProperties:InputProperties<null|number|string>,
+            event?:GenericEvent
         ):void => {
-            const start:InputProperties<null|number> =
+            const start:InputProperties<null|number|string> =
                 startInputReference.current?.properties ||
-                startProperties as unknown as InputProperties<null|number>
+                startProperties as
+                    unknown as
+                    InputProperties<null|number|string>
             start.value = Math.min(
-                startInputReference.current?.properties?.value ?? Infinity,
-                inputProperties.value ?? Infinity
+                normalizeDateTimeToNumber(
+                    startInputReference.current?.properties?.value, Infinity
+                ),
+                normalizeDateTimeToNumber(inputProperties.value, Infinity)
             )
 
             triggerCallbackIfExists<Properties>(
@@ -309,14 +317,17 @@ export const IntervalInner = function(
             )
         }
         startProperties.onChange = (
-            inputProperties:InputProperties<null|number>, event?:GenericEvent
+            inputProperties:InputProperties<null|number|string>,
+            event?:GenericEvent
         ):void => {
-            const end:InputProperties<null|number> =
+            const end:InputProperties<null|number|string> =
                 endInputReference.current?.properties ||
-                endProperties as unknown as InputProperties<null|number>
+                endProperties as unknown as InputProperties<null|number|string>
             end.value = Math.max(
-                endInputReference.current?.properties?.value ?? -Infinity,
-                inputProperties.value ?? -Infinity
+                normalizeDateTimeToNumber(
+                    endInputReference.current?.properties?.value, -Infinity
+                ),
+                normalizeDateTimeToNumber(inputProperties.value, -Infinity)
             )
 
             triggerCallbackIfExists<Properties>(
@@ -336,11 +347,13 @@ export const IntervalInner = function(
     }
 
     endProperties.onChangeValue = (
-        value:null|number, event?:GenericEvent
+        value:null|number|string, event?:GenericEvent
     ) => {
         const startValue = Math.min(
-            startInputReference.current?.properties?.value ?? Infinity,
-            value ?? Infinity
+            normalizeDateTimeToNumber(
+                startInputReference.current?.properties?.value, Infinity
+            ),
+            normalizeDateTimeToNumber(value, Infinity)
         )
         const newValue:Value = {
             end: value, start: isFinite(startValue) ? startValue : value
@@ -358,11 +371,13 @@ export const IntervalInner = function(
         setValue(newValue)
     }
     startProperties.onChangeValue = (
-        value:null|number, event?:GenericEvent
+        value:null|number|string, event?:GenericEvent
     ) => {
         const endValue = Math.max(
-            endInputReference.current?.properties?.value ?? -Infinity,
-            value ?? -Infinity
+            normalizeDateTimeToNumber(
+                endInputReference.current?.properties?.value, -Infinity
+            ),
+            normalizeDateTimeToNumber(value, -Infinity)
         )
         const newValue:Value = {
             end: isFinite(endValue) ? endValue : value, start: value
