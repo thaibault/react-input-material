@@ -124,7 +124,7 @@
     "react-transition-group": "*",
     "react-useanimations": "*",
     "style-loader": "*",
-    "stylelint": "*",
+    "stylelint": "^15.11.0",
     "stylelint-config-standard": "*",
     "tslib": "*",
     "typescript-plugin-css-modules": "*",
