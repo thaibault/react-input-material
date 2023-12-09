@@ -10,8 +10,8 @@ This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
 .text-input {
-    & label,
-    & .mdc-form-field {
+    label,
+    .mdc-form-field {
         width: 100%;
 
         &.mdc-text-field--textarea {
@@ -22,14 +22,14 @@ endregion */
         Fading input elements with pre-filled inputs or placeholder are not
         over background outline.
     */
-    & .mdc-select--outlined,
-    & .mdc-text-field--outlined {
-        & .mdc-floating-label--float-above {
+    .mdc-select--outlined,
+    .mdc-text-field--outlined {
+        .mdc-floating-label--float-above {
             background-color: var(--mdc-theme-surface);
         }
     }
 
-    & .mdc-icon-button {
+    .mdc-icon-button {
         font-size: 1rem;
         height: 30px;
         padding: 6px;
@@ -37,38 +37,38 @@ endregion */
         width: 30px;
     }
 
-    & .mdc-select {
+    .mdc-select {
         width: 100%;
 
         &.mdc-select--disabled .mdc-select__dropdown-icon {
             color: rgba(0 0 0 / 38%);
         }
 
-        & .mdc-select__menu {
+        .mdc-select__menu {
             width: 100%;
         }
     }
 
-    & .mdc-select-helper-text {
+    .mdc-select-helper-text {
         color: rgb(0 0 0 / 60%);
         margin-left: 0;
 
-        & .material-icons {
+        .material-icons {
             font-size: 1rem;
         }
     }
 
-    & .mdc-text-field {
+    .mdc-text-field {
         /* stylelint-disable-next-line selector-class-pattern */
-        & .ace_editor.mdc-text-field__input {
+        .ace_editor.mdc-text-field__input {
             font-family: monospace;
         }
 
-        & + .mdc-text-field-helper-line {
+        + .mdc-text-field-helper-line {
             padding-left: 0;
             padding-right: 0;
 
-            & .material-icons {
+            .material-icons {
                 font-size: 1rem;
             }
         }
