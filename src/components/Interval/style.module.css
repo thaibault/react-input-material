@@ -13,21 +13,21 @@ endregion */
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-}
 
-.interval__icon {
-    box-sizing: border-box;
-    margin: 16px;
-    text-align: center;
-}
+    .interval__icon {
+        box-sizing: border-box;
+        margin: 16px;
+        text-align: center;
+    }
 
-.interval--disabled .interval__icon {
-    opacity: 0.5;
-}
+    .interval__end,
+    .interval__start {
+        width: 100%;
+    }
 
-.interval__end,
-.interval__start {
-    width: 100%;
+    &.interval--disabled .interval__icon {
+        opacity: 0.5;
+    }
 }
 /* region vim modline
 vim: set tabstop=4 shiftwidth=4 expandtab:
