@@ -35,7 +35,9 @@ import {
     FileInputProps,
     FileValue,
     InputProperties,
+    InputProps,
     IntervalConfiguration,
+    IntervalModel,
     IntervalProps,
     IntervalValue,
     SuggestionCreatorOptions
@@ -1003,9 +1005,7 @@ const Application = () => {
                     <Inputs<FileValue|null, FileInputProps>
                         createItem={useMemorizedValue(
                             ({
-                                index,
-                                item,
-                                properties: {name}
+                                index, item, properties: {name}
                             }):FileInputProps =>
                                 ({...item, name: `${name}-${index + 1}`})
                         )}
@@ -1027,11 +1027,7 @@ const Application = () => {
                         maximumNumber={2}
                         minimumNumber={2}
                         model={useMemorizedValue({
-                            default: [{
-                                name: 'inputs2-1',
-                                type: 'boolean',
-                                value: false
-                            }],
+                            default: [{type: 'boolean', value: false}],
                             name: 'inputs2'
                         })}
                         onChange={onChange}
@@ -1044,26 +1040,80 @@ const Application = () => {
                     <Inputs<
                         IntervalConfiguration|IntervalValue|null, IntervalProps
                     >
-                        createItem={useMemorizedValue(
-                            ({index, item, properties: {name}}):IntervalProps =>
-                                ({...item, name: `${name}-${index + 1}`})
+                        createPrototype={useMemorizedValue(
+                            (
+                                {item, lastValue, properties}
+                            ):IntervalProps => {
+                                const sixHoursInSeconds =
+                                    new Date(1970, 0, 1, 6).getTime() / 1000
+                                const length = properties?.value?.length
+                                const nextStart =
+                                    lastValue?.end ??
+                                    (
+                                        (
+                                            length &&
+                                            properties.value![length - 1].value
+                                        ) ?
+                                            properties.value![
+                                                length - 1
+                                            ].value!.end as number :
+                                            sixHoursInSeconds
+                                    )
+                                const nextStartTime =
+                                    (
+                                        nextStart as InputProps<number|string>
+                                    ).value! ??
+                                    nextStart
+                                const nextStartTimeInSeconds =
+                                    typeof nextStartTime === 'number' ?
+                                        nextStartTime :
+                                        new Date(nextStartTime).getTime() / 1000
+
+                                const value = {
+                                    start: {value: nextStartTimeInSeconds},
+                                    end: {
+                                        value: nextStartTimeInSeconds + 60 ** 2
+                                    }
+                                }
+
+                                return Tools.extend(
+                                    true,
+                                    item,
+                                    /*
+                                        NOTE: We need to use "model" since it
+                                        would be overwritten by default values
+                                        otherwise.
+                                    */
+                                    {
+                                        model: {value} as
+                                            unknown as
+                                            IntervalModel,
+                                        value
+                                    }
+                                )
+                            }
                         )}
                         model={useMemorizedValue({
-                            default: [{
-                                name: 'inputs3-1',
-                                type: 'time',
-                                value: {
-                                    start: {default: 0},
-                                    end: {default: 0}
-                                }
-                            }],
+                            default: [
+                                {value: {
+                                    end: Date.UTC(1970, 0, 1, 11, 30) / 1000,
+                                    start: Date.UTC(1970, 0, 1, 7) / 1000
+                                }},
+                                {value: {
+                                    end: Date.UTC(1970, 0, 1, 18) / 1000,
+                                    start: Date.UTC(1970, 0, 1, 12) / 1000
+                                }}
+                            ],
                             name: 'inputs3'
                         })}
                         onChange={onChange}
                         showInitialValidationState
                     >
                         {useMemorizedValue(({properties}) =>
-                            <Interval {...properties as IntervalProps} />
+                            <Interval
+                                {...properties as IntervalProps}
+                                step={60}
+                            />
                         )}
                     </Inputs>
                     <Inputs
