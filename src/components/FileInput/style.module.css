@@ -25,6 +25,10 @@ endregion */
         text-decoration: none;
     }
 
+    .text-input .mdc-text-field {
+        border-radius: 0;
+    }
+
     .file-input__iframe-wrapper,
     .file-input__text-representation {
         border-left: 1px dashed black;
