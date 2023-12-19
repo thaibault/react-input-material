@@ -897,7 +897,7 @@ export const inputPropertyTypes:PropertiesValidationMap = {
     trailingIcon: any,
     transformer: object
 } as const
-export const inputRenderProperties:Array<string> =
+export const textInputRenderProperties:Array<string> =
     ['children', 'suggestionCreator']
 export const defaultInputModelState:InputModelState = {
     ...defaultModelState,
@@ -1052,6 +1052,8 @@ export type DefaultFileInputProperties<Type extends FileValue = FileValue> =
 export type FileInputPropertyTypes = {
     [key in keyof FileInputProperties]:ValueOf<typeof PropertyTypes>
 }
+export const fileInputRenderProperties:Array<string> =
+    ['children', 'generateFileNameInputProperties']
 
 export interface FileInputState<
     Type extends FileValue = FileValue

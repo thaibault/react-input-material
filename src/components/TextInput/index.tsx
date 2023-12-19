@@ -100,7 +100,7 @@ import {
     InputProperties as Properties,
     inputPropertyTypes as propertyTypes,
     InputProps as Props,
-    inputRenderProperties as renderProperties,
+    textInputRenderProperties as renderProperties,
     InputState as State,
     InputModel as Model,
     NativeInputType,
