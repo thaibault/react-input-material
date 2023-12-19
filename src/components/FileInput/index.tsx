@@ -68,10 +68,13 @@ import {
     FileValue,
     FileInputValueState as ValueState,
     fileInputPropertyTypes as propertyTypes,
+    fileInputRenderProperties as renderProperties,
     InputAdapter,
     InputProperties,
     FileRepresentationType as RepresentationType,
-    FileInputComponent, FileInputModel, DefaultFileInputProperties
+    FileInputComponent,
+    FileInputModel,
+    DefaultFileInputProperties
 } from '../../type'
 
 export {
@@ -206,7 +209,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      *
      * @returns Nothing.
      */
-    const onChange = (event?:SyntheticEvent):void => {
+    const onChange = (event?:SyntheticEvent) => {
         if (nameInputReference.current?.properties)
             properties.model.fileName =
                 nameInputReference.current.properties.model
@@ -368,7 +371,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      *
      * @returns Nothing.
      */
-    const onClick = (event:ReactMouseEvent):void => {
+    const onClick = (event:ReactMouseEvent) => {
         triggerCallbackIfExists<Properties<Type>>(
             properties, 'click', controlled, event, properties
         )
@@ -381,7 +384,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      *
      * @returns Nothing.
      */
-    const onFocus = (event:ReactFocusEvent):void => {
+    const onFocus = (event:ReactFocusEvent) => {
         triggerCallbackIfExists<Properties<Type>>(
             properties, 'focus', controlled, event, properties
         )
@@ -592,7 +595,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
             .catch(console.warn)
     })
     useEffect(
-        ():void => {
+        () => {
             if (properties.triggerInitialPropertiesConsolidation)
                 onChange()
         },
@@ -869,6 +872,7 @@ FileInput.defaultProperties = {
     value: undefined
 }
 FileInput.propTypes = propertyTypes
+FileInput.renderProperties = renderProperties
 FileInput.strict = false
 // endregion
 export default FileInput
