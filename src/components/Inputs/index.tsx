@@ -282,7 +282,15 @@ export const InputsInner = function<
                 properties.value[index] = inputProperties as P
             else
                 properties.value.push(inputProperties as P)
-        else if (inputProperties === undefined && typeof index === 'number')
+        else if (
+            !values &&
+            inputProperties === undefined &&
+            typeof index === 'number'
+        )
+            /*
+                NOTE: If "values" is set we assume that we already got a slice
+                array of inputs.
+            */
             properties.value.splice(index, 1)
 
         if (
