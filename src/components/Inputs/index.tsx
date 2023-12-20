@@ -30,6 +30,7 @@ import {
     ReactNode,
     useImperativeHandle,
     useEffect,
+    useRef,
     useState
 } from 'react'
 import {ComponentAdapter} from 'web-component-wrapper/type'
@@ -169,6 +170,7 @@ export const InputsInner = function<
 >(
     props:InputsProps<T, P>, reference?:ForwardedRef<Adapter<T, P>>
 ):ReactElement {
+    const lastAppliedDeleteEvent = useRef<GenericEvent>()
     // region consolidate properties
     const givenProps:InputsProps<T, P> =
         translateKnownSymbols(props) as InputsProps<T, P>
@@ -283,15 +285,18 @@ export const InputsInner = function<
             else
                 properties.value.push(inputProperties as P)
         else if (
-            !values &&
+            lastAppliedDeleteEvent.current !== event &&
+            values &&
             inputProperties === undefined &&
             typeof index === 'number'
-        )
+        ) {
+            lastAppliedDeleteEvent.current = event
             /*
                 NOTE: If "values" is set we assume that we already got a slice
                 array of inputs.
             */
             properties.value.splice(index, 1)
+        }
 
         if (
             properties.emptyEqualsNull &&
@@ -318,9 +323,10 @@ export const InputsInner = function<
             values = []
 
         if (typeof index === 'number')
-            if (value === null)
+            if (value === null) {
+                lastAppliedDeleteEvent.current = event
                 values.splice(index, 1)
-            else
+            } else
                 values[index] = value
         else
             values.push(value)
