@@ -1280,15 +1280,17 @@ export interface InputsProperties<
 
     writable:boolean
 }
+export type PartialInputsModel<
+    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
+> = Partial<
+    Omit<InputsModel<T, P>, 'state'> & {state?:Partial<InputsModelState>}
+>
 export type InputsProps<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
 > =
     Partial<Omit<InputsProperties<T, P>, 'model'|'value'>> &
     {
-        model?:Partial<
-            Omit<InputsModel<T, P>, 'state'> &
-            {state?:Partial<InputsModelState>}
-        >
+        model?:PartialInputsModel<T, P>
         value?:Array<Partial<P>>|Array<T>|null
     }
 
@@ -1377,8 +1379,14 @@ export interface IntervalValue {
 }
 
 export interface IntervalConfiguration {
-    end:InputModel<null|number|string>|InputProps<null|number|string>
-    start:InputModel<null|number|string>|InputProps<null|number|string>
+    end:(
+        Partial<InputModel<null|number|string>> |
+        Partial<InputProps<null|number|string>>
+    )
+    start:(
+        Partial<InputModel<null|number|string>> |
+        Partial<InputProps<null|number|string>>
+    )
 }
 
 export type IntervalModelState = ModelState
@@ -1404,21 +1412,30 @@ export interface IntervalProperties extends Omit<
 
     value:IntervalConfiguration
 }
+type PartialIntervalValue =
+    Partial<Omit<InputModel<null|number|string>, 'value'>> &
+    {value:null|number|string}
+export type PartialIntervalModel =
+    Partial<Omit<IntervalProperties['model'], 'state'|'value'>> &
+    {
+        value?:{
+            end:PartialIntervalValue
+            start:PartialIntervalValue
+        }
+        state?:Partial<IntervalModelState>
+    }
 export type IntervalProps =
     Omit<
         InputProps<null|number|string>,
         'icon'|'model'|'onChange'|'onChangeValue'|'value'
     > &
     Partial<{
-        end:InputProps<null|number|string>
-        start:InputProps<null|number|string>
+        end:Partial<InputProps<null|number|string>>
+        start:Partial<InputProps<null|number|string>>
 
         icon:IntervalProperties['icon']
 
-        model:(
-            Partial<Omit<IntervalProperties['model'], 'state'>> &
-            {state?:Partial<IntervalModelState>}
-        )
+        model:PartialIntervalModel
 
         onChange:IntervalProperties['onChange']
         onChangeValue:IntervalProperties['onChangeValue']

@@ -37,12 +37,11 @@ import {
     InputProperties,
     InputProps,
     InputsCreatePrototypeOptions,
-    InputsModel,
     InputsProperties,
     IntervalConfiguration,
-    IntervalModel,
     IntervalProps,
     IntervalValue,
+    PartialInputsModel,
     SuggestionCreatorOptions
 } from './type'
 // endregion
@@ -123,8 +122,11 @@ const Application = () => {
             setInputValue6
         )
 
+    type IntervalInputsType = PartialInputsModel<
+        IntervalConfiguration|IntervalValue|null, IntervalProps
+    >
     const [inputModel1, setInputModel1] =
-        useState<Partial<InputsModel<IntervalConfiguration>>>({
+        useState<IntervalInputsType>({
             value: [
                 {
                     model: {
@@ -145,7 +147,7 @@ const Application = () => {
             ]
         })
     const onChangeInputModel1 = useMemorizedValue((
-        properties:{model:Partial<InputsModel<IntervalConfiguration>>}
+        properties:{model:IntervalInputsType}
     ) => {
         onChange(properties)
         // NOTE: We reduce data to keep in state to be more performant here
@@ -195,7 +197,7 @@ const Application = () => {
                 NOTE: We need to use "model" since it would be overwritten by
                 default values otherwise.
             */
-            {model: {value} as unknown as IntervalModel, value}
+            {model: {value}, value}
         )
     })
     // endregion
