@@ -1130,12 +1130,12 @@ const Application = () => {
                         model={useMemorizedValue({
                             default: [
                                 {value: {
-                                    end: Date.UTC(1970, 0, 1, 11, 30) / 1000,
-                                    start: Date.UTC(1970, 0, 1, 7) / 1000
+                                    start: Date.UTC(1970, 0, 1, 7) / 1000,
+                                    end: Date.UTC(1970, 0, 1, 11, 30) / 1000
                                 }},
                                 {value: {
-                                    end: Date.UTC(1970, 0, 1, 18) / 1000,
-                                    start: Date.UTC(1970, 0, 1, 12) / 1000
+                                    start: Date.UTC(1970, 0, 1, 12) / 1000,
+                                    end: Date.UTC(1970, 0, 1, 18) / 1000
                                 }}
                             ],
                             name: 'inputs3'
@@ -1183,14 +1183,8 @@ const Application = () => {
                         required
                         step={60}
                         value={useMemorizedValue({
-                            end: {
-                                default: 240,
-                                minimum: 120
-                            },
-                            start: {
-                                default: 120,
-                                maximum: 3600
-                            }
+                            start: {default: 120, maximum: 3600},
+                            end: {default: 240, minimum: 120}
                         })}
                     />
                     <Interval
