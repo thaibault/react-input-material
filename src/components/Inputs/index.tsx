@@ -30,7 +30,6 @@ import {
     ReactNode,
     useImperativeHandle,
     useEffect,
-    useRef,
     useState
 } from 'react'
 import {ComponentAdapter} from 'web-component-wrapper/type'
@@ -170,7 +169,6 @@ export const InputsInner = function<
 >(
     props:InputsProps<T, P>, reference?:ForwardedRef<Adapter<T, P>>
 ):ReactElement {
-    const lastAppliedDeleteEvent = useRef<GenericEvent>()
     // region consolidate properties
     const givenProps:InputsProps<T, P> =
         translateKnownSymbols(props) as InputsProps<T, P>
@@ -202,7 +200,8 @@ export const InputsInner = function<
     // region consolidate state
     const [newInputState, setNewInputState] =
         useState<'added'|'rendered'|'stabilized'>('stabilized')
-    useEffect(():void => {
+
+    useEffect(() => {
         if (newInputState === 'added')
             setNewInputState('rendered')
         else if (newInputState === 'rendered') {
@@ -231,7 +230,7 @@ export const InputsInner = function<
             (
                 Array.isArray(givenProps.model?.value) ||
                 givenProps.model?.value === null
-            ) &&
+            ) ||
             (Array.isArray(givenProps.value) || givenProps.value === null)
         ) &&
         Boolean(givenProperties.onChange || givenProperties.onChangeValue)
@@ -270,7 +269,10 @@ export const InputsInner = function<
         inputProperties?:Partial<P>,
         index?:number
     ):void => {
-        if (values)
+        const isDeleteChange =
+            inputProperties === undefined && typeof index === 'number'
+
+        if (values && !isDeleteChange)
             properties.value = values.map((_:T, index):P =>
                 references[index]?.current?.properties ||
                 (properties.value as Array<P>)[index]
@@ -284,19 +286,8 @@ export const InputsInner = function<
                 properties.value[index] = inputProperties as P
             else
                 properties.value.push(inputProperties as P)
-        else if (
-            lastAppliedDeleteEvent.current !== event &&
-            values &&
-            inputProperties === undefined &&
-            typeof index === 'number'
-        ) {
-            lastAppliedDeleteEvent.current = event
-            /*
-                NOTE: If "values" is set we assume that we already got a slice
-                array of inputs.
-            */
+        else if (isDeleteChange)
             properties.value.splice(index, 1)
-        }
 
         if (
             properties.emptyEqualsNull &&
@@ -323,10 +314,9 @@ export const InputsInner = function<
             values = []
 
         if (typeof index === 'number')
-            if (value === null) {
-                lastAppliedDeleteEvent.current = event
+            if (value === null)
                 values.splice(index, 1)
-            } else
+            else
                 values[index] = value
         else
             values.push(value)
@@ -478,7 +468,7 @@ export const InputsInner = function<
 
         return result
     })
-    const createRemove = (index:number) =>
+    const createRemoveCallback = (index:number) =>
         (event?:IconButtonOnChangeEventT):void =>
             setValues((values:Array<T>|null):Array<T>|null => {
                 values = triggerOnChangeValue(
@@ -543,7 +533,7 @@ export const InputsInner = function<
                                 icon={properties.removeIcon}
                                 onIcon={properties.removeIcon}
 
-                                onChange={createRemove(index)}
+                                onChange={createRemoveCallback(index)}
                             />
                         }
                     </div>

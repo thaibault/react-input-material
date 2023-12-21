@@ -92,7 +92,7 @@ export const deriveMissingPropertiesFromState = <
     return properties
 }
 /**
- * Creates a hybrid a state setter wich only triggers when model state changes
+ * Creates a hybrid a state setter which only triggers when model state changes
  * occur. Useful to dynamically convert a component from uncontrolled to
  * controlled while model state should be uncontrolled either.
  * @param setValueState - Value setter to wrap.
@@ -105,9 +105,7 @@ export const wrapStateSetter = <Type = unknown>(
     setValueState:(value:Type|((value:Type) => Type)) => void,
     currentValueState:Type
 ):ReturnType<typeof useState>[1] =>
-        (
-            callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>
-        ):void => {
+        (callbackOrData:FirstParameter<ReturnType<typeof useState>[1]>) => {
             const result:Type = (typeof callbackOrData === 'function' ?
                 callbackOrData(currentValueState) :
                 callbackOrData
