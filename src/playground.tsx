@@ -36,6 +36,9 @@ import {
     FileValue,
     InputProperties,
     InputProps,
+    InputsCreatePrototypeOptions,
+    InputsModel,
+    InputsProperties,
     IntervalConfiguration,
     IntervalModel,
     IntervalProps,
@@ -119,6 +122,82 @@ const Application = () => {
         useMemorizedValue<(values:Array<null|string>|null) => void>(
             setInputValue6
         )
+
+    const [inputModel1, setInputModel1] =
+        useState<Partial<InputsModel<IntervalConfiguration>>>({
+            value: [
+                {
+                    model: {
+                        value: {
+                            end: {value: Date.UTC(1970, 0, 1, 11, 30) / 1000},
+                            start: {value: Date.UTC(1970, 0, 1, 7) / 1000}
+                        }
+                    }
+                },
+                {
+                    model: {
+                        value: {
+                            end: {value: Date.UTC(1970, 0, 1, 18) / 1000},
+                            start: {value: Date.UTC(1970, 0, 1, 12) / 1000}
+                        }
+                    }
+                }
+            ]
+        })
+    const onChangeInputModel1 = useMemorizedValue((
+        properties:{model:Partial<InputsModel<IntervalConfiguration>>}
+    ) => {
+        onChange(properties)
+        // NOTE: We reduce data to keep in state to be more performant here
+        setInputModel1({value: properties.model.value!.map(
+            ({model}) => ({
+                model: {value: {
+                    start: model!.value!.start, end: model!.value!.end
+                }}
+            })
+        )})
+    })
+
+    const createIntervalPrototype = useMemorizedValue((
+        {item, lastValue, properties}:InputsCreatePrototypeOptions<
+            IntervalConfiguration|IntervalValue|null,
+            IntervalProps,
+            InputsProperties<
+                IntervalValue|IntervalConfiguration|null, IntervalProps
+            >
+        >
+    ):IntervalProps => {
+        const sixHoursInSeconds =
+            new Date(1970, 0, 1, 6).getTime() / 1000
+        const length = properties?.value?.length
+        const nextStart =
+            lastValue?.end ??
+            (
+                (length && properties.value![length - 1].value) ?
+                    properties.value![length - 1].value!.end :
+                    sixHoursInSeconds
+            )
+        const nextStartTime =
+            (nextStart as InputProps<number|string>).value! ?? nextStart
+        const nextStartTimeInSeconds = typeof nextStartTime === 'number' ?
+            nextStartTime :
+            new Date(nextStartTime).getTime() / 1000
+
+        const value = {
+            start: {value: nextStartTimeInSeconds},
+            end: {value: nextStartTimeInSeconds + 60 ** 2}
+        }
+
+        return Tools.extend(
+            true,
+            item,
+            /*
+                NOTE: We need to use "model" since it would be overwritten by
+                default values otherwise.
+            */
+            {model: {value} as unknown as IntervalModel, value}
+        )
+    })
     // endregion
 
     return (<>
@@ -200,7 +279,7 @@ const Application = () => {
                         )}
                     </FileInput>
                     <FileInput
-                        name="Controlled"
+                        name="fileInputControlled"
                         onChange={onChange}
                         onChangeValue={onChangeValue1}
                         triggerInitialPropertiesConsolidation={true}
@@ -230,7 +309,7 @@ const Application = () => {
                         value={inputValue1}
                     />
                     <TextInput<null|string>
-                        name="controlled"
+                        name="textInputControlled"
                         onChange={onChange}
                         onChangeValue={onChangeInputValue1}
                         triggerInitialPropertiesConsolidation={true}
@@ -360,7 +439,7 @@ const Application = () => {
                     }}
                 >
                     <TextInput<null|number>
-                        name="controlled"
+                        name="numberInputControlled"
                         onChange={useMemorizedValue((
                             properties:InputProperties<null|number>
                         ) => {
@@ -955,7 +1034,7 @@ const Application = () => {
                         )}
                     />
                     <TextInput<null|string>
-                        name="controlled"
+                        name="selectionInputControlled1"
                         onChange={useMemorizedValue(
                             (properties:InputProperties<null|string>) => {
                                 onChangeInputValue3({
@@ -973,7 +1052,7 @@ const Application = () => {
                         value={selectionInput.value}
                     />
                     <TextInput<null|string>
-                        name="controlled"
+                        name="selectionInputControlled2"
                         onChange={useMemorizedValue(
                             (properties:InputProperties<null|string>) => {
                                 onChangeInputValue3({
@@ -1002,6 +1081,7 @@ const Application = () => {
                             'none'
                     }}
                 >
+                    {/* region inputs file */}
                     <Inputs<FileValue|null, FileInputProps>
                         createItem={useMemorizedValue(
                             ({
@@ -1019,6 +1099,8 @@ const Application = () => {
                             <FileInput {...properties as FileInputProps} />
                         )}
                     </Inputs>
+                    {/* endregion */}
+                    {/* region inputs checkbox */}
                     <Inputs<boolean, CheckboxProps>
                         createItem={useMemorizedValue(
                             ({index, item, properties: {name}}):CheckboxProps =>
@@ -1037,62 +1119,12 @@ const Application = () => {
                             <RequireableCheckbox {...properties} />
                         )}
                     </Inputs>
+                    {/* endregion */}
+                    {/* region interval */}
                     <Inputs<
                         IntervalConfiguration|IntervalValue|null, IntervalProps
                     >
-                        createPrototype={useMemorizedValue(
-                            (
-                                {item, lastValue, properties}
-                            ):IntervalProps => {
-                                const sixHoursInSeconds =
-                                    new Date(1970, 0, 1, 6).getTime() / 1000
-                                const length = properties?.value?.length
-                                const nextStart =
-                                    lastValue?.end ??
-                                    (
-                                        (
-                                            length &&
-                                            properties.value![length - 1].value
-                                        ) ?
-                                            properties.value![
-                                                length - 1
-                                            ].value!.end as number :
-                                            sixHoursInSeconds
-                                    )
-                                const nextStartTime =
-                                    (
-                                        nextStart as InputProps<number|string>
-                                    ).value! ??
-                                    nextStart
-                                const nextStartTimeInSeconds =
-                                    typeof nextStartTime === 'number' ?
-                                        nextStartTime :
-                                        new Date(nextStartTime).getTime() / 1000
-
-                                const value = {
-                                    start: {value: nextStartTimeInSeconds},
-                                    end: {
-                                        value: nextStartTimeInSeconds + 60 ** 2
-                                    }
-                                }
-
-                                return Tools.extend(
-                                    true,
-                                    item,
-                                    /*
-                                        NOTE: We need to use "model" since it
-                                        would be overwritten by default values
-                                        otherwise.
-                                    */
-                                    {
-                                        model: {value} as
-                                            unknown as
-                                            IntervalModel,
-                                        value
-                                    }
-                                )
-                            }
-                        )}
+                        createPrototype={createIntervalPrototype}
                         model={useMemorizedValue({
                             default: [
                                 {value: {
@@ -1110,14 +1142,25 @@ const Application = () => {
                         showInitialValidationState
                     >
                         {useMemorizedValue(({properties}) =>
-                            <Interval
-                                {...properties as IntervalProps}
-                                step={60}
-                            />
+                            <Interval {...properties} step={60} />
                         )}
                     </Inputs>
+                    <Inputs<
+                        IntervalConfiguration|IntervalValue|null, IntervalProps
+                    >
+                        createPrototype={createIntervalPrototype}
+                        model={inputModel1}
+                        name="inputsControlled1"
+                        onChange={onChangeInputModel1}
+                        showInitialValidationState
+                    >
+                        {useMemorizedValue(({properties}) =>
+                            <Interval {...properties} step={60} />
+                        )}
+                    </Inputs>
+                    {/* endregion */}
                     <Inputs
-                        name="controlled"
+                        name="inputsControlled2"
                         onChange={onChange}
                         onChangeValue={onChangeInputValue6}
                         triggerInitialPropertiesConsolidation={true}
@@ -1149,7 +1192,7 @@ const Application = () => {
                         })}
                     />
                     <Interval
-                        name="controlled"
+                        name="intervalControlled"
                         default={120}
                         onChange={onChange}
                         onChangeValue={onChangeInputValue4}
@@ -1171,7 +1214,7 @@ const Application = () => {
                 >
                     <RequireableCheckbox onChange={onChange} />
                     <RequireableCheckbox
-                        name="controlled"
+                        name="requireableCheckboxControlled"
                         onChange={onChange}
                         onChangeValue={onChangeInputValue5}
                         triggerInitialPropertiesConsolidation={true}

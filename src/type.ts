@@ -1238,9 +1238,9 @@ export interface InputsModelState extends ModelState {
     invalidMaximumNumber:boolean
     invalidMinimumNumber:boolean
 }
-export interface InputsModel<T, P extends InputsPropertiesItem<T>> extends
-    BaseModel<Array<P>|null>
-{
+export interface InputsModel<
+    T, P extends InputsPropertiesItem<T> = InputsPropertiesItem<T>
+> extends BaseModel<Array<P>|null> {
     maximumNumber:number
     minimumNumber:number
 
