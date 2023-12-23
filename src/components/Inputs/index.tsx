@@ -198,17 +198,28 @@ export const InputsInner = function<
     )
     // endregion
     // region consolidate state
-    const [newInputState, setNewInputState] =
-        useState<'added'|'rendered'|'stabilized'>('stabilized')
+    const [newInputState, setNewInputState] = useState<{
+        name:'added'|'rendered'|'stabilized'
+        event:GenericEvent|null
+    }>({name: 'stabilized', event: null})
 
-    useEffect(() => {
-        if (newInputState === 'added')
-            setNewInputState('rendered')
-        else if (newInputState === 'rendered') {
-            setNewInputState('stabilized')
-            triggerOnChange(inputPropertiesToValues<T, P>(properties.value))
-        }
-    })
+    useEffect(
+        () => {
+            if (newInputState.name === 'added')
+                setNewInputState((oldState) => ({
+                    name: 'rendered',
+                    event: oldState.event
+                }))
+            else if (newInputState.name === 'rendered') {
+                setNewInputState({name: 'stabilized', event: null})
+                triggerOnChange(
+                    inputPropertiesToValues<T, P>(properties.value),
+                    newInputState.event!
+                )
+            }
+        },
+        [newInputState.name]
+    )
 
     let [values, setValues] = useState<Array<T>|null>(
         inputPropertiesToValues<T, P>(
@@ -464,7 +475,9 @@ export const InputsInner = function<
          * NOTE: new Properties are not yet consolidated by nested input
          * component. So save that info for further rendering.
          */
-        setNewInputState('added')
+        setNewInputState({
+            name: 'added', event: event as unknown as GenericEvent
+        })
 
         return result
     })
