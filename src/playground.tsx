@@ -174,9 +174,11 @@ const Application = () => {
         const length = properties?.value?.length
         const nextStart =
             lastValue?.end ??
-            (length && properties.value![length - 1].value) ?
-                properties.value![length! - 1].value!.end :
-                sixHoursInSeconds
+            (
+                (length && properties.value![length - 1].value) ?
+                    properties.value![length! - 1].value!.end :
+                    sixHoursInSeconds
+            )
         const nextStartTime =
             (nextStart as InputProps<number|string>).value! ?? nextStart
         const nextStartTimeInSeconds = typeof nextStartTime === 'number' ?
