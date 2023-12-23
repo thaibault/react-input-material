@@ -174,11 +174,9 @@ const Application = () => {
         const length = properties?.value?.length
         const nextStart =
             lastValue?.end ??
-            (
-                (length && properties.value![length - 1].value) ?
-                    properties.value![length - 1].value!.end :
-                    sixHoursInSeconds
-            )
+            (length && properties.value![length - 1].value) ?
+                properties.value![length! - 1].value!.end :
+                sixHoursInSeconds
         const nextStartTime =
             (nextStart as InputProps<number|string>).value! ?? nextStart
         const nextStartTimeInSeconds = typeof nextStartTime === 'number' ?
@@ -190,15 +188,11 @@ const Application = () => {
             end: {value: nextStartTimeInSeconds + 60 ** 2}
         }
 
-        return Tools.extend(
-            true,
-            item,
-            /*
-                NOTE: We need to use "model" since it would be overwritten by
-                default values otherwise.
-            */
-            {model: {value}, value}
-        )
+        /*
+            NOTE: We need to use "model" since it would be overwritten by
+            default values otherwise.
+        */
+        return Tools.extend(true, item, {model: {value}, value})
     })
     // endregion
 
