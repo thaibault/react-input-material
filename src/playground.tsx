@@ -126,38 +126,45 @@ const Application = () => {
         IntervalConfiguration|IntervalValue|null, IntervalProps
     >
     const [inputModel1, setInputModel1] =
-        useState<IntervalInputsType>({
-            value: [
-                {
-                    model: {
-                        value: {
-                            end: {value: Date.UTC(1970, 0, 1, 11, 30) / 1000},
-                            start: {value: Date.UTC(1970, 0, 1, 7) / 1000}
-                        }
-                    }
+        useState<IntervalInputsType>({default: [
+            {model: {value: {
+                start: {
+                    declaration: 'Start time',
+                    value: '1970-01-01T06:00:00.000Z'
                 },
-                {
-                    model: {
-                        value: {
-                            end: {value: Date.UTC(1970, 0, 1, 18) / 1000},
-                            start: {value: Date.UTC(1970, 0, 1, 12) / 1000}
-                        }
-                    }
+                end: {
+                    declaration: 'End time',
+                    value: '1970-01-01T10:30:00.000Z'
                 }
-            ]
-        })
+            }}},
+            {model: {value: {
+                start: {
+                    declaration: 'Start time',
+                    value: '1970-01-01T11:00:00.000Z'
+                },
+                end: {
+                    declaration: 'End time',
+                    value: '1970-01-01T17:00:00.000Z'
+                }
+            }}}
+        ]})
     const onChangeInputModel1 = useMemorizedValue((
         properties:{model:IntervalInputsType}
     ) => {
         onChange(properties)
         // NOTE: We reduce data to keep in state to be more performant here
-        setInputModel1({value: properties.model.value!.map(
-            ({model}) => ({
-                model: {value: {
-                    start: model!.value!.start, end: model!.value!.end
-                }}
-            })
-        )})
+        setInputModel1({
+            default: properties.model.default,
+            value: properties.model.value ?
+                properties.model.value.map(
+                    ({model}) => ({
+                        model: {value: {
+                            start: model!.value!.start, end: model!.value!.end
+                        }}
+                    })
+                ) :
+                []
+        })
     })
 
     const createIntervalPrototype = useMemorizedValue((
@@ -176,7 +183,7 @@ const Application = () => {
             lastValue?.end ??
             (
                 (length && properties.value![length - 1].value) ?
-                    properties.value![length! - 1].value!.end :
+                    properties.value![length - 1].value!.end :
                     sixHoursInSeconds
             )
         const nextStartTime =
@@ -1118,7 +1125,7 @@ const Application = () => {
                         )}
                     </Inputs>
                     {/* endregion */}
-                    {/* region interval */}
+                    {/* region inputs interval */}
                     <Inputs<
                         IntervalConfiguration|IntervalValue|null, IntervalProps
                     >
@@ -1126,12 +1133,12 @@ const Application = () => {
                         model={useMemorizedValue({
                             default: [
                                 {value: {
-                                    start: Date.UTC(1970, 0, 1, 7) / 1000,
-                                    end: Date.UTC(1970, 0, 1, 11, 30) / 1000
+                                    start: '1970-01-01T07:00:00.000Z',
+                                    end: '1970-01-01T11:30:00.000Z'
                                 }},
                                 {value: {
-                                    start: Date.UTC(1970, 0, 1, 12) / 1000,
-                                    end: Date.UTC(1970, 0, 1, 18) / 1000
+                                    start: '1970-01-01T12:00:00.000Z',
+                                    end: '1970-01-01T18:00:00.000Z'
                                 }}
                             ],
                             name: 'inputs3'
@@ -1153,7 +1160,17 @@ const Application = () => {
                         showInitialValidationState
                     >
                         {useMemorizedValue(({properties}) =>
-                            <Interval {...properties} step={60} />
+                            <Interval {...Tools.extend(
+                                true,
+                                properties,
+                                {
+                                    value: {
+                                        start: {type: 'time-local'},
+                                        end: {type: 'time-local'}
+                                    },
+                                    step: 60
+                                }
+                            )} />
                         )}
                     </Inputs>
                     {/* endregion */}
@@ -1171,7 +1188,8 @@ const Application = () => {
                     className="playground__inputs__interval"
                     style={{
                         display: activeSection === 'interval' ?
-                            'block' : 'none'
+                            'block' :
+                            'none'
                     }}
                 >
                     <Interval
@@ -1183,6 +1201,24 @@ const Application = () => {
                             end: {default: 240, minimum: 120}
                         })}
                     />
+                    <Interval
+                        onChange={onChange}
+                        required
+                        step={60}
+                        value={useMemorizedValue({
+                            start: {
+                                default: '1970-01-01T00:02:00.000Z',
+                                maximum: '1970-01-01T01:00:00.000Z',
+                                type: 'time-local'
+                            },
+                            end: {
+                                default: '1970-01-01T00:04:00.000Z',
+                                minimum: '1970-01-01T00:02:00.000Z',
+                                type: 'time-local'
+                            }
+                        })}
+                    />
+
                     <Interval
                         name="intervalControlled"
                         default={120}
