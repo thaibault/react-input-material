@@ -1373,20 +1373,28 @@ export const defaultInputsProperties:DefaultInputsProperties = {
 //// endregion
 /// endregion
 /// region interval
+export type DateTimeRepresentation = number|string
+
 export interface IntervalValue {
-    end?:null|number|string
-    start?:null|number|string
+    end?:DateTimeRepresentation|null
+    start?:DateTimeRepresentation|null
 }
 
+export type IntervalInputModel =
+    Omit<InputModel<DateTimeRepresentation|null>, 'maximum'|'minimum'> &
+    {
+        maximum:DateTimeRepresentation
+        minimum:DateTimeRepresentation
+    }
+export type IntervalInputProps =
+    Omit<InputProps<DateTimeRepresentation|null>, 'maximum'|'minimum'> &
+    {
+        maximum:DateTimeRepresentation
+        minimum:DateTimeRepresentation
+    }
 export interface IntervalConfiguration {
-    end:(
-        Partial<InputModel<null|number|string>> |
-        Partial<InputProps<null|number|string>>
-    )
-    start:(
-        Partial<InputModel<null|number|string>> |
-        Partial<InputProps<null|number|string>>
-    )
+    end:Partial<IntervalInputModel>|Partial<IntervalInputProps>
+    start:Partial<IntervalInputModel>|Partial<IntervalInputProps>
 }
 
 export type IntervalModelState = ModelState
@@ -1394,13 +1402,13 @@ export interface IntervalModel {
     name:string
     state:IntervalModelState
     value:{
-        end:InputModel<null|number|string>
-        start:InputModel<null|number|string>
+        end:IntervalInputModel
+        start:IntervalInputModel
     }
 }
 
 export interface IntervalProperties extends Omit<
-    InputProperties<null|number|string>,
+    InputProperties<DateTimeRepresentation|null>,
     'icon'|'model'|'onChange'|'onChangeValue'|'value'
 > {
     icon:IconOptions
@@ -1413,8 +1421,8 @@ export interface IntervalProperties extends Omit<
     value:IntervalConfiguration
 }
 type PartialIntervalValue =
-    Partial<Omit<InputModel<null|number|string>, 'value'>> &
-    {value:null|number|string}
+    Partial<Omit<InputModel<DateTimeRepresentation|null>, 'value'>> &
+    {value:DateTimeRepresentation|null}
 export type PartialIntervalModel =
     Partial<Omit<IntervalProperties['model'], 'state'|'value'>> &
     {
@@ -1426,12 +1434,28 @@ export type PartialIntervalModel =
     }
 export type IntervalProps =
     Omit<
-        InputProps<null|number|string>,
+        InputProps<DateTimeRepresentation|null>,
         'icon'|'model'|'onChange'|'onChangeValue'|'value'
     > &
     Partial<{
-        end:Partial<InputProps<null|number|string>>
-        start:Partial<InputProps<null|number|string>>
+        end:Partial<
+            Omit<
+                InputProps<DateTimeRepresentation|null>, 'maximum'|'minimum'
+            > &
+            {
+                maximum:DateTimeRepresentation
+                minimum:DateTimeRepresentation
+            }
+        >
+        start:Partial<
+            Omit<
+                InputProps<DateTimeRepresentation|null>, 'maximum'|'minimum'
+            > &
+            {
+                maximum:DateTimeRepresentation
+                minimum:DateTimeRepresentation
+            }
+        >
 
         icon:IntervalProperties['icon']
 
@@ -1455,10 +1479,10 @@ export type IntervalAdapter =
 export interface IntervalAdapterWithReferences extends IntervalAdapter {
     references:{
         end:MutableRefObject<
-            InputAdapterWithReferences<null|number|string>|null
+            InputAdapterWithReferences<DateTimeRepresentation|null>|null
         >
         start:MutableRefObject<
-            InputAdapterWithReferences<null|number|string>|null
+            InputAdapterWithReferences<DateTimeRepresentation|null>|null
         >
     }
 }
@@ -1498,8 +1522,8 @@ export const defaultIntervalProperties:DefaultIntervalProperties = {
     icon: {icon: 'timelapse'},
 
     maximumText:
-        'Please provide somthing earlier than ${formatValue(maximum)}.',
-    minimumText: 'Please provide somthing later than ${formatValue(minimum)}.',
+        'Please provide something earlier than ${formatValue(maximum)}.',
+    minimumText: 'Please provide something later than ${formatValue(minimum)}.',
     requiredText: 'Please provide a range.',
 
     model: {
