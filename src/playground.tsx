@@ -29,6 +29,7 @@ import {
     FileInput, TextInput, Inputs, Interval, RequireableCheckbox as Checkbox
 } from './index'
 import {
+    BaseProps,
     CheckboxProps,
     FileInputChildrenOptions,
     FileInputProperties,
@@ -48,6 +49,7 @@ import {
 } from './type'
 import {slicePropertiesForStateRecursively} from './helper'
 // endregion
+// region configuration
 Tools.locales.push('de-DE')
 TextInput.transformer.currency.format!.final.options = {currency: 'EUR'}
 
@@ -65,18 +67,17 @@ const SECTIONS = [
 
     'requireable-checkbox'
 ] as const
-
+// endregion
 const Application = () => {
-    const [selectedState, setSelectedState] = useState<unknown>()
+    const [selectedState, setSelectedState] =
+        useState<BaseProps['model']|null>(null)
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
     const activeSection = SECTIONS[activeTabIndex]
 
-    const onChange:((properties:{model:unknown}) => void) =
-        useMemorizedValue<(properties:{model:unknown}) => void>(
-            ({model}) => {
-                setSelectedState(model)
-            }
-        )
+    const onChange:((properties:BaseProps) => void) =
+        useMemorizedValue(({model}) => {
+            setSelectedState(model)
+        })
     // region controlled state
     /// region file
     const [fileInputValue, setFileInputValue] =
@@ -230,6 +231,8 @@ const Application = () => {
                 onActivate={(event:{detail:{index:number}}) => {
                     if (event.detail.index !== activeTabIndex)
                         setActiveTabIndex(event.detail.index)
+
+                    setSelectedState(null)
                 }}
             >
                 {SECTIONS.map((name) =>
@@ -249,8 +252,8 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    <FileInput onChange={onChange} />
-                    <FileInput
+                    <FileInput name="fileInput1" onChange={onChange} />
+                    <FileInput<FileValue>
                         default={useMemorizedValue({
                             blob: {type: 'image/png'},
                             url: 'https://via.placeholder.com/150'
@@ -320,6 +323,7 @@ const Application = () => {
                     }}
                 >
                     <TextInput<string>
+                        name="simpleInput1"
                         inputProperties={useMemorizedValue({outlined: true})}
                         onChange={onChange}
                     />
@@ -346,12 +350,12 @@ const Application = () => {
                             ariaChecked: false,
                             ariaDescription: 'test'
                         }}
-                        name="simpleInput1"
+                        name="simpleInput2"
                         onChange={onChange}
                         showDeclaration={true}
                     />
                     <TextInput<string>
-                        model={useMemorizedValue({name: 'simpleInput1Model'})}
+                        model={useMemorizedValue({name: 'simpleInput2Model'})}
                         onChange={onChange}
                     />
 
@@ -360,16 +364,16 @@ const Application = () => {
                     <TextInput<string>
                         declaration="Disabled"
                         disabled
-                        initialValue="value2"
-                        name="simpleInput2"
+                        initialValue="simpleInputValue3"
+                        name="simpleInput3"
                         onChange={onChange}
                     />
                     <TextInput<string>
                         model={useMemorizedValue({
                             declaration: 'Disabled',
-                            default: 'value2Model',
+                            default: 'simpleInputValue3Model',
                             mutable: false,
-                            name: 'simpleInput2Model'
+                            name: 'simpleInputValue3Model'
                         })}
                         onChange={onChange}
                     />
@@ -378,7 +382,7 @@ const Application = () => {
 
                     <TextInput<string>
                         declaration="placeholder"
-                        name="simpleInput3"
+                        name="simpleInput4"
                         onChange={onChange}
                         placeholder="100.000,00"
                         required
@@ -386,16 +390,15 @@ const Application = () => {
                         trailingIcon="clear_preset"
                     />
                     <TextInput<string>
-                        default="simpleValue3Model"
+                        default="simpleValue4Model"
                         icon="backup"
                         model={useMemorizedValue({
                             declaration: 'placeholder',
-                            name: 'simpleInput3Model',
+                            name: 'simpleInput4Model',
                             nullable: false
                         })}
-                        name="simpleInput3Model"
                         onChange={onChange}
-                        placeholder="simpleInput3Model"
+                        placeholder="simpleInput4Model"
                         trailingIcon="clear_preset"
                     />
 
@@ -403,24 +406,24 @@ const Application = () => {
 
                     <TextInput<string>
                         declaration="pattern"
-                        description="simpleInput4Description"
+                        description="simpleInput5Description"
                         icon="search"
                         initialValue="only a`s allowed"
-                        name="simpleInput4"
+                        name="simpleInput5"
                         onChange={onChange}
                         pattern="^a+$"
-                        placeholder="simpleInput4Placeholder"
+                        placeholder="simpleInput5Placeholder"
                     />
                     <TextInput<string>
                         initialValue="has a`s and b`s"
                         model={useMemorizedValue({
                             declaration: 'pattern',
-                            description: 'simpleInput4ModelDescription',
+                            description: 'simpleInput5ModelDescription',
                             regularExpressionPattern: ['.*a+.*', /.*b+(.*)/]
                         })}
-                        name="simpleInput4Model"
+                        name="simpleInput5Model"
                         onChange={onChange}
-                        placeholder="simpleInput4ModelPlaceholder"
+                        placeholder="simpleInput5ModelPlaceholder"
                         trailingIcon="search"
                     />
 
@@ -428,13 +431,13 @@ const Application = () => {
 
                     <TextInput<string>
                         declaration="password"
-                        description="simpleInput5Description"
+                        description="simpleInput6Description"
                         icon="search"
                         initialValue="hans"
-                        name="simpleInput5"
+                        name="simpleInput6"
                         onChange={onChange}
                         pattern="a+"
-                        placeholder="simpleInput5Placeholder"
+                        placeholder="simpleInput6Placeholder"
                         tooltip="Please type in your password."
                         trailingIcon="password_preset"
                     />
@@ -442,12 +445,12 @@ const Application = () => {
                         initialValue="hans"
                         model={useMemorizedValue({
                             declaration: 'password',
-                            description: 'simpleInput5ModelDescription',
+                            description: 'simpleInput6ModelDescription',
                             regularExpressionPattern: 'a+'
                         })}
-                        name="simpleInput5Model"
+                        name="simpleInput6Model"
                         onChange={onChange}
-                        placeholder="simpleInput5ModelPlaceholder"
+                        placeholder="simpleInput6ModelPlaceholder"
                         trailingIcon="password_preset"
                     />
                 </div>
@@ -1273,7 +1276,7 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    <Checkbox onChange={onChange} />
+                    <Checkbox name="checkbox1" onChange={onChange} />
                     <Checkbox
                         name="CheckboxControlled"
                         onChange={onChange}
@@ -1284,9 +1287,9 @@ const Application = () => {
 
                     <hr/>
 
-                    <Checkbox name="checkbox1" onChange={onChange} />
+                    <Checkbox name="checkbox2" onChange={onChange} />
                     <Checkbox
-                        model={useMemorizedValue({name: 'checkbox1Model'})}
+                        model={useMemorizedValue({name: 'checkbox2Model'})}
                         onChange={onChange}
                         themeConfiguration={useMemorizedValue({
                             primary: 'yellow',
@@ -1299,13 +1302,13 @@ const Application = () => {
                     <Checkbox
                         default
                         disabled
-                        name="checkbox2"
+                        name="checkbox3"
                         onChange={onChange}
                         required
                     />
                     <Checkbox
                         model={useMemorizedValue({
-                            name: 'checkbox2Model',
+                            name: 'checkbox3Model',
                             mutable: false,
                             nullable: false
                         })}
@@ -1315,8 +1318,8 @@ const Application = () => {
                     <hr/>
 
                     <Checkbox
-                        description="checkbox3Description"
-                        name="checkbox3"
+                        description="checkbox4Description"
+                        name="checkbox4"
                         onChange={onChange}
                         required
                         showInitialValidationState
@@ -1324,8 +1327,8 @@ const Application = () => {
                     <Checkbox
                         model={useMemorizedValue({
                             default: true,
-                            description: 'checkbox3ModelDescription',
-                            name: 'checkbox3Model',
+                            description: 'checkbox4ModelDescription',
+                            name: 'checkbox4Model',
                             nullable: false
                         })}
                         onChange={onChange}
