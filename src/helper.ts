@@ -26,7 +26,7 @@ import {
     BaseModel,
     BaseProperties,
     BaseProps,
-    DataTransformSpecification,
+    DataTransformSpecification, DateTimeRepresentation,
     DefaultBaseProperties,
     DefaultInputProperties,
     FormatSpecifications,
@@ -39,8 +39,46 @@ import {
     TypeSpecification,
     ValueState
 } from './type'
+import TextInput from './components/TextInput'
 // endregion
 // region state
+/**
+ * Removes all none serializable values from given data structure.
+ * @param object - Mapping of values to slice.
+ * @returns Nothing.
+ */
+export const slicePropertiesForState = (object:Mapping) => {
+    /*
+       NOTE: Nested "representations" shouldn't be controlled usually since
+       complex inter input dependencies wont be resolved from the outside.
+    */
+    for (const name of ['ref', 'representation'])
+        delete object[name]
+    for (const [name, value] of Object.entries(object))
+        if (Tools.isFunction(value))
+            delete object[name]
+}
+/**
+ * Removes all none serializable values from given data structure recursively.
+ * @param properties - Mapping of values to slice.
+ * @returns Nothing.
+ */
+export const slicePropertiesForStateRecursively = (properties:unknown) => {
+    if (properties === null || typeof properties !== 'object')
+        return
+
+    slicePropertiesForState(properties as Mapping)
+
+    for (const value of Object.values(properties))
+        if (value !== null && typeof value === 'object')
+            if (Array.isArray(value))
+                for (const subValue of value as Array<unknown>)
+                    slicePropertiesForStateRecursively(subValue)
+            else
+                slicePropertiesForStateRecursively(value)
+
+    return Tools.copy(properties)
+}
 /**
  * Creates a mocked a state setter. Useful to dynamically convert a component
  * from uncontrolled to controlled.
@@ -720,6 +758,30 @@ export function formatValue<
     }
 
     return String(value)
+}
+export const formatDateTimeAsConfigured = (
+    value?:DateTimeRepresentation|Date|null
+):DateTimeRepresentation|null|undefined => {
+    if (TextInput.transformer.date.useISOString) {
+        if (typeof value === 'number' && !isNaN(value) && isFinite(value))
+            return new Date(value * 1000).toISOString()
+
+        if (value instanceof Date)
+            return value.toISOString()
+
+        return value
+    }
+
+    if (typeof value === 'number')
+        return value
+
+    if (value instanceof Date)
+        return value.getTime() / 1000
+
+    if (typeof value === 'string')
+        return new Date(value).getTime() / 1000
+
+    return value
 }
 // endregion
 // region vim modline

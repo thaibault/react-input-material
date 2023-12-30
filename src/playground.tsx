@@ -26,7 +26,7 @@ import {useMemorizedValue} from 'react-generic-tools'
 
 import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
 import {
-    FileInput, TextInput, Inputs, Interval, RequireableCheckbox
+    FileInput, TextInput, Inputs, Interval, RequireableCheckbox as Checkbox
 } from './index'
 import {
     CheckboxProps,
@@ -39,11 +39,14 @@ import {
     InputsCreatePrototypeOptions,
     InputsProperties,
     IntervalConfiguration,
+    IntervalProperties,
     IntervalProps,
     IntervalValue,
     PartialInputsModel,
+    PartialIntervalModel,
     SuggestionCreatorOptions
 } from './type'
+import {slicePropertiesForStateRecursively} from './helper'
 // endregion
 Tools.locales.push('de-DE')
 TextInput.transformer.currency.format!.final.options = {currency: 'EUR'}
@@ -75,18 +78,21 @@ const Application = () => {
             }
         )
     // region controlled state
+    /// region file
     const [fileInputValue, setFileInputValue] =
         useState<FileValue|null|undefined>({
             blob: new Blob(['test'], {type: 'text/plain'}),
             name: 'test.txt'
         })
-    const onChangeValue1 =
+    const onChangeFileInputValue =
         useMemorizedValue<(value?:FileValue|null) => void>(setFileInputValue)
-
-    const [inputValue1, setInputValue1] = useState<null|string>('')
-    const onChangeInputValue1 =
-        useMemorizedValue<(value:null|string) => void>(setInputValue1)
-
+    /// endregion
+    /// region text
+    const [textInputValue, setTextInputValue] = useState<null|string>('')
+    const onChangeTextInputValue =
+        useMemorizedValue<(value:null|string) => void>(setTextInputValue)
+    /// endregion
+    /// region number
     type FloatValueState = {
         representation:ReactNode|string
         value?:null|number
@@ -96,36 +102,33 @@ const Application = () => {
     })
     const onChangeNumberValue =
         useMemorizedValue<(value:FloatValueState) => void>(setNumberValue)
-
+    /// endregion
+    /// region selection
     type SelectionValueType = {
         representation:ReactNode|string
         value?:null|string
     }
     const [selectionInput, setSelectionInput] =
         useState<SelectionValueType>({representation: 'klaus', value: 'b'})
-    const onChangeInputValue3 =
+    const onChangeSelectionInputValue =
         useMemorizedValue<(value:SelectionValueType) => void>(setSelectionInput)
-
-    const [inputValue4, setInputValue4] =
+    /// endregion
+    /// region interval
+    const [intervalValue, setIntervalValue] =
         useState<IntervalValue|null>({end: 120, start: 60})
-    const onChangeInputValue4 =
-        useMemorizedValue<(value:IntervalValue|null) => void>(setInputValue4)
-
-    const [inputValue5, setInputValue5] = useState<boolean>(false)
-    const onChangeInputValue5 =
-        useMemorizedValue<(value:boolean) => void>(setInputValue5)
-
-    const [inputValue6, setInputValue6] =
-        useState<Array<null|string>|null>(['first item'])
-    const onChangeInputValue6 =
-        useMemorizedValue<(values:Array<null|string>|null) => void>(
-            setInputValue6
-        )
-
+    const onChangeIntervalValue =
+        useMemorizedValue<(value:IntervalValue|null) => void>(setIntervalValue)
+    /// endregion
+    /// region checkbox
+    const [checkboxInputValue, setCheckboxInputValue] = useState<boolean>(false)
+    const onChangeCheckboxInputValue =
+        useMemorizedValue<(value:boolean) => void>(setCheckboxInputValue)
+    /// endregion
+    /// region inputs
     type IntervalInputsType = PartialInputsModel<
         IntervalConfiguration|IntervalValue|null, IntervalProps
     >
-    const [inputModel1, setInputModel1] =
+    const [intervalInputsModel, setIntervalInputsModel] =
         useState<IntervalInputsType>({default: [
             {model: {value: {
                 start: {
@@ -148,26 +151,18 @@ const Application = () => {
                 }
             }}}
         ]})
-    const onChangeInputModel1 = useMemorizedValue((
+    const onChangeIntervalInputsModel = useMemorizedValue((
         properties:{model:IntervalInputsType}
     ) => {
-        onChange(properties)
-        // NOTE: We reduce data to keep in state to be more performant here
-        setInputModel1({
-            default: properties.model.default,
-            value: properties.model.value ?
-                properties.model.value.map(
-                    ({model}) => ({
-                        model: {value: {
-                            start: model!.value!.start, end: model!.value!.end
-                        }}
-                    })
-                ) :
-                []
-        })
+        const slicedProperties =
+            slicePropertiesForStateRecursively(properties) as
+                {model:IntervalInputsType}
+        onChange(slicedProperties)
+
+        setIntervalInputsModel(slicedProperties.model)
     })
 
-    const createIntervalPrototype = useMemorizedValue((
+    const createIntervalInputsPrototype = useMemorizedValue((
         {item, lastValue, properties}:InputsCreatePrototypeOptions<
             IntervalConfiguration|IntervalValue|null,
             IntervalProps,
@@ -197,12 +192,34 @@ const Application = () => {
             end: {value: nextStartTimeInSeconds + 60 ** 2}
         }
 
-        /*
-            NOTE: We need to use "model" since it would be overwritten by
-            default values otherwise.
-        */
         return Tools.extend(true, item, {model: {value}, value})
     })
+
+    const [textInputInputsValue, setTextInputInputsValue] =
+        useState<Array<null|string>|null>(['first item'])
+    const onChangeTextInputInputsValue =
+        useMemorizedValue<(values:Array<null|string>|null) => void>(
+            setTextInputInputsValue
+        )
+    /// endregion
+    /// region interval
+    const [intervalModel, setIntervalModel] = useState<PartialIntervalModel>({
+        value: {
+            start: {value: '1970-01-01T00:00:00.000Z'},
+            end: {value: '1970-01-01T00:02:00.000Z'}
+        }
+    })
+    const onChangeIntervalModel =
+        useMemorizedValue<(properties:IntervalProperties) => void>((
+            properties
+        ) => {
+            const slicedProperties =
+                slicePropertiesForStateRecursively(properties) as
+                    IntervalProperties
+            onChange(slicedProperties)
+            setIntervalModel(slicedProperties.model as PartialIntervalModel)
+        })
+    /// endregion
     // endregion
 
     return (<>
@@ -223,7 +240,7 @@ const Application = () => {
         {/* endregion */}
         <div className="playground">
             <div className="playground__inputs">
-                {/* region file-input */}
+                {/* region file */}
                 <div
                     className="playground__inputs__file-input"
                     style={{
@@ -242,7 +259,7 @@ const Application = () => {
                         generateFileNameInputProperties={
                             preserveStaticFileBaseNameInputGenerator
                         }
-                        name="UnControlled"
+                        name="fileInputUnControlled"
                         onChange={onChange}
                     >
                         {useMemorizedValue(({value}:FileInputChildrenOptions<
@@ -286,14 +303,14 @@ const Application = () => {
                     <FileInput
                         name="fileInputControlled"
                         onChange={onChange}
-                        onChangeValue={onChangeValue1}
+                        onChangeValue={onChangeFileInputValue}
                         triggerInitialPropertiesConsolidation={true}
                         value={fileInputValue}
                     />
                 </div>
                 {/* endregion */}
 
-                {/* region simple-input */}
+                {/* region simple */}
                 <div
                     className="playground__inputs__simple-input"
                     style={{
@@ -307,18 +324,18 @@ const Application = () => {
                         onChange={onChange}
                     />
                     <TextInput<null|string>
-                        name="UnControlled"
+                        name="simpleInputUnControlled"
                         onChange={onChange}
-                        onChangeValue={onChangeInputValue1}
+                        onChangeValue={onChangeTextInputValue}
                         enforceUncontrolled={true}
-                        value={inputValue1}
+                        value={textInputValue}
                     />
                     <TextInput<null|string>
-                        name="textInputControlled"
+                        name="simpleInputControlled"
                         onChange={onChange}
-                        onChangeValue={onChangeInputValue1}
+                        onChangeValue={onChangeTextInputValue}
                         triggerInitialPropertiesConsolidation={true}
-                        value={inputValue1}
+                        value={textInputValue}
                     />
 
                     <hr/>
@@ -376,6 +393,7 @@ const Application = () => {
                             name: 'simpleInput3Model',
                             nullable: false
                         })}
+                        name="simpleInput3Model"
                         onChange={onChange}
                         placeholder="simpleInput3Model"
                         trailingIcon="clear_preset"
@@ -388,7 +406,7 @@ const Application = () => {
                         description="simpleInput4Description"
                         icon="search"
                         initialValue="only a`s allowed"
-                        name="input4"
+                        name="simpleInput4"
                         onChange={onChange}
                         pattern="^a+$"
                         placeholder="simpleInput4Placeholder"
@@ -434,7 +452,7 @@ const Application = () => {
                     />
                 </div>
                 {/* endregion */}
-                {/* region number-input */}
+                {/* region number */}
                 <div
                     className="playground__inputs__number-input"
                     style={{
@@ -547,7 +565,7 @@ const Application = () => {
                     />
                 </div>
                 {/* endregion */}
-                {/* region text-input */}
+                {/* region text */}
                 <div
                     className="playground__inputs__text-input"
                     style={{
@@ -667,7 +685,7 @@ const Application = () => {
                     />
                 </div>
                 {/* endregion */}
-                {/* region time-input */}
+                {/* region time */}
                 <div
                     className="playground__inputs__time-input"
                     style={{
@@ -737,7 +755,7 @@ const Application = () => {
 
                     <TextInput<number>
                         default={120}
-                        name="timeTextInput4"
+                        name="timeInput4"
                         onChange={onChange}
                         type="datetime-local"
                     />
@@ -810,7 +828,7 @@ const Application = () => {
                     />
                 </div>
                 {/* endregion */}
-                {/* region selection-input */}
+                {/* region selection */}
                 <div
                     className="playground__inputs__selection-input"
                     style={{
@@ -1042,7 +1060,7 @@ const Application = () => {
                         name="selectionInputControlled1"
                         onChange={useMemorizedValue(
                             (properties:InputProperties<null|string>) => {
-                                onChangeInputValue3({
+                                onChangeSelectionInputValue({
                                     representation: properties.representation,
                                     value: properties.value
                                 })
@@ -1060,7 +1078,7 @@ const Application = () => {
                         name="selectionInputControlled2"
                         onChange={useMemorizedValue(
                             (properties:InputProperties<null|string>) => {
-                                onChangeInputValue3({
+                                onChangeSelectionInputValue({
                                     representation: properties.representation,
                                     value: properties.value
                                 })
@@ -1086,8 +1104,9 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    {/* region inputs file */}
+                    {/* region file-input inputs */}
                     <Inputs<FileValue|null, FileInputProps>
+                        name="fileInputs"
                         createItem={useMemorizedValue(
                             ({
                                 index, item, properties: {name}
@@ -1105,7 +1124,7 @@ const Application = () => {
                         )}
                     </Inputs>
                     {/* endregion */}
-                    {/* region inputs checkbox */}
+                    {/* region checkbox inputs */}
                     <Inputs<boolean, CheckboxProps>
                         createItem={useMemorizedValue(
                             ({index, item, properties: {name}}):CheckboxProps =>
@@ -1115,21 +1134,22 @@ const Application = () => {
                         minimumNumber={2}
                         model={useMemorizedValue({
                             default: [{type: 'boolean', value: false}],
-                            name: 'inputs2'
+                            name: 'checkboxInputs'
                         })}
                         onChange={onChange}
                         showInitialValidationState
                     >
                         {useMemorizedValue(({properties}) =>
-                            <RequireableCheckbox {...properties} />
+                            <Checkbox {...properties} />
                         )}
                     </Inputs>
                     {/* endregion */}
-                    {/* region inputs interval */}
+                    {/* region interval inputs */}
+                    {/* region uncontrolled */}
                     <Inputs<
                         IntervalConfiguration|IntervalValue|null, IntervalProps
                     >
-                        createPrototype={createIntervalPrototype}
+                        createPrototype={createIntervalInputsPrototype}
                         model={useMemorizedValue({
                             default: [
                                 {value: {
@@ -1141,7 +1161,7 @@ const Application = () => {
                                     end: '1970-01-01T18:00:00.000Z'
                                 }}
                             ],
-                            name: 'inputs3'
+                            name: 'intervalInputsUnControlled'
                         })}
                         onChange={onChange}
                         showInitialValidationState
@@ -1150,13 +1170,15 @@ const Application = () => {
                             <Interval {...properties} step={60} />
                         )}
                     </Inputs>
+                    {/* endregion */}
+                    {/* region controlled */}
                     <Inputs<
                         IntervalConfiguration|IntervalValue|null, IntervalProps
                     >
-                        createPrototype={createIntervalPrototype}
-                        model={inputModel1}
-                        name="inputsControlled1"
-                        onChange={onChangeInputModel1}
+                        createPrototype={createIntervalInputsPrototype}
+                        model={intervalInputsModel}
+                        name="intervalInputsControlled"
+                        onChange={onChangeIntervalInputsModel}
                         showInitialValidationState
                     >
                         {useMemorizedValue(({properties}) =>
@@ -1174,12 +1196,13 @@ const Application = () => {
                         )}
                     </Inputs>
                     {/* endregion */}
+                    {/* endregion */}
                     <Inputs
-                        name="inputsControlled2"
+                        name="textInputInputsControlled"
                         onChange={onChange}
-                        onChangeValue={onChangeInputValue6}
+                        onChangeValue={onChangeTextInputInputsValue}
                         triggerInitialPropertiesConsolidation={true}
-                        value={inputValue6}
+                        value={textInputInputsValue}
                     />
                 </div>
                 {/* endregion */}
@@ -1193,6 +1216,7 @@ const Application = () => {
                     }}
                 >
                     <Interval
+                        name="intervalInput1"
                         onChange={onChange}
                         required
                         step={60}
@@ -1202,6 +1226,7 @@ const Application = () => {
                         })}
                     />
                     <Interval
+                        name="intervalInput2"
                         onChange={onChange}
                         required
                         step={60}
@@ -1220,18 +1245,26 @@ const Application = () => {
                     />
 
                     <Interval
-                        name="intervalControlled"
+                        name="intervalControlled1"
                         default={120}
                         onChange={onChange}
-                        onChangeValue={onChangeInputValue4}
+                        onChangeValue={onChangeIntervalValue}
                         step={60}
                         triggerInitialPropertiesConsolidation={true}
-                        value={inputValue4}
+                        value={intervalValue}
+                    />
+                    <Interval
+                        name="intervalControlled2"
+                        default={120}
+                        model={intervalModel}
+                        onChange={onChangeIntervalModel}
+                        step={60}
+                        triggerInitialPropertiesConsolidation={true}
                     />
                 </div>
                 {/* endregion */}
 
-                {/* region requireable-checkbox */}
+                {/* region checkbox */}
                 <div
                     className="playground__inputs__requireable-checkbox"
                     style={{
@@ -1240,19 +1273,19 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    <RequireableCheckbox onChange={onChange} />
-                    <RequireableCheckbox
-                        name="requireableCheckboxControlled"
+                    <Checkbox onChange={onChange} />
+                    <Checkbox
+                        name="CheckboxControlled"
                         onChange={onChange}
-                        onChangeValue={onChangeInputValue5}
+                        onChangeValue={onChangeCheckboxInputValue}
                         triggerInitialPropertiesConsolidation={true}
-                        value={inputValue5}
+                        value={checkboxInputValue}
                     />
 
                     <hr/>
 
-                    <RequireableCheckbox name="checkbox1" onChange={onChange} />
-                    <RequireableCheckbox
+                    <Checkbox name="checkbox1" onChange={onChange} />
+                    <Checkbox
                         model={useMemorizedValue({name: 'checkbox1Model'})}
                         onChange={onChange}
                         themeConfiguration={useMemorizedValue({
@@ -1263,14 +1296,14 @@ const Application = () => {
 
                     <hr/>
 
-                    <RequireableCheckbox
+                    <Checkbox
                         default
                         disabled
                         name="checkbox2"
                         onChange={onChange}
                         required
                     />
-                    <RequireableCheckbox
+                    <Checkbox
                         model={useMemorizedValue({
                             name: 'checkbox2Model',
                             mutable: false,
@@ -1281,14 +1314,14 @@ const Application = () => {
 
                     <hr/>
 
-                    <RequireableCheckbox
+                    <Checkbox
                         description="checkbox3Description"
                         name="checkbox3"
                         onChange={onChange}
                         required
                         showInitialValidationState
                     />
-                    <RequireableCheckbox
+                    <Checkbox
                         model={useMemorizedValue({
                             default: true,
                             description: 'checkbox3ModelDescription',

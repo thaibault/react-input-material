@@ -41,11 +41,13 @@ import {intervalClassName, intervalDisabledClassName} from './style.module'
 import cssClassNames from './style.module'
 import WrapConfigurations from '../WrapConfigurations'
 import {
-    createDummyStateSetter, translateKnownSymbols, triggerCallbackIfExists
+    createDummyStateSetter,
+    formatDateTimeAsConfigured,
+    translateKnownSymbols,
+    triggerCallbackIfExists
 } from '../../helper'
 import {
     defaultIntervalProperties as defaultProperties,
-    InputProps,
     InputProperties,
     InputAdapterWithReferences,
     IntervalAdapter as Adapter,
@@ -55,11 +57,20 @@ import {
     IntervalProperties as Properties,
     intervalPropertyTypes as propertyTypes,
     IntervalProps as Props,
-    IntervalValue as Value
+    IntervalValue as Value,
+    IntervalInputProps
 } from '../../type'
 // endregion
 const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
 // region helper
+const determineControlled = (props:Props) =>
+    props.model?.value?.end?.value !== undefined ||
+    props.model?.value?.start?.value !== undefined ||
+    props.value !== undefined &&
+    !(
+        (props.value?.start as IntervalInputProps)?.value === undefined &&
+        (props.value?.end as IntervalInputProps)?.value === undefined
+    )
 const normalizeDateTimeToNumber = (
     value?:null|number|string, fallbackValue = 0
 ):number =>
@@ -151,27 +162,19 @@ export const IntervalInner = function(
         )
 
     let endProperties =
-        properties.value?.end as InputProps<null|number|string> || {}
+        properties.value?.end as IntervalInputProps || {}
     const iconProperties:IconOptions = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
         properties.icon!
     let startProperties =
-        properties.value?.start as InputProps<null|number|string> || {}
+        properties.value?.start as IntervalInputProps || {}
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
     */
     const controlled:boolean =
         !properties.enforceUncontrolled &&
-        (
-            givenProps.model?.value?.end?.value !== undefined ||
-            givenProps.model?.value?.start?.value !== undefined ||
-            givenProps.value !== undefined &&
-            !(
-                (givenProps.value?.start as InputProps)?.value === undefined &&
-                (givenProps.value?.end as InputProps)?.value === undefined
-            )
-        ) &&
+        determineControlled(givenProps) &&
         Boolean(properties.onChange || properties.onChangeValue)
     let [value, setValue] = useState<Value>({
         end:
@@ -191,8 +194,8 @@ export const IntervalInner = function(
         properties.value =
             {end: {value: value.end}, start: {value: value.start}}
     const propertiesToForward =
-        Tools.mask<InputProps<null|number|string>>(
-            properties as unknown as InputProps<null|number|string>,
+        Tools.mask<IntervalInputProps>(
+            properties as unknown as IntervalInputProps,
             {exclude: {
                 className: true,
                 enforceUncontrolled: true,
@@ -208,14 +211,6 @@ export const IntervalInner = function(
             }}
         )
 
-    endProperties = Tools.extend(
-        true,
-        Tools.copy(propertiesToForward),
-        properties.model?.value?.end ?
-            {model: properties.model.value.end} :
-            {},
-        endProperties
-    )
     startProperties = Tools.extend(
         true,
         Tools.copy(propertiesToForward),
@@ -224,44 +219,61 @@ export const IntervalInner = function(
             {},
         startProperties
     )
+    endProperties = Tools.extend(
+        true,
+        Tools.copy(propertiesToForward),
+        properties.model?.value?.end ?
+            {model: properties.model.value.end} :
+            {},
+        endProperties
+    )
 
-    if (!endProperties.className)
-        endProperties.className = `${CSS_CLASS_NAMES.interval}__end`
-    if (!iconProperties.className)
-        iconProperties.className = `${CSS_CLASS_NAMES.interval}__icon`
     if (!startProperties.className)
         startProperties.className = `${CSS_CLASS_NAMES.interval}__start`
+    if (!iconProperties.className)
+        iconProperties.className = `${CSS_CLASS_NAMES.interval}__icon`
+    if (!endProperties.className)
+        endProperties.className = `${CSS_CLASS_NAMES.interval}__end`
 
-    const endConfiguration = {...endProperties.model, ...endProperties}
     const startConfiguration = {...startProperties.model, ...startProperties}
+    const endConfiguration = {...endProperties.model, ...endProperties}
 
-    startProperties.maximum = Math.min(
-        normalizeDateTimeToNumber(startConfiguration.maximum, Infinity),
-        normalizeDateTimeToNumber(properties.value.end.value, Infinity),
-        normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
-    )
-    startProperties.minimum =
-        normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
-    startProperties.value = properties.value.start.value
+    // NOTE: Consolidates only internal boundaries for better user experience.
+    const consolidateBoundaries = ({start, end}:Value) => {
+        startProperties.maximum = formatDateTimeAsConfigured(Math.min(
+            normalizeDateTimeToNumber(startConfiguration.maximum, Infinity),
+            normalizeDateTimeToNumber(end, Infinity),
+            normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
+        ))!
 
-    endProperties.maximum =
-        normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
-    endProperties.minimum = Math.max(
-        normalizeDateTimeToNumber(endConfiguration.minimum, -Infinity),
-        normalizeDateTimeToNumber(properties.value.start.value, -Infinity),
-        normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
-    )
-    endProperties.value = properties.value.end.value
+        startProperties.minimum = formatDateTimeAsConfigured(
+            normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
+        )!
+        startProperties.value = formatDateTimeAsConfigured(start)
+
+        endProperties.maximum = formatDateTimeAsConfigured(
+            normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
+        )!
+
+        endProperties.minimum = formatDateTimeAsConfigured(Math.max(
+            normalizeDateTimeToNumber(endConfiguration.minimum, -Infinity),
+            normalizeDateTimeToNumber(start, -Infinity),
+            normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
+        ))!
+        endProperties.value = end
+    }
+
+    const valueState:Value = {
+        end: properties.value.end.value, start: properties.value.start.value
+    }
+
+    consolidateBoundaries(valueState)
 
     const endInputReference =
         useRef<InputAdapterWithReferences<null|number|string>>(null)
     const startInputReference=
         useRef<InputAdapterWithReferences<null|number|string>>(null)
 
-    const valueState:Value = {
-        end: properties.value.end.value,
-        start: properties.value.start.value
-    }
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
@@ -286,36 +298,6 @@ export const IntervalInner = function(
     )
     // region attach event handler
     if (properties.onChange) {
-        endProperties.onChange = (
-            inputProperties:InputProperties<null|number|string>,
-            event?:GenericEvent
-        ):void => {
-            const start:InputProperties<null|number|string> =
-                startInputReference.current?.properties ||
-                startProperties as
-                    unknown as
-                    InputProperties<null|number|string>
-            start.value = Math.min(
-                normalizeDateTimeToNumber(
-                    startInputReference.current?.properties?.value, Infinity
-                ),
-                normalizeDateTimeToNumber(inputProperties.value, Infinity)
-            )
-
-            triggerCallbackIfExists<Properties>(
-                properties as Properties,
-                'change',
-                controlled,
-                getExternalProperties(
-                    properties as Properties,
-                    iconProperties,
-                    start,
-                    inputProperties
-                ),
-                event,
-                properties
-            )
-        }
         startProperties.onChange = (
             inputProperties:InputProperties<null|number|string>,
             event?:GenericEvent
@@ -323,12 +305,19 @@ export const IntervalInner = function(
             const end:InputProperties<null|number|string> =
                 endInputReference.current?.properties ||
                 endProperties as unknown as InputProperties<null|number|string>
-            end.value = Math.max(
+            end.value = end.model.value = formatDateTimeAsConfigured(Math.max(
                 normalizeDateTimeToNumber(
                     endInputReference.current?.properties?.value, -Infinity
                 ),
                 normalizeDateTimeToNumber(inputProperties.value, -Infinity)
-            )
+            ))
+            // NOTE: We need to reset internal temporary set boundaries.
+            end.maximum = end.model.maximum = endConfiguration.maximum
+            end.minimum = end.model.minimum = endConfiguration.minimum
+            inputProperties.maximum = inputProperties.model.maximum =
+                startConfiguration.maximum
+            inputProperties.minimum = inputProperties.model.minimum =
+                startConfiguration.minimum
 
             triggerCallbackIfExists<Properties>(
                 properties as Properties,
@@ -340,23 +329,62 @@ export const IntervalInner = function(
                     inputProperties,
                     end
                 ),
-                event,
+                event || new Event('genericIntervalStartChange'),
+                properties
+            )
+        }
+        endProperties.onChange = (
+            inputProperties:InputProperties<null|number|string>,
+            event?:GenericEvent
+        ):void => {
+            const start:InputProperties<null|number|string> =
+                startInputReference.current?.properties ||
+                startProperties as
+                    unknown as
+                    InputProperties<null|number|string>
+            start.value = start.model.value = formatDateTimeAsConfigured(
+                Math.min(
+                    normalizeDateTimeToNumber(
+                        startInputReference.current?.properties?.value, Infinity
+                    ),
+                    normalizeDateTimeToNumber(inputProperties.value, Infinity)
+                )
+            )
+            // NOTE: We need to reset internal temporary set boundaries.
+            start.maximum = start.model.maximum = startConfiguration.maximum
+            start.minimum = start.model.minimum = startConfiguration.minimum
+            inputProperties.maximum = inputProperties.model.maximum =
+                endConfiguration.maximum
+            inputProperties.minimum = inputProperties.model.minimum =
+                endConfiguration.minimum
+
+            triggerCallbackIfExists<Properties>(
+                properties as Properties,
+                'change',
+                controlled,
+                getExternalProperties(
+                    properties as Properties,
+                    iconProperties,
+                    start,
+                    inputProperties
+                ),
+                event || new Event('genericIntervalEndChange'),
                 properties
             )
         }
     }
 
-    endProperties.onChangeValue = (
+    startProperties.onChangeValue = (
         value:null|number|string, event?:GenericEvent
     ) => {
-        const startValue = Math.min(
+        const endValue = Math.max(
             normalizeDateTimeToNumber(
-                startInputReference.current?.properties?.value, Infinity
+                endInputReference.current?.properties?.value, -Infinity
             ),
-            normalizeDateTimeToNumber(value, Infinity)
+            normalizeDateTimeToNumber(value, -Infinity)
         )
         const newValue:Value = {
-            end: value, start: isFinite(startValue) ? startValue : value
+            end: isFinite(endValue) ? endValue : value, start: value
         }
 
         triggerCallbackIfExists<Properties>(
@@ -370,17 +398,17 @@ export const IntervalInner = function(
 
         setValue(newValue)
     }
-    startProperties.onChangeValue = (
+    endProperties.onChangeValue = (
         value:null|number|string, event?:GenericEvent
     ) => {
-        const endValue = Math.max(
+        const startValue = Math.min(
             normalizeDateTimeToNumber(
-                endInputReference.current?.properties?.value, -Infinity
+                startInputReference.current?.properties?.value, Infinity
             ),
-            normalizeDateTimeToNumber(value, -Infinity)
+            normalizeDateTimeToNumber(value, Infinity)
         )
         const newValue:Value = {
-            end: isFinite(endValue) ? endValue : value, start: value
+            end: value, start: isFinite(startValue) ? startValue : value
         }
 
         triggerCallbackIfExists<Properties>(

@@ -105,8 +105,8 @@ export interface CommonBaseModel<Type = unknown> {
 
     emptyEqualsNull:boolean
 
-    maximum:number
-    minimum:number
+    maximum:number|string
+    minimum:number|string
 
     maximumLength:number
     minimumLength:number
