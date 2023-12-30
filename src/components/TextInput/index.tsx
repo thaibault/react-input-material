@@ -342,7 +342,9 @@ export const TextInputInner = function<Type = unknown>(
     useEffect(
         () => {
             if (properties.triggerInitialPropertiesConsolidation)
-                onChange()
+                onChange(new Event(
+                    'genericInitialPropertiesConsolidation'
+                ) as unknown as GenericEvent)
         },
         []
     )
@@ -1167,7 +1169,7 @@ export const TextInputInner = function<Type = unknown>(
      *
      * @returns Nothing.
      */
-    const onChange = (event?:GenericEvent):void => {
+    const onChange = (event:GenericEvent):void => {
         Tools.extend(
             true,
             properties,
@@ -1190,7 +1192,7 @@ export const TextInputInner = function<Type = unknown>(
      *
      * @returns Nothing.
      */
-    const onChangeEditorIsActive = (event?:ReactMouseEvent):void => {
+    const onChangeEditorIsActive = (event:ReactMouseEvent):void => {
         if (event) {
             event.preventDefault()
             event.stopPropagation()
@@ -1261,7 +1263,7 @@ export const TextInputInner = function<Type = unknown>(
     ):void => {
         setIsSuggestionOpen(true)
 
-        let event:GenericEvent|undefined
+        let event:GenericEvent
         if (eventOrValue !== null && typeof eventOrValue === 'object') {
             const target:HTMLInputElement|null|undefined =
                 (eventOrValue as GenericEvent).target as HTMLInputElement ||

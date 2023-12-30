@@ -88,7 +88,7 @@ const getPrototype = function<T, P extends InputsPropertiesItem<T>>(
         triggerInitialPropertiesConsolidation:
             properties.triggerInitialPropertiesConsolidation,
         ...(properties.default && properties.default.length > 0 ?
-            properties.default[properties.default.length - 1] :
+            properties.default[0] :
             {}
         )
     } as Partial<P>
