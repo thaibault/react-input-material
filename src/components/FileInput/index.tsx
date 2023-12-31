@@ -287,7 +287,6 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                 return
         }
 
-
         setValueState((oldValueState:ValueState<Type>):ValueState<Type> => {
             if (typeof eventSourceOrName === 'undefined')
                 // NOTE: Mark file as deleted.
@@ -556,18 +555,17 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                             [properties.value.source],
                             properties.sourceToBlobOptions
                         )
-                } else if (
-                    !properties.value.url &&
-                    (properties.value.blob as Blob)?.type
-                )
+                } else if (!properties.value.url) {
+                    const type =
+                        (properties.value.blob as Blob)?.type || 'text/plain'
                     /*
                         Try to derive missing encoded base64 url from given
                         blob or plain source.
                     */
                     valueChanged.url =
-                        `data:${(properties.value.blob as Blob).type};` +
-                        `charset=${properties.encoding};base64,` +
+                        `data:${type};charset=${properties.encoding};base64,` +
                         await deriveBase64String(properties.value)
+                }
             } else if (
                 properties.value?.blob && properties.value.blob instanceof Blob
             )

@@ -55,9 +55,14 @@ export const IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
     'i'
 )
 export const TEXT_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
-    '^(?:application\\/(json|xml))|' +
-    '(?:text\\/(?:plain|x-ndpb[wy]html|(?:x-)?csv|' +
-    'x?html?|xml))$',
+    '^' +
+    '(?:application\\/(?:json|xml))|' +
+    '(?:text\\/(?:' + (
+        'plain|x-ndpb[wy]html|javascript|x?html?|xml|(?:(?:x-)?(?:' + (
+            'csv|python-script'
+        ) + '))'
+    ) + '))' +
+    '$',
     'i'
 )
 export const REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION =
