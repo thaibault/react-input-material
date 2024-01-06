@@ -109,7 +109,7 @@
     "material-components-web": "*",
     "material-icons": "*",
     "mini-css-extract-plugin": "*",
-    "postcss": "*",
+    "postcss": "8.4.32",
     "postcss-import": "*",
     "postcss-loader": "*",
     "postcss-nested": "*",
