@@ -110,7 +110,7 @@
     "material-icons": "*",
     "mini-css-extract-plugin": "*",
     "postcss": "*",
-    "postcss-import": "*",
+    "postcss-import": "15.1.*",
     "postcss-loader": "*",
     "postcss-nested": "*",
     "postcss-preset-env": "*",
