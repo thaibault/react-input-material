@@ -12,6 +12,13 @@ endregion */
 .text-input {
     display: block;
 
+    .mdc-text-field-helper-text {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 100%;
+        white-space: nowrap;
+    }
+
     &.text-input--custom {
         padding-top: 9px;
     }
