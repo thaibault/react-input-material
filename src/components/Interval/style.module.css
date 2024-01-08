@@ -22,7 +22,8 @@ endregion */
 
     .interval__end,
     .interval__start {
-        width: 100%;
+        /* NOTE: Icon in between has 24 px with and 2 border of 16 px. */
+        width: calc((100% - (24px + 32px)) / 2);
     }
 
     &.interval--disabled .interval__icon {

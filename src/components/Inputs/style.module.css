@@ -32,7 +32,8 @@ endregion */
         justify-content: space-between;
 
         .inputs__item__input {
-            width: 100%;
+            /* NOTE: Remove icon has 48 px with. */
+            width: calc(100% - 48px);
         }
 
         &.inputs__item--disabled .inputs__item__input {

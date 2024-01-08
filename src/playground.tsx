@@ -133,21 +133,21 @@ const Application = () => {
         useState<IntervalInputsType>({default: [
             {model: {value: {
                 start: {
-                    declaration: 'Start time',
+                    declaration: 'Please enter start time here.',
                     value: '1970-01-01T06:00:00.000Z'
                 },
                 end: {
-                    declaration: 'End time',
+                    declaration: 'Please enter end time here.',
                     value: '1970-01-01T10:30:00.000Z'
                 }
             }}},
             {model: {value: {
                 start: {
-                    declaration: 'Start time',
+                    declaration: 'Please enter start time here.',
                     value: '1970-01-01T11:00:00.000Z'
                 },
                 end: {
-                    declaration: 'End time',
+                    declaration: 'Please enter end time here.',
                     value: '1970-01-01T17:00:00.000Z'
                 }
             }}}
@@ -381,7 +381,11 @@ const Application = () => {
                     <hr/>
 
                     <TextInput<string>
-                        declaration="placeholder"
+                        declaration={
+                            'Very long declaration which should be dotted in' +
+                            'the end since it should fit into the available' +
+                            'space.'
+                        }
                         name="simpleInput4"
                         onChange={onChange}
                         placeholder="100.000,00"
@@ -1258,6 +1262,11 @@ const Application = () => {
                     />
                     <Interval
                         name="intervalControlled2"
+                        declaration={
+                            'Very long declaration which should be dotted in' +
+                            'the end since it should fit into the available' +
+                            'space.'
+                        }
                         default={120}
                         model={intervalModel}
                         onChange={onChangeIntervalModel}
