@@ -5368,9 +5368,9 @@ doctrine@^3.0.0:
     esutils "^2.0.2"
 
 documentation-website@*:
-  version "1.0.322"
-  resolved "https://registry.yarnpkg.com/documentation-website/-/documentation-website-1.0.322.tgz#6024c3351acf784c7b0707e812c644df2777f1d2"
-  integrity sha512-8GtUw7ayCxHN10cCegCnyq7fMGdOjKPvTjtUMzKBa+/tt40BXJHBOGhkPapWBwV6WFl9uQ7T/+9xvfF0NnEI9w==
+  version "1.0.323"
+  resolved "https://registry.yarnpkg.com/documentation-website/-/documentation-website-1.0.323.tgz#2a3f8738055ac77c9d41a7911a71f715a01dd3a1"
+  integrity sha512-6Jgd//tbwdeMWVQRVdQFJ7XEIqWrdFYFdPbOQgpzgs84Zja2S5fNFxbmnh1Dz00xTHy1tsRNa7RCpqyqbEDSZw==
 
 dom-converter@^0.2.0:
   version "0.2.0"
@@ -10238,9 +10238,9 @@ wbuf@^1.1.0, wbuf@^1.7.3:
     minimalistic-assert "^1.0.0"
 
 web-component-wrapper@*:
-  version "0.0.477"
-  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.477.tgz#cc6f888738253f274c6898450c99520c73eb9708"
-  integrity sha512-COWd70/2UoR5dvoeENO5LNsbe789CLRtew6L9SaE0DR+kSXFiD6wi/KcxV/lQOpDxl5f1+geABB6SIsI/trPKg==
+  version "0.0.478"
+  resolved "https://registry.yarnpkg.com/web-component-wrapper/-/web-component-wrapper-0.0.478.tgz#87c5d4d35088a6eb9c7d0d717709b0712a21e654"
+  integrity sha512-ePyzhg1yp2Ne9nHsZ9yS6c8aQW+2XLP442BR3rbP+IrskQX+6AjTsZqkxdnpxrVGrUOqEA55XQR4LnCD7IozeQ==
 
 webidl-conversions@^7.0.0:
   version "7.0.0"
