@@ -54,13 +54,13 @@ Tools.locales.push('de-DE')
 TextInput.transformer.currency.format!.final.options = {currency: 'EUR'}
 
 const SECTIONS = [
-    'file-input',
-
     'simple-input',
     'number-input',
     'text-input',
     'time-input',
     'selection-input',
+
+    'file-input',
 
     'inputs',
     'interval',
@@ -79,15 +79,6 @@ const Application = () => {
             setSelectedState(model)
         })
     // region controlled state
-    /// region file
-    const [fileInputValue, setFileInputValue] =
-        useState<FileValue|null|undefined>({
-            blob: new Blob(['test'], {type: 'text/plain'}),
-            name: 'test.txt'
-        })
-    const onChangeFileInputValue =
-        useMemorizedValue<(value?:FileValue|null) => void>(setFileInputValue)
-    /// endregion
     /// region text
     const [textInputValue, setTextInputValue] = useState<null|string>('')
     const onChangeTextInputValue =
@@ -103,6 +94,15 @@ const Application = () => {
     })
     const onChangeNumberValue =
         useMemorizedValue<(value:FloatValueState) => void>(setNumberValue)
+    /// endregion
+    /// region file
+    const [fileInputValue, setFileInputValue] =
+        useState<FileValue|null|undefined>({
+            blob: new Blob(['test'], {type: 'text/plain'}),
+            name: 'test.txt'
+        })
+    const onChangeFileInputValue =
+        useMemorizedValue<(value?:FileValue|null) => void>(setFileInputValue)
     /// endregion
     /// region selection
     type SelectionValueType = {
@@ -243,76 +243,6 @@ const Application = () => {
         {/* endregion */}
         <div className="playground">
             <div className="playground__inputs">
-                {/* region file */}
-                <div
-                    className="playground__inputs__file-input"
-                    style={{
-                        display: activeSection === 'file-input' ?
-                            'block' :
-                            'none'
-                    }}
-                >
-                    <FileInput name="fileInput1" onChange={onChange} />
-                    <FileInput<FileValue>
-                        default={useMemorizedValue({
-                            blob: {type: 'image/png'},
-                            url: 'https://via.placeholder.com/150'
-                        })}
-                        encoding="latin1"
-                        generateFileNameInputProperties={
-                            preserveStaticFileBaseNameInputGenerator
-                        }
-                        name="fileInputUnControlled"
-                        onChange={onChange}
-                    >
-                        {useMemorizedValue(({value}:FileInputChildrenOptions<
-                            FileInputProperties
-                        >):ReactNode =>
-                            value?.blob ?
-                                <ul>
-                                    <li>
-                                        Expected encoding for text based files:
-                                        latin1
-                                    </li>
-                                    {(value.blob as File).lastModified ?
-                                        <li>
-                                            Last modified date time:
-                                            {Tools.dateTimeFormat(
-                                                '${mediumDay}.${mediumMonth}.' +
-                                                '${fullYear}',
-                                                new Date(
-                                                    (value.blob as File)
-                                                        .lastModified
-                                                )
-                                            )}
-                                        </li> :
-                                        ''
-                                    }
-                                    {(value.blob as File).type ?
-                                        <li>
-                                            Mime-Typ:
-                                            {(value.blob as Blob).type}
-                                        </li> :
-                                        ''
-                                    }
-                                    {value.blob instanceof Blob ?
-                                        <li>Size: {value.blob.size}</li> :
-                                        ''
-                                    }
-                                </ul> :
-                                ''
-                        )}
-                    </FileInput>
-                    <FileInput
-                        name="fileInputControlled"
-                        onChange={onChange}
-                        onChangeValue={onChangeFileInputValue}
-                        triggerInitialPropertiesConsolidation={true}
-                        value={fileInputValue}
-                    />
-                </div>
-                {/* endregion */}
-
                 {/* region simple */}
                 <div
                     className="playground__inputs__simple-input"
@@ -1098,6 +1028,76 @@ const Application = () => {
                             {a: 'hans', b: 'peter', c: 'klaus'}
                         )}
                         value={selectionInput.value}
+                    />
+                </div>
+                {/* endregion */}
+
+                {/* region file */}
+                <div
+                    className="playground__inputs__file-input"
+                    style={{
+                        display: activeSection === 'file-input' ?
+                            'block' :
+                            'none'
+                    }}
+                >
+                    <FileInput name="fileInput1" onChange={onChange} />
+                    <FileInput<FileValue>
+                        default={useMemorizedValue({
+                            blob: {type: 'image/png'},
+                            url: 'https://via.placeholder.com/150'
+                        })}
+                        encoding="latin1"
+                        generateFileNameInputProperties={
+                            preserveStaticFileBaseNameInputGenerator
+                        }
+                        name="fileInputUnControlled"
+                        onChange={onChange}
+                    >
+                        {useMemorizedValue(({value}:FileInputChildrenOptions<
+                                FileInputProperties
+                            >):ReactNode =>
+                                value?.blob ?
+                                    <ul>
+                                        <li>
+                                            Expected encoding for text based files:
+                                            latin1
+                                        </li>
+                                        {(value.blob as File).lastModified ?
+                                            <li>
+                                                Last modified date time:
+                                                {Tools.dateTimeFormat(
+                                                    '${mediumDay}.${mediumMonth}.' +
+                                                    '${fullYear}',
+                                                    new Date(
+                                                        (value.blob as File)
+                                                            .lastModified
+                                                    )
+                                                )}
+                                            </li> :
+                                            ''
+                                        }
+                                        {(value.blob as File).type ?
+                                            <li>
+                                                Mime-Typ:
+                                                {(value.blob as Blob).type}
+                                            </li> :
+                                            ''
+                                        }
+                                        {value.blob instanceof Blob ?
+                                            <li>Size: {value.blob.size}</li> :
+                                            ''
+                                        }
+                                    </ul> :
+                                    ''
+                        )}
+                    </FileInput>
+                    <FileInput
+                        name="fileInputControlled"
+                        onChange={onChange}
+                        onChangeValue={onChangeFileInputValue}
+                        triggerInitialPropertiesConsolidation={true}
+                        value={fileInputValue}
                     />
                 </div>
                 {/* endregion */}

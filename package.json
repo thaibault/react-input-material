@@ -115,7 +115,7 @@
     "postcss-nested": "*",
     "postcss-preset-env": "*",
     "prop-types": "*",
-    "react": "",
+    "react": "*",
     "react-ace": "*",
     "react-dom": "*",
     "react-generic-animate": "*",
@@ -391,6 +391,32 @@
           "react-useanimations$": "react-generic-dummy",
           "react-useanimations/lib/lock$": "react-generic-dummy",
           "react-useanimations/lib/plusToX$": "react-generic-dummy"
+        }
+      }
+    },
+    "webpack": {
+      "snapshot": {
+        "unmanagedPaths": [
+          {
+            "__evaluate__":  "/^(.+?[\\/]node_modules[\\/])clientnode[\\/]/"
+          },
+          {
+            "__evaluate__":  "/^(.+?[\\/]node_modules[\\/])react-generic-animate[\\/]/"
+          },
+          {
+            "__evaluate__":  "/^(.+?[\\/]node_modules[\\/])react-generic-dummy[\\/]/"
+          },
+          {
+            "__evaluate__":  "/^(.+?[\\/]node_modules[\\/])react-generic-tools[\\/]/"
+          },
+          {
+            "__evaluate__":  "/^(.+?[\\/]node_modules[\\/])web-component-wrapper[\\/]/"
+          }
+        ]
+      },
+      "watchOptions": {
+        "ignored": {
+          "__remove__": "**/node_modules"
         }
       }
     }

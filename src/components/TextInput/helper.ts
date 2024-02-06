@@ -53,8 +53,10 @@ import cssClassNames from './style.module'
 // region constants
 declare const TARGET_TECHNOLOGY:string
 
-export const IS_BROWSER =
-    !(TARGET_TECHNOLOGY === 'node' || typeof window === 'undefined')
+export const IS_BROWSER = !(
+    typeof TARGET_TECHNOLOGY !== 'undefined' && TARGET_TECHNOLOGY === 'node' ||
+    typeof window === 'undefined'
+)
 /* eslint-disable @typescript-eslint/no-var-requires */
 export const GivenRichTextEditorComponent:typeof RichTextEditorComponent =
     IS_BROWSER && RichTextEditorComponent ?
