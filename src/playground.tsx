@@ -1055,41 +1055,41 @@ const Application = () => {
                         onChange={onChange}
                     >
                         {useMemorizedValue(({value}:FileInputChildrenOptions<
-                                FileInputProperties
-                            >):ReactNode =>
-                                value?.blob ?
-                                    <ul>
+                            FileInputProperties
+                        >):ReactNode =>
+                            value?.blob ?
+                                <ul>
+                                    <li>
+                                        Expected encoding for text based files:
+                                        latin1
+                                    </li>
+                                    {(value.blob as File).lastModified ?
                                         <li>
-                                            Expected encoding for text based files:
-                                            latin1
-                                        </li>
-                                        {(value.blob as File).lastModified ?
-                                            <li>
-                                                Last modified date time:
-                                                {Tools.dateTimeFormat(
-                                                    '${mediumDay}.${mediumMonth}.' +
-                                                    '${fullYear}',
-                                                    new Date(
-                                                        (value.blob as File)
-                                                            .lastModified
-                                                    )
-                                                )}
-                                            </li> :
-                                            ''
-                                        }
-                                        {(value.blob as File).type ?
-                                            <li>
-                                                Mime-Typ:
-                                                {(value.blob as Blob).type}
-                                            </li> :
-                                            ''
-                                        }
-                                        {value.blob instanceof Blob ?
-                                            <li>Size: {value.blob.size}</li> :
-                                            ''
-                                        }
-                                    </ul> :
-                                    ''
+                                            Last modified date time:
+                                            {Tools.dateTimeFormat(
+                                                '${mediumDay}.${mediumMonth}.' +
+                                                '${fullYear}',
+                                                new Date(
+                                                    (value.blob as File)
+                                                        .lastModified
+                                                )
+                                            )}
+                                        </li> :
+                                        ''
+                                    }
+                                    {(value.blob as File).type ?
+                                        <li>
+                                            Mime-Typ:
+                                            {(value.blob as Blob).type}
+                                        </li> :
+                                        ''
+                                    }
+                                    {value.blob instanceof Blob ?
+                                        <li>Size: {value.blob.size}</li> :
+                                        ''
+                                    }
+                                </ul> :
+                                ''
                         )}
                     </FileInput>
                     <FileInput
