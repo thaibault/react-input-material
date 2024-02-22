@@ -1033,6 +1033,11 @@ export interface FileInputProperties<
         endings?:'native'|'transparent'
         type?:string
     }
+
+    hashingConfiguration:{
+        prefix:string
+        readChunkSizeInByte:number
+    }
 }
 export type FileInputProps<Type extends FileValue = FileValue> =
     Partial<Omit<FileInputProperties<Type>, 'model'>> &
@@ -1206,7 +1211,9 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 
     model: {...defaultFileInputModel},
 
-    sourceToBlobOptions: {endings: 'transparent', type: 'text/plain'}
+    sourceToBlobOptions: {endings: 'transparent', type: 'text/plain'},
+
+    hashingConfiguration: {prefix: 'md5-', readChunkSizeInByte: 2097152}
 } as const
 //// endregion
 /// endregion

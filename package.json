@@ -92,6 +92,7 @@
     "@types/react": "*",
     "@types/react-dom": "*",
     "@types/react-transition-group": "*",
+    "@types/spark-md5": "*",
     "@types/webpack-env": "*",
     "@typescript-eslint/eslint-plugin": "*",
     "@typescript-eslint/parser": "*",
@@ -123,6 +124,7 @@
     "react-generic-tools": "*",
     "react-transition-group": "*",
     "react-useanimations": "*",
+    "spark-md5": "*",
     "style-loader": "*",
     "stylelint": "*",
     "stylelint-config-standard": "*",
@@ -148,6 +150,7 @@
     "@tinymce/tinymce-react": "*",
     "@types/react": "*",
     "@types/react-dom": "*",
+    "@types/spark-md5": "*",
     "blob-util": "*",
     "clientnode": "*",
     "material-components-web": "*",
@@ -155,6 +158,7 @@
     "react": "*",
     "react-ace": "*",
     "react-dom": "*",
+    "spark-md5": "*",
     "tslib": "*"
   },
   "peerDependenciesMeta": {
@@ -206,6 +210,9 @@
     "@types/react-transition-group": {
       "optional": true
     },
+    "@types/spark-md5": {
+      "optional": true
+    },
     "blob-util": {
       "optional": true
     },
@@ -231,6 +238,9 @@
       "optional": true
     },
     "react-useanimations": {
+      "optional": true
+    },
+    "spark-md5": {
       "optional": true
     },
     "tinymce": {

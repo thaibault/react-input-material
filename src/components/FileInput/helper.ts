@@ -211,13 +211,16 @@ export const determineValidationState = <
 export const deriveBase64String = <Type extends FileValue = FileValue>(
     value:Type
 ):Promise<string> =>
-        typeof Blob === 'undefined' ?
-            Promise.resolve(
-                (value.toString as unknown as (_encoding:string) => string)(
-                    'base64'
+        value.blob ?
+            blobToBase64String(value.blob as Blob) :
+            value.source ?
+                Promise.resolve(
+                    Buffer.from(value.source).toString('base64')
+                ) :
+                Promise.reject(
+                    new Error('Base 64 string could not be determined.')
                 )
-            ) :
-            blobToBase64String(value.blob as Blob)
+
 /**
  * Read text from given binary data with given encoding.
  * @param blob - Binary data object.

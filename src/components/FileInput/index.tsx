@@ -33,6 +33,7 @@ import {
     useRef,
     useState
 } from 'react'
+import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
 import {
     Card,
     CardActionButton,
@@ -566,26 +567,97 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                         `data:${type};charset=${properties.encoding};base64,` +
                         await deriveBase64String(properties.value)
                 }
-            } else if (
-                properties.value?.blob && properties.value.blob instanceof Blob
-            )
-                // Derive missing source from given blob.
-                valueChanged.source = await (
-                    representationType === 'text' ?
-                        readBinaryDataIntoText(
-                            properties.value.blob, properties.encoding
-                        ) :
-                        deriveBase64String(properties.value)
-                )
-            else if (properties.value?.url && representationType === 'text')
-                // Derive missing source from given data url.
-                valueChanged.source = await readBinaryDataIntoText(
-                    await (properties.value.url?.startsWith('data:') ?
+
+                if (!properties.value?.hash)
+                    valueChanged.hash =
+                        properties.hashingConfiguration.prefix +
+                        md5Hash(properties.value.source)
+            } else {
+                let blob:Blob|undefined
+                if (
+                    properties.value?.blob &&
+                    properties.value.blob instanceof Blob
+                ) {
+                    blob = properties.value?.blob
+                    // Derive missing source from given blob.
+                    valueChanged.source = await (
+                        representationType === 'text' ?
+                            readBinaryDataIntoText(blob, properties.encoding) :
+                            deriveBase64String(properties.value)
+                    )
+                } else if (
+                    properties.value?.url &&
+                    representationType === 'text'
+                ) {
+                    blob = await (properties.value.url?.startsWith('data:') ?
                         dataURLToBlob(properties.value.url) :
                         (await fetch(properties.value.url)).blob()
-                    ),
-                    properties.encoding
-                )
+                    )
+
+                    // Derive missing source from given data url.
+                    valueChanged.source = await readBinaryDataIntoText(
+                        blob, properties.encoding
+                    )
+                }
+
+                if (
+                    !properties.value?.hash &&
+                    (blob || properties.value?.url)
+                ) {
+                    if (!blob && properties.value?.url)
+                        blob = await (await fetch(properties.value.url)).blob()
+
+                    /*
+                        we have a blob but no hash so far. Therefore we read
+                        the file with reduced memory effort chunk by chunk
+                        having the configured size.
+                    */
+                    let currentChunk = 0
+                    const chunkSize =
+                        properties.hashingConfiguration.readChunkSizeInByte
+                    const chunks = Math.ceil(blob!.size / chunkSize)
+                    const buffer = new MD5ArrayBuffer()
+                    const fileReader = new FileReader()
+
+                    const hash = await new Promise<string>((
+                        resolve, reject
+                    ) => {
+                        fileReader.onload = (e) => {
+                            console.debug(
+                                `Read chunk ${currentChunk + 1} of ${chunks}.`
+                            )
+
+                            buffer.append(e.target!.result as ArrayBuffer)
+                            currentChunk++
+
+                            if (currentChunk < chunks)
+                                loadNext()
+                            else
+                                resolve(buffer.end())
+                        }
+
+                        fileReader.onerror = (error) => {
+                            reject(error)
+                        }
+
+                        const loadNext = () => {
+                            const start = currentChunk * chunkSize
+                            const end = ((start + chunkSize) >= blob!.size) ?
+                                blob!.size :
+                                start + chunkSize
+
+                            fileReader.readAsArrayBuffer(
+                                blob!.slice(start, end)
+                            )
+                        }
+
+                        loadNext()
+                    })
+
+                    valueChanged.hash =
+                        properties.hashingConfiguration.prefix + hash
+                }
+            }
 
             if (Object.keys(valueChanged).length > 0)
                 onChangeValue(valueChanged, undefined, undefined, true)
