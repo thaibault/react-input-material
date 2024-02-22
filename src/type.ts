@@ -1035,9 +1035,9 @@ export interface FileInputProperties<
     }
 
     hashingConfiguration:{
-        binaryString:boolean
-        prefix:string
-        readChunkSizeInByte:number
+        binaryString?:boolean
+        prefix?:string
+        readChunkSizeInByte?:number
     }
 }
 export type FileInputProps<Type extends FileValue = FileValue> =
