@@ -1035,6 +1035,7 @@ export interface FileInputProperties<
     }
 
     hashingConfiguration:{
+        binaryString:boolean
         prefix:string
         readChunkSizeInByte:number
     }
@@ -1213,7 +1214,11 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 
     sourceToBlobOptions: {endings: 'transparent', type: 'text/plain'},
 
-    hashingConfiguration: {prefix: 'md5-', readChunkSizeInByte: 2097152}
+    hashingConfiguration: {
+        binaryString: false,
+        prefix: 'md5-',
+        readChunkSizeInByte: 2097152
+    }
 } as const
 //// endregion
 /// endregion

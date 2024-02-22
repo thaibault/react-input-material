@@ -633,7 +633,11 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                             if (currentChunk < chunks)
                                 loadNext()
                             else
-                                resolve(buffer.end())
+                                resolve(buffer.end(
+                                    properties
+                                        .hashingConfiguration
+                                        .binaryString
+                                ))
                         }
 
                         fileReader.onerror = (error) => {
