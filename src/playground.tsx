@@ -1088,6 +1088,10 @@ const Application = () => {
                                         <li>Size: {value.blob.size}</li> :
                                         ''
                                     }
+                                    {value.hash ?
+                                        <li>MD5-Hash: {value.hash}</li> :
+                                        ''
+                                    }
                                 </ul> :
                                 ''
                         )}
