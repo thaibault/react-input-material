@@ -1216,7 +1216,7 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 
     hashingConfiguration: {
         binaryString: false,
-        prefix: 'md5-',
+        prefix: '',
         readChunkSizeInByte: 2097152
     }
 } as const
