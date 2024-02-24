@@ -1217,7 +1217,7 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
     hashingConfiguration: {
         binaryString: false,
         prefix: '',
-        readChunkSizeInByte: 2097152
+        readChunkSizeInByte: 2097152 // MiB
     }
 } as const
 //// endregion
