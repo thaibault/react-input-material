@@ -28,7 +28,7 @@ import {
     MutableRefObject,
     ReactElement,
     SyntheticEvent,
-    useEffect,
+    useEffect, useId,
     useImperativeHandle,
     useRef,
     useState
@@ -53,6 +53,7 @@ import {
     determineInitialValue,
     getConsolidatedProperties as getBaseConsolidatedProperties,
     mapPropertiesIntoModel,
+    renderMessage,
     translateKnownSymbols,
     triggerCallbackIfExists,
     wrapStateSetter
@@ -75,7 +76,7 @@ import {
     FileRepresentationType as RepresentationType,
     FileInputComponent,
     FileInputModel,
-    DefaultFileInputProperties
+    DefaultFileInputProperties, FileInputProperties
 } from '../../type'
 
 export {
@@ -93,6 +94,7 @@ import {
     deriveBase64String,
     readBinaryDataIntoText
 } from './helper'
+import GenericAnimate from 'react-generic-animate'
 
 export * from './helper'
 // endregion
@@ -126,6 +128,8 @@ export * from './helper'
 export const FileInputInner = function<Type extends FileValue = FileValue>(
     props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
 ):ReactElement {
+    const defaultID = useId()
+    const id = props.id ?? defaultID
     // region property aggregation
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -764,7 +768,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                         <CircularProgress size="large" /> :
                         ''
                 }
-                <div>
+                <div className={CSS_CLASS_NAMES['file-input__info']}>
                     <Typography tag="h2" use="headline6">
                         {invalid ?
                             <Theme use="error">{
@@ -777,22 +781,50 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                 properties.name
                         }
                     </Typography>
-                    {properties.declaration ?
-                        <Typography
-                            style={{marginTop: '-1rem'}}
-                            tag="h3"
-                            theme="textSecondaryOnBackground"
-                            use="subtitle2"
-                        >
-                            {invalid ?
-                                <Theme use="error">
-                                    {properties.declaration}
-                                </Theme> :
-                                properties.declaration
+                    <GenericAnimate
+                        in={invalid || Boolean(properties.declaration)}
+                    >
+                        <div className={
+                            CSS_CLASS_NAMES['file-input__info__body']
+                        }>
+                            {properties.declaration ?
+                                <Typography
+                                    style={{marginTop: '-1rem'}}
+                                    tag="h3"
+                                    theme="textSecondaryOnBackground"
+                                    use="subtitle2"
+                                >
+                                    {invalid ?
+                                        <Theme use="error">
+                                            {properties.declaration}
+                                        </Theme> :
+                                        properties.declaration
+                                    }
+                                </Typography> :
+                                ''
                             }
-                        </Typography> :
-                        ''
-                    }
+                            <Theme use="error" wrap={true}>
+                                <span id={`${id}-error-message`}>
+                                    {renderMessage<FileInputProperties<Type>>(
+                                        properties.invalidContentTypePattern &&
+                                        properties.contentTypePatternText ||
+                                        properties[
+                                            'invalidInvertedContentTypePattern'
+                                        ] &&
+                                        properties.invalidMaximumSize &&
+                                        properties.maximumSizeText ||
+                                        properties.invalidMinimumSize &&
+                                        properties.minimumSizeText ||
+                                        properties
+                                            .invertedContentTypePatternText ||
+                                        properties.invalidRequired &&
+                                        properties.requiredText,
+                                        properties
+                                    )}
+                                </span>
+                            </Theme>
+                        </div>
+                    </GenericAnimate>
                     {properties.value ?
                         <TextInput
                             ref={nameInputReference}
@@ -828,11 +860,16 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                 {/* TODO use "accept" attribute for better validation. */}
                 <input
                     disabled={properties.disabled}
+
                     className={CSS_CLASS_NAMES['file-input__native']}
-                    id={properties.id || properties.name}
+                    id={id}
+
                     name={properties.name}
+
                     onChange={onChangeValue}
+
                     ref={fileInputReference}
+
                     type="file"
                 />
             </CardPrimaryAction>

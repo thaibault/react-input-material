@@ -19,7 +19,9 @@
 // region imports
 import Tools from 'clientnode'
 import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
-import {FirstParameter, Mapping, ValueOf} from 'clientnode/type'
+import {
+    EvaluationResult, FirstParameter, Mapping, ValueOf
+} from 'clientnode/type'
 import {ReactNode, useState} from 'react'
 
 import {
@@ -31,7 +33,6 @@ import {
     DefaultInputProperties,
     FormatSpecifications,
     InputDataTransformation,
-    InputProperties,
     InputSelection,
     ModelState,
     NormalizedSelection,
@@ -158,6 +159,35 @@ export const wrapStateSetter = <Type = unknown>(
                 setValueState(result)
         }
 // endregion
+/**
+ * Renders given template string against all properties in current
+ * instance.
+ * @param template - Template to render.
+ * @param scope - Scope to render given template again.
+ *
+ * @returns Evaluated template or an empty string if something goes wrong.
+ */
+export const renderMessage = <Scope extends object = object>(
+    template:unknown, scope:Scope
+):string => {
+    if (typeof template !== 'string')
+        return ''
+
+    const evaluated:EvaluationResult = Tools.stringEvaluate<string, Scope>(
+        `\`${template}\``, scope
+    )
+
+    if (evaluated.error) {
+        console.warn(
+            'Given message template could not be proceed:',
+            evaluated.error
+        )
+
+        return ''
+    }
+
+    return evaluated.result
+}
 /**
  * Triggered when a value state changes like validation or focusing.
  * @param properties - Properties to search in.
@@ -383,12 +413,12 @@ export const mapPropertiesIntoModel = <
         delete result.disabled
     }
     if ((result as unknown as DefaultInputProperties).invertedPattern) {
-        result.model.invertedRegularExpressionPattern =
+        result.model.invertedPattern =
             (result as unknown as DefaultInputProperties).invertedPattern!
         delete (result as unknown as DefaultInputProperties).invertedPattern
     }
     if ((result as unknown as DefaultInputProperties).pattern) {
-        result.model.regularExpressionPattern =
+        result.model.pattern =
             (result as unknown as DefaultInputProperties).pattern!
         delete (result as unknown as DefaultInputProperties).pattern
     }
@@ -447,19 +477,6 @@ export const getConsolidatedProperties = <
 
     result.required = !result.nullable
     delete result.nullable
-
-    if (result.invertedRegularExpressionPattern)
-        (result as unknown as InputProperties).invertedPattern =
-            result.invertedRegularExpressionPattern
-    // NOTE: Workaround since optional type configuration above is ignored.
-    delete (result as {invertedRegularExpressionPattern?:RegExp|string})
-        .invertedRegularExpressionPattern
-    if (result.regularExpressionPattern)
-        (result as unknown as InputProperties).pattern =
-            result.regularExpressionPattern
-    // NOTE: Workaround since optional type configuration above is ignored.
-    delete (result as {regularExpressionPattern?:RegExp|string})
-        .regularExpressionPattern
     // endregion
     return result
 }

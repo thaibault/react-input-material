@@ -21,6 +21,14 @@ endregion */
         margin-left: 10px;
     }
 
+    .file-input__info {
+        padding: 0;
+
+        .file-input__info__body {
+            padding: 0 1rem 1rem;
+        }
+    }
+
     .file-input__download {
         text-decoration: none;
     }

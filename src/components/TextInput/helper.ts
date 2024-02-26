@@ -200,9 +200,9 @@ export function determineValidationState<T>(
 
             invalidInvertedPattern: ():boolean => (
                 typeof properties.model.value === 'string' &&
-                Boolean(properties.model.invertedRegularExpressionPattern) &&
+                Boolean(properties.model.invertedPattern) &&
                 ([] as Array<RegExp|string>)
-                    .concat(properties.model.invertedRegularExpressionPattern!)
+                    .concat(properties.model.invertedPattern!)
                     .some((expression:RegExp|string):boolean =>
                         (new RegExp(expression)).test(
                             properties.model.value as unknown as string
@@ -211,9 +211,9 @@ export function determineValidationState<T>(
             ),
             invalidPattern: ():boolean => (
                 typeof properties.model.value === 'string' &&
-                Boolean(properties.model.regularExpressionPattern) &&
+                Boolean(properties.model.pattern) &&
                 ([] as Array<RegExp|string>)
-                    .concat(properties.model.regularExpressionPattern!)
+                    .concat(properties.model.pattern!)
                     .some((expression:RegExp|string):boolean =>
                         !(new RegExp(expression)).test(
                             properties.model.value as unknown as string
