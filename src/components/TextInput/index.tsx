@@ -19,7 +19,7 @@
 // region imports
 import {Ace as CodeEditorNamespace} from 'ace-builds'
 import Tools from 'clientnode'
-import {EvaluationResult, Mapping} from 'clientnode/type'
+import {Mapping} from 'clientnode/type'
 
 import {
     FocusEvent as ReactFocusEvent,
@@ -82,6 +82,7 @@ import {
     mapPropertiesIntoModel,
     normalizeSelection,
     parseValue,
+    renderMessage,
     translateKnownSymbols,
     triggerCallbackIfExists,
     wrapStateSetter
@@ -161,8 +162,9 @@ let RICH_TEXT_EDITOR_LOADER_ONCE = false
 export const TextInputInner = function<Type = unknown>(
     props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
 ):ReactElement {
-    const id = useId()
 /* eslint-enable jsdoc/require-description-complete-sentence */
+    const defaultID = useId()
+    const id = props.id ?? defaultID
     // region live-cycle
     /// region text-editor selection synchronisation
     /**
@@ -558,44 +560,19 @@ export const TextInputInner = function<Type = unknown>(
                         properties.invalidPattern &&
                         properties.patternText ||
                         properties.invalidRequired &&
-                        properties.requiredText
+                        properties.requiredText,
+                        {
+                            formatValue: (value:Type):string =>
+                                formatValue<Type>(
+                                    properties, value, transformer
+                                ),
+                            ...properties
+                        }
                     )}
                 </span>
             </Theme>
         </GenericAnimate>
     </>
-    /**
-     * Renders given template string against all properties in current
-     * instance.
-     * @param template - Template to render.
-     *
-     * @returns Evaluated template or an empty string if something goes wrong.
-     */
-    const renderMessage = (template?:unknown):string => {
-        if (typeof template === 'string') {
-            const evaluated:EvaluationResult = Tools.stringEvaluate(
-                `\`${template}\``,
-                {
-                    formatValue: (value:Type):string =>
-                        formatValue<Type>(properties, value, transformer),
-                    ...properties
-                }
-            )
-
-            if (evaluated.error) {
-                console.warn(
-                    'Given message template could not be proceed:',
-                    evaluated.error
-                )
-
-                return ''
-            }
-
-            return evaluated.result
-        }
-
-        return ''
-    }
     /**
      * Wraps given component with animation component if given condition holds.
      * @param content - Component or string to wrap.

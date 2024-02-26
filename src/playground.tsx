@@ -353,7 +353,7 @@ const Application = () => {
                         model={useMemorizedValue({
                             declaration: 'pattern',
                             description: 'simpleInput5ModelDescription',
-                            regularExpressionPattern: ['.*a+.*', /.*b+(.*)/]
+                            pattern: ['.*a+.*', /.*b+(.*)/]
                         })}
                         name="simpleInput5Model"
                         onChange={onChange}
@@ -380,7 +380,7 @@ const Application = () => {
                         model={useMemorizedValue({
                             declaration: 'password',
                             description: 'simpleInput6ModelDescription',
-                            regularExpressionPattern: 'a+'
+                            pattern: 'a+'
                         })}
                         name="simpleInput6Model"
                         onChange={onChange}
@@ -1047,11 +1047,20 @@ const Application = () => {
                             blob: {type: 'image/png'},
                             url: 'https://via.placeholder.com/150'
                         })}
+
+                        contentTypePattern="(?:text/(?:plain|(?:x-)?csv|xml))"
+                        model={{fileName: {
+                            pattern: '^[a-zA-Z0-9]\\.(?:csv|txt|xml)$'
+                        }}}
+
                         encoding="latin1"
+
                         generateFileNameInputProperties={
                             preserveStaticFileBaseNameInputGenerator
                         }
+
                         name="fileInputUnControlled"
+
                         onChange={onChange}
                     >
                         {useMemorizedValue(({value}:FileInputChildrenOptions<

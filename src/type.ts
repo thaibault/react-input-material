@@ -135,8 +135,8 @@ export interface ModelState {
 }
 export type Pattern = Array<RegExp|string>|RegExp|string
 export interface BaseModel<T = unknown> extends CommonBaseModel<T> {
-    regularExpressionPattern?:Pattern
-    invertedRegularExpressionPattern?:Pattern
+    pattern?:Pattern
+    invertedPattern?:Pattern
 
     mutable:boolean
     writable:boolean
@@ -345,9 +345,9 @@ export const modelPropertyTypes:ValidationMapping = {
     emptyEqualsNull: boolean,
     trim: boolean,
 
-    invertedRegularExpressionPattern:
+    invertedPattern:
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
-    regularExpressionPattern:
+    pattern:
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
 
     maximum: oneOfType([number, string]),
@@ -427,8 +427,8 @@ export const defaultModel:BaseModel<string> = {
 
     emptyEqualsNull: true,
 
-    regularExpressionPattern: undefined,
-    invertedRegularExpressionPattern: undefined,
+    pattern: undefined,
+    invertedPattern: undefined,
 
     maximum: Infinity,
     minimum: -Infinity,
@@ -921,31 +921,40 @@ export const defaultInputModel:InputModel<string> = {
 */
 export const defaultInputProperties:DefaultInputProperties = {
     ...defaultProperties as DefaultInputProperties,
+
     cursor: {
         end: 0,
         start: 0
     },
+
     editor: 'plain',
+    selectableEditor: false,
+    rows: 4,
+
     invertedPatternText:
         'Your string should not match the regular expression' +
         '${[].concat(invertedPattern).length > 1 ? "s" : ""}: ' +
         '"${[].concat(invertedPattern).join("\\", \\"")}".',
+
     maximumLengthText:
         'Please type less or equal than ${maximumLength} symbols.',
-    maximumText: 'Please type less or equal than ${formatValue(maximum)}.',
     minimumLengthText:
         'Please type at least or equal ${minimumLength} symbols.',
+
+    maximumText: 'Please type less or equal than ${formatValue(maximum)}.',
     minimumText: 'Please type at least or equal ${formatValue(minimum)}.',
+
     model: {...defaultInputModel},
+
     patternText:
         'Your string have to match the regular expression' +
         '${[].concat(pattern).length > 1 ? "s" : ""}: ' +
         '"${[].concat(pattern).join("\\", \\"")}".',
-    rows: 4,
+
     searchSelection: false,
-    selectableEditor: false,
-    step: 1,
-    suggestSelection: false
+    suggestSelection: false,
+
+    step: 1
 } as const
 //// endregion
 /// endregion
@@ -971,14 +980,15 @@ export interface FileInputModelState extends ModelState {
     invalidMinimumSize:boolean
 
     invalidContentTypePattern:boolean
+    invalidInvertedContentTypePattern:boolean
 
     invalidName:boolean
 }
 export interface FileInputModel<
     Type extends FileValue = FileValue
 > extends BaseModel<null|Type> {
-    contentTypeRegularExpressionPattern?:Pattern
-    invertedContentTypeRegularExpressionPattern?:Pattern
+    contentTypePattern?:Pattern
+    invertedContentTypePattern?:Pattern
 
     maximumSize:number
     minimumSize:number
@@ -1097,6 +1107,7 @@ export const fileInputModelStatePropertyTypes:{
     ...modelStatePropertyTypes,
 
     invalidContentTypePattern: oneOfType([boolean, symbol]),
+    invalidInvertedContentTypePattern: oneOfType([boolean, symbol]),
 
     invalidMaximumSize: oneOfType([boolean, symbol]),
     invalidMinimumSize: oneOfType([boolean, symbol]),
@@ -1113,6 +1124,8 @@ export const fileInputPropertyTypes:PropertiesValidationMap = {
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
     invertedContentTypePatternText:
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
+    maximumSizeText: string,
+    minimumSizeText: string,
 
     deleteButton: oneOfType([object, string]),
     downloadButton: oneOfType([object, string]),
@@ -1123,9 +1136,6 @@ export const fileInputPropertyTypes:PropertiesValidationMap = {
 
     generateFileNameInputProperties: func,
 
-    maximumSizeText: string,
-    minimumSizeText: string,
-
     onBlur: func,
 
     outlined: boolean
@@ -1133,6 +1143,7 @@ export const fileInputPropertyTypes:PropertiesValidationMap = {
 export const defaultFileInputModelState:FileInputModelState = {
     ...defaultModelState,
     invalidContentTypePattern: false,
+    invalidInvertedContentTypePattern: false,
 
     invalidMaximumSize: false,
     invalidMinimumSize: false,
@@ -1142,14 +1153,14 @@ export const defaultFileInputModelState:FileInputModelState = {
 export const defaultFileInputModel:FileInputModel = {
     ...defaultModel as BaseModel<FileValue>,
 
-    contentTypeRegularExpressionPattern: /^.+\/.+$/,
-    invertedContentTypeRegularExpressionPattern: undefined,
+    contentTypePattern: /^.+\/.+$/,
+    invertedContentTypePattern: undefined,
 
     fileName: {
         ...defaultInputModel,
         maximumLength: 1024,
         name: 'Name',
-        regularExpressionPattern: /^[^/]+$/
+        pattern: /^[^/]+$/
     },
 
     maximumSize: Infinity,
@@ -1168,11 +1179,11 @@ export const defaultFileNameInputProperties:InputProps<string> = {
 
     invertedPatternText:
         'Your file\'s name should not match the regular expression' +
-        '${[].concat(invertedPattern).length > 1 ? "s" : ""}: "' +
+        '${[].concat(invertedPattern).length > 1 ? "s" : ""}: ' +
         '"${[].concat(invertedPattern).join("\\", \\"")}".',
     patternText:
         'Your file\'s name has to match the regular expression' +
-        '${[].concat(pattern).length > 1 ? "s" : ""}: "' +
+        '${[].concat(pattern).length > 1 ? "s" : ""}: ' +
         '"${[].concat(pattern).join("\\", \\"")}".',
 
     required: true
@@ -1183,12 +1194,18 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 
     contentTypePatternText:
         'Your file\'s mime-type has to match the regular expression' +
-        '${[].concat(contentTypePattern).length > 1 ? "s" : ""}: "' +
+        '${[].concat(contentTypePattern).length > 1 ? "s" : ""}: ' +
         '"${[].concat(contentTypePattern).join("\\", \\"")}".',
     invertedContentTypePatternText:
         'Your file\'s mime-type should not match the regular expression' +
-        '${[].concat(invertedContentTypePattern).length > 1 ? "s" : ""}: "' +
+        '${[].concat(invertedContentTypePattern).length > 1 ? "s" : ""}: ' +
         '"${[].concat(invertedContentTypePattern).join("\\", \\"")}".',
+    maximumSizeText:
+        'Please provide a file with less or equal size than ${maximumSize} ' +
+        'byte.',
+    minimumSizeText:
+        'Please provide a file with more or equal size than ${maximumSize} ' +
+        'byte.',
 
     deleteButton: 'delete',
     downloadButton: 'download',
@@ -1198,13 +1215,6 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
     encoding: 'utf-8',
 
     generateFileNameInputProperties: Tools.identity,
-
-    maximumSizeText:
-        'Please provide a file with less or equal size than ${maximumSize} ' +
-        'byte.',
-    minimumSizeText:
-        'Please provide a file with more or equal size than ${maximumSize} ' +
-        'byte.',
 
     media: {
         sixteenByNine: true
