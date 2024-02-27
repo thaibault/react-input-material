@@ -808,17 +808,22 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                     {renderMessage<FileInputProperties<Type>>(
                                         properties.invalidContentTypePattern &&
                                         properties.contentTypePatternText ||
+
                                         properties[
                                             'invalidInvertedContentTypePattern'
                                         ] &&
-                                        properties.invalidMaximumSize &&
-                                        properties.maximumSizeText ||
-                                        properties.invalidMinimumSize &&
-                                        properties.minimumSizeText ||
                                         properties
                                             .invertedContentTypePatternText ||
+
+                                        properties.invalidMaximumSize &&
+                                        properties.maximumSizeText ||
+
+                                        properties.invalidMinimumSize &&
+                                        properties.minimumSizeText ||
+
                                         properties.invalidRequired &&
                                         properties.requiredText,
+
                                         properties
                                     )}
                                 </span>
