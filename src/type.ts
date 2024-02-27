@@ -1110,13 +1110,14 @@ export const dedicatedFileInputPropertyTypes:ValidationMapping = {
     maximumSize: number,
     minimumSize: number
 } as const
-export const fileInputModelPropertyTypes:ValidationMapping = {
+export const fileInputModelPropertyTypes:PropertiesValidationMap = {
     ...modelPropertyTypes,
     ...dedicatedFileInputPropertyTypes,
 
-    fileName: inputPropertyTypes
+    fileName: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
+        inputPropertyTypes
+    )
 } as const
-
 export const fileInputModelStatePropertyTypes:{
     [key in keyof FileInputModelState]:Requireable<boolean|symbol>
 } = {
