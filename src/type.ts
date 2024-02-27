@@ -1228,6 +1228,8 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
     minimumSizeText:
         'Please provide a file with more or equal size than ${maximumSize} ' +
         'byte.',
+    requiredText: 'Please select a file.',
+
 
     deleteButton: 'delete',
     downloadButton: 'download',
