@@ -1101,6 +1101,22 @@ export interface FileInputComponent<Type> extends
     ):ReactElement
 }
 //// region constants
+export const dedicatedFileInputPropertyTypes:ValidationMapping = {
+    contentTypePattern:
+        oneOfType([arrayOf(oneOfType([object, string])), object, string]),
+    invertedContentTypePattern:
+        oneOfType([arrayOf(oneOfType([object, string])), object, string]),
+
+    maximumSize: number,
+    minimumSize: number
+} as const
+export const fileInputModelPropertyTypes:ValidationMapping = {
+    ...modelPropertyTypes,
+    ...dedicatedFileInputPropertyTypes,
+
+    fileName: inputPropertyTypes
+} as const
+
 export const fileInputModelStatePropertyTypes:{
     [key in keyof FileInputModelState]:Requireable<boolean|symbol>
 } = {
@@ -1116,6 +1132,7 @@ export const fileInputModelStatePropertyTypes:{
 } as const
 export const fileInputPropertyTypes:PropertiesValidationMap = {
     ...propertyTypes,
+    ...dedicatedFileInputPropertyTypes,
     ...fileInputModelStatePropertyTypes,
 
     children: func,
@@ -1126,6 +1143,10 @@ export const fileInputPropertyTypes:PropertiesValidationMap = {
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
     maximumSizeText: string,
     minimumSizeText: string,
+
+    model: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
+        fileInputModelPropertyTypes
+    ),
 
     deleteButton: oneOfType([object, string]),
     downloadButton: oneOfType([object, string]),

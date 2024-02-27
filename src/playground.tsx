@@ -1048,7 +1048,7 @@ const Application = () => {
                             url: 'https://via.placeholder.com/150'
                         })}
 
-                        contentTypePattern="(?:text/(?:plain|(?:x-)?csv|xml))"
+                        contentTypePattern="^text/(?:plain|(?:x-)?csv|xml)$"
                         model={{fileName: {
                             pattern: '^[a-zA-Z0-9]\\.(?:csv|txt|xml)$'
                         }}}
