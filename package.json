@@ -58,7 +58,7 @@
     "test:browser": "yarn clear && weboptimizer test:browser '{__reference__: \"target:minimal\"}'",
     "test:coverage": "yarn clear && weboptimizer test:coverage",
     "test:coverage:report": "yarn clear && weboptimizer test:coverage:report '{__reference__: \"target:minimal\"}'",
-    "update": "yarn version patch && git push --tags",
+    "update": "yarn version patch && yarn npm publish",
     "update:documentation": "documentation-website",
     "watch": "weboptimizer build --watch"
   },
