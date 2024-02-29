@@ -1230,7 +1230,6 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
         'byte.',
     requiredText: 'Please select a file.',
 
-
     deleteButton: 'delete',
     downloadButton: 'download',
     editButton: 'edit',

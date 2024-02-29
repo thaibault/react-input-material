@@ -73,6 +73,7 @@ import {
     fileInputRenderProperties as renderProperties,
     InputAdapter,
     InputProperties,
+    InputProps,
     FileRepresentationType as RepresentationType,
     FileInputComponent,
     FileInputModel,
@@ -838,7 +839,14 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                     disabled: properties.disabled,
                                     value: properties.value?.name,
 
-                                    ...defaultFileNameInputProperties,
+                                    ...Tools.mask(
+                                        defaultFileNameInputProperties,
+                                        {
+                                            exclude: Object.keys(
+                                                properties.model.fileName
+                                            )
+                                        }
+                                    ) as InputProps<string>,
 
                                     default: properties.value.name,
                                     model: properties.model.fileName,
