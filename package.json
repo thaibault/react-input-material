@@ -22,8 +22,8 @@
     "url": "https://torben.website"
   },
   "files": [
-    "dist/components/WrapConfiguration.d.ts",
-    "dist/components/WrapConfiguration.js",
+    "dist/components/WrapConfigurations.d.ts",
+    "dist/components/WrapConfigurations.js",
     "dist/components/WrapStrict.d.ts",
     "dist/components/WrapStrict.js",
     "dist/components/WrapThemeProvicer.d.ts",
