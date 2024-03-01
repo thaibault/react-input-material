@@ -12249,7 +12249,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.4.35, postcss@npm:^8.0.0, postcss@npm:^8.4.33, postcss@npm:^8.4.35":
+"postcss@npm:8.4.32":
+  version: 8.4.32
+  resolution: "postcss@npm:8.4.32"
+  dependencies:
+    nanoid: "npm:^3.3.7"
+    picocolors: "npm:^1.0.0"
+    source-map-js: "npm:^1.0.2"
+  checksum: 10c0/39308a9195fa34d4dbdd7b58a896cff0c7809f84f7a4ac1b95b68ca86c9138a395addff33075668ed3983d41b90aac05754c445237a9365eb1c3a5602ebd03ad
+  languageName: node
+  linkType: hard
+
+"postcss@npm:^8.0.0, postcss@npm:^8.4.33, postcss@npm:^8.4.35":
   version: 8.4.35
   resolution: "postcss@npm:8.4.35"
   dependencies:
@@ -12624,7 +12635,7 @@ __metadata:
     material-components-web: "npm:^14.0.0"
     material-icons: "npm:^1.13.12"
     mini-css-extract-plugin: "npm:^2.8.1"
-    postcss: "npm:8.4.35"
+    postcss: "npm:8.4.32"
     postcss-import: "npm:^16.0.1"
     postcss-loader: "npm:^8.1.1"
     postcss-nested: "npm:^6.0.1"
