@@ -80,14 +80,6 @@ import {
     DefaultFileInputProperties, FileInputProperties
 } from '../../type'
 
-export {
-    IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION,
-    TEXT_CONTENT_TYPE_REGULAR_EXPRESSION,
-    REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION,
-    VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION,
-
-    preserveStaticFileBaseNameInputGenerator
-} from './helper'
 import {
     CSS_CLASS_NAMES,
     determineRepresentationType,
@@ -97,7 +89,20 @@ import {
 } from './helper'
 import GenericAnimate from 'react-generic-animate'
 
-export * from './helper'
+export {
+    CSS_CLASS_NAMES,
+
+    IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION,
+    TEXT_CONTENT_TYPE_REGULAR_EXPRESSION,
+    REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION,
+    VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION,
+
+    determineRepresentationType,
+    determineValidationState,
+    deriveBase64String,
+    readBinaryDataIntoText,
+    preserveStaticFileBaseNameInputGenerator
+} from './helper'
 // endregion
 /* eslint-disable jsdoc/require-description-complete-sentence */
 /**
