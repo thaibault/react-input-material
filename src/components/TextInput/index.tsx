@@ -129,7 +129,21 @@ import TRANSFORMER from './transformer'
 import {IconButtonOnChangeEventT} from '@rmwc/icon-button/lib/icon-button'
 import {ListApi} from '@rmwc/list/lib/list'
 
-export * from './helper'
+export {
+    ACE_BASE_PATH,
+    ACE_EDITOR_OPTIONS,
+
+    CodeEditor,
+
+    CSS_CLASS_NAMES,
+
+    determineValidationState,
+    preventEnterKeyPropagation,
+    suggestionMatches,
+
+    TINYMCE_BASE_PATH,
+    TINYMCE_DEFAULT_OPTIONS
+} from './helper'
 export const INPUT_TRANSFORMER = TRANSFORMER
 // endregion
 

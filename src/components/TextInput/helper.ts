@@ -101,13 +101,13 @@ declare const UTC_BUILD_TIMESTAMP:number|undefined
 // NOTE: Could be set via module bundler environment variables.
 export const CURRENT_UTC_BUILD_TIMESTAMP =
     typeof UTC_BUILD_TIMESTAMP === 'undefined' ? 1 : UTC_BUILD_TIMESTAMP
-export const tinymceBasePath = '/tinymce/'
+export const TINYMCE_BASE_PATH = '/tinymce/'
 export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
     /* eslint-disable camelcase */
     // region paths
-    base_url: tinymceBasePath,
-    skin_url: `${tinymceBasePath}skins/ui/oxide`,
-    theme_url: `${tinymceBasePath}themes/silver/theme.min.js`,
+    base_url: TINYMCE_BASE_PATH,
+    skin_url: `${TINYMCE_BASE_PATH}skins/ui/oxide`,
+    theme_url: `${TINYMCE_BASE_PATH}themes/silver/theme.min.js`,
     // endregion
     allow_conditional_comments: false,
     allow_script_urls: false,
