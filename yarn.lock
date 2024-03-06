@@ -3611,7 +3611,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rmwc/select@npm:^14.1.0":
+"@rmwc/select@npm:14.1.0":
   version: 14.1.0
   resolution: "@rmwc/select@npm:14.1.0"
   dependencies:
@@ -3629,6 +3629,27 @@ __metadata:
     react: ">=16.8.x"
     react-dom: ">=16.8.x"
   checksum: 10c0/125a527ef0b8dd0496d7b617c3e782919c996fb5dd2e7ddb9ddad1973bf393d5441e3b815a5cc4030d580f5014b998924e60e82d05cac16e30335de7d9dd0501
+  languageName: node
+  linkType: hard
+
+"@rmwc/select@patch:@rmwc/select@npm%3A14.1.0#~/.yarn/patches/@rmwc-select-npm-14.1.0-57e63cd771.patch":
+  version: 14.1.0
+  resolution: "@rmwc/select@patch:@rmwc/select@npm%3A14.1.0#~/.yarn/patches/@rmwc-select-npm-14.1.0-57e63cd771.patch::version=14.1.0&hash=7ee405"
+  dependencies:
+    "@material/select": "npm:^14.0.0"
+    "@rmwc/base": "npm:14.1.0"
+    "@rmwc/floating-label": "npm:14.1.0"
+    "@rmwc/icon": "npm:14.1.0"
+    "@rmwc/line-ripple": "npm:14.1.0"
+    "@rmwc/list": "npm:14.1.0"
+    "@rmwc/menu": "npm:14.1.0"
+    "@rmwc/notched-outline": "npm:14.1.0"
+    "@rmwc/ripple": "npm:14.1.0"
+    "@rmwc/types": "npm:14.1.0"
+  peerDependencies:
+    react: ">=16.8.x"
+    react-dom: ">=16.8.x"
+  checksum: 10c0/0971167bb9638ba5ebcd87e9dc2ea2eeb7fdb27902b99b94c2b0e4cf77dd6fda8190cf9ae3b0027b9b2f627e39ef0544076b5cb9009d4b5fe20623e87fcc46c8
   languageName: node
   linkType: hard
 
@@ -12624,7 +12645,7 @@ __metadata:
     "@rmwc/icon": "npm:^14.1.0"
     "@rmwc/icon-button": "npm:^14.1.0"
     "@rmwc/menu": "npm:^14.1.0"
-    "@rmwc/select": "npm:^14.1.0"
+    "@rmwc/select": "patch:@rmwc/select@npm%3A14.1.0#~/.yarn/patches/@rmwc-select-npm-14.1.0-57e63cd771.patch"
     "@rmwc/tabs": "npm:^14.1.0"
     "@rmwc/textfield": "npm:^14.1.0"
     "@rmwc/theme": "npm:^14.1.0"
