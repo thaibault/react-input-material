@@ -126,7 +126,7 @@
     "blob-util": "^2.0.2",
     "clientnode": "^3.0.1138",
     "css-loader": "^6.10.0",
-    "cssnano": "^6.0.5",
+    "cssnano": "^6.1.0",
     "documentation-website": "^1.0.326",
     "eslint": "^8.57.0",
     "eslint-config-google": "^0.14.0",
