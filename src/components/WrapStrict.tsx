@@ -25,7 +25,6 @@ import {FunctionComponent, ReactElement, ReactNode, StrictMode} from 'react'
  * @param properties.children - Components to wrap.
  * @param properties.strict - Indicates whether to wrap with strict indicating
  * component.
- *
  * @returns React component.
  */
 export const WrapStrict:FunctionComponent<{

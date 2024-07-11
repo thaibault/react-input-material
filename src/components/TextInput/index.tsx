@@ -18,7 +18,18 @@
 */
 // region imports
 import {Ace as CodeEditorNamespace} from 'ace-builds'
-import {camelCaseToDelimited, capitalize, equals, Mapping} from 'clientnode'
+import {
+    camelCaseToDelimited,
+    capitalize,
+    copy,
+    equals,
+    extend,
+    isFunction,
+    LOCALES,
+    Mapping,
+    mark,
+    NOOP
+} from 'clientnode'
 
 import {
     FocusEvent as ReactFocusEvent,
@@ -154,28 +165,8 @@ let RICH_TEXT_EDITOR_LOADER_ONCE = false
  * 1. On-Render all states are merged with given properties into a normalized
  *    property object.
  * 2. Properties, corresponding state values and sub node instances are saved
- *    into a "ref" object (to make them accessible from the outside e.g. For
- *    wrapper like web-components).
- * 3. Event handler saves corresponding data modifications into state and
- *    normalized properties object.
- * 4. All state changes except selection changes trigger an "onChange" event
- *    which delivers the consolidated properties object (with latest
- *    modifications included).
- * @property displayName - Descriptive name for component to show in web
- * developer tools.
- * @param props - Given components properties.
- * @param reference - Reference object to forward internal state.
- * @returns React elements.
- */
-/**
- * Generic text input wrapper component which automatically determines a useful
- * input field depending on given model specification.
- * Dataflow:
- * 1. On-Render all states are merged with given properties into a normalized
- *    property object.
- * 2. Properties, corresponding state values and sub node instances are saved
- *    into a "ref" object (to make them accessible from the outside e.g. for
- *    wrapper like web-components).
+ *    into a "ref" object (to make them accessible from the outside for example
+ *    for wrapper like web-components).
  * 3. Event handler saves corresponding data modifications into state and
  *    normalized properties object.
  * 4. All state changes except selection changes trigger an "onChange" event
@@ -810,8 +801,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Saves current selection/cursor state in components state.
      * @param event - Event which triggered selection change.
-     *
-     * @returns Nothing.
      */
     const saveSelectionState = (event:GenericEvent):void => {
         /*
@@ -932,9 +921,8 @@ export const TextInputInner = function<Type = unknown>(
      * Properties overwrites default properties which overwrites default model
      * properties.
      * @param properties - Properties to merge.
-     *
-     * @returns Nothing.
-    */
+     * @returns Default properties.
+     */
     const mapPropertiesAndValidationStateIntoModel = (
         properties:Props<Type>
     ):DefaultProperties<Type> => {
@@ -955,7 +943,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Calculate external properties (a set of all configurable properties).
      * @param properties - Properties to merge.
-     *
      * @returns External properties object.
      */
     const getConsolidatedProperties = (
@@ -1012,8 +999,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Set code editor references.
      * @param instance - Code editor instance.
-     *
-     * @returns Nothing.
      */
     const setCodeEditorReference = (instance:CodeEditorType|null):void => {
         codeEditorReference.current = instance
@@ -1041,8 +1026,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Set rich text editor references.
      * @param instance - Editor instance.
-     *
-     * @returns Nothing.
      */
     const setRichTextEditorReference = (
         instance:null|RichTextEditorComponent
@@ -1063,7 +1046,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Triggered on blur events.
      * @param event - Event object.
-     *
      * @returns Newly computed value state.
      */
     const onBlur = (
@@ -1112,7 +1094,7 @@ export const TextInputInner = function<Type = unknown>(
         }
 
         if (
-            !Tools.equals(oldValueState.value, properties.value) ||
+            !equals(oldValueState.value, properties.value) ||
             oldValueState.representation !== properties.representation
         )
             changed = true
@@ -1120,7 +1102,7 @@ export const TextInputInner = function<Type = unknown>(
         if (changed)
             onChange(event)
 
-        if (!Tools.equals(oldValueState.value, properties.value))
+        if (!equals(oldValueState.value, properties.value))
             triggerCallbackIfExists<Properties<Type>>(
                 properties,
                 'changeValue',
@@ -1156,11 +1138,9 @@ export const TextInputInner = function<Type = unknown>(
      * Triggered on any change events. Consolidates properties object and
      * triggers given on change callbacks.
      * @param event - Potential event object.
-     *
-     * @returns Nothing.
      */
     const onChange = (event:GenericEvent):void => {
-        Tools.extend(
+        extend(
             true,
             properties,
             getConsolidatedProperties(
@@ -1179,8 +1159,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Triggered when editor is active indicator should be changed.
      * @param event - Mouse event object.
-     *
-     * @returns Nothing.
      */
     const onChangeEditorIsActive = (event:ReactMouseEvent):void => {
         if (event) {
@@ -1211,8 +1189,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Triggered when show declaration indicator should be changed.
      * @param event - Potential event object.
-     *
-     * @returns Nothing.
      */
     const onChangeShowDeclaration = (event?:IconButtonOnChangeEventT) => {
         setShowDeclaration((value:boolean):boolean => {
@@ -1243,8 +1219,6 @@ export const TextInputInner = function<Type = unknown>(
      * rich text or code editor.
      * @param selectedIndex - Indicates whether given event was triggered by a
      * selection.
-     *
-     * @returns Nothing.
      */
     const onChangeValue = (
         eventOrValue:GenericEvent|Type,
@@ -1294,10 +1268,7 @@ export const TextInputInner = function<Type = unknown>(
                 ...oldValueState, representation: properties.representation
             }
 
-            if (
-                !controlled &&
-                Tools.equals(oldValueState.value, properties.value)
-            )
+            if (!controlled && equals(oldValueState.value, properties.value))
                 /*
                     NOTE: No value update and no controlled value:
 
@@ -1451,7 +1422,7 @@ export const TextInputInner = function<Type = unknown>(
                         NOTE: Avoid to through an exception when aborting the
                         request intentionally.
                     */
-                    Tools.noop
+                    NOOP
                 )
             } else
                 onResultsRetrieved(result as Properties['selection'])
@@ -1481,8 +1452,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Triggered on click events.
      * @param event - Mouse event object.
-     *
-     * @returns Nothing.
      */
     const onClick = (event:ReactMouseEvent):void => {
         onSelectionChange(event)
@@ -1496,8 +1465,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Triggered on focus events and opens suggestions.
      * @param event - Focus event object.
-     *
-     * @returns Nothing.
      */
     const triggerOnFocusAndOpenSuggestions = (event:ReactFocusEvent):void => {
         setIsSuggestionOpen(true)
@@ -1507,8 +1474,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Triggered on focus events.
      * @param event - Focus event object.
-     *
-     * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
         triggerCallbackIfExists<Properties<Type>>(
@@ -1520,8 +1485,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Triggered on key down events.
      * @param event - Key up event object.
-     *
-     * @returns Nothing.
      */
     const onKeyDown = (event:ReactKeyboardEvent):void => {
         if (
@@ -1552,8 +1515,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Triggered on key up events.
      * @param event - Key up event object.
-     *
-     * @returns Nothing.
      */
     const onKeyUp = (event:ReactKeyboardEvent):void => {
         // NOTE: Avoid breaking password-filler on non textarea fields!
@@ -1568,8 +1529,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Triggered on selection change events.
      * @param event - Event which triggered selection change.
-     *
-     * @returns Nothing.
      */
     const onSelectionChange = (event:GenericEvent):void => {
         saveSelectionState(event)
@@ -1581,10 +1540,8 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
-     *
-     * @returns Nothing.
      */
-    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
+    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void => {
         setValueState((
             oldValueState:ValueState<Type, ModelState>
         ):ValueState<Type, ModelState> => {
@@ -1624,6 +1581,7 @@ export const TextInputInner = function<Type = unknown>(
 
             return result
         })
+    }
     // endregion
     // region properties
     /// region references
@@ -1674,9 +1632,9 @@ export const TextInputInner = function<Type = unknown>(
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:Props<Type> = Tools.extend<Props<Type>>(
+    const givenProperties:Props<Type> = extend<Props<Type>>(
         true,
-        Tools.copy<Props<Type>>(TextInput.defaultProperties as Props<Type>),
+        copy<Props<Type>>(TextInput.defaultProperties as Props<Type>),
         givenProps
     )
 
@@ -1688,9 +1646,9 @@ export const TextInputInner = function<Type = unknown>(
         givenProperties.transformer ?
             {
                 ...TextInput.transformer,
-                [type]: Tools.extend<DataTransformSpecification<Type>>(
+                [type]: extend<DataTransformSpecification<Type>>(
                     true,
-                    Tools.copy<DataTransformSpecification<Type>>(
+                    copy<DataTransformSpecification<Type>>(
                         TextInput.transformer[type] as
                             DataTransformSpecification<Type>
                     ) ||
@@ -1761,7 +1719,7 @@ export const TextInputInner = function<Type = unknown>(
     if (properties.hidden === undefined)
         properties.hidden = properties.name?.startsWith('password')
     /// region synchronize properties into state where values are not controlled
-    if (!Tools.equals(properties.cursor, cursor))
+    if (!equals(properties.cursor, cursor))
         setCursor(properties.cursor)
     if (properties.editorIsActive !== editorState.editorIsActive)
         setEditorState({
@@ -1784,10 +1742,10 @@ export const TextInputInner = function<Type = unknown>(
     if (
         !controlled &&
         (
-            !Tools.equals(properties.value, valueState.value) ||
+            !equals(properties.value, valueState.value) ||
             properties.representation !== valueState.representation
         ) ||
-        !Tools.equals(properties.model.state, valueState.modelState)
+        !equals(properties.model.state, valueState.modelState)
     )
         setValueState(currentValueState)
     if (controlled)
@@ -1840,7 +1798,7 @@ export const TextInputInner = function<Type = unknown>(
     > = {
         /*
             NOTE: If not set label with forbidden symbols will automatically
-            used.
+            be used.
         */
         id,
         onFocus: triggerOnFocusAndOpenSuggestions,
@@ -1871,12 +1829,11 @@ export const TextInputInner = function<Type = unknown>(
             applyIconPreset(properties.icon) as IconOptions
         ) as IconOptions
 
-    const tinyMCEOptions:Partial<TinyMCEOptions> = {
+    const tinyMCEOptions:Partial<Omit<TinyMCEOptions, 'readonly'>> = {
         ...TINYMCE_DEFAULT_OPTIONS,
         // eslint-disable-next-line camelcase
         content_style: properties.disabled ? 'body {opacity: .38}' : '',
         placeholder: properties.placeholder,
-        readonly: Boolean(properties.disabled),
         setup: (instance:RichTextEditor):void => {
             richTextEditorInstance.current = instance
             richTextEditorInstance.current.on('init', ():void => {
@@ -1938,7 +1895,7 @@ export const TextInputInner = function<Type = unknown>(
 
         let index = 0
         for (const suggestion of suggestionLabels) {
-            if (Tools.isFunction(properties.children)) {
+            if (isFunction(properties.children)) {
                 const result:null|ReactElement = properties.children({
                     index,
                     normalizedSelection: normalizedSelection!,
@@ -1952,7 +1909,7 @@ export const TextInputInner = function<Type = unknown>(
                     currentRenderableSuggestions.push(
                         <MenuItem
                             className={CSS_CLASS_NAMES[
-                                'text-input__suggestions__suggestion'
+                                'textInputSuggestionsSuggestion'
                             ]}
                             key={index}
                         >
@@ -1972,11 +1929,11 @@ export const TextInputInner = function<Type = unknown>(
                 currentRenderableSuggestions.push(
                     <MenuItem
                         className={CSS_CLASS_NAMES[
-                            'text-input__suggestions__suggestion'
+                            'textInputSuggestionsSuggestion'
                         ]}
                         key={index}
                     >
-                        {(Tools.stringMark(
+                        {(mark(
                             suggestion,
                             (
                                 properties.representation as string
@@ -1984,8 +1941,7 @@ export const TextInputInner = function<Type = unknown>(
                             {
                                 marker: (foundWord:string):ReactElement =>
                                     <span className={CSS_CLASS_NAMES[
-                                        'text-input__suggestions' +
-                                        '__suggestion__mark'
+                                        'textInputSuggestionsSuggestionMark'
                                     ]}>
                                         {foundWord}
                                     </span>,
@@ -2063,11 +2019,9 @@ export const TextInputInner = function<Type = unknown>(
         tooltip={properties.tooltip}
     >
         <div
-            className={[CSS_CLASS_NAMES['text-input']]
+            className={[CSS_CLASS_NAMES.textInput]
                 .concat(
-                    isAdvancedEditor ?
-                        CSS_CLASS_NAMES['text-input--custom'] :
-                        [],
+                    isAdvancedEditor ? CSS_CLASS_NAMES.textInputCustom : [],
                     properties.className ?? []
                 )
                 .join(' ')
@@ -2133,7 +2087,7 @@ export const TextInputInner = function<Type = unknown>(
                     >
                         <label>
                             <span className={
-                                [CSS_CLASS_NAMES['text-input__editor__label']]
+                                [CSS_CLASS_NAMES.textInputEditorLabel]
                                     .concat(
                                         'mdc-floating-label',
                                         'mdc-floating-label--float-above'
@@ -2282,14 +2236,10 @@ export const TextInputInner = function<Type = unknown>(
                                 <MenuSurface
                                     anchorCorner="bottomLeft"
                                     className={
-                                        CSS_CLASS_NAMES[
-                                            'text-input__suggestions'
-                                        ] +
+                                        CSS_CLASS_NAMES.textInputSuggestions +
                                         ' ' +
-                                        CSS_CLASS_NAMES[
-                                            'text-input__suggestions' +
-                                            '--pending'
-                                        ]
+                                        CSS_CLASS_NAMES
+                                            .textInputSuggestionsPending
                                     }
                                     open={true}
                                 >
@@ -2302,7 +2252,7 @@ export const TextInputInner = function<Type = unknown>(
                                             instance
                                     }}
                                     className={CSS_CLASS_NAMES[
-                                        'text-input__suggestions'
+                                        'textInputSuggestions'
                                     ]}
                                     focusOnOpen={false}
                                     foundationRef={
@@ -2372,8 +2322,8 @@ export const TextInputInner = function<Type = unknown>(
                                 NOTE: Disabled input fields are not focusable
                                 via keyboard which makes them unreachable for
                                 blind people using e.g. screen readers.
-                                Therefore the label gets a tabindex to make the
-                                input focusable.
+                                That's wgy the label gets a tabindex to make
+                                the input focusable.
                             */
                             tabIndex: properties.disabled ? '0' : '-1',
                             ...properties.rootProps
@@ -2403,19 +2353,16 @@ export const TextInputInner = function<Type = unknown>(
 TextInputInner.displayName = 'TextInput'
 /**
  * Wrapping web component compatible react component.
- * @property static:defaultModelState - Initial model state.
- * @property static:defaultProperties - Initial property configuration.
- * @property static:locales - Defines input formatting locales.
- * @property static:propTypes - Triggers reacts runtime property value checks.
- * @property static:strict - Indicates whether we should wrap render output in
- * reacts strict component.
- * @property static:transformer - Text input data transformation
- * specifications.
- * @property static:wrapped - Wrapped component.
- *
+ * @property defaultModelState - Initial model state.
+ * @property defaultProperties - Initial property configuration.
+ * @property locales - Defines input formatting locales.
+ * @property propTypes - Triggers reacts runtime property value checks.
+ * @property strict - Indicates whether we should wrap render output in reacts
+ * strict component.
+ * @property transformer - Text input data transformation specifications.
+ * @property wrapped - Wrapped component.
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
- *
  * @returns React elements.
  */
 export const TextInput = memorize(forwardRef(TextInputInner)) as
@@ -2443,14 +2390,10 @@ TextInput.defaultProperties = {
     representation: undefined,
     value: undefined
 }
-TextInput.locales = Tools.locales
+TextInput.locales = LOCALES
 TextInput.propTypes = propertyTypes
 TextInput.renderProperties = renderProperties
 TextInput.strict = false
 TextInput.transformer = TRANSFORMER
 // endregion
 export default TextInput
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

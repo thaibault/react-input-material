@@ -28,7 +28,6 @@ import {ThemeProvider, ThemeProviderProps} from '@rmwc/theme'
  * @param properties.wrap - Instead of injecting a div tag, wrap a child
  * component by merging the theme styles directly onto it. Useful when you
  * don't want to mess with layout.
- *
  * @returns Wrapped content.
  */
 export const WrapThemeProvider:FunctionComponent<{

@@ -105,8 +105,7 @@ export const preserveStaticFileBaseNameInputGenerator = <
 /**
  * Determines which type of file we have to present.
  * @param contentType - File type to derive representation type from.
- *
- * @returns Nothing.
+ * @returns Representative string for given content type.
  */
 export const determineRepresentationType = (
     contentType:string

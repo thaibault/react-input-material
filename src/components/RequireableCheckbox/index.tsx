@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import {copy, equals, extend, Mapping} from 'clientnode'
+import {copy, equals, extend} from 'clientnode'
 import {
     FocusEvent as ReactFocusEvent,
     forwardRef,
@@ -66,7 +66,7 @@ import {
     CheckboxValueState as ValueState
 } from '../../type'
 // endregion
-const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
+const CSS_CLASS_NAMES = cssClassNames
 // region helper
 /**
  * Derives validation state from provided properties and state.
@@ -290,7 +290,7 @@ export const RequireableCheckboxInner = function(
      * @param event - Event object which triggered interaction.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void => {
-        setValueState((oldValueState: ValueState):ValueState => {
+        setValueState((oldValueState:ValueState):ValueState => {
             let changedState = false
 
             if (!oldValueState.modelState.focused) {
@@ -419,7 +419,7 @@ export const RequireableCheckboxInner = function(
         tooltip={properties.tooltip}
     >
         <div
-            className={[CSS_CLASS_NAMES['requireable-checkbox']]
+            className={[CSS_CLASS_NAMES.requireableCheckbox]
                 .concat(properties.className ?? [])
                 .join(' ')
             }

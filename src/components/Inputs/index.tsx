@@ -49,6 +49,7 @@ import {
 } from './style.module'
 */
 import cssClassNames from './style.module'
+
 import WrapConfigurations from '../WrapConfigurations'
 import {
     createDummyStateSetter,
@@ -76,14 +77,14 @@ import {
 } from '../../type'
 import {IconButtonOnChangeEventT} from '@rmwc/icon-button/lib/icon-button'
 // endregion
-const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
+const CSS_CLASS_NAMES = cssClassNames
 // region helper
 const getPrototype = function<T, P extends InputsPropertiesItem<T>>(
     properties:InputsProperties<T, P>
 ):Partial<P> {
     return {
         ...defaultProperties as unknown as Partial<P>,
-        className: CSS_CLASS_NAMES.inputs__item__input,
+        className: CSS_CLASS_NAMES.inputsItemInput,
         triggerInitialPropertiesConsolidation:
             properties.triggerInitialPropertiesConsolidation,
         ...(properties.default && properties.default.length > 0 ?
@@ -490,7 +491,7 @@ export const InputsInner = function<
     // endregion
     // region render
     const addButton:ReactElement = <IconButton
-        className={CSS_CLASS_NAMES.inputs__add__button}
+        className={CSS_CLASS_NAMES.inputsAddButton}
 
         icon={properties.addIcon}
         onIcon={properties.addIcon}
@@ -528,14 +529,14 @@ export const InputsInner = function<
                 properties.value.map((
                     inputProperties:P, index
                 ):ReactNode =>
-                    <div className={CSS_CLASS_NAMES.inputs__item} key={index}>
+                    <div className={CSS_CLASS_NAMES.inputsItem} key={index}>
                         {renderInput(inputProperties, index)}
 
                         {properties.disabled ?
                             '' :
                             <IconButton
                                 className={
-                                    CSS_CLASS_NAMES.inputs__item__remove
+                                    CSS_CLASS_NAMES.inputsItemRemove
                                 }
 
                                 icon={properties.removeIcon}
@@ -547,8 +548,8 @@ export const InputsInner = function<
                     </div>
                 ) :
                 <div className={[
-                    CSS_CLASS_NAMES.inputs__item,
-                    CSS_CLASS_NAMES['inputs__item--disabled']
+                    CSS_CLASS_NAMES.inputsItem,
+                    CSS_CLASS_NAMES.inputsItemDisabled
                 ].join(' ')}>
                     {renderInput(
                         properties.createPrototype({
@@ -579,7 +580,7 @@ export const InputsInner = function<
                 )
             ) ?
                 '' :
-                <div className={CSS_CLASS_NAMES.inputs__add}>{addButton}</div>
+                <div className={CSS_CLASS_NAMES.inputsAdd}>{addButton}</div>
             }
         </div>
     </WrapConfigurations>

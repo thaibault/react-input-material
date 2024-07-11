@@ -26,7 +26,3 @@ describe('WrapTooltip', ():void => {
             .querySelector('.test')
     ).toBeDefined())
 })
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

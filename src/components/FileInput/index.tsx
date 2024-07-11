@@ -18,7 +18,7 @@
 */
 // region imports
 import {dataURLToBlob} from 'blob-util'
-import Tools from 'clientnode'
+import {copy, equals, extend, mask} from 'clientnode'
 import {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
@@ -33,6 +33,7 @@ import {
     useRef,
     useState
 } from 'react'
+import GenericAnimate from 'react-generic-animate'
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
 import {
     Card,
@@ -87,7 +88,6 @@ import {
     deriveBase64String,
     readBinaryDataIntoText
 } from './helper'
-import GenericAnimate from 'react-generic-animate'
 
 export {
     CSS_CLASS_NAMES,
@@ -104,7 +104,6 @@ export {
     preserveStaticFileBaseNameInputGenerator
 } from './helper'
 // endregion
-/* eslint-disable jsdoc/require-description-complete-sentence */
 /**
  * Validatable checkbox wrapper component.
  * @property displayName - Descriptive name for component to show in web
@@ -113,15 +112,13 @@ export {
  * 1. On-Render all states are merged with given properties into a normalized
  *    property object.
  * 2. Properties, corresponding state values and sub node instances are saved
- *    into a "ref" object (to make them accessible from the outside e.g. for
- *    wrapper like web-components).
+ *    into a "ref" object (to make them accessible from the outside for example
+ *    for wrapper like web-components).
  * 3. Event handler saves corresponding data modifications into state and
  *    normalized properties object.
  * 4. All state changes except selection changes trigger an "onChange" event
  *    which delivers the consolidated properties object (with latest
  *    modifications included).
- * @property displayName - Descriptive name for component to show in web
- * developer tools.
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
@@ -228,9 +225,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         delete properties.model.value
         delete properties.value
         // NOTE: Avoid trying to write into a readonly object.
-        properties.styles = Tools.copy(properties.styles)
+        properties.styles = copy(properties.styles)
 
-        Tools.extend(true, properties, consolidatedProperties)
+        extend(true, properties, consolidatedProperties)
 
         triggerCallbackIfExists<Properties<Type>>(
             properties, 'change', controlled, properties, event
@@ -310,7 +307,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                 else
                     properties.value = eventSourceOrName as Type
 
-            if (Tools.equals(oldValueState.value, properties.value))
+            if (equals(oldValueState.value, properties.value))
                 return oldValueState
 
             let stateChanged = false
@@ -390,7 +387,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
      */
-    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
+    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void => {
         setValueState((oldValueState:ValueState<Type>):ValueState<Type> => {
             let changedState = false
 
@@ -428,6 +425,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
 
             return result
         })
+    }
     // endregion
     // region properties
     /// region references
@@ -452,9 +450,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:Props<Type> = Tools.extend(
+    const givenProperties:Props<Type> = extend(
         true,
-        Tools.copy(FileInput.defaultProperties as DefaultProperties<Type>),
+        copy(FileInput.defaultProperties as DefaultProperties<Type>),
         givenProps
     )
     /*
@@ -487,7 +485,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     */
     if (valueState.attachBlobProperty && valueState.value)
         properties.value =
-            Tools.extend<Type>(true, valueState.value, properties.value!)
+            extend<Type>(true, valueState.value, properties.value!)
 
     /// region synchronize uncontrolled properties into state
     const currentValueState:ValueState<Type> = {
@@ -501,8 +499,8 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     */
     if (
         valueState.attachBlobProperty ||
-        !(controlled || Tools.equals(properties.value, valueState.value)) ||
-        !Tools.equals(properties.model.state, valueState.modelState)
+        !(controlled || equals(properties.value, valueState.value)) ||
+        !equals(properties.model.state, valueState.modelState)
     )
         setValueState(currentValueState)
     if (controlled)
@@ -691,7 +689,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     >
         <Card
             className={
-                [CSS_CLASS_NAMES['file-input']]
+                [CSS_CLASS_NAMES.fileInput]
                     .concat(properties.className ?? [])
                     .join(' ')
             }
@@ -718,9 +716,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                             </video> :
                             representationType === 'renderableText' ?
                                 <div className={
-                                    [CSS_CLASS_NAMES[
-                                        'file-input__iframe-wrapper'
-                                    ]]
+                                    [CSS_CLASS_NAMES.fileInputIframeWrapper]
                                         .concat(
                                             ['text/html', 'text/plain']
                                                 .includes((
@@ -728,15 +724,16 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                                         Blob
                                                 ).type) ?
                                                 CSS_CLASS_NAMES[
-                                                    'file-input__iframe-' +
-                                                    'wrapper--padding'
+                                                    'fileInputIframeWrapper' +
+                                                    'Padding'
                                                 ] :
                                                 []
                                         )
                                         .join(' ')
                                 }>
                                     <iframe
-                                        frameBorder="no"
+                                        style={{border: 0, overflow: 'hidden'}}
+                                        frameBorder="0"
                                         scrolling="no"
                                         src={properties.value.url}
                                     />
@@ -745,7 +742,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                 representationType === 'text' ?
                                     <pre
                                         className={CSS_CLASS_NAMES[
-                                            'file-input__text-representation'
+                                            'fileInputTextRepresentation'
                                         ]}
                                     >
                                         {properties.value.source}
@@ -757,7 +754,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                         <CircularProgress size="large" /> :
                         ''
                 }
-                <div className={CSS_CLASS_NAMES['file-input__info']}>
+                <div className={CSS_CLASS_NAMES.fileInputInfo}>
                     <Typography tag="h2" use="headline6">
                         {invalid ?
                             <Theme use="error">{
@@ -773,9 +770,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                     <GenericAnimate
                         in={invalid || Boolean(properties.declaration)}
                     >
-                        <div className={
-                            CSS_CLASS_NAMES['file-input__info__body']
-                        }>
+                        <div className={CSS_CLASS_NAMES.fileInputInfoBody}>
                             {properties.declaration ?
                                 <Typography
                                     style={{marginTop: '-1rem'}}
@@ -827,7 +822,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                     disabled: properties.disabled,
                                     value: properties.value?.name,
 
-                                    ...Tools.mask(
+                                    ...mask(
                                         defaultFileNameInputProperties,
                                         {
                                             exclude: Object.keys(
@@ -862,7 +857,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                 <input
                     disabled={properties.disabled}
 
-                    className={CSS_CLASS_NAMES['file-input__native']}
+                    className={CSS_CLASS_NAMES.fileInputNative}
                     id={id}
 
                     name={properties.name}
@@ -914,7 +909,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                     >
                                         <a
                                             className={CSS_CLASS_NAMES[
-                                                'file-input__download'
+                                                'fileInputDownload'
                                             ]}
                                             download={properties.value.name}
                                             href={properties.value.url}
@@ -944,7 +939,6 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     </WrapConfigurations>
     // endregion
 }
-/* eslint-enable jsdoc/require-description-complete-sentence */
 // NOTE: This is useful in react dev tools.
 FileInputInner.displayName = 'FileInput'
 /**

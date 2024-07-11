@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import {copy, extend, Mapping, mask} from 'clientnode'
+import {copy, extend, mask} from 'clientnode'
 import {GenericEvent} from 'react-generic-tools/type'
 import {Icon} from '@rmwc/icon'
 import {IconOptions} from '@rmwc/types'
@@ -60,7 +60,7 @@ import {
     IntervalInputProps
 } from '../../type'
 // endregion
-const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
+const CSS_CLASS_NAMES = cssClassNames
 // region helper
 const determineControlled = (props:Props) =>
     props.model?.value?.end?.value !== undefined ||
@@ -430,7 +430,7 @@ export const IntervalInner = function(
                 .concat(
                     properties.className ?? [],
                     properties.disabled ?
-                        CSS_CLASS_NAMES['interval--disabled'] :
+                        CSS_CLASS_NAMES.intervalDisabled :
                         []
                 )
                 .join(' ')
