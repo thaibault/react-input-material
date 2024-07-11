@@ -17,11 +17,21 @@
     endregion
 */
 // region imports
-import Tools from 'clientnode'
-import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 import {
-    EvaluationResult, FirstParameter, Mapping, ValueOf
-} from 'clientnode/type'
+    capitalize,
+    copy,
+    equals,
+    evaluate,
+    EvaluationResult,
+    extend,
+    FirstParameter,
+    isFunction,
+    Mapping,
+    timeout,
+    ValueOf
+} from 'clientnode'
+import {NullSymbol, UndefinedSymbol} from 'clientnode/dist/property-types'
+
 import {ReactNode, useState} from 'react'
 
 import {
@@ -46,7 +56,6 @@ import TextInput from './components/TextInput'
 /**
  * Removes all none serializable values from given data structure.
  * @param object - Mapping of values to slice.
- * @returns Nothing.
  */
 export const slicePropertiesForState = (object:Mapping) => {
     /*
@@ -56,7 +65,7 @@ export const slicePropertiesForState = (object:Mapping) => {
     for (const name of ['ref', 'representation'])
         delete object[name]
     for (const [name, value] of Object.entries(object))
-        if (Tools.isFunction(value))
+        if (isFunction(value))
             delete object[name]
 }
 /**
@@ -78,14 +87,13 @@ export const slicePropertiesForStateRecursively = (properties:unknown) => {
             else
                 slicePropertiesForStateRecursively(value)
 
-    return Tools.copy(properties)
+    return copy(properties)
 }
 /**
  * Creates a mocked a state setter. Useful to dynamically convert a component
- * from uncontrolled to controlled.
+ * from uncontrolled to controlled one.
  * @param value - Parameter for state setter.
- *
- * @returns Nothing.
+ * @returns Resulting value of the "useState" hook.
  */
 export const createDummyStateSetter =
     <Type = unknown>(value:Type):ReturnType<typeof useState>[1] =>
@@ -100,7 +108,6 @@ export const createDummyStateSetter =
  * properties.
  * @param properties - To consolidate.
  * @param state - To search values in.
- *
  * @returns Consolidated properties.
  */
 export const deriveMissingPropertiesFromState = <
@@ -137,7 +144,6 @@ export const deriveMissingPropertiesFromState = <
  * @param setValueState - Value setter to wrap.
  * @param currentValueState - Last known value state to provide to setter when
  * called.
- *
  * @returns Wrapped given method.
  */
 export const wrapStateSetter = <Type = unknown>(
@@ -150,7 +156,7 @@ export const wrapStateSetter = <Type = unknown>(
                 callbackOrData
             ) as Type
 
-            if (!Tools.equals(
+            if (!equals(
                 (result as unknown as {modelState:unknown})?.modelState,
                 (
                     currentValueState as unknown as {modelState:unknown}
@@ -164,7 +170,6 @@ export const wrapStateSetter = <Type = unknown>(
  * instance.
  * @param template - Template to render.
  * @param scope - Scope to render given template again.
- *
  * @returns Evaluated template or an empty string if something goes wrong.
  */
 export const renderMessage = <Scope extends object = object>(
@@ -173,7 +178,7 @@ export const renderMessage = <Scope extends object = object>(
     if (typeof template !== 'string')
         return ''
 
-    const evaluated:EvaluationResult = Tools.stringEvaluate<string, Scope>(
+    const evaluated:EvaluationResult = evaluate<string, Scope>(
         `\`${template}\``, scope
     )
 
@@ -196,8 +201,6 @@ export const renderMessage = <Scope extends object = object>(
  * later. Controlled components should call synchronously and uncontrolled
  * otherwise as long as callbacks are called in a state setter context.
  * @param parameters - Additional arguments to forward to callback.
- *
- * @returns Nothing.
  */
 export const triggerCallbackIfExists =
     <P extends Omit<BaseProperties, 'model'> & {model:unknown}>(
@@ -206,7 +209,7 @@ export const triggerCallbackIfExists =
         synchronous = true,
         ...parameters:Array<unknown>
     ):void => {
-        name = `on${Tools.stringCapitalize(name)}`
+        name = `on${capitalize(name)}`
 
         if (properties[name as keyof P])
             if (synchronous)
@@ -215,7 +218,7 @@ export const triggerCallbackIfExists =
                     (...parameters:Array<unknown>) => void
                 )(...parameters)
             else
-                void Tools.timeout(() =>
+                void timeout(() =>
                     (properties[name as keyof P] as
                         unknown as
                         (...parameters:Array<unknown>) => void
@@ -226,7 +229,6 @@ export const triggerCallbackIfExists =
 /**
  * Translate known symbols in a copied and return properties object.
  * @param properties - Object to translate.
- *
  * @returns Transformed properties.
  */
 export const translateKnownSymbols = <Type = unknown>(
@@ -239,7 +241,7 @@ export const translateKnownSymbols = <Type = unknown>(
         else if (value === NullSymbol)
             (result[name] as unknown as null) = null
         else
-            result[name] = Tools.copy(properties[name] as Type)
+            result[name] = copy(properties[name] as Type)
 
     return result
 }
@@ -250,7 +252,6 @@ export const translateKnownSymbols = <Type = unknown>(
  * @param value - Current value to represent.
  * @param transformer - To apply to given value.
  * @param selection - Data mapping of allowed values.
- *
  * @returns Determined initial representation.
  */
 export function determineInitialRepresentation<
@@ -294,7 +295,6 @@ export function determineInitialRepresentation<
  * @param properties - Components properties.
  * @param defaultValue - Internal fallback value.
  * @param alternateValue - Alternate value to respect.
- *
  * @returns Determined value.
  */
 export const determineInitialValue = <Type = unknown>(
@@ -312,13 +312,13 @@ export const determineInitialValue = <Type = unknown>(
         return properties.model.value as Type
 
     if (properties.initialValue !== undefined)
-        return Tools.copy(properties.initialValue as Type)
+        return copy(properties.initialValue as Type)
 
     if (properties.default !== undefined)
-        return Tools.copy(properties.default as Type)
+        return copy(properties.default as Type)
 
     if (properties.model?.default !== undefined)
-        return Tools.copy(properties.model.default as Type)
+        return copy(properties.model.default as Type)
 
     if (defaultValue !== undefined)
         return defaultValue
@@ -331,7 +331,6 @@ export const determineInitialValue = <Type = unknown>(
  * @param currentState - Current validation state.
  * @param validators - Mapping from validation state key to corresponding
  * validator function.
- *
  * @returns A boolean indicating if validation state has changed.
  */
 export const determineValidationState =
@@ -391,9 +390,8 @@ export const determineValidationState =
  * properties.
  * @param properties - Properties to merge.
  * @param defaultModel - Default model to merge.
- *
  * @returns Merged properties.
-*/
+ */
 export const mapPropertiesIntoModel = <
     P extends BaseProps = BaseProps,
     DP extends DefaultBaseProperties = DefaultBaseProperties
@@ -402,9 +400,9 @@ export const mapPropertiesIntoModel = <
         NOTE: Default props seems not to respect nested layers to merge so we
         have to manage this for nested model structure.
     */
-    const result:DP = Tools.extend<DP>(
+    const result:DP = extend<DP>(
         true,
-        {model: Tools.copy<DP['model']>(defaultModel)} as DP,
+        {model: copy<DP['model']>(defaultModel)} as DP,
         properties as unknown as DP
     )
     // region handle aliases
@@ -449,7 +447,7 @@ export const mapPropertiesIntoModel = <
                 result[name as keyof DP] as unknown as ValueOf<ModelState>
 
     if (result.model.value === undefined)
-        result.model.value = Tools.copy(result.model.default)
+        result.model.value = copy(result.model.default)
     // else -> Controlled component via model's "value" property.
     // endregion
     return result
@@ -457,7 +455,6 @@ export const mapPropertiesIntoModel = <
 /**
  * Calculate external properties (a set of all configurable properties).
  * @param properties - Properties to merge.
- *
  * @returns External properties object.
  */
 export const getConsolidatedProperties = <
@@ -487,7 +484,6 @@ export const getConsolidatedProperties = <
  * Determine normalized labels and values for selection and auto-complete
  * components.
  * @param selection - Selection component property configuration.
- *
  * @returns Normalized sorted listed of labels and values.
  */
 export function getLabelAndValues(selection?:NormalizedSelection):[
@@ -512,7 +508,6 @@ export function getLabelAndValues(selection?:NormalizedSelection):[
  * Determine representation for given value while respecting existing labels.
  * @param value - To represent.
  * @param selection - Selection component property configuration.
- *
  * @returns Determined representation.
  */
 export function getRepresentationFromValueSelection(
@@ -520,7 +515,7 @@ export function getRepresentationFromValueSelection(
 ):null|string {
     if (selection)
         for (const option of selection)
-            if (Tools.equals((option as {value:unknown})?.value, value))
+            if (equals((option as {value:unknown})?.value, value))
                 return (
                     (option as {label:string}).label || `${value as string}`
                 )
@@ -531,7 +526,6 @@ export function getRepresentationFromValueSelection(
  * Determine value from provided representation (for example user inputs).
  * @param label - To search a value for.
  * @param selection - Selection component property configuration.
- *
  * @returns Determined value.
  */
 export function getValueFromSelection<T>(
@@ -562,7 +556,6 @@ export function getValueFromSelection<T>(
  * @param selection - Selection component property configuration.
  * @param labels - Additional labels to take into account (for example provided
  * via a content management system).
- *
  * @returns Determined normalized sorted selection configuration.
  */
 export function normalizeSelection(
@@ -694,7 +687,6 @@ export function normalizeSelection(
  * @param configuration - Input configuration.
  * @param value - Value to transform.
  * @param transformer - To apply to given value.
- *
  * @returns Transformed value.
  */
 export const parseValue =
@@ -742,7 +734,6 @@ export const parseValue =
  * @param value - To represent.
  * @param transformerMapping - To apply to given value.
  * @param final - Specifies whether it is a final representation.
- *
  * @returns Transformed value.
  */
 export function formatValue<

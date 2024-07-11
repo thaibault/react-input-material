@@ -9,7 +9,3 @@ declare module '*.module' {
     const classes:Mapping
     export default classes
 }
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

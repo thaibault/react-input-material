@@ -18,8 +18,7 @@
 */
 // region imports
 import {Ace as CodeEditorNamespace} from 'ace-builds'
-import Tools from 'clientnode'
-import {Mapping} from 'clientnode/type'
+import {camelCaseToDelimited, capitalize, equals, Mapping} from 'clientnode'
 
 import {
     FocusEvent as ReactFocusEvent,
@@ -148,13 +147,30 @@ export const INPUT_TRANSFORMER = TRANSFORMER
 // endregion
 
 let RICH_TEXT_EDITOR_LOADER_ONCE = false
-/* eslint-disable jsdoc/require-description-complete-sentence */
 /**
  * Generic text input wrapper component which automatically determines a useful
  * input field depending on given model specification.
- *
  * Dataflow:
- *
+ * 1. On-Render all states are merged with given properties into a normalized
+ *    property object.
+ * 2. Properties, corresponding state values and sub node instances are saved
+ *    into a "ref" object (to make them accessible from the outside e.g. For
+ *    wrapper like web-components).
+ * 3. Event handler saves corresponding data modifications into state and
+ *    normalized properties object.
+ * 4. All state changes except selection changes trigger an "onChange" event
+ *    which delivers the consolidated properties object (with latest
+ *    modifications included).
+ * @property displayName - Descriptive name for component to show in web
+ * developer tools.
+ * @param props - Given components properties.
+ * @param reference - Reference object to forward internal state.
+ * @returns React elements.
+ */
+/**
+ * Generic text input wrapper component which automatically determines a useful
+ * input field depending on given model specification.
+ * Dataflow:
  * 1. On-Render all states are merged with given properties into a normalized
  *    property object.
  * 2. Properties, corresponding state values and sub node instances are saved
@@ -165,18 +181,15 @@ let RICH_TEXT_EDITOR_LOADER_ONCE = false
  * 4. All state changes except selection changes trigger an "onChange" event
  *    which delivers the consolidated properties object (with latest
  *    modifications included).
- * @property static:displayName - Descriptive name for component to show in web
+ * @property displayName - Descriptive name for component to show in web
  * developer tools.
- *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
- *
  * @returns React elements.
  */
 export const TextInputInner = function<Type = unknown>(
     props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
 ):ReactElement {
-/* eslint-enable jsdoc/require-description-complete-sentence */
     const defaultID = useId()
     const id = props.id ?? defaultID
     // region live-cycle
@@ -235,7 +248,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Is triggered immediate after a re-rendering. Connects error message
      * with input element.
-     * @returns Nothing.
      */
     useEffect(() => {
         if (inputReference.current) {
@@ -275,8 +287,7 @@ export const TextInputInner = function<Type = unknown>(
 
             // Apply configured native input properties.
             for (const [name, value] of Object.entries(inputProps)) {
-                const attributeName:string =
-                    Tools.stringCamelCaseToDelimited(name)
+                const attributeName:string = camelCaseToDelimited(name)
 
                 if (typeof value === 'boolean')
                     if (value)
@@ -290,8 +301,7 @@ export const TextInputInner = function<Type = unknown>(
             }
 
             for (const name of propsToRemove) {
-                const attributeName:string =
-                    Tools.stringCamelCaseToDelimited(name)
+                const attributeName:string = camelCaseToDelimited(name)
                 if (inputReference.current.hasAttribute(attributeName))
                     inputReference.current.removeAttribute(attributeName)
             }
@@ -371,7 +381,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Applies icon preset configurations.
      * @param options - Icon options to extend of known preset identified.
-     *
      * @returns Given potential extended icon configuration.
      */
     const applyIconPreset = (
@@ -399,8 +408,7 @@ export const TextInputInner = function<Type = unknown>(
                 ))
             }
 
-            const hide:boolean =
-                Tools.equals(properties.value, properties.default) as boolean
+            const hide = equals(properties.value, properties.default) as boolean
             return {
                 icon: <GenericAnimate in={!hide}>
                     {(
@@ -485,7 +493,6 @@ export const TextInputInner = function<Type = unknown>(
      * Derives native input type from given input property configuration.
      * @param properties - Input configuration to derive native input type
      * from.
-     *
      * @returns Determined input type.
      */
     const determineNativeType = (
@@ -593,7 +600,6 @@ export const TextInputInner = function<Type = unknown>(
      * @param propertiesOrInCondition - Animation properties or in condition
      * only.
      * @param condition - Show condition.
-     *
      * @returns Wrapped component.
      */
     const wrapAnimationConditionally = (
@@ -622,7 +628,6 @@ export const TextInputInner = function<Type = unknown>(
      * tooltip configuration.
      * @param options - Icon configuration potential extended a tooltip
      * configuration.
-     *
      * @returns Resolved icon configuration.
      */
     const wrapIconWithTooltip = (
@@ -651,7 +656,6 @@ export const TextInputInner = function<Type = unknown>(
      * contained.
      * @param domNode - Dom node which contains given position.
      * @param offset - Relative position within given node.
-     *
      * @returns Determine absolute offset.
      */
     const determineAbsoluteSymbolOffsetFromHTML = (
@@ -687,7 +691,6 @@ export const TextInputInner = function<Type = unknown>(
      * Determines absolute range from table oriented position.
      * @param column - Symbol offset in given row.
      * @param row - Offset row.
-     *
      * @returns Determined offset.
      */
     const determineAbsoluteSymbolOffsetFromTable = (
@@ -707,7 +710,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Converts absolute range into table oriented position.
      * @param offset - Absolute position.
-     *
      * @returns Position.
      */
     const determineTablePosition = (offset:number):TablePosition => {
@@ -730,8 +732,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Sets current cursor selection range in given code editor instance.
      * @param instance - Code editor instance.
-     *
-     * @returns Nothing.
      */
     const setCodeEditorSelectionState = (instance:CodeEditorType):void => {
         const range:CodeEditorNamespace.Range =
@@ -747,8 +747,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Sets current cursor selection range in given rich text editor instance.
      * @param instance - Code editor instance.
-     *
-     * @returns Nothing.
      */
     const setRichTextEditorSelectionState = (instance:RichTextEditor):void => {
         const indicator:{
@@ -801,9 +799,9 @@ export const TextInputInner = function<Type = unknown>(
 
         for (const type of keysSorted)
             if (result[type])
-                range[
-                    `set${Tools.stringCapitalize(type)}` as 'setEnd'|'setStart'
-                ](...(result[type] as [Node, number]))
+                range[`set${capitalize(type)}` as 'setEnd'|'setStart'](
+                    ...(result[type] as [Node, number])
+                )
 
         if (result.end && result.start)
             instance.selection.setRng(range)

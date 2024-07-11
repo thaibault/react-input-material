@@ -16,7 +16,9 @@
     endregion
 */
 // region imports
-import Tools from 'clientnode'
+import {
+    identity, Mapping, PlainObject, RecursivePartial, ValueOf
+} from 'clientnode'
 import PropertyTypes, {
     any,
     arrayOf,
@@ -31,8 +33,7 @@ import PropertyTypes, {
     symbol,
     ValidationMap,
     Validator
-} from 'clientnode/property-types'
-import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode/type'
+} from 'clientnode/dist/property-types'
 import {
     ComponentClass,
     ElementType,
@@ -1237,7 +1238,7 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 
     encoding: 'utf-8',
 
-    generateFileNameInputProperties: Tools.identity,
+    generateFileNameInputProperties: identity,
 
     media: {
         sixteenByNine: true
@@ -1598,8 +1599,4 @@ export interface ConfigurationProperties {
     tooltip?:Properties['tooltip']
     wrap?:boolean
 }
-// endregion
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
 // endregion

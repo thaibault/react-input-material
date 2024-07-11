@@ -17,8 +17,7 @@
     endregion
 */
 // region imports
-import Tools from 'clientnode'
-import {Mapping} from 'clientnode/type'
+import {copy, equals, extend, Mapping} from 'clientnode'
 import {
     FocusEvent as ReactFocusEvent,
     forwardRef,
@@ -73,7 +72,6 @@ const CSS_CLASS_NAMES:Mapping = cssClassNames as Mapping
  * Derives validation state from provided properties and state.
  * @param properties - Current component properties.
  * @param currentState - Current component state.
- *
  * @returns Whether component is in an aggregated valid or invalid state.
  */
 export function determineValidationState(
@@ -92,12 +90,10 @@ export function determineValidationState(
 // endregion
 /* eslint-disable jsdoc/require-description-complete-sentence */
 /**
- * Validateable checkbox wrapper component.
- * @property static:displayName - Descriptive name for component to show in web
+ * Wrapper component for checkboxes to validate.
+ * @property displayName - Descriptive name for component to show in web
  * developer tools.
- *
  * Dataflow:
- *
  * 1. On-Render all states are merged with given properties into a normalized
  *    property object.
  * 2. Properties, corresponding state values and sub node instances are saved
@@ -108,12 +104,9 @@ export function determineValidationState(
  * 4. All state changes except selection changes trigger an "onChange" event
  *    which delivers the consolidated properties object (with latest
  *    modifications included).
- * @property static:displayName - Descriptive name for component to show in web
  * developer tools.
- *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
- *
  * @returns React elements.
  */
 export const RequireableCheckboxInner = function(
@@ -124,7 +117,6 @@ export const RequireableCheckboxInner = function(
     /**
      * Calculate external properties (a set of all configurable properties).
      * @param properties - Properties to merge.
-     *
      * @returns External properties object.
      */
     const getConsolidatedProperties = (properties:Props):Properties => {
@@ -153,54 +145,52 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered on blur events.
      * @param event - Event object.
-     *
-     * @returns Nothing.
      */
-    const onBlur = (event:SyntheticEvent):void => setValueState((
-        oldValueState:ValueState
-    ):ValueState => {
-        let changed = false
+    const onBlur = (event:SyntheticEvent):void => {
+        setValueState((
+            oldValueState:ValueState
+        ):ValueState => {
+            let changed = false
 
-        if (oldValueState.modelState.focused) {
-            properties.focused = false
-            changed = true
-        }
+            if (oldValueState.modelState.focused) {
+                properties.focused = false
+                changed = true
+            }
 
-        if (!oldValueState.modelState.visited) {
-            properties.visited = true
-            changed = true
-        }
+            if (!oldValueState.modelState.visited) {
+                properties.visited = true
+                changed = true
+            }
 
-        if (changed) {
-            onChange(event)
+            if (changed) {
+                onChange(event)
+
+                triggerCallbackIfExists<Properties>(
+                    properties,
+                    'changeState',
+                    controlled,
+                    properties.model.state,
+                    event,
+                    properties
+                )
+            }
 
             triggerCallbackIfExists<Properties>(
-                properties,
-                'changeState',
-                controlled,
-                properties.model.state,
-                event,
-                properties
+                properties, 'blur', controlled, event, properties
             )
-        }
 
-        triggerCallbackIfExists<Properties>(
-            properties, 'blur', controlled, event, properties
-        )
-
-        return changed ?
-            {...oldValueState, modelState: properties.model.state} :
-            oldValueState
-    })
+            return changed ?
+                {...oldValueState, modelState: properties.model.state} :
+                oldValueState
+        })
+    }
     /**
      * Triggered on any change events. Consolidates properties object and
      * triggers given on change callbacks.
      * @param event - Potential event object.
-     *
-     * @returns Nothing.
      */
     const onChange = (event?:SyntheticEvent):void => {
-        Tools.extend(
+        extend(
             true,
             properties,
             getConsolidatedProperties(
@@ -219,8 +209,6 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered when ever the value changes.
      * @param event - Event object.
-     *
-     * @returns Nothing.
      */
     const onChangeValue = (event:SyntheticEvent):void => {
         if (!(properties.model.mutable && properties.model.writable))
@@ -278,8 +266,6 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered on click events.
      * @param event - Mouse event object.
-     *
-     * @returns Nothing.
      */
     const onClick = (event:ReactMouseEvent):void => {
         triggerCallbackIfExists<Properties>(
@@ -291,8 +277,6 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggered on focus events.
      * @param event - Focus event object.
-     *
-     * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent):void => {
         triggerCallbackIfExists<Properties>(
@@ -304,11 +288,9 @@ export const RequireableCheckboxInner = function(
     /**
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
-     *
-     * @returns Nothing.
      */
-    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
-        setValueState((oldValueState:ValueState):ValueState => {
+    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void => {
+        setValueState((oldValueState: ValueState):ValueState => {
             let changedState = false
 
             if (!oldValueState.modelState.focused) {
@@ -345,6 +327,7 @@ export const RequireableCheckboxInner = function(
 
             return result
         })
+    }
     // endregion
     // region properties
     /// region references
@@ -365,8 +348,8 @@ export const RequireableCheckboxInner = function(
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:Props = Tools.extend(
-        true, Tools.copy(RequireableCheckbox.defaultProperties), givenProps
+    const givenProperties:Props = extend(
+        true, copy(RequireableCheckbox.defaultProperties), givenProps
     )
     /*
         NOTE: This values have to share the same state item since they have to
@@ -401,7 +384,7 @@ export const RequireableCheckboxInner = function(
     */
     if (
         !controlled && properties.value !== valueState.value ||
-        !Tools.equals(properties.model.state, valueState.modelState)
+        !equals(properties.model.state, valueState.modelState)
     )
         setValueState(currentValueState)
     if (controlled)
@@ -478,16 +461,14 @@ export const RequireableCheckboxInner = function(
 RequireableCheckboxInner.displayName = 'RequireableCheckbox'
 /**
  * Wrapping web component compatible react component.
- * @property static:defaultModelState - Initial model state.
- * @property static:defaultProperties - Initial property configuration.
- * @property static:propTypes - Triggers reacts runtime property value checks.
- * @property static:strict - Indicates whether we should wrap render output in
- * reacts strict component.
- * @property static:wrapped - Wrapped component.
- *
+ * @property defaultModelState - Initial model state.
+ * @property defaultProperties - Initial property configuration.
+ * @property propTypes - Triggers reacts runtime property value checks.
+ * @property strict - Indicates whether we should wrap render output in reacts
+ * strict component.
+ * @property wrapped - Wrapped component.
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
- *
  * @returns React elements.
  */
 export const RequireableCheckbox:CheckboxComponent<
@@ -519,7 +500,3 @@ RequireableCheckbox.propTypes = propertyTypes
 RequireableCheckbox.strict = false
 // endregion
 export default RequireableCheckbox
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

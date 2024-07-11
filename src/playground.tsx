@@ -18,8 +18,16 @@
 */
 // region imports
 import {Tab, TabBar} from '@rmwc/tabs'
-import Tools from 'clientnode'
-import {Mapping, UnknownFunction} from 'clientnode/type'
+import {
+    dateTimeFormat,
+    debounce,
+    extend,
+    LOCALES,
+    Mapping,
+    represent,
+    timeout,
+    UnknownFunction
+} from 'clientnode'
 import {ReactNode, useState} from 'react'
 import {createRoot} from 'react-dom/client'
 import {useMemorizedValue} from 'react-generic-tools'
@@ -50,7 +58,7 @@ import {
 import {slicePropertiesForStateRecursively} from './helper'
 // endregion
 // region configuration
-Tools.locales.push('de-DE')
+LOCALES.push('de-DE')
 TextInput.transformer.currency.format!.final.options = {currency: 'EUR'}
 
 const SECTIONS = [
@@ -193,7 +201,7 @@ const Application = () => {
             end: {value: nextStartTimeInSeconds + 60 ** 2}
         }
 
-        return Tools.extend(true, item, {model: {value}, value})
+        return extend(true, item, {model: {value}, value})
     })
 
     const [textInputInputsValue, setTextInputInputsValue] =
@@ -921,14 +929,14 @@ const Application = () => {
                         placeholder="selectionInput6ModelPlaceholder"
                         searchSelection
                         suggestionCreator={useMemorizedValue(
-                            Tools.debounce<Array<string>>(
+                            debounce<Array<string>>(
                                 (({query}:SuggestionCreatorOptions<
                                     InputProperties<string>
                                 >):Array<string>|Promise<Array<string>> => {
                                     if (!query || query.length < 3)
                                         return []
 
-                                    return Tools.timeout(2000)
+                                    return timeout(2000)
                                         .then(():Array<string> =>
                                             [
                                                 'hans with veeeeeeeeeeeeeeee' +
@@ -973,7 +981,7 @@ const Application = () => {
                             async ({query}:SuggestionCreatorOptions<
                                 InputProperties<string>
                             >):Promise<Mapping> => {
-                                await Tools.timeout(500)
+                                await timeout(500)
 
                                 const selection:Mapping = {
                                     a: 'hans with veeeeeeeeeeeeeeeery ' +
@@ -1075,7 +1083,7 @@ const Application = () => {
                                     {(value.blob as File).lastModified ?
                                         <li>
                                             Last modified date time:
-                                            {Tools.dateTimeFormat(
+                                            {dateTimeFormat(
                                                 '${mediumDay}.${mediumMonth}.' +
                                                 '${fullYear}',
                                                 new Date(
@@ -1202,7 +1210,7 @@ const Application = () => {
                         showInitialValidationState
                     >
                         {useMemorizedValue(({properties}) =>
-                            <Interval {...Tools.extend(
+                            <Interval {...extend(
                                 true,
                                 properties,
                                 {
@@ -1368,10 +1376,10 @@ const Application = () => {
                         visible independently from current scroll position.
                      */}
                     <pre className="playground__outputs__bar">
-                        {Tools.represent(selectedState)}
+                        {represent(selectedState)}
                     </pre>
                     <pre className="playground__outputs__content">
-                        {Tools.represent(selectedState)}
+                        {represent(selectedState)}
                     </pre>
                 </div> :
                 ''
@@ -1382,7 +1390,3 @@ const Application = () => {
 }
 window.onload = ():void =>
     createRoot(document.querySelector('application')!).render(<Application />)
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

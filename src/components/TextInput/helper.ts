@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import {Mapping} from 'clientnode/type'
+import {Mapping} from 'clientnode'
 import {lazy, KeyboardEvent} from 'react'
 import CodeEditorType from 'react-ace'
 import Dummy from 'react-generic-dummy'
@@ -125,7 +125,6 @@ export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
     invalid_styles: 'color font-size line-height',
     keep_styles: false,
     menubar: false,
-    /* eslint-disable max-len */
     plugins: [
         'fullscreen',
         'link',
@@ -134,7 +133,6 @@ export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
         'searchreplace',
         'visualblocks'
     ],
-    /* eslint-enable max-len */
     relative_urls: false,
     remove_script_host: false,
     remove_trailing_brs: true,
@@ -159,7 +157,6 @@ export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
  * Derives validation state from provided properties and state.
  * @param properties - Current component properties.
  * @param currentState - Current component state.
- *
  * @returns Boolean indicating whether component is in an aggregated valid or
  * invalid state.
  */
@@ -227,8 +224,6 @@ export function determineValidationState<T>(
  * Avoid propagating the enter key event since this usually sends a form which
  * is not intended when working in a text field.
  * @param event - Keyboard event.
- *
- * @returns Nothing.
  */
 export function preventEnterKeyPropagation(event:KeyboardEvent) {
     if (event.code === 'Enter')
@@ -239,7 +234,6 @@ export function preventEnterKeyPropagation(event:KeyboardEvent) {
  * suggestion.
  * @param suggestion - Candidate to match again.
  * @param query - Search query to check for matching.
- *
  * @returns Boolean result whether provided suggestion matches given query or
  * not.
  */
@@ -258,7 +252,3 @@ export function suggestionMatches(
 
     return false
 }
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

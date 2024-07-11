@@ -17,8 +17,7 @@
     endregion
 */
 // region imports
-import Tools from 'clientnode'
-import {Mapping} from 'clientnode/type'
+import {copy, extend, Mapping, mask} from 'clientnode'
 import {GenericEvent} from 'react-generic-tools/type'
 import {Icon} from '@rmwc/icon'
 import {IconOptions} from '@rmwc/types'
@@ -126,7 +125,6 @@ const getExternalProperties = (
  * Generic interval start, end input wrapper component.
  * @param props - Component properties.
  * @param reference - Mutable reference bound to created component instance.
- *
  * @returns React elements.
  */
 export const IntervalInner = function(
@@ -155,9 +153,9 @@ export const IntervalInner = function(
     */
     type StrictProps = Omit<Props, 'value'> & {value:Properties['value']}
     const properties:StrictProps =
-        Tools.extend(
+        extend(
             true,
-            Tools.copy(Interval.defaultProperties as StrictProps),
+            copy(Interval.defaultProperties as StrictProps),
             givenProps as StrictProps
         )
 
@@ -194,7 +192,7 @@ export const IntervalInner = function(
         properties.value =
             {end: {value: value.end}, start: {value: value.start}}
     const propertiesToForward =
-        Tools.mask<IntervalInputProps>(
+        mask<IntervalInputProps>(
             properties as unknown as IntervalInputProps,
             {exclude: {
                 className: true,
@@ -211,17 +209,17 @@ export const IntervalInner = function(
             }}
         )
 
-    startProperties = Tools.extend(
+    startProperties = extend(
         true,
-        Tools.copy(propertiesToForward),
+        copy(propertiesToForward),
         properties.model?.value?.start ?
             {model: properties.model.value.start} :
             {},
         startProperties
     )
-    endProperties = Tools.extend(
+    endProperties = extend(
         true,
-        Tools.copy(propertiesToForward),
+        copy(propertiesToForward),
         properties.model?.value?.end ?
             {model: properties.model.value.end} :
             {},
@@ -450,15 +448,13 @@ export const IntervalInner = function(
 IntervalInner.displayName = 'Interval'
 /**
  * Wrapping web component compatible react component.
- * @property static:defaultProperties - Initial property configuration.
- * @property static:propTypes - Triggers reacts runtime property value checks.
- * @property static:strict - Indicates whether we should wrap render output in
- * reacts strict component.
- * @property static:wrapped - Wrapped component.
- *
+ * @property defaultProperties - Initial property configuration.
+ * @property propTypes - Triggers reacts runtime property value checks.
+ * @property strict - Indicates whether we should wrap render output in reacts
+ * strict component.
+ * @property wrapped - Wrapped component.
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
- *
  * @returns React elements.
  */
 export const Interval:IntervalComponent<typeof IntervalInner> =
@@ -475,7 +471,3 @@ Interval.propTypes = propertyTypes
 Interval.strict = false
 // endregion
 export default Interval
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

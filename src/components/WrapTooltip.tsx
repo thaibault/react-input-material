@@ -27,13 +27,12 @@ import {Properties} from '../type'
 export const isDummy:boolean =
     !Tooltip || (Tooltip as unknown as typeof Dummy).isDummy
 /**
-  * Wraps given component with a tooltip component with given tooltip
-  * configuration.
-  * @param properties - Component provided properties.
-  * @param properties.children - Component or string to wrap.
-  * @param properties.options - Tooltip options.
-  *
-  * @returns Wrapped given content.
+ * Wraps given component with a tooltip component with given tooltip
+ * configuration.
+ * @param properties - Component provided properties.
+ * @param properties.children - Component or string to wrap.
+ * @param properties.options - Tooltip options.
+ * @returns Wrapped given content.
  */
 export const WrapTooltip:FunctionComponent<{
     children:ReactElement
@@ -81,7 +80,3 @@ export const WrapTooltip:FunctionComponent<{
 }
 
 export default WrapTooltip
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

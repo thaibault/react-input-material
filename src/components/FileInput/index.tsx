@@ -107,11 +107,9 @@ export {
 /* eslint-disable jsdoc/require-description-complete-sentence */
 /**
  * Validatable checkbox wrapper component.
- * @property static:displayName - Descriptive name for component to show in web
+ * @property displayName - Descriptive name for component to show in web
  * developer tools.
- *
  * Dataflow:
- *
  * 1. On-Render all states are merged with given properties into a normalized
  *    property object.
  * 2. Properties, corresponding state values and sub node instances are saved
@@ -122,13 +120,10 @@ export {
  * 4. All state changes except selection changes trigger an "onChange" event
  *    which delivers the consolidated properties object (with latest
  *    modifications included).
- *
- * @property static:displayName - Descriptive name for component to show in web
+ * @property displayName - Descriptive name for component to show in web
  * developer tools.
- *
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
- *
  * @returns React elements.
  */
 export const FileInputInner = function<Type extends FileValue = FileValue>(
@@ -140,7 +135,6 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     /**
      * Calculate external properties (a set of all configurable properties).
      * @param properties - Properties to merge.
-     *
      * @returns External properties object.
      */
     const getConsolidatedProperties = (properties:Props<Type>):Properties<
@@ -174,8 +168,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     /**
      * Triggered on blur events.
      * @param event - Event object.
-     *
-     * @returns Nothing.
+     * @returns Current validation state.
      */
     const onBlur = (event:SyntheticEvent):void => setValueState((
         oldValueState:ValueState<Type>
@@ -217,8 +210,6 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      * Triggered on any change events. Consolidates properties object and
      * triggers given on change callbacks.
      * @param event - Potential event object.
-     *
-     * @returns Nothing.
      */
     const onChange = (event?:SyntheticEvent) => {
         if (nameInputReference.current?.properties)
@@ -253,8 +244,6 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      * @param inputProperties - Current properties state.
      * @param attachBlobProperty - Indicates whether additional data is added
      * through post processed data properties.
-     *
-     * @returns Nothing.
      */
     const onChangeValue = (
         eventSourceOrName?:Partial<Type>|string|SyntheticEvent,
@@ -378,8 +367,6 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     /**
      * Triggered on click events.
      * @param event - Mouse event object.
-     *
-     * @returns Nothing.
      */
     const onClick = (event:ReactMouseEvent) => {
         triggerCallbackIfExists<Properties<Type>>(
@@ -391,8 +378,6 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     /**
      * Triggered on focus events.
      * @param event - Focus event object.
-     *
-     * @returns Nothing.
      */
     const onFocus = (event:ReactFocusEvent) => {
         triggerCallbackIfExists<Properties<Type>>(
@@ -404,8 +389,6 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     /**
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
-     *
-     * @returns Nothing.
      */
     const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void =>
         setValueState((oldValueState:ValueState<Type>):ValueState<Type> => {
@@ -966,16 +949,14 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
 FileInputInner.displayName = 'FileInput'
 /**
  * Wrapping web component compatible react component.
- * @property static:defaultModelState - Initial model state.
- * @property static:defaultProperties - Initial property configuration.
- * @property static:propTypes - Triggers reacts runtime property value checks.
- * @property static:strict - Indicates whether we should wrap render output in
- * reacts strict component.
- * @property static:wrapped - Wrapped component.
- *
+ * @property defaultModelState - Initial model state.
+ * @property defaultProperties - Initial property configuration.
+ * @property propTypes - Triggers reacts runtime property value checks.
+ * @property strict - Indicates whether we should wrap render output in reacts
+ * strict component.
+ * @property wrapped - Wrapped component.
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
- *
  * @returns React elements.
  */
 export const FileInput = memorize(forwardRef(FileInputInner)) as
@@ -1006,7 +987,3 @@ FileInput.renderProperties = renderProperties
 FileInput.strict = false
 // endregion
 export default FileInput
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

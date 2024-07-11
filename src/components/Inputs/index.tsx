@@ -17,8 +17,7 @@
     endregion
 */
 // region imports
-import Tools from 'clientnode'
-import {Mapping} from 'clientnode/type'
+import {copy, extend, isFunction, Mapping} from 'clientnode'
 import {GenericEvent} from 'react-generic-tools/type'
 import {
     createRef,
@@ -155,11 +154,10 @@ const getExternalProperties = function<T, P extends InputsPropertiesItem<T>>(
 // endregion
 /**
  * Generic inputs wrapper component.
- * @property static:displayName - Descriptive name for component to show in web
+ * @property displayName - Descriptive name for component to show in web
  * developer tools.
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
- *
  * @returns React elements.
  */
 export const InputsInner = function<
@@ -189,11 +187,9 @@ export const InputsInner = function<
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:InputsProps<T, P> = Tools.extend<InputsProps<T, P>>(
+    const givenProperties:InputsProps<T, P> = extend<InputsProps<T, P>>(
         true,
-        Tools.copy<InputsProps<T, P>>(
-            Inputs.defaultProperties as InputsProps<T, P>
-        ),
+        copy<InputsProps<T, P>>(Inputs.defaultProperties as InputsProps<T, P>),
         givenProps
     )
     // endregion
@@ -225,8 +221,7 @@ export const InputsInner = function<
         inputPropertiesToValues<T, P>(
             determineInitialValue<Array<P>|null>(
                 givenProps,
-                Tools.copy(Inputs.defaultProperties.model?.default) as
-                    Array<P>|null
+                copy(Inputs.defaultProperties.model?.default) as Array<P>|null
             ) ||
             null
         )
@@ -367,12 +362,12 @@ export const InputsInner = function<
         if (index >= properties.value.length)
             properties.value.push({} as P)
 
-        properties.value[index] = Tools.extend<P>(
+        properties.value[index] = extend<P>(
             true,
             {
                 ...properties.createItem({
                     index,
-                    item: Tools.copy(getPrototype<T, P>(properties)),
+                    item: copy(getPrototype<T, P>(properties)),
                     properties,
                     values
                 }),
@@ -505,7 +500,7 @@ export const InputsInner = function<
     const renderInput = (
         inputProperties:Partial<P>, index:number
     ):ReactNode =>
-        Tools.isFunction(properties.children) ?
+        isFunction(properties.children) ?
             properties.children({
                 index,
                 inputsProperties: properties,
@@ -594,15 +589,13 @@ export const InputsInner = function<
 InputsInner.displayName = 'Inputs'
 /**
  * Wrapping web component compatible react component.
- * @property static:defaultProperties - Initial property configuration.
- * @property static:propTypes - Triggers reacts runtime property value checks.
- * @property static:strict - Indicates whether we should wrap render output in
- * reacts strict component.
- * @property static:wrapped - Wrapped component.
- *
+ * @property defaultProperties - Initial property configuration.
+ * @property propTypes - Triggers reacts runtime property value checks.
+ * @property strict - Indicates whether we should wrap render output in reacts
+ * strict component.
+ * @property wrapped - Wrapped component.
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
- *
  * @returns React elements.
  */
 export const Inputs:InputsComponent<typeof InputsInner> =
@@ -620,7 +613,3 @@ Inputs.renderProperties = renderProperties
 Inputs.strict = false
 // endregion
 export default Inputs
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion
