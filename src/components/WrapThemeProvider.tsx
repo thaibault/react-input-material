@@ -28,7 +28,6 @@ import {ThemeProvider, ThemeProviderProps} from '@rmwc/theme'
  * @param properties.wrap - Instead of injecting a div tag, wrap a child
  * component by merging the theme styles directly onto it. Useful when you
  * don't want to mess with layout.
- *
  * @returns Wrapped content.
  */
 export const WrapThemeProvider:FunctionComponent<{
@@ -42,7 +41,3 @@ export const WrapThemeProvider:FunctionComponent<{
     children
 
 export default WrapThemeProvider
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

@@ -25,7 +25,3 @@ export {WrapConfigurations} from './components/WrapConfigurations'
 export {WrapStrict} from './components/WrapStrict'
 export {WrapThemeProvider} from './components/WrapThemeProvider'
 export {WrapTooltip} from './components/WrapTooltip'
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

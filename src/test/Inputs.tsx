@@ -55,7 +55,3 @@ describe('Inputs', ():void => {
         ).toHaveProperty('value', 'a')
     })
 })
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

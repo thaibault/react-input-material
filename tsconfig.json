@@ -3,7 +3,7 @@
         "declaration": true,
         "declarationDir": "dist/"
     },
-    "extends": "./node_modules/weboptimizer/tsconfigApplication.json",
+    "extends": "./node_modules/weboptimizer/tsconfig.application.json",
     "include": [
         "src/*.d.ts",
         "src/**/*.d.ts",

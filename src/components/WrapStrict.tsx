@@ -25,7 +25,6 @@ import {FunctionComponent, ReactElement, ReactNode, StrictMode} from 'react'
  * @param properties.children - Components to wrap.
  * @param properties.strict - Indicates whether to wrap with strict indicating
  * component.
- *
  * @returns React component.
  */
 export const WrapStrict:FunctionComponent<{
@@ -35,7 +34,3 @@ export const WrapStrict:FunctionComponent<{
     strict ? <StrictMode>{children}</StrictMode> : <>{children}</>
 
 export default WrapStrict
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

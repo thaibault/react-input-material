@@ -17,7 +17,7 @@
     endregion
 */
 // region imports
-import {AnyFunction, FirstParameter} from 'clientnode/type'
+import {AnyFunction, FirstParameter} from 'clientnode'
 import {
     forwardRef,
     ForwardRefRenderFunction,
@@ -44,7 +44,6 @@ import {ConfigurationProperties} from '../type'
  * @param properties.wrap - Instead of injecting a div tag, wrap a child
  * component by merging the theme styles directly onto it. Useful when you
  * don't want to mess with layout.
- *
  * @returns Wrapped content.
  */
 export const WrapConfigurations:FunctionComponent<
@@ -65,7 +64,6 @@ export const WrapConfigurations:FunctionComponent<
  * to wrapping component.
  * @param options.withThemeWrapper - Indicates whether all theme configurations
  * should be provided.
- *
  * @returns Created wrapped component.
  */
 export function createWrapConfigurationsComponent<
@@ -121,7 +119,3 @@ export function createWrapConfigurationsComponent<
 }
 
 export default WrapConfigurations
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

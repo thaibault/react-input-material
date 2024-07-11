@@ -15,8 +15,8 @@
 */
 // region imports
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
-import {testEach} from 'clientnode/testHelper'
-import {Mapping} from 'clientnode/type'
+import {Mapping} from 'clientnode'
+import {testEach} from 'clientnode/dist/test-helper'
 import {useMemorizedValue} from 'react-generic-tools'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 import {TestHookResult} from 'react-generic-tools/type'
@@ -139,7 +139,3 @@ describe('helper', ():void => {
     })
     // endregion
 })
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

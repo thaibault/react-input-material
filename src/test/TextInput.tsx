@@ -15,8 +15,8 @@
 */
 // region imports
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
-import {AnyFunction} from 'clientnode/type'
-import {testEach} from 'clientnode/testHelper'
+import {AnyFunction} from 'clientnode'
+import {testEach} from 'clientnode/dist/test-helper'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
 import TextInput, {suggestionMatches} from '../components/TextInput'
@@ -271,7 +271,3 @@ describe('TextInput', () => {
         ).not.toStrictEqual(null)
     })
 })
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
-// endregion

@@ -20,7 +20,3 @@ This library written by Torben Sickert stand under a creative commons naming
 @import "./components/RequireableCheckbox/import.module.css";
 
 @import "./material-fixes.css";
-/* region vim modline
-vim: set tabstop=4 shiftwidth=4 expandtab:
-vim: foldmethod=marker foldmarker=region,endregion:
-endregion */

@@ -18,7 +18,7 @@
 */
 // region imports
 import {blobToBase64String} from 'blob-util'
-import {Mapping} from 'clientnode/type'
+import {Mapping} from 'clientnode'
 /*
 "namedExport" version of css-loader:
 
@@ -84,7 +84,6 @@ export const VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
  * @param properties - Actual properties to derive from.
  * @param properties.name - Name of filename input field.
  * @param properties.value - Current edited file value.
- *
  * @returns Input properties.
  */
 export const preserveStaticFileBaseNameInputGenerator = <
@@ -106,8 +105,7 @@ export const preserveStaticFileBaseNameInputGenerator = <
 /**
  * Determines which type of file we have to present.
  * @param contentType - File type to derive representation type from.
- *
- * @returns Nothing.
+ * @returns Representative string for given content type.
  */
 export const determineRepresentationType = (
     contentType:string
@@ -136,7 +134,6 @@ export const determineRepresentationType = (
  * @param properties - Current component properties.
  * @param invalidName - Determines if edited file name is invalid or not.
  * @param currentState - Current component state.
- *
  * @returns Boolean indicating Whether component is in an aggregated valid or
  * invalid state.
  */
@@ -203,7 +200,6 @@ export const determineValidationState = <
 /**
  * Derive base46 string from given file value.
  * @param value - File to derive string from.
- *
  * @returns A promise holding base64 string.
  */
 export const deriveBase64String = <Type extends FileValue = FileValue>(
@@ -223,9 +219,8 @@ export const deriveBase64String = <Type extends FileValue = FileValue>(
  * Read text from given binary data with given encoding.
  * @param blob - Binary data object.
  * @param encoding - Encoding for reading file correctly.
- *
  * @returns A promise holding parsed text as string.
- **/
+ */
 export const readBinaryDataIntoText = (
     blob:Blob, encoding = 'utf-8'
 ):Promise<string> =>
@@ -260,8 +255,4 @@ export const readBinaryDataIntoText = (
         )
     })
 /// endregion
-// endregion
-// region vim modline
-// vim: set tabstop=4 shiftwidth=4 expandtab:
-// vim: foldmethod=marker foldmarker=region,endregion:
 // endregion
