@@ -1908,9 +1908,9 @@ export const TextInputInner = function<Type = unknown>(
                 if (result) {
                     currentRenderableSuggestions.push(
                         <MenuItem
-                            className={CSS_CLASS_NAMES[
-                                'textInputSuggestionsSuggestion'
-                            ]}
+                            className={
+                                CSS_CLASS_NAMES.textInputSuggestionsSuggestion
+                            }
                             key={index}
                         >
                             {result}
@@ -1928,9 +1928,9 @@ export const TextInputInner = function<Type = unknown>(
             ) {
                 currentRenderableSuggestions.push(
                     <MenuItem
-                        className={CSS_CLASS_NAMES[
-                            'textInputSuggestionsSuggestion'
-                        ]}
+                        className={
+                            CSS_CLASS_NAMES.textInputSuggestionsSuggestion
+                        }
                         key={index}
                     >
                         {(mark(
@@ -1940,9 +1940,10 @@ export const TextInputInner = function<Type = unknown>(
                             )?.split(' ') || '',
                             {
                                 marker: (foundWord:string):ReactElement =>
-                                    <span className={CSS_CLASS_NAMES[
-                                        'textInputSuggestionsSuggestionMark'
-                                    ]}>
+                                    <span className={
+                                        CSS_CLASS_NAMES
+                                            .textInputSuggestionsSuggestionMark
+                                    }>
                                         {foundWord}
                                     </span>,
                                 normalizer: (value:unknown):string =>
@@ -2251,9 +2252,9 @@ export const TextInputInner = function<Type = unknown>(
                                         suggestionMenuAPIReference.current =
                                             instance
                                     }}
-                                    className={CSS_CLASS_NAMES[
-                                        'textInputSuggestions'
-                                    ]}
+                                    className={
+                                        CSS_CLASS_NAMES.textInputSuggestions
+                                    }
                                     focusOnOpen={false}
                                     foundationRef={
                                         suggestionMenuFoundationReference

@@ -88,7 +88,6 @@ export function determineValidationState(
     )
 }
 // endregion
-/* eslint-disable jsdoc/require-description-complete-sentence */
 /**
  * Wrapper component for checkboxes to validate.
  * @property displayName - Descriptive name for component to show in web
@@ -97,14 +96,13 @@ export function determineValidationState(
  * 1. On-Render all states are merged with given properties into a normalized
  *    property object.
  * 2. Properties, corresponding state values and sub node instances are saved
- *    into a "ref" object (to make them accessible from the outside e.g. for
- *    wrapper like web-components).
+ *    into a "ref" object (to make them accessible from the outside for example
+ *    for wrapper like web-components).
  * 3. Event handler saves corresponding data modifications into state and
  *    normalized properties object.
  * 4. All state changes except selection changes trigger an "onChange" event
  *    which delivers the consolidated properties object (with latest
  *    modifications included).
- * developer tools.
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
@@ -112,7 +110,6 @@ export function determineValidationState(
 export const RequireableCheckboxInner = function(
     props:Props, reference?:MutableRefObject<Adapter>
 ):ReactElement {
-/* eslint-enable jsdoc/require-description-complete-sentence */
     // region property aggregation
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -135,7 +132,7 @@ export const RequireableCheckboxInner = function(
     }
     // endregion
     useEffect(
-        ():void => {
+        () => {
             if (properties.triggerInitialPropertiesConsolidation)
                 onChange()
         },
@@ -432,7 +429,15 @@ export const RequireableCheckboxInner = function(
                 id={properties.id || properties.name}
                 indeterminate={properties.value === null}
                 inputRef={inputReference}
-                label={(
+                name={properties.name}
+                onBlur={onBlur}
+                onChange={onChangeValue}
+                onClick={onClick}
+                onFocus={onFocus}
+                ripple={properties.ripple}
+                value={`${properties.value as unknown as string}`}
+            >
+                {(
                     properties.invalid &&
                     properties.showValidationState &&
                     (
@@ -445,14 +450,7 @@ export const RequireableCheckboxInner = function(
                     </Theme> :
                     properties.description || properties.name
                 }
-                name={properties.name}
-                onBlur={onBlur}
-                onChange={onChangeValue}
-                onClick={onClick}
-                onFocus={onFocus}
-                ripple={properties.ripple}
-                value={`${properties.value as unknown as string}`}
-            />
+            </Checkbox>
         </div>
     </WrapConfigurations>
     // endregion

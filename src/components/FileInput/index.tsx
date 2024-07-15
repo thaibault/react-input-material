@@ -741,9 +741,10 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                 properties.value?.source &&
                                 representationType === 'text' ?
                                     <pre
-                                        className={CSS_CLASS_NAMES[
-                                            'fileInputTextRepresentation'
-                                        ]}
+                                        className={
+                                            CSS_CLASS_NAMES
+                                                .fileInputTextRepresentation
+                                        }
                                     >
                                         {properties.value.source}
                                     </pre> :
@@ -908,9 +909,10 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                         ripple={properties.ripple}
                                     >
                                         <a
-                                            className={CSS_CLASS_NAMES[
-                                                'fileInputDownload'
-                                            ]}
+                                            className={
+                                                CSS_CLASS_NAMES
+                                                    .fileInputDownload
+                                            }
                                             download={properties.value.name}
                                             href={properties.value.url}
                                             ref={downloadLinkReference}
