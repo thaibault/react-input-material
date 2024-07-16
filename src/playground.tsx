@@ -1053,7 +1053,7 @@ const Application = () => {
                     <FileInput<FileValue>
                         default={useMemorizedValue({
                             blob: {type: 'image/png'},
-                            url: 'https://via.placeholder.com/150'
+                            url: '/placeholder/150'
                         })}
 
                         contentTypePattern="^text/(?:plain|(?:x-)?csv|xml)$"
