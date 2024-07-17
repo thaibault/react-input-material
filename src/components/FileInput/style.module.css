@@ -42,17 +42,17 @@ endregion */
         border-left: 1px dashed black;
         box-sizing: content-box;
         opacity: 0.5;
-
-        margin-bottom: -55px;
-
-        height: 200px;
-        transform: scale(0.75);
-        transform-origin: 0 0;
+        font-size: 0.5rem;
+        max-height: 225px;
     }
 
     .file-input__iframe-wrapper {
+        height: 200px;
+        margin-bottom: -55px;
+
+        transform: scale(0.75);
+        transform-origin: 0 0;
         overflow: hidden;
-        width: 645px;
 
         iframe {
             padding: 0 10px;

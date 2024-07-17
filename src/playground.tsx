@@ -1050,6 +1050,7 @@ const Application = () => {
                     }}
                 >
                     <FileInput name="fileInput1" onChange={onChange} />
+
                     <FileInput<FileValue>
                         default={useMemorizedValue({
                             blob: {type: 'image/png'},
