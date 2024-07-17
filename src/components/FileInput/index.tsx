@@ -83,6 +83,7 @@ import {
 
 import {
     CSS_CLASS_NAMES,
+    determineContentType,
     determineRepresentationType,
     determineValidationState,
     deriveBase64String,
@@ -94,7 +95,7 @@ export {
 
     IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION,
     TEXT_CONTENT_TYPE_REGULAR_EXPRESSION,
-    REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION,
+    EMBEDABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION,
     VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION,
 
     determineRepresentationType,
@@ -439,6 +440,8 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         useRef<InputAdapter<string>>(null)
     const uploadButtonReference:MutableRefObject<HTMLDivElement|null> =
         useRef<HTMLDivElement>(null)
+    const iFrameReference:MutableRefObject<HTMLIFrameElement|null> =
+        useRef<HTMLIFrameElement>(null)
     /// endregion
     const givenProps:Props<Type> = translateKnownSymbols(props)
 
@@ -511,10 +514,11 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         reference,
         ():Adapter<Type> & {
             references:{
-                deleteButtonReference:MutableRefObject<HTMLButtonElement|null>,
-                downloadLinkReference:MutableRefObject<HTMLAnchorElement|null>,
-                fileInputReference:MutableRefObject<HTMLInputElement|null>,
-                nameInputReference:MutableRefObject<InputAdapter<string>|null>,
+                deleteButtonReference:MutableRefObject<HTMLButtonElement|null>
+                downloadLinkReference:MutableRefObject<HTMLAnchorElement|null>
+                fileInputReference:MutableRefObject<HTMLInputElement|null>
+                iFrameReference:MutableRefObject<HTMLIFrameElement|null>
+                nameInputReference:MutableRefObject<InputAdapter<string>|null>
                 uploadButtonReference:MutableRefObject<HTMLDivElement|null>
             }
         } => ({
@@ -523,6 +527,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                 deleteButtonReference,
                 downloadLinkReference,
                 fileInputReference,
+                iFrameReference,
                 nameInputReference,
                 uploadButtonReference
             },
@@ -541,15 +546,14 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                     // Derive missing blob from given source.
                     if (properties.value.url?.startsWith('data:'))
                         valueChanged.blob =
-                            dataURLToBlob(properties.value.source)
+                            dataURLToBlob(properties.value.url)
                     else if (properties.sourceToBlobOptions)
                         valueChanged.blob = new Blob(
                             [properties.value.source],
                             properties.sourceToBlobOptions
                         )
                 } else if (!properties.value.url) {
-                    const type =
-                        (properties.value.blob as Blob)?.type || 'text/plain'
+                    const type = contentType || 'text/plain'
                     /*
                         Try to derive missing encoded base64 url from given
                         blob or plain source.
@@ -576,30 +580,22 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                             readBinaryDataIntoText(blob, properties.encoding) :
                             deriveBase64String(properties.value)
                     )
-                } else if (
-                    properties.value?.url &&
-                    representationType === 'text'
-                ) {
+                } else if (properties.value?.url) {
                     blob = await (properties.value.url?.startsWith('data:') ?
                         dataURLToBlob(properties.value.url) :
                         (await fetch(properties.value.url)).blob()
                     )
 
-                    // Derive missing source from given data url.
-                    valueChanged.source = await readBinaryDataIntoText(
-                        blob, properties.encoding
-                    )
+                    if (representationType === 'text')
+                        // Derive missing source from given data url.
+                        valueChanged.source = await readBinaryDataIntoText(
+                            blob, properties.encoding
+                        )
                 }
 
-                if (
-                    !properties.value?.hash &&
-                    (blob || properties.value?.url)
-                ) {
-                    if (!blob && properties.value?.url)
-                        blob = await (await fetch(properties.value.url)).blob()
-
+                if (!properties.value?.hash && blob) {
                     /*
-                        we have a blob but no hash so far. Therefore we read
+                        We have a blob but no hash so far, therefore we read
                         the file with reduced memory effort chunk by chunk
                         having the configured size.
                     */
@@ -667,13 +663,10 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         },
         []
     )
+    const contentType = determineContentType<Type>(properties)
     // region render
     const representationType:RepresentationType =
-        (properties.value?.blob as Blob)?.type ?
-            determineRepresentationType(
-                (properties.value!.blob as Blob).type
-            ) :
-            'binary'
+        contentType ? determineRepresentationType(contentType) : 'binary'
     const invalid:boolean = (
         properties.invalid &&
         properties.showValidationState &&
@@ -711,18 +704,15 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                             <video autoPlay loop muted>
                                 <source
                                     src={properties.value.url}
-                                    type={(properties.value.blob as Blob).type}
+                                    type={contentType!}
                                 />
                             </video> :
-                            representationType === 'renderableText' ?
+                            representationType === 'embedableText' ?
                                 <div className={
                                     [CSS_CLASS_NAMES.fileInputIframeWrapper]
                                         .concat(
                                             ['text/html', 'text/plain']
-                                                .includes((
-                                                    properties.value.blob as
-                                                        Blob
-                                                ).type) ?
+                                                .includes(contentType!) ?
                                                 CSS_CLASS_NAMES[
                                                     'fileInputIframeWrapper' +
                                                     'Padding'
@@ -732,6 +722,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                         .join(' ')
                                 }>
                                     <iframe
+                                        ref={iFrameReference}
                                         style={{border: 0, overflow: 'hidden'}}
                                         frameBorder="0"
                                         scrolling="no"
@@ -917,13 +908,8 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                             href={properties.value.url}
                                             ref={downloadLinkReference}
                                             target="_blank"
-                                            {...((
-                                                properties.value.blob as Blob
-                                            )?.type ?
-                                                {type: (
-                                                    properties.value.blob as
-                                                        Blob
-                                                ).type} :
+                                            {...(contentType ?
+                                                {type: contentType} :
                                                 {}
                                             )}
                                         >{properties.downloadButton}</a>

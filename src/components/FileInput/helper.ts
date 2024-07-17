@@ -39,7 +39,8 @@ import {
     FileInputModelState as ModelState,
     FileValue,
     InputProps,
-    FileRepresentationType as RepresentationType, FileInputProperties
+    FileRepresentationType as RepresentationType,
+    FileInputProperties
 } from '../../type'
 import {ElementType} from 'react'
 // endregion
@@ -65,7 +66,7 @@ export const TEXT_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
     '$',
     'i'
 )
-export const REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION =
+export const EMBEDABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION =
     // Plain version:
     /^text\/plain$/i
     // Rendered version:
@@ -103,6 +104,28 @@ export const preserveStaticFileBaseNameInputGenerator = <
             )
     })
 /**
+ * Determines files content type for given file input properties.
+ * @param properties - File input properties to analyze.
+ * @returns The determined content type.
+ */
+export const determineContentType = <Type extends FileValue = FileValue>(
+    properties:FileInputProperties<Type>
+):null|string => {
+    if (properties.value) {
+        if ((properties.value.blob as Blob)?.type)
+            return (properties.value.blob as Blob)?.type
+
+        if (properties.value.url?.startsWith('data:')) {
+            const contentTypeMatch =
+                properties.value.url.match(/^data:([^/]+\/[^;]+).*$/)
+            if (contentTypeMatch)
+                return contentTypeMatch[1]
+        }
+    }
+
+    return null
+}
+/**
  * Determines which type of file we have to present.
  * @param contentType - File type to derive representation type from.
  * @returns Representative string for given content type.
@@ -112,14 +135,13 @@ export const determineRepresentationType = (
 ):RepresentationType => {
     contentType = contentType.replace(/; *charset=.+$/, '')
 
-    if (TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType)) {
-        if (REPRESENTABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
-            contentType
-        ))
-            return 'renderableText'
-
+    if (TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType))
         return 'text'
-    }
+
+    if (EMBEDABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
+        contentType
+    ))
+        return 'embedableText'
 
     if (IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType))
         return 'image'
