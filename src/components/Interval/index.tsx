@@ -62,7 +62,7 @@ import {
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
-const determineControlled = (props:Props) =>
+const determineControlled = (props: Props) =>
     props.model?.value?.end?.value !== undefined ||
     props.model?.value?.start?.value !== undefined ||
     props.value !== undefined &&
@@ -71,17 +71,17 @@ const determineControlled = (props:Props) =>
         (props.value?.end as IntervalInputProps)?.value === undefined
     )
 const normalizeDateTimeToNumber = (
-    value?:null|number|string, fallbackValue = 0
-):number =>
+    value?: null|number|string, fallbackValue = 0
+): number =>
     typeof value === 'number' ?
         value :
         value ?
             new Date(value).getTime() / 1000 :
             fallbackValue
 const getModelState = (
-    startProperties:InputProperties<null|number|string>,
-    endProperties:InputProperties<null|number|string>
-):ModelState => ({
+    startProperties: InputProperties<null|number|string>,
+    endProperties: InputProperties<null|number|string>
+): ModelState => ({
     dirty: startProperties.dirty || endProperties.dirty,
     focused: startProperties.focused || endProperties.focused,
     invalid: startProperties.invalid || endProperties.invalid,
@@ -95,11 +95,11 @@ const getModelState = (
     visited: startProperties.visited || endProperties.visited
 })
 const getExternalProperties = (
-    properties:Properties,
-    iconProperties:IconOptions,
-    startProperties:InputProperties<null|number|string>,
-    endProperties:InputProperties<null|number|string>
-):Properties => {
+    properties: Properties,
+    iconProperties: IconOptions,
+    startProperties: InputProperties<null|number|string>,
+    endProperties: InputProperties<null|number|string>
+): Properties => {
     const modelState = getModelState(startProperties, endProperties)
 
     return {
@@ -128,10 +128,10 @@ const getExternalProperties = (
  * @returns React elements.
  */
 export const IntervalInner = function(
-    props:Props, reference?:ForwardedRef<Adapter>
-):ReactElement {
+    props: Props, reference?: ForwardedRef<Adapter>
+): ReactElement {
     // region consolidate properties
-    const givenProps:Props = translateKnownSymbols(props) as Props
+    const givenProps: Props = translateKnownSymbols(props) as Props
     /*
         Normalize value property (providing only value instead of props is
         allowed also).
@@ -151,8 +151,8 @@ export const IntervalInner = function(
         default property object untouched for unchanged usage in other
         instances.
     */
-    type StrictProps = Omit<Props, 'value'> & {value:Properties['value']}
-    const properties:StrictProps =
+    type StrictProps = Omit<Props, 'value'> & {value: Properties['value']}
+    const properties: StrictProps =
         extend(
             true,
             copy(Interval.defaultProperties as StrictProps),
@@ -161,7 +161,7 @@ export const IntervalInner = function(
 
     let endProperties =
         properties.value?.end as IntervalInputProps || {}
-    const iconProperties:IconOptions = typeof properties.icon === 'string' ?
+    const iconProperties: IconOptions = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
         properties.icon!
     let startProperties =
@@ -170,7 +170,7 @@ export const IntervalInner = function(
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
     */
-    const controlled:boolean =
+    const controlled: boolean =
         !properties.enforceUncontrolled &&
         determineControlled(givenProps) &&
         Boolean(properties.onChange || properties.onChangeValue)
@@ -237,7 +237,7 @@ export const IntervalInner = function(
     const endConfiguration = {...endProperties.model, ...endProperties}
 
     // NOTE: Consolidates only internal boundaries for better user experience.
-    const consolidateBoundaries = ({start, end}:Value) => {
+    const consolidateBoundaries = ({start, end}: Value) => {
         startProperties.maximum = formatDateTimeAsConfigured(Math.min(
             normalizeDateTimeToNumber(startConfiguration.maximum, Infinity),
             normalizeDateTimeToNumber(end, Infinity),
@@ -261,7 +261,7 @@ export const IntervalInner = function(
         endProperties.value = end
     }
 
-    const valueState:Value = {
+    const valueState: Value = {
         end: properties.value.end.value, start: properties.value.start.value
     }
 
@@ -281,7 +281,7 @@ export const IntervalInner = function(
     // endregion
     useImperativeHandle(
         reference,
-        ():AdapterWithReferences => ({
+        (): AdapterWithReferences => ({
             properties: getExternalProperties(
                 properties as Properties,
                 iconProperties,
@@ -297,10 +297,10 @@ export const IntervalInner = function(
     // region attach event handler
     if (properties.onChange) {
         startProperties.onChange = (
-            inputProperties:InputProperties<null|number|string>,
-            event?:GenericEvent
-        ):void => {
-            const end:InputProperties<null|number|string> =
+            inputProperties: InputProperties<null|number|string>,
+            event?: GenericEvent
+        ): void => {
+            const end: InputProperties<null|number|string> =
                 endInputReference.current?.properties ||
                 endProperties as unknown as InputProperties<null|number|string>
             end.value = end.model.value = formatDateTimeAsConfigured(Math.max(
@@ -332,10 +332,10 @@ export const IntervalInner = function(
             )
         }
         endProperties.onChange = (
-            inputProperties:InputProperties<null|number|string>,
-            event?:GenericEvent
-        ):void => {
-            const start:InputProperties<null|number|string> =
+            inputProperties: InputProperties<null|number|string>,
+            event?: GenericEvent
+        ): void => {
+            const start: InputProperties<null|number|string> =
                 startInputReference.current?.properties ||
                 startProperties as
                     unknown as
@@ -373,7 +373,7 @@ export const IntervalInner = function(
     }
 
     startProperties.onChangeValue = (
-        value:null|number|string, event?:GenericEvent
+        value: null|number|string, event?: GenericEvent
     ) => {
         const endValue = Math.max(
             normalizeDateTimeToNumber(
@@ -381,7 +381,7 @@ export const IntervalInner = function(
             ),
             normalizeDateTimeToNumber(value, -Infinity)
         )
-        const newValue:Value = {
+        const newValue: Value = {
             end: isFinite(endValue) ? endValue : value, start: value
         }
 
@@ -397,7 +397,7 @@ export const IntervalInner = function(
         setValue(newValue)
     }
     endProperties.onChangeValue = (
-        value:null|number|string, event?:GenericEvent
+        value: null|number|string, event?: GenericEvent
     ) => {
         const startValue = Math.min(
             normalizeDateTimeToNumber(
@@ -405,7 +405,7 @@ export const IntervalInner = function(
             ),
             normalizeDateTimeToNumber(value, Infinity)
         )
-        const newValue:Value = {
+        const newValue: Value = {
             end: value, start: isFinite(startValue) ? startValue : value
         }
 
@@ -457,7 +457,7 @@ IntervalInner.displayName = 'Interval'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Interval:IntervalComponent<typeof IntervalInner> =
+export const Interval: IntervalComponent<typeof IntervalInner> =
     memorize(forwardRef(IntervalInner)) as
         unknown as
         IntervalComponent<typeof IntervalInner>

@@ -20,9 +20,12 @@ import prepareTestEnvironment from 'react-generic-tools/testHelper'
 import WrapTooltip from '../components/WrapTooltip'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
-describe('WrapTooltip', ():void => {
-    test('render', ():void => expect(
-        render(<WrapTooltip><div className="test"/></WrapTooltip>)!
-            .querySelector('.test')
-    ).toBeDefined())
+describe('WrapTooltip', () => {
+    test('render', () => {
+        expect(
+            render(
+                <WrapTooltip><div className="test"/></WrapTooltip>
+            )?.querySelector('.test')
+        ).toBeDefined()
+    })
 })

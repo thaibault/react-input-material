@@ -27,10 +27,10 @@ import {FunctionComponent, ReactElement, ReactNode, StrictMode} from 'react'
  * component.
  * @returns React component.
  */
-export const WrapStrict:FunctionComponent<{
-    children:ReactNode
-    strict:boolean
-}> = ({children, strict}):ReactElement =>
+export const WrapStrict: FunctionComponent<{
+    children: ReactNode
+    strict: boolean
+}> = ({children, strict}): ReactElement =>
     strict ? <StrictMode>{children}</StrictMode> : <>{children}</>
 
 export default WrapStrict

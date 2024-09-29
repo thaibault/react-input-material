@@ -125,8 +125,8 @@ export {
  * @returns React elements.
  */
 export const FileInputInner = function<Type extends FileValue = FileValue>(
-    props:Props<Type>, reference?:ForwardedRef<Adapter<Type>>
-):ReactElement {
+    props: Props<Type>, reference?: ForwardedRef<Adapter<Type>>
+): ReactElement {
     const defaultID = useId()
     const id = props.id ?? defaultID
     // region property aggregation
@@ -135,10 +135,10 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      * @param properties - Properties to merge.
      * @returns External properties object.
      */
-    const getConsolidatedProperties = (properties:Props<Type>):Properties<
+    const getConsolidatedProperties = (properties: Props<Type>): Properties<
         Type
     > => {
-        const result:DefaultProperties<Type> =
+        const result: DefaultProperties<Type> =
             mapPropertiesIntoModel<Props<Type>, DefaultProperties<Type>>(
                 properties,
                 FileInput.defaultProperties.model as FileInputModel<Type>
@@ -168,53 +168,55 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      * @param event - Event object.
      * @returns Current validation state.
      */
-    const onBlur = (event:SyntheticEvent):void => setValueState((
-        oldValueState:ValueState<Type>
-    ):ValueState<Type> => {
-        let changed = false
+    const onBlur = (event: SyntheticEvent): void => {
+        setValueState((
+            oldValueState: ValueState<Type>
+        ): ValueState<Type> => {
+            let changed = false
 
-        if (oldValueState.modelState.focused) {
-            properties.focused = false
-            changed = true
-        }
+            if (oldValueState.modelState.focused) {
+                properties.focused = false
+                changed = true
+            }
 
-        if (!oldValueState.modelState.visited) {
-            properties.visited = true
-            changed = true
-        }
+            if (!oldValueState.modelState.visited) {
+                properties.visited = true
+                changed = true
+            }
 
-        if (changed) {
-            onChange(event)
+            if (changed) {
+                onChange(event)
+
+                triggerCallbackIfExists<Properties<Type>>(
+                    properties,
+                    'changeState',
+                    controlled,
+                    properties.model.state,
+                    event,
+                    properties
+                )
+            }
 
             triggerCallbackIfExists<Properties<Type>>(
-                properties,
-                'changeState',
-                controlled,
-                properties.model.state,
-                event,
-                properties
+                properties, 'blur', controlled, event, properties
             )
-        }
 
-        triggerCallbackIfExists<Properties<Type>>(
-            properties, 'blur', controlled, event, properties
-        )
-
-        return changed ?
-            {...oldValueState, modelState: properties.model.state} :
-            oldValueState
-    })
+            return changed ?
+                {...oldValueState, modelState: properties.model.state} :
+                oldValueState
+        })
+    }
     /**
      * Triggered on any change events. Consolidates properties object and
      * triggers given on change callbacks.
      * @param event - Potential event object.
      */
-    const onChange = (event?:SyntheticEvent) => {
+    const onChange = (event?: SyntheticEvent) => {
         if (nameInputReference.current?.properties)
             properties.model.fileName =
                 nameInputReference.current.properties.model
 
-        const consolidatedProperties:Properties<Type> =
+        const consolidatedProperties: Properties<Type> =
             getConsolidatedProperties(
                 /*
                     Workaround since "Type" isn't identified as subset of
@@ -244,11 +246,11 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      * through post processed data properties.
      */
     const onChangeValue = (
-        eventSourceOrName?:Partial<Type>|string|SyntheticEvent,
-        event?:SyntheticEvent,
-        inputProperties?:InputProperties<string>,
+        eventSourceOrName?: Partial<Type>|string|SyntheticEvent,
+        event?: SyntheticEvent,
+        inputProperties?: InputProperties<string>,
         attachBlobProperty = false
-    ):void => {
+    ): void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
 
@@ -260,9 +262,12 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         ) {
             event = eventSourceOrName as SyntheticEvent
 
-            if ((event.target as unknown as {files:FileList}).files?.length) {
-                const blob:File =
-                    (event.target as unknown as {files:FileList}).files[0]
+            if (
+                (event.target as unknown as {files: FileList|null})
+                    .files?.length
+            ) {
+                const blob: File =
+                    (event.target as unknown as {files: FileList}).files[0]
 
                 properties.value = {blob, name: blob.name} as unknown as Type
 
@@ -278,14 +283,14 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                         },
                         properties as
                             Omit<Properties<Type>, 'value'> &
-                            {value:Type & {name:string}}
+                            {value: Type & {name: string}}
                     )?.value ||
                     blob.name
             } else
                 return
         }
 
-        setValueState((oldValueState:ValueState<Type>):ValueState<Type> => {
+        setValueState((oldValueState: ValueState<Type>): ValueState<Type> => {
             if (typeof eventSourceOrName === 'undefined')
                 // NOTE: Mark file as deleted.
                 properties.value = null
@@ -313,7 +318,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
 
             let stateChanged = false
 
-            const result:ValueState<Type> = {
+            const result: ValueState<Type> = {
                 ...oldValueState, value: properties.value as null|Type
             }
 
@@ -366,7 +371,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      * Triggered on click events.
      * @param event - Mouse event object.
      */
-    const onClick = (event:ReactMouseEvent) => {
+    const onClick = (event: ReactMouseEvent) => {
         triggerCallbackIfExists<Properties<Type>>(
             properties, 'click', controlled, event, properties
         )
@@ -377,7 +382,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      * Triggered on focus events.
      * @param event - Focus event object.
      */
-    const onFocus = (event:ReactFocusEvent) => {
+    const onFocus = (event: ReactFocusEvent) => {
         triggerCallbackIfExists<Properties<Type>>(
             properties, 'focus', controlled, event, properties
         )
@@ -388,8 +393,8 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
      */
-    const onTouch = (event:ReactFocusEvent|ReactMouseEvent):void => {
-        setValueState((oldValueState:ValueState<Type>):ValueState<Type> => {
+    const onTouch = (event: ReactFocusEvent|ReactMouseEvent): void => {
+        setValueState((oldValueState: ValueState<Type>): ValueState<Type> => {
             let changedState = false
 
             if (!oldValueState.modelState.focused) {
@@ -403,7 +408,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                 changedState = true
             }
 
-            let result:ValueState<Type> = oldValueState
+            let result: ValueState<Type> = oldValueState
 
             if (changedState) {
                 onChange(event)
@@ -430,22 +435,22 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     // endregion
     // region properties
     /// region references
-    const deleteButtonReference:MutableRefObject<HTMLButtonElement|null> =
+    const deleteButtonReference: MutableRefObject<HTMLButtonElement|null> =
         useRef<HTMLButtonElement>(null)
-    const downloadLinkReference:MutableRefObject<HTMLAnchorElement|null> =
+    const downloadLinkReference: MutableRefObject<HTMLAnchorElement|null> =
         useRef<HTMLAnchorElement>(null)
-    const fileInputReference:MutableRefObject<HTMLInputElement|null> =
+    const fileInputReference: MutableRefObject<HTMLInputElement|null> =
         useRef<HTMLInputElement>(null)
-    const nameInputReference:MutableRefObject<InputAdapter<string>|null> =
+    const nameInputReference: MutableRefObject<InputAdapter<string>|null> =
         useRef<InputAdapter<string>>(null)
-    const uploadButtonReference:MutableRefObject<HTMLDivElement|null> =
+    const uploadButtonReference: MutableRefObject<HTMLDivElement|null> =
         useRef<HTMLDivElement>(null)
-    const iFrameReference:MutableRefObject<HTMLIFrameElement|null> =
+    const iFrameReference: MutableRefObject<HTMLIFrameElement|null> =
         useRef<HTMLIFrameElement>(null)
     /// endregion
-    const givenProps:Props<Type> = translateKnownSymbols(props)
+    const givenProps: Props<Type> = translateKnownSymbols(props)
 
-    const initialValue:null|Type = determineInitialValue<Type>(
+    const initialValue: null|Type = determineInitialValue<Type>(
         givenProps, FileInput.defaultProperties.model.default as Type
     )
     /*
@@ -453,7 +458,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:Props<Type> = extend(
+    const givenProperties: Props<Type> = extend(
         true,
         copy(FileInput.defaultProperties as DefaultProperties<Type>),
         givenProps
@@ -468,7 +473,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         value: initialValue
     })
 
-    const controlled:boolean =
+    const controlled: boolean =
         !givenProperties.enforceUncontrolled &&
         (
             givenProps.model?.value !== undefined ||
@@ -478,7 +483,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
 
     deriveMissingPropertiesFromState(givenProperties, valueState)
 
-    const properties:Properties<Type> =
+    const properties: Properties<Type> =
         getConsolidatedProperties(givenProperties)
 
     /*
@@ -491,7 +496,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
             extend<Type>(true, valueState.value, properties.value!)
 
     /// region synchronize uncontrolled properties into state
-    const currentValueState:ValueState<Type> = {
+    const currentValueState: ValueState<Type> = {
         attachBlobProperty: false,
         modelState: properties.model.state,
         value: properties.value as null|Type
@@ -512,14 +517,14 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     /// endregion
     useImperativeHandle(
         reference,
-        ():Adapter<Type> & {
-            references:{
-                deleteButtonReference:MutableRefObject<HTMLButtonElement|null>
-                downloadLinkReference:MutableRefObject<HTMLAnchorElement|null>
-                fileInputReference:MutableRefObject<HTMLInputElement|null>
-                iFrameReference:MutableRefObject<HTMLIFrameElement|null>
-                nameInputReference:MutableRefObject<InputAdapter<string>|null>
-                uploadButtonReference:MutableRefObject<HTMLDivElement|null>
+        (): Adapter<Type> & {
+            references: {
+                deleteButtonReference: MutableRefObject<HTMLButtonElement|null>
+                downloadLinkReference: MutableRefObject<HTMLAnchorElement|null>
+                fileInputReference: MutableRefObject<HTMLInputElement|null>
+                iFrameReference: MutableRefObject<HTMLIFrameElement|null>
+                nameInputReference: MutableRefObject<InputAdapter<string>|null>
+                uploadButtonReference: MutableRefObject<HTMLDivElement|null>
             }
         } => ({
             properties,
@@ -538,9 +543,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         })
     )
     // endregion
-    useEffect(():void => {
-        (async ():Promise<void> => {
-            const valueChanged:Partial<Type> = {}
+    useEffect((): void => {
+        (async (): Promise<void> => {
+            const valueChanged: Partial<Type> = {}
             if (properties.value?.source) {
                 if (!properties.value.blob) {
                     // Derive missing blob from given source.
@@ -568,7 +573,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                         (properties.hashingConfiguration.prefix ?? '') +
                         md5Hash(properties.value.source)
             } else {
-                let blob:Blob|undefined
+                let blob: Blob|undefined
                 if (
                     properties.value?.blob &&
                     properties.value.blob instanceof Blob
@@ -603,19 +608,20 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                     const chunkSize =
                         properties.hashingConfiguration.readChunkSizeInByte ??
                         2097152
-                    const chunks = Math.ceil(blob!.size / chunkSize)
+                    const chunks = Math.ceil(blob.size / chunkSize)
                     const buffer = new MD5ArrayBuffer()
                     const fileReader = new FileReader()
 
                     const hash = await new Promise<string>((
                         resolve, reject
                     ) => {
-                        fileReader.onload = (e) => {
+                        fileReader.onload = (event) => {
                             console.debug(
-                                `Read chunk ${currentChunk + 1} of ${chunks}.`
+                                `Read chunk ${String(currentChunk + 1)} of ` +
+                                `${String(chunks)}.`
                             )
 
-                            buffer.append(e.target!.result as ArrayBuffer)
+                            buffer.append(event.target!.result as ArrayBuffer)
                             currentChunk++
 
                             if (currentChunk < chunks)
@@ -634,12 +640,12 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
 
                         const loadNext = () => {
                             const start = currentChunk * chunkSize
-                            const end = ((start + chunkSize) >= blob!.size) ?
-                                blob!.size :
+                            const end = ((start + chunkSize) >= blob.size) ?
+                                blob.size :
                                 start + chunkSize
 
                             fileReader.readAsArrayBuffer(
-                                blob!.slice(start, end)
+                                blob.slice(start, end)
                             )
                         }
 
@@ -654,7 +660,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
             if (Object.keys(valueChanged).length > 0)
                 onChangeValue(valueChanged, undefined, undefined, true)
         })()
-            .catch(console.warn)
+            .catch((reason: unknown) => {
+                console.warn(reason)
+            })
     })
     useEffect(
         () => {
@@ -665,9 +673,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     )
     const contentType = determineContentType<Type>(properties)
     // region render
-    const representationType:RepresentationType =
+    const representationType: RepresentationType =
         contentType ? determineRepresentationType(contentType) : 'binary'
-    const invalid:boolean = (
+    const invalid: boolean = (
         properties.invalid &&
         properties.showValidationState &&
         (properties.showInitialValidationState || properties.visited)
@@ -830,7 +838,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                 },
                                 properties as
                                     Omit<Properties<Type>, 'value'> &
-                                    {value:Type & {name:string}}
+                                    {value: Type & {name: string}}
                             )}
                         /> :
                         ''
@@ -866,9 +874,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                     <CardActionButtons>
                         {!properties.disabled ?
                             <CardActionButton
-                                onClick={():void =>
+                                onClick={() => {
                                     fileInputReference.current?.click()
-                                }
+                                }}
                                 ref={uploadButtonReference}
                                 ripple={properties.ripple}
                             >
@@ -893,10 +901,10 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                 }
                                 {properties.value.url ?
                                     <CardActionButton
-                                        onClick={():void =>
+                                        onClick={() => {
                                             downloadLinkReference
                                                 .current?.click()
-                                        }
+                                        }}
                                         ripple={properties.ripple}
                                     >
                                         <a

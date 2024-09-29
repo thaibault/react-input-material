@@ -21,27 +21,27 @@ import Interval from '../components/Interval'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 
-describe('Interval', ():void => {
-    test('render', ():void => {
+describe('Interval', (): void => {
+    test('render', (): void => {
         expect(render(<Interval/>)).toBeDefined()
 
         expect(Array.from(
-            render(<Interval/>)!.querySelectorAll('input')
+            render(<Interval/>)?.querySelectorAll('input')
         )).toHaveLength(2)
 
-        expect(render(<Interval/>)!.getAttribute('class'))
+        expect(render(<Interval/>)?.getAttribute('class'))
             .toStrictEqual('interval')
 
-        expect(render(<Interval/>)!.querySelectorAll('.interval__end')
+        expect(render(<Interval/>)?.querySelectorAll('.interval__end')
         ).toBeDefined()
-        expect(render(<Interval/>)!.querySelectorAll('.interval__icon')
+        expect(render(<Interval/>)?.querySelectorAll('.interval__icon')
         ).toBeDefined()
         expect(
-            render(<Interval/>)!.querySelectorAll('.interval__start')
+            render(<Interval/>)?.querySelectorAll('.interval__start')
         ).toBeDefined()
 
         expect(
-            render(<Interval name="test"/>)!.getAttribute('data-name')
+            render(<Interval name="test"/>)?.getAttribute('data-name')
         ).toStrictEqual('test')
     })
 })

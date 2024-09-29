@@ -51,29 +51,29 @@ import {
 import cssClassNames from './style.module'
 // endregion
 // region constants
-declare const TARGET_TECHNOLOGY:string
+declare const TARGET_TECHNOLOGY: string
 
 export const IS_BROWSER = !(
     typeof TARGET_TECHNOLOGY !== 'undefined' && TARGET_TECHNOLOGY === 'node' ||
     typeof window === 'undefined'
 )
 /* eslint-disable @typescript-eslint/no-var-requires */
-export const GivenRichTextEditorComponent:typeof RichTextEditorComponent =
+export const GivenRichTextEditorComponent: typeof RichTextEditorComponent =
     IS_BROWSER && RichTextEditorComponent ?
         RichTextEditorComponent :
         Dummy as unknown as typeof RichTextEditorComponent
-export const UseAnimations:null|typeof Dummy|typeof UseAnimationsType =
+export const UseAnimations: null|typeof Dummy|typeof UseAnimationsType =
     IS_BROWSER ?
         (require('react-useanimations') as
-            {default:null|typeof Dummy|typeof UseAnimationsType}
+            {default: null|typeof Dummy|typeof UseAnimationsType}|null
         )?.default : null
-export const lockAnimation:null|typeof LockAnimation = IS_BROWSER ?
+export const lockAnimation: null|typeof LockAnimation = IS_BROWSER ?
     (require('react-useanimations/lib/lock') as
-        {default:null|typeof LockAnimation}
+        {default: null|typeof LockAnimation}|null
     )?.default : null
-export const plusToXAnimation:null|typeof PlusToXAnimation = IS_BROWSER ?
+export const plusToXAnimation: null|typeof PlusToXAnimation = IS_BROWSER ?
     (require('react-useanimations/lib/plusToX') as
-        {default:null|typeof PlusToXAnimation}
+        {default: null|typeof PlusToXAnimation}|null
     )?.default : null
 /* eslint-enable @typescript-eslint/no-var-requires */
 // endregion
@@ -88,7 +88,7 @@ export const ACE_EDITOR_OPTIONS = {
     useWorker: false
 }
 export const CodeEditor = lazy<typeof CodeEditorType>(
-    async ():Promise<{default:typeof CodeEditorType}> => {
+    async (): Promise<{default: typeof CodeEditorType}> => {
         const {config} = await import('ace-builds')
         for (const [name, value] of Object.entries(ACE_EDITOR_OPTIONS))
             config.set(name, value)
@@ -97,12 +97,12 @@ export const CodeEditor = lazy<typeof CodeEditorType>(
     }
 )
 /// region rich text editor configuration
-declare const UTC_BUILD_TIMESTAMP:number|undefined
+declare const UTC_BUILD_TIMESTAMP: number|undefined
 // NOTE: Could be set via module bundler environment variables.
 export const CURRENT_UTC_BUILD_TIMESTAMP =
     typeof UTC_BUILD_TIMESTAMP === 'undefined' ? 1 : UTC_BUILD_TIMESTAMP
 export const TINYMCE_BASE_PATH = '/tinymce/'
-export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
+export const TINYMCE_DEFAULT_OPTIONS: Partial<TinyMCEOptions> = {
     /* eslint-disable camelcase */
     // region paths
     base_url: TINYMCE_BASE_PATH,
@@ -113,7 +113,7 @@ export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
     allow_script_urls: false,
     body_class: 'mdc-text-field__input',
     branding: false,
-    cache_suffix: `?version=${CURRENT_UTC_BUILD_TIMESTAMP}`,
+    cache_suffix: `?version=${String(CURRENT_UTC_BUILD_TIMESTAMP)}`,
     contextmenu: [],
     document_base_url: '/',
     element_format: 'xhtml',
@@ -161,57 +161,57 @@ export const TINYMCE_DEFAULT_OPTIONS:Partial<TinyMCEOptions> = {
  * invalid state.
  */
 export function determineValidationState<T>(
-    properties:DefaultProperties<T>, currentState:Partial<ModelState>
-):boolean {
+    properties: DefaultProperties<T>, currentState: Partial<ModelState>
+): boolean {
     return determineBaseValidationState<
         DefaultProperties<T>, Partial<ModelState>
     >(
         properties,
         currentState,
         {
-            invalidMaximum: ():boolean => (
+            invalidMaximum: (): boolean => (
                 typeof properties.model.maximum === 'number' &&
                 typeof properties.model.value === 'number' &&
                 !isNaN(properties.model.value) &&
                 properties.model.maximum >= 0 &&
                 properties.model.maximum < properties.model.value
             ),
-            invalidMinimum: ():boolean => (
+            invalidMinimum: (): boolean => (
                 typeof properties.model.minimum === 'number' &&
                 typeof properties.model.value === 'number' &&
                 !isNaN(properties.model.value) &&
                 properties.model.value < properties.model.minimum
             ),
 
-            invalidMaximumLength: ():boolean => (
+            invalidMaximumLength: (): boolean => (
                 typeof properties.model.maximumLength === 'number' &&
                 typeof properties.model.value === 'string' &&
                 properties.model.maximumLength >= 0 &&
                 properties.model.maximumLength < properties.model.value.length
             ),
-            invalidMinimumLength: ():boolean => (
+            invalidMinimumLength: (): boolean => (
                 typeof properties.model.minimumLength === 'number' &&
                 typeof properties.model.value === 'string' &&
                 properties.model.value.length < properties.model.minimumLength
             ),
 
-            invalidInvertedPattern: ():boolean => (
+            invalidInvertedPattern: (): boolean => (
                 typeof properties.model.value === 'string' &&
                 Boolean(properties.model.invertedPattern) &&
                 ([] as Array<RegExp|string>)
                     .concat(properties.model.invertedPattern!)
-                    .some((expression:RegExp|string):boolean =>
+                    .some((expression: RegExp|string): boolean =>
                         (new RegExp(expression)).test(
                             properties.model.value as unknown as string
                         )
                     )
             ),
-            invalidPattern: ():boolean => (
+            invalidPattern: (): boolean => (
                 typeof properties.model.value === 'string' &&
                 Boolean(properties.model.pattern) &&
                 ([] as Array<RegExp|string>)
                     .concat(properties.model.pattern!)
-                    .some((expression:RegExp|string):boolean =>
+                    .some((expression: RegExp|string): boolean =>
                         !(new RegExp(expression)).test(
                             properties.model.value as unknown as string
                         )
@@ -225,7 +225,7 @@ export function determineValidationState<T>(
  * is not intended when working in a text field.
  * @param event - Keyboard event.
  */
-export function preventEnterKeyPropagation(event:KeyboardEvent) {
+export function preventEnterKeyPropagation(event: KeyboardEvent) {
     if (event.code === 'Enter')
         event.stopPropagation()
 }
@@ -238,8 +238,8 @@ export function preventEnterKeyPropagation(event:KeyboardEvent) {
  * not.
  */
 export function suggestionMatches(
-    suggestion:string, query?:null|string
-):boolean {
+    suggestion: string, query?: null|string
+): boolean {
     if (query) {
         suggestion = suggestion.toLowerCase()
 
@@ -247,7 +247,7 @@ export function suggestionMatches(
             .replace(/  +/g, ' ')
             .toLowerCase()
             .split(' ')
-            .every((part:string):boolean => suggestion.includes(part))
+            .every((part: string): boolean => suggestion.includes(part))
     }
 
     return false

@@ -23,7 +23,7 @@ import {
     DefaultInputProperties as DefaultProperties, InputDataTransformation
 } from '../../type'
 // endregion
-const convertEdgeValueToString = (value:Date|number|string):null|string => {
+const convertEdgeValueToString = (value: Date|number|string): null|string => {
     if (value === Infinity)
         return 'Infinitely far in the future'
 
@@ -35,20 +35,20 @@ const convertEdgeValueToString = (value:Date|number|string):null|string => {
 
     return null
 }
-const utcSecondsToISOString = (value:number):string =>
+const utcSecondsToISOString = (value: number): string =>
     (new Date(Math.round(value * 1000))).toISOString()
 const normalizeDateRepresentation = (
-    value:Date|number|string
-):number|string => {
+    value: Date|number|string
+): number|string => {
     if (value instanceof Date)
         return value.getTime() / 1000
 
     return value
 }
 
-export const TRANSFORMER:InputDataTransformation = {
+export const TRANSFORMER: InputDataTransformation = {
     boolean: {
-        parse: (value:boolean|number|string):boolean =>
+        parse: (value: boolean|number|string): boolean =>
             typeof value === 'boolean' ?
                 value :
                 new Map<number|string, boolean>([
@@ -64,10 +64,10 @@ export const TRANSFORMER:InputDataTransformation = {
         format: {final: {
             options: {currency: 'USD'},
             transform: (
-                value:number, {currency: {format}}:InputDataTransformation
-            ):string => {
+                value: number, {currency: {format}}: InputDataTransformation
+            ): string => {
                 const currency =
-                    format?.final.options?.currency as string ?? 'USD'
+                    format?.final.options?.currency as null|string ?? 'USD'
 
                 if (value === Infinity)
                     return `Infinity ${currency}`
@@ -85,10 +85,10 @@ export const TRANSFORMER:InputDataTransformation = {
             }
         }},
         parse: (
-            value:string,
-            transformation:InputDataTransformation,
-            configuration:DefaultProperties<number>
-        ):number =>
+            value: string,
+            transformation: InputDataTransformation,
+            configuration: DefaultProperties<number>
+        ): number =>
             transformation.float.parse ?
                 transformation.float.parse(
                     value, transformation, configuration
@@ -100,10 +100,10 @@ export const TRANSFORMER:InputDataTransformation = {
     datetime: {
         // Converts given utc date representation into iso date time string.
         format: {final: {transform: (
-            value:Date|number|string,
-            transformation:InputDataTransformation,
-            configuration:DefaultProperties<number|string>
-        ):string => {
+            value: Date|number|string,
+            transformation: InputDataTransformation,
+            configuration: DefaultProperties<number|string>
+        ): string => {
             if (typeof value !== 'number')
                 value = transformation.datetime.parse!(
                     value,
@@ -126,9 +126,9 @@ export const TRANSFORMER:InputDataTransformation = {
             return formattedValue.substring(0, formattedValue.lastIndexOf('.'))
         }}},
         parse: (
-            value:Date|number|string,
-            {date: {useISOString}}:InputDataTransformation
-        ):number|string => {
+            value: Date|number|string,
+            {date: {useISOString}}: InputDataTransformation
+        ): number|string => {
             value = normalizeDateRepresentation(value)
 
             if (typeof value === 'string') {
@@ -161,10 +161,10 @@ export const TRANSFORMER:InputDataTransformation = {
     'datetime-local': {
         // Converts given utc date representation into iso date time string.
         format: {final: {transform: (
-            value:number|string,
-            transformation:InputDataTransformation,
-            configuration:DefaultProperties<number|string>
-        ):string => {
+            value: number|string,
+            transformation: InputDataTransformation,
+            configuration: DefaultProperties<number|string>
+        ): string => {
             if (typeof value !== 'number')
                 value = transformation['datetime-local'].parse!(
                     value,
@@ -179,16 +179,16 @@ export const TRANSFORMER:InputDataTransformation = {
             if (typeof edgeValueDescription === 'string')
                 return edgeValueDescription
 
-            const formattedValue:string = utcSecondsToISOString(
+            const formattedValue: string = utcSecondsToISOString(
                 value + new Date().getTimezoneOffset() * 60
             )
 
             return formattedValue.substring(0, formattedValue.lastIndexOf('.'))
         }}},
         parse: (
-            value:Date|number|string,
-            {date: {useISOString}}:InputDataTransformation
-        ):number|string => {
+            value: Date|number|string,
+            {date: {useISOString}}: InputDataTransformation
+        ): number|string => {
             value = normalizeDateRepresentation(value)
 
             if (typeof value === 'string') {
@@ -227,10 +227,10 @@ export const TRANSFORMER:InputDataTransformation = {
     date: {
         // Converts given date representation into utc iso date time string.
         format: {final: {transform: (
-            value:number|string,
-            transformation:InputDataTransformation,
-            configuration:DefaultProperties<number|string>
-        ):string => {
+            value: number|string,
+            transformation: InputDataTransformation,
+            configuration: DefaultProperties<number|string>
+        ): string => {
             const formattedValue =
                 transformation.datetime.format!.final.transform!(
                     value, transformation, configuration
@@ -247,10 +247,10 @@ export const TRANSFORMER:InputDataTransformation = {
             changed).
         */
         parse: (
-            value:Date|number|string,
-            transformation:InputDataTransformation,
-            configuration:DefaultInputProperties<number|string>
-        ):number|string =>
+            value: Date|number|string,
+            transformation: InputDataTransformation,
+            configuration: DefaultInputProperties<number|string>
+        ): number|string =>
             transformation.datetime.parse!(
                 value, transformation, configuration
             ),
@@ -258,10 +258,10 @@ export const TRANSFORMER:InputDataTransformation = {
     },
     'date-local': {
         format: {final: {transform: (
-            value:number|string,
-            transformation:InputDataTransformation,
-            configuration:DefaultProperties<number|string>
-        ):string =>{
+            value: number|string,
+            transformation: InputDataTransformation,
+            configuration: DefaultProperties<number|string>
+        ): string =>{
             if (typeof value !== 'number')
                 value = transformation['datetime-local'].parse!(
                     value,
@@ -282,7 +282,7 @@ export const TRANSFORMER:InputDataTransformation = {
             */
             value -= new Date().getTimezoneOffset() * 60
 
-            const formattedValue:string = utcSecondsToISOString(value)
+            const formattedValue: string = utcSecondsToISOString(value)
             return formattedValue.substring(0, formattedValue.lastIndexOf('T'))
         }}},
         /*
@@ -290,10 +290,10 @@ export const TRANSFORMER:InputDataTransformation = {
             changed) or iso string.
         */
         parse: (
-            value:Date|number|string,
-            transformation:InputDataTransformation,
-            configuration:DefaultInputProperties<number|string>
-        ):number|string => {
+            value: Date|number|string,
+            transformation: InputDataTransformation,
+            configuration: DefaultInputProperties<number|string>
+        ): number|string => {
             value = transformation.datetime.parse!(
                 value,
                 {
@@ -321,10 +321,10 @@ export const TRANSFORMER:InputDataTransformation = {
             1/1/1970.
         */
         format: {final: {transform: (
-            value:number|string,
-            transformation:InputDataTransformation,
-            configuration:DefaultProperties<number|string>
-        ):string => {
+            value: number|string,
+            transformation: InputDataTransformation,
+            configuration: DefaultProperties<number|string>
+        ): string => {
             if (typeof value !== 'number')
                 value = transformation.datetime.parse!(
                     value,
@@ -362,24 +362,24 @@ export const TRANSFORMER:InputDataTransformation = {
         }}},
         // Converts given date representation into unix time stamp.
         parse: (
-            value:Date|number|string,
-            {date: {useISOString}}:InputDataTransformation
-        ):number|string => {
+            value: Date|number|string,
+            {date: {useISOString}}: InputDataTransformation
+        ): number|string => {
             value = normalizeDateRepresentation(value)
 
             if (typeof value === 'string') {
-                const parsedDate:number = Date.parse(value)
+                const parsedDate: number = Date.parse(value)
                 if (isNaN(parsedDate)) {
-                    const parsedFloat:number = parseFloat(value.replace(
+                    const parsedFloat: number = parseFloat(value.replace(
                         /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
                         (
-                            _match:string,
-                            hours:string,
-                            minutes:string,
-                            secondsSuffix?:string,
-                            seconds?:string,
-                            _millisecondsSuffix?:string
-                        ):string =>
+                            _match: string,
+                            hours: string,
+                            minutes: string,
+                            secondsSuffix?: string,
+                            seconds?: string,
+                            _millisecondsSuffix?: string
+                        ): string =>
                             String(
                                 parseInt(hours) *
                                 60 ** 2 +
@@ -411,10 +411,10 @@ export const TRANSFORMER:InputDataTransformation = {
             on 1/1/1970.
         */
         format: {final: {transform: (
-            value:number|string,
-            transformation:InputDataTransformation,
-            configuration:DefaultProperties<number|string>
-        ):string => {
+            value: number|string,
+            transformation: InputDataTransformation,
+            configuration: DefaultProperties<number|string>
+        ): string => {
             if (typeof value !== 'number')
                 value = transformation['time-local'].parse!(
                     value,
@@ -433,10 +433,10 @@ export const TRANSFORMER:InputDataTransformation = {
                 (value/* + new Date().getTimezoneOffset() * 60*/) * 1000
             )
 
-            const hours:number = dateTime.getHours()
-            const minutes:number = dateTime.getMinutes()
+            const hours: number = dateTime.getHours()
+            const minutes: number = dateTime.getMinutes()
 
-            const formattedValue:string = (
+            const formattedValue: string = (
                 `${hours < 10 ? '0' : ''}${String(hours)}:` +
                 `${minutes < 10 ? '0' : ''}${String(minutes)}`
             )
@@ -446,7 +446,7 @@ export const TRANSFORMER:InputDataTransformation = {
                 configuration.step >= 60 &&
                 (configuration.step % 60) === 0
             )) {
-                const seconds:number = dateTime.getSeconds()
+                const seconds: number = dateTime.getSeconds()
 
                 return (
                     `${formattedValue}:${(seconds < 10) ? '0' : ''}` +
@@ -461,24 +461,24 @@ export const TRANSFORMER:InputDataTransformation = {
             time shift is taken into account.
         */
         parse: (
-            value:Date|number|string,
-            {date: {useISOString}}:InputDataTransformation
-        ):number|string => {
+            value: Date|number|string,
+            {date: {useISOString}}: InputDataTransformation
+        ): number|string => {
             value = normalizeDateRepresentation(value)
 
             if (typeof value === 'string') {
-                const parsedDate:number = Date.parse(value)
+                const parsedDate: number = Date.parse(value)
                 if (isNaN(parsedDate)) {
-                    const parsedFloat:number = parseFloat(value.replace(
+                    const parsedFloat: number = parseFloat(value.replace(
                         /^([0-9]{2}):([0-9]{2})(:([0-9]{2}(\.[0-9]+)?))?$/,
                         (
-                            _match:string,
-                            hours:string,
-                            minutes:string,
-                            secondsSuffix?:string,
-                            seconds?:string,
-                            _millisecondsSuffix?:string
-                        ):string => {
+                            _match: string,
+                            hours: string,
+                            minutes: string,
+                            secondsSuffix?: string,
+                            seconds?: string,
+                            _millisecondsSuffix?: string
+                        ): string => {
                             const zeroDateTime = new Date(0)
 
                             zeroDateTime.setHours(parseInt(hours))
@@ -505,8 +505,8 @@ export const TRANSFORMER:InputDataTransformation = {
 
     float: {
         format: {final: {transform: (
-            value:number, {float: {format}}:InputDataTransformation
-        ):string =>
+            value: number, {float: {format}}: InputDataTransformation
+        ): string =>
             format ?
                 value === Infinity ?
                     'Infinity' :
@@ -515,13 +515,13 @@ export const TRANSFORMER:InputDataTransformation = {
                         (new Intl.NumberFormat(
                             TextInput.locales, format.final.options || {}
                         )).format(value) :
-                `${value}`
+                String(value)
         }},
         parse: (
-            value:number|string,
-            transformation:InputDataTransformation,
-            {maximum, minimum}:DefaultProperties<number>
-        ):number => {
+            value: number|string,
+            transformation: InputDataTransformation,
+            {maximum, minimum}: DefaultProperties<number>
+        ): number => {
             if (typeof value === 'string')
                 value = parseFloat(
                     TextInput.locales[0] === 'de-DE' ?
@@ -542,8 +542,8 @@ export const TRANSFORMER:InputDataTransformation = {
     },
     integer: {
         format: {final: {transform: (
-            value:number, {integer: {format}}:InputDataTransformation
-        ):string => (
+            value: number, {integer: {format}}: InputDataTransformation
+        ): string => (
             new Intl.NumberFormat(
                 TextInput.locales,
                 {
@@ -552,10 +552,10 @@ export const TRANSFORMER:InputDataTransformation = {
             )).format(value)
         }},
         parse: (
-            value:number|string,
-            transformation:InputDataTransformation,
-            {maximum, minimum}:DefaultProperties<number>
-        ):number => {
+            value: number|string,
+            transformation: InputDataTransformation,
+            {maximum, minimum}: DefaultProperties<number>
+        ): number => {
             if (typeof value === 'string')
                 value = parseInt(
                     TextInput.locales[0] === 'de-DE' ?
@@ -574,7 +574,7 @@ export const TRANSFORMER:InputDataTransformation = {
         },
         type: 'text'
     },
-    number: {parse: (value:number|string):number =>
+    number: {parse: (value: number|string): number =>
         typeof value === 'number' ? value : parseInt(value)
     }
 }

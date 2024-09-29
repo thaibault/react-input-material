@@ -21,10 +21,12 @@ import WrapThemeProvider from '../components/WrapThemeProvider'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 
-describe('WrapThemeProvider', ():void => {
-    test('render', ():void => expect(
-        render(
-            <WrapThemeProvider><div className="test"/></WrapThemeProvider>
-        )!.querySelector('.test')
-    ).toBeDefined())
+describe('WrapThemeProvider', () => {
+    test('render', () => {
+        expect(
+            render(
+                <WrapThemeProvider><div className="test"/></WrapThemeProvider>
+            )?.querySelector('.test')
+        ).toBeDefined()
+    })
 })

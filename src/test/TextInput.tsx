@@ -76,7 +76,7 @@ describe('TextInput', () => {
             ['Infinity USD', Infinity],
             ['- Infinity USD', -Infinity],
             ['unknown', NaN]
-        ].map((item:Array<unknown>):Array<unknown> =>
+        ].map((item: Array<unknown>): Array<unknown> =>
             item.concat(TextInput.transformer)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
@@ -92,7 +92,7 @@ describe('TextInput', () => {
             [1, '1 €'],
             [1.1, '1.1 $'],
             [1.1, '1.1']
-        ].map((item:Array<unknown>):Array<unknown> =>
+        ].map((item: Array<unknown>): Array<unknown> =>
             item.concat(TRANSFORMER, {maximum: Infinity, minimum: -Infinity})
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
@@ -108,7 +108,7 @@ describe('TextInput', () => {
             ['Infinitely far in the future', Infinity],
             ['Infinitely early in the past', -Infinity],
             ['', NaN]
-        ].map((item:Array<unknown>):Array<unknown> =>
+        ].map((item: Array<unknown>): Array<unknown> =>
             item.concat(TextInput.transformer)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
@@ -125,7 +125,7 @@ describe('TextInput', () => {
             [1, '1 f'],
             [1.1, '1.1 f'],
             [8 * 60 ** 2, '1970-01-01T08:00:00.000Z']
-        ].map((item:Array<unknown>):Array<unknown> =>
+        ].map((item: Array<unknown>): Array<unknown> =>
             item.concat(TIMESTAMP_TRANSFORMER)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
@@ -153,7 +153,7 @@ describe('TextInput', () => {
             [1, '1 f'],
             [1.1, '1.1 f'],
             [8 * 60 ** 2, '1970-01-01T08:00:00.000Z']
-        ].map((item:Array<unknown>):Array<unknown> =>
+        ].map((item: Array<unknown>): Array<unknown> =>
             item.concat(TIMESTAMP_TRANSFORMER)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
@@ -216,7 +216,7 @@ describe('TextInput', () => {
             [10 * 60 ** 2 + 10 * 60 + 10, '10:10:10'],
             [10 * 60 ** 2 + 10 * 60 + 10.1, '10:10:10.10'],
             [8 * 60 ** 2, '1970-01-01T08:00:00.000Z']
-        ].map((item:Array<unknown>):Array<unknown> =>
+        ].map((item: Array<unknown>): Array<unknown> =>
             item.concat(TIMESTAMP_TRANSFORMER)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
@@ -232,7 +232,8 @@ describe('TextInput', () => {
 
         [
             // E.g. will result in 9 o'clock in germany.
-            `0${new Date('1970-01-01T08:00:00.000Z').getHours()}:00`,
+            '0' +
+            `${String(new Date('1970-01-01T08:00:00.000Z').getHours())}:00`,
             Date.parse('1970-01-01T08:00:00.000Z') / 1000,
             TRANSFORMER,
             {step: 60}
@@ -245,29 +246,29 @@ describe('TextInput', () => {
         ...([
             [
                 // E.g. will result in 8 o'clock in germany.
-                (():number => {
+                ((): number => {
                     const zeroDateTime = new Date(0)
                     zeroDateTime.setHours(9)
                     return zeroDateTime.getTime() / 1000
                 })(),
                 '09:00'
             ]
-        ].map((item:Array<unknown>):Array<unknown> =>
+        ].map((item: Array<unknown>): Array<unknown> =>
             item.concat(TIMESTAMP_TRANSFORMER)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
     // TODO
-    test('render', ():void => {
+    test('render', () => {
         expect(render(<TextInput/>)).toBeDefined()
 
-        expect(render(<TextInput/>)!.querySelector('input')).toBeDefined()
+        expect(render(<TextInput/>)?.querySelector('input')).toBeDefined()
 
-        expect(render(<TextInput/>)!.getAttribute('class'))
+        expect(render(<TextInput/>)?.getAttribute('class'))
             .toStrictEqual('text-input')
 
         expect(
-            render(<TextInput name="test"/>)!.querySelector('[name="test"]')
+            render(<TextInput name="test"/>)?.querySelector('[name="test"]')
         ).not.toStrictEqual(null)
     })
 })

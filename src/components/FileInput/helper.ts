@@ -90,9 +90,9 @@ export const VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
 export const preserveStaticFileBaseNameInputGenerator = <
     Type extends FileValue = FileValue, MediaTag extends ElementType = 'div'
 >(
-        prototype:InputProps<string>,
-        {name, value}:FileInputProperties<Type, MediaTag>
-    ):InputProps<string> => ({
+        prototype: InputProps<string>,
+        {name, value}: FileInputProperties<Type, MediaTag>
+    ): InputProps<string> => ({
         ...prototype,
         disabled: true,
         value:
@@ -109,11 +109,11 @@ export const preserveStaticFileBaseNameInputGenerator = <
  * @returns The determined content type.
  */
 export const determineContentType = <Type extends FileValue = FileValue>(
-    properties:FileInputProperties<Type>
-):null|string => {
+    properties: FileInputProperties<Type>
+): null|string => {
     if (properties.value) {
-        if ((properties.value.blob as Blob)?.type)
-            return (properties.value.blob as Blob)?.type
+        if ((properties.value.blob as Blob|null)?.type)
+            return (properties.value.blob as Blob).type
 
         if (properties.value.url?.startsWith('data:')) {
             const contentTypeMatch =
@@ -131,8 +131,8 @@ export const determineContentType = <Type extends FileValue = FileValue>(
  * @returns Representative string for given content type.
  */
 export const determineRepresentationType = (
-    contentType:string
-):RepresentationType => {
+    contentType: string
+): RepresentationType => {
     contentType = contentType.replace(/; *charset=.+$/, '')
 
     if (TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType))
@@ -162,23 +162,23 @@ export const determineRepresentationType = (
 export const determineValidationState = <
     Type extends FileValue = FileValue,
     P extends DefaultProperties<Type> = DefaultProperties<Type>
->(properties:P, invalidName:boolean, currentState:ModelState):boolean => {
-    const invalidMaximumSize = ():boolean => (
+>(properties: P, invalidName: boolean, currentState: ModelState): boolean => {
+    const invalidMaximumSize = (): boolean => (
         typeof properties.model.maximumSize === 'number' &&
         properties.model.maximumSize <
-        ((properties.model.value?.blob as Blob)?.size || 0)
+        ((properties.model.value?.blob as Blob|null)?.size || 0)
     )
-    const invalidMinimumSize = ():boolean => (
+    const invalidMinimumSize = (): boolean => (
         typeof properties.model.minimumSize === 'number' &&
         properties.model.minimumSize >
-        ((properties.model.value?.blob as Blob)?.size || 0)
+        ((properties.model.value?.blob as Blob|null)?.size || 0)
     )
-    const invalidContentTypePattern = ():boolean => (
+    const invalidContentTypePattern = (): boolean => (
         Boolean(properties.model.contentTypePattern) &&
-        typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
+        typeof (properties.model.value?.blob as Blob|null)?.type === 'string' &&
         ([] as Array<RegExp|string>)
             .concat(properties.model.contentTypePattern!)
-            .some((expression:RegExp|string):boolean =>
+            .some((expression: RegExp|string): boolean =>
                 typeof expression === 'string' &&
                 !(new RegExp(expression))
                     .test((properties.model.value!.blob as Blob).type) ||
@@ -189,14 +189,14 @@ export const determineValidationState = <
                 )
             )
     )
-    const invalidInvertedContentTypePattern = ():boolean => (
+    const invalidInvertedContentTypePattern = (): boolean => (
         Boolean(
             properties.model.invertedContentTypePattern
         ) &&
         typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
         ([] as Array<RegExp|string>)
             .concat(properties.model.invertedContentTypePattern!)
-            .some((expression:RegExp|string):boolean =>
+            .some((expression: RegExp|string): boolean =>
                 typeof expression === 'string' &&
                 (new RegExp(expression))
                     .test((properties.model.value!.blob as Blob).type) ||
@@ -212,7 +212,7 @@ export const determineValidationState = <
         {
             invalidMaximumSize,
             invalidMinimumSize,
-            invalidName: ():boolean => invalidName,
+            invalidName: (): boolean => invalidName,
             invalidContentTypePattern,
             invalidInvertedContentTypePattern
         }
@@ -225,8 +225,8 @@ export const determineValidationState = <
  * @returns A promise holding base64 string.
  */
 export const deriveBase64String = <Type extends FileValue = FileValue>(
-    value:Type
-):Promise<string> =>
+    value: Type
+): Promise<string> =>
         value.blob ?
             blobToBase64String(value.blob as Blob) :
             value.source ?
@@ -244,16 +244,16 @@ export const deriveBase64String = <Type extends FileValue = FileValue>(
  * @returns A promise holding parsed text as string.
  */
 export const readBinaryDataIntoText = (
-    blob:Blob, encoding = 'utf-8'
-):Promise<string> =>
+    blob: Blob, encoding = 'utf-8'
+): Promise<string> =>
     new Promise<string>((
-        resolve:(value:string) => void, reject:(reason:Error) => void
+        resolve: (value: string) => void, reject: (reason: Error) => void
     ) => {
         const fileReader = new FileReader()
 
-        fileReader.onload = (event:Event) => {
-            let content:string =
-                (event.target as unknown as {result:string}).result
+        fileReader.onload = (event: Event) => {
+            let content: string =
+                (event.target as unknown as {result: string}).result
             // Remove preceding BOM.
             if (
                 content.length &&
@@ -266,8 +266,12 @@ export const readBinaryDataIntoText = (
             resolve(content)
         }
 
-        fileReader.onabort = ():void => reject(new Error('abort'))
-        fileReader.onerror = ():void => reject(new Error())
+        fileReader.onabort = () => {
+            reject(new Error('abort'))
+        }
+        fileReader.onerror = () => {
+            reject(new Error())
+        }
 
         fileReader.readAsText(
             blob,

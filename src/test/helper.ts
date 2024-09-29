@@ -33,7 +33,7 @@ const {runHook} = prepareTestEnvironment(beforeEach, afterEach)
 
 describe('helper', ():void => {
     // region consolidate state
-    test('determineInitialValue', ():void => {
+    test('determineInitialValue', () => {
         expect(
             determineInitialValue({model: {default: true}}, false)
         ).toStrictEqual(true)
@@ -100,7 +100,7 @@ describe('helper', ():void => {
     )
     // endregion
     // region hooks
-    test('useMemorizedValue', ():void => {
+    test('useMemorizedValue', (): void => {
         // Simple forward primitive value.
         expect(
             runHook<string, [string]>(
@@ -112,8 +112,8 @@ describe('helper', ():void => {
             Prepare hook with mutable object as parameter and boolean change
             trigger.
         */
-        const testObject:Mapping<number> = {content: 1}
-        const hookResult:TestHookResult<
+        const testObject: Mapping<number> = {content: 1}
+        const hookResult: TestHookResult<
             Mapping<number>, [Mapping<number>, boolean]
         > = runHook<Mapping<number>, [Mapping<number>, boolean]>(
             useMemorizedValue, {parameters: [testObject, true]}

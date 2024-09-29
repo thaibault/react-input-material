@@ -21,16 +21,16 @@ import FileInput from '../components/FileInput'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 
-describe('FileInput', ():void => {
-    test('render', ():void => {
+describe('FileInput', () => {
+    test('render', () => {
         expect(render(<FileInput/>)).toBeDefined()
-        expect(render(<FileInput/>)!.querySelector('input')).toBeDefined()
+        expect(render(<FileInput/>)?.querySelector('input')).toBeDefined()
 
-        expect(render(<FileInput/>)!.getAttribute('class'))
+        expect(render(<FileInput/>)?.getAttribute('class'))
             .toStrictEqual('file-input mdc-card')
 
         expect(
-            render(<FileInput name="test"/>)!.querySelector('[name="test"]')
+            render(<FileInput name="test"/>)?.querySelector('[name="test"]')
         ).not.toStrictEqual(null)
     })
 })
