@@ -180,7 +180,7 @@ export const TRANSFORMER: InputDataTransformation = {
                 return edgeValueDescription
 
             const formattedValue: string = utcSecondsToISOString(
-                value + new Date().getTimezoneOffset() * 60
+                value + new Date(value * 1000).getTimezoneOffset() * 60
             )
 
             return formattedValue.substring(0, formattedValue.lastIndexOf('.'))
@@ -212,7 +212,7 @@ export const TRANSFORMER: InputDataTransformation = {
                 if (!modifiedParsing)
                     value =
                         (parsedDate / 1000) -
-                        new Date().getTimezoneOffset() * 60
+                        new Date(parsedDate * 1000).getTimezoneOffset() * 60
             }
 
             if (isNaN(value as number))
@@ -261,7 +261,7 @@ export const TRANSFORMER: InputDataTransformation = {
             value: number|string,
             transformation: InputDataTransformation,
             configuration: DefaultProperties<number|string>
-        ): string =>{
+        ): string => {
             if (typeof value !== 'number')
                 value = transformation['datetime-local'].parse!(
                     value,
@@ -278,9 +278,9 @@ export const TRANSFORMER: InputDataTransformation = {
 
             /*
                 NOTE: We need to add timezone offset since we slice time
-                afterwards (rounding to day).
+                afterward (rounding to day).
             */
-            value -= new Date().getTimezoneOffset() * 60
+            value -= new Date(value * 1000).getTimezoneOffset() * 60
 
             const formattedValue: string = utcSecondsToISOString(value)
             return formattedValue.substring(0, formattedValue.lastIndexOf('T'))
@@ -306,7 +306,7 @@ export const TRANSFORMER: InputDataTransformation = {
             const isRoundedToDay = (value % (24 * 60 ** 2)) === 0
             // NOTE: We need to re-apply sliced time for formatting.
             if (isRoundedToDay)
-                value += new Date().getTimezoneOffset() * 60
+                value += new Date(value * 1000).getTimezoneOffset() * 60
 
             return transformation.date.useISOString ?
                 utcSecondsToISOString(value) :
@@ -377,15 +377,20 @@ export const TRANSFORMER: InputDataTransformation = {
                             hours: string,
                             minutes: string,
                             secondsSuffix?: string,
-                            seconds?: string,
-                            _millisecondsSuffix?: string
+                            seconds?: string // ,
+                            // _millisecondsSuffix?: string
                         ): string =>
                             String(
                                 parseInt(hours) *
                                 60 ** 2 +
                                 parseInt(minutes) *
                                 60 +
-                                (secondsSuffix ? parseFloat(seconds!) : 0)
+                                (
+                                    secondsSuffix &&
+                                    typeof seconds !== 'undefined' ?
+                                        parseFloat(seconds) :
+                                        0
+                                )
                             )
                     ))
 
@@ -430,7 +435,9 @@ export const TRANSFORMER: InputDataTransformation = {
                 return edgeValueDescription
 
             const dateTime = new Date(
-                (value/* + new Date().getTimezoneOffset() * 60*/) * 1000
+                (
+                    value/* + new Date(value * 1000).getTimezoneOffset() * 60*/
+                ) * 1000
             )
 
             const hours: number = dateTime.getHours()
@@ -476,15 +483,17 @@ export const TRANSFORMER: InputDataTransformation = {
                             hours: string,
                             minutes: string,
                             secondsSuffix?: string,
-                            seconds?: string,
-                            _millisecondsSuffix?: string
+                            seconds?: string // ,
+                            // _millisecondsSuffix?: string
                         ): string => {
                             const zeroDateTime = new Date(0)
 
                             zeroDateTime.setHours(parseInt(hours))
                             zeroDateTime.setMinutes(parseInt(minutes))
-                            if (secondsSuffix)
-                                zeroDateTime.setSeconds(parseInt(seconds!))
+                            if (
+                                secondsSuffix && typeof seconds !== 'undefined'
+                            )
+                                zeroDateTime.setSeconds(parseInt(seconds))
 
                             return String(zeroDateTime.getTime() / 1000)
                         }
