@@ -1,6 +1,6 @@
 {
   "name": "react-input-material",
-  "version": "0.0.655",
+  "version": "0.0.656",
   "description": "Reusable material design based input field with support for (richt-)text, code, selections, numbers, dates and so on.",
   "keywords": [
     "form-field",
