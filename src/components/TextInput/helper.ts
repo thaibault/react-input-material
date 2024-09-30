@@ -57,25 +57,29 @@ export const IS_BROWSER = !(
     typeof TARGET_TECHNOLOGY !== 'undefined' && TARGET_TECHNOLOGY === 'node' ||
     typeof window === 'undefined'
 )
-/* eslint-disable @typescript-eslint/no-var-requires */
 export const GivenRichTextEditorComponent: typeof RichTextEditorComponent =
-    IS_BROWSER && RichTextEditorComponent ?
+    IS_BROWSER && RichTextEditorComponent as unknown ?
         RichTextEditorComponent :
         Dummy as unknown as typeof RichTextEditorComponent
-export const UseAnimations: null|typeof Dummy|typeof UseAnimationsType =
-    IS_BROWSER ?
-        (require('react-useanimations') as
-            {default: null|typeof Dummy|typeof UseAnimationsType}|null
-        )?.default : null
-export const lockAnimation: null|typeof LockAnimation = IS_BROWSER ?
+export const UseAnimations: (
+    null|typeof Dummy|typeof UseAnimationsType|undefined
+) = IS_BROWSER ?
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('react-useanimations') as
+        {default: null|typeof Dummy|typeof UseAnimationsType}|null
+    )?.default :
+    null
+export const lockAnimation: null|typeof LockAnimation|undefined = IS_BROWSER ?
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     (require('react-useanimations/lib/lock') as
         {default: null|typeof LockAnimation}|null
     )?.default : null
-export const plusToXAnimation: null|typeof PlusToXAnimation = IS_BROWSER ?
-    (require('react-useanimations/lib/plusToX') as
-        {default: null|typeof PlusToXAnimation}|null
-    )?.default : null
-/* eslint-enable @typescript-eslint/no-var-requires */
+export const plusToXAnimation: null|typeof PlusToXAnimation|undefined =
+    IS_BROWSER ?
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        (require('react-useanimations/lib/plusToX') as
+            {default: null|typeof PlusToXAnimation}|null
+        )?.default : null
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 // region code editor configuration
@@ -197,9 +201,10 @@ export function determineValidationState<T>(
 
             invalidInvertedPattern: (): boolean => (
                 typeof properties.model.value === 'string' &&
+                typeof properties.model.invertedPattern !== 'undefined' &&
                 Boolean(properties.model.invertedPattern) &&
                 ([] as Array<RegExp|string>)
-                    .concat(properties.model.invertedPattern!)
+                    .concat(properties.model.invertedPattern)
                     .some((expression: RegExp|string): boolean =>
                         (new RegExp(expression)).test(
                             properties.model.value as unknown as string
@@ -208,9 +213,10 @@ export function determineValidationState<T>(
             ),
             invalidPattern: (): boolean => (
                 typeof properties.model.value === 'string' &&
+                typeof properties.model.pattern !== 'undefined' &&
                 Boolean(properties.model.pattern) &&
                 ([] as Array<RegExp|string>)
-                    .concat(properties.model.pattern!)
+                    .concat(properties.model.pattern)
                     .some((expression: RegExp|string): boolean =>
                         !(new RegExp(expression)).test(
                             properties.model.value as unknown as string

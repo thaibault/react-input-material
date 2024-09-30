@@ -25,9 +25,9 @@ describe('Interval', (): void => {
     test('render', (): void => {
         expect(render(<Interval/>)).toBeDefined()
 
-        expect(Array.from(
-            render(<Interval/>)?.querySelectorAll('input')
-        )).toHaveLength(2)
+        const inputElements = render(<Interval/>)?.querySelectorAll('input')
+        if (inputElements)
+            expect(Array.from(inputElements)).toHaveLength(2)
 
         expect(render(<Interval/>)?.getAttribute('class'))
             .toStrictEqual('interval')

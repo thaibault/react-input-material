@@ -31,7 +31,7 @@ import {
 // endregion
 const {runHook} = prepareTestEnvironment(beforeEach, afterEach)
 
-describe('helper', ():void => {
+describe('helper', (): void => {
     // region consolidate state
     test('determineInitialValue', () => {
         expect(

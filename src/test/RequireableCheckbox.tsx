@@ -39,10 +39,10 @@ describe('RequireableCheckbox', (): void => {
         ).toStrictEqual('NO_NAME_DEFINED')
     })
     test('render id', () => {
-        const domNode:HTMLDivElement =
+        const domNode: HTMLDivElement|null =
             render(<RequireableCheckbox id="test" name="test"/>)
 
-        expect(domNode.querySelector('input')?.getAttribute('id'))
+        expect(domNode?.querySelector('input')?.getAttribute('id'))
             .toStrictEqual('test')
     })
 })

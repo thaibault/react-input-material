@@ -77,13 +77,19 @@ const CSS_CLASS_NAMES = cssClassNames
 export function determineValidationState(
     properties: DefaultProperties, currentState: Partial<ModelState>
 ): boolean {
-    return determineBaseValidationState<
-        DefaultProperties, Partial<ModelState>
-    >(
+    return determineBaseValidationState<DefaultProperties>(
         properties,
         currentState,
         {invalidRequired: (): boolean =>
+            /*
+                eslint-disable
+                @typescript-eslint/no-unnecessary-boolean-literal-compare
+            */
             properties.model.nullable === false && !properties.model.value
+            /*
+                eslint-enable
+                @typescript-eslint/no-unnecessary-boolean-literal-compare
+            */
         }
     )
 }
@@ -433,7 +439,7 @@ export const RequireableCheckboxInner = function(
                 onClick={onClick}
                 onFocus={onFocus}
                 ripple={properties.ripple}
-                value={`${properties.value as unknown as string}`}
+                value={String(properties.value as unknown as string)}
             >
                 {(
                     properties.invalid &&

@@ -31,7 +31,8 @@ const TIMESTAMP_TRANSFORMER = {
     ...TextInput.transformer,
     date: {...TextInput.transformer.date, useISOString: false}
 }
-const TIMEZONE_OFFSET_IN_SECONDS = -1 * new Date().getTimezoneOffset() * 60
+const TIMEZONE_OFFSET_IN_SECONDS =
+    -1 * new Date(1970, 0, 1).getTimezoneOffset() * 60
 
 describe('TextInput', () => {
     testEach<typeof suggestionMatches>(
@@ -50,6 +51,7 @@ describe('TextInput', () => {
     )
     testEach<AnyFunction>(
         'transformer.boolean.parse',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TRANSFORMER.boolean.parse!,
 
         [false, false],
@@ -65,6 +67,7 @@ describe('TextInput', () => {
     // TODO add missing transformer
     testEach<AnyFunction>(
         'transformer.currency.format.final.transform',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TRANSFORMER.currency.format!.final.transform!,
 
         ...([
@@ -82,6 +85,7 @@ describe('TextInput', () => {
     )
 
     testEach<AnyFunction>(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         'transformer.currency.parse', TRANSFORMER.currency.parse!,
 
         ...([
@@ -99,6 +103,7 @@ describe('TextInput', () => {
 
     testEach<AnyFunction>(
         'transformer.date.format.final.transform',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TRANSFORMER.date.format!.final.transform!,
 
         ...([
@@ -115,6 +120,7 @@ describe('TextInput', () => {
 
     testEach<AnyFunction>(
         'transformer.date.parse',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TIMESTAMP_TRANSFORMER.date.parse!,
 
         ...([
@@ -132,6 +138,7 @@ describe('TextInput', () => {
 
     testEach<AnyFunction>(
         'transformer.datetime-local.format.final.transform',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TRANSFORMER['datetime-local'].format!.final.transform!,
 
         ['1970-01-01T00:00:00', TIMEZONE_OFFSET_IN_SECONDS],
@@ -143,6 +150,7 @@ describe('TextInput', () => {
     )
     testEach<AnyFunction>(
         'transformer.datetime-local.parse',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TIMESTAMP_TRANSFORMER['datetime-local'].parse!,
 
         ...([
@@ -160,6 +168,7 @@ describe('TextInput', () => {
 
     testEach<AnyFunction>(
         'transformer.time.format.final.transform',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TextInput.transformer.time.format!.final.transform!,
 
         ['00:00:00.000', 0, TextInput.transformer, {}],
@@ -203,6 +212,7 @@ describe('TextInput', () => {
     )
     testEach<AnyFunction>(
         'transformer.time.parse',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TIMESTAMP_TRANSFORMER.time.parse!,
 
         ...([
@@ -228,6 +238,7 @@ describe('TextInput', () => {
     */
     testEach<AnyFunction>(
         'transformer.time-local.format.final.transform',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TRANSFORMER['time-local'].format!.final.transform!,
 
         [
@@ -241,6 +252,7 @@ describe('TextInput', () => {
     )
     testEach<AnyFunction>(
         'transformer.time-local.parse',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TIMESTAMP_TRANSFORMER['time-local'].parse!,
 
         ...([

@@ -104,8 +104,14 @@ export const TRANSFORMER: InputDataTransformation = {
             transformation: InputDataTransformation,
             configuration: DefaultProperties<number|string>
         ): string => {
-            if (typeof value !== 'number')
-                value = transformation.datetime.parse!(
+            if (typeof value !== 'number') {
+                if (!transformation.datetime.parse)
+                    throw new Error(
+                        'Missing datetime parse tansformation configured. ' +
+                        'Datetime formatting depends on it.'
+                    )
+
+                value = transformation.datetime.parse(
                     value,
                     {
                         ...transformation,
@@ -113,6 +119,7 @@ export const TRANSFORMER: InputDataTransformation = {
                     },
                     configuration
                 ) as number
+            }
 
             const edgeValueDescription = convertEdgeValueToString(value)
             if (typeof edgeValueDescription === 'string')
@@ -165,8 +172,14 @@ export const TRANSFORMER: InputDataTransformation = {
             transformation: InputDataTransformation,
             configuration: DefaultProperties<number|string>
         ): string => {
-            if (typeof value !== 'number')
-                value = transformation['datetime-local'].parse!(
+            if (typeof value !== 'number') {
+                if (!transformation['datetime-local'].parse)
+                    throw new Error(
+                        'Missing datetime local parse tansformation ' +
+                        'configured. Datetime local formatting depends on.'
+                    )
+
+                value = transformation['datetime-local'].parse(
                     value,
                     {
                         ...transformation,
@@ -174,6 +187,7 @@ export const TRANSFORMER: InputDataTransformation = {
                     },
                     configuration
                 ) as number
+            }
 
             const edgeValueDescription = convertEdgeValueToString(value)
             if (typeof edgeValueDescription === 'string')
@@ -212,7 +226,7 @@ export const TRANSFORMER: InputDataTransformation = {
                 if (!modifiedParsing)
                     value =
                         (parsedDate / 1000) -
-                        new Date(parsedDate * 1000).getTimezoneOffset() * 60
+                        new Date(parsedDate).getTimezoneOffset() * 60
             }
 
             if (isNaN(value as number))
@@ -231,8 +245,14 @@ export const TRANSFORMER: InputDataTransformation = {
             transformation: InputDataTransformation,
             configuration: DefaultProperties<number|string>
         ): string => {
+            if (!transformation.datetime.format?.final.transform)
+                throw new Error(
+                    'Missing datetime final format transformation ' +
+                    'configured. Date formatting depends on it.'
+                )
+
             const formattedValue =
-                transformation.datetime.format!.final.transform!(
+                transformation.datetime.format.final.transform(
                     value, transformation, configuration
                 )
 
@@ -250,10 +270,17 @@ export const TRANSFORMER: InputDataTransformation = {
             value: Date|number|string,
             transformation: InputDataTransformation,
             configuration: DefaultInputProperties<number|string>
-        ): number|string =>
-            transformation.datetime.parse!(
+        ): number|string => {
+            if (!transformation.datetime.parse)
+                throw new Error(
+                    'Missing datetime parse transformation configured. ' +
+                    'Date parsing depends on it.'
+                )
+
+            return transformation.datetime.parse(
                 value, transformation, configuration
-            ),
+            )
+        },
         useISOString: true
     },
     'date-local': {
@@ -262,8 +289,14 @@ export const TRANSFORMER: InputDataTransformation = {
             transformation: InputDataTransformation,
             configuration: DefaultProperties<number|string>
         ): string => {
-            if (typeof value !== 'number')
-                value = transformation['datetime-local'].parse!(
+            if (typeof value !== 'number') {
+                if (!transformation['datetime-local'].parse)
+                    throw new Error(
+                        'Missing datetime local parse transformation ' +
+                        'configured. Date local formatting depends on it.'
+                    )
+
+                value = transformation['datetime-local'].parse(
                     value,
                     {
                         ...transformation,
@@ -271,6 +304,7 @@ export const TRANSFORMER: InputDataTransformation = {
                     },
                     configuration
                 ) as number
+            }
 
             const edgeValueDescription = convertEdgeValueToString(value)
             if (typeof edgeValueDescription === 'string')
@@ -294,7 +328,13 @@ export const TRANSFORMER: InputDataTransformation = {
             transformation: InputDataTransformation,
             configuration: DefaultInputProperties<number|string>
         ): number|string => {
-            value = transformation.datetime.parse!(
+            if (!transformation.datetime.parse)
+                throw new Error(
+                    'Missing datetime parse transformation configured. ' +
+                    'Date local parsing depends on.'
+                )
+
+            value = transformation.datetime.parse(
                 value,
                 {
                     ...transformation,
@@ -325,8 +365,14 @@ export const TRANSFORMER: InputDataTransformation = {
             transformation: InputDataTransformation,
             configuration: DefaultProperties<number|string>
         ): string => {
-            if (typeof value !== 'number')
-                value = transformation.datetime.parse!(
+            if (typeof value !== 'number') {
+                if (!transformation.datetime.parse)
+                    throw new Error(
+                        'Missing datetime parse transformation configured. ' +
+                        'Time formatting depends on it.'
+                    )
+
+                value = transformation.datetime.parse(
                     value,
                     {
                         ...transformation,
@@ -334,6 +380,7 @@ export const TRANSFORMER: InputDataTransformation = {
                     },
                     configuration
                 ) as number
+            }
 
             const edgeValueDescription = convertEdgeValueToString(value)
             if (typeof edgeValueDescription === 'string')
@@ -420,8 +467,14 @@ export const TRANSFORMER: InputDataTransformation = {
             transformation: InputDataTransformation,
             configuration: DefaultProperties<number|string>
         ): string => {
-            if (typeof value !== 'number')
-                value = transformation['time-local'].parse!(
+            if (typeof value !== 'number') {
+                if (!transformation['time-local'].parse)
+                    throw new Error(
+                        'Missing time local parse transformation ' +
+                        'configured. Time local formatting depends on it.'
+                    )
+
+                value = transformation['time-local'].parse(
                     value,
                     {
                         ...transformation,
@@ -429,16 +482,23 @@ export const TRANSFORMER: InputDataTransformation = {
                     },
                     configuration
                 ) as number
+            }
 
             const edgeValueDescription = convertEdgeValueToString(value)
             if (typeof edgeValueDescription === 'string')
                 return edgeValueDescription
 
-            const dateTime = new Date(
-                (
-                    value/* + new Date(value * 1000).getTimezoneOffset() * 60*/
-                ) * 1000
-            )
+            /*
+                NOTE: For time without any date information we cannot determine
+                a time zone shift since it depends on connected date because of
+                political changes and daylight saving periods.
+
+                When transforming time into local time we would have to add
+                the local timezone offset like:
+
+                + CURRENT_DATE.getTimezoneOffset() * 60
+            */
+            const dateTime = new Date(value * 1000)
 
             const hours: number = dateTime.getHours()
             const minutes: number = dateTime.getMinutes()

@@ -185,19 +185,23 @@ const Application = () => {
     ): IntervalProps => {
         const sixHoursInSeconds =
             new Date(1970, 0, 1, 6).getTime() / 1000
-        const length = properties?.value?.length
+        const length = properties.value?.length
         const nextStart =
             lastValue?.end ??
             (
-                (length && properties.value![length - 1].value) ?
-                    properties.value![length - 1].value!.end :
+                (
+                    length &&
+                    properties.value &&
+                    properties.value[length - 1].value
+                ) ?
+                    properties.value[length - 1].value?.end :
                     sixHoursInSeconds
             )
         const nextStartTime =
             (nextStart as InputProps<number|string>).value ?? nextStart
         const nextStartTimeInSeconds = typeof nextStartTime === 'number' ?
             nextStartTime :
-            new Date(nextStartTime).getTime() / 1000
+            new Date(nextStartTime as string).getTime() / 1000
 
         const value = {
             start: {value: nextStartTimeInSeconds},
