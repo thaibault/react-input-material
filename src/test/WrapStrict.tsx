@@ -21,8 +21,8 @@ import WrapStrict from '../components/WrapStrict'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 
-describe('WrapStrict', ():void => {
-    test('render', ():void => {
+describe('WrapStrict', () => {
+    test('render', () => {
         expect(
             (render(<WrapStrict strict><div className="test"/></WrapStrict>) as
                 HTMLElement
@@ -32,7 +32,7 @@ describe('WrapStrict', ():void => {
         expect(
             render(
                 <WrapStrict strict={false}><div className="test"/></WrapStrict>
-            )!.querySelector('.test')
+            )?.querySelector('.test')
         ).toBeDefined()
     })
 })

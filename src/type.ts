@@ -28,6 +28,7 @@ import PropertyTypes, {
     object,
     objectOf,
     oneOfType,
+    Requireable,
     shape,
     string,
     symbol,
@@ -46,8 +47,7 @@ import {
     MutableRefObject,
     ReactElement,
     ReactNode,
-    RefAttributes,
-    Requireable
+    RefAttributes
 } from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
@@ -81,181 +81,181 @@ import {
 // region exports
 /// region generic
 export interface CursorState {
-    end:number
-    start:number
+    end: number
+    start: number
 }
 export type TypeSpecification = Array<string>|string
 //// region model
 export interface BaseSelectionMapping {
-    label:string
+    label: string
     /*
         NOTE: Databases may support any value here but the current selection
         input does not allow this via typescript but seems to work with any
         value.
      */
-    value:unknown
+    value: unknown
 }
 export type BaseSelection =
     Array<BaseSelectionMapping>|Array<unknown>|Mapping<unknown>
 export interface CommonBaseModel<Type = unknown> {
-    declaration:string
-    description:string
-    name:string
+    declaration: string
+    description: string
+    name: string
 
-    default?:Type
+    default?: Type
 
-    emptyEqualsNull:boolean
+    emptyEqualsNull: boolean
 
-    maximum:number|string
-    minimum:number|string
+    maximum: number|string
+    minimum: number|string
 
-    maximumLength:number
-    minimumLength:number
+    maximumLength: number
+    minimumLength: number
 
-    selection?:BaseSelection
-    type:TypeSpecification
+    selection?: BaseSelection
+    type: TypeSpecification
 
-    trim:boolean
+    trim: boolean
 
-    value?:Type
+    value?: Type
 }
 export interface ModelState {
-    dirty:boolean
-    pristine:boolean
+    dirty: boolean
+    pristine: boolean
 
-    touched:boolean
-    untouched:boolean
+    touched: boolean
+    untouched: boolean
 
-    focused:boolean
-    visited:boolean
+    focused: boolean
+    visited: boolean
 
-    invalid:boolean
-    valid:boolean
+    invalid: boolean
+    valid: boolean
 
-    invalidRequired:boolean
+    invalidRequired: boolean
 }
 export type Pattern = Array<RegExp|string>|RegExp|string
 export interface BaseModel<T = unknown> extends CommonBaseModel<T> {
-    pattern?:Pattern
-    invertedPattern?:Pattern
+    pattern?: Pattern
+    invertedPattern?: Pattern
 
-    mutable:boolean
-    writable:boolean
+    mutable: boolean
+    writable: boolean
 
-    nullable:boolean
+    nullable: boolean
 
-    state:ModelState
+    state: ModelState
 }
 //// endregion
 export type Selection = Array<boolean|number>|SelectProps['options']
 export interface BaseProperties<T = unknown>
     extends
 CommonBaseModel<T>, ModelState {
-    className:string
+    className: string
     // NOTE: We want to avoid a collision with html's native "style" property.
-    styles:Mapping
-    themeConfiguration:ThemeProviderProps['options']
+    styles: Mapping
+    themeConfiguration: ThemeProviderProps['options']
 
-    disabled:boolean
+    disabled: boolean
 
-    enforceUncontrolled:boolean
+    enforceUncontrolled: boolean
 
-    id:string
-    label:string
-    name:string
+    id: string
+    label: string
+    name: string
 
-    initialValue:T
+    initialValue: T
 
-    model:BaseModel<T>
+    model: BaseModel<T>
 
-    required:boolean
-    requiredText:string
+    required: boolean
+    requiredText: string
 
-    ripple:RipplePropT
+    ripple: RipplePropT
 
-    rootProps:Mapping<boolean|number|string>
+    rootProps: Mapping<boolean|number|string>
     /*
         NOTE: selection allows more options than when configuring via "model"
         to be aligned to backend view of selections.
      */
-    selection:Selection
+    selection: Selection
 
-    showDeclaration:boolean
+    showDeclaration: boolean
 
-    showInitialValidationState:boolean
-    showValidationState:boolean
+    showInitialValidationState: boolean
+    showValidationState: boolean
 
-    tooltip:string|TooltipProps
+    tooltip: string|TooltipProps
 
-    triggerInitialPropertiesConsolidation:boolean
+    triggerInitialPropertiesConsolidation: boolean
 }
 export type BaseProps<T = unknown> =
     Partial<Omit<BaseProperties<T>, 'model'>> &
     {
-        model?:(
+        model?: (
             Partial<Omit<BaseModel<T>, 'state'>> &
-            {state?:Partial<ModelState>}
+            {state?: Partial<ModelState>}
         )
     }
 
 export type DefaultBaseProperties<T = unknown> =
-    Omit<BaseProps<T>, 'model'> & {model:BaseModel<T>}
+    Omit<BaseProps<T>, 'model'> & {model: BaseModel<T>}
 
 export interface TypedProperties<T = unknown> extends BaseProperties<T> {
-    initialValue:T
+    initialValue: T
 
-    model:BaseModel<T>
+    model: BaseModel<T>
 
-    onBlur:(event:GenericEvent|undefined, properties:this) => void
+    onBlur: (event: GenericEvent|undefined, properties: this) => void
 
-    onChange:(properties:this, event?:GenericEvent) => void
-    onChangeShowDeclaration:(
-        show:boolean, event:GenericEvent|undefined, properties:this
+    onChange: (properties: this, event?: GenericEvent) => void
+    onChangeShowDeclaration: (
+        show: boolean, event: GenericEvent|undefined, properties: this
     ) => void
-    onChangeState:(
-        state:ModelState, event:GenericEvent|undefined, properties:this
+    onChangeState: (
+        state: ModelState, event: GenericEvent|undefined, properties: this
     ) => void
-    onChangeValue:(
-        value:T, event:GenericEvent|undefined, properties:this
+    onChangeValue: (
+        value: T, event: GenericEvent|undefined, properties: this
     ) => void
 
-    onClick:(event:MouseEvent, properties:this) => void
-    onFocus:(event:FocusEvent, properties:this) => void
-    onTouch:(event:GenericEvent, properties:this) => void
+    onClick: (event: MouseEvent, properties: this) => void
+    onFocus: (event: FocusEvent, properties: this) => void
+    onTouch: (event: GenericEvent, properties: this) => void
 }
 export type Properties<T = unknown> =
     TypedProperties<T> & CommonBaseModel<T>
 export type Props<T = unknown> =
     Partial<Omit<Properties<T>, 'model'>> &
     {
-        model?:(
+        model?: (
             Partial<Omit<BaseModel<T>, 'state'>> &
-            {state?:Partial<ModelState>}
+            {state?: Partial<ModelState>}
         )
     }
 
 export type DefaultProperties<T = unknown> =
-    Omit<Props<T>, 'model'> & {model:BaseModel<T>}
+    Omit<Props<T>, 'model'> & {model: BaseModel<T>}
 //// region state
 export interface State<T = unknown> {
-    modelState?:ModelState
-    value?:null|T
+    modelState?: ModelState
+    value?: null|T
 }
 export interface ValueState<T = unknown, MS = ModelState> {
-    modelState:MS
-    value:null|T
+    modelState: MS
+    value: null|T
 }
 export interface EditorState {
-    editorIsActive:boolean
-    selectionIsUnstable:boolean
+    editorIsActive: boolean
+    selectionIsUnstable: boolean
 }
 //// endregion
 export interface StaticWebComponent<
     Type, MS = ModelState, DP = DefaultProperties<Type>
 > extends StaticBaseWebComponent<Type> {
-    defaultModelState:MS
-    defaultProperties:DP
-    strict:boolean
+    defaultModelState: MS
+    defaultProperties: DP
+    strict: boolean
 }
 
 export type StaticComponent<
@@ -276,10 +276,10 @@ export interface InputComponent<
     Omit<ForwardRefExoticComponent<P>, 'propTypes'>,
     StaticWebComponent<ComponentType, MS, DP>
 {
-    (props:P & RefAttributes<A>):ReactElement
+    (props: P & RefAttributes<A>): ReactElement
 }
 //// region constants
-export const baseModelPropertyTypes:ValidationMapping = {
+export const baseModelPropertyTypes: ValidationMapping = {
     name: string,
 
     declaration: string,
@@ -325,8 +325,8 @@ export const baseModelPropertyTypes:ValidationMapping = {
 
     value: any
 } as const
-export const modelStatePropertyTypes:{
-    [key in keyof ModelState]:Requireable<boolean|symbol>
+export const modelStatePropertyTypes: {
+    [key in keyof ModelState]: Requireable<boolean|symbol>
 } = {
     dirty: oneOfType([boolean, symbol]),
     pristine: oneOfType([boolean, symbol]),
@@ -340,7 +340,7 @@ export const modelStatePropertyTypes:{
     invalidRequired: oneOfType([boolean, symbol]),
     valid: oneOfType([boolean, symbol])
 } as const
-export const modelPropertyTypes:ValidationMapping = {
+export const modelPropertyTypes: ValidationMapping = {
     ...baseModelPropertyTypes,
 
     emptyEqualsNull: boolean,
@@ -362,7 +362,7 @@ export const modelPropertyTypes:ValidationMapping = {
 
     state: shape(modelStatePropertyTypes)
 } as const
-export const propertyTypes:ValidationMapping = {
+export const propertyTypes: ValidationMapping = {
     ...baseModelPropertyTypes,
     ...modelStatePropertyTypes,
 
@@ -402,12 +402,12 @@ export const propertyTypes:ValidationMapping = {
 
     /*
         NOTE: Not yet working:
-        tooltip?:string|TooltipProps
-        trailingIcon?:string|(IconOptions & {tooltip?:string|TooltipProps})
+        tooltip?: string|TooltipProps
+        trailingIcon?: string|(IconOptions & {tooltip?: string|TooltipProps})
     */
     tooltip: any
 }
-export const defaultModelState:ModelState = {
+export const defaultModelState: ModelState = {
     dirty: false,
     pristine: true,
 
@@ -421,7 +421,7 @@ export const defaultModelState:ModelState = {
     touched: false,
     untouched: true
 } as const
-export const defaultModel:BaseModel<string> = {
+export const defaultModel: BaseModel<string> = {
     declaration: '',
     description: '',
     name: 'NO_NAME_DEFINED',
@@ -456,7 +456,7 @@ export const defaultModel:BaseModel<string> = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultProperties:DefaultProperties = {
+export const defaultProperties: DefaultProperties = {
     enforceUncontrolled: false,
 
     model: {...defaultModel},
@@ -474,22 +474,22 @@ export const defaultProperties:DefaultProperties = {
 /// endregion
 /// region checkbox
 export interface CheckboxProperties extends Properties<boolean> {
-    checked:boolean
-    id:string
+    checked: boolean
+    id: string
 }
 export type CheckboxModel = BaseModel<boolean>
 export type CheckboxModelState = ModelState
-export type CheckboxValueState = ValueState<boolean, CheckboxModelState>
+export type CheckboxValueState = ValueState<boolean>
 export type CheckboxProps =
     Partial<Omit<CheckboxProperties, 'model'>> &
     {
-        model?:(
+        model?: (
             Partial<Omit<CheckboxModel, 'state'>> &
-            {state?:Partial<CheckboxModelState>}
+            {state?: Partial<CheckboxModelState>}
         )
     }
 export type DefaultCheckboxProperties =
-    Omit<CheckboxProps, 'model'> & {model:CheckboxModel}
+    Omit<CheckboxProps, 'model'> & {model: CheckboxModel}
 export type CheckboxState = State<boolean>
 export type CheckboxAdapter =
     ComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
@@ -503,13 +503,13 @@ export type CheckboxComponent<ComponentType> = InputComponent<
     CheckboxAdapter
 >
 //// region constants
-export const checkboxPropertyTypes:PropertiesValidationMap = {
+export const checkboxPropertyTypes: PropertiesValidationMap = {
     ...propertyTypes,
     ...modelStatePropertyTypes,
     checked: boolean,
     id: string
 } as const
-export const defaultCheckboxModel:CheckboxModel = {
+export const defaultCheckboxModel: CheckboxModel = {
     ...defaultModel as unknown as CheckboxModel,
     default: false,
     type: 'boolean',
@@ -519,7 +519,7 @@ export const defaultCheckboxModel:CheckboxModel = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultCheckboxProperties:DefaultCheckboxProperties = {
+export const defaultCheckboxProperties: DefaultCheckboxProperties = {
     ...defaultProperties as CheckboxProps,
     default: false,
     model: {...defaultCheckboxModel},
@@ -530,60 +530,60 @@ export const defaultCheckboxProperties:DefaultCheckboxProperties = {
 /// region input
 //// region data transformation
 export type Transformer<T = unknown> = (
-    value:T,
-    transformer:InputDataTransformation,
-    configuration:DefaultInputProperties<T>
+    value: T,
+    transformer: InputDataTransformation,
+    configuration: DefaultInputProperties<T>
 ) => string
 export interface FormatSpecification<T = unknown> {
-    options?:PlainObject
-    transform?:Transformer<T>
+    options?: PlainObject
+    transform?: Transformer<T>
 }
 export interface FormatSpecifications<T = unknown> {
-    final:FormatSpecification<T>
-    intermediate?:FormatSpecification<T>
+    final: FormatSpecification<T>
+    intermediate?: FormatSpecification<T>
 }
 export interface DataTransformSpecification<
     T = unknown, InputType = number|string
 > {
-    format?:FormatSpecifications<T>
-    parse?:(
-        value:InputType,
-        transformer:InputDataTransformation,
-        configuration:DefaultInputProperties<T>
+    format?: FormatSpecifications<T>
+    parse?: (
+        value: InputType,
+        transformer: InputDataTransformation,
+        configuration: DefaultInputProperties<T>
     ) => T
-    type?:NativeInputType,
+    type?: NativeInputType,
 }
 export interface DateTransformSpecification
     extends
 DataTransformSpecification<number|string, Date|number|string> {
-    useISOString:boolean
+    useISOString: boolean
 }
 export type InputDataTransformation =
     {
-        boolean:DataTransformSpecification<boolean, number|string>
+        boolean: DataTransformSpecification<boolean>
 
-        currency:DataTransformSpecification<number, string>
+        currency: DataTransformSpecification<number, string>
 
-        date:DateTransformSpecification
-        'date-local':DataTransformSpecification<
+        date: DateTransformSpecification
+        'date-local': DataTransformSpecification<
             number|string, Date|number|string
         >
 
-        datetime:DataTransformSpecification<number|string, Date|number|string>
-        'datetime-local':DataTransformSpecification<
+        datetime: DataTransformSpecification<number|string, Date|number|string>
+        'datetime-local': DataTransformSpecification<
             number|string, Date|number|string
         >
 
-        time:DataTransformSpecification<number|string, Date|number|string>
-        'time-local':DataTransformSpecification<
+        time: DataTransformSpecification<number|string, Date|number|string>
+        'time-local': DataTransformSpecification<
             number|string, Date|number|string
         >
 
-        float:DataTransformSpecification<number, string>
-        integer:DataTransformSpecification<number, string>
-        number:DataTransformSpecification<number, number>
+        float: DataTransformSpecification<number, string>
+        integer: DataTransformSpecification<number, string>
+        number: DataTransformSpecification<number, number>
 
-        string?:DataTransformSpecification<unknown>
+        string?: DataTransformSpecification
     } &
     {[key in Exclude<
         NativeInputType,
@@ -593,7 +593,7 @@ export type InputDataTransformation =
             'time' | 'time-local' |
             'number'
         )
-    >]?:DataTransformSpecification<unknown>}
+    >]?: DataTransformSpecification}
 //// endregion
 export type InputSelection =
     Array<boolean|number> |
@@ -601,31 +601,31 @@ export type InputSelection =
     NormalizedSelection |
     SelectProps['options']
 export type NormalizedSelection =
-    Array<Omit<FormattedSelectionOption, 'value'> & {value:unknown}>
+    Array<Omit<FormattedSelectionOption, 'value'> & {value: unknown}>
 export interface InputTablePosition {
-    column:number
-    row:number
+    column: number
+    row: number
 }
 export interface InputModelState extends ModelState {
-    invalidMaximum:boolean
-    invalidMinimum:boolean
+    invalidMaximum: boolean
+    invalidMinimum: boolean
 
-    invalidMaximumLength:boolean
-    invalidMinimumLength:boolean
+    invalidMaximumLength: boolean
+    invalidMinimumLength: boolean
 
-    invalidInvertedPattern:boolean
-    invalidPattern:boolean
+    invalidInvertedPattern: boolean
+    invalidPattern: boolean
 }
 export interface InputModel<T = unknown> extends BaseModel<T> {
-    state:InputModelState
+    state: InputModelState
 }
 export type PartialInputModel<T = unknown> =
     Partial<Omit<InputModel<T>, 'state'>> &
-    {state?:Partial<InputModelState>}
+    {state?: Partial<InputModelState>}
 export interface InputValueState<T = unknown, MS = ModelState> extends
     ValueState<T, MS>
 {
-    representation?:ReactNode
+    representation?: ReactNode
 }
 export type NativeInputType = (
     'date' |
@@ -649,17 +649,17 @@ export type TextInputType = (
     NativeInputType
 )
 export interface InputChildrenOptions<P, T> {
-    index:number
-    normalizedSelection:NormalizedSelection
-    properties:P
-    query:string
-    suggestion:ReactNode|string
-    value:T
+    index: number
+    normalizedSelection: NormalizedSelection
+    properties: P
+    query: string
+    suggestion: ReactNode|string
+    value: T
 }
 export interface SuggestionCreatorOptions<P> {
-    abortController:AbortController
-    properties:P
-    query:string
+    abortController: AbortController
+    properties: P
+    query: string
 }
 /*
     plain -> input field
@@ -683,86 +683,86 @@ export type Editor = (
 export interface InputProperties<T = unknown> extends
     InputModelState, Properties<T>
 {
-    align:'end'|'start'
-    children:(options:InputChildrenOptions<this, T>) => null|ReactElement
-    cursor:CursorState
+    align: 'end'|'start'
+    children: (options: InputChildrenOptions<this, T>) => null|ReactElement
+    cursor: CursorState
 
-    editor:Editor
-    editorIsActive:boolean
+    editor: Editor
+    editorIsActive: boolean
 
-    hidden:boolean
+    hidden: boolean
 
-    icon:string|(IconOptions & {tooltip?:string|TooltipProps})
-    trailingIcon:string|(IconOptions & {tooltip?:string|TooltipProps})
+    icon: string|(IconOptions & {tooltip?: string|TooltipProps})
+    trailingIcon: string|(IconOptions & {tooltip?: string|TooltipProps})
 
-    inputProperties:Partial<
+    inputProperties: Partial<
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     >
-    inputProps:Mapping<boolean|number|string>
+    inputProps: Mapping<boolean|number|string>
 
-    invertedPattern:Array<RegExp|string>|null|RegExp|string
-    invertedPatternText:string
+    invertedPattern: Array<RegExp|string>|null|RegExp|string
+    invertedPatternText: string
 
-    labels:Array<[string, string]>|Array<string>|Mapping
+    labels: Array<[string, string]>|Array<string>|Mapping
 
-    maximumLengthText:string
-    minimumLengthText:string
+    maximumLengthText: string
+    minimumLengthText: string
 
-    maximumText:string
-    minimumText:string
+    maximumText: string
+    minimumText: string
 
-    model:InputModel<T>
+    model: InputModel<T>
 
-    onChangeEditorIsActive:(
-        isActive:boolean, event:MouseEvent|undefined, properties:this
+    onChangeEditorIsActive: (
+        isActive: boolean, event: MouseEvent|undefined, properties: this
     ) => void
-    onKeyDown:(event:KeyboardEvent, properties:this) => void
-    onKeyUp:(event:KeyboardEvent, properties:this) => void
-    onSelect:(event:GenericEvent, properties:this) => void
-    onSelectionChange:(event:GenericEvent, properties:this) => void
+    onKeyDown: (event: KeyboardEvent, properties: this) => void
+    onKeyUp: (event: KeyboardEvent, properties: this) => void
+    onSelect: (event: GenericEvent, properties: this) => void
+    onSelectionChange: (event: GenericEvent, properties: this) => void
 
-    outlined:boolean
+    outlined: boolean
 
-    pattern:Array<RegExp|string>|null|RegExp|string
-    patternText:string
+    pattern: Array<RegExp|string>|null|RegExp|string
+    patternText: string
 
-    placeholder:string
-    representation:ReactNode|string
+    placeholder: string
+    representation: ReactNode|string
 
-    rows:number
+    rows: number
 
-    searchSelection:boolean
-    selectableEditor:boolean
+    searchSelection: boolean
+    selectableEditor: boolean
 
-    step:number
+    step: number
 
-    suggestionCreator?:(options:SuggestionCreatorOptions<this>) =>
+    suggestionCreator?: (options: SuggestionCreatorOptions<this>) =>
         InputProperties['selection']|Promise<InputProperties['selection']>
-    suggestSelection:boolean
+    suggestSelection: boolean
 
-    transformer:RecursivePartial<DataTransformSpecification<
+    transformer: RecursivePartial<DataTransformSpecification<
         T, Date|number|string
     >>
 }
 export type InputProps<T = unknown> =
     Partial<Omit<InputProperties<T>, 'model'>> &
-    {model?:PartialInputModel<T>}
+    {model?: PartialInputModel<T>}
 
 export type DefaultInputProperties<T = string> =
-    Omit<InputProps<T>, 'model'> & {model:InputModel<T>}
+    Omit<InputProps<T>, 'model'> & {model: InputModel<T>}
 
 export type InputPropertyTypes<T = unknown> = {
-    [key in keyof InputProperties<T>]:ValueOf<typeof PropertyTypes>
+    [key in keyof InputProperties<T>]: ValueOf<typeof PropertyTypes>
 }
 
 export interface InputState<T = unknown> extends State<T> {
-    cursor:CursorState
-    editorIsActive:boolean
-    hidden?:boolean
-    modelState:InputModelState
-    representation?:ReactNode|string
-    selectionIsUnstable:boolean
-    showDeclaration:boolean
+    cursor: CursorState
+    editorIsActive: boolean
+    hidden?: boolean
+    modelState: InputModelState
+    representation?: ReactNode|string
+    selectionIsUnstable: boolean
+    showDeclaration: boolean
 }
 
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
@@ -770,36 +770,36 @@ export type InputAdapter<T = unknown> = ComponentAdapter<
     InputProperties<T>,
     Omit<InputState<T>, 'representation'|'selectionIsUnstable'|'value'> &
     {
-        representation?:ReactNode|string
-        value?:null|T
+        representation?: ReactNode|string
+        value?: null|T
     }
 >
 export interface InputAdapterWithReferences<T = unknown> extends
     InputAdapter<T>
 {
-    references:{
-        codeEditorReference:MutableRefObject<CodeEditorType|null>
-        codeEditorInputReference:MutableRefObject<HTMLTextAreaElement|null>
-        foundationReference:MutableRefObject<
+    references: {
+        codeEditorReference: MutableRefObject<CodeEditorType|null>
+        codeEditorInputReference: MutableRefObject<HTMLTextAreaElement|null>
+        foundationReference: MutableRefObject<
             MDCSelectFoundation|MDCTextFieldFoundation|null
         >
-        inputReference:MutableRefObject<
+        inputReference: MutableRefObject<
             HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement|null
         >
-        richTextEditorInputReference:MutableRefObject<HTMLTextAreaElement|null>
-        richTextEditorInstance:MutableRefObject<RichTextEditor|null>
-        richTextEditorReference:MutableRefObject<RichTextEditorComponent|null>
-        suggestionMenuAPIReference:MutableRefObject<MenuApi|null>
-        suggestionMenuFoundationReference:MutableRefObject<
+        richTextEditorInputReference: MutableRefObject<HTMLTextAreaElement|null>
+        richTextEditorInstance: MutableRefObject<RichTextEditor|null>
+        richTextEditorReference: MutableRefObject<RichTextEditorComponent|null>
+        suggestionMenuAPIReference: MutableRefObject<MenuApi|null>
+        suggestionMenuFoundationReference: MutableRefObject<
             MDCMenuFoundation|null
         >
-        wrapperReference:MutableRefObject<HTMLDivElement|null>
+        wrapperReference: MutableRefObject<HTMLDivElement|null>
     }
 }
 
 export interface TinyMCEOptions extends RawTinyMCEOptions {
-    selector?:undefined
-    target?:undefined
+    selector?: undefined
+    target?: undefined
 }
 
 export interface TextInputComponent<Type> extends
@@ -807,15 +807,15 @@ export interface TextInputComponent<Type> extends
     StaticWebComponent<Type, InputModelState, DefaultInputProperties>
 {
     <T = string>(
-        props:InputProps<T> & RefAttributes<InputAdapter<T>>
-    ):ReactElement
+        props: InputProps<T> & RefAttributes<InputAdapter<T>>
+    ): ReactElement
 
-    locales:Array<string>
-    transformer:InputDataTransformation
+    locales: Array<string>
+    transformer: InputDataTransformation
 }
 //// region constants
-export const inputModelStatePropertyTypes:{
-    [key in keyof InputModelState]:Requireable<boolean|symbol>
+export const inputModelStatePropertyTypes: {
+    [key in keyof InputModelState]: Requireable<boolean|symbol>
 } = {
     ...modelStatePropertyTypes,
 
@@ -828,7 +828,7 @@ export const inputModelStatePropertyTypes:{
     invalidInvertedPattern: oneOfType([boolean, symbol]),
     invalidPattern: oneOfType([boolean, symbol])
 } as const
-export const inputPropertyTypes:PropertiesValidationMap = {
+export const inputPropertyTypes: PropertiesValidationMap = {
     ...propertyTypes,
     ...inputModelStatePropertyTypes,
     /*
@@ -863,7 +863,7 @@ export const inputPropertyTypes:PropertiesValidationMap = {
     hidden: oneOfType([boolean, symbol]),
     /*
         NOTE: Not yet working:
-        icon?:string|(IconOptions & {tooltip?:string|TooltipProps})
+        icon?: string|(IconOptions & {tooltip?: string|TooltipProps})
     */
     icon: oneOfType([string, object]),
     inputProps: object,
@@ -898,9 +898,9 @@ export const inputPropertyTypes:PropertiesValidationMap = {
     trailingIcon: any,
     transformer: object
 } as const
-export const textInputRenderProperties:Array<string> =
+export const textInputRenderProperties: Array<string> =
     ['children', 'suggestionCreator']
-export const defaultInputModelState:InputModelState = {
+export const defaultInputModelState: InputModelState = {
     ...defaultModelState,
 
     invalidMaximum: false,
@@ -912,7 +912,7 @@ export const defaultInputModelState:InputModelState = {
     invalidInvertedPattern: false,
     invalidPattern: false
 } as const
-export const defaultInputModel:InputModel<string> = {
+export const defaultInputModel: InputModel<string> = {
     ...defaultModel as InputModel<string>,
     state: defaultInputModelState
 } as const
@@ -920,7 +920,7 @@ export const defaultInputModel:InputModel<string> = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultInputProperties:DefaultInputProperties = {
+export const defaultInputProperties: DefaultInputProperties = {
     ...defaultProperties as DefaultInputProperties,
 
     cursor: {
@@ -964,132 +964,132 @@ export type FileRepresentationType =
     'binary'|'image'|'embedableText'|'text'|'video'
 export type BlobType = Blob|Buffer|string
 export interface FileValue {
-    blob?:Partial<BlobType>
-    hash?:string
-    name?:string
-    source?:string
-    url?:string
+    blob?: Partial<BlobType>
+    hash?: string
+    name?: string
+    source?: string
+    url?: string
 }
 export interface FileInputValueState<
     Type extends FileValue = FileValue
 > extends ValueState<Type, FileInputModelState> {
-    attachBlobProperty:boolean
+    attachBlobProperty: boolean
 }
 
 export interface FileInputModelState extends ModelState {
-    invalidMaximumSize:boolean
-    invalidMinimumSize:boolean
+    invalidMaximumSize: boolean
+    invalidMinimumSize: boolean
 
-    invalidContentTypePattern:boolean
-    invalidInvertedContentTypePattern:boolean
+    invalidContentTypePattern: boolean
+    invalidInvertedContentTypePattern: boolean
 
-    invalidName:boolean
+    invalidName: boolean
 }
 export interface FileInputModel<
     Type extends FileValue = FileValue
 > extends BaseModel<null|Type> {
-    contentTypePattern?:Pattern
-    invertedContentTypePattern?:Pattern
+    contentTypePattern?: Pattern
+    invertedContentTypePattern?: Pattern
 
-    maximumSize:number
-    minimumSize:number
+    maximumSize: number
+    minimumSize: number
 
-    fileName:InputModel<string>
+    fileName: InputModel<string>
 
-    state:FileInputModelState
+    state: FileInputModelState
 }
 
 export interface FileInputChildrenOptions<
     P, Type extends FileValue = FileValue
 > {
-    declaration:string
-    invalid:boolean
-    properties:P
-    value?:null|Type
+    declaration: string
+    invalid: boolean
+    properties: P
+    value?: null|Type
 }
 export interface FileInputProperties<
     Type extends FileValue = FileValue, MediaTag extends ElementType = 'div'
 > extends Properties<null|Type>, FileInputModelState {
-    children:(options:FileInputChildrenOptions<
+    children: (options: FileInputChildrenOptions<
         FileInputProperties<Type, MediaTag>, Type
     >) => ReactNode
 
-    contentTypePattern:Array<RegExp|string>|null|RegExp|string
-    invertedContentTypePattern:Array<RegExp|string>|null|RegExp|string
+    contentTypePattern: Array<RegExp|string>|null|RegExp|string
+    invertedContentTypePattern: Array<RegExp|string>|null|RegExp|string
 
-    contentTypePatternText:string
-    invertedContentTypePatternText:string
-    maximumSizeText:string
-    minimumSizeText:string
+    contentTypePatternText: string
+    invertedContentTypePatternText: string
+    maximumSizeText: string
+    minimumSizeText: string
 
-    deleteButton:ReactNode
-    downloadButton:ReactNode
-    editButton:ReactNode
-    newButton:ReactNode
+    deleteButton: ReactNode
+    downloadButton: ReactNode
+    editButton: ReactNode
+    newButton: ReactNode
 
-    encoding:string
+    encoding: string
 
-    generateFileNameInputProperties:(
-        prototype:InputProps<string>,
-        properties:FileInputProperties<Type, MediaTag>
+    generateFileNameInputProperties: (
+        prototype: InputProps<string>,
+        properties: FileInputProperties<Type, MediaTag>
     ) => InputProps<string>
 
-    media:RMWCComponentProps<CardMediaProps, HTMLProps<HTMLElement>, MediaTag>
+    media: RMWCComponentProps<CardMediaProps, HTMLProps<HTMLElement>, MediaTag>
 
-    model:FileInputModel<Type>
+    model: FileInputModel<Type>
 
-    outlined:boolean
+    outlined: boolean
 
-    sourceToBlobOptions:{
-        endings?:'native'|'transparent'
-        type?:string
+    sourceToBlobOptions: {
+        endings?: 'native'|'transparent'
+        type?: string
     }
 
-    hashingConfiguration:{
-        binaryString?:boolean
-        prefix?:string
-        readChunkSizeInByte?:number
+    hashingConfiguration: {
+        binaryString?: boolean
+        prefix?: string
+        readChunkSizeInByte?: number
     }
 }
 export type FileInputProps<Type extends FileValue = FileValue> =
     Partial<Omit<FileInputProperties<Type>, 'model'>> &
     {
-        model?:(
+        model?: (
             Partial<Omit<FileInputModel<Type>, 'fileName'|'state'>> &
             {
-                fileName?:PartialInputModel<string>
-                state?:Partial<FileInputModelState>
+                fileName?: PartialInputModel<string>
+                state?: Partial<FileInputModelState>
             }
         )
     }
 
 export type DefaultFileInputProperties<Type extends FileValue = FileValue> =
-    Omit<FileInputProps<Type>, 'model'> & {model:FileInputModel<Type>}
+    Omit<FileInputProps<Type>, 'model'> & {model: FileInputModel<Type>}
 
 export type FileInputPropertyTypes = {
-    [key in keyof FileInputProperties]:ValueOf<typeof PropertyTypes>
+    [key in keyof FileInputProperties]: ValueOf<typeof PropertyTypes>
 }
-export const fileInputRenderProperties:Array<string> =
+export const fileInputRenderProperties: Array<string> =
     ['children', 'generateFileNameInputProperties']
 
 export interface FileInputState<
     Type extends FileValue = FileValue
 > extends State<Type> {
-    modelState:FileInputModelState
+    modelState: FileInputModelState
 }
 
 export type FileInputAdapter<Type extends FileValue = FileValue> =
     ComponentAdapter<
         FileInputProperties<Type>, Omit<FileInputState<Type>, 'value'> &
-        {value?:null|Type}
+        {value?: null|Type}
     >
 export interface FileInputAdapterWithReferences extends FileInputAdapter {
-    references:{
-        deleteButtonReference:MutableRefObject<HTMLButtonElement|null>
-        downloadLinkReference:MutableRefObject<HTMLAnchorElement|null>
-        fileInputReference:MutableRefObject<HTMLInputElement|null>
-        nameInputReference:MutableRefObject<InputAdapter<string>|null>
-        uploadButtonReference:MutableRefObject<HTMLButtonElement|null>
+    references: {
+        deleteButtonReference: MutableRefObject<HTMLButtonElement|null>
+        downloadLinkReference: MutableRefObject<HTMLAnchorElement|null>
+        fileInputReference: MutableRefObject<HTMLInputElement|null>
+        nameInputReference: MutableRefObject<InputAdapter<string>|null>
+        uploadButtonReference: MutableRefObject<HTMLButtonElement|null>
     }
 }
 
@@ -1098,11 +1098,11 @@ export interface FileInputComponent<Type> extends
     StaticWebComponent<Type, FileInputModelState, DefaultFileInputProperties>
 {
     <T extends FileValue = FileValue>(
-        props:FileInputProps<T> & RefAttributes<FileInputAdapter<T>>
-    ):ReactElement
+        props: FileInputProps<T> & RefAttributes<FileInputAdapter<T>>
+    ): ReactElement
 }
 //// region constants
-export const dedicatedFileInputPropertyTypes:ValidationMapping = {
+export const dedicatedFileInputPropertyTypes: ValidationMapping = {
     contentTypePattern:
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
     invertedContentTypePattern:
@@ -1111,7 +1111,7 @@ export const dedicatedFileInputPropertyTypes:ValidationMapping = {
     maximumSize: number,
     minimumSize: number
 } as const
-export const fileInputModelPropertyTypes:PropertiesValidationMap = {
+export const fileInputModelPropertyTypes: PropertiesValidationMap = {
     ...modelPropertyTypes,
     ...dedicatedFileInputPropertyTypes,
 
@@ -1119,8 +1119,8 @@ export const fileInputModelPropertyTypes:PropertiesValidationMap = {
         inputPropertyTypes
     )
 } as const
-export const fileInputModelStatePropertyTypes:{
-    [key in keyof FileInputModelState]:Requireable<boolean|symbol>
+export const fileInputModelStatePropertyTypes: {
+    [key in keyof FileInputModelState]: Requireable<boolean|symbol>
 } = {
     ...modelStatePropertyTypes,
 
@@ -1132,7 +1132,7 @@ export const fileInputModelStatePropertyTypes:{
 
     invalidName: oneOfType([boolean, symbol])
 } as const
-export const fileInputPropertyTypes:PropertiesValidationMap = {
+export const fileInputPropertyTypes: PropertiesValidationMap = {
     ...propertyTypes,
     ...dedicatedFileInputPropertyTypes,
     ...fileInputModelStatePropertyTypes,
@@ -1163,7 +1163,7 @@ export const fileInputPropertyTypes:PropertiesValidationMap = {
 
     outlined: boolean
 } as const
-export const defaultFileInputModelState:FileInputModelState = {
+export const defaultFileInputModelState: FileInputModelState = {
     ...defaultModelState,
     invalidContentTypePattern: false,
     invalidInvertedContentTypePattern: false,
@@ -1173,7 +1173,7 @@ export const defaultFileInputModelState:FileInputModelState = {
 
     invalidName: false
 } as const
-export const defaultFileInputModel:FileInputModel = {
+export const defaultFileInputModel: FileInputModel = {
     ...defaultModel as BaseModel<FileValue>,
 
     contentTypePattern: /^.+\/.+$/,
@@ -1195,7 +1195,7 @@ export const defaultFileInputModel:FileInputModel = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultFileNameInputProperties:InputProps<string> = {
+export const defaultFileNameInputProperties: InputProps<string> = {
     ...defaultInputProperties,
 
     emptyEqualsNull: false,
@@ -1211,8 +1211,8 @@ export const defaultFileNameInputProperties:InputProps<string> = {
 
     required: true
 } as const
-delete (defaultFileNameInputProperties as {model?:InputModel}).model
-export const defaultFileInputProperties:DefaultFileInputProperties = {
+delete (defaultFileNameInputProperties as {model?: InputModel}).model
+export const defaultFileInputProperties: DefaultFileInputProperties = {
     ...defaultProperties as unknown as Partial<DefaultFileInputProperties>,
 
     contentTypePatternText:
@@ -1258,98 +1258,98 @@ export const defaultFileInputProperties:DefaultFileInputProperties = {
 /// endregion
 /// region inputs
 export interface InputsPropertiesItem<T, TS = unknown> {
-    model?:{
-        state?:TS
-        value?:T
+    model?: {
+        state?: TS
+        value?: T
     }
-    value?:T
+    value?: T
 }
 export interface InputsCreateOptions<T, IP> {
-    index:number
-    properties:IP
-    values?:Array<T>|null
+    index: number
+    properties: IP
+    values?: Array<T>|null
 }
 export interface InputsCreateItemOptions<
     T, P extends InputsPropertiesItem<T>, IP
 > extends InputsCreateOptions<T, IP> {
-    item:Partial<P>
+    item: Partial<P>
 }
 export interface InputsCreatePrototypeOptions<
     T, P extends InputsPropertiesItem<T>, IP
 > extends InputsCreateItemOptions<T, P, IP> {
-    lastValue:null|T|undefined
+    lastValue: null|T|undefined
 }
 
 export interface InputsModelState extends ModelState {
-    invalidMaximumNumber:boolean
-    invalidMinimumNumber:boolean
+    invalidMaximumNumber: boolean
+    invalidMinimumNumber: boolean
 }
 export interface InputsModel<
     T, P extends InputsPropertiesItem<T> = InputsPropertiesItem<T>
 > extends BaseModel<Array<P>|null> {
-    maximumNumber:number
-    minimumNumber:number
+    maximumNumber: number
+    minimumNumber: number
 
-    state:InputsModelState
+    state: InputsModelState
 
-    writable:boolean
+    writable: boolean
 }
 
 export interface InputsChildrenOptions<
     T, P extends InputsPropertiesItem<T>, IP
 > {
-    index:number
-    inputsProperties:IP
-    properties:Partial<P>
+    index: number
+    inputsProperties: IP
+    properties: Partial<P>
 }
 export interface InputsProperties<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
 > extends InputsModelState, Omit<Properties<Array<P>|null>, 'onChangeValue'> {
-    addIcon:IconOptions
-    removeIcon:IconOptions
+    addIcon: IconOptions
+    removeIcon: IconOptions
 
-    children:(options:InputsChildrenOptions<T, P, this>) => ReactNode
+    children: (options: InputsChildrenOptions<T, P, this>) => ReactNode
 
-    createItem:(options:InputsCreateItemOptions<T, P, this>) => P
-    createPrototype:(options:InputsCreatePrototypeOptions<T, P, this>) => P
+    createItem: (options: InputsCreateItemOptions<T, P, this>) => P
+    createPrototype: (options: InputsCreatePrototypeOptions<T, P, this>) => P
 
-    maximumNumber:number
-    minimumNumber:number
+    maximumNumber: number
+    minimumNumber: number
 
-    model:InputsModel<T, P>
+    model: InputsModel<T, P>
 
-    onChangeValue:(
-        values:Array<T>|null, event:unknown, properties:this
+    onChangeValue: (
+        values: Array<T>|null, event: unknown, properties: this
     ) => void
 
-    value:Array<P>|null
+    value: Array<P>|null
 
-    writable:boolean
+    writable: boolean
 }
 export type PartialInputsModel<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
 > = Partial<
-    Omit<InputsModel<T, P>, 'state'> & {state?:Partial<InputsModelState>}
+    Omit<InputsModel<T, P>, 'state'> & {state?: Partial<InputsModelState>}
 >
 export type InputsProps<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
 > =
     Partial<Omit<InputsProperties<T, P>, 'model'|'value'>> &
     {
-        model?:PartialInputsModel<T, P>
-        value?:Array<Partial<P>>|Array<T>|null
+        model?: PartialInputsModel<T, P>
+        value?: Array<Partial<P>>|Array<T>|null
     }
 
 export type DefaultInputsProperties<
     T = string, P extends InputsPropertiesItem<T> = InputProps<T>
 > =
     Partial<Omit<InputsProperties<T, P>, 'default'|'model'|'value'>> &
-    {model:InputsModel<T, P>}
+    {model: InputsModel<T, P>}
 
 export type InputsPropertyTypes<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
 > = {
-    [key in keyof InputsProperties<P>]:ValueOf<typeof PropertyTypes>
+    [key in keyof InputsProperties<P>]: ValueOf<typeof PropertyTypes>
 }
 
 export type InputsState<T = unknown> = State<Array<null|T|undefined>>
@@ -1361,18 +1361,18 @@ export type InputsAdapterWithReferences<
     T = unknown,
     P extends InputsPropertiesItem<T> = Properties<T>,
     RefType = unknown
-> = InputsAdapter<T, P> & {references:Array<MutableRefObject<RefType>>}
+> = InputsAdapter<T, P> & {references: Array<MutableRefObject<RefType>>}
 
 export interface InputsComponent<Type> extends
     Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
     StaticWebComponent<Type, InputsModelState, DefaultInputsProperties>
 {
     <T = string, P extends InputsPropertiesItem<T> = InputProperties<T>>(
-        props:InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
-    ):ReactElement
+        props: InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
+    ): ReactElement
 }
 //// region constants
-export const inputsPropertyTypes:PropertiesValidationMap = {
+export const inputsPropertyTypes: PropertiesValidationMap = {
     ...propertyTypes,
     ...inputModelStatePropertyTypes,
     // We use that function (render prop) to produce input component instances.
@@ -1384,9 +1384,11 @@ export const inputsPropertyTypes:PropertiesValidationMap = {
     maximumNumber: number,
     minimumNumber: number
 } as const
-export const inputsRenderProperties:Array<string> =
+export const inputsRenderProperties: Array<string> =
     ['children', 'createItem', 'createPrototype']
-export const defaultInputsModel:InputsModel<string, InputProperties<string>> = {
+export const defaultInputsModel: InputsModel<
+    string, InputProperties<string>
+> = {
     ...defaultModel as InputsModel<string, InputProperties<string>>,
 
     state: {
@@ -1405,14 +1407,14 @@ export const defaultInputsModel:InputsModel<string, InputProperties<string>> = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultInputsProperties:DefaultInputsProperties = {
+export const defaultInputsProperties: DefaultInputsProperties = {
     ...defaultProperties as DefaultInputsProperties,
 
     addIcon: {icon: 'add'},
     removeIcon: {icon: 'clear'},
 
-    createItem: ({item}):InputProps<string> => item,
-    createPrototype: ({item}):InputProps<string> => item,
+    createItem: ({item}): InputProps<string> => item,
+    createPrototype: ({item}): InputProps<string> => item,
 
     model: {...defaultInputsModel}
 } as const
@@ -1422,34 +1424,34 @@ export const defaultInputsProperties:DefaultInputsProperties = {
 export type DateTimeRepresentation = number|string
 
 export interface IntervalValue {
-    end?:DateTimeRepresentation|null
-    start?:DateTimeRepresentation|null
+    end?: DateTimeRepresentation|null
+    start?: DateTimeRepresentation|null
 }
 
 export type IntervalInputModel =
     Omit<InputModel<DateTimeRepresentation|null>, 'maximum'|'minimum'> &
     {
-        maximum:DateTimeRepresentation
-        minimum:DateTimeRepresentation
+        maximum: DateTimeRepresentation
+        minimum: DateTimeRepresentation
     }
 export type IntervalInputProps =
     Omit<InputProps<DateTimeRepresentation|null>, 'maximum'|'minimum'> &
     {
-        maximum:DateTimeRepresentation
-        minimum:DateTimeRepresentation
+        maximum: DateTimeRepresentation
+        minimum: DateTimeRepresentation
     }
 export interface IntervalConfiguration {
-    end:Partial<IntervalInputModel>|Partial<IntervalInputProps>
-    start:Partial<IntervalInputModel>|Partial<IntervalInputProps>
+    end: Partial<IntervalInputModel>|Partial<IntervalInputProps>
+    start: Partial<IntervalInputModel>|Partial<IntervalInputProps>
 }
 
 export type IntervalModelState = ModelState
 export interface IntervalModel {
-    name:string
-    state:IntervalModelState
-    value:{
-        end:IntervalInputModel
-        start:IntervalInputModel
+    name: string
+    state: IntervalModelState
+    value: {
+        end: IntervalInputModel
+        start: IntervalInputModel
     }
 }
 
@@ -1457,26 +1459,26 @@ export interface IntervalProperties extends Omit<
     InputProperties<DateTimeRepresentation|null>,
     'icon'|'model'|'onChange'|'onChangeValue'|'value'
 > {
-    icon:IconOptions
+    icon: IconOptions
 
-    model:IntervalModel
+    model: IntervalModel
 
-    onChange:(properties:this, event?:GenericEvent) => void
-    onChangeValue:(value:IntervalValue|null, event?:GenericEvent) => void
+    onChange: (properties: this, event?: GenericEvent) => void
+    onChangeValue: (value: IntervalValue|null, event?: GenericEvent) => void
 
-    value:IntervalConfiguration
+    value: IntervalConfiguration
 }
 type PartialIntervalValue =
     Partial<Omit<InputModel<DateTimeRepresentation|null>, 'value'>> &
-    {value:DateTimeRepresentation|null}
+    {value: DateTimeRepresentation|null}
 export type PartialIntervalModel =
     Partial<Omit<IntervalProperties['model'], 'state'|'value'>> &
     {
-        value?:{
-            end:PartialIntervalValue
-            start:PartialIntervalValue
+        value?: {
+            end: PartialIntervalValue
+            start: PartialIntervalValue
         }
-        state?:Partial<IntervalModelState>
+        state?: Partial<IntervalModelState>
     }
 export type IntervalProps =
     Omit<
@@ -1484,50 +1486,50 @@ export type IntervalProps =
         'icon'|'model'|'onChange'|'onChangeValue'|'value'
     > &
     Partial<{
-        end:Partial<
+        end: Partial<
             Omit<
                 InputProps<DateTimeRepresentation|null>, 'maximum'|'minimum'
             > &
             {
-                maximum:DateTimeRepresentation
-                minimum:DateTimeRepresentation
+                maximum: DateTimeRepresentation
+                minimum: DateTimeRepresentation
             }
         >
-        start:Partial<
+        start: Partial<
             Omit<
                 InputProps<DateTimeRepresentation|null>, 'maximum'|'minimum'
             > &
             {
-                maximum:DateTimeRepresentation
-                minimum:DateTimeRepresentation
+                maximum: DateTimeRepresentation
+                minimum: DateTimeRepresentation
             }
         >
 
-        icon:IntervalProperties['icon']
+        icon: IntervalProperties['icon']
 
-        model:PartialIntervalModel
+        model: PartialIntervalModel
 
-        onChange:IntervalProperties['onChange']
-        onChangeValue:IntervalProperties['onChangeValue']
+        onChange: IntervalProperties['onChange']
+        onChangeValue: IntervalProperties['onChangeValue']
 
-        value:IntervalConfiguration|IntervalValue|null
+        value: IntervalConfiguration|IntervalValue|null
     }>
 
 export type DefaultIntervalProperties =
-    Omit<IntervalProps, 'model'> & {model:IntervalModel}
+    Omit<IntervalProps, 'model'> & {model: IntervalModel}
 
 export type IntervalPropertyTypes = {
-    [key in keyof IntervalProperties]:ValueOf<typeof PropertyTypes>
+    [key in keyof IntervalProperties]: ValueOf<typeof PropertyTypes>
 }
 
 export type IntervalAdapter =
-    ComponentAdapter<IntervalProperties, {value?:IntervalValue|null}>
+    ComponentAdapter<IntervalProperties, {value?: IntervalValue|null}>
 export interface IntervalAdapterWithReferences extends IntervalAdapter {
-    references:{
-        end:MutableRefObject<
+    references: {
+        end: MutableRefObject<
             InputAdapterWithReferences<DateTimeRepresentation|null>|null
         >
-        start:MutableRefObject<
+        start: MutableRefObject<
             InputAdapterWithReferences<DateTimeRepresentation|null>|null
         >
     }
@@ -1542,11 +1544,11 @@ export type IntervalComponent<ComponentType> = InputComponent<
     IntervalAdapter
 >
 //// region constants
-export const intervalPropertyTypes:PropertiesValidationMap = {
+export const intervalPropertyTypes: PropertiesValidationMap = {
     ...inputPropertyTypes as Mapping<ValueOf<PropertiesValidationMap>>,
     value: shape<ValidationMap<{
-        end:unknown
-        start:unknown
+        end: unknown
+        start: unknown
     }>>({
         end: oneOfType<Validator<unknown>>([
             number,
@@ -1564,7 +1566,7 @@ export const intervalPropertyTypes:PropertiesValidationMap = {
         ])
     })
 } as const
-export const defaultIntervalProperties:DefaultIntervalProperties = {
+export const defaultIntervalProperties: DefaultIntervalProperties = {
     icon: {icon: 'timelapse'},
 
     maximumText:
@@ -1594,9 +1596,9 @@ export const defaultIntervalProperties:DefaultIntervalProperties = {
 //// endregion
 /// endregion
 export interface ConfigurationProperties {
-    strict?:boolean
-    themeConfiguration?:ThemeProviderProps['options']
-    tooltip?:Properties['tooltip']
-    wrap?:boolean
+    strict?: boolean
+    themeConfiguration?: ThemeProviderProps['options']
+    tooltip?: Properties['tooltip']
+    wrap?: boolean
 }
 // endregion

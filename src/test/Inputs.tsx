@@ -21,11 +21,11 @@ import Inputs from '../components/Inputs'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 
-describe('Inputs', ():void => {
-    test('render', ():void => {
+describe('Inputs', (): void => {
+    test('render', (): void => {
         expect(render(<Inputs/>)).toBeDefined()
 
-        let domNode:HTMLElement = render(<Inputs/>)!
+        let domNode: HTMLElement = render(<Inputs/>)!
         expect(domNode.querySelector('input')).toHaveProperty('disabled', true)
         expect(domNode.querySelector('.inputs__add__button'))
             .not.toStrictEqual(null)

@@ -46,9 +46,9 @@ import {ConfigurationProperties} from '../type'
  * don't want to mess with layout.
  * @returns Wrapped content.
  */
-export const WrapConfigurations:FunctionComponent<
-    ConfigurationProperties & {children:ReactElement}
-> = ({children, strict, themeConfiguration, tooltip, wrap}):ReactElement =>
+export const WrapConfigurations: FunctionComponent<
+    ConfigurationProperties & {children: ReactElement}
+> = ({children, strict, themeConfiguration, tooltip, wrap}): ReactElement =>
     <WrapStrict strict={Boolean(strict)}>
         <WrapTooltip options={tooltip}>
             <WrapThemeProvider configuration={themeConfiguration} wrap={wrap}>
@@ -69,20 +69,20 @@ export const WrapConfigurations:FunctionComponent<
 export function createWrapConfigurationsComponent<
     Type extends AnyFunction = AnyFunction, Reference = unknown
 >(
-    WrappedComponent:Type,
-    options:{withReference?:boolean|null, withThemeWrapper?:boolean} = {}
-):FunctionComponent<
-    FirstParameter<Type> & ConfigurationProperties & {theme?:ThemePropT}
+    WrappedComponent: Type,
+    options: {withReference?: boolean|null, withThemeWrapper?: boolean} = {}
+): FunctionComponent<
+    FirstParameter<Type> & ConfigurationProperties & {theme?: ThemePropT}
 > {
-    const component:FunctionComponent<
+    const component: FunctionComponent<
         FirstParameter<Type> &
         ConfigurationProperties &
-        {theme:ThemePropT}
+        {theme: ThemePropT}
     > = (
         {strict, theme, themeConfiguration, tooltip, wrap, ...properties},
-        reference?:MutableRefObject<Reference>
-    ):ReactElement => {
-        const wrapped:ReactElement = <WrappedComponent {...{
+        reference?: MutableRefObject<Reference>
+    ): ReactElement => {
+        const wrapped: ReactElement = <WrappedComponent {...{
             ...(properties as FirstParameter<Type>),
             ...(options.withReference === false ?
                 {} :

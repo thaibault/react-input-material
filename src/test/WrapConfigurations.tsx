@@ -21,10 +21,12 @@ import WrapConfigurations from '../components/WrapConfigurations'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 
-describe('WrapConfigurations', ():void => {
-    test('render', ():void => expect(
-        render(
-            <WrapConfigurations><div className="test"/></WrapConfigurations>
-        )!.querySelector('.test')
-    ).toBeDefined())
+describe('WrapConfigurations', () => {
+    test('render', () => {
+        expect(
+            render(
+                <WrapConfigurations><div className="test"/></WrapConfigurations>
+            )?.querySelector('.test')
+        ).toBeDefined()
+    })
 })

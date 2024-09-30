@@ -80,8 +80,8 @@ import {IconButtonOnChangeEventT} from '@rmwc/icon-button/lib/icon-button'
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
 const getPrototype = function<T, P extends InputsPropertiesItem<T>>(
-    properties:InputsProperties<T, P>
-):Partial<P> {
+    properties: InputsProperties<T, P>
+): Partial<P> {
     return {
         ...defaultProperties as unknown as Partial<P>,
         className: CSS_CLASS_NAMES.inputsItemInput,
@@ -95,28 +95,29 @@ const getPrototype = function<T, P extends InputsPropertiesItem<T>>(
 }
 const inputPropertiesToValues = function<
     T, P extends InputsPropertiesItem<T>
->(inputProperties:Array<P>|null):Array<T>|null {
+>(inputProperties: Array<P>|null): Array<T>|null {
     return Array.isArray(inputProperties) ?
-        inputProperties.map(({model, value}):T =>
+        inputProperties.map(({model, value}): T =>
             typeof value === 'undefined' ? model?.value as T : value
         ) :
         inputProperties
 }
 const getModelState = function<T, P extends InputsPropertiesItem<T>>(
-    inputsProperties:InputsProperties<T, P>
-):ModelState {
-    const properties:Array<P> = inputsProperties.value || []
+    inputsProperties: InputsProperties<T, P>
+): ModelState {
+    const properties: Array<P> = inputsProperties.value || []
 
-    const unpack = (name:string, defaultValue = false) =>
-        (properties:P) =>
-            properties[name as keyof P] as unknown as boolean ?? defaultValue
+    const unpack = (name: string, defaultValue = false) =>
+        (properties: P) =>
+            properties[name as keyof P] as unknown as boolean|null ??
+            defaultValue
 
-    const validMaximumNumber:boolean =
+    const validMaximumNumber: boolean =
         inputsProperties.maximumNumber >= properties.length
-    const validMinimumNumber:boolean =
+    const validMinimumNumber: boolean =
         inputsProperties.minimumNumber <= properties.length
 
-    const valid:boolean = validMaximumNumber && validMinimumNumber
+    const valid: boolean = validMaximumNumber && validMinimumNumber
 
     return {
         invalid: !valid || properties.some(unpack('invalid', true)),
@@ -138,8 +139,8 @@ const getModelState = function<T, P extends InputsPropertiesItem<T>>(
     }
 }
 const getExternalProperties = function<T, P extends InputsPropertiesItem<T>>(
-    properties:InputsProperties<T, P>
-):InputsProperties<T, P> {
+    properties: InputsProperties<T, P>
+): InputsProperties<T, P> {
     const modelState = getModelState<T, P>(properties)
 
     return {
@@ -166,10 +167,10 @@ export const InputsInner = function<
     P extends InputsPropertiesItem<T> = InputProps<T>,
     State = Mapping<unknown>
 >(
-    props:InputsProps<T, P>, reference?:ForwardedRef<Adapter<T, P>>
-):ReactElement {
+    props: InputsProps<T, P>, reference?: ForwardedRef<Adapter<T, P>>
+): ReactElement {
     // region consolidate properties
-    const givenProps:InputsProps<T, P> =
+    const givenProps: InputsProps<T, P> =
         translateKnownSymbols(props) as InputsProps<T, P>
     /*
         Normalize value property (providing only value instead of props is
@@ -188,7 +189,7 @@ export const InputsInner = function<
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties:InputsProps<T, P> = extend<InputsProps<T, P>>(
+    const givenProperties: InputsProps<T, P> = extend<InputsProps<T, P>>(
         true,
         copy<InputsProps<T, P>>(Inputs.defaultProperties as InputsProps<T, P>),
         givenProps
@@ -196,8 +197,8 @@ export const InputsInner = function<
     // endregion
     // region consolidate state
     const [newInputState, setNewInputState] = useState<{
-        name:'added'|'rendered'|'stabilized'
-        event:GenericEvent|null
+        name: 'added'|'rendered'|'stabilized'
+        event: GenericEvent|null
     }>({name: 'stabilized', event: null})
 
     useEffect(
@@ -231,7 +232,7 @@ export const InputsInner = function<
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
     */
-    const controlled:boolean =
+    const controlled: boolean =
         !givenProperties.enforceUncontrolled &&
         (
             (
@@ -256,10 +257,10 @@ export const InputsInner = function<
         // NOTE: Indicates to be filled later from state.
         givenProperties.value = []
 
-    const references:Array<MutableRefObject<ComponentAdapter<P, State>|null>> =
+    const references: Array<MutableRefObject<ComponentAdapter<P, State>|null>> =
         []
 
-    const properties:InputsProperties<T, P> =
+    const properties: InputsProperties<T, P> =
         getConsolidatedProperties<InputsProps<T, P>, InputsProperties<T, P>>(
             mapPropertiesIntoModel<
                 InputsProps<T, P>,
@@ -271,16 +272,16 @@ export const InputsInner = function<
         )
 
     const triggerOnChange = (
-        values?:Array<T>|null,
-        event?:GenericEvent,
-        inputProperties?:Partial<P>,
-        index?:number
-    ):void => {
+        values?: Array<T>|null,
+        event?: GenericEvent,
+        inputProperties?: Partial<P>,
+        index?: number
+    ): void => {
         const isDeleteChange =
             inputProperties === undefined && typeof index === 'number'
 
         if (values && !isDeleteChange)
-            properties.value = values.map((_:T, index):P =>
+            properties.value = values.map((_: T, index): P =>
                 references[index]?.current?.properties ||
                 (properties.value as Array<P>)[index]
             )
@@ -312,11 +313,11 @@ export const InputsInner = function<
         )
     }
     const triggerOnChangeValue = (
-        values:Array<T>|null,
-        event:GenericEvent|undefined,
-        value:T,
-        index?:number
-    ):Array<T>|null => {
+        values: Array<T>|null,
+        event: GenericEvent|undefined,
+        value: T,
+        index?: number
+    ): Array<T>|null => {
         if (values === null)
             values = []
 
@@ -354,7 +355,7 @@ export const InputsInner = function<
             NOTE: We cannot use "useRef" here since the number of calls would
             be variable und therefor break the rules of hooks.
         */
-        const reference:MutableRefObject<ComponentAdapter<P, State>|null> =
+        const reference: MutableRefObject<ComponentAdapter<P, State>|null> =
             createRef<ComponentAdapter<P, State>>()
         references.push(reference)
 
@@ -373,15 +374,16 @@ export const InputsInner = function<
                     values
                 }),
                 ...properties.value[index],
-                onChange: (inputProperties:P, event?:GenericEvent):void =>
+                onChange: (inputProperties: P, event?: GenericEvent) => {
                     triggerOnChange(
                         inputPropertiesToValues<T, P>(properties.value),
                         event,
                         inputProperties,
                         index
-                    ),
-                onChangeValue: (value:T, event?:GenericEvent) => {
-                    setValues((values:Array<T>|null):Array<T>|null =>
+                    )
+                },
+                onChangeValue: (value: T, event?: GenericEvent) => {
+                    setValues((values: Array<T>|null): Array<T>|null =>
                         triggerOnChangeValue(values, event, value, index)
                     )
                 },
@@ -431,7 +433,7 @@ export const InputsInner = function<
 
     useImperativeHandle(
         reference,
-        ():AdapterWithReferences<T, P> => ({
+        (): AdapterWithReferences<T, P> => ({
             properties: properties,
             references,
             state: controlled ?
@@ -440,46 +442,46 @@ export const InputsInner = function<
         })
     )
 
-    const add = (event?:IconButtonOnChangeEventT):void => setValues((
-        values:Array<T>|null
-    ):Array<T>|null => {
-        /*
-            NOTE: This is needed since the event handler is provided to icon
-            and button component contained in rmwc's "IconButton".
-        */
-        event?.stopPropagation()
+    const add = (event?: IconButtonOnChangeEventT): void => {
+        setValues((values: Array<T>|null): Array<T>|null => {
+            /*
+                NOTE: This is needed since the event handler is provided to icon
+                and button component contained in rmwc's "IconButton".
+            */
+            event?.stopPropagation()
 
-        const newProperties:Partial<P> = properties.createPrototype({
-            index: values?.length || 0,
-            item: getPrototype<T, P>(properties),
-            lastValue: values?.length ? values[values.length - 1] : null,
-            properties,
-            values
+            const newProperties: Partial<P> = properties.createPrototype({
+                index: values?.length || 0,
+                item: getPrototype<T, P>(properties),
+                lastValue: values?.length ? values[values.length - 1] : null,
+                properties,
+                values
+            })
+
+            triggerOnChange(
+                values, event as unknown as GenericEvent, newProperties
+            )
+
+            const result = triggerOnChangeValue(
+                values,
+                event as unknown as GenericEvent,
+                (newProperties.value ?? newProperties.model?.value ?? null) as T
+            )
+
+            /**
+             * NOTE: new Properties are not yet consolidated by nested input
+             * component. So save that info for further rendering.
+             */
+            setNewInputState({
+                name: 'added', event: event as unknown as GenericEvent
+            })
+
+            return result
         })
-
-        triggerOnChange(
-            values, event as unknown as GenericEvent, newProperties
-        )
-
-        const result = triggerOnChangeValue(
-            values,
-            event as unknown as GenericEvent,
-            (newProperties.value ?? newProperties.model?.value ?? null) as T
-        )
-
-        /**
-         * NOTE: new Properties are not yet consolidated by nested input
-         * component. So save that info for further rendering.
-         */
-        setNewInputState({
-            name: 'added', event: event as unknown as GenericEvent
-        })
-
-        return result
-    })
-    const createRemoveCallback = (index:number) =>
-        (event?:IconButtonOnChangeEventT):void =>
-            setValues((values:Array<T>|null):Array<T>|null => {
+    }
+    const createRemoveCallback = (index: number) =>
+        (event?: IconButtonOnChangeEventT) => {
+            setValues((values: Array<T> | null): Array<T> | null => {
                 values = triggerOnChangeValue(
                     values, event as unknown as GenericEvent, null as T, index
                 )
@@ -488,9 +490,10 @@ export const InputsInner = function<
                 )
                 return values
             })
+        }
     // endregion
     // region render
-    const addButton:ReactElement = <IconButton
+    const addButton: ReactElement = <IconButton
         className={CSS_CLASS_NAMES.inputsAddButton}
 
         icon={properties.addIcon}
@@ -499,8 +502,8 @@ export const InputsInner = function<
         onChange={add}
     />
     const renderInput = (
-        inputProperties:Partial<P>, index:number
-    ):ReactNode =>
+        inputProperties: Partial<P>, index: number
+    ): ReactNode =>
         isFunction(properties.children) ?
             properties.children({
                 index,
@@ -527,8 +530,8 @@ export const InputsInner = function<
         >
             {properties.value ?
                 properties.value.map((
-                    inputProperties:P, index
-                ):ReactNode =>
+                    inputProperties: P, index
+                ): ReactNode =>
                     <div className={CSS_CLASS_NAMES.inputsItem} key={index}>
                         {renderInput(inputProperties, index)}
 
@@ -574,7 +577,7 @@ export const InputsInner = function<
                 properties.invalidMaximumNumber ||
                 !properties.value ||
                 properties.maximumNumber <= properties.value.length ||
-                properties.value.some(({model, value}):boolean =>
+                properties.value.some(({model, value}): boolean =>
                     [null, undefined].includes(value as null) &&
                     [null, undefined].includes(model?.value as null)
                 )
@@ -599,7 +602,7 @@ InputsInner.displayName = 'Inputs'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Inputs:InputsComponent<typeof InputsInner> =
+export const Inputs: InputsComponent<typeof InputsInner> =
     memorize(forwardRef(InputsInner)) as
         unknown as
         InputsComponent<typeof InputsInner>

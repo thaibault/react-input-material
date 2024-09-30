@@ -30,11 +30,11 @@ import {ThemeProvider, ThemeProviderProps} from '@rmwc/theme'
  * don't want to mess with layout.
  * @returns Wrapped content.
  */
-export const WrapThemeProvider:FunctionComponent<{
-    children:ReactElement
-    configuration?:ThemeProviderProps['options']
-    wrap?:boolean
-}> = ({children, configuration, wrap}):ReactElement =>
+export const WrapThemeProvider: FunctionComponent<{
+    children: ReactElement
+    configuration?: ThemeProviderProps['options']
+    wrap?: boolean
+}> = ({children, configuration, wrap}): ReactElement =>
     configuration ?
         <ThemeProvider options={configuration} wrap={wrap !== false}>
             {children}
