@@ -1383,7 +1383,7 @@ const Application = () => {
                 <div className="playground__outputs">
                     {/*
                         Add on version as a hidden spacer and one fixed version
-                        visible independently from current scroll position.
+                        visible independently of current scroll position.
                      */}
                     <pre className="playground__outputs__bar">
                         {represent(selectedState)}

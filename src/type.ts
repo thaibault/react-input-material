@@ -596,8 +596,8 @@ export type InputDataTransformation =
     >]?: DataTransformSpecification}
 //// endregion
 export type InputSelection =
-    Array<boolean|number> |
-    Array<[boolean|number|string, string]> |
+    Array<boolean|number|null> |
+    Array<[boolean|number|string|null, string]> |
     NormalizedSelection |
     SelectProps['options']
 export type NormalizedSelection =
