@@ -25,7 +25,8 @@ import {Tooltip} from '@rmwc/tooltip'
 import {Properties} from '../type'
 // endregion
 export const isDummy: boolean =
-    !Tooltip || (Tooltip as unknown as typeof Dummy).isDummy
+    !(Tooltip as typeof Tooltip|undefined) ||
+    Boolean((Tooltip as unknown as Partial<typeof Dummy>).isDummy)
 /**
  * Wraps given component with a tooltip component with given tooltip
  * configuration.
@@ -36,7 +37,7 @@ export const isDummy: boolean =
  */
 export const WrapTooltip: FunctionComponent<{
     children: ReactElement
-    options?: Properties['tooltip']
+    options?: Properties['tooltip']|null
 }> = ({children, options}): ReactElement => {
     if (typeof options === 'string') {
         if (isDummy)

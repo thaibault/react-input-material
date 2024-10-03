@@ -276,7 +276,7 @@ export function determineInitialRepresentation<
     defaultProperties: DP,
     value: null|T,
     transformer: InputDataTransformation,
-    selection?: NormalizedSelection
+    selection?: NormalizedSelection|null
 ): string {
     if (typeof properties.representation === 'string')
         return properties.representation
@@ -504,7 +504,7 @@ export const getConsolidatedProperties = <
  * @param selection - Selection component property configuration.
  * @returns Normalized sorted listed of labels and values.
  */
-export function getLabelAndValues(selection?: NormalizedSelection): [
+export function getLabelAndValues(selection?: NormalizedSelection|null): [
     Array<ReactNode|string>, Array<unknown>
 ] {
     if (Array.isArray(selection)) {
@@ -532,7 +532,7 @@ export function getLabelAndValues(selection?: NormalizedSelection): [
  * @returns Determined representation.
  */
 export function getRepresentationFromValueSelection(
-    value: unknown, selection?: NormalizedSelection
+    value: unknown, selection?: NormalizedSelection|null
 ): null|string {
     if (selection)
         for (const option of selection)
@@ -550,7 +550,7 @@ export function getRepresentationFromValueSelection(
  * @returns Determined value.
  */
 export function getValueFromSelection<T>(
-    label: ReactNode|string, selection: NormalizedSelection
+    label: ReactNode|string, selection: NormalizedSelection|null|undefined
 ): T {
     if (Array.isArray(selection))
         for (const value of selection) {

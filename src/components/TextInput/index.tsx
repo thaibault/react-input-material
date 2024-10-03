@@ -119,7 +119,7 @@ import {
     InputTablePosition as TablePosition,
     InputValueState as ValueState,
     Selection,
-    TinyMCEOptions
+    TinyMCEOptions, TypeSpecification
 } from '../../type'
 
 import {
@@ -193,11 +193,11 @@ export const TextInputInner = function<Type = unknown>(
         if (selectionIsUnstable || editorState.selectionIsUnstable)
             if (properties.editorIsActive) {
                 /*
-                    NOTE: If the corresponding editor are not loaded yet they
+                    NOTE: If the corresponding editor are not loaded, yet they
                     will set the selection state on initialisation as long as
                     "editorState.selectionIsUnstable" is set to "true".
                 */
-                if (codeEditorReference.current?.editor?.selection) {
+                if (codeEditorReference.current?.editor.selection) {
                     (codeEditorReference.current.editor.textInput as
                         unknown as
                         HTMLInputElement
@@ -224,7 +224,8 @@ export const TextInputInner = function<Type = unknown>(
                     inputReference.current as
                         HTMLInputElement|HTMLTextAreaElement
                 ).setSelectionRange(
-                    properties.cursor.start, properties.cursor.end
+                    properties.cursor?.start ?? null,
+                    properties.cursor?.end ?? null
                 )
 
                 if (editorState.selectionIsUnstable)
@@ -398,12 +399,13 @@ export const TextInputInner = function<Type = unknown>(
                 ))
             }
 
-            const hide = equals(properties.value, properties.default) as boolean
+            const hide =
+                equals(properties.value, properties.default) as boolean
             return {
                 icon: <GenericAnimate in={!hide}>
                     {(
                         UseAnimations &&
-                        !(UseAnimations as typeof Dummy).isDummy &&
+                        !(UseAnimations as Partial<typeof Dummy>).isDummy &&
                         plusToXAnimation
                     ) ?
                         <UseAnimations
@@ -451,7 +453,7 @@ export const TextInputInner = function<Type = unknown>(
             return {
                 icon: (
                     UseAnimations &&
-                    !(UseAnimations as typeof Dummy).isDummy &&
+                    !(UseAnimations as Partial<typeof Dummy>).isDummy &&
                     lockAnimation
                 ) ?
                     <UseAnimations
@@ -623,7 +625,7 @@ export const TextInputInner = function<Type = unknown>(
     const wrapIconWithTooltip = (
         options?: Properties['icon']
     ): IconOptions|undefined => {
-        if (typeof options === 'object' && options?.tooltip) {
+        if (typeof options === 'object' && options.tooltip) {
             const tooltip: Properties['tooltip'] = options.tooltip
             options = {...options}
             delete options.tooltip
@@ -727,10 +729,10 @@ export const TextInputInner = function<Type = unknown>(
         const range: CodeEditorNamespace.Range =
             instance.editor.selection.getRange()
         const endPosition: TablePosition =
-            determineTablePosition(properties.cursor.end)
+            determineTablePosition(properties.cursor?.end || 0)
         range.setEnd(endPosition.row, endPosition.column)
         const startPosition: TablePosition =
-            determineTablePosition(properties.cursor.start)
+            determineTablePosition(properties.cursor?.start || 0)
         range.setStart(startPosition.row, startPosition.column)
         instance.editor.selection.setRange(range)
     }
@@ -749,8 +751,8 @@ export const TextInputInner = function<Type = unknown>(
             start: '###text-input-selection-indicator-start###'
         }
         const cursor: CursorState = {
-            end: properties.cursor.end + indicator.start.length,
-            start: properties.cursor.start
+            end: (properties.cursor?.end || 0) + indicator.start.length,
+            start: properties.cursor?.start || 0
         }
         const keysSorted: Array<keyof typeof indicator> =
             ['start', 'end']
@@ -809,14 +811,14 @@ export const TextInputInner = function<Type = unknown>(
             the one in current selected node.
         */
         const codeEditorRange =
-            codeEditorReference.current?.editor?.selection?.getRange()
+            codeEditorReference.current?.editor.selection.getRange()
         const richTextEditorRange =
-            richTextEditorInstance.current?.selection?.getRng()
-        const selectionEnd: null|number = (
-            inputReference.current as HTMLInputElement|HTMLTextAreaElement
+            richTextEditorInstance.current?.selection.getRng()
+        const selectionEnd: null|number|undefined = (
+            inputReference.current as HTMLInputElement|HTMLTextAreaElement|null
         )?.selectionEnd
-        const selectionStart: null|number = (
-            inputReference.current as HTMLInputElement|HTMLTextAreaElement
+        const selectionStart: null|number|undefined = (
+            inputReference.current as HTMLInputElement|HTMLTextAreaElement|null
         )?.selectionStart
         if (codeEditorRange)
             setCursor({
@@ -840,13 +842,17 @@ export const TextInputInner = function<Type = unknown>(
         else if (richTextEditorRange)
             setCursor({
                 end: determineAbsoluteSymbolOffsetFromHTML(
-                    richTextEditorInstance.current!.getBody(),
-                    richTextEditorInstance.current!.selection.getEnd(),
+                    richTextEditorInstance.current?.getBody() ||
+                    document.createElement('p'),
+                    richTextEditorInstance.current?.selection.getEnd() ||
+                    document.createElement('p'),
                     richTextEditorRange.endOffset
                 ),
                 start: determineAbsoluteSymbolOffsetFromHTML(
-                    richTextEditorInstance.current!.getBody(),
-                    richTextEditorInstance.current!.selection.getStart(),
+                    richTextEditorInstance.current?.getBody() ||
+                    document.createElement('p'),
+                    richTextEditorInstance.current?.selection.getStart() ||
+                    document.createElement('p'),
                     richTextEditorRange.startOffset
                 )
             })
@@ -855,9 +861,10 @@ export const TextInputInner = function<Type = unknown>(
             typeof selectionStart === 'number'
         ) {
             const add: 0|1|-1 =
-                (event as unknown as KeyboardEvent)?.key?.length === 1 ?
+                (event as unknown as KeyboardEvent|null)?.key.length === 1 ?
                     1 :
-                    (event as unknown as KeyboardEvent)?.key === 'Backspace' &&
+                    (event as unknown as KeyboardEvent|null)?.key ===
+                        'Backspace' &&
                     (
                         (properties.representation as string).length >
                         selectionStart
@@ -904,7 +911,7 @@ export const TextInputInner = function<Type = unknown>(
         if (givenProperties.value === undefined) {
             if (
                 givenProperties.representation === undefined &&
-                givenProperties.model!.value === undefined
+                givenProperties.model?.value === undefined
             )
                 givenProperties.representation = valueState.representation
         } else if (
@@ -1004,7 +1011,7 @@ export const TextInputInner = function<Type = unknown>(
     const setCodeEditorReference = (instance: CodeEditorType|null): void => {
         codeEditorReference.current = instance
 
-        if (codeEditorReference.current?.editor?.container?.querySelector(
+        if (codeEditorReference.current?.editor.container.querySelector(
             'textarea'
         ))
             codeEditorInputReference.current =
@@ -1082,7 +1089,7 @@ export const TextInputInner = function<Type = unknown>(
 
             if (!useSuggestions || properties.suggestSelection) {
                 const candidate: null|Type = getValueFromSelection<Type>(
-                    properties.representation, normalizedSelection!
+                    properties.representation, normalizedSelection
                 )
                 if (candidate === null) {
                     properties.value = parseValue<Type>(
@@ -1164,10 +1171,8 @@ export const TextInputInner = function<Type = unknown>(
      * @param event - Mouse event object.
      */
     const onChangeEditorIsActive = (event: ReactMouseEvent): void => {
-        if (event) {
-            event.preventDefault()
-            event.stopPropagation()
-        }
+        event.preventDefault()
+        event.stopPropagation()
 
         setEditorState(({editorIsActive}): EditorState => {
             properties.editorIsActive = !editorIsActive
@@ -1233,8 +1238,9 @@ export const TextInputInner = function<Type = unknown>(
         let event: GenericEvent
         if (eventOrValue !== null && typeof eventOrValue === 'object') {
             const target: HTMLInputElement|null|undefined =
-                (eventOrValue as GenericEvent).target as HTMLInputElement ||
-                (eventOrValue as GenericEvent).detail as HTMLInputElement
+                (eventOrValue as GenericEvent).target as
+                    HTMLInputElement|null ||
+                (eventOrValue as GenericEvent).detail as HTMLInputElement|null
             if (target)
                 properties.value = typeof target.value === 'undefined' ?
                     null as Type :
@@ -1376,7 +1382,7 @@ export const TextInputInner = function<Type = unknown>(
 
                 if (selectedIndex === -1) {
                     const result: Type = getValueFromSelection<Type>(
-                        properties.representation, normalizeSelection(results)!
+                        properties.representation, normalizeSelection(results)
                     )
 
                     if (result !== null || properties.searchSelection)
@@ -1404,7 +1410,7 @@ export const TextInputInner = function<Type = unknown>(
                 query: properties.representation as string
             })
 
-            if ((result as Promise<Properties['selection']>)?.then) {
+            if ((result as Promise<Properties['selection']>|null)?.then) {
                 setSelection((
                     oldSelection: AbortController|Properties['selection']
                 ): AbortController => {
@@ -1445,7 +1451,7 @@ export const TextInputInner = function<Type = unknown>(
                     consolidation.
                 */
                 const result: null|Type = getValueFromSelection<Type>(
-                    properties.representation, normalizedSelection!
+                    properties.representation, normalizedSelection
                 )
 
                 if (result !== null || properties.searchSelection)
@@ -1635,7 +1641,7 @@ export const TextInputInner = function<Type = unknown>(
 
     let initialValue: null|Type = determineInitialValue<Type>(
         givenProps,
-        TextInput.defaultProperties.model?.default as Type
+        TextInput.defaultProperties.model.default as Type
     )
     if (initialValue instanceof Date)
         initialValue = (initialValue.getTime() / 1000) as unknown as Type
@@ -1650,19 +1656,20 @@ export const TextInputInner = function<Type = unknown>(
         givenProps
     )
 
-    const type: keyof InputDataTransformation =
-        givenProperties.type as keyof InputDataTransformation ||
+    const type: TypeSpecification =
+        givenProperties.type as keyof InputDataTransformation|null ||
         givenProperties.model?.type ||
         'string'
     const transformer: InputDataTransformation =
         givenProperties.transformer ?
             {
                 ...TextInput.transformer,
-                [type]: extend<DataTransformSpecification<Type>>(
+                [type as string]: extend<DataTransformSpecification<Type>>(
                     true,
-                    copy<DataTransformSpecification<Type>>(
-                        TextInput.transformer[type] as
-                            DataTransformSpecification<Type>
+                    copy(
+                        TextInput.transformer[
+                            type as keyof InputDataTransformation
+                        ] as DataTransformSpecification<Type> | null
                     ) ||
                     {},
                     givenProperties.transformer as
@@ -1679,7 +1686,7 @@ export const TextInputInner = function<Type = unknown>(
             givenProperties.model?.selection as
                 Selection
 
-    const normalizedSelection: NormalizedSelection|undefined =
+    const normalizedSelection: NormalizedSelection|null|undefined =
         selection instanceof AbortController ?
             [] :
             normalizeSelection(selection, givenProperties.labels)
@@ -1729,10 +1736,10 @@ export const TextInputInner = function<Type = unknown>(
         getConsolidatedProperties(givenProperties)
 
     if (properties.hidden === undefined)
-        properties.hidden = properties.name?.startsWith('password')
+        properties.hidden = properties.name.startsWith('password')
     /// region synchronize properties into state where values are not controlled
-    if (!equals(properties.cursor, cursor))
-        setCursor(properties.cursor)
+    if (properties.cursor && !equals(properties.cursor, cursor))
+        setCursor(properties.cursor as CursorState)
     if (properties.editorIsActive !== editorState.editorIsActive)
         setEditorState({
             ...editorState, editorIsActive: properties.editorIsActive
@@ -1745,7 +1752,7 @@ export const TextInputInner = function<Type = unknown>(
     const currentValueState: ValueState<Type, ModelState> = {
         modelState: properties.model.state,
         representation: properties.representation,
-        value: properties.value!
+        value: properties.value || null
     }
     /*
         NOTE: If value is controlled only trigger/save state changes when model
@@ -1777,7 +1784,8 @@ export const TextInputInner = function<Type = unknown>(
                 'cursor', 'editorIsActive', 'hidden', 'showDeclaration'
             ] as const)
                 if (!Object.prototype.hasOwnProperty.call(givenProps, name))
-                    (state[name] as boolean|CursorState) = properties[name]
+                    (state[name] as boolean|Partial<CursorState>) =
+                        properties[name] ?? false
 
             if (!representationControlled)
                 state.representation = properties.representation
@@ -1910,7 +1918,7 @@ export const TextInputInner = function<Type = unknown>(
             if (isFunction(properties.children)) {
                 const result: null|ReactElement = properties.children({
                     index,
-                    normalizedSelection: normalizedSelection!,
+                    normalizedSelection: normalizedSelection,
                     properties,
                     query: properties.representation as string,
                     suggestion,
@@ -1948,7 +1956,7 @@ export const TextInputInner = function<Type = unknown>(
                         {(mark(
                             suggestion,
                             (
-                                properties.representation as string
+                                properties.representation as string|null
                             )?.split(' ') || '',
                             {
                                 marker: (foundWord: string): ReactElement =>
@@ -2035,7 +2043,7 @@ export const TextInputInner = function<Type = unknown>(
             className={[CSS_CLASS_NAMES.textInput]
                 .concat(
                     isAdvancedEditor ? CSS_CLASS_NAMES.textInputCustom : [],
-                    properties.className ?? []
+                    properties.className
                 )
                 .join(' ')
             }

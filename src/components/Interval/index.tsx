@@ -67,8 +67,8 @@ const determineControlled = (props: Props) =>
     props.model?.value?.start?.value !== undefined ||
     props.value !== undefined &&
     !(
-        (props.value?.start as IntervalInputProps)?.value === undefined &&
-        (props.value?.end as IntervalInputProps)?.value === undefined
+        (props.value?.start as IntervalInputProps|null)?.value === undefined &&
+        (props.value?.end as IntervalInputProps|null)?.value === undefined
     )
 const normalizeDateTimeToNumber = (
     value?: null|number|string, fallbackValue = 0
@@ -151,7 +151,7 @@ export const IntervalInner = function(
         default property object untouched for unchanged usage in other
         instances.
     */
-    type StrictProps = Omit<Props, 'value'> & {value: Properties['value']}
+    type StrictProps = Omit<Props, 'value'> & {value: Props['value']}
     const properties: StrictProps =
         extend(
             true,
@@ -160,12 +160,14 @@ export const IntervalInner = function(
         )
 
     let endProperties =
-        properties.value?.end as IntervalInputProps || {}
+        properties.value?.end as IntervalInputProps|null ||
+        {} as IntervalInputProps
     const iconProperties: IconOptions = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
-        properties.icon!
+        properties.icon as IconOptions
     let startProperties =
-        properties.value?.start as IntervalInputProps || {}
+        properties.value?.start as IntervalInputProps|null ||
+        {} as IntervalInputProps
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
@@ -242,27 +244,28 @@ export const IntervalInner = function(
             normalizeDateTimeToNumber(startConfiguration.maximum, Infinity),
             normalizeDateTimeToNumber(end, Infinity),
             normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
-        ))!
+        )) ?? Infinity
 
         startProperties.minimum = formatDateTimeAsConfigured(
             normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
-        )!
+        ) ?? -Infinity
         startProperties.value = formatDateTimeAsConfigured(start)
 
         endProperties.maximum = formatDateTimeAsConfigured(
             normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
-        )!
+        ) ?? Infinity
 
         endProperties.minimum = formatDateTimeAsConfigured(Math.max(
             normalizeDateTimeToNumber(endConfiguration.minimum, -Infinity),
             normalizeDateTimeToNumber(start, -Infinity),
             normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
-        ))!
+        )) ?? -Infinity
         endProperties.value = end
     }
 
     const valueState: Value = {
-        end: properties.value.end.value, start: properties.value.start.value
+        start: (properties.value?.start as IntervalInputProps|null)?.value,
+        end: (properties.value?.end as IntervalInputProps|null)?.value
     }
 
     consolidateBoundaries(valueState)
@@ -286,9 +289,9 @@ export const IntervalInner = function(
                 properties as Properties,
                 iconProperties,
                 startInputReference.current?.properties ||
-                properties.value.start as InputProperties<null|number|string>,
+                properties.value?.start as InputProperties<null|number|string>,
                 endInputReference.current?.properties ||
-                properties.value.end as InputProperties<null|number|string>
+                properties.value?.end as InputProperties<null|number|string>
             ),
             references: {end: endInputReference, start: startInputReference},
             state: controlled ? {} : {value: valueState}

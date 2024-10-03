@@ -334,7 +334,7 @@ export const RequireableCheckboxInner = function(
     /// endregion
     const givenProps: Props = translateKnownSymbols(props)
 
-    const initialValue: boolean|null = determineInitialValue<boolean>(
+    const initialValue: boolean|null = determineInitialValue<boolean|null>(
         givenProps,
         RequireableCheckbox.defaultProperties.model.default,
         givenProps.checked

@@ -30,6 +30,7 @@ import {
     determineValidationState as determineBaseValidationState
 } from '../../helper'
 import {
+    DefaultProperties as DefaultBaseProperties,
     DefaultInputProperties as DefaultProperties,
     InputModelState as ModelState,
     TinyMCEOptions
@@ -164,68 +165,66 @@ export const TINYMCE_DEFAULT_OPTIONS: Partial<TinyMCEOptions> = {
  * @returns Boolean indicating whether component is in an aggregated valid or
  * invalid state.
  */
-export function determineValidationState<T>(
+export const determineValidationState = <T>(
     properties: DefaultProperties<T>, currentState: Partial<ModelState>
-): boolean {
-    return determineBaseValidationState<
-        T, DefaultProperties<T>, Partial<ModelState>
-    >(
-        properties,
-        currentState,
-        {
-            invalidMaximum: (): boolean => (
-                typeof properties.model.maximum === 'number' &&
-                typeof properties.model.value === 'number' &&
-                !isNaN(properties.model.value) &&
-                properties.model.maximum >= 0 &&
-                properties.model.maximum < properties.model.value
-            ),
-            invalidMinimum: (): boolean => (
-                typeof properties.model.minimum === 'number' &&
-                typeof properties.model.value === 'number' &&
-                !isNaN(properties.model.value) &&
-                properties.model.value < properties.model.minimum
-            ),
+): boolean => determineBaseValidationState<
+    T, DefaultBaseProperties<T>, Partial<ModelState>
+>(
+    properties as DefaultBaseProperties<T>,
+    currentState,
+    {
+        invalidMaximum: (): boolean => (
+            typeof properties.model.maximum === 'number' &&
+            typeof properties.model.value === 'number' &&
+            !isNaN(properties.model.value) &&
+            properties.model.maximum >= 0 &&
+            properties.model.maximum < properties.model.value
+        ),
+        invalidMinimum: (): boolean => (
+            typeof properties.model.minimum === 'number' &&
+            typeof properties.model.value === 'number' &&
+            !isNaN(properties.model.value) &&
+            properties.model.value < properties.model.minimum
+        ),
 
-            invalidMaximumLength: (): boolean => (
-                typeof properties.model.maximumLength === 'number' &&
-                typeof properties.model.value === 'string' &&
-                properties.model.maximumLength >= 0 &&
-                properties.model.maximumLength < properties.model.value.length
-            ),
-            invalidMinimumLength: (): boolean => (
-                typeof properties.model.minimumLength === 'number' &&
-                typeof properties.model.value === 'string' &&
-                properties.model.value.length < properties.model.minimumLength
-            ),
+        invalidMaximumLength: (): boolean => (
+            typeof properties.model.maximumLength === 'number' &&
+            typeof properties.model.value === 'string' &&
+            properties.model.maximumLength >= 0 &&
+            properties.model.maximumLength < properties.model.value.length
+        ),
+        invalidMinimumLength: (): boolean => (
+            typeof properties.model.minimumLength === 'number' &&
+            typeof properties.model.value === 'string' &&
+            properties.model.value.length < properties.model.minimumLength
+        ),
 
-            invalidInvertedPattern: (): boolean => (
-                typeof properties.model.value === 'string' &&
-                typeof properties.model.invertedPattern !== 'undefined' &&
-                Boolean(properties.model.invertedPattern) &&
-                ([] as Array<RegExp|string>)
-                    .concat(properties.model.invertedPattern)
-                    .some((expression: RegExp|string): boolean =>
-                        (new RegExp(expression)).test(
-                            properties.model.value as unknown as string
-                        )
+        invalidInvertedPattern: (): boolean => (
+            typeof properties.model.value === 'string' &&
+            typeof properties.model.invertedPattern !== 'undefined' &&
+            Boolean(properties.model.invertedPattern) &&
+            ([] as Array<RegExp|string>)
+                .concat(properties.model.invertedPattern)
+                .some((expression: RegExp|string): boolean =>
+                    (new RegExp(expression)).test(
+                        properties.model.value as unknown as string
                     )
-            ),
-            invalidPattern: (): boolean => (
-                typeof properties.model.value === 'string' &&
-                typeof properties.model.pattern !== 'undefined' &&
-                Boolean(properties.model.pattern) &&
-                ([] as Array<RegExp|string>)
-                    .concat(properties.model.pattern)
-                    .some((expression: RegExp|string): boolean =>
-                        !(new RegExp(expression)).test(
-                            properties.model.value as unknown as string
-                        )
+                )
+        ),
+        invalidPattern: (): boolean => (
+            typeof properties.model.value === 'string' &&
+            typeof properties.model.pattern !== 'undefined' &&
+            Boolean(properties.model.pattern) &&
+            ([] as Array<RegExp|string>)
+                .concat(properties.model.pattern)
+                .some((expression: RegExp|string): boolean =>
+                    !(new RegExp(expression)).test(
+                        properties.model.value as unknown as string
                     )
-            )
-        }
-    )
-}
+                )
+        )
+    }
+)
 /**
  * Avoid propagating the enter key event since this usually sends a form which
  * is not intended when working in a text field.
