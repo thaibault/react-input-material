@@ -40,7 +40,7 @@ import {
     BaseProps,
     DataTransformSpecification, DateTimeRepresentation,
     DefaultBaseProperties,
-    DefaultInputProperties,
+    DefaultInputProperties, DefaultProperties,
     FormatSpecifications,
     InputDataTransformation,
     InputProps,
@@ -349,7 +349,8 @@ export const determineInitialValue = <Type = unknown>(
  */
 export const determineValidationState =
     <
-        P extends InputProps = InputProps,
+        Type = unknown,
+        P extends DefaultProperties<Type> = DefaultProperties<Type>,
         MS extends Partial<ModelState> = Partial<ModelState>
     >(
         properties: P, currentState: MS, validators: Mapping<() => boolean> = {}
@@ -358,14 +359,14 @@ export const determineValidationState =
 
         validators = {
             invalidRequired: (): boolean => (
-                properties.model?.nullable === false &&
+                properties.model.nullable === false &&
                 (
                     properties.model.type !== 'boolean' &&
                     !properties.model.value &&
                     properties.model.value !== 0
                 ) ||
                 (
-                    properties.model?.type === 'boolean' &&
+                    properties.model.type === 'boolean' &&
                     !(
                         typeof properties.model.value === 'boolean' ||
                         ['false', 'true'].includes(
@@ -377,10 +378,6 @@ export const determineValidationState =
             ...validators
         }
 
-        if (!properties.model)
-            properties.model = {}
-
-        properties.model.state = properties.model.state || {} as MS
         for (const [name, validator] of Object.entries(validators)) {
             const oldValue: boolean|undefined =
                 currentState[name as keyof ModelState]
@@ -394,10 +391,7 @@ export const determineValidationState =
         if (changed) {
             properties.model.state.invalid =
                 Object.keys(validators).some((name: string): boolean =>
-                    Boolean(
-                        properties.model?.state &&
-                        properties.model.state[name as keyof ModelState]
-                    )
+                    Boolean(properties.model.state[name as keyof ModelState])
                 )
             properties.model.state.valid = !properties.model.state.invalid
         }

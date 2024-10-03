@@ -58,6 +58,7 @@ import {
     CheckboxProperties as Properties,
     CheckboxProps as Props,
     defaultModelState,
+    DefaultProperties as DefaultBaseProperties,
     DefaultCheckboxProperties as DefaultProperties,
     defaultCheckboxProperties as defaultProperties,
     CheckboxModelState as ModelState,
@@ -77,19 +78,13 @@ const CSS_CLASS_NAMES = cssClassNames
 export function determineValidationState(
     properties: DefaultProperties, currentState: Partial<ModelState>
 ): boolean {
-    return determineBaseValidationState<DefaultProperties>(
-        properties,
+    return determineBaseValidationState<
+        boolean, DefaultBaseProperties<boolean>
+    >(
+        properties as DefaultBaseProperties<boolean>,
         currentState,
         {invalidRequired: (): boolean =>
-            /*
-                eslint-disable
-                @typescript-eslint/no-unnecessary-boolean-literal-compare
-            */
             properties.model.nullable === false && !properties.model.value
-            /*
-                eslint-enable
-                @typescript-eslint/no-unnecessary-boolean-literal-compare
-            */
         }
     )
 }
@@ -421,7 +416,7 @@ export const RequireableCheckboxInner = function(
     >
         <div
             className={[CSS_CLASS_NAMES.requireableCheckbox]
-                .concat(properties.className ?? [])
+                .concat(properties.className)
                 .join(' ')
             }
             style={properties.styles}

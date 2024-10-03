@@ -35,6 +35,7 @@ import {
     determineValidationState as determineBaseValidationState
 } from '../../helper'
 import {
+    DefaultProperties as DefaultBaseProperties,
     DefaultFileInputProperties as DefaultProperties,
     FileInputModelState as ModelState,
     FileValue,
@@ -177,15 +178,14 @@ export const determineValidationState = <
         Boolean(properties.model.contentTypePattern) &&
         typeof (properties.model.value?.blob as Blob|null)?.type === 'string' &&
         ([] as Array<RegExp|string>)
-            .concat(properties.model.contentTypePattern!)
+            .concat(properties.model.contentTypePattern ?? [])
             .some((expression: RegExp|string): boolean =>
                 typeof expression === 'string' &&
                 !(new RegExp(expression))
-                    .test((properties.model.value!.blob as Blob).type) ||
-                expression !== null &&
+                    .test((properties.model.value?.blob as Blob).type) ||
                 typeof expression === 'object' &&
                 !expression.test(
-                    (properties.model.value!.blob as Blob).type
+                    (properties.model.value?.blob as Blob).type
                 )
             )
     )
@@ -193,21 +193,21 @@ export const determineValidationState = <
         Boolean(
             properties.model.invertedContentTypePattern
         ) &&
-        typeof (properties.model.value?.blob as Blob)?.type === 'string' &&
+        typeof (properties.model.value?.blob as Blob|undefined)?.type ===
+            'string' &&
         ([] as Array<RegExp|string>)
-            .concat(properties.model.invertedContentTypePattern!)
+            .concat(properties.model.invertedContentTypePattern ?? [])
             .some((expression: RegExp|string): boolean =>
                 typeof expression === 'string' &&
                 (new RegExp(expression))
-                    .test((properties.model.value!.blob as Blob).type) ||
-                expression !== null &&
+                    .test((properties.model.value?.blob as Blob).type) ||
                 typeof expression === 'object' &&
-                expression.test((properties.model.value!.blob as Blob).type)
+                expression.test((properties.model.value?.blob as Blob).type)
             )
     )
 
-    return determineBaseValidationState<P>(
-        properties,
+    return determineBaseValidationState<Type>(
+        properties as DefaultBaseProperties<Type>,
         currentState,
         {
             invalidMaximumSize,

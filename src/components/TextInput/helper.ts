@@ -168,7 +168,7 @@ export function determineValidationState<T>(
     properties: DefaultProperties<T>, currentState: Partial<ModelState>
 ): boolean {
     return determineBaseValidationState<
-        DefaultProperties<T>, Partial<ModelState>
+        T, DefaultProperties<T>, Partial<ModelState>
     >(
         properties,
         currentState,

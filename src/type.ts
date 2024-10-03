@@ -151,7 +151,7 @@ export type Selection = Array<boolean|number>|SelectProps['options']
 export interface BaseProperties<T = unknown>
     extends
 CommonBaseModel<T>, ModelState {
-    className: string
+    className: Array<string>|string
     // NOTE: We want to avoid a collision with html's native "style" property.
     styles: Mapping
     themeConfiguration: ThemeProviderProps['options']
@@ -457,6 +457,9 @@ export const defaultModel: BaseModel<string> = {
     would permanently shadow them.
 */
 export const defaultProperties: DefaultProperties = {
+    className: [],
+    styles: {},
+
     enforceUncontrolled: false,
 
     model: {...defaultModel},
