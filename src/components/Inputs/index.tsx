@@ -147,7 +147,7 @@ const getExternalProperties = function<T, P extends InputsPropertiesItem<T>>(
         ...properties,
         ...modelState,
         model: {
-            ...(properties.model || {}),
+            ...properties.model,
             state: modelState,
             value: properties.value
         }
@@ -198,7 +198,7 @@ export const InputsInner = function<
     // region consolidate state
     const [newInputState, setNewInputState] = useState<{
         name: 'added'|'rendered'|'stabilized'
-        event: GenericEvent|null
+        event?: GenericEvent|null
     }>({name: 'stabilized', event: null})
 
     useEffect(
@@ -212,7 +212,7 @@ export const InputsInner = function<
                 setNewInputState({name: 'stabilized', event: null})
                 triggerOnChange(
                     inputPropertiesToValues<T, P>(properties.value),
-                    newInputState.event!
+                    newInputState.event
                 )
             }
         },
@@ -223,7 +223,7 @@ export const InputsInner = function<
         inputPropertiesToValues<T, P>(
             determineInitialValue<Array<P>|null>(
                 givenProps,
-                copy(Inputs.defaultProperties.model?.default) as Array<P>|null
+                copy(Inputs.defaultProperties.model.default) as Array<P>|null
             ) ||
             null
         )
@@ -249,10 +249,10 @@ export const InputsInner = function<
         value to properties directly.
     */
     if (
-        givenProperties.model!.value !== undefined &&
+        givenProperties.model?.value !== undefined &&
         givenProperties.value === undefined
     )
-        givenProperties.value = givenProperties.model!.value
+        givenProperties.value = givenProperties.model.value
     if (givenProperties.value === undefined)
         // NOTE: Indicates to be filled later from state.
         givenProperties.value = []
@@ -273,7 +273,7 @@ export const InputsInner = function<
 
     const triggerOnChange = (
         values?: Array<T>|null,
-        event?: GenericEvent,
+        event?: GenericEvent|null,
         inputProperties?: Partial<P>,
         index?: number
     ): void => {
@@ -297,10 +297,7 @@ export const InputsInner = function<
         else if (isDeleteChange)
             properties.value.splice(index, 1)
 
-        if (
-            properties.emptyEqualsNull &&
-            (!properties.value || properties.value.length === 0)
-        )
+        if (properties.emptyEqualsNull && properties.value.length === 0)
             properties.value = null
 
         triggerCallbackIfExists<InputsProperties<T, P>>(
@@ -347,7 +344,7 @@ export const InputsInner = function<
     }
 
     for (let index = 0; index < Math.max(
-        properties.model?.value?.length || 0,
+        properties.model.value?.length || 0,
         properties.value?.length || 0,
         !controlled && values?.length || 0
     ); index += 1) {
@@ -390,14 +387,14 @@ export const InputsInner = function<
                 ref: reference
             },
             (
-                properties.model?.value &&
+                properties.model.value &&
                 properties.model.value.length > index &&
                 properties.model.value[index].model ?
                     {model: properties.model.value[index].model} :
                     {}
             ) as P,
             (
-                properties.value && properties.value.length > index ?
+                properties.value.length > index ?
                     {value: (properties.value)[index].value} :
                     {}
             ) as P,
@@ -512,7 +509,7 @@ export const InputsInner = function<
             }) :
             <TextInput
                 {...inputProperties as InputProps<T>}
-                name={`${properties.name}-${index + 1}`}
+                name={`${properties.name}-${String(index + 1)}`}
             />
 
     return <WrapConfigurations
@@ -522,7 +519,7 @@ export const InputsInner = function<
         <div
             className={
                 [CSS_CLASS_NAMES.inputs]
-                    .concat(properties.className ?? [])
+                    .concat(properties.className)
                     .join(' ')
             }
             data-name={properties.name}

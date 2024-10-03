@@ -45,6 +45,7 @@ import {
     FileValue,
     InputProperties,
     InputProps,
+    InputsCreateItemOptions,
     InputsCreatePrototypeOptions,
     InputsProperties,
     IntervalConfiguration,
@@ -132,13 +133,15 @@ const Application = () => {
         useMemorizedValue<(value: IntervalValue|null) => void>(setIntervalValue)
     /// endregion
     /// region checkbox
-    const [checkboxInputValue, setCheckboxInputValue] = useState<boolean>(false)
+    const [checkboxInputValue, setCheckboxInputValue] =
+        useState<boolean|null>(false)
     const onChangeCheckboxInputValue =
-        useMemorizedValue<(value: boolean) => void>(setCheckboxInputValue)
+        useMemorizedValue<(value: boolean|null) => void>(setCheckboxInputValue)
     /// endregion
     /// region inputs
     type IntervalInputsType = PartialInputsModel<
-        IntervalConfiguration|IntervalValue|null, IntervalProps
+        Partial<IntervalConfiguration>|Partial<IntervalValue>|null,
+        IntervalProps
     >
     const [intervalInputsModel, setIntervalInputsModel] =
         useState<IntervalInputsType>({default: [
@@ -176,10 +179,11 @@ const Application = () => {
 
     const createIntervalInputsPrototype = useMemorizedValue((
         {item, lastValue, properties}: InputsCreatePrototypeOptions<
-            IntervalConfiguration|IntervalValue|null,
+            Partial<IntervalConfiguration>|Partial<IntervalValue>|null,
             IntervalProps,
             InputsProperties<
-                IntervalValue|IntervalConfiguration|null, IntervalProps
+                Partial<IntervalValue>|Partial<IntervalConfiguration>|null,
+                IntervalProps
             >
         >
     ): IntervalProps => {
@@ -1162,12 +1166,17 @@ const Application = () => {
                     </Inputs>
                     {/* endregion */}
                     {/* region checkbox inputs */}
-                    <Inputs<boolean, CheckboxProps>
+                    <Inputs<boolean|null, CheckboxProps>
                         createItem={useMemorizedValue(({
                             index, item, properties: {name}
-                        }): CheckboxProps =>
-                            ({...item, name: `${name}-${String(index + 1)}`})
-                        )}
+                        }: InputsCreateItemOptions<
+                            boolean|null,
+                            CheckboxProps,
+                            InputsProperties<boolean|null, CheckboxProps>
+                        >): CheckboxProps => ({
+                            ...item,
+                            name: `${name}-${String(index + 1)}`
+                        }))}
                         maximumNumber={2}
                         minimumNumber={2}
                         model={useMemorizedValue({
@@ -1185,7 +1194,12 @@ const Application = () => {
                     {/* region interval inputs */}
                     {/* region uncontrolled */}
                     <Inputs<
-                        IntervalConfiguration|IntervalValue|null, IntervalProps
+                        (
+                            Partial<IntervalConfiguration> |
+                            Partial<IntervalValue> |
+                            null
+                        ),
+                        IntervalProps
                     >
                         createPrototype={createIntervalInputsPrototype}
                         model={useMemorizedValue({
@@ -1211,7 +1225,12 @@ const Application = () => {
                     {/* endregion */}
                     {/* region controlled */}
                     <Inputs<
-                        IntervalConfiguration|IntervalValue|null, IntervalProps
+                        (
+                            Partial<IntervalConfiguration> |
+                            Partial<IntervalValue> |
+                            null
+                        ),
+                        IntervalProps
                     >
                         createPrototype={createIntervalInputsPrototype}
                         model={intervalInputsModel}

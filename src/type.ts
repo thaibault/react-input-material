@@ -366,7 +366,7 @@ export const propertyTypes: ValidationMapping = {
     ...baseModelPropertyTypes,
     ...modelStatePropertyTypes,
 
-    className: string,
+    className: oneOfType([arrayOf(string), string]),
     styles: object,
     themeConfiguration: object,
 
@@ -1486,7 +1486,7 @@ export type PartialIntervalModel =
 export type IntervalProps =
     Omit<
         InputProps<DateTimeRepresentation|null>,
-        'icon'|'model'|'onChange'|'onChangeValue'|'value'
+          'icon'|'model'|'onChange'|'onChangeValue'|'value'
     > &
     Partial<{
         end: Partial<
@@ -1510,12 +1510,12 @@ export type IntervalProps =
 
         icon: IntervalProperties['icon']|string
 
-        model: PartialIntervalModel
+        model?: PartialIntervalModel
 
         onChange: IntervalProperties['onChange']
         onChangeValue: IntervalProperties['onChangeValue']
 
-        value: IntervalConfiguration|IntervalValue|null
+        value?: IntervalConfiguration|IntervalValue|null
     }>
 
 export type DefaultIntervalProperties =

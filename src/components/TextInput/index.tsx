@@ -395,7 +395,8 @@ export const TextInputInner = function<Type = unknown>(
                 onChangeValue(parseValue<Type>(
                     properties,
                     properties.default as Type,
-                    TextInput.transformer
+                    TextInput.transformer,
+                    !controlled && properties.model.trim
                 ))
             }
 
@@ -861,7 +862,9 @@ export const TextInputInner = function<Type = unknown>(
             typeof selectionStart === 'number'
         ) {
             const add: 0|1|-1 =
-                (event as unknown as KeyboardEvent|null)?.key.length === 1 ?
+                (
+                    event as unknown as Partial<KeyboardEvent>|null
+                )?.key?.length === 1 ?
                     1 :
                     (event as unknown as KeyboardEvent|null)?.key ===
                         'Backspace' &&
@@ -941,7 +944,10 @@ export const TextInputInner = function<Type = unknown>(
             )
 
         result.model.value = parseValue<Type>(
-            result, result.model.value, transformer
+            result,
+            result.model.value,
+            transformer,
+            !controlled && properties.model?.trim
         )
 
         determineValidationState<Type>(result, result.model.state)
@@ -1092,7 +1098,10 @@ export const TextInputInner = function<Type = unknown>(
                 )
                 if (candidate === null) {
                     properties.value = parseValue<Type>(
-                        properties, properties.value, transformer
+                        properties,
+                        properties.value,
+                        transformer,
+                        properties.model.trim
                     )
                     properties.representation = formatValue<Type>(
                         properties, properties.value, transformer
@@ -1343,6 +1352,8 @@ export const TextInputInner = function<Type = unknown>(
             })
         }
 
+        const trim = !controlled && properties.model.trim
+
         properties.representation = selectedIndex !== -1 ?
             currentSuggestionLabels[selectedIndex] :
             typeof properties.value === 'string' ?
@@ -1350,8 +1361,12 @@ export const TextInputInner = function<Type = unknown>(
                 formatValue<Type>(properties, properties.value, transformer)
 
         if (!useSuggestions) {
-            properties.value =
-                parseValue<Type>(properties, properties.value, transformer)
+            properties.value = parseValue<Type>(
+                properties,
+                properties.value,
+                transformer,
+                trim
+            )
 
             setHelper()
         } else if (properties.suggestionCreator) {
@@ -1390,7 +1405,8 @@ export const TextInputInner = function<Type = unknown>(
                         properties.value = parseValue<Type>(
                             properties,
                             properties.representation as unknown as Type,
-                            transformer
+                            transformer,
+                            trim
                         )
                 }
 
@@ -1459,7 +1475,8 @@ export const TextInputInner = function<Type = unknown>(
                     properties.value = parseValue<Type>(
                         properties,
                         properties.representation as unknown as Type,
-                        transformer
+                        transformer,
+                        trim
                     )
             }
 

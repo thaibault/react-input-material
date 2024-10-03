@@ -709,6 +709,7 @@ export function normalizeSelection(
  * @param configuration - Input configuration.
  * @param value - Value to transform.
  * @param transformer - To apply to given value.
+ * @param trim - Indicates whether to trim strings or not.
  * @returns Transformed value.
  */
 export const parseValue =
@@ -719,10 +720,11 @@ export const parseValue =
     >(
         configuration: P,
         value: InputType|undefined,
-        transformer: InputDataTransformation
+        transformer: InputDataTransformation,
+        trim= false
     ): T => {
-        if (configuration.model.trim && typeof value === 'string')
-            (value as string) = value.trim().replace(/ +\n/g, '\\n')
+        if (trim && typeof value === 'string')
+            value = value.trim().replace(/ +\n/g, '\\n') as InputType
 
         if (
             configuration.model.emptyEqualsNull &&

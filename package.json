@@ -102,7 +102,7 @@
     "@rmwc/icon": "^14.3.4",
     "@rmwc/icon-button": "^14.3.4",
     "@rmwc/menu": "^14.3.4",
-    "@rmwc/select": "^14.3.4",
+    "@rmwc/select": "patch:@rmwc/select@npm%3A14.3.4#~/.yarn/patches/@rmwc-select-npm-14.3.4-6d0aebe22c.patch",
     "@rmwc/tabs": "^14.3.4",
     "@rmwc/textfield": "^14.3.4",
     "@rmwc/theme": "^14.3.4",
@@ -288,7 +288,8 @@
     "webpack@npm:^5.90.3": "patch:webpack@npm%3A5.90.3#~/.yarn/patches/webpack-npm-5.90.3-2a12e60d26.patch",
     "globals@npm:^11.1.0": "patch:globals@npm%3A11.12.0#~/.yarn/patches/globals-npm-11.12.0-1fa7f41a6c.patch",
     "globals@npm:^14.0.0": "patch:globals@npm%3A11.12.0#~/.yarn/patches/globals-npm-11.12.0-1fa7f41a6c.patch",
-    "globals@npm:^9.18.0": "patch:globals@npm%3A11.12.0#~/.yarn/patches/globals-npm-11.12.0-1fa7f41a6c.patch"
+    "globals@npm:^9.18.0": "patch:globals@npm%3A11.12.0#~/.yarn/patches/globals-npm-11.12.0-1fa7f41a6c.patch",
+    "@rmwc/ripple@npm:14.3.4": "patch:@rmwc/ripple@npm%3A14.3.4#~/.yarn/patches/@rmwc-ripple-npm-14.3.4-27648eff11.patch"
   },
   "sideEffects": false,
   "documentationWebsite": {

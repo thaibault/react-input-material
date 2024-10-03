@@ -194,7 +194,7 @@ export const TRANSFORMER: InputDataTransformation = {
                 return edgeValueDescription
 
             const formattedValue: string = utcSecondsToISOString(
-                value + new Date(value * 1000).getTimezoneOffset() * 60
+                value - new Date(value * 1000).getTimezoneOffset() * 60
             )
 
             return formattedValue.substring(0, formattedValue.lastIndexOf('.'))
@@ -225,7 +225,7 @@ export const TRANSFORMER: InputDataTransformation = {
                 */
                 if (!modifiedParsing)
                     value =
-                        (parsedDate / 1000) -
+                        (parsedDate / 1000) +
                         new Date(parsedDate).getTimezoneOffset() * 60
             }
 
