@@ -1054,7 +1054,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Triggered on blur events.
      * @param event - Event object.
-     * @returns Newly computed value state.
      */
     const onBlur = (
         event: ReactFocusEvent<HTMLDivElement>

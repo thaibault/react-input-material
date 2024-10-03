@@ -166,7 +166,6 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     /**
      * Triggered on blur events.
      * @param event - Event object.
-     * @returns Current validation state.
      */
     const onBlur = (event: SyntheticEvent): void => {
         setValueState((
