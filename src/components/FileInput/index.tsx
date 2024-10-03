@@ -166,7 +166,6 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     /**
      * Triggered on blur events.
      * @param event - Event object.
-     * @returns Current validation state.
      */
     const onBlur = (event: SyntheticEvent): void => {
         setValueState((
@@ -491,9 +490,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         to avoid endless rendering loops when a value is provided via
         properties.
     */
-    if (valueState.attachBlobProperty && valueState.value)
+    if (valueState.attachBlobProperty && valueState.value && properties.value)
         properties.value =
-            extend<Type>(true, valueState.value, properties.value!)
+            extend<Type>(true, valueState.value, properties.value)
 
     /// region synchronize uncontrolled properties into state
     const currentValueState: ValueState<Type> = {
@@ -568,9 +567,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                         await deriveBase64String(properties.value)
                 }
 
-                if (!properties.value?.hash)
+                if (!properties.value.hash)
                     valueChanged.hash =
-                        (properties.hashingConfiguration.prefix ?? '') +
+                        (properties.hashingConfiguration?.prefix ?? '') +
                         md5Hash(properties.value.source)
             } else {
                 let blob: Blob|undefined
@@ -578,7 +577,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                     properties.value?.blob &&
                     properties.value.blob instanceof Blob
                 ) {
-                    blob = properties.value?.blob
+                    blob = properties.value.blob
                     // Derive missing source from given blob.
                     valueChanged.source = await (
                         representationType === 'text' ?
@@ -586,7 +585,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                             deriveBase64String(properties.value)
                     )
                 } else if (properties.value?.url) {
-                    blob = await (properties.value.url?.startsWith('data:') ?
+                    blob = await (properties.value.url.startsWith('data:') ?
                         dataURLToBlob(properties.value.url) :
                         (await fetch(properties.value.url)).blob()
                     )
@@ -606,7 +605,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                     */
                     let currentChunk = 0
                     const chunkSize =
-                        properties.hashingConfiguration.readChunkSizeInByte ??
+                        properties.hashingConfiguration?.readChunkSizeInByte ??
                         2097152
                     const chunks = Math.ceil(blob.size / chunkSize)
                     const buffer = new MD5ArrayBuffer()
@@ -621,7 +620,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                 `${String(chunks)}.`
                             )
 
-                            buffer.append(event.target!.result as ArrayBuffer)
+                            buffer.append(event.target?.result as ArrayBuffer)
                             currentChunk++
 
                             if (currentChunk < chunks)
@@ -629,14 +628,12 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                             else
                                 resolve(buffer.end(
                                     properties
-                                        .hashingConfiguration
-                                        .binaryString
+                                        .hashingConfiguration?.binaryString ??
+                                    true
                                 ))
                         }
 
-                        fileReader.onerror = (error) => {
-                            reject(error)
-                        }
+                        fileReader.onerror = reject
 
                         const loadNext = () => {
                             const start = currentChunk * chunkSize
@@ -653,7 +650,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                     })
 
                     valueChanged.hash =
-                        (properties.hashingConfiguration.prefix ?? '') + hash
+                        (properties.hashingConfiguration?.prefix ?? '') + hash
                 }
             }
 
@@ -671,7 +668,8 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         },
         []
     )
-    const contentType = determineContentType<Type>(properties)
+    const contentType =
+        determineContentType<Type>(properties) ?? 'application/binary'
     // region render
     const representationType: RepresentationType =
         contentType ? determineRepresentationType(contentType) : 'binary'
@@ -691,7 +689,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         <Card
             className={
                 [CSS_CLASS_NAMES.fileInput]
-                    .concat(properties.className ?? [])
+                    .concat(properties.className)
                     .join(' ')
             }
             onBlur={onBlur}
@@ -712,7 +710,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                             <video autoPlay loop muted>
                                 <source
                                     src={properties.value.url}
-                                    type={contentType!}
+                                    type={contentType}
                                 />
                             </video> :
                             representationType === 'embedableText' ?
@@ -720,7 +718,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                     [CSS_CLASS_NAMES.fileInputIframeWrapper]
                                         .concat(
                                             ['text/html', 'text/plain']
-                                                .includes(contentType!) ?
+                                                .includes(contentType) ?
                                                 CSS_CLASS_NAMES[
                                                     'fileInputIframeWrapper' +
                                                     'Padding'
@@ -737,7 +735,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                         src={properties.value.url}
                                     />
                                 </div> :
-                                properties.value?.source &&
+                                (properties.value as FileValue|null)?.source &&
                                 representationType === 'text' ?
                                     <pre
                                         className={
@@ -820,7 +818,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                             {...properties.generateFileNameInputProperties(
                                 {
                                     disabled: properties.disabled,
-                                    value: properties.value?.name,
+                                    value: (
+                                        properties.value as FileValue|null
+                                    )?.name,
 
                                     ...mask(
                                         defaultFileNameInputProperties,
@@ -892,7 +892,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                 {properties.disabled ?
                                     '' :
                                     <CardActionButton
-                                        onClick={() => onChangeValue()}
+                                        onClick={() => {
+                                            onChangeValue()
+                                        }}
                                         ref={deleteButtonReference}
                                         ripple={properties.ripple}
                                     >

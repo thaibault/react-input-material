@@ -151,7 +151,7 @@ export type Selection = Array<boolean|number>|SelectProps['options']
 export interface BaseProperties<T = unknown>
     extends
 CommonBaseModel<T>, ModelState {
-    className: string
+    className: Array<string>|string
     // NOTE: We want to avoid a collision with html's native "style" property.
     styles: Mapping
     themeConfiguration: ThemeProviderProps['options']
@@ -366,7 +366,7 @@ export const propertyTypes: ValidationMapping = {
     ...baseModelPropertyTypes,
     ...modelStatePropertyTypes,
 
-    className: string,
+    className: oneOfType([arrayOf(string), string]),
     styles: object,
     themeConfiguration: object,
 
@@ -457,6 +457,9 @@ export const defaultModel: BaseModel<string> = {
     would permanently shadow them.
 */
 export const defaultProperties: DefaultProperties = {
+    className: [],
+    styles: {},
+
     enforceUncontrolled: false,
 
     model: {...defaultModel},
@@ -473,11 +476,11 @@ export const defaultProperties: DefaultProperties = {
 //// endregion
 /// endregion
 /// region checkbox
-export interface CheckboxProperties extends Properties<boolean> {
+export interface CheckboxProperties extends Properties<boolean|null> {
     checked: boolean
     id: string
 }
-export type CheckboxModel = BaseModel<boolean>
+export type CheckboxModel = BaseModel<boolean|null>
 export type CheckboxModelState = ModelState
 export type CheckboxValueState = ValueState<boolean>
 export type CheckboxProps =
@@ -596,8 +599,8 @@ export type InputDataTransformation =
     >]?: DataTransformSpecification}
 //// endregion
 export type InputSelection =
-    Array<boolean|number> |
-    Array<[boolean|number|string, string]> |
+    Array<boolean|number|null> |
+    Array<[boolean|number|string|null, string]> |
     NormalizedSelection |
     SelectProps['options']
 export type NormalizedSelection =
@@ -650,7 +653,7 @@ export type TextInputType = (
 )
 export interface InputChildrenOptions<P, T> {
     index: number
-    normalizedSelection: NormalizedSelection
+    normalizedSelection?: NormalizedSelection|null
     properties: P
     query: string
     suggestion: ReactNode|string
@@ -685,12 +688,12 @@ export interface InputProperties<T = unknown> extends
 {
     align: 'end'|'start'
     children: (options: InputChildrenOptions<this, T>) => null|ReactElement
-    cursor: CursorState
+    cursor: Partial<CursorState>|null
 
     editor: Editor
     editorIsActive: boolean
 
-    hidden: boolean
+    hidden?: boolean
 
     icon: string|(IconOptions & {tooltip?: string|TooltipProps})
     trailingIcon: string|(IconOptions & {tooltip?: string|TooltipProps})
@@ -698,7 +701,7 @@ export interface InputProperties<T = unknown> extends
     inputProperties: Partial<
         CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
     >
-    inputProps: Mapping<boolean|number|string>
+    inputProps?: Mapping<boolean|number|string>
 
     invertedPattern: Array<RegExp|string>|null|RegExp|string
     invertedPatternText: string
@@ -863,7 +866,7 @@ export const inputPropertyTypes: PropertiesValidationMap = {
     hidden: oneOfType([boolean, symbol]),
     /*
         NOTE: Not yet working:
-        icon?: string|(IconOptions & {tooltip?: string|TooltipProps})
+        icon: string|(IconOptions & {tooltip?: string|TooltipProps})
     */
     icon: oneOfType([string, object]),
     inputProps: object,
@@ -1010,7 +1013,7 @@ export interface FileInputChildrenOptions<
 export interface FileInputProperties<
     Type extends FileValue = FileValue, MediaTag extends ElementType = 'div'
 > extends Properties<null|Type>, FileInputModelState {
-    children: (options: FileInputChildrenOptions<
+    children?: (options: FileInputChildrenOptions<
         FileInputProperties<Type, MediaTag>, Type
     >) => ReactNode
 
@@ -1032,7 +1035,7 @@ export interface FileInputProperties<
     generateFileNameInputProperties: (
         prototype: InputProps<string>,
         properties: FileInputProperties<Type, MediaTag>
-    ) => InputProps<string>
+    ) => InputProps<string>|null
 
     media: RMWCComponentProps<CardMediaProps, HTMLProps<HTMLElement>, MediaTag>
 
@@ -1040,12 +1043,12 @@ export interface FileInputProperties<
 
     outlined: boolean
 
-    sourceToBlobOptions: {
+    sourceToBlobOptions?: {
         endings?: 'native'|'transparent'
         type?: string
     }
 
-    hashingConfiguration: {
+    hashingConfiguration?: {
         binaryString?: boolean
         prefix?: string
         readChunkSizeInByte?: number
@@ -1475,15 +1478,15 @@ export type PartialIntervalModel =
     Partial<Omit<IntervalProperties['model'], 'state'|'value'>> &
     {
         value?: {
-            end: PartialIntervalValue
-            start: PartialIntervalValue
+            end?: PartialIntervalValue
+            start?: PartialIntervalValue
         }
         state?: Partial<IntervalModelState>
     }
 export type IntervalProps =
     Omit<
         InputProps<DateTimeRepresentation|null>,
-        'icon'|'model'|'onChange'|'onChangeValue'|'value'
+          'icon'|'model'|'onChange'|'onChangeValue'|'value'
     > &
     Partial<{
         end: Partial<
@@ -1505,14 +1508,14 @@ export type IntervalProps =
             }
         >
 
-        icon: IntervalProperties['icon']
+        icon: IntervalProperties['icon']|string
 
-        model: PartialIntervalModel
+        model?: PartialIntervalModel
 
         onChange: IntervalProperties['onChange']
         onChangeValue: IntervalProperties['onChangeValue']
 
-        value: IntervalConfiguration|IntervalValue|null
+        value?: IntervalConfiguration|IntervalValue|null
     }>
 
 export type DefaultIntervalProperties =

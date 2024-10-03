@@ -5,6 +5,6 @@
  only needed for intellij only.
 */
 declare module '*.module' {
-    const classes: Mapping
+    const classes: Record<string, string>
     export default classes
 }

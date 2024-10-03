@@ -141,9 +141,12 @@ describe('TextInput', () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TRANSFORMER['datetime-local'].format!.final.transform!,
 
-        ['1970-01-01T00:00:00', TIMEZONE_OFFSET_IN_SECONDS],
-        ['1970-01-01T00:00:10', 10 + TIMEZONE_OFFSET_IN_SECONDS],
-        ['1970-01-02T00:00:00', 60 ** 2 * 24 + TIMEZONE_OFFSET_IN_SECONDS],
+        ['1970-01-01T00:00:00', -1 * TIMEZONE_OFFSET_IN_SECONDS],
+        ['1970-01-01T00:00:10', 10 + -1 * TIMEZONE_OFFSET_IN_SECONDS],
+        [
+            '1970-01-02T00:00:00',
+            60 ** 2 * 24 + -1 * TIMEZONE_OFFSET_IN_SECONDS
+        ],
         ['Infinitely far in the future', Infinity],
         ['Infinitely early in the past', -Infinity],
         ['', NaN]
