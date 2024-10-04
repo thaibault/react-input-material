@@ -27,6 +27,7 @@ import {
     FirstParameter,
     isFunction,
     Mapping,
+    PositiveEvaluationResult,
     timeout,
     ValueOf
 } from 'clientnode'
@@ -204,7 +205,7 @@ export const renderMessage = <Scope extends object = object>(
         return ''
     }
 
-    return evaluated.result
+    return (evaluated as PositiveEvaluationResult).result
 }
 /**
  * Triggered when a value state changes like validation or focusing.
