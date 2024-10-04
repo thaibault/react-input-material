@@ -7073,9 +7073,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clientnode@npm:^3.0.1194":
-  version: 3.0.1194
-  resolution: "clientnode@npm:3.0.1194"
+"clientnode@npm:^3.0.1195":
+  version: 3.0.1195
+  resolution: "clientnode@npm:3.0.1195"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/prop-types": "*"
@@ -7093,7 +7093,7 @@ __metadata:
       optional: true
     prop-types:
       optional: true
-  checksum: 10c0/b700837ed9f92526b51c6518380f44a3f55d8859cc9280a045662ea344995891af9eaaca21054a56d1f70edd3d22430696db46893bdd0e00a92da71b3abdb2e9
+  checksum: 10c0/58aa183338ef00ee317b7d8221f11177395c61133b50e289aff431bcdf06b44f872585a180a8a4d528403eaee0d122902cd2e9e4e2976ab3ad90128e4901a945
   languageName: node
   linkType: hard
 
@@ -13443,7 +13443,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.8.0"
     "@typescript-eslint/parser": "npm:^8.8.0"
     blob-util: "npm:^2.0.2"
-    clientnode: "npm:^3.0.1194"
+    clientnode: "npm:^3.0.1195"
     css-loader: "npm:^7.1.2"
     cssnano: "npm:^7.0.6"
     documentation-website: "npm:^1.0.334"
@@ -13478,7 +13478,7 @@ __metadata:
     tslib: "npm:^2.7.0"
     typescript-eslint: "npm:^8.8.0"
     typescript-plugin-css-modules: "npm:^5.1.0"
-    web-component-wrapper: "npm:^0.0.496"
+    web-component-wrapper: "npm:^0.0.497"
     weboptimizer: "npm:^2.0.1518"
     webpack-dev-server: "npm:^5.1.0"
   peerDependencies:
@@ -15486,9 +15486,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-component-wrapper@npm:^0.0.496":
-  version: 0.0.496
-  resolution: "web-component-wrapper@npm:0.0.496"
+"web-component-wrapper@npm:^0.0.497":
+  version: 0.0.497
+  resolution: "web-component-wrapper@npm:0.0.497"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/react": "*"
@@ -15507,7 +15507,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/5a9daff58e345d3e417a5ce2bb5d517bd17dad0fed2f3eed7403efa3d4d19ca33ff0f232d7b76c0d4eef7de86c5ead41b8ef345caf6be48fc818d5ed1d8a2bb4
+  checksum: 10c0/e36af0c93cd4994afffd0a1914af00f0d29e201a59f441deaebe1ae548c84509c08ba9e655e73a991b018ab99d45bd32dcab1aa3098155a2b9067b7f9e6906c2
   languageName: node
   linkType: hard
 
