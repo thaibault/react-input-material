@@ -245,7 +245,7 @@ describe('TextInput', () => {
         TRANSFORMER['time-local'].format!.final.transform!,
 
         [
-            // E.g. will result in 9 o'clock in germany.
+            // E.g. will result at 9 o'clock in germany.
             '0' +
             `${String(new Date('1970-01-01T08:00:00.000Z').getHours())}:00`,
             Date.parse('1970-01-01T08:00:00.000Z') / 1000,
@@ -260,7 +260,7 @@ describe('TextInput', () => {
 
         ...([
             [
-                // E.g. will result in 8 o'clock in germany.
+                // E.g. will result at 8 o'clock in germany.
                 ((): number => {
                     const zeroDateTime = new Date(0)
                     zeroDateTime.setHours(9)

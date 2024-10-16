@@ -63,23 +63,24 @@ export const GivenRichTextEditorComponent: typeof RichTextEditorComponent =
         RichTextEditorComponent :
         Dummy as unknown as typeof RichTextEditorComponent
 export const UseAnimations: (
-    null|typeof Dummy|typeof UseAnimationsType|undefined
+    null | typeof Dummy | typeof UseAnimationsType | undefined
 ) = IS_BROWSER ?
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     (require('react-useanimations') as
-        {default: null|typeof Dummy|typeof UseAnimationsType}|null
+        {default: null | typeof Dummy | typeof UseAnimationsType} | null
     )?.default :
     null
-export const lockAnimation: null|typeof LockAnimation|undefined = IS_BROWSER ?
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    (require('react-useanimations/lib/lock') as
-        {default: null|typeof LockAnimation}|null
-    )?.default : null
-export const plusToXAnimation: null|typeof PlusToXAnimation|undefined =
+export const lockAnimation: null | typeof LockAnimation | undefined =
+    IS_BROWSER ?
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        (require('react-useanimations/lib/lock') as
+            {default: null | typeof LockAnimation} | null
+        )?.default : null
+export const plusToXAnimation: null | typeof PlusToXAnimation | undefined =
     IS_BROWSER ?
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         (require('react-useanimations/lib/plusToX') as
-            {default: null|typeof PlusToXAnimation}|null
+            {default: null | typeof PlusToXAnimation} | null
         )?.default : null
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
@@ -102,7 +103,7 @@ export const CodeEditor = lazy<typeof CodeEditorType>(
     }
 )
 /// region rich text editor configuration
-declare const UTC_BUILD_TIMESTAMP: number|undefined
+declare const UTC_BUILD_TIMESTAMP: number | undefined
 // NOTE: Could be set via module bundler environment variables.
 export const CURRENT_UTC_BUILD_TIMESTAMP =
     typeof UTC_BUILD_TIMESTAMP === 'undefined' ? 1 : UTC_BUILD_TIMESTAMP
@@ -203,9 +204,9 @@ export const determineValidationState = <T>(
             typeof properties.model.value === 'string' &&
             typeof properties.model.invertedPattern !== 'undefined' &&
             Boolean(properties.model.invertedPattern) &&
-            ([] as Array<RegExp|string>)
+            ([] as Array<RegExp | string>)
                 .concat(properties.model.invertedPattern)
-                .some((expression: RegExp|string): boolean =>
+                .some((expression: RegExp | string): boolean =>
                     (new RegExp(expression)).test(
                         properties.model.value as unknown as string
                     )
@@ -215,9 +216,9 @@ export const determineValidationState = <T>(
             typeof properties.model.value === 'string' &&
             typeof properties.model.pattern !== 'undefined' &&
             Boolean(properties.model.pattern) &&
-            ([] as Array<RegExp|string>)
+            ([] as Array<RegExp | string>)
                 .concat(properties.model.pattern)
-                .some((expression: RegExp|string): boolean =>
+                .some((expression: RegExp | string): boolean =>
                     !(new RegExp(expression)).test(
                         properties.model.value as unknown as string
                     )
@@ -243,7 +244,7 @@ export function preventEnterKeyPropagation(event: KeyboardEvent) {
  * not.
  */
 export function suggestionMatches(
-    suggestion: string, query?: null|string
+    suggestion: string, query?: null | string
 ): boolean {
     if (query) {
         suggestion = suggestion.toLowerCase()

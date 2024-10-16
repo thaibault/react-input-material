@@ -62,7 +62,7 @@ import TextInput from './components/TextInput'
 export const slicePropertiesForState = (object: Mapping) => {
     /*
        NOTE: Nested "representations" shouldn't be controlled usually since
-       complex inter input dependencies wont be resolved from the outside.
+       complex inter input dependencies won't be resolved from the outside.
     */
     for (const name of ['ref', 'representation'])
         delete object[name]
@@ -155,7 +155,7 @@ export const deriveMissingPropertiesFromState = <
  * @returns Wrapped given method.
  */
 export const wrapStateSetter = <Type = unknown>(
-    setValueState: (value: Type|((value: Type) => Type)) => void,
+    setValueState: (value: Type | ((value: Type) => Type)) => void,
     currentValueState: Type
 ): ReturnType<typeof useState>[1] =>
         (callbackOrData: FirstParameter<ReturnType<typeof useState>[1]>) => {
@@ -168,12 +168,12 @@ export const wrapStateSetter = <Type = unknown>(
 
             if (!equals(
                 (
-                    result as unknown as {modelState: unknown}|undefined
+                    result as unknown as {modelState: unknown} | undefined
                 )?.modelState,
                 (
                     currentValueState as
                         unknown as
-                        {modelState: unknown}|undefined
+                        {modelState: unknown} | undefined
                 )?.modelState
             ))
                 setValueState(result)
@@ -246,7 +246,7 @@ export const triggerCallbackIfExists =
  * @returns Transformed properties.
  */
 export const translateKnownSymbols = <Type = unknown>(
-    properties: Mapping<typeof NullSymbol|Type|typeof UndefinedSymbol>
+    properties: Mapping<typeof NullSymbol | Type | typeof UndefinedSymbol>
 ): Mapping<Type> => {
     const result: Mapping<Type> = {}
     for (const [name, value] of Object.entries(properties))
@@ -275,15 +275,15 @@ export function determineInitialRepresentation<
 >(
     properties: P,
     defaultProperties: DP,
-    value: null|T,
+    value: null | T,
     transformer: InputDataTransformation,
-    selection?: NormalizedSelection|null
+    selection?: NormalizedSelection | null
 ): string {
     if (typeof properties.representation === 'string')
         return properties.representation
 
     if (value !== null) {
-        const candidate: null|string =
+        const candidate: null | string =
             getRepresentationFromValueSelection(value, selection)
 
         if (typeof candidate === 'string')
@@ -316,7 +316,7 @@ export const determineInitialValue = <Type = unknown>(
     properties: BaseProps,
     defaultValue?: Type,
     alternateValue?: Type
-): null|Type => {
+): null | Type => {
     if (alternateValue !== undefined)
         return alternateValue
 
@@ -380,7 +380,7 @@ export const determineValidationState =
         }
 
         for (const [name, validator] of Object.entries(validators)) {
-            const oldValue: boolean|undefined =
+            const oldValue: boolean | undefined =
                 currentState[name as keyof ModelState]
 
             properties.model.state[name as keyof ModelState] = validator()
@@ -412,7 +412,7 @@ export const mapPropertiesIntoModel = <
     DP extends DefaultBaseProperties = DefaultBaseProperties
 >(properties: P, defaultModel: DP['model']): DP => {
     /*
-        NOTE: Default props seems not to respect nested layers to merge so we
+        NOTE: Default props seems not to respect nested layers to merge, so we
         have to manage this for nested model structure.
     */
     const result: DP = extend<DP>(
@@ -505,8 +505,8 @@ export const getConsolidatedProperties = <
  * @param selection - Selection component property configuration.
  * @returns Normalized sorted listed of labels and values.
  */
-export function getLabelAndValues(selection?: NormalizedSelection|null): [
-    Array<ReactNode|string>, Array<unknown>
+export function getLabelAndValues(selection?: NormalizedSelection | null): [
+    Array<ReactNode | string>, Array<unknown>
 ] {
     if (Array.isArray(selection)) {
         const labels: Array<string> = []
@@ -514,7 +514,7 @@ export function getLabelAndValues(selection?: NormalizedSelection|null): [
 
         for (const value of selection)
             if (
-                typeof (value as {label?: string}|undefined)?.label ===
+                typeof (value as {label?: string} | undefined)?.label ===
                     'string'
             ) {
                 labels.push((value as {label: string}).label)
@@ -533,11 +533,11 @@ export function getLabelAndValues(selection?: NormalizedSelection|null): [
  * @returns Determined representation.
  */
 export function getRepresentationFromValueSelection(
-    value: unknown, selection?: NormalizedSelection|null
-): null|string {
+    value: unknown, selection?: NormalizedSelection | null
+): null | string {
     if (selection)
         for (const option of selection)
-            if (equals((option as {value: unknown}|undefined)?.value, value))
+            if (equals((option as {value: unknown} | undefined)?.value, value))
                 return (
                     (option as {label: string}).label || String(value)
                 )
@@ -551,12 +551,12 @@ export function getRepresentationFromValueSelection(
  * @returns Determined value.
  */
 export function getValueFromSelection<T>(
-    label: ReactNode|string, selection: NormalizedSelection|null|undefined
+    label: ReactNode | string, selection: NormalizedSelection | null | undefined
 ): T {
     if (Array.isArray(selection))
         for (const value of selection) {
             if (
-                typeof (value as {label?: null|string}|undefined)?.label ===
+                typeof (value as {label?: null | string} | undefined)?.label ===
                     'string' &&
                 (value as {label: string}).label === label
             )
@@ -564,7 +564,7 @@ export function getValueFromSelection<T>(
 
             if (
                 ['number', 'string'].includes(
-                    typeof (value as {value: string}|null)?.value
+                    typeof (value as {value: string} | null)?.value
                 ) &&
                 String((value as {value: unknown}).value) === label
             )
@@ -582,9 +582,9 @@ export function getValueFromSelection<T>(
  * @returns Determined normalized sorted selection configuration.
  */
 export function normalizeSelection(
-    selection?: InputSelection|null,
-    labels?: Array<[string, string]>|Array<string>|Mapping|null
-): NormalizedSelection|null|undefined {
+    selection?: InputSelection | null,
+    labels?: Array<[string, string]> | Array<string> | Mapping | null
+): NormalizedSelection | null | undefined {
     if (!selection) {
         selection = labels
         labels = undefined
@@ -595,7 +595,7 @@ export function normalizeSelection(
 
     const hasLabels: boolean = labels !== null && typeof labels === 'object'
 
-    const getLabel = <T = unknown>(value: T, index?: number): null|string => {
+    const getLabel = <T = unknown>(value: T, index?: number): null | string => {
         if (hasLabels)
             if (Array.isArray(labels)) {
                 if (labels.length)
@@ -702,7 +702,7 @@ export function normalizeSelection(
         )
     // endregion
 
-    return selection as NormalizedSelection|undefined
+    return selection as NormalizedSelection | undefined
 }
 /// endregion
 /**
@@ -720,7 +720,7 @@ export const parseValue =
         InputType = T
     >(
         configuration: P,
-        value: InputType|undefined,
+        value: InputType | undefined,
         transformer: InputDataTransformation,
         trim= false
     ): T => {
@@ -771,7 +771,7 @@ export function formatValue<
     P extends DefaultInputProperties<T> = DefaultInputProperties<T>
 >(
     configuration: P,
-    value: null|T,
+    value: null | T,
     transformerMapping: InputDataTransformation,
     final = true
 ): string {
@@ -786,9 +786,9 @@ export function formatValue<
     const format = transformerMapping[
         (configuration.type || configuration.model.type) as
             keyof InputDataTransformation
-    ]?.format as FormatSpecifications<T>|undefined
+    ]?.format as FormatSpecifications<T> | undefined
     if (format) {
-        const transformer: Transformer<T>|undefined =
+        const transformer: Transformer<T> | undefined =
             format[methodName]?.transform || format.final.transform
 
         if (transformer)
@@ -798,8 +798,8 @@ export function formatValue<
     return String(value)
 }
 export const formatDateTimeAsConfigured = (
-    value?: DateTimeRepresentation|Date|null
-): DateTimeRepresentation|null|undefined => {
+    value?: DateTimeRepresentation | Date | null
+): DateTimeRepresentation | null | undefined => {
     if (TextInput.transformer.date.useISOString) {
         if (typeof value === 'number' && !isNaN(value) && isFinite(value))
             return new Date(value * 1000).toISOString()
