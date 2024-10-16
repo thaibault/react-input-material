@@ -111,9 +111,9 @@ export const preserveStaticFileBaseNameInputGenerator = <
  */
 export const determineContentType = <Type extends FileValue = FileValue>(
     properties: FileInputProperties<Type>
-): null|string => {
+): null | string => {
     if (properties.value) {
-        if ((properties.value.blob as Blob|null)?.type)
+        if ((properties.value.blob as Blob | null)?.type)
             return (properties.value.blob as Blob).type
 
         if (properties.value.url?.startsWith('data:')) {
@@ -167,19 +167,20 @@ export const determineValidationState = <
     const invalidMaximumSize = (): boolean => (
         typeof properties.model.maximumSize === 'number' &&
         properties.model.maximumSize <
-        ((properties.model.value?.blob as Blob|null)?.size || 0)
+        ((properties.model.value?.blob as Blob | null)?.size || 0)
     )
     const invalidMinimumSize = (): boolean => (
         typeof properties.model.minimumSize === 'number' &&
         properties.model.minimumSize >
-        ((properties.model.value?.blob as Blob|null)?.size || 0)
+        ((properties.model.value?.blob as Blob | null)?.size || 0)
     )
     const invalidContentTypePattern = (): boolean => (
         Boolean(properties.model.contentTypePattern) &&
-        typeof (properties.model.value?.blob as Blob|null)?.type === 'string' &&
-        ([] as Array<RegExp|string>)
+        typeof (properties.model.value?.blob as Blob | null)?.type ===
+            'string' &&
+        ([] as Array<RegExp | string>)
             .concat(properties.model.contentTypePattern ?? [])
-            .some((expression: RegExp|string): boolean =>
+            .some((expression: RegExp | string): boolean =>
                 typeof expression === 'string' &&
                 !(new RegExp(expression))
                     .test((properties.model.value?.blob as Blob).type) ||
@@ -193,11 +194,11 @@ export const determineValidationState = <
         Boolean(
             properties.model.invertedContentTypePattern
         ) &&
-        typeof (properties.model.value?.blob as Blob|undefined)?.type ===
+        typeof (properties.model.value?.blob as Blob | undefined)?.type ===
             'string' &&
-        ([] as Array<RegExp|string>)
+        ([] as Array<RegExp | string>)
             .concat(properties.model.invertedContentTypePattern ?? [])
-            .some((expression: RegExp|string): boolean =>
+            .some((expression: RegExp | string): boolean =>
                 typeof expression === 'string' &&
                 (new RegExp(expression))
                     .test((properties.model.value?.blob as Blob).type) ||

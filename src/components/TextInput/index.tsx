@@ -987,7 +987,7 @@ export const TextInputInner = function<Type = unknown>(
                 /*
                     NOTE: Handle two cases:
 
-                    1. Representation has to be determine initially
+                    1. Representation has to be determined initially
                        (-> usually no focus).
                     2. Representation was set from the outside
                        (-> usually no focus).
@@ -1231,14 +1231,14 @@ export const TextInputInner = function<Type = unknown>(
      * states). Derived event handler will be triggered when internal state has
      * been consolidated.
      * @param eventOrValue - Event object or new value.
-     * @param editorInstance - Potential editor instance if triggered from a
+     * @param _editorInstance - Potential editor instance if triggered from a
      * rich text or code editor.
      * @param selectedIndex - Indicates whether given event was triggered by a
      * selection.
      */
     const onChangeValue = (
         eventOrValue: GenericEvent|Type,
-        editorInstance?: RichTextEditor,
+        _editorInstance?: RichTextEditor,
         selectedIndex = -1
     ): void => {
         setIsSuggestionOpen(true)
@@ -1379,7 +1379,7 @@ export const TextInputInner = function<Type = unknown>(
                     return
 
                 /*
-                    NOTE: A synchronous retrieved selection may has to stop a
+                    NOTE: A synchronous retrieved selection may have to stop a
                     pending (slower) asynchronous request.
                 */
                 setSelection((
