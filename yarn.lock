@@ -4061,6 +4061,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rmwc/ripple@patch:@rmwc/ripple@npm%3A14.3.5#~/.yarn/patches/@rmwc-ripple-npm-14.3.5-9657693602.patch":
+  version: 14.3.5
+  resolution: "@rmwc/ripple@patch:@rmwc/ripple@npm%3A14.3.5#~/.yarn/patches/@rmwc-ripple-npm-14.3.5-9657693602.patch::version=14.3.5&hash=d612fc"
+  dependencies:
+    "@material/ripple": "npm:^14.0.0"
+    "@rmwc/base": "npm:14.3.5"
+    "@rmwc/provider": "npm:14.3.5"
+    "@rmwc/types": "npm:14.3.5"
+  peerDependencies:
+    react: ">=16.8.x"
+    react-dom: ">=16.8.x"
+  checksum: 10c0/5ecab2f41455df4c01c37e56924c428132d379604c581e4428ed19db451d641d935f40358bef65e16aae3aa52d6434554270153759245062636c864eafe3131f
+  languageName: node
+  linkType: hard
+
 "@rmwc/select@npm:^14.3.5":
   version: 14.3.5
   resolution: "@rmwc/select@npm:14.3.5"
