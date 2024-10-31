@@ -569,7 +569,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
 
                 if (!properties.value.hash)
                     valueChanged.hash =
-                        (properties.hashingConfiguration?.prefix ?? '') +
+                        properties.hashingConfiguration.prefix +
                         md5Hash(properties.value.source)
             } else {
                 let blob: Blob|undefined
@@ -605,8 +605,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                     */
                     let currentChunk = 0
                     const chunkSize =
-                        properties.hashingConfiguration?.readChunkSizeInByte ??
-                        2097152
+                        properties.hashingConfiguration.readChunkSizeInByte
                     const chunks = Math.ceil(blob.size / chunkSize)
                     const buffer = new MD5ArrayBuffer()
                     const fileReader = new FileReader()
@@ -627,9 +626,8 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                 loadNext()
                             else
                                 resolve(buffer.end(
-                                    properties
-                                        .hashingConfiguration?.binaryString ??
-                                    true
+                                    properties.hashingConfiguration
+                                        .binaryString
                                 ))
                         }
 
@@ -650,7 +648,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                     })
 
                     valueChanged.hash =
-                        (properties.hashingConfiguration?.prefix ?? '') + hash
+                        properties.hashingConfiguration.prefix + hash
                 }
             }
 

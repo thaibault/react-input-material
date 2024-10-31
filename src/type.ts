@@ -594,15 +594,19 @@ export type InputDataTransformation =
 
         string?: DataTransformSpecification
     } &
-    {[key in Exclude<
-        NativeInputType,
-        (
-            'date' | 'date-local' |
-            'datetime' | 'datetime-local' |
-            'time' | 'time-local' |
-            'number'
-        )
-    >]?: DataTransformSpecification}
+    /* eslint-disable @typescript-eslint/consistent-indexed-object-style */
+    {
+        [key in Exclude<
+            NativeInputType,
+            (
+                'date' | 'date-local' |
+                'datetime' | 'datetime-local' |
+                'time' | 'time-local' |
+                'number'
+            )
+        >]?: DataTransformSpecification
+    }
+    /* eslint-enable @typescript-eslint/consistent-indexed-object-style */
 //// endregion
 export type InputSelection =
     Array<boolean | number | null> |
@@ -1056,10 +1060,10 @@ export interface FileInputProperties<
         type?: string
     }
 
-    hashingConfiguration?: {
-        binaryString?: boolean
-        prefix?: string
-        readChunkSizeInByte?: number
+    hashingConfiguration: {
+        binaryString: boolean
+        prefix: string
+        readChunkSizeInByte: number
     }
 }
 export type FileInputProps<Type extends FileValue = FileValue> =
@@ -1262,7 +1266,7 @@ export const defaultFileInputProperties: DefaultFileInputProperties = {
     hashingConfiguration: {
         binaryString: false,
         prefix: '',
-        readChunkSizeInByte: 2097152 // MiB
+        readChunkSizeInByte: 2097152 // 2 MiB
     }
 } as const
 //// endregion
