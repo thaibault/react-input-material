@@ -379,6 +379,9 @@ export const determineValidationState =
             ...validators
         }
 
+        if (!properties.model.state)
+            properties.model.state = {} as ModelState
+
         for (const [name, validator] of Object.entries(validators)) {
             const oldValue: boolean | undefined =
                 currentState[name as keyof ModelState]
@@ -392,7 +395,10 @@ export const determineValidationState =
         if (changed) {
             properties.model.state.invalid =
                 Object.keys(validators).some((name: string): boolean =>
-                    Boolean(properties.model.state[name as keyof ModelState])
+                    Boolean(
+                        properties.model.state &&
+                        properties.model.state[name as keyof ModelState]
+                    )
                 )
             properties.model.state.valid = !properties.model.state.invalid
         }

@@ -64,7 +64,7 @@ import {
     CheckboxModelState as ModelState,
     checkboxPropertyTypes as propertyTypes,
     CheckboxComponent,
-    CheckboxValueState as ValueState
+    CheckboxValueState as ValueState, CheckboxModelState, CheckboxValueState
 } from '../../type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
@@ -123,7 +123,9 @@ export const RequireableCheckboxInner = function(
                 properties, RequireableCheckbox.defaultProperties.model
             )
 
-        determineValidationState(result, result.model.state)
+        determineValidationState(
+            result, result.model.state as CheckboxModelState
+        )
 
         result = getBaseConsolidatedProperties<Props, Properties>(result)
 
@@ -176,7 +178,8 @@ export const RequireableCheckboxInner = function(
             )
 
             return changed ?
-                {...oldValueState, modelState: properties.model.state} :
+                {...oldValueState, modelState: properties.model.state} as
+                    CheckboxValueState :
                 oldValueState
         })
     }
@@ -211,7 +214,7 @@ export const RequireableCheckboxInner = function(
             return
 
         properties.value = Boolean(
-            (event.target as unknown as {checked: boolean|null}).checked
+            (event.target as unknown as {checked: boolean | null}).checked
         )
 
         setValueState((oldValueState: ValueState): ValueState => {
@@ -221,7 +224,7 @@ export const RequireableCheckboxInner = function(
             let stateChanged = false
 
             const result: ValueState =
-                {...oldValueState, value: properties.value as boolean|null}
+                {...oldValueState, value: properties.value as boolean | null}
 
             if (oldValueState.modelState.pristine) {
                 properties.dirty = true
@@ -243,7 +246,7 @@ export const RequireableCheckboxInner = function(
                 properties
             )
 
-            if (stateChanged) {
+            if (stateChanged && properties.model.state) {
                 result.modelState = properties.model.state
 
                 triggerCallbackIfExists<Properties>(
@@ -285,7 +288,7 @@ export const RequireableCheckboxInner = function(
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
      */
-    const onTouch = (event: ReactFocusEvent|ReactMouseEvent): void => {
+    const onTouch = (event: ReactFocusEvent | ReactMouseEvent): void => {
         setValueState((oldValueState: ValueState): ValueState => {
             let changedState = false
 
@@ -305,7 +308,10 @@ export const RequireableCheckboxInner = function(
             if (changedState) {
                 onChange(event)
 
-                result = {...oldValueState, modelState: properties.model.state}
+                result = {
+                    ...oldValueState,
+                    modelState: properties.model.state as CheckboxModelState
+                }
 
                 triggerCallbackIfExists<Properties>(
                     properties,
@@ -327,14 +333,14 @@ export const RequireableCheckboxInner = function(
     // endregion
     // region properties
     /// region references
-    const inputReference: MutableRefObject<HTMLInputElement|null> =
+    const inputReference: MutableRefObject<HTMLInputElement | null> =
         useRef<HTMLInputElement>(null)
-    const foundationRef: MutableRefObject<MDCCheckboxFoundation|null> =
+    const foundationRef: MutableRefObject<MDCCheckboxFoundation | null> =
         useRef<MDCCheckboxFoundation>(null)
     /// endregion
     const givenProps: Props = translateKnownSymbols(props)
 
-    const initialValue: boolean|null = determineInitialValue<boolean|null>(
+    const initialValue: boolean | null = determineInitialValue<boolean | null>(
         givenProps,
         RequireableCheckbox.defaultProperties.model.default,
         givenProps.checked
@@ -371,8 +377,8 @@ export const RequireableCheckboxInner = function(
     const properties: Properties = getConsolidatedProperties(givenProperties)
 
     const currentValueState: ValueState = {
-        modelState: properties.model.state,
-        value: properties.value as boolean|null
+        modelState: properties.model.state as CheckboxModelState,
+        value: properties.value as boolean | null
     }
     /*
         NOTE: If value is controlled only trigger/save state changes when model
@@ -392,8 +398,8 @@ export const RequireableCheckboxInner = function(
         reference,
         (): Adapter & {
             references: {
-                foundationRef: MutableRefObject<MDCCheckboxFoundation|null>
-                inputReference: MutableRefObject<HTMLInputElement|null>
+                foundationRef: MutableRefObject<MDCCheckboxFoundation | null>
+                inputReference: MutableRefObject<HTMLInputElement | null>
             }
         } => ({
             properties,
@@ -402,7 +408,7 @@ export const RequireableCheckboxInner = function(
                 modelState: properties.model.state,
                 ...(controlled ?
                     {} :
-                    {value: properties.value as boolean|null}
+                    {value: properties.value as boolean | null}
                 )
             }
         })

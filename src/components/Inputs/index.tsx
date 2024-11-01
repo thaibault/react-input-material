@@ -73,7 +73,7 @@ import {
     InputsModelState as ModelState,
     InputsProperties,
     InputsPropertiesItem,
-    InputsProps
+    InputsProps, InputsModelState
 } from '../../type'
 import {IconButtonOnChangeEventT} from '@rmwc/icon-button/lib/icon-button'
 // endregion
@@ -95,7 +95,7 @@ const getPrototype = function<T, P extends InputsPropertiesItem<T>>(
 }
 const inputPropertiesToValues = function<
     T, P extends InputsPropertiesItem<T>
->(inputProperties: Array<P>|null): Array<T>|null {
+>(inputProperties: Array<P> | null): Array<T> | null {
     return Array.isArray(inputProperties) ?
         inputProperties.map(({model, value}): T =>
             typeof value === 'undefined' ? model?.value as T : value
@@ -109,7 +109,7 @@ const getModelState = function<T, P extends InputsPropertiesItem<T>>(
 
     const unpack = (name: string, defaultValue = false) =>
         (properties: P) =>
-            properties[name as keyof P] as unknown as boolean|null ??
+            properties[name as keyof P] as unknown as boolean | null ??
             defaultValue
 
     const validMaximumNumber: boolean =
@@ -197,8 +197,8 @@ export const InputsInner = function<
     // endregion
     // region consolidate state
     const [newInputState, setNewInputState] = useState<{
-        name: 'added'|'rendered'|'stabilized'
-        event?: GenericEvent|null
+        name: 'added' | 'rendered' | 'stabilized'
+        event?: GenericEvent | null
     }>({name: 'stabilized', event: null})
 
     useEffect(
@@ -219,11 +219,11 @@ export const InputsInner = function<
         [newInputState.name]
     )
 
-    let [values, setValues] = useState<Array<T>|null>(
+    let [values, setValues] = useState<Array<T> | null>(
         inputPropertiesToValues<T, P>(
-            determineInitialValue<Array<P>|null>(
+            determineInitialValue<Array<P> | null>(
                 givenProps,
-                copy(Inputs.defaultProperties.model.default) as Array<P>|null
+                copy(Inputs.defaultProperties.model.default) as Array<P> | null
             ) ||
             null
         )
@@ -257,8 +257,9 @@ export const InputsInner = function<
         // NOTE: Indicates to be filled later from state.
         givenProperties.value = []
 
-    const references: Array<MutableRefObject<ComponentAdapter<P, State>|null>> =
-        []
+    const references: Array<
+        MutableRefObject<ComponentAdapter<P, State> | null>
+    > = []
 
     const properties: InputsProperties<T, P> =
         getConsolidatedProperties<InputsProps<T, P>, InputsProperties<T, P>>(
@@ -272,8 +273,8 @@ export const InputsInner = function<
         )
 
     const triggerOnChange = (
-        values?: Array<T>|null,
-        event?: GenericEvent|null,
+        values?: Array<T> | null,
+        event?: GenericEvent | null,
         inputProperties?: Partial<P>,
         index?: number
     ): void => {
@@ -310,11 +311,11 @@ export const InputsInner = function<
         )
     }
     const triggerOnChangeValue = (
-        values: Array<T>|null,
-        event: GenericEvent|undefined,
+        values: Array<T> | null,
+        event: GenericEvent | undefined,
         value: T,
         index?: number
-    ): Array<T>|null => {
+    ): Array<T> | null => {
         if (values === null)
             values = []
 
@@ -352,7 +353,7 @@ export const InputsInner = function<
             NOTE: We cannot use "useRef" here since the number of calls would
             be variable und therefor break the rules of hooks.
         */
-        const reference: MutableRefObject<ComponentAdapter<P, State>|null> =
+        const reference: MutableRefObject<ComponentAdapter<P, State> | null> =
             createRef<ComponentAdapter<P, State>>()
         references.push(reference)
 
@@ -380,7 +381,7 @@ export const InputsInner = function<
                     )
                 },
                 onChangeValue: (value: T, event?: GenericEvent) => {
-                    setValues((values: Array<T>|null): Array<T>|null =>
+                    setValues((values: Array<T> | null): Array<T> | null =>
                         triggerOnChangeValue(values, event, value, index)
                     )
                 },
@@ -419,7 +420,10 @@ export const InputsInner = function<
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
-        setValues = createDummyStateSetter<Array<T>|null>(values)
+        setValues = createDummyStateSetter<Array<T> | null>(values)
+
+    if (!properties.model.state)
+        properties.model.state = {} as InputsModelState
 
     properties.invalidMaximumNumber =
         properties.model.state.invalidMaximumNumber =
@@ -440,7 +444,7 @@ export const InputsInner = function<
     )
 
     const add = (event?: IconButtonOnChangeEventT): void => {
-        setValues((values: Array<T>|null): Array<T>|null => {
+        setValues((values: Array<T> | null): Array<T> | null => {
             /*
                 NOTE: This is needed since the event handler is provided to icon
                 and button component contained in rmwc's "IconButton".

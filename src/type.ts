@@ -144,7 +144,7 @@ export interface BaseModel<T = unknown> extends CommonBaseModel<T> {
 
     nullable: boolean
 
-    state: ModelState
+    state?: ModelState
 }
 //// endregion
 export type Selection = Array<boolean | number> | SelectProps['options']
@@ -630,7 +630,7 @@ export interface InputModelState extends ModelState {
     invalidPattern: boolean
 }
 export interface InputModel<T = unknown> extends BaseModel<T> {
-    state: InputModelState
+    state?: InputModelState
 }
 export type PartialInputModel<T = unknown> =
     Partial<Omit<InputModel<T>, 'state'>> &
@@ -1011,7 +1011,7 @@ export interface FileInputModel<
 
     fileName: InputModel<string>
 
-    state: FileInputModelState
+    state?: FileInputModelState
 }
 
 export interface FileInputChildrenOptions<
@@ -1292,7 +1292,7 @@ export interface InputsCreateItemOptions<
 export interface InputsCreatePrototypeOptions<
     T, P extends InputsPropertiesItem<T>, IP
 > extends InputsCreateItemOptions<T, P, IP> {
-    lastValue: null | T|undefined
+    lastValue: null | T | undefined
 }
 
 export interface InputsModelState extends ModelState {
@@ -1305,7 +1305,7 @@ export interface InputsModel<
     maximumNumber: number
     minimumNumber: number
 
-    state: InputsModelState
+    state?: InputsModelState
 
     writable: boolean
 }
@@ -1367,7 +1367,7 @@ export type InputsPropertyTypes<
     [key in keyof InputsProperties<P>]: ValueOf<typeof PropertyTypes>
 }
 
-export type InputsState<T = unknown> = State<Array<null | T|undefined>>
+export type InputsState<T = unknown> = State<Array<null | T | undefined>>
 
 export type InputsAdapter<
     T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
@@ -1407,7 +1407,7 @@ export const defaultInputsModel: InputsModel<
     ...defaultModel as InputsModel<string, InputProperties<string>>,
 
     state: {
-        ...defaultModel.state,
+        ...defaultModel.state as InputsModelState,
 
         invalidMaximumNumber: false,
         invalidMinimumNumber: false
@@ -1463,7 +1463,7 @@ export interface IntervalConfiguration {
 export type IntervalModelState = ModelState
 export interface IntervalModel {
     name: string
-    state: IntervalModelState
+    state?: IntervalModelState
     value: {
         end: IntervalInputModel
         start: IntervalInputModel
