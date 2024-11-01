@@ -25,6 +25,7 @@ import {
     equals,
     extend,
     isFunction,
+    isObject,
     LOCALES,
     Mapping,
     mark
@@ -1251,11 +1252,12 @@ export const TextInputInner = function<Type = unknown>(
         setIsSuggestionOpen(true)
 
         let event: GenericEvent
-        if (eventOrValue !== null && typeof eventOrValue === 'object') {
+        if (isObject(eventOrValue)) {
             const target: HTMLInputElement | null | undefined =
-                (eventOrValue as GenericEvent).target as
+                (eventOrValue as unknown as GenericEvent).target as
                     HTMLInputElement | null ||
-                (eventOrValue as GenericEvent).detail as HTMLInputElement | null
+                (eventOrValue as unknown as GenericEvent).detail as
+                    HTMLInputElement | null
             if (target)
                 properties.value = typeof target.value === 'undefined' ?
                     null as Type :
@@ -1263,7 +1265,7 @@ export const TextInputInner = function<Type = unknown>(
             else
                 properties.value = eventOrValue as Type
         } else
-            properties.value = eventOrValue
+            properties.value = eventOrValue as Type
 
         const setHelper = (): void => {
             setValueState((
