@@ -17,6 +17,7 @@
     endregion
 */
 // region imports
+import {isObject} from 'clientnode'
 import {FunctionComponent, ReactElement} from 'react'
 import Dummy from 'react-generic-dummy'
 import {Typography} from '@rmwc/typography'
@@ -52,7 +53,7 @@ export const WrapTooltip: FunctionComponent<{
         </Tooltip>
     }
 
-    if (options !== null && typeof options === 'object') {
+    if (isObject(options)) {
         if (typeof options.overlay === 'string') {
             if (isDummy)
                 return <div

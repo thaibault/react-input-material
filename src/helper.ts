@@ -26,6 +26,7 @@ import {
     extend,
     FirstParameter,
     isFunction,
+    isObject,
     Mapping,
     PositiveEvaluationResult,
     timeout,
@@ -39,9 +40,11 @@ import {
     BaseModel,
     BaseProperties,
     BaseProps,
-    DataTransformSpecification, DateTimeRepresentation,
+    DataTransformSpecification,
+    DateTimeRepresentation,
     DefaultBaseProperties,
-    DefaultInputProperties, DefaultProperties,
+    DefaultInputProperties,
+    DefaultProperties,
     FormatSpecifications,
     InputDataTransformation,
     InputProps,
@@ -82,7 +85,7 @@ export const slicePropertiesForStateRecursively = (properties: unknown) => {
     slicePropertiesForState(properties as Mapping)
 
     for (const value of Object.values(properties))
-        if (value !== null && typeof value === 'object')
+        if (isObject(value))
             if (Array.isArray(value))
                 for (const subValue of value as Array<unknown>)
                     slicePropertiesForStateRecursively(subValue)
@@ -599,7 +602,7 @@ export function normalizeSelection(
     if (!selection)
         return selection
 
-    const hasLabels: boolean = labels !== null && typeof labels === 'object'
+    const hasLabels: boolean = isObject(labels)
 
     const getLabel = <T = unknown>(value: T, index?: number): null | string => {
         if (hasLabels)
@@ -652,9 +655,7 @@ export function normalizeSelection(
 
                     index += 1
                 }
-            else if (
-                selection[0] !== null && typeof selection[0] === 'object'
-            )
+            else if (isObject(selection[0]))
                 for (const option of selection as NormalizedSelection) {
                     result.push({
                         ...option,
