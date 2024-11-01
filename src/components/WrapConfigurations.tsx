@@ -70,7 +70,7 @@ export function createWrapConfigurationsComponent<
     Type extends AnyFunction = AnyFunction, Reference = unknown
 >(
     WrappedComponent: Type,
-    options: {withReference?: boolean|null, withThemeWrapper?: boolean} = {}
+    options: {withReference?: boolean | null, withThemeWrapper?: boolean} = {}
 ): FunctionComponent<
     FirstParameter<Type> & ConfigurationProperties & {theme?: ThemePropT}
 > {

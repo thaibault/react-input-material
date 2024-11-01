@@ -119,7 +119,10 @@ import {
     InputTablePosition as TablePosition,
     InputValueState as ValueState,
     Selection,
-    TinyMCEOptions, TypeSpecification
+    TinyMCEOptions,
+    TypeSpecification,
+    InputModelState,
+    InputValueState
 } from '../../type'
 
 import {
@@ -222,7 +225,7 @@ export const TextInputInner = function<Type = unknown>(
             } else if (inputReference.current) {
                 (
                     inputReference.current as
-                        HTMLInputElement|HTMLTextAreaElement
+                        HTMLInputElement | HTMLTextAreaElement
                 ).setSelectionRange(
                     properties.cursor?.start ?? null,
                     properties.cursor?.end ?? null
@@ -242,7 +245,7 @@ export const TextInputInner = function<Type = unknown>(
      */
     useEffect(() => {
         if (inputReference.current) {
-            const determinedInputProps: Mapping<boolean|number|string> = {}
+            const determinedInputProps: Mapping<boolean | number | string> = {}
             const propsToRemove: Array<string> = []
 
             // Apply aria attributes regarding validation state.
@@ -307,7 +310,7 @@ export const TextInputInner = function<Type = unknown>(
      */
     useEffect(() => {
         if (useSelection) {
-            const selectionWrapper: HTMLElement|null|undefined =
+            const selectionWrapper: HTMLElement | null | undefined =
                 wrapperReference.current?.querySelector(
                     '[aria-haspopup="listbox"]'
                 )
@@ -315,12 +318,12 @@ export const TextInputInner = function<Type = unknown>(
                 if (!selectionWrapper.hasAttribute('aria-expanded'))
                     selectionWrapper.setAttribute('aria-expanded', 'false')
 
-                const activeIcon: HTMLElement|null = selectionWrapper
+                const activeIcon: HTMLElement | null = selectionWrapper
                     .querySelector('.mdc-select__dropdown-icon-active')
                 if (activeIcon && !activeIcon.hasAttribute('aria-hidden'))
                     activeIcon.setAttribute('aria-hidden', 'true')
 
-                const inactiveIcon: HTMLElement|null = selectionWrapper
+                const inactiveIcon: HTMLElement | null = selectionWrapper
                     .querySelector('.mdc-select__dropdown-icon-inactive')
                 if (inactiveIcon && !inactiveIcon.hasAttribute('aria-hidden'))
                     inactiveIcon.setAttribute('aria-hidden', 'true')
@@ -334,9 +337,9 @@ export const TextInputInner = function<Type = unknown>(
      * on disabled select fields.
      * @returns Nothing.
      */
-    useEffect((): undefined|(() => void) => {
+    useEffect((): undefined | (() => void) => {
         if (useSelection) {
-            const selectionWrapper: HTMLElement|null|undefined =
+            const selectionWrapper: HTMLElement | null | undefined =
                 wrapperReference.current?.querySelector(
                     '[aria-haspopup="listbox"]'
                 )
@@ -376,10 +379,10 @@ export const TextInputInner = function<Type = unknown>(
      */
     const applyIconPreset = (
         options?: Properties['icon']
-    ): IconOptions|string|undefined => {
+    ): IconOptions | string | undefined => {
         if (options === 'clear_preset') {
             const handler = (
-                event: ReactKeyboardEvent|ReactMouseEvent
+                event: ReactKeyboardEvent | ReactMouseEvent
             ): void => {
                 if (
                     (event as ReactKeyboardEvent).code &&
@@ -427,7 +430,7 @@ export const TextInputInner = function<Type = unknown>(
 
         if (options === 'password_preset') {
             const handler = (
-                event: ReactKeyboardEvent|ReactMouseEvent
+                event: ReactKeyboardEvent | ReactMouseEvent
             ): void => {
                 if (
                     (event as ReactKeyboardEvent).code &&
@@ -440,7 +443,7 @@ export const TextInputInner = function<Type = unknown>(
                 event.preventDefault()
                 event.stopPropagation()
 
-                setHidden((value: boolean|undefined): boolean => {
+                setHidden((value: boolean | undefined): boolean => {
                     if (value === undefined)
                         value = properties.hidden
                     properties.hidden = !value
@@ -598,7 +601,7 @@ export const TextInputInner = function<Type = unknown>(
     const wrapAnimationConditionally = (
         content: ReactNode,
         propertiesOrInCondition: (
-            boolean|Partial<TransitionProps<HTMLElement|undefined>>
+            boolean | Partial<TransitionProps<HTMLElement | undefined>>
         ) = {},
         condition = true
     ): ReactNode => {
@@ -625,7 +628,7 @@ export const TextInputInner = function<Type = unknown>(
      */
     const wrapIconWithTooltip = (
         options?: Properties['icon']
-    ): IconOptions|undefined => {
+    ): IconOptions | undefined => {
         if (typeof options === 'object' && options.tooltip) {
             const tooltip: Properties['tooltip'] = options.tooltip
             options = {...options}
@@ -638,7 +641,7 @@ export const TextInputInner = function<Type = unknown>(
             </WrapTooltip>
         }
 
-        return options as IconOptions|undefined
+        return options as IconOptions | undefined
     }
     /// endregion
     /// region handle cursor selection state
@@ -777,7 +780,7 @@ export const TextInputInner = function<Type = unknown>(
             start?: [Node, number]
         } = {}
 
-        let node: Node|null
+        let node: Node | null
         while (node = walker.nextNode())
             for (const type of keysSorted)
                 if (node.nodeValue) {
@@ -794,7 +797,7 @@ export const TextInputInner = function<Type = unknown>(
 
         for (const type of keysSorted)
             if (result[type])
-                range[`set${capitalize(type)}` as 'setEnd'|'setStart'](
+                range[`set${capitalize(type)}` as 'setEnd' | 'setStart'](
                     ...(result[type])
                 )
 
@@ -815,11 +818,13 @@ export const TextInputInner = function<Type = unknown>(
             codeEditorReference.current?.editor.selection.getRange()
         const richTextEditorRange =
             richTextEditorInstance.current?.selection.getRng()
-        const selectionEnd: null|number|undefined = (
-            inputReference.current as HTMLInputElement|HTMLTextAreaElement|null
+        const selectionEnd: null | number | undefined = (
+            inputReference.current as
+                HTMLInputElement | HTMLTextAreaElement | null
         )?.selectionEnd
-        const selectionStart: null|number|undefined = (
-            inputReference.current as HTMLInputElement|HTMLTextAreaElement|null
+        const selectionStart: null | number | undefined = (
+            inputReference.current as
+                HTMLInputElement | HTMLTextAreaElement | null
         )?.selectionStart
         if (codeEditorRange)
             setCursor({
@@ -861,12 +866,12 @@ export const TextInputInner = function<Type = unknown>(
             typeof selectionEnd === 'number' &&
             typeof selectionStart === 'number'
         ) {
-            const add: 0|1|-1 =
+            const add: 0 | 1 | -1 =
                 (
-                    event as unknown as Partial<KeyboardEvent>|null
+                    event as unknown as Partial<KeyboardEvent> | null
                 )?.key?.length === 1 ?
                     1 :
-                    (event as unknown as KeyboardEvent|null)?.key ===
+                    (event as unknown as KeyboardEvent | null)?.key ===
                         'Backspace' &&
                     (
                         (properties.representation as string).length >
@@ -950,7 +955,9 @@ export const TextInputInner = function<Type = unknown>(
             !controlled && properties.model?.trim
         )
 
-        determineValidationState<Type>(result, result.model.state)
+        determineValidationState<Type>(
+            result, result.model.state as InputModelState
+        )
 
         return result
     }
@@ -982,7 +989,7 @@ export const TextInputInner = function<Type = unknown>(
         if (typeof result.representation !== 'string') {
             result.representation = formatValue<Type>(
                 result,
-                result.value as null|Type,
+                result.value as null | Type,
                 transformer,
                 /*
                     NOTE: Handle two cases:
@@ -1014,7 +1021,7 @@ export const TextInputInner = function<Type = unknown>(
      * Set code editor references.
      * @param instance - Code editor instance.
      */
-    const setCodeEditorReference = (instance: CodeEditorType|null): void => {
+    const setCodeEditorReference = (instance: CodeEditorType | null): void => {
         codeEditorReference.current = instance
 
         if (codeEditorReference.current?.editor.container.querySelector(
@@ -1042,7 +1049,7 @@ export const TextInputInner = function<Type = unknown>(
      * @param instance - Editor instance.
      */
     const setRichTextEditorReference = (
-        instance: null|RichTextEditorComponent
+        instance: null | RichTextEditorComponent
     ): void => {
         richTextEditorReference.current = instance
 
@@ -1093,7 +1100,7 @@ export const TextInputInner = function<Type = unknown>(
             }
 
             if (!useSuggestions || properties.suggestSelection) {
-                const candidate: null|Type = getValueFromSelection<Type>(
+                const candidate: null | Type = getValueFromSelection<Type>(
                     properties.representation, normalizedSelection
                 )
                 if (candidate === null) {
@@ -1147,8 +1154,8 @@ export const TextInputInner = function<Type = unknown>(
                 {
                     modelState: properties.model.state,
                     representation: properties.representation,
-                    value: properties.value as null|Type
-                } :
+                    value: properties.value as null | Type
+                } as InputValueState<Type, InputModelState> :
                 oldValueState
         })
     }
@@ -1237,7 +1244,7 @@ export const TextInputInner = function<Type = unknown>(
      * selection.
      */
     const onChangeValue = (
-        eventOrValue: GenericEvent|Type,
+        eventOrValue: GenericEvent | Type,
         _editorInstance?: RichTextEditor,
         selectedIndex = -1
     ): void => {
@@ -1245,10 +1252,10 @@ export const TextInputInner = function<Type = unknown>(
 
         let event: GenericEvent
         if (eventOrValue !== null && typeof eventOrValue === 'object') {
-            const target: HTMLInputElement|null|undefined =
+            const target: HTMLInputElement | null | undefined =
                 (eventOrValue as GenericEvent).target as
-                    HTMLInputElement|null ||
-                (eventOrValue as GenericEvent).detail as HTMLInputElement|null
+                    HTMLInputElement | null ||
+                (eventOrValue as GenericEvent).detail as HTMLInputElement | null
             if (target)
                 properties.value = typeof target.value === 'undefined' ?
                     null as Type :
@@ -1299,7 +1306,7 @@ export const TextInputInner = function<Type = unknown>(
                     */
                     return valueState
 
-                valueState.value = properties.value as null|Type
+                valueState.value = properties.value as null | Type
 
                 let stateChanged = false
 
@@ -1326,7 +1333,7 @@ export const TextInputInner = function<Type = unknown>(
                     properties
                 )
 
-                if (stateChanged) {
+                if (stateChanged && properties.model.state) {
                     valueState.modelState = properties.model.state
 
                     triggerCallbackIfExists<Properties<Type>>(
@@ -1383,7 +1390,7 @@ export const TextInputInner = function<Type = unknown>(
                     pending (slower) asynchronous request.
                 */
                 setSelection((
-                    oldSelection: AbortController|Properties['selection']
+                    oldSelection: AbortController | Properties['selection']
                 ): Properties['selection'] => {
                     if (
                         oldSelection instanceof AbortController &&
@@ -1418,16 +1425,16 @@ export const TextInputInner = function<Type = unknown>(
                 consolidation.
             */
             const result: (
-                Properties['selection']|Promise<Properties['selection']>
+                Properties['selection'] | Promise<Properties['selection']>
             ) = properties.suggestionCreator({
                 abortController,
                 properties,
                 query: properties.representation as string
             })
 
-            if ((result as Promise<Properties['selection']>|null)?.then) {
+            if ((result as Promise<Properties['selection']> | null)?.then) {
                 setSelection((
-                    oldSelection: AbortController|Properties['selection']
+                    oldSelection: AbortController | Properties['selection']
                 ): AbortController => {
                     if (
                         oldSelection instanceof AbortController &&
@@ -1465,7 +1472,7 @@ export const TextInputInner = function<Type = unknown>(
                     Map value from given selections and trigger state
                     consolidation.
                 */
-                const result: null|Type = getValueFromSelection<Type>(
+                const result: null | Type = getValueFromSelection<Type>(
                     properties.representation, normalizedSelection
                 )
 
@@ -1528,7 +1535,7 @@ export const TextInputInner = function<Type = unknown>(
             event.target === inputReference.current
         )
             (
-                suggestionMenuAPIReference.current as unknown as ListApi|null
+                suggestionMenuAPIReference.current as unknown as ListApi | null
             )?.focusItemAtIndex(0)
 
         /*
@@ -1575,7 +1582,7 @@ export const TextInputInner = function<Type = unknown>(
      * Triggers on start interacting with the input.
      * @param event - Event object which triggered interaction.
      */
-    const onTouch = (event: ReactFocusEvent|ReactMouseEvent): void => {
+    const onTouch = (event: ReactFocusEvent | ReactMouseEvent): void => {
         setValueState((
             oldValueState: ValueState<Type, ModelState>
         ): ValueState<Type, ModelState> => {
@@ -1597,7 +1604,10 @@ export const TextInputInner = function<Type = unknown>(
             if (changedState) {
                 onChange(event)
 
-                result = {...oldValueState, modelState: properties.model.state}
+                result = {
+                    ...oldValueState,
+                    modelState: properties.model.state as InputModelState
+                }
 
                 triggerCallbackIfExists<Properties<Type>>(
                     properties,
@@ -1619,30 +1629,31 @@ export const TextInputInner = function<Type = unknown>(
     // endregion
     // region properties
     /// region references
-    const codeEditorReference: MutableRefObject<CodeEditorType|null> =
+    const codeEditorReference: MutableRefObject<CodeEditorType | null> =
         useRef<CodeEditorType>(null)
-    const codeEditorInputReference: MutableRefObject<HTMLTextAreaElement|null> =
-        useRef<HTMLTextAreaElement>(null)
-    const foundationReference: MutableRefObject<
-        MDCSelectFoundation|MDCTextFieldFoundation|null
-    > = useRef<MDCSelectFoundation|MDCTextFieldFoundation>(null)
-    const inputReference: MutableRefObject<
-        HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement|null
-    > = useRef<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>(null)
-    const richTextEditorInputReference: MutableRefObject<
-        HTMLTextAreaElement|null
+    const codeEditorInputReference: MutableRefObject<
+        HTMLTextAreaElement | null
     > = useRef<HTMLTextAreaElement>(null)
-    const richTextEditorInstance: MutableRefObject<null|RichTextEditor> =
+    const foundationReference: MutableRefObject<
+        MDCSelectFoundation | MDCTextFieldFoundation | null
+    > = useRef<MDCSelectFoundation | MDCTextFieldFoundation>(null)
+    const inputReference: MutableRefObject<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
+    > = useRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(null)
+    const richTextEditorInputReference: MutableRefObject<
+        HTMLTextAreaElement | null
+    > = useRef<HTMLTextAreaElement>(null)
+    const richTextEditorInstance: MutableRefObject<null | RichTextEditor> =
         useRef<RichTextEditor>(null)
     const richTextEditorReference: MutableRefObject<
-        null|RichTextEditorComponent
+        null | RichTextEditorComponent
     > = useRef<RichTextEditorComponent>(null)
-    const suggestionMenuAPIReference: MutableRefObject<MenuApi|null> =
+    const suggestionMenuAPIReference: MutableRefObject<MenuApi | null> =
         useRef<MenuApi>(null)
     const suggestionMenuFoundationReference: MutableRefObject<
-        MDCMenuFoundation|null
+        MDCMenuFoundation | null
     > = useRef<MDCMenuFoundation>(null)
-    const wrapperReference: MutableRefObject<HTMLDivElement|null> =
+    const wrapperReference: MutableRefObject<HTMLDivElement | null> =
         useRef<HTMLDivElement>(null)
     /// endregion
     const givenProps: Props<Type> = translateKnownSymbols(props)
@@ -1651,11 +1662,11 @@ export const TextInputInner = function<Type = unknown>(
     const [editorState, setEditorState] = useState<EditorState>({
         editorIsActive: false, selectionIsUnstable: false
     })
-    const [hidden, setHidden] = useState<boolean|undefined>()
+    const [hidden, setHidden] = useState<boolean | undefined>()
     const [isSuggestionOpen, setIsSuggestionOpen] = useState<boolean>(false)
     const [showDeclaration, setShowDeclaration] = useState<boolean>(false)
 
-    let initialValue: null|Type = determineInitialValue<Type>(
+    let initialValue: null | Type = determineInitialValue<Type>(
         givenProps,
         TextInput.defaultProperties.model.default as Type
     )
@@ -1673,7 +1684,7 @@ export const TextInputInner = function<Type = unknown>(
     )
 
     const type: TypeSpecification =
-        givenProperties.type as keyof InputDataTransformation|null ||
+        givenProperties.type as keyof InputDataTransformation | null ||
         givenProperties.model?.type ||
         'string'
     const transformer: InputDataTransformation =
@@ -1695,14 +1706,14 @@ export const TextInputInner = function<Type = unknown>(
             TextInput.transformer
 
     let [selection, setSelection] =
-        useState<AbortController|Properties['selection']>()
+        useState<AbortController | Properties['selection']>()
     if (givenProperties.selection || givenProperties.model?.selection)
         selection =
             givenProperties.selection ||
             givenProperties.model?.selection as
                 Selection
 
-    const normalizedSelection: NormalizedSelection|null|undefined =
+    const normalizedSelection: NormalizedSelection | null | undefined =
         selection instanceof AbortController ?
             [] :
             normalizeSelection(selection, givenProperties.labels)
@@ -1766,7 +1777,7 @@ export const TextInputInner = function<Type = unknown>(
         setShowDeclaration(properties.showDeclaration)
 
     const currentValueState: ValueState<Type, ModelState> = {
-        modelState: properties.model.state,
+        modelState: properties.model.state as InputModelState,
         representation: properties.representation,
         value: properties.value || null
     }
@@ -1800,13 +1811,13 @@ export const TextInputInner = function<Type = unknown>(
                 'cursor', 'editorIsActive', 'hidden', 'showDeclaration'
             ] as const)
                 if (!Object.prototype.hasOwnProperty.call(givenProps, name))
-                    (state[name] as boolean|Partial<CursorState>) =
+                    (state[name] as boolean | Partial<CursorState>) =
                         properties[name] ?? false
 
             if (!representationControlled)
                 state.representation = properties.representation
             if (!controlled)
-                state.value = properties.value as null|Type
+                state.value = properties.value as null | Type
 
             return {
                 properties,
@@ -1830,7 +1841,7 @@ export const TextInputInner = function<Type = unknown>(
     // region render
     /// region intermediate render properties
     const genericProperties: Partial<
-        CodeEditorProps|RichTextEditorProps|SelectProps|TextFieldProps
+        CodeEditorProps | RichTextEditorProps | SelectProps | TextFieldProps
     > = {
         /*
             NOTE: If not set label with forbidden symbols will automatically
@@ -1840,7 +1851,7 @@ export const TextInputInner = function<Type = unknown>(
         onFocus: triggerOnFocusAndOpenSuggestions,
         placeholder: properties.placeholder
     }
-    const materialProperties: SelectProps|TextFieldProps = {
+    const materialProperties: SelectProps | TextFieldProps = {
         disabled: properties.disabled,
         helpText: {
             children: renderHelpText(),
@@ -1918,7 +1929,7 @@ export const TextInputInner = function<Type = unknown>(
     )
 
     const currentRenderableSuggestions: Array<ReactElement> = []
-    const currentSuggestionLabels: Array<ReactNode|string> = []
+    const currentSuggestionLabels: Array<ReactNode | string> = []
     const currentSuggestionValues: Array<unknown> = []
     const useSuggestions = Boolean(
         properties.suggestionCreator ||
@@ -1932,7 +1943,7 @@ export const TextInputInner = function<Type = unknown>(
         let index = 0
         for (const suggestion of suggestionLabels) {
             if (isFunction(properties.children)) {
-                const result: null|ReactElement = properties.children({
+                const result: null | ReactElement = properties.children({
                     index,
                     normalizedSelection: normalizedSelection,
                     properties,
@@ -1972,7 +1983,7 @@ export const TextInputInner = function<Type = unknown>(
                         {(mark(
                             suggestion,
                             (
-                                properties.representation as string|null
+                                properties.representation as string | null
                             )?.split(' ') || '',
                             {
                                 marker: (foundWord: string): ReactElement =>
@@ -1986,8 +1997,8 @@ export const TextInputInner = function<Type = unknown>(
                                     String(value).toLowerCase(),
                                 skipTagDelimitedParts: null
                             }
-                        ) as Array<ReactElement|string>).map((
-                            item: ReactElement|string, index: number
+                        ) as Array<ReactElement | string>).map((
+                            item: ReactElement | string, index: number
                         ): ReactElement =>
                             <span key={index}>{item}</span>
                         )}
@@ -2077,11 +2088,11 @@ export const TextInputInner = function<Type = unknown>(
                     enhanced={true}
 
                     foundationRef={foundationReference as
-                        MutableRefObject<MDCSelectFoundation|null>
+                        MutableRefObject<MDCSelectFoundation | null>
                     }
                     inputRef={inputReference as
                         unknown as
-                        (reference: HTMLSelectElement|null) => void
+                        (reference: HTMLSelectElement | null) => void
                     }
 
                     onChange={onChangeValue}
@@ -2284,7 +2295,7 @@ export const TextInputInner = function<Type = unknown>(
                                 </MenuSurface> :
                                 <Menu
                                     anchorCorner="bottomLeft"
-                                    apiRef={(instance: MenuApi|null) => {
+                                    apiRef={(instance: MenuApi | null) => {
                                         suggestionMenuAPIReference.current =
                                             instance
                                     }}
@@ -2344,10 +2355,10 @@ export const TextInputInner = function<Type = unknown>(
                             properties.maximumLength >= 0
                         }
                         foundationRef={foundationReference as
-                            MutableRefObject<MDCTextFieldFoundation|null>
+                            MutableRefObject<MDCTextFieldFoundation | null>
                         }
                         inputRef={inputReference as
-                            MutableRefObject<HTMLInputElement|null>
+                            MutableRefObject<HTMLInputElement | null>
                         }
                         onChange={onChangeValue}
                         ripple={properties.ripple}

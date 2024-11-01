@@ -67,11 +67,12 @@ const determineControlled = (props: Props) =>
     props.model?.value?.start?.value !== undefined ||
     props.value !== undefined &&
     !(
-        (props.value?.start as IntervalInputProps|null)?.value === undefined &&
-        (props.value?.end as IntervalInputProps|null)?.value === undefined
+        (props.value?.start as IntervalInputProps | null)?.value ===
+            undefined &&
+        (props.value?.end as IntervalInputProps | null)?.value === undefined
     )
 const normalizeDateTimeToNumber = (
-    value?: null|number|string, fallbackValue = 0
+    value?: null | number | string, fallbackValue = 0
 ): number =>
     typeof value === 'number' ?
         value :
@@ -79,8 +80,8 @@ const normalizeDateTimeToNumber = (
             new Date(value).getTime() / 1000 :
             fallbackValue
 const getModelState = (
-    startProperties: InputProperties<null|number|string>,
-    endProperties: InputProperties<null|number|string>
+    startProperties: InputProperties<null | number | string>,
+    endProperties: InputProperties<null | number | string>
 ): ModelState => ({
     dirty: startProperties.dirty || endProperties.dirty,
     focused: startProperties.focused || endProperties.focused,
@@ -97,8 +98,8 @@ const getModelState = (
 const getExternalProperties = (
     properties: Properties,
     iconProperties: IconOptions,
-    startProperties: InputProperties<null|number|string>,
-    endProperties: InputProperties<null|number|string>
+    startProperties: InputProperties<null | number | string>,
+    endProperties: InputProperties<null | number | string>
 ): Properties => {
     const modelState = getModelState(startProperties, endProperties)
 
@@ -141,10 +142,10 @@ export const IntervalInner = function(
             end: {value: givenProps.value}, start: {value: givenProps.value}
         }
     if (['number', 'string'].includes(typeof givenProps.value.end))
-        givenProps.value.end = {value: givenProps.value.end as number|string}
+        givenProps.value.end = {value: givenProps.value.end as number | string}
     if (['number', 'string'].includes(typeof givenProps.value.start))
         givenProps.value.start = {
-            value: givenProps.value.start as number|string
+            value: givenProps.value.start as number | string
         }
     /*
         NOTE: Extend default properties with given properties while letting
@@ -160,13 +161,13 @@ export const IntervalInner = function(
         )
 
     let endProperties =
-        properties.value?.end as IntervalInputProps|null ||
+        properties.value?.end as IntervalInputProps | null ||
         {} as IntervalInputProps
     const iconProperties: IconOptions = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
         properties.icon as IconOptions
     let startProperties =
-        properties.value?.start as IntervalInputProps|null ||
+        properties.value?.start as IntervalInputProps | null ||
         {} as IntervalInputProps
     /*
         NOTE: Sometimes we need real given properties or derived (default
@@ -264,16 +265,16 @@ export const IntervalInner = function(
     }
 
     const valueState: Value = {
-        start: (properties.value?.start as IntervalInputProps|null)?.value,
-        end: (properties.value?.end as IntervalInputProps|null)?.value
+        start: (properties.value?.start as IntervalInputProps | null)?.value,
+        end: (properties.value?.end as IntervalInputProps | null)?.value
     }
 
     consolidateBoundaries(valueState)
 
     const endInputReference =
-        useRef<InputAdapterWithReferences<null|number|string>>(null)
+        useRef<InputAdapterWithReferences<null | number | string>>(null)
     const startInputReference=
-        useRef<InputAdapterWithReferences<null|number|string>>(null)
+        useRef<InputAdapterWithReferences<null | number | string>>(null)
 
     if (controlled)
         /*
@@ -289,9 +290,10 @@ export const IntervalInner = function(
                 properties as Properties,
                 iconProperties,
                 startInputReference.current?.properties ||
-                properties.value?.start as InputProperties<null|number|string>,
+                properties.value?.start as
+                    InputProperties<null | number | string>,
                 endInputReference.current?.properties ||
-                properties.value?.end as InputProperties<null|number|string>
+                properties.value?.end as InputProperties<null | number | string>
             ),
             references: {end: endInputReference, start: startInputReference},
             state: controlled ? {} : {value: valueState}
@@ -300,12 +302,14 @@ export const IntervalInner = function(
     // region attach event handler
     if (properties.onChange) {
         startProperties.onChange = (
-            inputProperties: InputProperties<null|number|string>,
+            inputProperties: InputProperties<null | number | string>,
             event?: GenericEvent
         ): void => {
-            const end: InputProperties<null|number|string> =
+            const end: InputProperties<null | number | string> =
                 endInputReference.current?.properties ||
-                endProperties as unknown as InputProperties<null|number|string>
+                endProperties as
+                    unknown as
+                    InputProperties<null | number | string>
             end.value = end.model.value = formatDateTimeAsConfigured(Math.max(
                 normalizeDateTimeToNumber(
                     endInputReference.current?.properties?.value, -Infinity
@@ -335,14 +339,14 @@ export const IntervalInner = function(
             )
         }
         endProperties.onChange = (
-            inputProperties: InputProperties<null|number|string>,
+            inputProperties: InputProperties<null | number | string>,
             event?: GenericEvent
         ): void => {
-            const start: InputProperties<null|number|string> =
+            const start: InputProperties<null | number | string> =
                 startInputReference.current?.properties ||
                 startProperties as
                     unknown as
-                    InputProperties<null|number|string>
+                    InputProperties<null | number | string>
             start.value = start.model.value = formatDateTimeAsConfigured(
                 Math.min(
                     normalizeDateTimeToNumber(
@@ -376,7 +380,7 @@ export const IntervalInner = function(
     }
 
     startProperties.onChangeValue = (
-        value: null|number|string, event?: GenericEvent
+        value: null | number | string, event?: GenericEvent
     ) => {
         const endValue = Math.max(
             normalizeDateTimeToNumber(
@@ -400,7 +404,7 @@ export const IntervalInner = function(
         setValue(newValue)
     }
     endProperties.onChangeValue = (
-        value: null|number|string, event?: GenericEvent
+        value: null | number | string, event?: GenericEvent
     ) => {
         const startValue = Math.min(
             normalizeDateTimeToNumber(

@@ -80,7 +80,7 @@ const SECTIONS = [
 // endregion
 const Application = () => {
     const [selectedState, setSelectedState] =
-        useState<BaseProps['model']|null>(null)
+        useState<BaseProps['model'] | null>(null)
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
     const activeSection = SECTIONS[activeTabIndex]
 
@@ -90,14 +90,14 @@ const Application = () => {
         })
     // region controlled state
     /// region text
-    const [textInputValue, setTextInputValue] = useState<null|string>('')
+    const [textInputValue, setTextInputValue] = useState<null | string>('')
     const onChangeTextInputValue =
-        useMemorizedValue<(value: null|string) => void>(setTextInputValue)
+        useMemorizedValue<(value: null | string) => void>(setTextInputValue)
     /// endregion
     /// region number
     interface FloatValueState {
-        representation: ReactNode|string
-        value?: null|number
+        representation: ReactNode | string
+        value?: null | number
     }
     const [numberValue, setNumberValue] = useState<FloatValueState>({
         value: 1234.34, representation: '1.234,34'
@@ -107,17 +107,17 @@ const Application = () => {
     /// endregion
     /// region file
     const [fileInputValue, setFileInputValue] =
-        useState<FileValue|null|undefined>({
+        useState<FileValue | null | undefined>({
             blob: new Blob(['test'], {type: 'text/plain'}),
             name: 'test.txt'
         })
     const onChangeFileInputValue =
-        useMemorizedValue<(value?: FileValue|null) => void>(setFileInputValue)
+        useMemorizedValue<(value?: FileValue | null) => void>(setFileInputValue)
     /// endregion
     /// region selection
     interface SelectionValueType {
-        representation: ReactNode|string
-        value?: null|string
+        representation: ReactNode | string
+        value?: null | string
     }
     const [selectionInput, setSelectionInput] =
         useState<SelectionValueType>({representation: 'klaus', value: 'b'})
@@ -128,19 +128,23 @@ const Application = () => {
     /// endregion
     /// region interval
     const [intervalValue, setIntervalValue] =
-        useState<IntervalValue|null>({end: 120, start: 60})
+        useState<IntervalValue | null>({end: 120, start: 60})
     const onChangeIntervalValue =
-        useMemorizedValue<(value: IntervalValue|null) => void>(setIntervalValue)
+        useMemorizedValue<(value: IntervalValue | null) => void>(
+            setIntervalValue
+        )
     /// endregion
     /// region checkbox
     const [checkboxInputValue, setCheckboxInputValue] =
-        useState<boolean|null>(false)
+        useState<boolean | null>(false)
     const onChangeCheckboxInputValue =
-        useMemorizedValue<(value: boolean|null) => void>(setCheckboxInputValue)
+        useMemorizedValue<(value: boolean | null) => void>(
+            setCheckboxInputValue
+        )
     /// endregion
     /// region inputs
     type IntervalInputsType = PartialInputsModel<
-        Partial<IntervalConfiguration>|Partial<IntervalValue>|null,
+        Partial<IntervalConfiguration> | Partial<IntervalValue> | null,
         IntervalProps
     >
     const [intervalInputsModel, setIntervalInputsModel] =
@@ -179,10 +183,10 @@ const Application = () => {
 
     const createIntervalInputsPrototype = useMemorizedValue((
         {item, lastValue, properties}: InputsCreatePrototypeOptions<
-            Partial<IntervalConfiguration>|Partial<IntervalValue>|null,
+            Partial<IntervalConfiguration> | Partial<IntervalValue> | null,
             IntervalProps,
             InputsProperties<
-                Partial<IntervalValue>|Partial<IntervalConfiguration>|null,
+                Partial<IntervalValue> | Partial<IntervalConfiguration> | null,
                 IntervalProps
             >
         >
@@ -202,7 +206,7 @@ const Application = () => {
                     sixHoursInSeconds
             )
         const nextStartTime =
-            (nextStart as InputProps<number|string>).value ?? nextStart
+            (nextStart as InputProps<number | string>).value ?? nextStart
         const nextStartTimeInSeconds = typeof nextStartTime === 'number' ?
             nextStartTime :
             new Date(nextStartTime as string).getTime() / 1000
@@ -216,9 +220,9 @@ const Application = () => {
     })
 
     const [textInputInputsValue, setTextInputInputsValue] =
-        useState<Array<null|string>|null>(['first item'])
+        useState<Array<null | string> | null>(['first item'])
     const onChangeTextInputInputsValue =
-        useMemorizedValue<(values: Array<null|string>|null) => void>(
+        useMemorizedValue<(values: Array<null | string> | null) => void>(
             setTextInputInputsValue
         )
     /// endregion
@@ -276,14 +280,14 @@ const Application = () => {
                         inputProperties={useMemorizedValue({outlined: true})}
                         onChange={onChange}
                     />
-                    <TextInput<null|string>
+                    <TextInput<null | string>
                         name="simpleInputUnControlled"
                         onChange={onChange}
                         onChangeValue={onChangeTextInputValue}
                         enforceUncontrolled={true}
                         value={textInputValue}
                     />
-                    <TextInput<null|string>
+                    <TextInput<null | string>
                         name="simpleInputControlled"
                         onChange={onChange}
                         onChangeValue={onChangeTextInputValue}
@@ -417,10 +421,10 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    <TextInput<null|number>
+                    <TextInput<null | number>
                         name="numberInputControlled"
                         onChange={useMemorizedValue((
-                            properties: InputProperties<null|number>
+                            properties: InputProperties<null | number>
                         ) => {
                             onChange(properties)
                             onChangeNumberValue({
@@ -715,7 +719,7 @@ const Application = () => {
                         onChange={onChange}
                         type="datetime-local"
                     />
-                    <TextInput<Date|number>
+                    <TextInput<Date | number>
                         model={useMemorizedValue({
                             default: new Date(120 * 1000),
                             maximum: 3600,
@@ -734,7 +738,7 @@ const Application = () => {
                         onChange={onChange}
                         type="time"
                     />
-                    <TextInput<Date|number>
+                    <TextInput<Date | number>
                         model={useMemorizedValue({
                             default: new Date(60 * 1000),
                             maximum: 3600,
@@ -753,7 +757,7 @@ const Application = () => {
                         onChange={onChange}
                         type="time-local"
                     />
-                    <TextInput<Date|number>
+                    <TextInput<Date | number>
                         model={useMemorizedValue({
                             default: new Date(60 * 1000),
                             maximum: 3600,
@@ -943,7 +947,7 @@ const Application = () => {
                             debounce<Array<string>>(
                                 (({query}: SuggestionCreatorOptions<
                                     InputProperties<string>
-                                >): Array<string>|Promise<Array<string>> => {
+                                >): Array<string> | Promise<Array<string>> => {
                                     if (!query || query.length < 3)
                                         return []
 
@@ -1012,10 +1016,10 @@ const Application = () => {
                             }
                         )}
                     />
-                    <TextInput<null|string>
+                    <TextInput<null | string>
                         name="selectionInputControlled1"
                         onChange={useMemorizedValue(
-                            (properties: InputProperties<null|string>) => {
+                            (properties: InputProperties<null | string>) => {
                                 onChangeSelectionInputValue({
                                     representation: properties.representation,
                                     value: properties.value
@@ -1030,10 +1034,10 @@ const Application = () => {
                         )}
                         value={selectionInput.value}
                     />
-                    <TextInput<null|string>
+                    <TextInput<null | string>
                         name="selectionInputControlled2"
                         onChange={useMemorizedValue(
-                            (properties: InputProperties<null|string>) => {
+                            (properties: InputProperties<null | string>) => {
                                 onChangeSelectionInputValue({
                                     representation: properties.representation,
                                     value: properties.value
@@ -1145,7 +1149,7 @@ const Application = () => {
                     }}
                 >
                     {/* region file-input inputs */}
-                    <Inputs<FileValue|null, FileInputProps>
+                    <Inputs<FileValue | null, FileInputProps>
                         name="fileInputs"
                         createItem={useMemorizedValue(
                             ({
@@ -1166,13 +1170,13 @@ const Application = () => {
                     </Inputs>
                     {/* endregion */}
                     {/* region checkbox inputs */}
-                    <Inputs<boolean|null, CheckboxProps>
+                    <Inputs<boolean | null, CheckboxProps>
                         createItem={useMemorizedValue(({
                             index, item, properties: {name}
                         }: InputsCreateItemOptions<
-                            boolean|null,
+                            boolean | null,
                             CheckboxProps,
-                            InputsProperties<boolean|null, CheckboxProps>
+                            InputsProperties<boolean | null, CheckboxProps>
                         >): CheckboxProps => ({
                             ...item,
                             name: `${name}-${String(index + 1)}`
