@@ -186,7 +186,7 @@ const Application = () => {
             Partial<IntervalConfiguration> | Partial<IntervalValue> | null,
             IntervalProps,
             InputsProperties<
-                Partial<IntervalValue> | Partial<IntervalConfiguration> | null,
+                Partial<IntervalConfiguration> | Partial<IntervalValue> | null,
                 IntervalProps
             >
         >
