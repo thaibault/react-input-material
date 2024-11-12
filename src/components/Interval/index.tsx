@@ -310,12 +310,19 @@ export const IntervalInner = function(
                 endProperties as
                     unknown as
                     InputProperties<null | number | string>
-            end.value = end.model.value = formatDateTimeAsConfigured(Math.max(
-                normalizeDateTimeToNumber(
-                    endInputReference.current?.properties?.value, -Infinity
-                ),
-                normalizeDateTimeToNumber(inputProperties.value, -Infinity)
-            ))
+            end.value = end.model.value = normalizeDateTimeToNumber(
+                endInputReference.current?.properties?.value, -Infinity
+            )
+            if (!controlled)
+                end.value = end.model.value = formatDateTimeAsConfigured(
+                    Math.max(
+                        end.value,
+                        normalizeDateTimeToNumber(
+                            inputProperties.value, -Infinity
+                        )
+                    )
+                )
+
             // NOTE: We need to reset internal temporary set boundaries.
             end.maximum = end.model.maximum = endConfiguration.maximum
             end.minimum = end.model.minimum = endConfiguration.minimum
@@ -347,14 +354,19 @@ export const IntervalInner = function(
                 startProperties as
                     unknown as
                     InputProperties<null | number | string>
-            start.value = start.model.value = formatDateTimeAsConfigured(
-                Math.min(
-                    normalizeDateTimeToNumber(
-                        startInputReference.current?.properties?.value, Infinity
-                    ),
-                    normalizeDateTimeToNumber(inputProperties.value, Infinity)
-                )
+            start.value = start.model.value = normalizeDateTimeToNumber(
+                startInputReference.current?.properties?.value, Infinity
             )
+            if (!controlled)
+                start.value = start.model.value = formatDateTimeAsConfigured(
+                    Math.min(
+                        start.value,
+                        normalizeDateTimeToNumber(
+                            inputProperties.value, Infinity
+                        )
+                    )
+                )
+
             // NOTE: We need to reset internal temporary set boundaries.
             start.maximum = start.model.maximum = startConfiguration.maximum
             start.minimum = start.model.minimum = startConfiguration.minimum
@@ -382,14 +394,17 @@ export const IntervalInner = function(
     startProperties.onChangeValue = (
         value: null | number | string, event?: GenericEvent
     ) => {
-        const endValue = Math.max(
-            normalizeDateTimeToNumber(
-                endInputReference.current?.properties?.value, -Infinity
-            ),
-            normalizeDateTimeToNumber(value, -Infinity)
+        let endValue = normalizeDateTimeToNumber(
+            endInputReference.current?.properties?.value, -Infinity
         )
+        if (!controlled)
+            endValue = Math.max(
+                endValue, normalizeDateTimeToNumber(value, -Infinity)
+            )
+
         const newValue: Value = {
-            end: isFinite(endValue) ? endValue : value, start: value
+            start: value,
+            end: isFinite(endValue) ? endValue : value
         }
 
         triggerCallbackIfExists<Properties>(
@@ -406,14 +421,17 @@ export const IntervalInner = function(
     endProperties.onChangeValue = (
         value: null | number | string, event?: GenericEvent
     ) => {
-        const startValue = Math.min(
-            normalizeDateTimeToNumber(
-                startInputReference.current?.properties?.value, Infinity
-            ),
-            normalizeDateTimeToNumber(value, Infinity)
+        let startValue = normalizeDateTimeToNumber(
+            startInputReference.current?.properties?.value, Infinity
         )
+        if (!controlled)
+            startValue = Math.min(
+                startValue, normalizeDateTimeToNumber(value, Infinity)
+            )
+
         const newValue: Value = {
-            end: value, start: isFinite(startValue) ? startValue : value
+            start: isFinite(startValue) ? startValue : value,
+            end: value
         }
 
         triggerCallbackIfExists<Properties>(

@@ -729,7 +729,7 @@ export const parseValue =
         configuration: P,
         value: InputType | undefined,
         transformer: InputDataTransformation,
-        trim= false
+        trim = false
     ): T => {
         if (trim && typeof value === 'string')
             value = value.trim().replace(/ +\n/g, '\\n') as InputType
