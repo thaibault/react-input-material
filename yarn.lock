@@ -7139,9 +7139,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clientnode@npm:3.0.1218":
-  version: 3.0.1218
-  resolution: "clientnode@npm:3.0.1218"
+"clientnode@npm:3.0.1226, clientnode@npm:^3.0.1226":
+  version: 3.0.1226
+  resolution: "clientnode@npm:3.0.1226"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/prop-types": "*"
@@ -7159,31 +7159,7 @@ __metadata:
       optional: true
     prop-types:
       optional: true
-  checksum: 10c0/74c20a302800a4f235b3d7e2e54f475b9a54dc0cb243ee09416c41c91054736654653324465aa4fe937a885619f4b17da6579feb05e7852dd1eddb1bc99fdd16
-  languageName: node
-  linkType: hard
-
-"clientnode@npm:^3.0.1223":
-  version: 3.0.1223
-  resolution: "clientnode@npm:3.0.1223"
-  peerDependencies:
-    "@babel/runtime": "*"
-    "@types/prop-types": "*"
-    jquery: "*"
-    node-fetch: "*"
-    prop-types: "*"
-  peerDependenciesMeta:
-    "@babel/runtime":
-      optional: true
-    "@types/prop-types":
-      optional: true
-    jquery:
-      optional: true
-    node-fetch:
-      optional: true
-    prop-types:
-      optional: true
-  checksum: 10c0/77d8b1b6279347be9f7cb31a4160708aec7abc1a7daef98fcc26c68c98de91831d739ffa2d7a194c1ef4184701da8036a55530a2b6e899bb27e8765c04fd4433
+  checksum: 10c0/61aa2592cfc6e93b6a3a30872d0199a49585fd29dfa4c038ef6965ec78db52774a7dbdb5a3f5173233d5f622c258cd83fdcfe71cb0f3b71f1c13debe06bad027
   languageName: node
   linkType: hard
 
@@ -7993,12 +7969,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"documentation-website@npm:^1.0.337":
-  version: 1.0.337
-  resolution: "documentation-website@npm:1.0.337"
+"documentation-website@npm:^1.0.338":
+  version: 1.0.338
+  resolution: "documentation-website@npm:1.0.338"
   bin:
     documentation-website: build/deploy.js
-  checksum: 10c0/f900c0239f80d2e1ecd40bf2c80732d2a64f2f435313610c2c3fbe5cee020f10491ca1ecdc03ebc5b099fb87d519ceb9cbe75ad686bbfcdfdb07ae3249845ac9
+  checksum: 10c0/18e7a47854cdcf9ac008eb23f4bbfccfd95507dc7af71fd9e148a04599abdc9948040728864e77b9a3cbe6ef9d58214d5ec4a59f69b058098531faf6075fe926
   languageName: node
   linkType: hard
 
@@ -8372,9 +8348,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:^50.4.3":
-  version: 50.4.3
-  resolution: "eslint-plugin-jsdoc@npm:50.4.3"
+"eslint-plugin-jsdoc@npm:^50.5.0":
+  version: 50.5.0
+  resolution: "eslint-plugin-jsdoc@npm:50.5.0"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.49.0"
     are-docs-informative: "npm:^0.0.2"
@@ -8389,7 +8365,7 @@ __metadata:
     synckit: "npm:^0.9.1"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 10c0/96067f8fc3553371e9afdc6d03c166228bfd3cb004fcd70c4357d49185732f384351e20f44c21b0a13ea318c8aabbd584b627804f62a2a80376507646708a786
+  checksum: 10c0/07754c7ba91cfc9dc5adacf25132bd7621f4e5bacc6150bd6f1909ae653180e988fa8bced66ac26565d7196c0bb8c2066df3ad2364c33256ac3ceffa60623aaa
   languageName: node
   linkType: hard
 
@@ -13447,9 +13423,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-generic-animate@npm:^0.0.58":
-  version: 0.0.58
-  resolution: "react-generic-animate@npm:0.0.58"
+"react-generic-animate@npm:^0.0.59":
+  version: 0.0.59
+  resolution: "react-generic-animate@npm:0.0.59"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/react": "*"
@@ -13480,13 +13456,13 @@ __metadata:
       optional: true
     react-useanimations:
       optional: true
-  checksum: 10c0/e8d8c520a66b85e9234fc6e67a94b212c8cb6b6038b463da9190f1c9803459ad187fff654a29d2dae06427552d29c968628baf0b5259de1b8fcfaedc091ba9df
+  checksum: 10c0/560cbd2b704321de0d49c343fc0c0701a0ca804cacee11f10598b82b742513e838d87fe5125ff384e38a8c98ba8eccbc38fcb077c5f0e5c295917e4c2ae7dd82
   languageName: node
   linkType: hard
 
-"react-generic-dummy@npm:^0.0.82":
-  version: 0.0.82
-  resolution: "react-generic-dummy@npm:0.0.82"
+"react-generic-dummy@npm:^0.0.83":
+  version: 0.0.83
+  resolution: "react-generic-dummy@npm:0.0.83"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/react": "*"
@@ -13508,13 +13484,13 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/d208b49be47619dd7e5a249b2238eccea3a253214f88df7c041d7c26b52611fe9096b4fe113829bbe0e8d35e18e23078f00fcf936db48c4be2d0c03570148e21
+  checksum: 10c0/beb9552bcbc5227862c0b6e05c1cba0f8ecc2040712959f907e86754aeb82d15d56cfc548a62522ff6679474d051d236b7fd5800b686603422938bac8727070a
   languageName: node
   linkType: hard
 
-"react-generic-tools@npm:^0.0.54":
-  version: 0.0.54
-  resolution: "react-generic-tools@npm:0.0.54"
+"react-generic-tools@npm:^0.0.55":
+  version: 0.0.55
+  resolution: "react-generic-tools@npm:0.0.55"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/react": "*"
@@ -13536,7 +13512,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/e6a4b278286cc816ffa4231f01018a47ced3b26e5b45b969ddfa064aa6535560588860bbf2addbcfe4ddfd1a21af671b548b5f377f68fa8df4bc69fae2a22cc6
+  checksum: 10c0/3c13af8874eceae889f4c4e76e73c4ef26e6ffb84d7eee527a578257705f3f09968b0490fa76e6301532c3755953be8b1487f1c59a9d24fb8c153cb0100592c1
   languageName: node
   linkType: hard
 
@@ -13579,13 +13555,13 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.14.0"
     "@typescript-eslint/parser": "npm:^8.14.0"
     blob-util: "npm:^2.0.2"
-    clientnode: "npm:^3.0.1223"
+    clientnode: "npm:^3.0.1226"
     css-loader: "npm:^7.1.2"
     cssnano: "npm:^7.0.6"
-    documentation-website: "npm:^1.0.337"
+    documentation-website: "npm:^1.0.338"
     eslint: "npm:^9.14.0"
     eslint-config-google: "npm:^0.14.0"
-    eslint-plugin-jsdoc: "npm:^50.4.3"
+    eslint-plugin-jsdoc: "npm:^50.5.0"
     identity-obj-proxy: "npm:^3.0.0"
     jest: "npm:^29.7.0"
     jsdoc: "npm:^4.0.4"
@@ -13601,21 +13577,21 @@ __metadata:
     react: "npm:^18.3.1"
     react-ace: "npm:^13.0.0"
     react-dom: "npm:^18.3.1"
-    react-generic-animate: "npm:^0.0.58"
-    react-generic-dummy: "npm:^0.0.82"
-    react-generic-tools: "npm:^0.0.54"
+    react-generic-animate: "npm:^0.0.59"
+    react-generic-dummy: "npm:^0.0.83"
+    react-generic-tools: "npm:^0.0.55"
     react-transition-group: "npm:^4.4.5"
     react-useanimations: "npm:^2.10.0"
     spark-md5: "npm:^3.0.2"
     style-loader: "npm:^4.0.0"
     stylelint: "npm:^16.10.0"
     stylelint-config-standard: "npm:^36.0.1"
-    tinymce: "npm:^7.5.0"
+    tinymce: "npm:^7.5.1"
     tslib: "npm:^2.8.1"
     typescript-eslint: "npm:^8.14.0"
     typescript-plugin-css-modules: "npm:^5.1.0"
-    web-component-wrapper: "npm:^0.0.503"
-    weboptimizer: "npm:^2.0.1534"
+    web-component-wrapper: "npm:^0.0.504"
+    weboptimizer: "npm:^2.0.1537"
     webpack-dev-server: "npm:^5.1.0"
   peerDependencies:
     "@babel/runtime": "*"
@@ -15183,10 +15159,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinymce@npm:^7.5.0":
-  version: 7.5.0
-  resolution: "tinymce@npm:7.5.0"
-  checksum: 10c0/8c30f74435edb690da570d697b4b31aa761b40a4d929cc041bd428e042725df7663e461b61b9f9e342dcfa7bf9135e5ba22f4b8156abe2c4370b7b0aaa0a7635
+"tinymce@npm:^7.5.1":
+  version: 7.5.1
+  resolution: "tinymce@npm:7.5.1"
+  checksum: 10c0/d8c301ffd202c51be93171a7457dd69d03ae7801a8eb6ee5080af9628ac77daf2648b3a8d8321b919670adc326e6548c7b563133afc6ec75ae0aeb29dfc783b5
   languageName: node
   linkType: hard
 
@@ -15621,9 +15597,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-component-wrapper@npm:^0.0.503":
-  version: 0.0.503
-  resolution: "web-component-wrapper@npm:0.0.503"
+"web-component-wrapper@npm:^0.0.504":
+  version: 0.0.504
+  resolution: "web-component-wrapper@npm:0.0.504"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/react": "*"
@@ -15642,7 +15618,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/4708fa10c94bea7df3206403e722a859b16e4332d686356134cc20555d4790fe0050c458e58ae1e8b7bef1e5739549705b1a6d9461c279c52d1856c85e98067d
+  checksum: 10c0/46f66f1968efaec7228043d8113e0f0ffe71c78a3492498cbb7b5761e849335fb9c5c385b4895a832a66010be200a8a948594ab08a31ec0f03005d0502e33431
   languageName: node
   linkType: hard
 
@@ -15653,9 +15629,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"weboptimizer@npm:^2.0.1534":
-  version: 2.0.1534
-  resolution: "weboptimizer@npm:2.0.1534"
+"weboptimizer@npm:^2.0.1537":
+  version: 2.0.1537
+  resolution: "weboptimizer@npm:2.0.1537"
   dependencies:
     "@babel/core": "npm:^7.26.0"
     "@babel/plugin-proposal-class-properties": "npm:^7.18.6"
@@ -15669,7 +15645,7 @@ __metadata:
     babel-loader: "npm:^9.2.1"
     babel-plugin-transform-modern-regexp: "npm:^0.0.6"
     babel-preset-minify: "npm:^0.5.2"
-    clientnode: "npm:3.0.1218"
+    clientnode: "npm:3.0.1226"
     ejs: "npm:^3.1.10"
     exports-loader: "npm:^5.0.0"
     extract-loader: "npm:^5.1.0"
@@ -15795,7 +15771,7 @@ __metadata:
       optional: true
   bin:
     weboptimizer: index.js
-  checksum: 10c0/3daeff6f7200a65ac7de8e128bbf6d50e6c083db3879abbe4248da2ac1ca435a2e6fab9d2a32ffb9bc6b88bf4a663aaaa072d05dded5281075c1987a929c7cae
+  checksum: 10c0/d1738cefc37defe102903d037418e94e0133d893bcd3c3957e5769dc50eb79c625e262da50e486d9b5a8002baccd096e8ca7838b08aa0f83d4050595bac245d9
   languageName: node
   linkType: hard
 
