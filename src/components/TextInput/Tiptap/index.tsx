@@ -17,44 +17,51 @@
     endregion
 */
 // region imports
-import {EditorProvider, FloatingMenu, BubbleMenu} from '@tiptap/react'
+import {EditorProvider} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import {EditorProviderProps} from '@tiptap/react/dist/Context'
 
-import {TiptapProps} from './type'
+import {AdditionalContainerProps, TiptapProps} from '../type'
+
+import MenuBar from './MenuBar'
 // endregion
-export const Tiptap = (props: TiptapProps) => {
+export const Index = (givenProps: TiptapProps) => {
+    const props = {...givenProps}
     const value = props.value || ''
 
     const extensions =
         props.extensions ||
         [StarterKit.configure(props.starterKitOptions || {})]
 
-    const className = props.className
-    const id = props.id
-    // TODO const name = props.name
+    const additionalContainerProps: AdditionalContainerProps = {}
+    if (props.className) {
+        additionalContainerProps.className = props.className
+        delete props.className
+    }
+    if (props.id) {
+        additionalContainerProps.id = props.id
+        delete props.id
+    }
+    /* TODO
+    if (props.name) {
+        additionalContainerProps.name = props.name
+        delete props.name
+    }
+    */
 
-    delete props.className
-    delete props.id
-    delete props.name
-
-    const editorOptions: EditorProviderProps = {
+    const editorProperties: EditorProviderProps = {
         ...props,
         editorContainerProps: {
             ...props.editorContainerProps || {},
-            className,
-            id
-            // TODO name
+            ...additionalContainerProps
         },
         editable: !props.disabled,
         content: value,
         extensions: extensions
     }
 
-    return <EditorProvider {...editorOptions}>
-        <FloatingMenu editor={null}>This is the floating menu</FloatingMenu>
-        <BubbleMenu editor={null}>This is the bubble menu</BubbleMenu>
+    return <EditorProvider slotBefore={<MenuBar />} {...editorProperties}>
     </EditorProvider>
 }
 
-export default Tiptap
+export default Index

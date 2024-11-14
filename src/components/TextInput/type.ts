@@ -150,12 +150,14 @@ export type InputDataTransformation =
     }
     /* eslint-enable @typescript-eslint/consistent-indexed-object-style */
 // endregion
-export interface TiptapProps extends Omit<
-    EditorProviderProps, 'content'| 'readonly'
-> {
+export interface AdditionalContainerProps {
     className?: string
     id?: string
     name?: string
+}
+export interface TiptapProps
+    extends
+AdditionalContainerProps, Omit<EditorProviderProps, 'content'| 'readonly'> {
     disabled?: boolean
     value?: string
     extensions?: Extensions
