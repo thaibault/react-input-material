@@ -20,7 +20,6 @@
 import {Ace as CodeEditorNamespace} from 'ace-builds'
 import {
     camelCaseToDelimited,
-    capitalize,
     copy,
     equals,
     extend,
@@ -30,7 +29,6 @@ import {
     Mapping,
     mark
 } from 'clientnode'
-
 import {
     FocusEvent as ReactFocusEvent,
     forwardRef,
@@ -71,6 +69,8 @@ import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
 import {IconOptions} from '@rmwc/types'
 
+import {Editor as RichTextEditor} from '@tiptap/core'
+
 import WrapConfigurations from '../WrapConfigurations'
 import WrapTooltip from '../WrapTooltip'
 import {
@@ -90,32 +90,7 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState,
-    DataTransformSpecification,
-    defaultInputModelState as defaultModelState,
-    DefaultInputProperties as DefaultProperties,
-    defaultInputProperties as defaultProperties,
-    EditorState,
-    InputAdapter as Adapter,
-    InputAdapterWithReferences as AdapterWithReferences,
-    InputDataTransformation,
-    InputModelState as ModelState,
-    InputProperties as Properties,
-    inputPropertyTypes as propertyTypes,
-    InputProps as Props,
-    textInputRenderProperties as renderProperties,
-    InputState as State,
-    InputModel as Model,
-    NativeInputType,
-    NormalizedSelection,
-    TextInputComponent,
-    InputTablePosition as TablePosition,
-    InputValueState as ValueState,
-    Selection,
-    TinyMCEOptions,
-    TypeSpecification,
-    InputModelState,
-    InputValueState
+    CursorState, EditorState, Selection, TypeSpecification
 } from '../../type'
 
 import {
@@ -127,10 +102,33 @@ import {
     plusToXAnimation,
     preventEnterKeyPropagation,
     suggestionMatches,
-    TINYMCE_DEFAULT_OPTIONS,
+    TIPTAP_DEFAULT_OPTIONS,
     UseAnimations
 } from './helper'
-import RichTextEditorComponent from './Tiptap'
+import {
+    DataTransformSpecification,
+    defaultInputModelState as defaultModelState,
+    DefaultInputProperties as DefaultProperties,
+    defaultInputProperties as defaultProperties,
+    InputAdapter as Adapter,
+    InputAdapterWithReferences as AdapterWithReferences,
+    InputDataTransformation,
+    InputModelState as ModelState,
+    InputModelState,
+    InputProperties as Properties,
+    InputTablePosition as TablePosition,
+    inputPropertyTypes as propertyTypes,
+    InputValueState as ValueState,
+    InputValueState,
+    InputProps as Props,
+    InputState as State,
+    InputModel as Model,
+    NativeInputType,
+    NormalizedSelection,
+    textInputRenderProperties as renderProperties,
+    TextInputComponent,
+    TiptapProps as RichTextEditorProps
+} from './type'
 import TRANSFORMER from './transformer'
 
 export {
@@ -149,8 +147,6 @@ export {
 } from './helper'
 export const INPUT_TRANSFORMER = TRANSFORMER
 // endregion
-
-let RICH_TEXT_EDITOR_LOADER_ONCE = false
 /**
  * Generic text input wrapper component which automatically determines a useful
  * input field depending on given model specification.
@@ -202,7 +198,8 @@ export const TextInputInner = function<Type = unknown>(
                         setEditorState(
                             {...editorState, selectionIsUnstable: false}
                         )
-                } else if (richTextEditorInstance.current?.selection) {
+                }/*
+                TODO else if (richTextEditorInstance.current?.selection) {
                     richTextEditorInstance.current.focus(false)
                     setRichTextEditorSelectionState(
                         richTextEditorInstance.current
@@ -212,7 +209,7 @@ export const TextInputInner = function<Type = unknown>(
                         setEditorState(
                             {...editorState, selectionIsUnstable: false}
                         )
-                }
+                }*/
             } else if (inputReference.current) {
                 (
                     inputReference.current as
@@ -636,43 +633,6 @@ export const TextInputInner = function<Type = unknown>(
     }
     /// endregion
     /// region handle cursor selection state
-    //// region rich-text editor
-    /**
-     * Determines absolute offset in given markup.
-     * @param contentDomNode - Wrapping dom node where all content is
-     * contained.
-     * @param domNode - Dom node which contains given position.
-     * @param offset - Relative position within given node.
-     * @returns Determine absolute offset.
-     */
-    const determineAbsoluteSymbolOffsetFromHTML = (
-        contentDomNode: Element, domNode: Element, offset: number
-    ): number => {
-        if (!properties.value)
-            return 0
-
-        const indicatorKey = 'text-input-selection-indicator'
-        const indicatorValue = '###'
-        const indicator = ` ${indicatorKey}="${indicatorValue}"`
-
-        domNode.setAttribute(indicatorKey, indicatorValue)
-        // NOTE: TinyMCE seems to add a newline after each paragraph.
-        const content: string = contentDomNode.innerHTML.replace(
-            /(<\/p>)/gi, '$1\n'
-        )
-        domNode.removeAttribute(indicatorKey)
-
-        const domNodeOffset: number = content.indexOf(indicator)
-        const startIndex: number = domNodeOffset + indicator.length
-
-        return (
-            offset +
-            content.indexOf('>', startIndex) +
-            1 -
-            indicator.length
-        )
-    }
-    //// endregion
     //// region code editor
     /**
      * Determines absolute range from table oriented position.
@@ -731,10 +691,10 @@ export const TextInputInner = function<Type = unknown>(
         range.setStart(startPosition.row, startPosition.column)
         instance.editor.selection.setRange(range)
     }
-    /**
+    /* TODO *
      * Sets current cursor selection range in given rich text editor instance.
      * @param instance - Code editor instance.
-     */
+     * /
     const setRichTextEditorSelectionState = (
         instance: RichTextEditor
     ): void => {
@@ -795,6 +755,7 @@ export const TextInputInner = function<Type = unknown>(
         if (result.end && result.start)
             instance.selection.setRng(range)
     }
+    */
     //// endregion
     /**
      * Saves current selection/cursor state in components state.
@@ -836,6 +797,7 @@ export const TextInputInner = function<Type = unknown>(
                             0
                 )
             })
+        /*
         else if (richTextEditorRange)
             setCursor({
                 end: determineAbsoluteSymbolOffsetFromHTML(
@@ -853,6 +815,7 @@ export const TextInputInner = function<Type = unknown>(
                     richTextEditorRange.startOffset
                 )
             })
+        */
         else if (
             typeof selectionEnd === 'number' &&
             typeof selectionStart === 'number'
@@ -1035,23 +998,6 @@ export const TextInputInner = function<Type = unknown>(
             setEditorState({...editorState, selectionIsUnstable: false})
         }
     }
-    /**
-     * Set rich text editor references.
-     * @param instance - Editor instance.
-     */
-    const setRichTextEditorReference = (
-        instance: null | RichTextEditorComponent
-    ): void => {
-        richTextEditorReference.current = instance
-
-        /*
-            Refer inner element here is possible but marked as private.
-
-            if (richTextEditorReference.current?.elementRef)
-                richTextEditorInputReference.current =
-                    richTextEditorReference.current.elementRef
-        */
-    }
     /// endregion
     // endregion
     // region event handler
@@ -1229,14 +1175,11 @@ export const TextInputInner = function<Type = unknown>(
      * states). Derived event handler will be triggered when internal state has
      * been consolidated.
      * @param eventOrValue - Event object or new value.
-     * @param _editorInstance - Potential editor instance if triggered from a
-     * rich text or code editor.
      * @param selectedIndex - Indicates whether given event was triggered by a
      * selection.
      */
     const onChangeValue = (
         eventOrValue: GenericEvent | Type,
-        _editorInstance?: RichTextEditor,
         selectedIndex = -1
     ): void => {
         setIsSuggestionOpen(true)
@@ -1637,9 +1580,6 @@ export const TextInputInner = function<Type = unknown>(
     > = useRef<HTMLTextAreaElement>(null)
     const richTextEditorInstance: MutableRefObject<null | RichTextEditor> =
         useRef<RichTextEditor>(null)
-    const richTextEditorReference: MutableRefObject<
-        null | RichTextEditorComponent
-    > = useRef<RichTextEditorComponent>(null)
     const suggestionMenuAPIReference: MutableRefObject<MenuApi | null> =
         useRef<MenuApi>(null)
     const suggestionMenuFoundationReference: MutableRefObject<
@@ -1820,7 +1760,6 @@ export const TextInputInner = function<Type = unknown>(
                     inputReference,
                     richTextEditorInputReference,
                     richTextEditorInstance,
-                    richTextEditorReference,
                     suggestionMenuAPIReference,
                     suggestionMenuFoundationReference,
                     wrapperReference
@@ -1868,48 +1807,20 @@ export const TextInputInner = function<Type = unknown>(
             applyIconPreset(properties.icon) as IconOptions
         ) as IconOptions
 
-    const tinyMCEOptions: Partial<Omit<TinyMCEOptions, 'readonly'>> = {
-        ...TINYMCE_DEFAULT_OPTIONS,
-        // eslint-disable-next-line camelcase
-        /*
-        TODO
-        content_style: properties.disabled ? 'body {opacity: .38}' : '',
-        placeholder: properties.placeholder,
-        setup: (instance: RichTextEditor): void => {
-            richTextEditorInstance.current = instance
-            richTextEditorInstance.current.on('init', (): void => {
-                if (!richTextEditorInstance.current)
-                    return
-
-                RICH_TEXT_EDITOR_LOADER_ONCE = true
-
-                if (
-                    properties.editorIsActive &&
-                    editorState.selectionIsUnstable
-                ) {
-                    richTextEditorInstance.current.focus(false)
-                    setRichTextEditorSelectionState(
-                        richTextEditorInstance.current
-                    )
-                    setEditorState(
-                        {...editorState, selectionIsUnstable: false}
-                    )
-                }
-            })
-        }
-        */
+    const tiptapProps: RichTextEditorProps = {
+        ...TIPTAP_DEFAULT_OPTIONS
     }
     if (properties.editor.endsWith('raw)')) {
-        tinyMCEOptions.toolbar1 =
+        tiptapProps.toolbar1 =
             'cut copy paste | undo redo removeformat | code | fullscreen'
-        delete tinyMCEOptions.toolbar2
+        delete tiptapProps.toolbar2
     } else if (properties.editor.endsWith('simple)')) {
-        tinyMCEOptions.toolbar1 =
+        tiptapProps.toolbar1 =
             'cut copy paste | undo redo removeformat | bold italic ' +
             'underline strikethrough subscript superscript | fullscreen'
-        delete tinyMCEOptions.toolbar2
+        delete tiptapProps.toolbar2
     } else if (properties.editor.endsWith('normal)'))
-        tinyMCEOptions.toolbar1 =
+        tiptapProps.toolbar1 =
             'cut copy paste | undo redo removeformat | styleselect ' +
             'formatselect | searchreplace visualblocks fullscreen code'
 
@@ -2212,7 +2123,6 @@ export const TextInputInner = function<Type = unknown>(
                                             RichTextEditorProps
                                         }
                                         disabled={properties.disabled}
-                                        init={tinyMCEOptions}
                                         onClick={onClick as
                                             unknown as
                                             RichTextEventHandler<MouseEvent>
@@ -2227,22 +2137,14 @@ export const TextInputInner = function<Type = unknown>(
                                             unknown as
                                             RichTextEventHandler<KeyboardEvent>
                                         }
-                                        ref={setRichTextEditorReference}
                                         textareaName={properties.name}
-                                        tinymceScriptSrc={
-                                            (
-                                                TINYMCE_DEFAULT_OPTIONS
-                                                    .base_url as
-                                                        string
-                                            ) +
-                                            'tinymce.min.js'
-                                        }
                                         value={
                                             properties.representation as string
                                         }
                                         {...properties.inputProperties as
                                             RichTextEditorProps
                                         }
+                                        {...tiptapProps}
                                     />
                             }
                         </label>

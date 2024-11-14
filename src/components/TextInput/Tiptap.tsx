@@ -17,24 +17,12 @@
     endregion
 */
 // region imports
-import {Extensions} from '@tiptap/core'
 import {EditorProvider, FloatingMenu, BubbleMenu} from '@tiptap/react'
-import StarterKit, {StarterKitOptions} from '@tiptap/starter-kit'
-import {
-    Content,
-    EditorEvents,
-    EnableRules,
-    FocusPosition
-} from "@tiptap/core/src/types";
-import {EditorProviderProps} from "@tiptap/react/dist/Context";
+import StarterKit from '@tiptap/starter-kit'
+import {EditorProviderProps} from '@tiptap/react/dist/Context'
 
+import {TiptapProps} from './type'
 // endregion
-export interface TiptapProps {
-    value?: string
-    extensions?: Extensions
-    starterKitOptions?: Partial<StarterKitOptions>
-}
-
 export const Tiptap = (props: TiptapProps) => {
     const value = props.value || ''
 
@@ -43,9 +31,10 @@ export const Tiptap = (props: TiptapProps) => {
         [StarterKit.configure(props.starterKitOptions || {})]
 
     const editorOptions: EditorProviderProps = {
+        ...props,
+        editable: !props.disabled,
         content: value,
-        extensions: extensions,
-
+        extensions: extensions
     }
 
     return <EditorProvider {...editorOptions}>

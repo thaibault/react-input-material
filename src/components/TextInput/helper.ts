@@ -28,14 +28,14 @@ import PlusToXAnimation from 'react-useanimations/lib/plusToX'
 import {
     determineValidationState as determineBaseValidationState
 } from '../../helper'
+import {DefaultProperties as DefaultBaseProperties} from '../../type'
 import {
-    DefaultProperties as DefaultBaseProperties,
     DefaultInputProperties as DefaultProperties,
     InputModelState as ModelState,
-    TinyMCEOptions
-} from '../../type'
+    TiptapProps
+} from './type'
 
-import RichTextEditorComponent, {TiptapProps} from './Tiptap'
+import RichTextEditorComponent from './Tiptap'
 
 /*
 "namedExport" version of css-loader:
@@ -111,19 +111,7 @@ export const CURRENT_UTC_BUILD_TIMESTAMP =
 export const TIPTAP_DEFAULT_OPTIONS: Partial<TiptapProps> = {
     injectCSS: true,
     enableContentCheck: true,
-
-    body_class: 'mdc-text-field__input',
-
-    toolbar1: `
-        cut copy paste |
-        undo redo removeformat |
-        styleselect formatselect fontselect fontsizeselect |
-        searchreplace visualblocks fullscreen code
-    `.trim(),
-    toolbar2: `
-        alignleft aligncenter alignright alignjustify outdent indent |
-        link nonbreaking bullist numlist bold italic underline strikethrough
-    `.trim()
+    editorContainerProps: {className: 'mdc-text-field__input'}
 }
 /// endregion
 // endregion
