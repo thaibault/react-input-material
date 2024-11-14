@@ -17,9 +17,7 @@
 */
 // region imports
 import {boolean, string} from 'clientnode/dist/property-types'
-import {
-    ComponentAdapter, PropertiesValidationMap
-} from 'web-component-wrapper/type'
+import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 
 import {
     BaseModel,
@@ -64,7 +62,7 @@ export type CheckboxComponent<ComponentType> = InputComponent<
     CheckboxAdapter
 >
 // region constants
-export const checkboxPropertyTypes: PropertiesValidationMap = {
+export const checkboxPropertyTypes: ValidationMapping = {
     ...propertyTypes,
     ...modelStatePropertyTypes,
     checked: boolean,

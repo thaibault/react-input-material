@@ -30,8 +30,22 @@ export const Tiptap = (props: TiptapProps) => {
         props.extensions ||
         [StarterKit.configure(props.starterKitOptions || {})]
 
+    const className = props.className
+    const id = props.id
+    // TODO const name = props.name
+
+    delete props.className
+    delete props.id
+    delete props.name
+
     const editorOptions: EditorProviderProps = {
         ...props,
+        editorContainerProps: {
+            ...props.editorContainerProps || {},
+            className,
+            id
+            // TODO name
+        },
         editable: !props.disabled,
         content: value,
         extensions: extensions

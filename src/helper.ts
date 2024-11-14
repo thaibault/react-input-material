@@ -40,22 +40,24 @@ import {
     BaseModel,
     BaseProperties,
     BaseProps,
-    DataTransformSpecification,
-    DateTimeRepresentation,
     DefaultBaseProperties,
-    DefaultInputProperties,
     DefaultProperties,
+    ModelState,
+    TypeSpecification,
+    ValueState
+} from './type'
+import {DateTimeRepresentation} from './components/Interval/type'
+import TextInput from './components/TextInput'
+import {
+    DataTransformSpecification,
+    DefaultInputProperties,
     FormatSpecifications,
     InputDataTransformation,
     InputProps,
     InputSelection,
-    ModelState,
     NormalizedSelection,
-    Transformer,
-    TypeSpecification,
-    ValueState
-} from './type'
-import TextInput from './components/TextInput'
+    Transformer
+} from './components/TextInput/type'
 // endregion
 // region state
 /**

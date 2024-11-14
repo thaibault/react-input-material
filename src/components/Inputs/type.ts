@@ -25,9 +25,7 @@ import {
     ReactNode,
     RefAttributes
 } from 'react'
-import {
-    ComponentAdapter, PropertiesValidationMap
-} from 'web-component-wrapper/type'
+import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 import {IconOptions} from '@rmwc/types'
 
 import {
@@ -159,7 +157,7 @@ export interface InputsComponent<Type> extends
     ): ReactElement
 }
 // region constants
-export const inputsPropertyTypes: PropertiesValidationMap = {
+export const inputsPropertyTypes: ValidationMapping = {
     ...propertyTypes,
     ...inputModelStatePropertyTypes,
     // We use that function (render prop) to produce input component instances.

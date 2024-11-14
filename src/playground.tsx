@@ -34,28 +34,29 @@ import {useMemorizedValue} from 'react-generic-tools'
 
 import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
 import {
-    FileInput, TextInput, Inputs, Interval, RequireableCheckbox as Checkbox
-} from './index'
+    FileInputChildrenOptions, FileInputProperties, FileInputProps, FileValue
+} from './components/FileInput/type'
+import {CheckboxProps} from './components/RequireableCheckbox/type'
 import {
-    BaseProps,
-    CheckboxProps,
-    FileInputChildrenOptions,
-    FileInputProperties,
-    FileInputProps,
-    FileValue,
-    InputProperties,
-    InputProps,
+    InputProperties, InputProps, SuggestionCreatorOptions
+} from './components/TextInput/type'
+import {
     InputsCreateItemOptions,
     InputsCreatePrototypeOptions,
     InputsProperties,
+    PartialInputsModel
+} from './components/Inputs/type'
+import {
     IntervalConfiguration,
     IntervalProperties,
     IntervalProps,
     IntervalValue,
-    PartialInputsModel,
-    PartialIntervalModel,
-    SuggestionCreatorOptions
-} from './type'
+    PartialIntervalModel
+} from './components/Interval/type'
+import {
+    FileInput, TextInput, Inputs, Interval, RequireableCheckbox as Checkbox
+} from './index'
+import {BaseProps} from './type'
 import {slicePropertiesForStateRecursively} from './helper'
 // endregion
 // region configuration

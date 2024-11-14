@@ -19,6 +19,7 @@
 // region imports
 import {blobToBase64String} from 'blob-util'
 import {Mapping} from 'clientnode'
+import {ElementType} from 'react'
 /*
 "namedExport" version of css-loader:
 
@@ -34,16 +35,15 @@ import cssClassNames from './style.module'
 import {
     determineValidationState as determineBaseValidationState
 } from '../../helper'
+import {DefaultProperties as DefaultBaseProperties} from '../../type'
+import {InputProps} from '../TextInput/type'
 import {
-    DefaultProperties as DefaultBaseProperties,
     DefaultFileInputProperties as DefaultProperties,
     FileInputModelState as ModelState,
     FileValue,
-    InputProps,
     FileRepresentationType as RepresentationType,
     FileInputProperties
-} from '../../type'
-import {ElementType} from 'react'
+} from './type'
 // endregion
 // region constants
 export const CSS_CLASS_NAMES = cssClassNames as Mapping

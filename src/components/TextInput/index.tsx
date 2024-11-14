@@ -52,6 +52,8 @@ import {GenericEvent} from 'react-generic-tools/type'
 import Dummy from 'react-generic-dummy'
 import {TransitionProps} from 'react-transition-group/Transition'
 
+import {PropertiesValidationMap} from 'web-component-wrapper/type'
+
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
@@ -768,8 +770,8 @@ export const TextInputInner = function<Type = unknown>(
         */
         const codeEditorRange =
             codeEditorReference.current?.editor.selection.getRange()
-        const richTextEditorRange =
-            richTextEditorInstance.current?.selection.getRng()
+        // TODO const richTextEditorRange = null
+        // TODO richTextEditorInstance.current?.selection.getRng()
         const selectionEnd: null | number | undefined = (
             inputReference.current as
                 HTMLInputElement | HTMLTextAreaElement | null
@@ -797,7 +799,7 @@ export const TextInputInner = function<Type = unknown>(
                             0
                 )
             })
-        /*
+        /* TODO
         else if (richTextEditorRange)
             setCursor({
                 end: determineAbsoluteSymbolOffsetFromHTML(
@@ -1808,8 +1810,11 @@ export const TextInputInner = function<Type = unknown>(
         ) as IconOptions
 
     const tiptapProps: RichTextEditorProps = {
-        ...TIPTAP_DEFAULT_OPTIONS
+        ...TIPTAP_DEFAULT_OPTIONS,
+        name: properties.name,
+        className: 'mdc-text-field__input'
     }
+    /* TODO
     if (properties.editor.endsWith('raw)')) {
         tiptapProps.toolbar1 =
             'cut copy paste | undo redo removeformat | code | fullscreen'
@@ -1823,6 +1828,7 @@ export const TextInputInner = function<Type = unknown>(
         tiptapProps.toolbar1 =
             'cut copy paste | undo redo removeformat | styleselect ' +
             'formatselect | searchreplace visualblocks fullscreen code'
+    */
 
     const isAdvancedEditor: boolean = (
         !properties.selection &&
@@ -2123,7 +2129,13 @@ export const TextInputInner = function<Type = unknown>(
                                             RichTextEditorProps
                                         }
                                         disabled={properties.disabled}
-                                        onClick={onClick as
+                                        value={
+                                            properties.representation as string
+                                        }
+                                        {...properties.inputProperties as
+                                            RichTextEditorProps
+                                        }
+                                        {...tiptapProps/* onClick={onClick as
                                             unknown as
                                             RichTextEventHandler<MouseEvent>
                                         }
@@ -2136,15 +2148,7 @@ export const TextInputInner = function<Type = unknown>(
                                         onKeyUp={onKeyUp as
                                             unknown as
                                             RichTextEventHandler<KeyboardEvent>
-                                        }
-                                        textareaName={properties.name}
-                                        value={
-                                            properties.representation as string
-                                        }
-                                        {...properties.inputProperties as
-                                            RichTextEditorProps
-                                        }
-                                        {...tiptapProps}
+                                        }*/}
                                     />
                             }
                         </label>
@@ -2210,7 +2214,6 @@ export const TextInputInner = function<Type = unknown>(
                                                     {detail: {index: number}}
                                                 ).detail.index
                                             ] as Type,
-                                            undefined,
                                             (event as {detail: {index: number}})
                                                 .detail.index
                                         )
@@ -2334,7 +2337,7 @@ TextInput.defaultProperties = {
     value: undefined
 }
 TextInput.locales = LOCALES
-TextInput.propTypes = propertyTypes
+TextInput.propTypes = propertyTypes as PropertiesValidationMap
 TextInput.renderProperties = renderProperties
 TextInput.strict = false
 TextInput.transformer = TRANSFORMER

@@ -110,8 +110,7 @@ export const CURRENT_UTC_BUILD_TIMESTAMP =
     typeof UTC_BUILD_TIMESTAMP === 'undefined' ? 1 : UTC_BUILD_TIMESTAMP
 export const TIPTAP_DEFAULT_OPTIONS: Partial<TiptapProps> = {
     injectCSS: true,
-    enableContentCheck: true,
-    editorContainerProps: {className: 'mdc-text-field__input'}
+    enableContentCheck: true
 }
 /// endregion
 // endregion

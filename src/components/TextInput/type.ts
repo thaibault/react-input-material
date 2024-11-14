@@ -41,12 +41,13 @@ import {
 } from 'react'
 import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 import {GenericEvent} from 'react-generic-tools/type'
-import {
-    ComponentAdapter, PropertiesValidationMap
-} from 'web-component-wrapper/type'
+
+import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
+
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
+
 import {MenuApi} from '@rmwc/menu'
 import {
     FormattedOption as FormattedSelectionOption, SelectProps
@@ -54,6 +55,7 @@ import {
 import {TextFieldProps} from '@rmwc/textfield'
 import {TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
+
 import {Editor as RichTextEditor, Extensions} from '@tiptap/core'
 import {EditorProviderProps} from '@tiptap/react'
 import {StarterKitOptions} from '@tiptap/starter-kit'
@@ -151,6 +153,9 @@ export type InputDataTransformation =
 export interface TiptapProps extends Omit<
     EditorProviderProps, 'content'| 'readonly'
 > {
+    className?: string
+    id?: string
+    name?: string
     disabled?: boolean
     value?: string
     extensions?: Extensions
@@ -385,7 +390,7 @@ export const inputModelStatePropertyTypes: {
     invalidInvertedPattern: oneOfType([boolean, symbol]),
     invalidPattern: oneOfType([boolean, symbol])
 } as const
-export const inputPropertyTypes: PropertiesValidationMap = {
+export const inputPropertyTypes: ValidationMapping = {
     ...propertyTypes,
     ...inputModelStatePropertyTypes,
     /*

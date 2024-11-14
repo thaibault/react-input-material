@@ -40,9 +40,7 @@ import {
     RefAttributes
 } from 'react'
 
-import {
-    ComponentAdapter, PropertiesValidationMap, ValidationMapping
-} from 'web-component-wrapper/type'
+import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 import {ComponentProps as RMWCComponentProps} from '@rmwc/types'
 import {CardMediaProps} from '@rmwc/card'
 
@@ -222,7 +220,7 @@ export const dedicatedFileInputPropertyTypes: ValidationMapping = {
     maximumSize: number,
     minimumSize: number
 } as const
-export const fileInputModelPropertyTypes: PropertiesValidationMap = {
+export const fileInputModelPropertyTypes: ValidationMapping = {
     ...modelPropertyTypes,
     ...dedicatedFileInputPropertyTypes,
 
@@ -243,7 +241,7 @@ export const fileInputModelStatePropertyTypes: {
 
     invalidName: oneOfType([boolean, symbol])
 } as const
-export const fileInputPropertyTypes: PropertiesValidationMap = {
+export const fileInputPropertyTypes: ValidationMapping = {
     ...propertyTypes,
     ...dedicatedFileInputPropertyTypes,
     ...fileInputModelStatePropertyTypes,

@@ -32,7 +32,11 @@ import {
     useRef,
     useState
 } from 'react'
+
+import {PropertiesValidationMap} from 'web-component-wrapper/type'
+
 import {MDCCheckboxFoundation} from '@material/checkbox'
+
 import {Checkbox} from '@rmwc/checkbox'
 import {Theme} from '@rmwc/theme'
 
@@ -503,7 +507,7 @@ RequireableCheckbox.defaultProperties = {
     },
     value: undefined
 }
-RequireableCheckbox.propTypes = propertyTypes
+RequireableCheckbox.propTypes = propertyTypes as PropertiesValidationMap
 RequireableCheckbox.strict = false
 // endregion
 export default RequireableCheckbox

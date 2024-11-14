@@ -31,24 +31,25 @@ import {
     useState
 } from 'react'
 
-import TextInput from '../TextInput'
-/*
-"namedExport" version of css-loader:
-
-import {intervalClassName, intervalDisabledClassName} from './style.module'
-*/
-import cssClassNames from './style.module'
-import WrapConfigurations from '../WrapConfigurations'
 import {
     createDummyStateSetter,
     formatDateTimeAsConfigured,
     translateKnownSymbols,
     triggerCallbackIfExists
 } from '../../helper'
+import TextInput from '../TextInput'
+import {InputProperties, InputAdapterWithReferences} from '../TextInput/type'
+import WrapConfigurations from '../WrapConfigurations'
+
+/*
+"namedExport" version of css-loader:
+
+import {intervalClassName, intervalDisabledClassName} from './style.module'
+*/
+import cssClassNames from './style.module'
+
 import {
     defaultIntervalProperties as defaultProperties,
-    InputProperties,
-    InputAdapterWithReferences,
     IntervalAdapter as Adapter,
     IntervalAdapterWithReferences as AdapterWithReferences,
     IntervalComponent,
@@ -58,7 +59,7 @@ import {
     IntervalProps as Props,
     IntervalValue as Value,
     IntervalInputProps
-} from '../../type'
+} from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
