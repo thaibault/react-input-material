@@ -111,7 +111,9 @@
     "@rmwc/typography": "^14.3.5",
     "@stylistic/eslint-plugin-ts": "^2.10.1",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
-    "@tinymce/tinymce-react": "^5.1.1",
+    "@tiptap/core": "^2.9.1",
+    "@tiptap/react": "^2.9.1",
+    "@tiptap/starter-kit": "^2.9.1",
     "@types/ejs": "^3.1.5",
     "@types/html-minifier": "^4.0.5",
     "@types/jquery": "^3.5.32",
@@ -156,7 +158,6 @@
     "style-loader": "^4.0.0",
     "stylelint": "^16.10.0",
     "stylelint-config-standard": "^36.0.1",
-    "tinymce": "^7.5.1",
     "tslib": "^2.8.1",
     "typescript-eslint": "^8.14.0",
     "typescript-plugin-css-modules": "^5.1.0",
@@ -177,7 +178,9 @@
     "@rmwc/tooltip": "*",
     "@rmwc/touch-target": "*",
     "@rmwc/typography": "*",
-    "@tinymce/tinymce-react": "*",
+    "@tiptap/core": "*",
+    "@tiptap/react": "*",
+    "@tiptap/starter-kit": "*",
     "@types/react": "*",
     "@types/react-dom": "*",
     "@types/spark-md5": "*",
@@ -228,7 +231,13 @@
     "@rmwc/typography": {
       "optional": true
     },
-    "@tinymce/tinymce-react": {
+    "@tiptap/core": {
+      "optional": true
+    },
+    "@tiptap/react": {
+      "optional": true
+    },
+    "@tiptap/starter-kit": {
       "optional": true
     },
     "@types/react": {
@@ -271,9 +280,6 @@
       "optional": true
     },
     "spark-md5": {
-      "optional": true
-    },
-    "tinymce": {
       "optional": true
     }
   },
@@ -449,7 +455,9 @@
         "aliases": {
           "#": "Remove unneeded optional dependencies.",
           "@rmwc/tooltip": "react-generic-dummy",
-          "@tinymce/tinymce-react$": "react-generic-dummy",
+          "@tiptap/core$": "react-generic-dummy",
+          "@tiptap/react": "react-generic-dummy",
+          "@tiptap/starter-kit$": "react-generic-dummy",
           "ace-builds$": "react-generic-dummy",
           "react-ace$": "react-generic-dummy",
           "react-useanimations$": "react-generic-dummy",

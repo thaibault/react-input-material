@@ -54,8 +54,6 @@ import {GenericEvent} from 'react-generic-tools/type'
 import Dummy from 'react-generic-dummy'
 import {TransitionProps} from 'react-transition-group/Transition'
 
-import {Editor as RichTextEditor} from 'tinymce'
-
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
@@ -63,7 +61,8 @@ import {MDCTextFieldFoundation} from '@material/textfield'
 import {CircularProgress} from '@rmwc/circular-progress'
 import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
-import {IconButton} from '@rmwc/icon-button'
+import {IconButton, IconButtonOnChangeEventT} from '@rmwc/icon-button'
+import {ListApi} from '@rmwc/list'
 import {
     Menu, MenuApi, MenuSurface, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
 } from '@rmwc/menu'
@@ -71,13 +70,6 @@ import {Select, SelectProps} from '@rmwc/select'
 import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
 import {IconOptions} from '@rmwc/types'
-
-import {
-    Editor as RichTextEditorComponent, IAllProps as RichTextEditorProps
-} from '@tinymce/tinymce-react'
-import {
-    EventHandler as RichTextEventHandler
-} from '@tinymce/tinymce-react/lib/cjs/main/ts/Events'
 
 import WrapConfigurations from '../WrapConfigurations'
 import WrapTooltip from '../WrapTooltip'
@@ -138,9 +130,8 @@ import {
     TINYMCE_DEFAULT_OPTIONS,
     UseAnimations
 } from './helper'
+import RichTextEditorComponent from './Tiptap'
 import TRANSFORMER from './transformer'
-import {IconButtonOnChangeEventT} from '@rmwc/icon-button/lib/icon-button'
-import {ListApi} from '@rmwc/list/lib/list'
 
 export {
     ACE_BASE_PATH,
@@ -154,8 +145,7 @@ export {
     preventEnterKeyPropagation,
     suggestionMatches,
 
-    TINYMCE_BASE_PATH,
-    TINYMCE_DEFAULT_OPTIONS
+    TIPTAP_DEFAULT_OPTIONS
 } from './helper'
 export const INPUT_TRANSFORMER = TRANSFORMER
 // endregion
@@ -1881,6 +1871,8 @@ export const TextInputInner = function<Type = unknown>(
     const tinyMCEOptions: Partial<Omit<TinyMCEOptions, 'readonly'>> = {
         ...TINYMCE_DEFAULT_OPTIONS,
         // eslint-disable-next-line camelcase
+        /*
+        TODO
         content_style: properties.disabled ? 'body {opacity: .38}' : '',
         placeholder: properties.placeholder,
         setup: (instance: RichTextEditor): void => {
@@ -1905,6 +1897,7 @@ export const TextInputInner = function<Type = unknown>(
                 }
             })
         }
+        */
     }
     if (properties.editor.endsWith('raw)')) {
         tinyMCEOptions.toolbar1 =
@@ -2273,7 +2266,6 @@ export const TextInputInner = function<Type = unknown>(
                     </div>
                 ],
                 isAdvancedEditor,
-                RICH_TEXT_EDITOR_LOADER_ONCE ||
                 properties.editor.startsWith('code')
             )}
             {wrapAnimationConditionally(
@@ -2391,7 +2383,6 @@ export const TextInputInner = function<Type = unknown>(
                     />
                 </div>,
                 !(isAdvancedEditor || useSelection),
-                RICH_TEXT_EDITOR_LOADER_ONCE ||
                 properties.editor.startsWith('code')
             )}
         </div>

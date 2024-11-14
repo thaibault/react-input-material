@@ -24,7 +24,6 @@ import Dummy from 'react-generic-dummy'
 import UseAnimationsType from 'react-useanimations'
 import LockAnimation from 'react-useanimations/lib/lock'
 import PlusToXAnimation from 'react-useanimations/lib/plusToX'
-import {Editor as RichTextEditorComponent} from '@tinymce/tinymce-react'
 
 import {
     determineValidationState as determineBaseValidationState
@@ -35,6 +34,8 @@ import {
     InputModelState as ModelState,
     TinyMCEOptions
 } from '../../type'
+
+import RichTextEditorComponent, {TiptapProps} from './Tiptap'
 
 /*
 "namedExport" version of css-loader:
@@ -107,42 +108,12 @@ declare const UTC_BUILD_TIMESTAMP: number | undefined
 // NOTE: Could be set via module bundler environment variables.
 export const CURRENT_UTC_BUILD_TIMESTAMP =
     typeof UTC_BUILD_TIMESTAMP === 'undefined' ? 1 : UTC_BUILD_TIMESTAMP
-export const TINYMCE_BASE_PATH = '/tinymce/'
-export const TINYMCE_DEFAULT_OPTIONS: Partial<TinyMCEOptions> = {
-    /* eslint-disable camelcase */
-    // region paths
-    base_url: TINYMCE_BASE_PATH,
-    skin_url: `${TINYMCE_BASE_PATH}skins/ui/oxide`,
-    theme_url: `${TINYMCE_BASE_PATH}themes/silver/theme.min.js`,
-    // endregion
-    allow_conditional_comments: false,
-    allow_script_urls: false,
+export const TIPTAP_DEFAULT_OPTIONS: Partial<TiptapProps> = {
+    injectCSS: true,
+    enableContentCheck: true,
+
     body_class: 'mdc-text-field__input',
-    branding: false,
-    cache_suffix: `?version=${String(CURRENT_UTC_BUILD_TIMESTAMP)}`,
-    contextmenu: [],
-    document_base_url: '/',
-    element_format: 'xhtml',
-    entity_encoding: 'raw',
-    fix_list_elements: true,
-    hidden_input: false,
-    icon: 'material',
-    invalid_elements: 'em',
-    invalid_styles: 'color font-size line-height',
-    keep_styles: false,
-    menubar: false,
-    plugins: [
-        'fullscreen',
-        'link',
-        'code',
-        'nonbreaking',
-        'searchreplace',
-        'visualblocks'
-    ],
-    relative_urls: false,
-    remove_script_host: false,
-    remove_trailing_brs: true,
-    schema: 'html5',
+
     toolbar1: `
         cut copy paste |
         undo redo removeformat |
@@ -152,9 +123,7 @@ export const TINYMCE_DEFAULT_OPTIONS: Partial<TinyMCEOptions> = {
     toolbar2: `
         alignleft aligncenter alignright alignjustify outdent indent |
         link nonbreaking bullist numlist bold italic underline strikethrough
-    `.trim(),
-    trim: true
-    /* eslint-enable camelcase */
+    `.trim()
 }
 /// endregion
 // endregion
