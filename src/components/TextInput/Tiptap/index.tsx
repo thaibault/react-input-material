@@ -17,11 +17,11 @@
     endregion
 */
 // region imports
-import {Ripple} from '@rmwc/ripple'
-import {EditorProvider} from '@tiptap/react'
+import {MDCTextField} from '@material/textfield'
+import {EditorProvider, EditorProviderProps} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import {EditorProviderProps} from '@tiptap/react/dist/Context'
-import {HTMLAttributes} from 'react'
+
+import {HTMLAttributes, useEffect, useRef} from 'react'
 
 import {AdditionalContainerProps, TiptapProps} from '../type'
 
@@ -36,7 +36,8 @@ export const Index = (givenProps: TiptapProps) => {
         [StarterKit.configure(props.starterKitOptions || {})]
 
     const additionalContainerProps: AdditionalContainerProps = {
-        className: ['richtext-editor']
+        className: ['mdc-text-field__input'],
+        'aria-labelledby': 'my-label-id'
     }
     if (props.className && additionalContainerProps.className) {
         additionalContainerProps.className =
@@ -68,15 +69,76 @@ export const Index = (givenProps: TiptapProps) => {
         },
         editable: !props.disabled,
         content: value,
-        extensions: extensions
+        extensions: extensions,
+        onFocus: (editorEvent) => {
+            const syntheticEvent = new Event('focus')
+            syntheticEvent.detail = editorEvent
+            textareaReferemce.current?.dispatchEvent(syntheticEvent)
+        },
+        onBlur: (editorEvent) => {
+            const syntheticEvent = new Event('blur')
+            syntheticEvent.detail = editorEvent
+            textareaReferemce.current?.dispatchEvent(syntheticEvent)
+        },
+        onUpdate: (editorEvent) => {
+            if (textareaReferemce.current) {
+                const syntheticEvent = new Event('input')
+                syntheticEvent.detail = editorEvent
+                textareaReferemce.current.value = editorEvent.editor.getHTML()
+                textareaReferemce.current.dispatchEvent(syntheticEvent)
+            }
+        }
     }
 
-    return <Ripple>
-        <div>
-            <EditorProvider slotBefore={<MenuBar />} {...editorProperties}>
-            </EditorProvider>
+    const mdcTextFieldReference = useRef<HTMLLabelElement>()
+    const textareaReferemce = useRef<HTMLTextAreaElement>()
+
+    useEffect(() => {
+        if (mdcTextFieldReference.current) {
+            console.log(mdcTextFieldReference.current)
+            const textField = new MDCTextField(mdcTextFieldReference.current)
+            console.log('A')
+        }
+    })
+
+    return <>
+        <label
+            ref={mdcTextFieldReference}
+            className="mdc-text-field mdc-text-field--filled mdc-text-field--textarea"
+        >
+            <span className="mdc-text-field__ripple"></span>
+            <span className="mdc-floating-label" id="my-label-id">
+                Textarea Label
+            </span>
+
+            <span className="mdc-text-field__resizer">
+                <textarea
+                    ref={textareaReferemce}
+                    className="mdc-text-field__input"
+                    aria-labelledby="my-label-id"
+                    readOnly
+                    rows="8"
+                    cols="40"
+                    maxLength="140"
+                    value={value}
+                    style={{visibility: 'hidden', position: 'absolute'}}
+                ></textarea>
+
+                <EditorProvider slotBefore={<MenuBar/>} {...editorProperties}>
+                </EditorProvider>
+
+            </span>
+            <span className="mdc-line-ripple"></span>
+        </label>
+        <div className="mdc-text-field-helper-line">
+            <div className="mdc-text-field-character-counter">0 / 140</div>
         </div>
-    </Ripple>
+    </>
+
+    return <div>
+        <EditorProvider slotBefore={<MenuBar/>} {...editorProperties}>
+        </EditorProvider>
+    </div>
 }
 
 export default Index

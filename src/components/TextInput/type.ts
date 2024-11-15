@@ -57,7 +57,7 @@ import {TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
 
 import {
-    CanCommands, ChainedCommands, Editor as RichTextEditor, Extensions
+    ChainedCommands, Editor as RichTextEditor, Extensions
 } from '@tiptap/core'
 import {EditorProviderProps} from '@tiptap/react'
 import {StarterKitOptions} from '@tiptap/starter-kit'

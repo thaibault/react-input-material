@@ -46,6 +46,7 @@ const Button = ({
             }
             disabled={!enabled}
             onClick={(event) => {
+                console.log(label ?? activeIndicator ?? iconName, event)
                 event.stopPropagation()
                 action(editor.chain().focus()).run()
             }}

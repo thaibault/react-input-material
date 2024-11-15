@@ -78,6 +78,8 @@ const SECTIONS = [
 
     'requireable-checkbox'
 ] as const
+
+import Tiptap from './components/TextInput/Tiptap'
 // endregion
 const Application = () => {
     const [selectedState, setSelectedState] =
@@ -246,6 +248,8 @@ const Application = () => {
         })
     /// endregion
     // endregion
+
+    return <Tiptap />
 
     return (<>
         {/* region navigation */}
