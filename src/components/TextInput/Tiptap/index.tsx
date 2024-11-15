@@ -18,10 +18,10 @@
 */
 // region imports
 import {MDCTextField} from '@material/textfield'
-import {EditorProvider, EditorProviderProps} from '@tiptap/react'
+import {EditorContent, EditorContentProps, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
-import {HTMLAttributes, useEffect, useRef} from 'react'
+import {useEffect, useRef} from 'react'
 
 import {AdditionalContainerProps, TiptapProps} from '../type'
 
@@ -35,76 +35,53 @@ export const Index = (givenProps: TiptapProps) => {
         props.extensions ||
         [StarterKit.configure(props.starterKitOptions || {})]
 
-    const additionalContainerProps: AdditionalContainerProps = {
-        className: ['mdc-text-field__input'],
-        'aria-labelledby': 'my-label-id'
-    }
-    if (props.className && additionalContainerProps.className) {
-        additionalContainerProps.className =
-            additionalContainerProps.className.concat(
-                props.className as string
-            )
-        delete props.className
-    }
-    if (props.id) {
-        additionalContainerProps.id = props.id
-        delete props.id
-    }
-    /* TODO
-    if (props.name) {
-        additionalContainerProps.name = props.name
-        delete props.name
-    }
-    */
-
-    if (Array.isArray(additionalContainerProps.className))
-        additionalContainerProps.className =
-            additionalContainerProps.className.join(' ')
-
-    const editorProperties: EditorProviderProps = {
-        ...props,
-        editorContainerProps: {
-            ...props.editorContainerProps || {},
-            ...additionalContainerProps as HTMLAttributes<HTMLDivElement>
-        },
-        editable: !props.disabled,
+    const editor = useEditor({
+        extensions,
         content: value,
-        extensions: extensions,
         onFocus: (editorEvent) => {
             const syntheticEvent = new Event('focus')
             syntheticEvent.detail = editorEvent
-            textareaReferemce.current?.dispatchEvent(syntheticEvent)
+            textareaReference.current?.dispatchEvent(syntheticEvent)
         },
         onBlur: (editorEvent) => {
             const syntheticEvent = new Event('blur')
             syntheticEvent.detail = editorEvent
-            textareaReferemce.current?.dispatchEvent(syntheticEvent)
+            textareaReference.current?.dispatchEvent(syntheticEvent)
         },
         onUpdate: (editorEvent) => {
-            if (textareaReferemce.current) {
+            if (textareaReference.current) {
                 const syntheticEvent = new Event('input')
                 syntheticEvent.detail = editorEvent
-                textareaReferemce.current.value = editorEvent.editor.getHTML()
-                textareaReferemce.current.dispatchEvent(syntheticEvent)
+                const html = editorEvent.editor.getHTML()
+                if (html === '<p></p>')
+                    textareaReference.current.value = ''
+                else
+                    textareaReference.current.value =
+                        editorEvent.editor.getHTML()
+                textareaReference.current.dispatchEvent(syntheticEvent)
             }
         }
-    }
+    })
 
     const mdcTextFieldReference = useRef<HTMLLabelElement>()
-    const textareaReferemce = useRef<HTMLTextAreaElement>()
+    const textareaReference = useRef<HTMLTextAreaElement>()
+    let materialTextFieldInstance: MDCTextField | null = null
 
-    useEffect(() => {
-        if (mdcTextFieldReference.current) {
-            console.log(mdcTextFieldReference.current)
-            const textField = new MDCTextField(mdcTextFieldReference.current)
-            console.log('A')
-        }
-    })
+    useEffect(
+        () => {
+            if (mdcTextFieldReference.current)
+                materialTextFieldInstance =
+                    new MDCTextField(mdcTextFieldReference.current)
+        },
+        [mdcTextFieldReference.current]
+    )
+
+    const htmlContent = editor?.getHTML()
 
     return <>
         <label
             ref={mdcTextFieldReference}
-            className="mdc-text-field mdc-text-field--filled mdc-text-field--textarea"
+            className="richtext-editor mdc-text-field mdc-text-field--filled mdc-text-field--textarea mdc-text-field--with-internal-counter"
         >
             <span className="mdc-text-field__ripple"></span>
             <span className="mdc-floating-label" id="my-label-id">
@@ -113,32 +90,29 @@ export const Index = (givenProps: TiptapProps) => {
 
             <span className="mdc-text-field__resizer">
                 <textarea
-                    ref={textareaReferemce}
+                    ref={textareaReference}
                     className="mdc-text-field__input"
                     aria-labelledby="my-label-id"
                     readOnly
                     rows="8"
                     cols="40"
                     maxLength="140"
-                    value={value}
+                    value={htmlContent === '<p></p>' ? '' : htmlContent}
                     style={{visibility: 'hidden', position: 'absolute'}}
                 ></textarea>
 
-                <EditorProvider slotBefore={<MenuBar/>} {...editorProperties}>
-                </EditorProvider>
+                <EditorContent
+                    className="mdc-text-field__input" editor={editor}
+                />
+                <MenuBar editor={editor} />
 
+                <div className="mdc-text-field-character-counter">0 / 140</div>
             </span>
             <span className="mdc-line-ripple"></span>
         </label>
         <div className="mdc-text-field-helper-line">
-            <div className="mdc-text-field-character-counter">0 / 140</div>
         </div>
     </>
-
-    return <div>
-        <EditorProvider slotBefore={<MenuBar/>} {...editorProperties}>
-        </EditorProvider>
-    </div>
 }
 
 export default Index

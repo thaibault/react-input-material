@@ -21,17 +21,6 @@ endregion */
 
     &.text-input--custom {
         padding-top: 9px;
-
-        & .text-input__editor__label {
-            margin-top: 23px;
-            margin-bottom: 9px;
-            margin-left: 16px;
-        }
-
-        & .mdc-text-field--textarea {
-            background-color: whitesmoke;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.6);
-        }
     }
     /* stylelint-disable selector-class-pattern */
     .ace_editor {
@@ -43,12 +32,19 @@ endregion */
     }
     /* stylelint-enable selector-class-pattern */
     .richtext-editor {
-        & .mdc-ripple-surface {
-            margin-top: 22px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+
+        .tiptap:focus-visible {
+            outline: none;
         }
-    }
-    .richtext-editor-menu-bar {
-        margin-top: 44px;
+
+        .richtext-editor-menu-bar {
+            margin-left: 16px;
+
+            .mdc-icon-button--on {
+                color: var(--mdc-theme-secondary);;
+            }
+        }
     }
 
     .text-input__editor__label {

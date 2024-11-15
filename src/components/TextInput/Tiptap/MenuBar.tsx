@@ -18,17 +18,21 @@
 */
 // region imports
 import {IconButton} from '@rmwc/icon-button'
-import {ChainedCommands} from '@tiptap/core'
+import {ChainedCommands, Editor} from '@tiptap/core'
 import {useCurrentEditor} from '@tiptap/react'
+
+import {createContext, useContext} from 'react'
 
 import WrapTooltip from '../../WrapTooltip'
 
 import {RichTextEditorButtonProps} from '../type'
 // endregion
+const EditorContext = createContext<Editor | null>(null)
+
 const Button = ({
     action, activeIndicator, checkedIconName, enabledIndicator, iconName, label
 }: RichTextEditorButtonProps) => {
-    const {editor} = useCurrentEditor()
+    const editor = useContext(EditorContext)
 
     if (!editor)
         return null
@@ -46,7 +50,6 @@ const Button = ({
             }
             disabled={!enabled}
             onClick={(event) => {
-                console.log(label ?? activeIndicator ?? iconName, event)
                 event.stopPropagation()
                 action(editor.chain().focus()).run()
             }}
@@ -57,100 +60,110 @@ const Button = ({
     </WrapTooltip>
 }
 
-const Index = () => {
-    const {editor} = useCurrentEditor()
-
+const Index = ({editor}: {editor: Editor | null}) => {
     if (!editor)
         return null
 
     return <div className="richtext-editor-menu-bar">
-        <div className="richtext-editor-menu-bar__history">
-            <Button
-                action={(command: ChainedCommands) => command.undo()}
-                iconName="undo"
-            />
-            <Button
-                action={(command: ChainedCommands) => command.redo()}
-                iconName="redo"
-            />
-        </div>
+        <EditorContext.Provider value={editor}>
+            <span className="richtext-editor-menu-bar__history">
+                <Button
+                    action={(command: ChainedCommands) => command.undo()}
+                    iconName="undo"
+                />
+                <Button
+                    action={(command: ChainedCommands) => command.redo()}
+                    iconName="redo"
+                />
+            </span>
 
-        <div className="richtext-editor-menu-bar__marks">
-            <Button
-                action={(command: ChainedCommands) => command.unsetAllMarks()}
-                enabledIndicator={null}
-                iconName="format_clear"
-                label="clear formatting"
-            />
+            <span className="richtext-editor-menu-bar__marks">
+                <Button
+                    action={(command: ChainedCommands) =>
+                        command.unsetAllMarks()
+                    }
+                    enabledIndicator={null}
+                    iconName="format_clear"
+                    label="clear formatting"
+                />
 
-            <Button
-                action={(command: ChainedCommands) => command.toggleBold()}
-                activeIndicator="bold"
-                iconName="format_bold"
-            />
-            <Button
-                action={(command: ChainedCommands) => command.toggleItalic()}
-                activeIndicator="italic"
-                iconName="format_italic"
-            />
-            <Button
-                action={(command: ChainedCommands) => command.toggleStrike()}
-                activeIndicator="strike"
-                iconName="format_strikethrough"
-                label="strikethrough"
-            />
-        </div>
+                <Button
+                    action={(command: ChainedCommands) => command.toggleBold()}
+                    activeIndicator="bold"
+                    iconName="format_bold"
+                />
+                <Button
+                    action={(command: ChainedCommands) =>
+                        command.toggleItalic()
+                    }
+                    activeIndicator="italic"
+                    iconName="format_italic"
+                />
+                <Button
+                    action={(command: ChainedCommands) =>
+                        command.toggleStrike()
+                    }
+                    activeIndicator="strike"
+                    iconName="format_strikethrough"
+                    label="strikethrough"
+                />
+            </span>
 
-        <div className="richtext-editor-menu-bar__nodes">
-            <Button
-                action={(command: ChainedCommands) => command.unsetAllMarks()}
-                enabledIndicator={null}
-                iconName="layers_clear"
-                label="clear markup"
-            />
+            <span className="richtext-editor-menu-bar__nodes">
+                <Button
+                    action={(command: ChainedCommands) => command.clearNodes()}
+                    enabledIndicator={null}
+                    iconName="layers_clear"
+                    label="clear markup"
+                />
 
-            <Button
-                action={(command: ChainedCommands) =>
-                    command.toggleHeading({level: 2})
-                }
-                enabledIndicator={null}
-                activeIndicator="heading"
-                iconName="title"
-                label="headline"
-            />
-            <Button
-                action={(command: ChainedCommands) => command.setParagraph()}
-                enabledIndicator={null}
-                activeIndicator="paragraph"
-                iconName="segment"
-            />
+                <Button
+                    action={(command: ChainedCommands) =>
+                        command.toggleHeading({level: 2})
+                    }
+                    enabledIndicator={null}
+                    activeIndicator="heading"
+                    iconName="title"
+                    label="headline"
+                />
+                <Button
+                    action={(command: ChainedCommands) =>
+                        command.setParagraph()
+                    }
+                    enabledIndicator={null}
+                    activeIndicator="paragraph"
+                    iconName="segment"
+                />
 
-            <Button
-                action={(command: ChainedCommands) =>
-                    command.toggleBulletList()
-                }
-                enabledIndicator={null}
-                activeIndicator="bulletList"
-                iconName="format_list_bulleted"
-                label="Unordered List"
-            />
-            <Button
-                action={(command: ChainedCommands) =>
-                    command.toggleOrderedList()
-                }
-                enabledIndicator={null}
-                activeIndicator="orderedList"
-                iconName="format_list_numbered"
-                label="Ordered List"
-            />
+                <Button
+                    action={(command: ChainedCommands) =>
+                        command.toggleBulletList()
+                    }
+                    enabledIndicator={null}
+                    activeIndicator="bulletList"
+                    iconName="format_list_bulleted"
+                    label="Unordered List"
+                />
+                <Button
+                    action={(command: ChainedCommands) =>
+                        command.toggleOrderedList()
+                    }
+                    enabledIndicator={null}
+                    activeIndicator="orderedList"
+                    iconName="format_list_numbered"
+                    label="Ordered List"
+                />
 
-            <Button
-                action={(command: ChainedCommands) => command.setHardBreak()}
-                enabledIndicator={null}
-                iconName="insert_page_break"
-                label="Hard break"
-            />
-        </div>
+                <Button
+                    action={(command: ChainedCommands) =>
+                        command.setHardBreak()
+                    }
+                    enabledIndicator={null}
+                    iconName="insert_page_break"
+                    label="Hard break"
+                />
+            </span>
+        </EditorContext.Provider>
     </div>
 }
 
