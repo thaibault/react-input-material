@@ -56,7 +56,9 @@ import {TextFieldProps} from '@rmwc/textfield'
 import {TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
 
-import {Editor as RichTextEditor, Extensions} from '@tiptap/core'
+import {
+    CanCommands, ChainedCommands, Editor as RichTextEditor, Extensions
+} from '@tiptap/core'
 import {EditorProviderProps} from '@tiptap/react'
 import {StarterKitOptions} from '@tiptap/starter-kit'
 
@@ -150,8 +152,19 @@ export type InputDataTransformation =
     }
     /* eslint-enable @typescript-eslint/consistent-indexed-object-style */
 // endregion
+export interface RichTextEditorButtonProps {
+    action: (command: ChainedCommands) => ChainedCommands,
+
+    activeIndicator?: string,
+    enabledIndicator?: null | ((command: ChainedCommands) => ChainedCommands),
+
+    checkedIconName?: string,
+    iconName: string,
+
+    label?: string
+}
 export interface AdditionalContainerProps {
-    className?: string
+    className?: Array<string> | string
     id?: string
     name?: string
 }

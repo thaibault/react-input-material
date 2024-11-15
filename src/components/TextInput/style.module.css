@@ -21,10 +21,20 @@ endregion */
 
     &.text-input--custom {
         padding-top: 9px;
+
+        & .text-input__editor__label {
+            margin-top: 23px;
+            margin-bottom: 9px;
+            margin-left: 16px;
+        }
+
+        & .mdc-text-field--textarea {
+            background-color: whitesmoke;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+        }
     }
     /* stylelint-disable selector-class-pattern */
-    .ace_editor,
-    .tiptap {
+    .ace_editor {
         border-radius: 0;
 
         margin-top: 27px;
@@ -32,8 +42,13 @@ endregion */
         margin-right: 4px;
     }
     /* stylelint-enable selector-class-pattern */
-    .tiptap {
-        border-width: 1px;
+    .richtext-editor {
+        & .mdc-ripple-surface {
+            margin-top: 22px;
+        }
+    }
+    .richtext-editor-menu-bar {
+        margin-top: 44px;
     }
 
     .text-input__editor__label {

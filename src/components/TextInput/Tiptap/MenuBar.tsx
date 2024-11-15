@@ -17,174 +17,140 @@
     endregion
 */
 // region imports
+import {IconButton} from '@rmwc/icon-button'
+import {ChainedCommands} from '@tiptap/core'
 import {useCurrentEditor} from '@tiptap/react'
+
+import WrapTooltip from '../../WrapTooltip'
+
+import {RichTextEditorButtonProps} from '../type'
 // endregion
+const Button = ({
+    action, activeIndicator, checkedIconName, enabledIndicator, iconName, label
+}: RichTextEditorButtonProps) => {
+    const {editor} = useCurrentEditor()
+
+    if (!editor)
+        return null
+
+    let enabled = true
+    if (enabledIndicator)
+        enabled = enabledIndicator(editor.can().chain().focus()).run()
+    else if (enabledIndicator !== null)
+        enabled = action(editor.can().chain().focus()).run()
+
+    return <WrapTooltip options={label}>
+        <IconButton
+            checked={
+                Boolean(activeIndicator && editor.isActive(activeIndicator))
+            }
+            disabled={!enabled}
+            onClick={(event) => {
+                event.stopPropagation()
+                action(editor.chain().focus()).run()
+            }}
+            icon={{icon: iconName, size: 'xsmall'}}
+            onIcon={{icon: checkedIconName ?? iconName, size: 'xsmall'}}
+            label={label ?? activeIndicator ?? iconName}
+        />
+    </WrapTooltip>
+}
+
 const Index = () => {
     const {editor} = useCurrentEditor()
 
     if (!editor)
         return null
 
-    return <>
-        <div className="history">
-            <button
-                onClick={() => {
-                    editor.chain().focus().undo().run()
-                }}
-                disabled={!editor.can().chain().focus().undo().run()}
-            >
-                Undo
-            </button>
-            <button
-                onClick={() => {
-                    editor.chain().focus().redo().run()
-                }}
-                disabled={!editor.can().chain().focus().redo().run()}
-            >
-                Redo
-            </button>
+    return <div className="richtext-editor-menu-bar">
+        <div className="richtext-editor-menu-bar__history">
+            <Button
+                action={(command: ChainedCommands) => command.undo()}
+                iconName="undo"
+            />
+            <Button
+                action={(command: ChainedCommands) => command.redo()}
+                iconName="redo"
+            />
         </div>
 
-        <div className="marks">
-            <button
-                onClick={() => {
-                    editor.chain().focus().unsetAllMarks().run()
-                }}
-            >
-                Clear marks
-            </button>
+        <div className="richtext-editor-menu-bar__marks">
+            <Button
+                action={(command: ChainedCommands) => command.unsetAllMarks()}
+                enabledIndicator={null}
+                iconName="format_clear"
+                label="clear formatting"
+            />
 
-            <button
-                onClick={() => {
-                    editor.chain().focus().toggleBold().run()
-                }}
-                disabled={!editor.can().chain().focus().toggleBold().run()}
-                className={editor.isActive('bold') ? 'is-active' : ''}
-            >
-                Bold
-            </button>
-            <button
-                onClick={() => {
-                    editor.chain().focus().toggleItalic().run()
-                }}
-                disabled={!editor.can().chain().focus().toggleItalic().run()}
-                className={editor.isActive('italic') ? 'is-active' : ''}
-            >
-                Italic
-            </button>
-            <button
-                onClick={() => {
-                    editor.chain().focus().toggleStrike().run()
-                }}
-                disabled={!editor.can().chain().focus().toggleStrike().run()}
-                className={editor.isActive('strike') ? 'is-active' : ''}
-            >
-                Strike
-            </button>
+            <Button
+                action={(command: ChainedCommands) => command.toggleBold()}
+                activeIndicator="bold"
+                iconName="format_bold"
+            />
+            <Button
+                action={(command: ChainedCommands) => command.toggleItalic()}
+                activeIndicator="italic"
+                iconName="format_italic"
+            />
+            <Button
+                action={(command: ChainedCommands) => command.toggleStrike()}
+                activeIndicator="strike"
+                iconName="format_strikethrough"
+                label="strikethrough"
+            />
         </div>
 
-        <div className="nodes">
-            <button
-                onClick={() => {
-                    editor.chain().focus().clearNodes().run()
-                }}
-            >
-                Clear nodes
-            </button>
+        <div className="richtext-editor-menu-bar__nodes">
+            <Button
+                action={(command: ChainedCommands) => command.unsetAllMarks()}
+                enabledIndicator={null}
+                iconName="layers_clear"
+                label="clear markup"
+            />
 
-            <button
-                onClick={() => editor.chain().focus().setParagraph().run()}
-                className={editor.isActive('paragraph') ? 'is-active' : ''}
-            >
-                Paragraph
-            </button>
-            <button
-                onClick={() => {
-                    editor.chain().focus().toggleHeading({level: 1}).run()
-                }}
-                className={
-                    editor.isActive('heading', {level: 1}) ? 'is-active' : ''
+            <Button
+                action={(command: ChainedCommands) =>
+                    command.toggleHeading({level: 2})
                 }
-            >
-                H1
-            </button>
-            <button
-                onClick={() => {
-                    editor.chain().focus().toggleHeading({level: 2}).run()
-                }}
-                className={
-                    editor.isActive('heading', {level: 2}) ? 'is-active' : ''
-                }
-            >
-                H2
-            </button>
-            <button
-                onClick={() => {
-                    editor.chain().focus().toggleHeading({level: 3}).run()
-                }}
-                className={
-                    editor.isActive('heading', {level: 3}) ? 'is-active' : ''
-                }
-            >
-                H3
-            </button>
-            <button
-                onClick={() => {
-                    editor.chain().focus().toggleHeading({level: 4}).run()
-                }}
-                className={
-                    editor.isActive('heading', {level: 4}) ? 'is-active' : ''
-                }
-            >
-                H4
-            </button>
-            <button
-                onClick={() => {
-                    editor.chain().focus().toggleHeading({level: 5}).run()
-                }}
-                className={
-                    editor.isActive('heading', {level: 5}) ? 'is-active' : ''
-                }
-            >
-                H5
-            </button>
-            <button
-                onClick={() => {
-                    editor.chain().focus().toggleHeading({level: 6}).run()
-                }}
-                className={
-                    editor.isActive('heading', {level: 6}) ? 'is-active' : ''
-                }
-            >
-                H6
-            </button>
+                enabledIndicator={null}
+                activeIndicator="heading"
+                iconName="title"
+                label="headline"
+            />
+            <Button
+                action={(command: ChainedCommands) => command.setParagraph()}
+                enabledIndicator={null}
+                activeIndicator="paragraph"
+                iconName="segment"
+            />
 
-            <button
-                onClick={() => {
-                    editor.chain().focus().toggleBulletList().run()
-                }}
-                className={editor.isActive('bulletList') ? 'is-active' : ''}
-            >
-                Bullet list
-            </button>
-            <button
-                onClick={() => {
-                    editor.chain().focus().toggleOrderedList().run()
-                }}
-                className={editor.isActive('orderedList') ? 'is-active' : ''}
-            >
-                Ordered list
-            </button>
+            <Button
+                action={(command: ChainedCommands) =>
+                    command.toggleBulletList()
+                }
+                enabledIndicator={null}
+                activeIndicator="bulletList"
+                iconName="format_list_bulleted"
+                label="Unordered List"
+            />
+            <Button
+                action={(command: ChainedCommands) =>
+                    command.toggleOrderedList()
+                }
+                enabledIndicator={null}
+                activeIndicator="orderedList"
+                iconName="format_list_numbered"
+                label="Ordered List"
+            />
 
-            <button
-                onClick={() => {
-                    editor.chain().focus().setHardBreak().run()
-                }}
-            >
-                Hard break
-            </button>
+            <Button
+                action={(command: ChainedCommands) => command.setHardBreak()}
+                enabledIndicator={null}
+                iconName="insert_page_break"
+                label="Hard break"
+            />
         </div>
-    </>
+    </div>
 }
 
 export default Index

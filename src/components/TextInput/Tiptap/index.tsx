@@ -17,9 +17,11 @@
     endregion
 */
 // region imports
+import {Ripple} from '@rmwc/ripple'
 import {EditorProvider} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import {EditorProviderProps} from '@tiptap/react/dist/Context'
+import {HTMLAttributes} from 'react'
 
 import {AdditionalContainerProps, TiptapProps} from '../type'
 
@@ -33,9 +35,14 @@ export const Index = (givenProps: TiptapProps) => {
         props.extensions ||
         [StarterKit.configure(props.starterKitOptions || {})]
 
-    const additionalContainerProps: AdditionalContainerProps = {}
-    if (props.className) {
-        additionalContainerProps.className = props.className
+    const additionalContainerProps: AdditionalContainerProps = {
+        className: ['richtext-editor']
+    }
+    if (props.className && additionalContainerProps.className) {
+        additionalContainerProps.className =
+            additionalContainerProps.className.concat(
+                props.className as string
+            )
         delete props.className
     }
     if (props.id) {
@@ -49,19 +56,27 @@ export const Index = (givenProps: TiptapProps) => {
     }
     */
 
+    if (Array.isArray(additionalContainerProps.className))
+        additionalContainerProps.className =
+            additionalContainerProps.className.join(' ')
+
     const editorProperties: EditorProviderProps = {
         ...props,
         editorContainerProps: {
             ...props.editorContainerProps || {},
-            ...additionalContainerProps
+            ...additionalContainerProps as HTMLAttributes<HTMLDivElement>
         },
         editable: !props.disabled,
         content: value,
         extensions: extensions
     }
 
-    return <EditorProvider slotBefore={<MenuBar />} {...editorProperties}>
-    </EditorProvider>
+    return <Ripple>
+        <div>
+            <EditorProvider slotBefore={<MenuBar />} {...editorProperties}>
+            </EditorProvider>
+        </div>
+    </Ripple>
 }
 
 export default Index
