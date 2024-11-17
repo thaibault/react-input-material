@@ -38,11 +38,18 @@ endregion */
             outline: none;
         }
 
-        .richtext-editor-menu-bar {
-            margin-left: 16px;
+        .richtext-editor-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
 
-            .mdc-icon-button--on {
-                color: var(--mdc-theme-secondary);;
+            .richtext-editor-menu-bar {
+                margin-bottom: 5px;
+                margin-left: 10px;
+
+                .mdc-icon-button--on {
+                    color: var(--mdc-theme-secondary);;
+                }
             }
         }
     }
