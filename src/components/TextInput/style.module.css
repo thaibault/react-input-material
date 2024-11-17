@@ -32,7 +32,7 @@ endregion */
     }
     /* stylelint-enable selector-class-pattern */
     .richtext-editor {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+        border-bottom: 1px solid rgba(0 0 0 / 42%);
 
         .tiptap:focus-visible {
             outline: none;

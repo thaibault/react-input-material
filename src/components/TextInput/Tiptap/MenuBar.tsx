@@ -19,7 +19,6 @@
 // region imports
 import {IconButton} from '@rmwc/icon-button'
 import {ChainedCommands, Editor} from '@tiptap/core'
-import {useCurrentEditor} from '@tiptap/react'
 
 import {createContext, useContext} from 'react'
 

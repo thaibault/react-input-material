@@ -31,6 +31,7 @@ import PropertyTypes, {
     symbol
 } from 'clientnode/dist/property-types'
 import {
+    FocusEvent as ReactFocusEvent,
     ForwardRefExoticComponent,
     KeyboardEvent,
     MouseEvent,
@@ -39,7 +40,6 @@ import {
     ReactNode,
     RefAttributes
 } from 'react'
-import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
 import {GenericEvent} from 'react-generic-tools/type'
 
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
@@ -56,9 +56,7 @@ import {TextFieldProps} from '@rmwc/textfield'
 import {TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
 
-import {
-    ChainedCommands, Editor as RichTextEditor, Extensions
-} from '@tiptap/core'
+import {ChainedCommands, Extensions} from '@tiptap/core'
 import {EditorProviderProps} from '@tiptap/react'
 import {StarterKitOptions} from '@tiptap/starter-kit'
 
@@ -177,6 +175,14 @@ AdditionalContainerProps, Omit<EditorProviderProps, 'content'| 'readonly'> {
     starterKitOptions?: Partial<StarterKitOptions>
 }
 
+export interface CodeMirrorProps {
+    value?: string
+    mode?: string
+    name?: string
+    onChange?: (value: string) => void
+    onFocus?: (event: ReactFocusEvent) => void
+}
+
 export type InputSelection =
     Array<boolean | number | null> |
     Array<[boolean | number | string | null, string]> |
@@ -278,7 +284,7 @@ export interface InputProperties<T = unknown> extends
     trailingIcon: string | (IconOptions & {tooltip?: string | TooltipProps})
 
     inputProperties: Partial<
-        CodeEditorProps | TiptapProps | SelectProps | TextFieldProps
+        CodeMirrorProps | TiptapProps | SelectProps | TextFieldProps
     >
     inputProps?: Mapping<boolean | number | string>
 
@@ -360,17 +366,12 @@ export interface InputAdapterWithReferences<T = unknown> extends
     InputAdapter<T>
 {
     references: {
-        codeEditorReference: MutableRefObject<CodeEditorType | null>
-        codeEditorInputReference: MutableRefObject<HTMLTextAreaElement | null>
         foundationReference: MutableRefObject<
             MDCSelectFoundation | MDCTextFieldFoundation | null
         >
         inputReference: MutableRefObject<
             HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
         >
-        richTextEditorInputReference:
-            MutableRefObject<HTMLTextAreaElement | null>
-        richTextEditorInstance: MutableRefObject<RichTextEditor | null>
         suggestionMenuAPIReference: MutableRefObject<MenuApi | null>
         suggestionMenuFoundationReference: MutableRefObject<
             MDCMenuFoundation | null

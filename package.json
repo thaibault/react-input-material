@@ -94,6 +94,10 @@
     "@babel/plugin-transform-proto-to-assign": "^7.25.9",
     "@babel/preset-react": "^7.25.9",
     "@babel/runtime": "^7.26.0",
+    "@codemirror/commands": "^6.7.1",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/state": "^6.4.1",
+    "@codemirror/view": "^6.34.3",
     "@emotion/react": "^11.13.3",
     "@rmwc/card": "^14.3.5",
     "@rmwc/checkbox": "^14.3.5",
@@ -128,6 +132,7 @@
     "@typescript-eslint/parser": "^8.14.0",
     "blob-util": "^2.0.2",
     "clientnode": "^3.0.1226",
+    "codemirror": "^6.0.1",
     "css-loader": "^7.1.2",
     "cssnano": "^7.0.6",
     "documentation-website": "^1.0.338",
@@ -147,7 +152,6 @@
     "postcss-preset-env": "^10.1.0",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
-    "react-ace": "^13.0.0",
     "react-dom": "^18.3.1",
     "react-generic-animate": "^0.0.59",
     "react-generic-dummy": "^0.0.83",
@@ -167,6 +171,10 @@
   },
   "peerDependencies": {
     "@babel/runtime": "*",
+    "@codemirror/commands": "*",
+    "@codemirror/lang-javascript": "*",
+    "@codemirror/state": "*",
+    "@codemirror/view": "*",
     "@rmwc/card": "*",
     "@rmwc/checkbox": "*",
     "@rmwc/circular-progress": "*",
@@ -186,16 +194,28 @@
     "@types/spark-md5": "*",
     "blob-util": "*",
     "clientnode": "*",
+    "codemirror": "*",
     "material-components-web": "*",
     "material-icons": "*",
     "react": "*",
-    "react-ace": "*",
     "react-dom": "*",
     "spark-md5": "*",
     "tslib": "*"
   },
   "peerDependenciesMeta": {
     "@babel/runtime": {
+      "optional": true
+    },
+    "@codemirror/commands": {
+      "optional": true
+    },
+    "@codemirror/lang-javascript": {
+      "optional": true
+    },
+    "@codemirror/state": {
+      "optional": true
+    },
+    "@codemirror/view": {
       "optional": true
     },
     "@rmwc/card": {
@@ -258,6 +278,9 @@
     "clientnode": {
       "optional": true
     },
+    "codemirror": {
+      "optional": true
+    },
     "material-components-web": {
       "optional": true
     },
@@ -265,9 +288,6 @@
       "optional": true
     },
     "react": {
-      "optional": true
-    },
-    "react-ace": {
       "optional": true
     },
     "react-dom": {
@@ -454,12 +474,15 @@
       "module": {
         "aliases": {
           "#": "Remove unneeded optional dependencies.",
+          "@codemirror/commands": "react-generic-dummy",
+          "@codemirror/lang-javascript": "react-generic-dummy",
+          "@codemirror/state": "react-generic-dummy",
+          "@codemirror/view": "react-generic-dummy",
           "@rmwc/tooltip": "react-generic-dummy",
           "@tiptap/core$": "react-generic-dummy",
           "@tiptap/react": "react-generic-dummy",
           "@tiptap/starter-kit$": "react-generic-dummy",
-          "ace-builds$": "react-generic-dummy",
-          "react-ace$": "react-generic-dummy",
+          "codemirror": "react-generic-dummy",
           "react-useanimations$": "react-generic-dummy",
           "react-useanimations/lib/lock$": "react-generic-dummy",
           "react-useanimations/lib/plusToX$": "react-generic-dummy"

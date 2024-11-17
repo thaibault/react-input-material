@@ -27,8 +27,7 @@ import {TiptapProps} from '../type'
 
 import MenuBar from './MenuBar'
 // endregion
-export const Index = (givenProps: TiptapProps) => {
-    const props = {...givenProps}
+export const Index = (props: TiptapProps) => {
     const value = props.value || ''
 
     const extensions =
@@ -68,12 +67,10 @@ export const Index = (givenProps: TiptapProps) => {
         useRef<HTMLLabelElement>() as MutableRefObject<HTMLLabelElement>
     const textareaReference =
         useRef<HTMLTextAreaElement>() as MutableRefObject<HTMLTextAreaElement>
-    let materialTextFieldInstance: MDCTextField | null = null
 
     useEffect(
         () => {
-            materialTextFieldInstance =
-                new MDCTextField(mdcTextFieldReference.current)
+            new MDCTextField(mdcTextFieldReference.current)
         },
         [mdcTextFieldReference.current]
     )

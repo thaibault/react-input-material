@@ -18,6 +18,7 @@
 */
 // region imports
 import {Tab, TabBar} from '@rmwc/tabs'
+
 import {
     dateTimeFormat,
     debounce,
@@ -28,6 +29,7 @@ import {
     timeout,
     UnknownFunction
 } from 'clientnode'
+
 import {ReactNode, useState} from 'react'
 import {createRoot} from 'react-dom/client'
 import {useMemorizedValue} from 'react-generic-tools'
@@ -37,6 +39,8 @@ import {
     FileInputChildrenOptions, FileInputProperties, FileInputProps, FileValue
 } from './components/FileInput/type'
 import {CheckboxProps} from './components/RequireableCheckbox/type'
+import CodeMirror from './components/TextInput/CodeMirror'
+import Tiptap from './components/TextInput/Tiptap'
 import {
     InputProperties, InputProps, SuggestionCreatorOptions
 } from './components/TextInput/type'
@@ -78,8 +82,6 @@ const SECTIONS = [
 
     'requireable-checkbox'
 ] as const
-
-import Tiptap from './components/TextInput/Tiptap'
 // endregion
 const Application = () => {
     const [selectedState, setSelectedState] =
@@ -251,7 +253,11 @@ const Application = () => {
 
     return <>
         <div className="text-input">
-            <Tiptap />
+            <Tiptap/>
+        </div>
+
+        <div className="text-input">
+            <CodeMirror/>
         </div>
 
         <TextInput<string>
