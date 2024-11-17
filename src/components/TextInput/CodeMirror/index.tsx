@@ -17,13 +17,14 @@
     endregion
 */
 // region imports
+import {javascript} from '@codemirror/lang-javascript'
+import {EditorState} from '@codemirror/state'
+import {EditorView, ViewUpdate} from '@codemirror/view'
+
 import {MDCTextField} from '@material/textfield'
 
-import {javascript} from '@codemirror/lang-javascript'
-import {EditorView} from '@codemirror/view'
 import {basicSetup} from 'codemirror'
-
-import {MutableRefObject, useEffect, useRef} from 'react'
+import {FocusEvent, MutableRefObject, useEffect, useRef, useState} from 'react'
 
 import {CodeMirrorProps} from '../type'
 // endregion
@@ -35,24 +36,52 @@ export const Index = (props: CodeMirrorProps) => {
     const editorViewReference =
         useRef<HTMLDivElement>() as MutableRefObject<HTMLDivElement>
 
+    const [value, setValue] = useState(props.value || '')
+
     useEffect(
         () => {
-            new MDCTextField(mdcTextFieldReference.current)
+            const textField = new MDCTextField(mdcTextFieldReference.current)
+            return () => {
+                textField.destroy()
+            }
         },
         [mdcTextFieldReference.current]
     )
 
-    let editor: EditorView | null = null
-
     useEffect(
         () => {
-            // TODO apply
-            console.log('TODO value', props.value)
-            editor = new EditorView({
-                extensions: [basicSetup, javascript()],
+            const state = EditorState.create({
+                doc: value,
+                extensions: [
+                    EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
+                        setValue((oldValue: string): string => {
+                            const newValue = viewUpdate.state.doc.toString()
+                            if (oldValue !== newValue) {
+                                const syntheticEvent = new Event('input') as
+                                    Event & { detail: ViewUpdate }
+                                syntheticEvent.detail = viewUpdate
+                                textareaReference.current.value = newValue
+                                textareaReference.current.dispatchEvent(syntheticEvent)
+
+                                return newValue
+                            }
+
+                            return oldValue
+                        })
+                    }),
+                    basicSetup,
+                    javascript()
+                ]
+            })
+
+            const editorView = new EditorView({
+                state,
                 parent: editorViewReference.current
             })
-            textareaReference.current.value = editor.state.doc.toString()
+
+            return () => {
+                editorView.destroy()
+            }
         },
         [editorViewReference.current]
     )
@@ -61,7 +90,7 @@ export const Index = (props: CodeMirrorProps) => {
         <label
             ref={mdcTextFieldReference}
             onClick={() => {
-                // TODO Do code mirror focus
+                editorViewReference.current.focus()
             }}
             className={[
                 'code-editor',
@@ -69,7 +98,7 @@ export const Index = (props: CodeMirrorProps) => {
                 'mdc-text-field--filled',
                 'mdc-text-field--textarea',
                 'mdc-text-field--with-internal-counter'
-            ].join(' ')}
+            ].concat(value ? 'code-editor--has-content' : []).join(' ')}
         >
             <span className="mdc-text-field__ripple"></span>
             <span className="mdc-floating-label" id="my-label-id">
@@ -86,10 +115,23 @@ export const Index = (props: CodeMirrorProps) => {
                     cols={40}
                     maxLength={140}
                     style={{visibility: 'hidden', position: 'absolute'}}
+                    value={value}
                 ></textarea>
 
                 <div
                     ref={editorViewReference}
+                    onFocus={(event: FocusEvent<HTMLDivElement>) => {
+                        const syntheticEvent = new Event('focus') as
+                            Event & {detail: FocusEvent<HTMLDivElement>}
+                        syntheticEvent.detail = event
+                        textareaReference.current.dispatchEvent(syntheticEvent)
+                    }}
+                    onBlur={(event: FocusEvent<HTMLDivElement>) => {
+                        const syntheticEvent = new Event('blur') as
+                            Event & {detail: FocusEvent<HTMLDivElement>}
+                        syntheticEvent.detail = event
+                        textareaReference.current.dispatchEvent(syntheticEvent)
+                    }}
                     className="code-editor__view mdc-text-field__input"
                 ></div>
 

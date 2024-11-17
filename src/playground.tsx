@@ -253,11 +253,14 @@ const Application = () => {
 
     return <>
         <div className="text-input">
-            <Tiptap/>
+            <CodeMirror/>
+        </div>
+        <div className="text-input">
+            <CodeMirror value="initial content"/>
         </div>
 
         <div className="text-input">
-            <CodeMirror/>
+            <Tiptap/>
         </div>
 
         <TextInput<string>
@@ -276,7 +279,7 @@ const Application = () => {
     return (<>
         {/* region navigation */}
         <div className="tab-bar">
-            <TabBar
+        <TabBar
                 activeTabIndex={activeTabIndex}
                 onActivate={(event: {detail: {index: number}}) => {
                     if (event.detail.index !== activeTabIndex)

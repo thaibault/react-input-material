@@ -22,15 +22,35 @@ endregion */
     &.text-input--custom {
         padding-top: 9px;
     }
-    /* stylelint-disable selector-class-pattern */
-    .ace_editor {
-        border-radius: 0;
 
-        margin-top: 27px;
-        margin-left: -4px;
-        margin-right: 4px;
+    .code-editor {
+        .cm-focused {
+            outline: none;
+
+            .cm-content {
+                opacity: 1;
+            }
+            .cm-gutters {
+                visibility: visible;
+            }
+        }
+
+        .cm-content {
+            opacity: 0;
+        }
+        .cm-gutters {
+            visibility: hidden;
+        }
     }
-    /* stylelint-enable selector-class-pattern */
+    .code-editor--has-content {
+        .cm-content {
+            opacity: 1;
+        }
+        .cm-gutters {
+            visibility: visible;
+        }
+    }
+
     .richtext-editor {
         border-bottom: 1px solid rgba(0 0 0 / 42%);
 
@@ -48,7 +68,7 @@ endregion */
                 margin-left: 10px;
 
                 .mdc-icon-button--on {
-                    color: var(--mdc-theme-secondary);;
+                    color: var(--mdc-theme-secondary);
                 }
             }
         }

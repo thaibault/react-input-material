@@ -70,7 +70,10 @@ export const Index = (props: TiptapProps) => {
 
     useEffect(
         () => {
-            new MDCTextField(mdcTextFieldReference.current)
+            const textField = new MDCTextField(mdcTextFieldReference.current)
+            return () => {
+                textField.destroy()
+            }
         },
         [mdcTextFieldReference.current]
     )
