@@ -235,7 +235,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Is triggered immediate after a re-rendering. Sets initial aria list box
      * opening and hidden state.
-     * @returns Nothing.
      */
     useEffect(() => {
         if (useSelection) {
@@ -874,8 +873,7 @@ export const TextInputInner = function<Type = unknown>(
      * selection.
      */
     const onChangeValue = (
-        eventOrValue: GenericEvent | Type,
-        selectedIndex = -1
+        eventOrValue: GenericEvent | Type, selectedIndex = -1
     ): void => {
         setIsSuggestionOpen(true)
 
@@ -1485,11 +1483,6 @@ export const TextInputInner = function<Type = unknown>(
             applyIconPreset(properties.icon) as IconOptions
         ) as IconOptions
 
-    const tiptapProps: RichTextEditorProps = {
-        ...TIPTAP_DEFAULT_OPTIONS,
-        name: properties.name,
-        className: 'mdc-text-field__input'
-    }
     /* TODO
     if (properties.editor.endsWith('raw)')) {
         tiptapProps.toolbar1 =
@@ -1707,128 +1700,38 @@ export const TextInputInner = function<Type = unknown>(
                 useSelection
             )}
             {wrapAnimationConditionally(
-                [
-                    <FormField
-                        className={['mdc-text-field']
-                            .concat(
-                                properties.disabled ?
-                                    'mdc-text-field--disabled' :
-                                    [],
-                                'mdc-text-field--textarea'
-                            )
-                            .join(' ')
+                properties.editor.startsWith('code') ?
+                    <GivenCodeEditorComponent
+                        {...genericProperties as CodeEditorProps}
+                        mode={(
+                            properties.editor.startsWith('code(') &&
+                            properties.editor.endsWith(')')
+                        ) ?
+                            properties.editor.substring(
+                                'code('.length,
+                                properties.editor.length -
+                                1
+                            ) :
+                            'javascript'
                         }
-                        onKeyDown={preventEnterKeyPropagation}
-                        key="advanced-editor-form-field"
-                    >
-                        <label>
-                            <span className={
-                                [CSS_CLASS_NAMES.textInputEditorLabel]
-                                    .concat(
-                                        'mdc-floating-label',
-                                        'mdc-floating-label--float-above'
-                                    )
-                                    .join(' ')
-                            }>
-                                <Theme use={
-                                    properties.invalid &&
-                                    properties.showValidationState &&
-                                    (
-                                        properties.showInitialValidationState ||
-                                        properties.visited
-                                    ) ? 'error' : undefined
-                                }>
-                                    {
-                                        (
-                                            properties.description ||
-                                            properties.name
-                                        ) +
-                                        (properties.required ? '*' : '')
-                                    }
-                                </Theme>
-                            </span>
-                            {
-                                properties.editor.startsWith('code') ?
-                                    <GivenCodeEditorComponent
-                                        {...genericProperties as
-                                            CodeEditorProps
-                                        }
-                                        mode={(
-                                            properties.editor.startsWith(
-                                                'code('
-                                            ) &&
-                                            properties.editor.endsWith(')')
-                                        ) ?
-                                            properties.editor.substring(
-                                                'code('.length,
-                                                properties.editor.length -
-                                                1
-                                            ) :
-                                            'javascript'
-                                        }
-                                        name={properties.name}
-                                        onChange={onChangeValue as
-                                            unknown as
-                                            (
-                                                value: string,
-                                                event?: unknown
-                                            ) => void
-                                        }
-                                        value={
-                                            properties.representation as
-                                                string
-                                        }
-                                        {...properties.inputProperties as
-                                            CodeEditorProps
-                                        }
-                                    /> :
-                                    <GivenRichTextEditorComponent
-                                        {...genericProperties as
-                                            RichTextEditorProps
-                                        }
-                                        disabled={properties.disabled}
-                                        value={
-                                            properties.representation as string
-                                        }
-                                        {...properties.inputProperties as
-                                            RichTextEditorProps
-                                        }
-                                        {...tiptapProps/* onClick={onClick as
-                                            unknown as
-                                            RichTextEventHandler<MouseEvent>
-                                        }
-                                        onEditorChange={onChangeValue as
-                                            unknown as
-                                            RichTextEditorProps[
-                                                'onEditorChange'
-                                            ]
-                                        }
-                                        onKeyUp={onKeyUp as
-                                            unknown as
-                                            RichTextEventHandler<KeyboardEvent>
-                                        }*/}
-                                    />
-                            }
-                        </label>
-                    </FormField>,
-                    <div
-                        className="mdc-text-field-helper-line"
-                        key="advanced-editor-helper-line"
-                    >
-                        <p
-                            className={
-                                'mdc-text-field-helper-text ' +
-                                'mdc-text-field-helper-text--persistent'
-                            }
-                            id={`${id}-error-message`}
-                        >
-                            {(
-                                materialProperties.helpText as
-                                    {children: ReactElement}
-                            ).children}
-                        </p>
-                    </div>
-                ],
+                        name={properties.name}
+                        onChange={onChangeValue as
+                            unknown as (value: string, event?: unknown) => void
+                        }
+                        value={properties.representation as string}
+                        {...properties.inputProperties as CodeEditorProps}
+                    /> :
+                    <GivenRichTextEditorComponent
+                        {...genericProperties as RichTextEditorProps}
+                        disabled={properties.disabled}
+                        {...properties.inputProperties}
+                        onClick={onClick}
+                        onChangeValue={
+                            onChangeValue as (value: string) => void
+                        }
+                        onKeyUp={onKeyUp}
+                        editor={{options: TIPTAP_DEFAULT_OPTIONS}}
+                    />,
                 isAdvancedEditor,
                 properties.editor.startsWith('code')
             )}

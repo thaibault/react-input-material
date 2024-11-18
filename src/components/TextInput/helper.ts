@@ -2,6 +2,7 @@
 // -*- coding: utf-8 -*-
 /** @module helper */
 'use strict'
+import type {EditorOptions} from '@tiptap/core'
 /* !
     region header
     [Project page](https://torben.website/react-material-input)
@@ -96,7 +97,7 @@ declare const UTC_BUILD_TIMESTAMP: number | undefined
 // NOTE: Could be set via module bundler environment variables.
 export const CURRENT_UTC_BUILD_TIMESTAMP =
     typeof UTC_BUILD_TIMESTAMP === 'undefined' ? 1 : UTC_BUILD_TIMESTAMP
-export const TIPTAP_DEFAULT_OPTIONS: Partial<TiptapProps> = {
+export const TIPTAP_DEFAULT_OPTIONS: Partial<EditorOptions> = {
     injectCSS: true,
     enableContentCheck: true
 }

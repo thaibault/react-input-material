@@ -32,8 +32,8 @@ import PropertyTypes, {
 } from 'clientnode/dist/property-types'
 import {
     FocusEvent as ReactFocusEvent,
-    ForwardRefExoticComponent,
-    KeyboardEvent,
+    ForwardRefExoticComponent, KeyboardEvent as ReactKeyboardEvent,
+    KeyboardEvent, MouseEvent as ReactMouseEvent,
     MouseEvent,
     MutableRefObject,
     ReactElement,
@@ -56,7 +56,7 @@ import {TextFieldProps} from '@rmwc/textfield'
 import {TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
 
-import {ChainedCommands, Extensions} from '@tiptap/core'
+import {ChainedCommands, type EditorOptions, Extensions} from '@tiptap/core'
 import {EditorProviderProps} from '@tiptap/react'
 import {StarterKitOptions} from '@tiptap/starter-kit'
 
@@ -161,19 +161,27 @@ export interface RichTextEditorButtonProps {
 
     label?: string
 }
-export interface AdditionalContainerProps {
+export interface TiptapProperties extends TextFieldProps {
     className?: Array<string> | string
     id?: string
-    name?: string
+
+    disabled: boolean
+    value: string
+    description: string
+    name: string
+
+    onBlur: (event: ReactFocusEvent<HTMLDivElement>) => void
+    onChangeValue: (value: string) => void
+    onClick: (event: ReactMouseEvent) => void
+    onKeyUp: (event: ReactKeyboardEvent) => void
+
+    editor: {
+        options?: Partial<EditorOptions>
+        extensions?: Extensions
+        starterKitOptions?: Partial<StarterKitOptions>
+    }
 }
-export interface TiptapProps
-    extends
-AdditionalContainerProps, Omit<EditorProviderProps, 'content'| 'readonly'> {
-    disabled?: boolean
-    value?: string
-    extensions?: Extensions
-    starterKitOptions?: Partial<StarterKitOptions>
-}
+export type TiptapProps = Partial<TiptapProperties>
 
 export interface CodeMirrorProps {
     value?: string

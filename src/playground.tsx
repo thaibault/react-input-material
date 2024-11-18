@@ -250,32 +250,6 @@ const Application = () => {
         })
     /// endregion
     // endregion
-
-    return <>
-        <div className="text-input">
-            <CodeMirror/>
-        </div>
-        <div className="text-input">
-            <CodeMirror value="initial content"/>
-        </div>
-
-        <div className="text-input">
-            <Tiptap/>
-        </div>
-
-        <TextInput<string>
-            declaration="text"
-            description="textInput1Description"
-            editor="text"
-            initialValue=""
-            name="textInput1"
-            onChange={onChange}
-            required
-            maximumLength={100}
-            rows={3}
-        />
-    </>
-
     return (<>
         {/* region navigation */}
         <div className="tab-bar">

@@ -31,8 +31,8 @@ export const Index = (props: TiptapProps) => {
     const value = props.value || ''
 
     const extensions =
-        props.extensions ||
-        [StarterKit.configure(props.starterKitOptions || {})]
+        props.editor?.extensions ||
+        [StarterKit.configure(props.editor?.starterKitOptions || {})]
 
     const editor = useEditor({
         extensions,
@@ -60,7 +60,8 @@ export const Index = (props: TiptapProps) => {
                 textareaReference.current.value =
                     editorEvent.editor.getHTML()
             textareaReference.current.dispatchEvent(syntheticEvent)
-        }
+        },
+        ...(props.editor?.options || {})
     })
 
     const mdcTextFieldReference =
@@ -96,7 +97,7 @@ export const Index = (props: TiptapProps) => {
         >
             <span className="mdc-text-field__ripple"></span>
             <span className="mdc-floating-label" id="my-label-id">
-                Textarea Label
+                {props.description || props.name}
             </span>
 
             <span className="mdc-text-field__resizer">
