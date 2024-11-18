@@ -42,11 +42,13 @@ const Button = ({
     else if (enabledIndicator !== null)
         enabled = action(editor.can().chain().focus()).run()
 
+    const checked =
+        Boolean(activeIndicator && editor.isActive(activeIndicator))
+
     return <WrapTooltip options={label}>
         <IconButton
-            checked={
-                Boolean(activeIndicator && editor.isActive(activeIndicator))
-            }
+            checked={checked}
+            className={checked ? 'mdc-icon-button--checked' : ''}
             disabled={!enabled}
             onClick={(event) => {
                 event.stopPropagation()

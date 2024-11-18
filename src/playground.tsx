@@ -632,6 +632,9 @@ const Application = () => {
                         required
                         rows={2}
                         selectableEditor
+
+                        minimumLength={10}
+                        maximumLength={100}
                     />
                     <TextInput<string>
                         editor="richtext(simple)"

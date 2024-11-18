@@ -161,19 +161,17 @@ export interface RichTextEditorButtonProps {
 
     label?: string
 }
-export interface TiptapProperties extends TextFieldProps {
-    className?: Array<string> | string
-    id?: string
-
-    disabled: boolean
+export interface TiptapProperties
+    extends
+Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
+    id: string
     value: string
-    description: string
-    name: string
 
-    onBlur: (event: ReactFocusEvent<HTMLDivElement>) => void
-    onChangeValue: (value: string) => void
-    onClick: (event: ReactMouseEvent) => void
-    onKeyUp: (event: ReactKeyboardEvent) => void
+    minLength: number
+    maxLength: number
+    rows: number
+
+    onChange: (value: string) => void
 
     editor: {
         options?: Partial<EditorOptions>

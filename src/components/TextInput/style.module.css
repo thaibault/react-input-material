@@ -19,10 +19,6 @@ endregion */
         white-space: nowrap;
     }
 
-    &.text-input--custom {
-        padding-top: 9px;
-    }
-
     .code-editor {
         .cm-focused {
             outline: none;
@@ -51,23 +47,30 @@ endregion */
         }
     }
 
+    .richtext-editor.mdc-text-field--with-internal-counter .richtext-editor-bar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
     .richtext-editor {
         border-bottom: 1px solid rgba(0 0 0 / 42%);
+
+        &.mdc-text-field--disabled .richtext-editor-bar {
+            opacity: 0.3;
+        }
 
         .tiptap:focus-visible {
             outline: none;
         }
 
         .richtext-editor-bar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
+            width: 100%;
 
             .richtext-editor-menu-bar {
                 margin-bottom: 5px;
                 margin-left: 10px;
 
-                .mdc-icon-button--on {
+                .mdc-icon-button--checked {
                     color: var(--mdc-theme-secondary);
                 }
             }

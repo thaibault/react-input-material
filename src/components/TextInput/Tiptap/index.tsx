@@ -17,11 +17,12 @@
     endregion
 */
 // region imports
-import {MDCTextField} from '@material/textfield'
+import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
+import {TextFieldHelperTextProps} from '@rmwc/textfield/lib/textfield'
 import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
-import {MutableRefObject, useEffect, useRef} from 'react'
+import {MutableRefObject, RefObject, useEffect, useRef} from 'react'
 
 import {TiptapProps} from '../type'
 
@@ -36,6 +37,8 @@ export const Index = (props: TiptapProps) => {
 
     const editor = useEditor({
         extensions,
+
+        editable: !props.disabled,
         content: value,
         onFocus: (editorEvent) => {
             const syntheticEvent =
@@ -57,9 +60,11 @@ export const Index = (props: TiptapProps) => {
             if (html === '<p></p>')
                 textareaReference.current.value = ''
             else
-                textareaReference.current.value =
-                    editorEvent.editor.getHTML()
+                textareaReference.current.value = html
             textareaReference.current.dispatchEvent(syntheticEvent)
+
+            if (props.onChange)
+                props.onChange(html)
         },
         ...(props.editor?.options || {})
     })
@@ -68,18 +73,101 @@ export const Index = (props: TiptapProps) => {
         useRef<HTMLLabelElement>() as MutableRefObject<HTMLLabelElement>
     const textareaReference =
         useRef<HTMLTextAreaElement>() as MutableRefObject<HTMLTextAreaElement>
+    const contentViewReference =
+        useRef<HTMLDivElement | null>(null)
 
     useEffect(
         () => {
             const textField = new MDCTextField(mdcTextFieldReference.current)
+            if (props.foundationRef)
+                (
+                    props.foundationRef as {current: MDCTextFieldFoundation}
+                ).current = textField.getDefaultFoundation()
+
+            if (typeof props.value === 'string')
+                textField.value = props.value
+            if (typeof props.disabled === 'boolean')
+                textField.disabled = props.disabled
+            if (typeof props.invalid === 'boolean')
+                textField.valid = !props.invalid
+            if (typeof props.required === 'boolean')
+                textField.required = props.required
+            if (typeof props.minLength === 'number')
+                textField.minLength = props.minLength
+            if (typeof props.maxLength === 'number')
+                textField.maxLength = props.maxLength
+
+            textField.useNativeValidation = false
+
             return () => {
                 textField.destroy()
             }
         },
-        [mdcTextFieldReference.current]
+        [
+            mdcTextFieldReference.current,
+
+            props.foundationRef,
+
+            props.value,
+            props.disabled,
+            props.invalid,
+            props.required,
+            props.minLength,
+            props.maxLength
+        ]
+    )
+
+    useEffect(
+        () => {
+            if (contentViewReference.current)
+                contentViewReference.current.style.height =
+                    `${textareaReference.current.clientHeight}px`
+        },
+        [contentViewReference.current, textareaReference.current?.clientHeight]
     )
 
     const htmlContent = editor?.getHTML()
+
+    const helpText: TextFieldHelperTextProps =
+        typeof props.helpText === 'object' ?
+            props.helpText as TextFieldHelperTextProps :
+            {children: props.helpText}
+
+    const editorContent = <>
+        <textarea
+            ref={textareaReference}
+
+            className="mdc-text-field__input"
+            style={{visibility: 'hidden', position: 'absolute'}}
+            rows={props.rows}
+
+            aria-labelledby={`${props.id}-label`}
+            aria-controls={`${props.id}-helper`}
+            aria-describedby={`${props.id}-helper`}
+
+            readOnly
+
+            value={htmlContent === '<p></p>' ? '' : htmlContent}
+
+            minLength={props.minLength}
+            maxLength={props.maxLength}
+        ></textarea>
+
+        <EditorContent
+            className="mdc-text-field__input"
+            editor={editor}
+            innerRef={contentViewReference}
+        />
+
+        <div className="richtext-editor-bar">
+            <MenuBar editor={editor}/>
+            {props.characterCount ?
+                <div className="mdc-text-field-character-counter">
+                </div> :
+                ''
+            }
+        </div>
+    </>
 
     return <>
         <label
@@ -90,42 +178,61 @@ export const Index = (props: TiptapProps) => {
             className={[
                 'richtext-editor',
                 'mdc-text-field',
-                'mdc-text-field--filled',
                 'mdc-text-field--textarea',
-                'mdc-text-field--with-internal-counter'
-            ].join(' ')}
+            ]
+                .concat(props.disabled ? 'mdc-text-field--disabled' : [])
+                .concat(props.outlined ?
+                    'mdc-text-field--outlined' :
+                    'mdc-text-field--filled'
+                )
+                .concat(
+                    props.characterCount ?
+                        'mdc-text-field--with-internal-counter' :
+                        []
+                )
+                .join(' ')}
         >
-            <span className="mdc-text-field__ripple"></span>
-            <span className="mdc-floating-label" id="my-label-id">
-                {props.description || props.name}
+            {props.ripple ?
+                <span className="mdc-text-field__ripple"></span> :
+                ''
+            }
+            <span className="mdc-floating-label" id={`${props.id}-label`}>
+                {props.label}
             </span>
 
-            <span className="mdc-text-field__resizer">
-                <textarea
-                    ref={textareaReference}
-                    className="mdc-text-field__input"
-                    aria-labelledby="my-label-id"
-                    readOnly
-                    rows={8}
-                    cols={40}
-                    maxLength={140}
-                    value={htmlContent === '<p></p>' ? '' : htmlContent}
-                    style={{visibility: 'hidden', position: 'absolute'}}
-                ></textarea>
+            {props.resizeable ?
+                <span className="mdc-text-field__resizer">
+                    {editorContent}
+                </span> :
+                editorContent
+            }
 
-                <EditorContent
-                    className="mdc-text-field__input" editor={editor}
-                />
-
-                <div className="richtext-editor-bar">
-                    <MenuBar editor={editor} />
-                    <div className="mdc-text-field-character-counter"></div>
-                </div>
-            </span>
-            <span className="mdc-line-ripple"></span>
+            {props.ripple ?
+                <span className="mdc-line-ripple"></span> :
+                ''
+            }
         </label>
-        <div className="mdc-text-field-helper-line">
-        </div>
+        {helpText.children ?
+            <div className="mdc-text-field-helper-line">
+                <div
+                    className={['mdc-text-field-helper-text']
+                        .concat(
+                            helpText.persistent ?
+                                'mdc-text-field-helper-text--persistent' :
+                                []
+                        )
+                        .join(' ')
+                    }
+                    id={`${props.id}-helper`}
+                >
+                    {(props.helpText as TextFieldHelperTextProps)?.children ?
+                        (props.helpText as TextFieldHelperTextProps).children :
+                        props.helpText as string
+                    }
+                </div>
+            </div> :
+            ''
+        }
     </>
 }
 
