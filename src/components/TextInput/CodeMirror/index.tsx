@@ -22,13 +22,17 @@ import {EditorState} from '@codemirror/state'
 import {EditorView, ViewUpdate} from '@codemirror/view'
 import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
 import {TextFieldHelperTextProps} from '@rmwc/textfield/lib/textfield'
+import {Mapping} from 'clientnode'
 
 import {basicSetup} from 'codemirror'
 import {FocusEvent, MutableRefObject, useEffect, useRef, useState} from 'react'
-import {VIEW_CONTENT_OFFSET_IN_PX} from '../Tiptap'
 
+import cssClassNames from '../style.module'
+import {VIEW_CONTENT_OFFSET_IN_PX} from '../Tiptap'
 import {CodeMirrorProps} from '../type'
 // endregion
+export const CSS_CLASS_NAMES = cssClassNames as Mapping
+
 export const Index = (props: CodeMirrorProps) => {
     const [value, setValue] = useState(props.value || '')
 
@@ -172,7 +176,9 @@ export const Index = (props: CodeMirrorProps) => {
                     props.onFocus(event)
             }}
 
-            className="code-editor__view mdc-text-field__input"
+            className={
+                CSS_CLASS_NAMES.codeEditorView + ' mdc-text-field__input'
+            }
         ></div>
 
         {props.characterCount ?
@@ -193,10 +199,11 @@ export const Index = (props: CodeMirrorProps) => {
                 editorViewReference.current.focus()
             }}
             className={[
-                'richtext-editor',
+                CSS_CLASS_NAMES.codeEditor,
                 'mdc-text-field',
                 'mdc-text-field--textarea',
             ]
+                .concat(value ? CSS_CLASS_NAMES.codeEditorHasContent : [])
                 .concat(props.disabled ? 'mdc-text-field--disabled' : [])
                 .concat(props.outlined ?
                     'mdc-text-field--outlined' :

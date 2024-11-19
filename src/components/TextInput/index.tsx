@@ -17,6 +17,25 @@
     endregion
 */
 // region imports
+import {javascript} from '@codemirror/lang-javascript'
+import {css} from '@codemirror/lang-css'
+
+import {MDCMenuFoundation} from '@material/menu'
+import {MDCSelectFoundation} from '@material/select'
+import {MDCTextFieldFoundation} from '@material/textfield'
+
+import {CircularProgress} from '@rmwc/circular-progress'
+import {Icon} from '@rmwc/icon'
+import {IconButton, IconButtonOnChangeEventT} from '@rmwc/icon-button'
+import {ListApi} from '@rmwc/list'
+import {
+    Menu, MenuApi, MenuSurface, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
+} from '@rmwc/menu'
+import {Select, SelectProps} from '@rmwc/select'
+import {TextField, TextFieldProps} from '@rmwc/textfield'
+import {Theme} from '@rmwc/theme'
+import {IconOptions} from '@rmwc/types'
+
 import {
     camelCaseToDelimited,
     copy,
@@ -50,23 +69,6 @@ import Dummy from 'react-generic-dummy'
 import {TransitionProps} from 'react-transition-group/Transition'
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
-
-import {MDCMenuFoundation} from '@material/menu'
-import {MDCSelectFoundation} from '@material/select'
-import {MDCTextFieldFoundation} from '@material/textfield'
-
-import {CircularProgress} from '@rmwc/circular-progress'
-import {FormField} from '@rmwc/formfield'
-import {Icon} from '@rmwc/icon'
-import {IconButton, IconButtonOnChangeEventT} from '@rmwc/icon-button'
-import {ListApi} from '@rmwc/list'
-import {
-    Menu, MenuApi, MenuSurface, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
-} from '@rmwc/menu'
-import {Select, SelectProps} from '@rmwc/select'
-import {TextField, TextFieldProps} from '@rmwc/textfield'
-import {Theme} from '@rmwc/theme'
-import {IconOptions} from '@rmwc/types'
 
 import WrapConfigurations from '../WrapConfigurations'
 import WrapTooltip from '../WrapTooltip'
@@ -124,7 +126,7 @@ import {
     NormalizedSelection,
     textInputRenderProperties as renderProperties,
     TextInputComponent,
-    TiptapProps as RichTextEditorProps, TiptapProperties
+    TiptapProps as RichTextEditorProps, TiptapProperties, CodeMirrorProps
 } from './type'
 import TRANSFORMER from './transformer'
 
@@ -1483,22 +1485,6 @@ export const TextInputInner = function<Type = unknown>(
             applyIconPreset(properties.icon) as IconOptions
         ) as IconOptions
 
-    /* TODO
-    if (properties.editor.endsWith('raw)')) {
-        tiptapProps.toolbar1 =
-            'cut copy paste | undo redo removeformat | code | fullscreen'
-        delete tiptapProps.toolbar2
-    } else if (properties.editor.endsWith('simple)')) {
-        tiptapProps.toolbar1 =
-            'cut copy paste | undo redo removeformat | bold italic ' +
-            'underline strikethrough subscript superscript | fullscreen'
-        delete tiptapProps.toolbar2
-    } else if (properties.editor.endsWith('normal)'))
-        tiptapProps.toolbar1 =
-            'cut copy paste | undo redo removeformat | styleselect ' +
-            'formatselect | searchreplace visualblocks fullscreen code'
-    */
-
     const isAdvancedEditor: boolean = (
         !properties.selection &&
         properties.type === 'string' &&
@@ -1644,6 +1630,30 @@ export const TextInputInner = function<Type = unknown>(
     const EditorComponent = properties.editor.startsWith('code') ?
         GivenCodeEditorComponent :
         GivenRichTextEditorComponent
+    const editorProperties = {} as CodeMirrorProps
+    if (
+        properties.editor.startsWith('code(') &&
+        properties.editor.endsWith(')')
+    ) {
+        const modeName = properties.editor.substring(
+            'code('.length, properties.editor.length - 1
+        )
+        if (modeName) {
+            editorProperties.editor = {}
+            if (['js', 'script', 'javascript'].includes(
+                modeName.toLowerCase()
+            ))
+                editorProperties.editor.mode = javascript()
+            else if ([
+                'css',
+                'style',
+                'styles',
+                'cascadingstylesheet',
+                'cascadingstylesheets'
+            ].includes(modeName.toLowerCase()))
+                editorProperties.editor.mode = css()
+        }
+    }
     /// region main markup
     return <WrapConfigurations
         strict={TextInput.strict}
@@ -1652,10 +1662,7 @@ export const TextInputInner = function<Type = unknown>(
     >
         <div
             className={[CSS_CLASS_NAMES.textInput]
-                .concat(
-                    isAdvancedEditor ? CSS_CLASS_NAMES.textInputCustom : [],
-                    properties.className
-                )
+                .concat(properties.className)
                 .join(' ')
             }
             onBlur={onBlur}
@@ -1707,17 +1714,7 @@ export const TextInputInner = function<Type = unknown>(
                     {...genericProperties}
                     {...materialProperties}
                     {...constraints}
-                    mode={(
-                        properties.editor.startsWith('code(') &&
-                        properties.editor.endsWith(')')
-                    ) ?
-                        properties.editor.substring(
-                            'code('.length,
-                            properties.editor.length -
-                            1
-                        ) :
-                        'javascript'
-                    }
+
                     align={properties.align}
                     characterCount={
                         typeof properties.maximumLength === 'number' &&
@@ -1753,6 +1750,8 @@ export const TextInputInner = function<Type = unknown>(
                     ))}
                     type={determineNativeType(properties)}
                     value={properties.representation as string}
+
+                    {...editorProperties}
                     {...properties.inputProperties}
                 />,
                 isAdvancedEditor,

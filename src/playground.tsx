@@ -597,7 +597,7 @@ const Application = () => {
                     <TextInput<string>
                         declaration="code"
                         description="textInput3Description"
-                        editor="code"
+                        editor="code(css)"
                         maximumLength={10}
                         name="textInput3"
                         onChange={onChange}
@@ -606,7 +606,7 @@ const Application = () => {
                         selectableEditor
                     />
                     <TextInput<string>
-                        editor="code"
+                        editor="code(css)"
                         model={useMemorizedValue({
                             declaration: 'code',
                             description: 'textInput3ModelDescription',

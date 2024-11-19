@@ -95,6 +95,7 @@
     "@babel/preset-react": "^7.25.9",
     "@babel/runtime": "^7.26.0",
     "@codemirror/commands": "^6.7.1",
+    "@codemirror/lang-css": "^6.2.2",
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.34.3",
@@ -172,6 +173,7 @@
   "peerDependencies": {
     "@babel/runtime": "*",
     "@codemirror/commands": "*",
+    "@codemirror/lang-css": "*",
     "@codemirror/lang-javascript": "*",
     "@codemirror/state": "*",
     "@codemirror/view": "*",
@@ -207,6 +209,9 @@
       "optional": true
     },
     "@codemirror/commands": {
+      "optional": true
+    },
+    "@codemirror/lang-css": {
       "optional": true
     },
     "@codemirror/lang-javascript": {
@@ -475,6 +480,7 @@
         "aliases": {
           "#": "Remove unneeded optional dependencies.",
           "@codemirror/commands": "react-generic-dummy",
+          "@codemirror/lang-css": "react-generic-dummy",
           "@codemirror/lang-javascript": "react-generic-dummy",
           "@codemirror/state": "react-generic-dummy",
           "@codemirror/view": "react-generic-dummy",

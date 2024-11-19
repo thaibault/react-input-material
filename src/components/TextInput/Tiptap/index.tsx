@@ -21,13 +21,16 @@ import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
 import {TextFieldHelperTextProps} from '@rmwc/textfield/lib/textfield'
 import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import {Mapping} from 'clientnode'
 
 import {MutableRefObject, useEffect, useRef} from 'react'
 
+import cssClassNames from '../style.module'
 import {TiptapProps} from '../type'
 
 import MenuBar from './MenuBar'
 // endregion
+export const CSS_CLASS_NAMES = cssClassNames as Mapping
 export const VIEW_CONTENT_OFFSET_IN_PX = 8
 
 export const Index = (props: TiptapProps) => {
@@ -161,11 +164,10 @@ export const Index = (props: TiptapProps) => {
             innerRef={contentViewReference}
         />
 
-        <div className="richtext-editor-bar">
+        <div className={CSS_CLASS_NAMES.richtextEditorBar}>
             <MenuBar editor={editor}/>
             {props.characterCount ?
-                <div className="mdc-text-field-character-counter">
-                </div> :
+                <div className="mdc-text-field-character-counter"></div> :
                 ''
             }
         </div>
@@ -183,7 +185,7 @@ export const Index = (props: TiptapProps) => {
                 editor?.chain().focus().run()
             }}
             className={[
-                'richtext-editor',
+                CSS_CLASS_NAMES.richtextEditor,
                 'mdc-text-field',
                 'mdc-text-field--textarea',
             ]
