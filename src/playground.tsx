@@ -624,6 +624,8 @@ const Application = () => {
                         declaration="richtext(raw)"
                         description="textInput4Description"
                         editor="richtext(raw)"
+                        minimumLength={10}
+                        maximumLength={100}
                         name="textInput4"
                         onChange={onChange}
                         placeholder={
@@ -632,9 +634,6 @@ const Application = () => {
                         required
                         rows={2}
                         selectableEditor
-
-                        minimumLength={10}
-                        maximumLength={100}
                     />
                     <TextInput<string>
                         editor="richtext(simple)"

@@ -28,6 +28,8 @@ import {TiptapProps} from '../type'
 
 import MenuBar from './MenuBar'
 // endregion
+export const VIEW_CONTENT_OFFSET_IN_PX = 8
+
 export const Index = (props: TiptapProps) => {
     const value = props.value || ''
 
@@ -121,7 +123,7 @@ export const Index = (props: TiptapProps) => {
         () => {
             if (contentViewReference.current)
                 contentViewReference.current.style.height =
-                    `${textareaReference.current.clientHeight}px`
+                    `${textareaReference.current.clientHeight + VIEW_CONTENT_OFFSET_IN_PX}px`
         },
         [contentViewReference.current, textareaReference.current?.clientHeight]
     )

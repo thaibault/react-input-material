@@ -45,7 +45,9 @@ const Button = ({
     const checked =
         Boolean(activeIndicator && editor.isActive(activeIndicator))
 
-    return <WrapTooltip options={label}>
+    const description = label ?? activeIndicator ?? iconName
+
+    return <WrapTooltip options={description}>
         <IconButton
             checked={checked}
             className={checked ? 'mdc-icon-button--checked' : ''}
@@ -56,7 +58,7 @@ const Button = ({
             }}
             icon={{icon: iconName, size: 'xsmall'}}
             onIcon={{icon: checkedIconName ?? iconName, size: 'xsmall'}}
-            label={label ?? activeIndicator ?? iconName}
+            label={description}
         />
     </WrapTooltip>
 }
@@ -65,7 +67,7 @@ const Index = ({editor}: {editor: Editor | null}) => {
     if (!editor)
         return null
 
-    return <div className="richtext-editor-menu-bar">
+    return <span className="richtext-editor-menu-bar">
         <EditorContext.Provider value={editor}>
             <span className="richtext-editor-menu-bar__history">
                 <Button
@@ -165,7 +167,7 @@ const Index = ({editor}: {editor: Editor | null}) => {
                 />
             </span>
         </EditorContext.Provider>
-    </div>
+    </span>
 }
 
 export default Index

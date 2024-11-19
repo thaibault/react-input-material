@@ -50,7 +50,7 @@ endregion */
     .richtext-editor.mdc-text-field--with-internal-counter .richtext-editor-bar {
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
+        width: 100%;
     }
     .richtext-editor {
         border-bottom: 1px solid rgba(0 0 0 / 42%);
@@ -64,15 +64,24 @@ endregion */
         }
 
         .richtext-editor-bar {
-            width: 100%;
+            width: calc(100% - 6px);
+
+            padding-left: 6px;
 
             .richtext-editor-menu-bar {
-                margin-bottom: 5px;
-                margin-left: 10px;
+                display: contents;
+
+                > span {
+                    align-self: flex-start;
+                }
 
                 .mdc-icon-button--checked {
                     color: var(--mdc-theme-secondary);
                 }
+            }
+
+            .mdc-text-field-character-counter {
+                margin-right: 10px;
             }
         }
     }
