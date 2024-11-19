@@ -34,7 +34,7 @@ import {CodeMirrorProps} from '../type'
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
 export const Index = (props: CodeMirrorProps) => {
-    const [value, setValue] = useState(props.value || '')
+    const [value, setValue] = useState(String(props.value) || '')
 
     const mdcTextFieldReference =
         useRef<HTMLLabelElement>() as MutableRefObject<HTMLLabelElement>

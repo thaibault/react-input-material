@@ -47,7 +47,7 @@ import {
     Mapping,
     mark
 } from 'clientnode'
-import {
+import React, {
     FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardedRef,
@@ -126,7 +126,10 @@ import {
     NormalizedSelection,
     textInputRenderProperties as renderProperties,
     TextInputComponent,
-    TiptapProps as RichTextEditorProps, TiptapProperties, CodeMirrorProps
+    TiptapProps as RichTextEditorProps,
+    TiptapProperties,
+    CodeMirrorProps,
+    EditorProperties
 } from './type'
 import TRANSFORMER from './transformer'
 
@@ -1259,7 +1262,7 @@ export const TextInputInner = function<Type = unknown>(
     /// region references
     const foundationReference: MutableRefObject<
         MDCSelectFoundation | MDCTextFieldFoundation | null
-    > = useRef<MDCSelectFoundation | MDCTextFieldFoundation>(null)
+    >  = useRef<MDCSelectFoundation | MDCTextFieldFoundation>(null)
     const inputReference: MutableRefObject<
         HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
     > = useRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(null)
@@ -1711,7 +1714,7 @@ export const TextInputInner = function<Type = unknown>(
             )}
             {wrapAnimationConditionally(
                 <EditorComponent
-                    {...genericProperties}
+                    {...genericProperties as EditorProperties}
                     {...materialProperties}
                     {...constraints}
 
@@ -1751,8 +1754,8 @@ export const TextInputInner = function<Type = unknown>(
                     type={determineNativeType(properties)}
                     value={properties.representation as string}
 
-                    {...editorProperties}
-                    {...properties.inputProperties}
+                    {...editorProperties as Partial<EditorProperties>}
+                    {...properties.inputProperties as Partial<EditorProperties>}
                 />,
                 isAdvancedEditor,
                 properties.editor.startsWith('code')

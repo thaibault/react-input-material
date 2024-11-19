@@ -151,9 +151,11 @@ export type InputDataTransformation =
     }
     /* eslint-enable @typescript-eslint/consistent-indexed-object-style */
 // endregion
-export interface EditorProperties {
+export interface EditorProperties
+    extends
+Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
     id: string
-    value: string
+    value: number | string
 
     minLength: number
     maxLength: number
@@ -173,9 +175,7 @@ export interface RichTextEditorButtonProps {
 
     label?: string
 }
-export interface TiptapProperties
-    extends
-EditorProperties, Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
+export interface TiptapProperties extends EditorProperties {
     onBlur: (event: EditorEvents['focus']) => void
     onFocus: (event: EditorEvents['focus']) => void
 
@@ -187,9 +187,7 @@ EditorProperties, Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
 }
 export type TiptapProps = Partial<TiptapProperties>
 
-export interface CodeMirrorProperties
-    extends
-EditorProperties, Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
+export interface CodeMirrorProperties extends EditorProperties {
     onBlur: (event: ReactFocusEvent<HTMLDivElement>) => void
     onFocus: (event: ReactFocusEvent<HTMLDivElement>) => void
 
@@ -207,10 +205,7 @@ export type InputSelection =
     SelectProps['options']
 export type NormalizedSelection =
     Array<Omit<FormattedSelectionOption, 'value'> & {value: unknown}>
-export interface InputTablePosition {
-    column: number
-    row: number
-}
+
 export interface InputModelState extends ModelState {
     invalidMaximum: boolean
     invalidMinimum: boolean

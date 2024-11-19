@@ -92,7 +92,7 @@ export const Index = (props: TiptapProps) => {
         extensions,
 
         editable: !props.disabled,
-        content: value,
+        content: String(value),
         onFocus: (editorEvent: EditorEvents['focus']) => {
             const syntheticEvent =
                 new Event('focus') as Event & {detail: EditorEvents['focus']}
