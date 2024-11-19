@@ -23,7 +23,7 @@ import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import {Mapping} from 'clientnode'
 
-import {MutableRefObject, useEffect, useRef} from 'react'
+import {MutableRefObject, useEffect, useId, useRef} from 'react'
 
 import cssClassNames from '../style.module'
 import {TiptapProps} from '../type'
@@ -39,6 +39,9 @@ export const Index = (props: TiptapProps) => {
     const extensions =
         props.editor?.extensions ||
         [StarterKit.configure(props.editor?.starterKitOptions || {})]
+
+    const defaultID = useId()
+    const id = props.id ?? defaultID
 
     const mdcTextFieldReference =
         useRef<HTMLLabelElement>() as MutableRefObject<HTMLLabelElement>
@@ -133,9 +136,13 @@ export const Index = (props: TiptapProps) => {
         () => {
             if (contentViewReference.current)
                 contentViewReference.current.style.height =
-                    `${textareaReference.current.clientHeight + VIEW_CONTENT_OFFSET_IN_PX}px`
+                    String(
+                        textareaReference.current.clientHeight +
+                        VIEW_CONTENT_OFFSET_IN_PX
+                    ) +
+                    'px'
         },
-        [contentViewReference.current, textareaReference.current?.clientHeight]
+        [contentViewReference.current, textareaReference.current.clientHeight]
     )
 
     const editorContent = <>
@@ -146,9 +153,9 @@ export const Index = (props: TiptapProps) => {
             style={{visibility: 'hidden', position: 'absolute'}}
             rows={props.rows}
 
-            aria-labelledby={`${props.id}-label`}
-            aria-controls={`${props.id}-helper`}
-            aria-describedby={`${props.id}-helper`}
+            aria-labelledby={`${id}-label`}
+            aria-controls={`${id}-helper`}
+            aria-describedby={`${id}-helper`}
 
             readOnly
 
@@ -187,7 +194,7 @@ export const Index = (props: TiptapProps) => {
             className={[
                 CSS_CLASS_NAMES.richtextEditor,
                 'mdc-text-field',
-                'mdc-text-field--textarea',
+                'mdc-text-field--textarea'
             ]
                 .concat(props.disabled ? 'mdc-text-field--disabled' : [])
                 .concat(props.outlined ?
@@ -205,7 +212,7 @@ export const Index = (props: TiptapProps) => {
                 <span className="mdc-text-field__ripple"></span> :
                 ''
             }
-            <span className="mdc-floating-label" id={`${props.id}-label`}>
+            <span className="mdc-floating-label" id={`${id}-label`}>
                 {props.label}
             </span>
 
@@ -232,9 +239,11 @@ export const Index = (props: TiptapProps) => {
                         )
                         .join(' ')
                     }
-                    id={`${props.id}-helper`}
+                    id={`${id}-helper`}
                 >
-                    {(props.helpText as TextFieldHelperTextProps)?.children ?
+                    {(
+                        props.helpText as TextFieldHelperTextProps | undefined
+                    )?.children ?
                         (props.helpText as TextFieldHelperTextProps).children :
                         props.helpText as string
                     }

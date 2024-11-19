@@ -106,6 +106,7 @@ import {
 } from './helper'
 import {
     CodeMirrorProps as CodeEditorProps,
+    CodeMirrorProperties as CodeEditorProperties,
     DataTransformSpecification,
     defaultInputModelState as defaultModelState,
     DefaultInputProperties as DefaultProperties,
@@ -127,8 +128,8 @@ import {
     textInputRenderProperties as renderProperties,
     TextInputComponent,
     TiptapProps as RichTextEditorProps,
-    TiptapProperties,
-    CodeMirrorProps,
+    TiptapProperties as RichTextEditorProperties,
+
     EditorProperties
 } from './type'
 import TRANSFORMER from './transformer'
@@ -1262,7 +1263,7 @@ export const TextInputInner = function<Type = unknown>(
     /// region references
     const foundationReference: MutableRefObject<
         MDCSelectFoundation | MDCTextFieldFoundation | null
-    >  = useRef<MDCSelectFoundation | MDCTextFieldFoundation>(null)
+    > = useRef<MDCSelectFoundation | MDCTextFieldFoundation>(null)
     const inputReference: MutableRefObject<
         HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
     > = useRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(null)
@@ -1633,30 +1634,35 @@ export const TextInputInner = function<Type = unknown>(
     const EditorComponent = properties.editor.startsWith('code') ?
         GivenCodeEditorComponent :
         GivenRichTextEditorComponent
-    const editorProperties = {} as CodeMirrorProps
-    if (
-        properties.editor.startsWith('code(') &&
-        properties.editor.endsWith(')')
-    ) {
-        const modeName = properties.editor.substring(
-            'code('.length, properties.editor.length - 1
-        )
-        if (modeName) {
-            editorProperties.editor = {}
-            if (['js', 'script', 'javascript'].includes(
-                modeName.toLowerCase()
-            ))
-                editorProperties.editor.mode = javascript()
-            else if ([
-                'css',
-                'style',
-                'styles',
-                'cascadingstylesheet',
-                'cascadingstylesheets'
-            ].includes(modeName.toLowerCase()))
-                editorProperties.editor.mode = css()
-        }
-    }
+    const editorProperties =
+        {} as CodeEditorProperties | RichTextEditorProperties
+    if (isAdvancedEditor)
+        if (
+            properties.editor.startsWith('code(') &&
+            properties.editor.endsWith(')')
+        ) {
+            const modeName = properties.editor.substring(
+                'code('.length, properties.editor.length - 1
+            )
+            if (modeName) {
+                editorProperties.editor = {}
+                if (['js', 'script', 'javascript'].includes(
+                    modeName.toLowerCase()
+                ))
+                    (editorProperties as CodeEditorProperties).editor.mode =
+                        javascript()
+                else if ([
+                    'css',
+                    'style',
+                    'styles',
+                    'cascadingstylesheet',
+                    'cascadingstylesheets'
+                ].includes(modeName.toLowerCase()))
+                    (editorProperties as CodeEditorProperties).editor.mode =
+                        css()
+            }
+        } else
+            editorProperties.editor = TIPTAP_DEFAULT_OPTIONS
     /// region main markup
     return <WrapConfigurations
         strict={TextInput.strict}

@@ -31,8 +31,7 @@ import {
 import {DefaultProperties as DefaultBaseProperties} from '../../type'
 import {
     DefaultInputProperties as DefaultProperties,
-    InputModelState as ModelState,
-    TiptapProps
+    InputModelState as ModelState
 } from './type'
 
 import RichTextEditorComponent from './Tiptap'

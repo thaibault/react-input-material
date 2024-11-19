@@ -39,8 +39,6 @@ import {
     FileInputChildrenOptions, FileInputProperties, FileInputProps, FileValue
 } from './components/FileInput/type'
 import {CheckboxProps} from './components/RequireableCheckbox/type'
-import CodeMirror from './components/TextInput/CodeMirror'
-import Tiptap from './components/TextInput/Tiptap'
 import {
     InputProperties, InputProps, SuggestionCreatorOptions
 } from './components/TextInput/type'
@@ -253,7 +251,7 @@ const Application = () => {
     return (<>
         {/* region navigation */}
         <div className="tab-bar">
-        <TabBar
+            <TabBar
                 activeTabIndex={activeTabIndex}
                 onActivate={(event: {detail: {index: number}}) => {
                     if (event.detail.index !== activeTabIndex)

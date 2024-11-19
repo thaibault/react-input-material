@@ -25,16 +25,25 @@ import {TextFieldHelperTextProps} from '@rmwc/textfield/lib/textfield'
 import {Mapping} from 'clientnode'
 
 import {basicSetup} from 'codemirror'
-import {FocusEvent, MutableRefObject, useEffect, useRef, useState} from 'react'
+import {
+    FocusEvent,
+    MutableRefObject,
+    useEffect,
+    useId,
+    useRef,
+    useState
+} from 'react'
 
 import cssClassNames from '../style.module'
-import {VIEW_CONTENT_OFFSET_IN_PX} from '../Tiptap'
 import {CodeMirrorProps} from '../type'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
 export const Index = (props: CodeMirrorProps) => {
     const [value, setValue] = useState(String(props.value) || '')
+
+    const defaultID = useId()
+    const id = props.id ?? defaultID
 
     const mdcTextFieldReference =
         useRef<HTMLLabelElement>() as MutableRefObject<HTMLLabelElement>
@@ -97,7 +106,9 @@ export const Index = (props: CodeMirrorProps) => {
                                     Event & { detail: ViewUpdate }
                                 syntheticEvent.detail = viewUpdate
                                 textareaReference.current.value = newValue
-                                textareaReference.current.dispatchEvent(syntheticEvent)
+                                textareaReference.current.dispatchEvent(
+                                    syntheticEvent
+                                )
 
                                 if (props.onChange)
                                     props.onChange(newValue)
@@ -127,11 +138,10 @@ export const Index = (props: CodeMirrorProps) => {
 
     useEffect(
         () => {
-            if (editorViewReference.current)
-                editorViewReference.current.style.height =
-                    `${textareaReference.current.clientHeight + VIEW_CONTENT_OFFSET_IN_PX}px`
+            editorViewReference.current.style.height =
+                `${String(textareaReference.current.clientHeight)}px`
         },
-        [editorViewReference.current, textareaReference.current?.clientHeight]
+        [editorViewReference.current, textareaReference.current.clientHeight]
     )
 
     const editorContent = <>
@@ -142,9 +152,9 @@ export const Index = (props: CodeMirrorProps) => {
             style={{visibility: 'hidden', position: 'absolute'}}
             rows={props.rows}
 
-            aria-labelledby={`${props.id}-label`}
-            aria-controls={`${props.id}-helper`}
-            aria-describedby={`${props.id}-helper`}
+            aria-labelledby={`${id}-label`}
+            aria-controls={`${id}-helper`}
+            aria-describedby={`${id}-helper`}
 
             readOnly
 
@@ -201,7 +211,7 @@ export const Index = (props: CodeMirrorProps) => {
             className={[
                 CSS_CLASS_NAMES.codeEditor,
                 'mdc-text-field',
-                'mdc-text-field--textarea',
+                'mdc-text-field--textarea'
             ]
                 .concat(value ? CSS_CLASS_NAMES.codeEditorHasContent : [])
                 .concat(props.disabled ? 'mdc-text-field--disabled' : [])
@@ -220,7 +230,7 @@ export const Index = (props: CodeMirrorProps) => {
                 <span className="mdc-text-field__ripple"></span> :
                 ''
             }
-            <span className="mdc-floating-label" id={`${props.id}-label`}>
+            <span className="mdc-floating-label" id={`${id}-label`}>
                 {props.label}
             </span>
 
@@ -247,9 +257,11 @@ export const Index = (props: CodeMirrorProps) => {
                         )
                         .join(' ')
                     }
-                    id={`${props.id}-helper`}
+                    id={`${id}-helper`}
                 >
-                    {(props.helpText as TextFieldHelperTextProps)?.children ?
+                    {(
+                        props.helpText as TextFieldHelperTextProps | undefined
+                    )?.children ?
                         (props.helpText as TextFieldHelperTextProps).children :
                         props.helpText as string
                     }
