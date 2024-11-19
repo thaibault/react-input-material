@@ -20,28 +20,32 @@ endregion */
     }
 
     .code-editor {
+        .cm-content {
+            opacity: 0;
+        }
+
         .cm-focused {
             outline: none;
 
             .cm-content {
                 opacity: 1;
             }
+
             .cm-gutters {
                 visibility: visible;
             }
         }
 
-        .cm-content {
-            opacity: 0;
-        }
         .cm-gutters {
             visibility: hidden;
         }
     }
+
     .code-editor--has-content {
         .cm-content {
             opacity: 1;
         }
+
         .cm-gutters {
             visibility: visible;
         }
@@ -52,6 +56,7 @@ endregion */
         flex-wrap: wrap;
         width: 100%;
     }
+
     .richtext-editor {
         border-bottom: 1px solid rgba(0 0 0 / 42%);
 
