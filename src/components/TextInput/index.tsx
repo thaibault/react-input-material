@@ -17,53 +17,17 @@
     endregion
 */
 // region imports
-import {Ace as CodeEditorNamespace} from 'ace-builds'
-import {
-    camelCaseToDelimited,
-    capitalize,
-    copy,
-    equals,
-    extend,
-    isFunction,
-    isObject,
-    LOCALES,
-    Mapping,
-    mark
-} from 'clientnode'
-
-import {
-    FocusEvent as ReactFocusEvent,
-    forwardRef,
-    ForwardedRef,
-    KeyboardEvent as ReactKeyboardEvent,
-    memo as memorize,
-    MouseEvent as ReactMouseEvent,
-    MutableRefObject,
-    ReactElement,
-    ReactNode,
-    Suspense,
-    useEffect,
-    useId,
-    useImperativeHandle,
-    useRef,
-    useState
-} from 'react'
-import CodeEditorType, {IAceEditorProps as CodeEditorProps} from 'react-ace'
-import GenericAnimate from 'react-generic-animate'
-import {GenericEvent} from 'react-generic-tools/type'
-import Dummy from 'react-generic-dummy'
-import {TransitionProps} from 'react-transition-group/Transition'
-
-import {Editor as RichTextEditor} from 'tinymce'
+import {javascript} from '@codemirror/lang-javascript'
+import {css} from '@codemirror/lang-css'
 
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
 
 import {CircularProgress} from '@rmwc/circular-progress'
-import {FormField} from '@rmwc/formfield'
 import {Icon} from '@rmwc/icon'
-import {IconButton} from '@rmwc/icon-button'
+import {IconButton, IconButtonOnChangeEventT} from '@rmwc/icon-button'
+import {ListApi} from '@rmwc/list'
 import {
     Menu, MenuApi, MenuSurface, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
 } from '@rmwc/menu'
@@ -73,11 +37,38 @@ import {Theme} from '@rmwc/theme'
 import {IconOptions} from '@rmwc/types'
 
 import {
-    Editor as RichTextEditorComponent, IAllProps as RichTextEditorProps
-} from '@tinymce/tinymce-react'
-import {
-    EventHandler as RichTextEventHandler
-} from '@tinymce/tinymce-react/lib/cjs/main/ts/Events'
+    camelCaseToDelimited,
+    copy,
+    equals,
+    extend,
+    isFunction,
+    isObject,
+    LOCALES,
+    Mapping,
+    mark
+} from 'clientnode'
+import React, {
+    FocusEvent as ReactFocusEvent,
+    forwardRef,
+    ForwardedRef,
+    KeyboardEvent as ReactKeyboardEvent,
+    memo as memorize,
+    MouseEvent as ReactMouseEvent,
+    MutableRefObject,
+    ReactElement,
+    ReactNode,
+    useEffect,
+    useId,
+    useImperativeHandle,
+    useRef,
+    useState
+} from 'react'
+import GenericAnimate from 'react-generic-animate'
+import {GenericEvent} from 'react-generic-tools/type'
+import Dummy from 'react-generic-dummy'
+import {TransitionProps} from 'react-transition-group/Transition'
+
+import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
 import WrapConfigurations from '../WrapConfigurations'
 import WrapTooltip from '../WrapTooltip'
@@ -98,55 +89,53 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState,
-    DataTransformSpecification,
-    defaultInputModelState as defaultModelState,
-    DefaultInputProperties as DefaultProperties,
-    defaultInputProperties as defaultProperties,
-    EditorState,
-    InputAdapter as Adapter,
-    InputAdapterWithReferences as AdapterWithReferences,
-    InputDataTransformation,
-    InputModelState as ModelState,
-    InputProperties as Properties,
-    inputPropertyTypes as propertyTypes,
-    InputProps as Props,
-    textInputRenderProperties as renderProperties,
-    InputState as State,
-    InputModel as Model,
-    NativeInputType,
-    NormalizedSelection,
-    TextInputComponent,
-    InputTablePosition as TablePosition,
-    InputValueState as ValueState,
-    Selection,
-    TinyMCEOptions,
-    TypeSpecification,
-    InputModelState,
-    InputValueState
+    CursorState, EditorState, Selection, TypeSpecification
 } from '../../type'
 
 import {
-    CodeEditor,
     CSS_CLASS_NAMES,
     determineValidationState,
+    GivenCodeEditorComponent,
     GivenRichTextEditorComponent,
     lockAnimation,
     plusToXAnimation,
     preventEnterKeyPropagation,
     suggestionMatches,
-    TINYMCE_DEFAULT_OPTIONS,
+    TIPTAP_DEFAULT_OPTIONS,
     UseAnimations
 } from './helper'
+import {
+    CodeMirrorProps as CodeEditorProps,
+    CodeMirrorProperties as CodeEditorProperties,
+    DataTransformSpecification,
+    defaultInputModelState as defaultModelState,
+    DefaultInputProperties as DefaultProperties,
+    defaultInputProperties as defaultProperties,
+    InputAdapter as Adapter,
+    InputAdapterWithReferences as AdapterWithReferences,
+    InputDataTransformation,
+    InputModelState as ModelState,
+    InputModelState,
+    InputProperties as Properties,
+    inputPropertyTypes as propertyTypes,
+    InputValueState as ValueState,
+    InputValueState,
+    InputProps as Props,
+    InputState as State,
+    InputModel as Model,
+    NativeInputType,
+    NormalizedSelection,
+    textInputRenderProperties as renderProperties,
+    TextInputComponent,
+    TiptapProps as RichTextEditorProps,
+    TiptapProperties as RichTextEditorProperties,
+
+    EditorProperties
+} from './type'
 import TRANSFORMER from './transformer'
-import {IconButtonOnChangeEventT} from '@rmwc/icon-button/lib/icon-button'
-import {ListApi} from '@rmwc/list/lib/list'
 
 export {
-    ACE_BASE_PATH,
-    ACE_EDITOR_OPTIONS,
-
-    CodeEditor,
+    CODE_EDITOR_OPTIONS,
 
     CSS_CLASS_NAMES,
 
@@ -154,13 +143,10 @@ export {
     preventEnterKeyPropagation,
     suggestionMatches,
 
-    TINYMCE_BASE_PATH,
-    TINYMCE_DEFAULT_OPTIONS
+    TIPTAP_DEFAULT_OPTIONS
 } from './helper'
 export const INPUT_TRANSFORMER = TRANSFORMER
 // endregion
-
-let RICH_TEXT_EDITOR_LOADER_ONCE = false
 /**
  * Generic text input wrapper component which automatically determines a useful
  * input field depending on given model specification.
@@ -187,58 +173,6 @@ export const TextInputInner = function<Type = unknown>(
     const defaultID = useId()
     const id = props.id ?? defaultID
     // region live-cycle
-    /// region text-editor selection synchronisation
-    /**
-     * Is triggered immediate after a re-rendering. Re-stores cursor selection
-     * state if editor has been switched.
-     * @returns Nothing.
-     */
-    useEffect(() => {
-        if (selectionIsUnstable || editorState.selectionIsUnstable)
-            if (properties.editorIsActive) {
-                /*
-                    NOTE: If the corresponding editor are not loaded, yet they
-                    will set the selection state on initialisation as long as
-                    "editorState.selectionIsUnstable" is set to "true".
-                */
-                if (codeEditorReference.current?.editor.selection) {
-                    (codeEditorReference.current.editor.textInput as
-                        unknown as
-                        HTMLInputElement
-                    ).focus()
-                    setCodeEditorSelectionState(codeEditorReference.current)
-
-                    if (editorState.selectionIsUnstable)
-                        setEditorState(
-                            {...editorState, selectionIsUnstable: false}
-                        )
-                } else if (richTextEditorInstance.current?.selection) {
-                    richTextEditorInstance.current.focus(false)
-                    setRichTextEditorSelectionState(
-                        richTextEditorInstance.current
-                    )
-
-                    if (editorState.selectionIsUnstable)
-                        setEditorState(
-                            {...editorState, selectionIsUnstable: false}
-                        )
-                }
-            } else if (inputReference.current) {
-                (
-                    inputReference.current as
-                        HTMLInputElement | HTMLTextAreaElement
-                ).setSelectionRange(
-                    properties.cursor?.start ?? null,
-                    properties.cursor?.end ?? null
-                )
-
-                if (editorState.selectionIsUnstable)
-                    setEditorState(
-                        {...editorState, selectionIsUnstable: false}
-                    )
-            }
-    })
-    /// endregion
     /// region input element property synchronisation
     /**
      * Is triggered immediate after a re-rendering. Connects error message
@@ -307,7 +241,6 @@ export const TextInputInner = function<Type = unknown>(
     /**
      * Is triggered immediate after a re-rendering. Sets initial aria list box
      * opening and hidden state.
-     * @returns Nothing.
      */
     useEffect(() => {
         if (useSelection) {
@@ -645,246 +578,6 @@ export const TextInputInner = function<Type = unknown>(
         return options as IconOptions | undefined
     }
     /// endregion
-    /// region handle cursor selection state
-    //// region rich-text editor
-    /**
-     * Determines absolute offset in given markup.
-     * @param contentDomNode - Wrapping dom node where all content is
-     * contained.
-     * @param domNode - Dom node which contains given position.
-     * @param offset - Relative position within given node.
-     * @returns Determine absolute offset.
-     */
-    const determineAbsoluteSymbolOffsetFromHTML = (
-        contentDomNode: Element, domNode: Element, offset: number
-    ): number => {
-        if (!properties.value)
-            return 0
-
-        const indicatorKey = 'text-input-selection-indicator'
-        const indicatorValue = '###'
-        const indicator = ` ${indicatorKey}="${indicatorValue}"`
-
-        domNode.setAttribute(indicatorKey, indicatorValue)
-        // NOTE: TinyMCE seems to add a newline after each paragraph.
-        const content: string = contentDomNode.innerHTML.replace(
-            /(<\/p>)/gi, '$1\n'
-        )
-        domNode.removeAttribute(indicatorKey)
-
-        const domNodeOffset: number = content.indexOf(indicator)
-        const startIndex: number = domNodeOffset + indicator.length
-
-        return (
-            offset +
-            content.indexOf('>', startIndex) +
-            1 -
-            indicator.length
-        )
-    }
-    //// endregion
-    //// region code editor
-    /**
-     * Determines absolute range from table oriented position.
-     * @param column - Symbol offset in given row.
-     * @param row - Offset row.
-     * @returns Determined offset.
-     */
-    const determineAbsoluteSymbolOffsetFromTable = (
-        column: number, row: number
-    ): number => {
-        if (typeof properties.value !== 'string' && !properties.value)
-            return 0
-
-        if (row > 0)
-            return column + (properties.value as unknown as string)
-                .split('\n')
-                .slice(0, row)
-                .map((line: string): number => 1 + line.length)
-                .reduce((sum: number, value: number): number => sum + value)
-        return column
-    }
-    /**
-     * Converts absolute range into table oriented position.
-     * @param offset - Absolute position.
-     * @returns Position.
-     */
-    const determineTablePosition = (offset: number): TablePosition => {
-        const result: TablePosition = {column: 0, row: 0}
-
-        if (typeof properties.value === 'string')
-            for (const line of properties.value.split('\n')) {
-                if (line.length < offset)
-                    offset -= 1 + line.length
-                else {
-                    result.column = offset
-                    break
-                }
-
-                result.row += 1
-            }
-
-        return result
-    }
-    /**
-     * Sets current cursor selection range in given code editor instance.
-     * @param instance - Code editor instance.
-     */
-    const setCodeEditorSelectionState = (instance: CodeEditorType): void => {
-        const range: CodeEditorNamespace.Range =
-            instance.editor.selection.getRange()
-        const endPosition: TablePosition =
-            determineTablePosition(properties.cursor?.end || 0)
-        range.setEnd(endPosition.row, endPosition.column)
-        const startPosition: TablePosition =
-            determineTablePosition(properties.cursor?.start || 0)
-        range.setStart(startPosition.row, startPosition.column)
-        instance.editor.selection.setRange(range)
-    }
-    /**
-     * Sets current cursor selection range in given rich text editor instance.
-     * @param instance - Code editor instance.
-     */
-    const setRichTextEditorSelectionState = (
-        instance: RichTextEditor
-    ): void => {
-        const indicator: {
-            end: string
-            start: string
-        } = {
-            end: '###text-input-selection-indicator-end###',
-            start: '###text-input-selection-indicator-start###'
-        }
-        const cursor: CursorState = {
-            end: (properties.cursor?.end || 0) + indicator.start.length,
-            start: properties.cursor?.start || 0
-        }
-        const keysSorted: Array<keyof typeof indicator> =
-            ['start', 'end']
-
-        let value: string = properties.representation as string
-        for (const type of keysSorted)
-            value = (
-                value.substring(0, cursor[type]) +
-                indicator[type] +
-                value.substring(cursor[type])
-            )
-        instance.getBody().innerHTML = value
-
-        const walker: TreeWalker = document.createTreeWalker(
-            instance.getBody(), NodeFilter.SHOW_TEXT, null
-        )
-
-        const range: Range = instance.dom.createRng()
-        const result: {
-            end?: [Node, number]
-            start?: [Node, number]
-        } = {}
-
-        let node: Node | null
-        while (node = walker.nextNode())
-            for (const type of keysSorted)
-                if (node.nodeValue) {
-                    const index: number =
-                        node.nodeValue.indexOf(indicator[type])
-                    if (index > -1) {
-                        node.nodeValue = node.nodeValue.replace(
-                            indicator[type], ''
-                        )
-
-                        result[type] = [node, index]
-                    }
-                }
-
-        for (const type of keysSorted)
-            if (result[type])
-                range[`set${capitalize(type)}` as 'setEnd' | 'setStart'](
-                    ...(result[type])
-                )
-
-        if (result.end && result.start)
-            instance.selection.setRng(range)
-    }
-    //// endregion
-    /**
-     * Saves current selection/cursor state in components state.
-     * @param event - Event which triggered selection change.
-     */
-    const saveSelectionState = (event: GenericEvent): void => {
-        /*
-            NOTE: Known issues is that we do not get the absolute positions but
-            the one in current selected node.
-        */
-        const codeEditorRange =
-            codeEditorReference.current?.editor.selection.getRange()
-        const richTextEditorRange =
-            richTextEditorInstance.current?.selection.getRng()
-        const selectionEnd: null | number | undefined = (
-            inputReference.current as
-                HTMLInputElement | HTMLTextAreaElement | null
-        )?.selectionEnd
-        const selectionStart: null | number | undefined = (
-            inputReference.current as
-                HTMLInputElement | HTMLTextAreaElement | null
-        )?.selectionStart
-        if (codeEditorRange)
-            setCursor({
-                end: determineAbsoluteSymbolOffsetFromTable(
-                    codeEditorRange.end.column,
-                    typeof codeEditorRange.end.row === 'number' ?
-                        codeEditorRange.end.row :
-                        typeof properties.value === 'string' ?
-                            properties.value.split('\n').length - 1 :
-                            0
-                ),
-                start: determineAbsoluteSymbolOffsetFromTable(
-                    codeEditorRange.start.column,
-                    typeof codeEditorRange.start.row === 'number' ?
-                        codeEditorRange.start.row :
-                        typeof properties.value === 'string' ?
-                            properties.value.split('\n').length - 1 :
-                            0
-                )
-            })
-        else if (richTextEditorRange)
-            setCursor({
-                end: determineAbsoluteSymbolOffsetFromHTML(
-                    richTextEditorInstance.current?.getBody() ||
-                    document.createElement('p'),
-                    richTextEditorInstance.current?.selection.getEnd() ||
-                    document.createElement('p'),
-                    richTextEditorRange.endOffset
-                ),
-                start: determineAbsoluteSymbolOffsetFromHTML(
-                    richTextEditorInstance.current?.getBody() ||
-                    document.createElement('p'),
-                    richTextEditorInstance.current?.selection.getStart() ||
-                    document.createElement('p'),
-                    richTextEditorRange.startOffset
-                )
-            })
-        else if (
-            typeof selectionEnd === 'number' &&
-            typeof selectionStart === 'number'
-        ) {
-            const add: 0 | 1 | -1 =
-                (
-                    event as unknown as Partial<KeyboardEvent> | null
-                )?.key?.length === 1 ?
-                    1 :
-                    (event as unknown as KeyboardEvent | null)?.key ===
-                        'Backspace' &&
-                    (
-                        (properties.representation as string).length >
-                        selectionStart
-                    ) ?
-                        -1 :
-                        0
-
-            setCursor({end: selectionEnd + add, start: selectionStart + add})
-        }
-    }
-    /// endregion
     /// region property aggregation
     const deriveMissingPropertiesFromState = () => {
         if (
@@ -987,7 +680,7 @@ export const TextInputInner = function<Type = unknown>(
         if (!(result.selectableEditor || result.editor === 'plain'))
             result.editorIsActive = true
 
-        if (typeof result.representation !== 'string') {
+        if (typeof result.representation !== 'string')
             result.representation = formatValue<Type>(
                 result,
                 result.value as null | Type,
@@ -1002,65 +695,8 @@ export const TextInputInner = function<Type = unknown>(
                 */
                 !result.focused
             )
-            /*
-                NOTE: We will try to restore last known selection state if
-                representation has been modified.
-            */
-            if (
-                result.focused &&
-                result.representation !== result.value as unknown as string &&
-                ['password', 'text'].includes(determineNativeType(result))
-            )
-                selectionIsUnstable = true
-        }
 
         return result
-    }
-    /// endregion
-    /// region reference setter
-    /**
-     * Set code editor references.
-     * @param instance - Code editor instance.
-     */
-    const setCodeEditorReference = (instance: CodeEditorType | null): void => {
-        codeEditorReference.current = instance
-
-        if (codeEditorReference.current?.editor.container.querySelector(
-            'textarea'
-        ))
-            codeEditorInputReference.current =
-                codeEditorReference.current.editor.container
-                    .querySelector('textarea')
-
-        if (
-            codeEditorReference.current &&
-            properties.editorIsActive &&
-            editorState.selectionIsUnstable
-        ) {
-            (codeEditorReference.current.editor.textInput as
-                unknown as
-                HTMLInputElement
-            ).focus()
-            setCodeEditorSelectionState(codeEditorReference.current)
-            setEditorState({...editorState, selectionIsUnstable: false})
-        }
-    }
-    /**
-     * Set rich text editor references.
-     * @param instance - Editor instance.
-     */
-    const setRichTextEditorReference = (
-        instance: null | RichTextEditorComponent
-    ): void => {
-        richTextEditorReference.current = instance
-
-        /*
-            Refer inner element here is possible but marked as private.
-
-            if (richTextEditorReference.current?.elementRef)
-                richTextEditorInputReference.current =
-                    richTextEditorReference.current.elementRef
-        */
     }
     /// endregion
     // endregion
@@ -1239,15 +875,11 @@ export const TextInputInner = function<Type = unknown>(
      * states). Derived event handler will be triggered when internal state has
      * been consolidated.
      * @param eventOrValue - Event object or new value.
-     * @param _editorInstance - Potential editor instance if triggered from a
-     * rich text or code editor.
      * @param selectedIndex - Indicates whether given event was triggered by a
      * selection.
      */
     const onChangeValue = (
-        eventOrValue: GenericEvent | Type,
-        _editorInstance?: RichTextEditor,
-        selectedIndex = -1
+        eventOrValue: GenericEvent | Type, selectedIndex = -1
     ): void => {
         setIsSuggestionOpen(true)
 
@@ -1574,8 +1206,6 @@ export const TextInputInner = function<Type = unknown>(
      * @param event - Event which triggered selection change.
      */
     const onSelectionChange = (event: GenericEvent) => {
-        saveSelectionState(event)
-
         triggerCallbackIfExists<Properties<Type>>(
             properties, 'selectionChange', controlled, event, properties
         )
@@ -1631,25 +1261,12 @@ export const TextInputInner = function<Type = unknown>(
     // endregion
     // region properties
     /// region references
-    const codeEditorReference: MutableRefObject<CodeEditorType | null> =
-        useRef<CodeEditorType>(null)
-    const codeEditorInputReference: MutableRefObject<
-        HTMLTextAreaElement | null
-    > = useRef<HTMLTextAreaElement>(null)
     const foundationReference: MutableRefObject<
         MDCSelectFoundation | MDCTextFieldFoundation | null
     > = useRef<MDCSelectFoundation | MDCTextFieldFoundation>(null)
     const inputReference: MutableRefObject<
         HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
     > = useRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(null)
-    const richTextEditorInputReference: MutableRefObject<
-        HTMLTextAreaElement | null
-    > = useRef<HTMLTextAreaElement>(null)
-    const richTextEditorInstance: MutableRefObject<null | RichTextEditor> =
-        useRef<RichTextEditor>(null)
-    const richTextEditorReference: MutableRefObject<
-        null | RichTextEditorComponent
-    > = useRef<RichTextEditorComponent>(null)
     const suggestionMenuAPIReference: MutableRefObject<MenuApi | null> =
         useRef<MenuApi>(null)
     const suggestionMenuFoundationReference: MutableRefObject<
@@ -1757,7 +1374,6 @@ export const TextInputInner = function<Type = unknown>(
         Boolean(givenProps.onChange || givenProps.onChangeValue)
     const representationControlled: boolean =
         controlled && givenProps.representation !== undefined
-    let selectionIsUnstable = false
 
     deriveMissingPropertiesFromState()
 
@@ -1824,13 +1440,8 @@ export const TextInputInner = function<Type = unknown>(
             return {
                 properties,
                 references: {
-                    codeEditorReference,
-                    codeEditorInputReference,
                     foundationReference,
                     inputReference,
-                    richTextEditorInputReference,
-                    richTextEditorInstance,
-                    richTextEditorReference,
                     suggestionMenuAPIReference,
                     suggestionMenuFoundationReference,
                     wrapperReference
@@ -1877,48 +1488,6 @@ export const TextInputInner = function<Type = unknown>(
         materialProperties.icon = wrapIconWithTooltip(
             applyIconPreset(properties.icon) as IconOptions
         ) as IconOptions
-
-    const tinyMCEOptions: Partial<Omit<TinyMCEOptions, 'readonly'>> = {
-        ...TINYMCE_DEFAULT_OPTIONS,
-        // eslint-disable-next-line camelcase
-        content_style: properties.disabled ? 'body {opacity: .38}' : '',
-        placeholder: properties.placeholder,
-        setup: (instance: RichTextEditor): void => {
-            richTextEditorInstance.current = instance
-            richTextEditorInstance.current.on('init', (): void => {
-                if (!richTextEditorInstance.current)
-                    return
-
-                RICH_TEXT_EDITOR_LOADER_ONCE = true
-
-                if (
-                    properties.editorIsActive &&
-                    editorState.selectionIsUnstable
-                ) {
-                    richTextEditorInstance.current.focus(false)
-                    setRichTextEditorSelectionState(
-                        richTextEditorInstance.current
-                    )
-                    setEditorState(
-                        {...editorState, selectionIsUnstable: false}
-                    )
-                }
-            })
-        }
-    }
-    if (properties.editor.endsWith('raw)')) {
-        tinyMCEOptions.toolbar1 =
-            'cut copy paste | undo redo removeformat | code | fullscreen'
-        delete tinyMCEOptions.toolbar2
-    } else if (properties.editor.endsWith('simple)')) {
-        tinyMCEOptions.toolbar1 =
-            'cut copy paste | undo redo removeformat | bold italic ' +
-            'underline strikethrough subscript superscript | fullscreen'
-        delete tinyMCEOptions.toolbar2
-    } else if (properties.editor.endsWith('normal)'))
-        tinyMCEOptions.toolbar1 =
-            'cut copy paste | undo redo removeformat | styleselect ' +
-            'formatselect | searchreplace visualblocks fullscreen code'
 
     const isAdvancedEditor: boolean = (
         !properties.selection &&
@@ -2062,6 +1631,38 @@ export const TextInputInner = function<Type = unknown>(
             )
     }
     /// endregion
+    const EditorComponent = properties.editor.startsWith('code') ?
+        GivenCodeEditorComponent :
+        GivenRichTextEditorComponent
+    const editorProperties =
+        {} as CodeEditorProperties | RichTextEditorProperties
+    if (isAdvancedEditor)
+        if (
+            properties.editor.startsWith('code(') &&
+            properties.editor.endsWith(')')
+        ) {
+            const modeName = properties.editor.substring(
+                'code('.length, properties.editor.length - 1
+            )
+            if (modeName) {
+                editorProperties.editor = {}
+                if (['js', 'script', 'javascript'].includes(
+                    modeName.toLowerCase()
+                ))
+                    (editorProperties as CodeEditorProperties).editor.mode =
+                        javascript()
+                else if ([
+                    'css',
+                    'style',
+                    'styles',
+                    'cascadingstylesheet',
+                    'cascadingstylesheets'
+                ].includes(modeName.toLowerCase()))
+                    (editorProperties as CodeEditorProperties).editor.mode =
+                        css()
+            }
+        } else
+            editorProperties.editor = TIPTAP_DEFAULT_OPTIONS
     /// region main markup
     return <WrapConfigurations
         strict={TextInput.strict}
@@ -2070,10 +1671,7 @@ export const TextInputInner = function<Type = unknown>(
     >
         <div
             className={[CSS_CLASS_NAMES.textInput]
-                .concat(
-                    isAdvancedEditor ? CSS_CLASS_NAMES.textInputCustom : [],
-                    properties.className
-                )
+                .concat(properties.className)
                 .join(' ')
             }
             onBlur={onBlur}
@@ -2121,159 +1719,51 @@ export const TextInputInner = function<Type = unknown>(
                 useSelection
             )}
             {wrapAnimationConditionally(
-                [
-                    <FormField
-                        className={['mdc-text-field']
-                            .concat(
-                                properties.disabled ?
-                                    'mdc-text-field--disabled' :
-                                    [],
-                                'mdc-text-field--textarea'
-                            )
-                            .join(' ')
-                        }
-                        onKeyDown={preventEnterKeyPropagation}
-                        key="advanced-editor-form-field"
-                    >
-                        <label>
-                            <span className={
-                                [CSS_CLASS_NAMES.textInputEditorLabel]
-                                    .concat(
-                                        'mdc-floating-label',
-                                        'mdc-floating-label--float-above'
-                                    )
-                                    .join(' ')
-                            }>
-                                <Theme use={
-                                    properties.invalid &&
-                                    properties.showValidationState &&
-                                    (
-                                        properties.showInitialValidationState ||
-                                        properties.visited
-                                    ) ? 'error' : undefined
-                                }>
-                                    {
-                                        (
-                                            properties.description ||
-                                            properties.name
-                                        ) +
-                                        (properties.required ? '*' : '')
-                                    }
-                                </Theme>
-                            </span>
-                            {
-                                properties.editor.startsWith('code') ?
-                                    <Suspense fallback={
-                                        <CircularProgress size="large" />
-                                    }>
-                                        <CodeEditor
-                                            {...genericProperties as
-                                                CodeEditorProps
-                                            }
-                                            className="mdc-text-field__input"
-                                            mode={(
-                                                properties.editor.startsWith(
-                                                    'code('
-                                                ) &&
-                                                properties.editor.endsWith(')')
-                                            ) ?
-                                                properties.editor.substring(
-                                                    'code('.length,
-                                                    properties.editor.length -
-                                                    1
-                                                ) :
-                                                'javascript'
-                                            }
-                                            name={properties.name}
-                                            onChange={onChangeValue as
-                                                unknown as
-                                                (
-                                                    value: string,
-                                                    event?: unknown
-                                                ) => void
-                                            }
-                                            onCursorChange={onSelectionChange}
-                                            onSelectionChange={
-                                                onSelectionChange
-                                            }
-                                            ref={setCodeEditorReference}
-                                            setOptions={{
-                                                maxLines: properties.rows,
-                                                minLines: properties.rows,
-                                                readOnly: properties.disabled,
-                                                tabSize: 4,
-                                                useWorker: false
-                                            }}
-                                            theme="github"
-                                            value={
-                                                properties.representation as
-                                                    string
-                                            }
-                                            {...properties.inputProperties as
-                                                CodeEditorProps
-                                            }
-                                        />
-                                    </Suspense> :
-                                    <GivenRichTextEditorComponent
-                                        {...genericProperties as
-                                            RichTextEditorProps
-                                        }
-                                        disabled={properties.disabled}
-                                        init={tinyMCEOptions}
-                                        onClick={onClick as
-                                            unknown as
-                                            RichTextEventHandler<MouseEvent>
-                                        }
-                                        onEditorChange={onChangeValue as
-                                            unknown as
-                                            RichTextEditorProps[
-                                                'onEditorChange'
-                                            ]
-                                        }
-                                        onKeyUp={onKeyUp as
-                                            unknown as
-                                            RichTextEventHandler<KeyboardEvent>
-                                        }
-                                        ref={setRichTextEditorReference}
-                                        textareaName={properties.name}
-                                        tinymceScriptSrc={
-                                            (
-                                                TINYMCE_DEFAULT_OPTIONS
-                                                    .base_url as
-                                                        string
-                                            ) +
-                                            'tinymce.min.js'
-                                        }
-                                        value={
-                                            properties.representation as string
-                                        }
-                                        {...properties.inputProperties as
-                                            RichTextEditorProps
-                                        }
-                                    />
-                            }
-                        </label>
-                    </FormField>,
-                    <div
-                        className="mdc-text-field-helper-line"
-                        key="advanced-editor-helper-line"
-                    >
-                        <p
-                            className={
-                                'mdc-text-field-helper-text ' +
-                                'mdc-text-field-helper-text--persistent'
-                            }
-                            id={`${id}-error-message`}
-                        >
-                            {(
-                                materialProperties.helpText as
-                                    {children: ReactElement}
-                            ).children}
-                        </p>
-                    </div>
-                ],
+                <EditorComponent
+                    {...genericProperties as EditorProperties}
+                    {...materialProperties}
+                    {...constraints}
+
+                    align={properties.align}
+                    characterCount={
+                        typeof properties.maximumLength === 'number' &&
+                        !isNaN(properties.maximumLength) &&
+                        properties.maximumLength >= 0
+                    }
+                    foundationRef={
+                        foundationReference as
+                            MutableRefObject<MDCTextFieldFoundation | null>
+                    }
+                    inputRef={
+                        inputReference as
+                            MutableRefObject<HTMLTextAreaElement | null>
+                    }
+                    onChange={onChangeValue as (value: string) => void}
+                    ripple={properties.ripple}
+                    rootProps={{
+                        name: properties.name,
+                        onClick,
+                        onKeyUp,
+                        /*
+                            NOTE: Disabled input fields are not focusable
+                            via keyboard which makes them unreachable for
+                            blind people using e.g. screen readers.
+                            That's wgy the label gets a tabindex to make
+                            the input focusable.
+                        */
+                        tabIndex: properties.disabled ? '0' : '-1',
+                        ...properties.rootProps
+                    }}
+                    trailingIcon={wrapIconWithTooltip(applyIconPreset(
+                        properties.trailingIcon
+                    ))}
+                    type={determineNativeType(properties)}
+                    value={properties.representation as string}
+
+                    {...editorProperties as Partial<EditorProperties>}
+                    {...properties.inputProperties as Partial<EditorProperties>}
+                />,
                 isAdvancedEditor,
-                RICH_TEXT_EDITOR_LOADER_ONCE ||
                 properties.editor.startsWith('code')
             )}
             {wrapAnimationConditionally(
@@ -2316,7 +1806,6 @@ export const TextInputInner = function<Type = unknown>(
                                                     {detail: {index: number}}
                                                 ).detail.index
                                             ] as Type,
-                                            undefined,
                                             (event as {detail: {index: number}})
                                                 .detail.index
                                         )
@@ -2348,7 +1837,7 @@ export const TextInputInner = function<Type = unknown>(
                     }
                     <TextField
                         {...genericProperties as TextFieldProps}
-                        {...materialProperties as TextFieldProps}
+                        {...materialProperties}
                         {...constraints}
                         align={properties.align}
                         characterCount={
@@ -2391,7 +1880,6 @@ export const TextInputInner = function<Type = unknown>(
                     />
                 </div>,
                 !(isAdvancedEditor || useSelection),
-                RICH_TEXT_EDITOR_LOADER_ONCE ||
                 properties.editor.startsWith('code')
             )}
         </div>
@@ -2441,7 +1929,7 @@ TextInput.defaultProperties = {
     value: undefined
 }
 TextInput.locales = LOCALES
-TextInput.propTypes = propertyTypes
+TextInput.propTypes = propertyTypes as PropertiesValidationMap
 TextInput.renderProperties = renderProperties
 TextInput.strict = false
 TextInput.transformer = TRANSFORMER

@@ -31,8 +31,10 @@ import {
     useEffect,
     useState
 } from 'react'
-import {ComponentAdapter} from 'web-component-wrapper/type'
-import {IconButton} from '@rmwc/icon-button'
+import {
+    ComponentAdapter, PropertiesValidationMap
+} from 'web-component-wrapper/type'
+import {IconButton, IconButtonOnChangeEventT} from '@rmwc/icon-button'
 
 import TextInput from '../TextInput'
 /*
@@ -59,13 +61,14 @@ import {
     translateKnownSymbols,
     triggerCallbackIfExists
 } from '../../helper'
+import {defaultProperties} from '../../type'
+import {InputProps} from '../TextInput/type'
+
 import {
     defaultInputsProperties,
     DefaultInputsProperties,
-    defaultProperties,
     inputsPropertyTypes as propertyTypes,
     inputsRenderProperties as renderProperties,
-    InputProps,
     InputsAdapter as Adapter,
     InputsAdapterWithReferences as AdapterWithReferences,
     InputsComponent,
@@ -74,8 +77,7 @@ import {
     InputsProperties,
     InputsPropertiesItem,
     InputsProps, InputsModelState
-} from '../../type'
-import {IconButtonOnChangeEventT} from '@rmwc/icon-button/lib/icon-button'
+} from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
@@ -613,7 +615,7 @@ Inputs.wrapped = InputsInner
 Inputs.webComponentAdapterWrapped = 'react'
 /// endregion
 Inputs.defaultProperties = defaultInputsProperties
-Inputs.propTypes = propertyTypes
+Inputs.propTypes = propertyTypes as PropertiesValidationMap
 Inputs.renderProperties = renderProperties
 Inputs.strict = false
 // endregion

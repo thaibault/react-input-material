@@ -2,6 +2,7 @@
 // -*- coding: utf-8 -*-
 /** @module helper */
 'use strict'
+import type {EditorOptions} from '@tiptap/core'
 /* !
     region header
     [Project page](https://torben.website/react-material-input)
@@ -18,23 +19,23 @@
 */
 // region imports
 import {Mapping} from 'clientnode'
-import {lazy, KeyboardEvent} from 'react'
-import CodeEditorType from 'react-ace'
+import {KeyboardEvent} from 'react'
 import Dummy from 'react-generic-dummy'
 import UseAnimationsType from 'react-useanimations'
 import LockAnimation from 'react-useanimations/lib/lock'
 import PlusToXAnimation from 'react-useanimations/lib/plusToX'
-import {Editor as RichTextEditorComponent} from '@tinymce/tinymce-react'
 
 import {
     determineValidationState as determineBaseValidationState
 } from '../../helper'
+import {DefaultProperties as DefaultBaseProperties} from '../../type'
 import {
-    DefaultProperties as DefaultBaseProperties,
     DefaultInputProperties as DefaultProperties,
-    InputModelState as ModelState,
-    TinyMCEOptions
-} from '../../type'
+    InputModelState as ModelState
+} from './type'
+
+import RichTextEditorComponent from './Tiptap'
+import CodeEditorComponent from './CodeMirror'
 
 /*
 "namedExport" version of css-loader:
@@ -62,6 +63,10 @@ export const GivenRichTextEditorComponent: typeof RichTextEditorComponent =
     IS_BROWSER && RichTextEditorComponent as unknown ?
         RichTextEditorComponent :
         Dummy as unknown as typeof RichTextEditorComponent
+export const GivenCodeEditorComponent: typeof CodeEditorComponent =
+    IS_BROWSER && CodeEditorComponent as unknown ?
+        CodeEditorComponent :
+        Dummy as unknown as typeof CodeEditorComponent
 export const UseAnimations: (
     null | typeof Dummy | typeof UseAnimationsType | undefined
 ) = IS_BROWSER ?
@@ -85,76 +90,15 @@ export const plusToXAnimation: null | typeof PlusToXAnimation | undefined =
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 // region code editor configuration
-export const ACE_BASE_PATH = '/ace-builds/src-min-noconflict/'
-export const ACE_EDITOR_OPTIONS = {
-    basePath: ACE_BASE_PATH,
-    modePath: ACE_BASE_PATH,
-    themePath: ACE_BASE_PATH,
-    workerPath: ACE_BASE_PATH,
-    useWorker: false
-}
-export const CodeEditor = lazy<typeof CodeEditorType>(
-    async (): Promise<{default: typeof CodeEditorType}> => {
-        const {config} = await import('ace-builds')
-        for (const [name, value] of Object.entries(ACE_EDITOR_OPTIONS))
-            config.set(name, value)
-
-        return await import('react-ace')
-    }
-)
+export const CODE_EDITOR_OPTIONS = {}
 /// region rich text editor configuration
 declare const UTC_BUILD_TIMESTAMP: number | undefined
 // NOTE: Could be set via module bundler environment variables.
 export const CURRENT_UTC_BUILD_TIMESTAMP =
     typeof UTC_BUILD_TIMESTAMP === 'undefined' ? 1 : UTC_BUILD_TIMESTAMP
-export const TINYMCE_BASE_PATH = '/tinymce/'
-export const TINYMCE_DEFAULT_OPTIONS: Partial<TinyMCEOptions> = {
-    /* eslint-disable camelcase */
-    // region paths
-    base_url: TINYMCE_BASE_PATH,
-    skin_url: `${TINYMCE_BASE_PATH}skins/ui/oxide`,
-    theme_url: `${TINYMCE_BASE_PATH}themes/silver/theme.min.js`,
-    // endregion
-    allow_conditional_comments: false,
-    allow_script_urls: false,
-    body_class: 'mdc-text-field__input',
-    branding: false,
-    cache_suffix: `?version=${String(CURRENT_UTC_BUILD_TIMESTAMP)}`,
-    contextmenu: [],
-    document_base_url: '/',
-    element_format: 'xhtml',
-    entity_encoding: 'raw',
-    fix_list_elements: true,
-    hidden_input: false,
-    icon: 'material',
-    invalid_elements: 'em',
-    invalid_styles: 'color font-size line-height',
-    keep_styles: false,
-    menubar: false,
-    plugins: [
-        'fullscreen',
-        'link',
-        'code',
-        'nonbreaking',
-        'searchreplace',
-        'visualblocks'
-    ],
-    relative_urls: false,
-    remove_script_host: false,
-    remove_trailing_brs: true,
-    schema: 'html5',
-    toolbar1: `
-        cut copy paste |
-        undo redo removeformat |
-        styleselect formatselect fontselect fontsizeselect |
-        searchreplace visualblocks fullscreen code
-    `.trim(),
-    toolbar2: `
-        alignleft aligncenter alignright alignjustify outdent indent |
-        link nonbreaking bullist numlist bold italic underline strikethrough
-    `.trim(),
-    trim: true
-    /* eslint-enable camelcase */
+export const TIPTAP_DEFAULT_OPTIONS: Partial<EditorOptions> = {
+    injectCSS: true,
+    enableContentCheck: true
 }
 /// endregion
 // endregion

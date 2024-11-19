@@ -34,7 +34,10 @@ import {
     useState
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
+
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
+import {PropertiesValidationMap} from 'web-component-wrapper/type'
+
 import {
     Card,
     CardActionButton,
@@ -59,6 +62,8 @@ import {
     triggerCallbackIfExists,
     wrapStateSetter
 } from '../../helper'
+import {InputAdapter, InputProperties, InputProps} from '../TextInput/type'
+
 import {
     defaultFileInputModelState as defaultModelState,
     DefaultFileInputProperties as DefaultProperties,
@@ -72,15 +77,11 @@ import {
     FileInputValueState as ValueState,
     fileInputPropertyTypes as propertyTypes,
     fileInputRenderProperties as renderProperties,
-    InputAdapter,
-    InputProperties,
-    InputProps,
     FileRepresentationType as RepresentationType,
     FileInputComponent,
     FileInputModel,
     DefaultFileInputProperties, FileInputProperties, FileInputModelState
-} from '../../type'
-
+} from './type'
 import {
     CSS_CLASS_NAMES,
     determineContentType,
@@ -982,7 +983,7 @@ FileInput.defaultProperties = {
     },
     value: undefined
 }
-FileInput.propTypes = propertyTypes
+FileInput.propTypes = propertyTypes as PropertiesValidationMap
 FileInput.renderProperties = renderProperties
 FileInput.strict = false
 // endregion

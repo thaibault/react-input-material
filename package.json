@@ -1,6 +1,6 @@
 {
   "name": "react-input-material",
-  "version": "0.0.670",
+  "version": "0.0.671",
   "description": "Reusable material design based input field with support for (richt-)text, code, selections, numbers, dates and so on.",
   "keywords": [
     "form-field",
@@ -94,6 +94,11 @@
     "@babel/plugin-transform-proto-to-assign": "^7.25.9",
     "@babel/preset-react": "^7.25.9",
     "@babel/runtime": "^7.26.0",
+    "@codemirror/commands": "^6.7.1",
+    "@codemirror/lang-css": "^6.3.0",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/state": "^6.4.1",
+    "@codemirror/view": "^6.34.3",
     "@emotion/react": "^11.13.3",
     "@rmwc/card": "^14.3.5",
     "@rmwc/checkbox": "^14.3.5",
@@ -109,9 +114,11 @@
     "@rmwc/tooltip": "^14.3.5",
     "@rmwc/touch-target": "^14.3.5",
     "@rmwc/typography": "^14.3.5",
-    "@stylistic/eslint-plugin-ts": "^2.10.1",
+    "@stylistic/eslint-plugin-ts": "^2.11.0",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
-    "@tinymce/tinymce-react": "^5.1.1",
+    "@tiptap/core": "^2.9.1",
+    "@tiptap/react": "^2.9.1",
+    "@tiptap/starter-kit": "^2.9.1",
     "@types/ejs": "^3.1.5",
     "@types/html-minifier": "^4.0.5",
     "@types/jquery": "^3.5.32",
@@ -122,14 +129,15 @@
     "@types/react-transition-group": "^4.4.11",
     "@types/spark-md5": "^3.0.5",
     "@types/webpack-env": "^1.18.5",
-    "@typescript-eslint/eslint-plugin": "^8.14.0",
-    "@typescript-eslint/parser": "^8.14.0",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
     "blob-util": "^2.0.2",
-    "clientnode": "^3.0.1226",
+    "clientnode": "^3.0.1229",
+    "codemirror": "^6.0.1",
     "css-loader": "^7.1.2",
     "cssnano": "^7.0.6",
-    "documentation-website": "^1.0.338",
-    "eslint": "^9.14.0",
+    "documentation-website": "^1.0.339",
+    "eslint": "^9.15.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-jsdoc": "^50.5.0",
     "identity-obj-proxy": "^3.0.0",
@@ -142,30 +150,33 @@
     "postcss-import": "^16.1.0",
     "postcss-loader": "^8.1.1",
     "postcss-nested": "^7.0.2",
-    "postcss-preset-env": "^10.1.0",
+    "postcss-preset-env": "^10.1.1",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
-    "react-ace": "^13.0.0",
     "react-dom": "^18.3.1",
-    "react-generic-animate": "^0.0.59",
-    "react-generic-dummy": "^0.0.83",
-    "react-generic-tools": "^0.0.55",
+    "react-generic-animate": "^0.0.61",
+    "react-generic-dummy": "^0.0.84",
+    "react-generic-tools": "^0.0.56",
     "react-transition-group": "^4.4.5",
     "react-useanimations": "^2.10.0",
     "spark-md5": "^3.0.2",
     "style-loader": "^4.0.0",
     "stylelint": "^16.10.0",
     "stylelint-config-standard": "^36.0.1",
-    "tinymce": "^7.5.1",
     "tslib": "^2.8.1",
-    "typescript-eslint": "^8.14.0",
+    "typescript-eslint": "^8.15.0",
     "typescript-plugin-css-modules": "^5.1.0",
-    "web-component-wrapper": "^0.0.504",
-    "weboptimizer": "^2.0.1537",
+    "web-component-wrapper": "^0.0.505",
+    "weboptimizer": "^2.0.1538",
     "webpack-dev-server": "^5.1.0"
   },
   "peerDependencies": {
     "@babel/runtime": "*",
+    "@codemirror/commands": "*",
+    "@codemirror/lang-css": "*",
+    "@codemirror/lang-javascript": "*",
+    "@codemirror/state": "*",
+    "@codemirror/view": "*",
     "@rmwc/card": "*",
     "@rmwc/checkbox": "*",
     "@rmwc/circular-progress": "*",
@@ -177,22 +188,39 @@
     "@rmwc/tooltip": "*",
     "@rmwc/touch-target": "*",
     "@rmwc/typography": "*",
-    "@tinymce/tinymce-react": "*",
+    "@tiptap/core": "*",
+    "@tiptap/react": "*",
+    "@tiptap/starter-kit": "*",
     "@types/react": "*",
     "@types/react-dom": "*",
     "@types/spark-md5": "*",
     "blob-util": "*",
     "clientnode": "*",
+    "codemirror": "*",
     "material-components-web": "*",
     "material-icons": "*",
     "react": "*",
-    "react-ace": "*",
     "react-dom": "*",
     "spark-md5": "*",
     "tslib": "*"
   },
   "peerDependenciesMeta": {
     "@babel/runtime": {
+      "optional": true
+    },
+    "@codemirror/commands": {
+      "optional": true
+    },
+    "@codemirror/lang-css": {
+      "optional": true
+    },
+    "@codemirror/lang-javascript": {
+      "optional": true
+    },
+    "@codemirror/state": {
+      "optional": true
+    },
+    "@codemirror/view": {
       "optional": true
     },
     "@rmwc/card": {
@@ -228,7 +256,13 @@
     "@rmwc/typography": {
       "optional": true
     },
-    "@tinymce/tinymce-react": {
+    "@tiptap/core": {
+      "optional": true
+    },
+    "@tiptap/react": {
+      "optional": true
+    },
+    "@tiptap/starter-kit": {
       "optional": true
     },
     "@types/react": {
@@ -249,6 +283,9 @@
     "clientnode": {
       "optional": true
     },
+    "codemirror": {
+      "optional": true
+    },
     "material-components-web": {
       "optional": true
     },
@@ -256,9 +293,6 @@
       "optional": true
     },
     "react": {
-      "optional": true
-    },
-    "react-ace": {
       "optional": true
     },
     "react-dom": {
@@ -272,9 +306,6 @@
     },
     "spark-md5": {
       "optional": true
-    },
-    "tinymce": {
-      "optional": true
     }
   },
   "engines": {
@@ -285,12 +316,12 @@
   "resolutions": {
     "@rmwc/ripple@npm:14.0.11": "patch:@rmwc/ripple@npm%3A14.0.11#~/.yarn/patches/@rmwc-ripple-npm-14.0.11-22d1530040.patch",
     "@rmwc/ripple@npm:14.3.4": "patch:@rmwc/ripple@npm%3A14.3.4#~/.yarn/patches/@rmwc-ripple-npm-14.3.4-27648eff11.patch",
+    "@rmwc/ripple@npm:14.3.5": "patch:@rmwc/ripple@npm%3A14.3.5#~/.yarn/patches/@rmwc-ripple-npm-14.3.5-9657693602.patch",
     "colors": "1.4.0",
     "globals@npm:^9.18.0": "patch:globals@npm%3A11.12.0#~/.yarn/patches/globals-npm-11.12.0-1fa7f41a6c.patch",
     "globals@npm:^11.1.0": "patch:globals@npm%3A11.12.0#~/.yarn/patches/globals-npm-11.12.0-1fa7f41a6c.patch",
     "globals@npm:^14.0.0": "patch:globals@npm%3A11.12.0#~/.yarn/patches/globals-npm-11.12.0-1fa7f41a6c.patch",
-    "webpack@npm:^5.90.3": "patch:webpack@npm%3A5.90.3#~/.yarn/patches/webpack-npm-5.90.3-2a12e60d26.patch",
-    "@rmwc/ripple@npm:14.3.5": "patch:@rmwc/ripple@npm%3A14.3.5#~/.yarn/patches/@rmwc-ripple-npm-14.3.5-9657693602.patch"
+    "webpack@npm:^5.90.3": "patch:webpack@npm%3A5.90.3#~/.yarn/patches/webpack-npm-5.90.3-2a12e60d26.patch"
   },
   "sideEffects": false,
   "documentationWebsite": {
@@ -448,10 +479,16 @@
       "module": {
         "aliases": {
           "#": "Remove unneeded optional dependencies.",
+          "@codemirror/commands": "react-generic-dummy",
+          "@codemirror/lang-css": "react-generic-dummy",
+          "@codemirror/lang-javascript": "react-generic-dummy",
+          "@codemirror/state": "react-generic-dummy",
+          "@codemirror/view": "react-generic-dummy",
           "@rmwc/tooltip": "react-generic-dummy",
-          "@tinymce/tinymce-react$": "react-generic-dummy",
-          "ace-builds$": "react-generic-dummy",
-          "react-ace$": "react-generic-dummy",
+          "@tiptap/core$": "react-generic-dummy",
+          "@tiptap/react": "react-generic-dummy",
+          "@tiptap/starter-kit$": "react-generic-dummy",
+          "codemirror": "react-generic-dummy",
           "react-useanimations$": "react-generic-dummy",
           "react-useanimations/lib/lock$": "react-generic-dummy",
           "react-useanimations/lib/plusToX$": "react-generic-dummy"

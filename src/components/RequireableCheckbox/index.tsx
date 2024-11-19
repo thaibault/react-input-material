@@ -32,7 +32,11 @@ import {
     useRef,
     useState
 } from 'react'
+
+import {PropertiesValidationMap} from 'web-component-wrapper/type'
+
 import {MDCCheckboxFoundation} from '@material/checkbox'
+
 import {Checkbox} from '@rmwc/checkbox'
 import {Theme} from '@rmwc/theme'
 
@@ -41,7 +45,6 @@ import {Theme} from '@rmwc/theme'
 
 import {requireableCheckboxClassName} from './style.module'
 */
-import cssClassNames from './style.module'
 import {WrapConfigurations} from '../WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
@@ -54,18 +57,23 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
+    defaultModelState, DefaultProperties as DefaultBaseProperties
+} from '../../type'
+
+import cssClassNames from './style.module'
+import {
     CheckboxAdapter as Adapter,
     CheckboxProperties as Properties,
     CheckboxProps as Props,
-    defaultModelState,
-    DefaultProperties as DefaultBaseProperties,
     DefaultCheckboxProperties as DefaultProperties,
     defaultCheckboxProperties as defaultProperties,
     CheckboxModelState as ModelState,
     checkboxPropertyTypes as propertyTypes,
     CheckboxComponent,
-    CheckboxValueState as ValueState, CheckboxModelState, CheckboxValueState
-} from '../../type'
+    CheckboxValueState as ValueState,
+    CheckboxModelState,
+    CheckboxValueState
+} from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
@@ -499,7 +507,7 @@ RequireableCheckbox.defaultProperties = {
     },
     value: undefined
 }
-RequireableCheckbox.propTypes = propertyTypes
+RequireableCheckbox.propTypes = propertyTypes as PropertiesValidationMap
 RequireableCheckbox.strict = false
 // endregion
 export default RequireableCheckbox

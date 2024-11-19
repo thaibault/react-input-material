@@ -18,6 +18,7 @@
 */
 // region imports
 import {Tab, TabBar} from '@rmwc/tabs'
+
 import {
     dateTimeFormat,
     debounce,
@@ -28,34 +29,36 @@ import {
     timeout,
     UnknownFunction
 } from 'clientnode'
+
 import {ReactNode, useState} from 'react'
 import {createRoot} from 'react-dom/client'
 import {useMemorizedValue} from 'react-generic-tools'
 
 import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
 import {
-    FileInput, TextInput, Inputs, Interval, RequireableCheckbox as Checkbox
-} from './index'
+    FileInputChildrenOptions, FileInputProperties, FileInputProps, FileValue
+} from './components/FileInput/type'
+import {CheckboxProps} from './components/RequireableCheckbox/type'
 import {
-    BaseProps,
-    CheckboxProps,
-    FileInputChildrenOptions,
-    FileInputProperties,
-    FileInputProps,
-    FileValue,
-    InputProperties,
-    InputProps,
+    InputProperties, InputProps, SuggestionCreatorOptions
+} from './components/TextInput/type'
+import {
     InputsCreateItemOptions,
     InputsCreatePrototypeOptions,
     InputsProperties,
+    PartialInputsModel
+} from './components/Inputs/type'
+import {
     IntervalConfiguration,
     IntervalProperties,
     IntervalProps,
     IntervalValue,
-    PartialInputsModel,
-    PartialIntervalModel,
-    SuggestionCreatorOptions
-} from './type'
+    PartialIntervalModel
+} from './components/Interval/type'
+import {
+    FileInput, TextInput, Inputs, Interval, RequireableCheckbox as Checkbox
+} from './index'
+import {BaseProps} from './type'
 import {slicePropertiesForStateRecursively} from './helper'
 // endregion
 // region configuration
@@ -245,7 +248,6 @@ const Application = () => {
         })
     /// endregion
     // endregion
-
     return (<>
         {/* region navigation */}
         <div className="tab-bar">
@@ -593,7 +595,7 @@ const Application = () => {
                     <TextInput<string>
                         declaration="code"
                         description="textInput3Description"
-                        editor="code"
+                        editor="code(css)"
                         maximumLength={10}
                         name="textInput3"
                         onChange={onChange}
@@ -602,7 +604,7 @@ const Application = () => {
                         selectableEditor
                     />
                     <TextInput<string>
-                        editor="code"
+                        editor="code(css)"
                         model={useMemorizedValue({
                             declaration: 'code',
                             description: 'textInput3ModelDescription',
@@ -620,6 +622,8 @@ const Application = () => {
                         declaration="richtext(raw)"
                         description="textInput4Description"
                         editor="richtext(raw)"
+                        minimumLength={10}
+                        maximumLength={100}
                         name="textInput4"
                         onChange={onChange}
                         placeholder={
