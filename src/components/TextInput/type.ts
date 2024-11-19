@@ -1,6 +1,7 @@
 // -*- coding: utf-8 -*-
 /** @module type */
 'use strict'
+import {LanguageSupport} from '@codemirror/language'
 /* !
     region header
     [Project page](https://torben.website/react-material-input)
@@ -32,8 +33,8 @@ import PropertyTypes, {
 } from 'clientnode/dist/property-types'
 import {
     FocusEvent as ReactFocusEvent,
-    ForwardRefExoticComponent, KeyboardEvent as ReactKeyboardEvent,
-    KeyboardEvent, MouseEvent as ReactMouseEvent,
+    ForwardRefExoticComponent,
+    KeyboardEvent,
     MouseEvent,
     MutableRefObject,
     ReactElement,
@@ -57,7 +58,7 @@ import {TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
 
 import {ChainedCommands, type EditorOptions, Extensions} from '@tiptap/core'
-import {EditorProviderProps} from '@tiptap/react'
+import {EditorEvents} from '@tiptap/react'
 import {StarterKitOptions} from '@tiptap/starter-kit'
 
 import {
@@ -150,6 +151,17 @@ export type InputDataTransformation =
     }
     /* eslint-enable @typescript-eslint/consistent-indexed-object-style */
 // endregion
+export interface EditorProperties {
+    id: string
+    value: string
+
+    minLength: number
+    maxLength: number
+    rows: number
+
+    onChange: (value: string) => void
+}
+
 export interface RichTextEditorButtonProps {
     action: (command: ChainedCommands) => ChainedCommands,
 
@@ -163,15 +175,9 @@ export interface RichTextEditorButtonProps {
 }
 export interface TiptapProperties
     extends
-Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
-    id: string
-    value: string
-
-    minLength: number
-    maxLength: number
-    rows: number
-
-    onChange: (value: string) => void
+EditorProperties, Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
+    onBlur: (event: EditorEvents['focus']) => void
+    onFocus: (event: EditorEvents['focus']) => void
 
     editor: {
         options?: Partial<EditorOptions>
@@ -181,13 +187,18 @@ Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
 }
 export type TiptapProps = Partial<TiptapProperties>
 
-export interface CodeMirrorProps {
-    value?: string
-    mode?: string
-    name?: string
-    onChange?: (value: string) => void
-    onFocus?: (event: ReactFocusEvent) => void
+export interface CodeMirrorProperties
+    extends
+EditorProperties, Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
+    onBlur: (event: ReactFocusEvent<HTMLDivElement>) => void
+    onFocus: (event: ReactFocusEvent<HTMLDivElement>) => void
+
+    editor: {
+        mode?: LanguageSupport
+    }
 }
+export type CodeMirrorProps = Partial<CodeMirrorProperties>
+
 
 export type InputSelection =
     Array<boolean | number | null> |

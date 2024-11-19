@@ -22,7 +22,7 @@ import {TextFieldHelperTextProps} from '@rmwc/textfield/lib/textfield'
 import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
-import {MutableRefObject, RefObject, useEffect, useRef} from 'react'
+import {MutableRefObject, useEffect, useRef} from 'react'
 
 import {TiptapProps} from '../type'
 
@@ -36,40 +36,6 @@ export const Index = (props: TiptapProps) => {
     const extensions =
         props.editor?.extensions ||
         [StarterKit.configure(props.editor?.starterKitOptions || {})]
-
-    const editor = useEditor({
-        extensions,
-
-        editable: !props.disabled,
-        content: value,
-        onFocus: (editorEvent) => {
-            const syntheticEvent =
-                new Event('focus') as Event & {detail: EditorEvents['focus']}
-            syntheticEvent.detail = editorEvent
-            textareaReference.current.dispatchEvent(syntheticEvent)
-        },
-        onBlur: (editorEvent) => {
-            const syntheticEvent =
-                new Event('blur') as Event & {detail: EditorEvents['blur']}
-            syntheticEvent.detail = editorEvent
-            textareaReference.current.dispatchEvent(syntheticEvent)
-        },
-        onUpdate: (editorEvent) => {
-            const syntheticEvent = new Event('input') as
-                Event & {detail: EditorEvents['update']}
-            syntheticEvent.detail = editorEvent
-            const html = editorEvent.editor.getHTML()
-            if (html === '<p></p>')
-                textareaReference.current.value = ''
-            else
-                textareaReference.current.value = html
-            textareaReference.current.dispatchEvent(syntheticEvent)
-
-            if (props.onChange)
-                props.onChange(html)
-        },
-        ...(props.editor?.options || {})
-    })
 
     const mdcTextFieldReference =
         useRef<HTMLLabelElement>() as MutableRefObject<HTMLLabelElement>
@@ -119,6 +85,47 @@ export const Index = (props: TiptapProps) => {
         ]
     )
 
+    const editor = useEditor({
+        extensions,
+
+        editable: !props.disabled,
+        content: value,
+        onFocus: (editorEvent: EditorEvents['focus']) => {
+            const syntheticEvent =
+                new Event('focus') as Event & {detail: EditorEvents['focus']}
+            syntheticEvent.detail = editorEvent
+            textareaReference.current.dispatchEvent(syntheticEvent)
+
+            if (props.onFocus)
+                props.onFocus(editorEvent)
+        },
+        onBlur: (editorEvent: EditorEvents['focus']) => {
+            const syntheticEvent =
+                new Event('blur') as Event & {detail: EditorEvents['blur']}
+            syntheticEvent.detail = editorEvent
+            textareaReference.current.dispatchEvent(syntheticEvent)
+
+            if (props.onBlur)
+                props.onBlur(editorEvent)
+        },
+        onUpdate: (editorEvent) => {
+            const syntheticEvent = new Event('input') as
+                Event & {detail: EditorEvents['update']}
+            syntheticEvent.detail = editorEvent
+            const html = editorEvent.editor.getHTML()
+            if (html === '<p></p>')
+                textareaReference.current.value = ''
+            else
+                textareaReference.current.value = html
+            textareaReference.current.dispatchEvent(syntheticEvent)
+
+            if (props.onChange)
+                props.onChange(html)
+        },
+        ...(props.editor?.options || {})
+    })
+    const htmlContent = editor?.getHTML()
+
     useEffect(
         () => {
             if (contentViewReference.current)
@@ -127,13 +134,6 @@ export const Index = (props: TiptapProps) => {
         },
         [contentViewReference.current, textareaReference.current?.clientHeight]
     )
-
-    const htmlContent = editor?.getHTML()
-
-    const helpText: TextFieldHelperTextProps =
-        typeof props.helpText === 'object' ?
-            props.helpText as TextFieldHelperTextProps :
-            {children: props.helpText}
 
     const editorContent = <>
         <textarea
@@ -170,6 +170,11 @@ export const Index = (props: TiptapProps) => {
             }
         </div>
     </>
+
+    const helpText: TextFieldHelperTextProps =
+        typeof props.helpText === 'object' ?
+            props.helpText as TextFieldHelperTextProps :
+            {children: props.helpText}
 
     return <>
         <label

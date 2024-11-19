@@ -1641,6 +1641,9 @@ export const TextInputInner = function<Type = unknown>(
             )
     }
     /// endregion
+    const EditorComponent = properties.editor.startsWith('code') ?
+        GivenCodeEditorComponent :
+        GivenRichTextEditorComponent
     /// region main markup
     return <WrapConfigurations
         strict={TextInput.strict}
@@ -1700,68 +1703,58 @@ export const TextInputInner = function<Type = unknown>(
                 useSelection
             )}
             {wrapAnimationConditionally(
-                properties.editor.startsWith('code') ?
-                    <GivenCodeEditorComponent
-                        {...genericProperties}
-                        mode={(
-                            properties.editor.startsWith('code(') &&
-                            properties.editor.endsWith(')')
-                        ) ?
-                            properties.editor.substring(
-                                'code('.length,
-                                properties.editor.length -
-                                1
-                            ) :
-                            'javascript'
-                        }
-                        name={properties.name}
-                        onChange={onChangeValue as
-                            unknown as (value: string, event?: unknown) => void
-                        }
-                        value={properties.representation as string}
-                        {...properties.inputProperties as CodeEditorProps}
-                    /> :
-                    <GivenRichTextEditorComponent
-                        {...genericProperties}
-                        {...materialProperties}
-                        {...constraints}
-                        align={properties.align}
-                        characterCount={
-                            typeof properties.maximumLength === 'number' &&
-                            !isNaN(properties.maximumLength) &&
-                            properties.maximumLength >= 0
-                        }
-                        foundationRef={
-                            foundationReference as
-                                MutableRefObject<MDCTextFieldFoundation | null>
-                        }
-                        inputRef={
-                            inputReference as
-                                MutableRefObject<HTMLTextAreaElement | null>
-                        }
-                        onChange={onChangeValue as (value: string) => void}
-                        ripple={properties.ripple}
-                        rootProps={{
-                            name: properties.name,
-                            onClick,
-                            onKeyUp,
-                            /*
-                                NOTE: Disabled input fields are not focusable
-                                via keyboard which makes them unreachable for
-                                blind people using e.g. screen readers.
-                                That's wgy the label gets a tabindex to make
-                                the input focusable.
-                            */
-                            tabIndex: properties.disabled ? '0' : '-1',
-                            ...properties.rootProps
-                        }}
-                        trailingIcon={wrapIconWithTooltip(applyIconPreset(
-                            properties.trailingIcon
-                        ))}
-                        type={determineNativeType(properties)}
-                        value={properties.representation as string}
-                        {...properties.inputProperties}
-                    />,
+                <EditorComponent
+                    {...genericProperties}
+                    {...materialProperties}
+                    {...constraints}
+                    mode={(
+                        properties.editor.startsWith('code(') &&
+                        properties.editor.endsWith(')')
+                    ) ?
+                        properties.editor.substring(
+                            'code('.length,
+                            properties.editor.length -
+                            1
+                        ) :
+                        'javascript'
+                    }
+                    align={properties.align}
+                    characterCount={
+                        typeof properties.maximumLength === 'number' &&
+                        !isNaN(properties.maximumLength) &&
+                        properties.maximumLength >= 0
+                    }
+                    foundationRef={
+                        foundationReference as
+                            MutableRefObject<MDCTextFieldFoundation | null>
+                    }
+                    inputRef={
+                        inputReference as
+                            MutableRefObject<HTMLTextAreaElement | null>
+                    }
+                    onChange={onChangeValue as (value: string) => void}
+                    ripple={properties.ripple}
+                    rootProps={{
+                        name: properties.name,
+                        onClick,
+                        onKeyUp,
+                        /*
+                            NOTE: Disabled input fields are not focusable
+                            via keyboard which makes them unreachable for
+                            blind people using e.g. screen readers.
+                            That's wgy the label gets a tabindex to make
+                            the input focusable.
+                        */
+                        tabIndex: properties.disabled ? '0' : '-1',
+                        ...properties.rootProps
+                    }}
+                    trailingIcon={wrapIconWithTooltip(applyIconPreset(
+                        properties.trailingIcon
+                    ))}
+                    type={determineNativeType(properties)}
+                    value={properties.representation as string}
+                    {...properties.inputProperties}
+                />,
                 isAdvancedEditor,
                 properties.editor.startsWith('code')
             )}
@@ -1835,7 +1828,7 @@ export const TextInputInner = function<Type = unknown>(
                         ''
                     }
                     <TextField
-                        {...genericProperties}
+                        {...genericProperties as TextFieldProps}
                         {...materialProperties}
                         {...constraints}
                         align={properties.align}
