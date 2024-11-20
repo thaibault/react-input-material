@@ -1,7 +1,6 @@
 // -*- coding: utf-8 -*-
 /** @module type */
 'use strict'
-import {LanguageSupport} from '@codemirror/language'
 /* !
     region header
     [Project page](https://torben.website/react-material-input)
@@ -17,6 +16,9 @@ import {LanguageSupport} from '@codemirror/language'
     endregion
 */
 // region imports
+import {LanguageSupport} from '@codemirror/language'
+import {JSONContent} from '@tiptap/core'
+
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode'
 import PropertyTypes, {
     any,
@@ -161,7 +163,7 @@ Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
     maxLength: number
     rows: number
 
-    onChange: (value: string) => void
+    onChange: (value: string, contentTree?: JSONContent) => void
 }
 
 export interface EditorWrapperProps extends Partial<EditorProperties> {
