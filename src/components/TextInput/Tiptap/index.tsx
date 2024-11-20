@@ -81,6 +81,7 @@ export const Index = (props: TiptapProps) => {
                 Event & { detail: EditorEvents['update'] }
             syntheticEvent.detail = editorEvent
             const html = editorEvent.editor.getHTML()
+            const contentTree = editorEvent.editor.getJSON()
             if (textareaReference.current) {
                 if (html === '<p></p>')
                     textareaReference.current.value = ''
@@ -90,7 +91,7 @@ export const Index = (props: TiptapProps) => {
             }
 
             if (props.onChange)
-                props.onChange(html)
+                props.onChange(html, {contentTree})
         },
         ...(props.editor?.options || {})
     })
