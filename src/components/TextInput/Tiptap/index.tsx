@@ -22,6 +22,7 @@ import StarterKit from '@tiptap/starter-kit'
 import {Mapping} from 'clientnode'
 
 import {useRef} from 'react'
+import Dummy from 'react-generic-dummy'
 
 import EditorWrapper from '../EditorWrapper'
 import cssClassNames from '../style.module'
@@ -33,6 +34,12 @@ export const CSS_CLASS_NAMES = cssClassNames as Mapping
 export const VIEW_CONTENT_OFFSET_IN_PX = 8
 
 export const Index = (props: TiptapProps) => {
+    if (
+        !(useEditor as typeof useEditor | undefined) ||
+        (StarterKit as unknown as Partial<typeof Dummy>).isDummy
+    )
+        throw Error('Missing tiptap dependencies.')
+
     const value = props.value || ''
 
     const editorViewReference = useRef<HTMLDivElement | null>(null)

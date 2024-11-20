@@ -32,7 +32,12 @@ import {CodeMirrorProps} from '../type'
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
 export const Index = (props: CodeMirrorProps) => {
-    if (!basicSetup)
+    if (!(
+        basicSetup as typeof basicSetup | undefined &&
+        javascript as typeof javascript | undefined &&
+        EditorState as typeof EditorState | undefined &&
+        EditorView as typeof EditorView | undefined
+    ))
         throw Error('Missing codemirror dependencies.')
 
     const [value, setValue] = useState(String(props.value) || '')

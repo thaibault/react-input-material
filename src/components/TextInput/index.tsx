@@ -1647,18 +1647,24 @@ export const TextInputInner = function<Type = unknown>(
             )
             if (modeName) {
                 editorProperties.editor = {}
-                if (['js', 'script', 'javascript'].includes(
-                    modeName.toLowerCase()
-                ))
+                if (
+                    javascript as (object | undefined) &&
+                    ['js', 'script', 'javascript'].includes(
+                        modeName.toLowerCase()
+                    )
+                )
                     (editorProperties as CodeEditorProperties).editor.mode =
                         javascript()
-                else if ([
-                    'css',
-                    'style',
-                    'styles',
-                    'cascadingstylesheet',
-                    'cascadingstylesheets'
-                ].includes(modeName.toLowerCase()))
+                else if (
+                    css as (object | undefined) &&
+                    [
+                        'css',
+                        'style',
+                        'styles',
+                        'cascadingstylesheet',
+                        'cascadingstylesheets'
+                    ].includes(modeName.toLowerCase())
+                )
                     (editorProperties as CodeEditorProperties).editor.mode =
                         css()
             }
