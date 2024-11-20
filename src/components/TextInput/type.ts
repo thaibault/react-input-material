@@ -164,6 +164,19 @@ Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
     onChange: (value: string) => void
 }
 
+export interface EditorWrapperProps extends Partial<EditorProperties> {
+    editorViewReference: MutableRefObject<HTMLDivElement | null>
+    textareaReference: MutableRefObject<HTMLTextAreaElement | null>
+
+    children: ReactNode
+    barContentSlot?: ReactNode
+
+    viewContentOffsetInPX?: number
+    classNamePrefix: string
+
+    onLabelClick?: (event: MouseEvent<HTMLLabelElement>) => void
+}
+
 export interface RichTextEditorButtonProps {
     action: (command: ChainedCommands) => ChainedCommands,
 
@@ -289,6 +302,7 @@ export interface InputProperties<T = unknown> extends
 
     editor: Editor
     editorIsActive: boolean
+    editorIsInitiallyActive: boolean
 
     hidden?: boolean
 

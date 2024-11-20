@@ -34,9 +34,6 @@ import {
     InputModelState as ModelState
 } from './type'
 
-import RichTextEditorComponent from './Tiptap'
-import CodeEditorComponent from './CodeMirror'
-
 /*
 "namedExport" version of css-loader:
 
@@ -59,14 +56,6 @@ export const IS_BROWSER = !(
     typeof TARGET_TECHNOLOGY !== 'undefined' && TARGET_TECHNOLOGY === 'node' ||
     typeof window === 'undefined'
 )
-export const GivenRichTextEditorComponent: typeof RichTextEditorComponent =
-    IS_BROWSER && RichTextEditorComponent as unknown ?
-        RichTextEditorComponent :
-        Dummy as unknown as typeof RichTextEditorComponent
-export const GivenCodeEditorComponent: typeof CodeEditorComponent =
-    IS_BROWSER && CodeEditorComponent as unknown ?
-        CodeEditorComponent :
-        Dummy as unknown as typeof CodeEditorComponent
 export const UseAnimations: (
     null | typeof Dummy | typeof UseAnimationsType | undefined
 ) = IS_BROWSER ?
