@@ -20,81 +20,31 @@
 import {javascript} from '@codemirror/lang-javascript'
 import {EditorState} from '@codemirror/state'
 import {EditorView, ViewUpdate} from '@codemirror/view'
-import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
-import {TextFieldHelperTextProps} from '@rmwc/textfield/lib/textfield'
 import {Mapping} from 'clientnode'
 
 import {basicSetup} from 'codemirror'
-import {
-    FocusEvent,
-    MutableRefObject,
-    useEffect,
-    useId,
-    useRef,
-    useState
-} from 'react'
+import {FocusEvent, useEffect, useRef, useState} from 'react'
 
+import EditorWrapper from '../EditorWrapper'
 import cssClassNames from '../style.module'
 import {CodeMirrorProps} from '../type'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
 export const Index = (props: CodeMirrorProps) => {
+    if (!basicSetup)
+        throw Error('Missing codemirror dependencies.')
+
     const [value, setValue] = useState(String(props.value) || '')
 
-    const defaultID = useId()
-    const id = props.id ?? defaultID
-
-    const mdcTextFieldReference =
-        useRef<HTMLLabelElement>() as MutableRefObject<HTMLLabelElement>
-    const textareaReference =
-        useRef<HTMLTextAreaElement>() as MutableRefObject<HTMLTextAreaElement>
-    const editorViewReference =
-        useRef<HTMLDivElement>() as MutableRefObject<HTMLDivElement>
+    const editorViewReference = useRef<HTMLDivElement | null>(null)
+    const textareaReference = useRef<HTMLTextAreaElement | null>(null)
 
     useEffect(
         () => {
-            const textField = new MDCTextField(mdcTextFieldReference.current)
-            if (props.foundationRef)
-                (
-                    props.foundationRef as {current: MDCTextFieldFoundation}
-                ).current = textField.getDefaultFoundation()
+            if (!editorViewReference.current)
+                return
 
-            if (typeof props.value === 'string')
-                textField.value = props.value
-            if (typeof props.disabled === 'boolean')
-                textField.disabled = props.disabled
-            if (typeof props.invalid === 'boolean')
-                textField.valid = !props.invalid
-            if (typeof props.required === 'boolean')
-                textField.required = props.required
-            if (typeof props.minLength === 'number')
-                textField.minLength = props.minLength
-            if (typeof props.maxLength === 'number')
-                textField.maxLength = props.maxLength
-
-            textField.useNativeValidation = false
-
-            return () => {
-                textField.destroy()
-            }
-        },
-        [
-            mdcTextFieldReference.current,
-
-            props.foundationRef,
-
-            props.value,
-            props.disabled,
-            props.invalid,
-            props.required,
-            props.minLength,
-            props.maxLength
-        ]
-    )
-
-    useEffect(
-        () => {
             const state = EditorState.create({
                 doc: value,
                 extensions: [
@@ -105,10 +55,12 @@ export const Index = (props: CodeMirrorProps) => {
                                 const syntheticEvent = new Event('input') as
                                     Event & { detail: ViewUpdate }
                                 syntheticEvent.detail = viewUpdate
-                                textareaReference.current.value = newValue
-                                textareaReference.current.dispatchEvent(
-                                    syntheticEvent
-                                )
+                                if (textareaReference.current) {
+                                    textareaReference.current.value = newValue
+                                    textareaReference.current.dispatchEvent(
+                                        syntheticEvent
+                                    )
+                                }
 
                                 if (props.onChange)
                                     props.onChange(newValue)
@@ -136,51 +88,41 @@ export const Index = (props: CodeMirrorProps) => {
         [editorViewReference.current]
     )
 
-    useEffect(
-        () => {
-            editorViewReference.current.style.height =
-                `${String(textareaReference.current.clientHeight)}px`
-        },
-        [editorViewReference.current, textareaReference.current.clientHeight]
-    )
+    return <EditorWrapper
+        editorViewReference={editorViewReference}
+        textareaReference={textareaReference}
 
-    const editorContent = <>
-        <textarea
-            ref={textareaReference}
+        value={value}
 
-            className="mdc-text-field__input"
-            style={{visibility: 'hidden', position: 'absolute'}}
-            rows={props.rows}
+        classNamePrefix={CSS_CLASS_NAMES.codeEditor}
 
-            aria-labelledby={`${id}-label`}
-            aria-controls={`${id}-helper`}
-            aria-describedby={`${id}-helper`}
+        onLabelClick={() => {
+            editorViewReference.current?.focus()
+        }}
 
-            readOnly
-
-            value={value}
-
-            minLength={props.minLength}
-            maxLength={props.maxLength}
-        ></textarea>
-
+        {...props}
+    >
         <div
             ref={editorViewReference}
 
             onBlur={(event: FocusEvent<HTMLDivElement>) => {
-                const syntheticEvent = new Event('blur') as
-                    Event & { detail: FocusEvent<HTMLDivElement> }
-                syntheticEvent.detail = event
-                textareaReference.current.dispatchEvent(syntheticEvent)
+                if (textareaReference.current) {
+                    const syntheticEvent = new Event('blur') as
+                        Event & { detail: FocusEvent<HTMLDivElement> }
+                    syntheticEvent.detail = event
+                    textareaReference.current.dispatchEvent(syntheticEvent)
+                }
 
                 if (props.onBlur)
                     props.onBlur(event)
             }}
             onFocus={(event: FocusEvent<HTMLDivElement>) => {
-                const syntheticEvent = new Event('focus') as
-                    Event & { detail: FocusEvent<HTMLDivElement> }
-                syntheticEvent.detail = event
-                textareaReference.current.dispatchEvent(syntheticEvent)
+                if (textareaReference.current) {
+                    const syntheticEvent = new Event('focus') as
+                        Event & { detail: FocusEvent<HTMLDivElement> }
+                    syntheticEvent.detail = event
+                    textareaReference.current.dispatchEvent(syntheticEvent)
+                }
 
                 if (props.onFocus)
                     props.onFocus(event)
@@ -190,86 +132,7 @@ export const Index = (props: CodeMirrorProps) => {
                 CSS_CLASS_NAMES.codeEditorView + ' mdc-text-field__input'
             }
         ></div>
-
-        {props.characterCount ?
-            <div className="mdc-text-field-character-counter"></div> :
-            ''
-        }
-    </>
-
-    const helpText: TextFieldHelperTextProps =
-        typeof props.helpText === 'object' ?
-            props.helpText as TextFieldHelperTextProps :
-            {children: props.helpText}
-
-    return <>
-        <label
-            ref={mdcTextFieldReference}
-            onClick={() => {
-                editorViewReference.current.focus()
-            }}
-            className={[
-                CSS_CLASS_NAMES.codeEditor,
-                'mdc-text-field',
-                'mdc-text-field--textarea'
-            ]
-                .concat(value ? CSS_CLASS_NAMES.codeEditorHasContent : [])
-                .concat(props.disabled ? 'mdc-text-field--disabled' : [])
-                .concat(props.outlined ?
-                    'mdc-text-field--outlined' :
-                    'mdc-text-field--filled'
-                )
-                .concat(
-                    props.characterCount ?
-                        'mdc-text-field--with-internal-counter' :
-                        []
-                )
-                .join(' ')}
-        >
-            {props.ripple ?
-                <span className="mdc-text-field__ripple"></span> :
-                ''
-            }
-            <span className="mdc-floating-label" id={`${id}-label`}>
-                {props.label}
-            </span>
-
-            {props.resizeable ?
-                <span className="mdc-text-field__resizer">
-                    {editorContent}
-                </span> :
-                editorContent
-            }
-
-            {props.ripple ?
-                <span className="mdc-line-ripple"></span> :
-                ''
-            }
-        </label>
-        {helpText.children ?
-            <div className="mdc-text-field-helper-line">
-                <div
-                    className={['mdc-text-field-helper-text']
-                        .concat(
-                            helpText.persistent ?
-                                'mdc-text-field-helper-text--persistent' :
-                                []
-                        )
-                        .join(' ')
-                    }
-                    id={`${id}-helper`}
-                >
-                    {(
-                        props.helpText as TextFieldHelperTextProps | undefined
-                    )?.children ?
-                        (props.helpText as TextFieldHelperTextProps).children :
-                        props.helpText as string
-                    }
-                </div>
-            </div> :
-            ''
-        }
-    </>
+    </EditorWrapper>
 }
 
 export default Index

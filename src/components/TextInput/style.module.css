@@ -54,7 +54,7 @@ endregion */
     .richtext-editor {
         border-bottom: 1px solid rgba(0 0 0 / 42%);
 
-        .richtext-editor-bar {
+        .richtext-editor__bar {
             width: calc(100% - 6px);
 
             padding-left: 6px;
@@ -80,7 +80,7 @@ endregion */
             opacity: 0.3;
         }
 
-        &.mdc-text-field--with-internal-counter .richtext-editor-bar {
+        &.mdc-text-field--with-internal-counter .richtext-editor__bar {
             display: flex;
             flex-wrap: wrap;
             width: 100%;
@@ -89,10 +89,6 @@ endregion */
         .tiptap:focus-visible {
             outline: none;
         }
-    }
-
-    .text-input__editor__label {
-        top: 9px !important;
     }
 
     .text-input__suggestions {

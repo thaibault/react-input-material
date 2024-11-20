@@ -92,11 +92,10 @@ import {
     CursorState, EditorState, Selection, TypeSpecification
 } from '../../type'
 
+import CodeEditorComponent from './CodeMirror'
 import {
     CSS_CLASS_NAMES,
     determineValidationState,
-    GivenCodeEditorComponent,
-    GivenRichTextEditorComponent,
     lockAnimation,
     plusToXAnimation,
     preventEnterKeyPropagation,
@@ -104,6 +103,7 @@ import {
     TIPTAP_DEFAULT_OPTIONS,
     UseAnimations
 } from './helper'
+import RichTextEditorComponent from './Tiptap'
 import {
     CodeMirrorProps as CodeEditorProps,
     CodeMirrorProperties as CodeEditorProperties,
@@ -1279,7 +1279,8 @@ export const TextInputInner = function<Type = unknown>(
 
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
     const [editorState, setEditorState] = useState<EditorState>({
-        editorIsActive: false, selectionIsUnstable: false
+        editorIsActive: givenProps.editorIsInitiallyActive || false,
+        selectionIsUnstable: false
     })
     const [hidden, setHidden] = useState<boolean | undefined>()
     const [isSuggestionOpen, setIsSuggestionOpen] = useState<boolean>(false)
@@ -1632,8 +1633,8 @@ export const TextInputInner = function<Type = unknown>(
     }
     /// endregion
     const EditorComponent = properties.editor.startsWith('code') ?
-        GivenCodeEditorComponent :
-        GivenRichTextEditorComponent
+        CodeEditorComponent :
+        RichTextEditorComponent
     const editorProperties =
         {} as CodeEditorProperties | RichTextEditorProperties
     if (isAdvancedEditor)
