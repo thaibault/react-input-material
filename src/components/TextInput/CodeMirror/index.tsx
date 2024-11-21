@@ -23,7 +23,7 @@ import {EditorView, ViewUpdate} from '@codemirror/view'
 import {Mapping} from 'clientnode'
 
 import {basicSetup} from 'codemirror'
-import {FocusEvent, useEffect, useRef, useState} from 'react'
+import {FocusEvent, useEffect, useRef} from 'react'
 
 import EditorWrapper from '../EditorWrapper'
 import cssClassNames from '../style.module'
@@ -40,57 +40,69 @@ export const Index = (props: CodeMirrorProps) => {
     ))
         throw Error('Missing codemirror dependencies.')
 
-    const [value, setValue] = useState(String(props.value) || '')
+    const value = props.value ?? ''
 
     const editorViewReference = useRef<HTMLDivElement | null>(null)
     const textareaReference = useRef<HTMLTextAreaElement | null>(null)
+    const editorView = useRef<EditorView | null>(null)
+
+    const onChange = (viewUpdate: ViewUpdate) => {
+        if (props.disabled)
+            return
+
+        const value = viewUpdate.state.doc.toString()
+
+        if (textareaReference.current) {
+            const syntheticEvent = new Event('input') as
+                Event & { detail: ViewUpdate }
+            syntheticEvent.detail = viewUpdate
+
+            textareaReference.current.value = value
+            textareaReference.current.dispatchEvent(
+                syntheticEvent
+            )
+        }
+
+        if (props.onChange)
+            props.onChange(value)
+    }
+
+    if (
+        editorView.current &&
+        props.value !== editorView.current.state.doc.toString()
+    )
+        // TODO
+        editorView.current.state.update()
 
     useEffect(
         () => {
-            if (!editorViewReference.current)
+            if (!editorViewReference.current || editorView.current)
                 return
 
             const state = EditorState.create({
-                doc: value,
+                doc: String(value),
                 extensions: [
                     EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
-                        setValue((oldValue: string): string => {
-                            const newValue = viewUpdate.state.doc.toString()
-                            if (oldValue !== newValue) {
-                                const syntheticEvent = new Event('input') as
-                                    Event & { detail: ViewUpdate }
-                                syntheticEvent.detail = viewUpdate
-                                if (textareaReference.current) {
-                                    textareaReference.current.value = newValue
-                                    textareaReference.current.dispatchEvent(
-                                        syntheticEvent
-                                    )
-                                }
-
-                                if (props.onChange)
-                                    props.onChange(newValue)
-
-                                return newValue
-                            }
-
-                            return oldValue
-                        })
+                        onChange(viewUpdate)
                     }),
                     basicSetup,
                     props.editor?.mode ?? javascript()
                 ]
             })
 
-            const editorView = new EditorView({
+            editorView.current = new EditorView({
                 state,
                 parent: editorViewReference.current
             })
 
             return () => {
-                editorView.destroy()
+                if (editorView.current) {
+                    editorView.current.destroy()
+                    editorView.current = null
+                }
             }
         },
-        [editorViewReference.current]
+        [editorViewReference.current, props.editor?.mode?.language.name]
     )
 
     return <EditorWrapper
@@ -134,7 +146,7 @@ export const Index = (props: CodeMirrorProps) => {
             }}
 
             className={
-                CSS_CLASS_NAMES.codeEditorView + ' mdc-text-field__input'
+                `${CSS_CLASS_NAMES.codeEditorView} mdc-text-field__input`
             }
         ></div>
     </EditorWrapper>

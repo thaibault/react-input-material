@@ -19,16 +19,6 @@ endregion */
         white-space: nowrap;
     }
 
-    .code-editor--has-content {
-        .cm-content {
-            opacity: 1;
-        }
-
-        .cm-gutters {
-            visibility: visible;
-        }
-    }
-
     .code-editor {
         .cm-content {
             opacity: 0;
@@ -48,6 +38,24 @@ endregion */
             .cm-gutters {
                 visibility: visible;
             }
+        }
+
+        &.code-editor--has-content {
+            .cm-content {
+                opacity: 1;
+            }
+
+            .cm-gutters {
+                visibility: visible;
+            }
+        }
+
+        &.mdc-text-field--disabled .cm-editor {
+            opacity: 0.3;
+        }
+
+        .code-editor__view {
+            /* This class is needed to be imported in the component. */
         }
     }
 
@@ -76,7 +84,11 @@ endregion */
             }
         }
 
-        &.mdc-text-field--disabled .richtext-editor-bar {
+        .richtext-editor__view {
+            /* This class is needed to be imported in the component. */
+        }
+
+        &.mdc-text-field--disabled .richtext-editor__bar {
             opacity: 0.3;
         }
 

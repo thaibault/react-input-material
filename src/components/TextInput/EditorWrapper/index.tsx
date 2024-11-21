@@ -149,9 +149,9 @@ export const Index = (props: EditorWrapperProps) => {
                 'mdc-text-field',
                 'mdc-text-field--textarea'
             ]
-                .concat(props.value ?
-                    `${props.classNamePrefix}--has-content` :
-                    'mdc-text-field--textarea'
+                .concat(props.value === '' ?
+                    'mdc-text-field--textarea' :
+                    `${props.classNamePrefix}--has-content`
                 )
                 .concat(props.disabled ? 'mdc-text-field--disabled' : [])
                 .concat(props.outlined ?

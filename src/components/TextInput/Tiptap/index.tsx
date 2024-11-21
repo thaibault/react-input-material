@@ -40,7 +40,7 @@ export const Index = (props: TiptapProps) => {
     )
         throw Error('Missing tiptap dependencies.')
 
-    const value = props.value || ''
+    const value = props.value ?? ''
 
     const editorViewReference = useRef<HTMLDivElement | null>(null)
     const textareaReference = useRef<HTMLTextAreaElement | null>(null)
@@ -81,7 +81,6 @@ export const Index = (props: TiptapProps) => {
                 Event & { detail: EditorEvents['update'] }
             syntheticEvent.detail = editorEvent
             const html = editorEvent.editor.getHTML()
-            const contentTree = editorEvent.editor.getJSON()
             if (textareaReference.current) {
                 if (html === '<p></p>')
                     textareaReference.current.value = ''
@@ -91,7 +90,9 @@ export const Index = (props: TiptapProps) => {
             }
 
             if (props.onChange)
-                props.onChange(html, {contentTree})
+                props.onChange(
+                    html, {contentTree: editorEvent.editor.getJSON()}
+                )
         },
         ...(props.editor?.options || {})
     })
@@ -115,7 +116,9 @@ export const Index = (props: TiptapProps) => {
         {...props}
     >
         <EditorContent
-            className="mdc-text-field__input"
+            className={
+                `${CSS_CLASS_NAMES.richtextEditorView} mdc-text-field__input`
+            }
             editor={editor}
             innerRef={editorViewReference}
         />
