@@ -20,6 +20,12 @@ endregion */
     }
 
     .code-editor {
+        /*
+            NOTE: This is needed to let autocomplete divs for the intellisense
+            mechanism being visible and overflow.
+        */
+        overflow: visible;
+
         .cm-content {
             opacity: 0;
         }
@@ -56,7 +62,18 @@ endregion */
 
         .code-editor__view {
             /* This class is needed to be imported in the component. */
+
+            /*
+                NOTE: This is needed to let autocomplete divs being visible and
+                overflow.
+            */
+            overflow: visible;
         }
+    }
+
+    .code-editor + .mdc-text-field-helper-line .mdc-text-field-helper-text {
+        /* NOTE: Is needed to render before the helper line below the input. */
+        z-index: -1;
     }
 
     .richtext-editor {

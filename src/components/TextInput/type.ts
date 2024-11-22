@@ -34,6 +34,7 @@ import PropertyTypes, {
     symbol
 } from 'clientnode/dist/property-types'
 import {
+    FocusEvent,
     FocusEvent as ReactFocusEvent,
     ForwardRefExoticComponent,
     KeyboardEvent,
@@ -166,9 +167,16 @@ Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
     onChange: (value: string, contentTree?: JSONContent) => void
 }
 
+export interface EditorWrapperEventWrapper {
+    blur: (event: object) => void
+    focus: (event: object) => void
+    input: (value: number | string, event: object) => void
+}
 export interface EditorWrapperProps extends Partial<EditorProperties> {
+    eventMapper: MutableRefObject<EditorWrapperEventWrapper | null>,
+
     editorViewReference: MutableRefObject<HTMLDivElement | null>
-    textareaReference: MutableRefObject<HTMLTextAreaElement | null>
+    textareaReference?: MutableRefObject<HTMLTextAreaElement | null>
 
     children: ReactNode
     barContentSlot?: ReactNode
@@ -286,14 +294,25 @@ export interface SuggestionCreatorOptions<P> {
 */
 export type Editor = (
     'code' |
+
     'code(css)' |
+    'code(cascadingstylesheet)' |
+    'code(cascadingstylesheets)' |
+    'code(style)' |
+    'code(styles)' |
+
     'code(script)' |
+    'code(js)' |
+    'code(jsx)' |
+    'code(javascript)' |
+
+    'code(ts)' |
+    'code(tsx)' |
+    'code(typescript)' |
+
     'plain' |
     'text' |
-    'richtext(raw)' |
-    'richtext(simple)' |
-    'richtext(normal)' |
-    'richtext(advanced)'
+    'richtext'
 )
 export interface InputProperties<T = unknown> extends
     InputModelState, Properties<T>

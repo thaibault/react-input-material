@@ -19,14 +19,14 @@
 // region imports
 import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import {Mapping} from 'clientnode'
 
+import {Mapping} from 'clientnode'
 import {useRef} from 'react'
 import Dummy from 'react-generic-dummy'
 
 import EditorWrapper from '../EditorWrapper'
 import cssClassNames from '../style.module'
-import {TiptapProps} from '../type'
+import {EditorWrapperEventWrapper, TiptapProps} from '../type'
 
 import MenuBar from './MenuBar'
 // endregion
@@ -43,7 +43,7 @@ export const Index = (props: TiptapProps) => {
     const value = props.value ?? ''
 
     const editorViewReference = useRef<HTMLDivElement | null>(null)
-    const textareaReference = useRef<HTMLTextAreaElement | null>(null)
+    const eventMapper = useRef<EditorWrapperEventWrapper | null>(null)
 
     const extensions =
         props.editor?.extensions ||
@@ -54,40 +54,24 @@ export const Index = (props: TiptapProps) => {
 
         editable: !props.disabled,
         content: String(value),
-        onFocus: (editorEvent: EditorEvents['focus']) => {
-            if (textareaReference.current) {
-                const syntheticEvent = new Event('focus') as
-                    Event & { detail: EditorEvents['focus'] }
-                syntheticEvent.detail = editorEvent
-                textareaReference.current.dispatchEvent(syntheticEvent)
-            }
-
-            if (props.onFocus)
-                props.onFocus(editorEvent)
-        },
         onBlur: (editorEvent: EditorEvents['focus']) => {
-            if (textareaReference.current) {
-                const syntheticEvent = new Event('blur') as
-                    Event & { detail: EditorEvents['blur'] }
-                syntheticEvent.detail = editorEvent
-                textareaReference.current.dispatchEvent(syntheticEvent)
-            }
+            eventMapper.current?.blur(editorEvent)
 
             if (props.onBlur)
                 props.onBlur(editorEvent)
         },
+        onFocus: (editorEvent: EditorEvents['focus']) => {
+            eventMapper.current?.focus(editorEvent)
+
+            if (props.onFocus)
+                props.onFocus(editorEvent)
+        },
         onUpdate: (editorEvent) => {
-            const syntheticEvent = new Event('input') as
-                Event & { detail: EditorEvents['update'] }
-            syntheticEvent.detail = editorEvent
             const html = editorEvent.editor.getHTML()
-            if (textareaReference.current) {
-                if (html === '<p></p>')
-                    textareaReference.current.value = ''
-                else
-                    textareaReference.current.value = html
-                textareaReference.current.dispatchEvent(syntheticEvent)
-            }
+
+            eventMapper.current?.input(
+                html === '<p></p>' ? '' : html, editorEvent
+            )
 
             if (props.onChange)
                 props.onChange(
@@ -99,8 +83,11 @@ export const Index = (props: TiptapProps) => {
     const htmlContent = editor?.getHTML()
 
     return <EditorWrapper
+        {...props}
+
+        eventMapper={eventMapper}
+
         editorViewReference={editorViewReference}
-        textareaReference={textareaReference}
 
         barContentSlot={<MenuBar editor={editor}/>}
 
@@ -112,8 +99,6 @@ export const Index = (props: TiptapProps) => {
         onLabelClick={() => {
             editor?.chain().focus().run()
         }}
-
-        {...props}
     >
         <EditorContent
             className={

@@ -1495,8 +1495,12 @@ export const TextInputInner = function<Type = unknown>(
         properties.type === 'string' &&
         properties.editorIsActive &&
         (
-            properties.editor.startsWith('code') ||
-            properties.editor.startsWith('richtext(')
+            properties.editor === 'code' ||
+            properties.editor.startsWith('code(') &&
+            properties.editor.endsWith(')') ||
+            properties.editor === 'richtext' ||
+            properties.editor.startsWith('richtext(') &&
+            properties.editor.endsWith(')')
         )
     )
 
@@ -1649,12 +1653,16 @@ export const TextInputInner = function<Type = unknown>(
                 editorProperties.editor = {}
                 if (
                     javascript as (object | undefined) &&
-                    ['js', 'script', 'javascript'].includes(
-                        modeName.toLowerCase()
-                    )
+                    [
+                        'js', 'jsx',
+                        'ts', 'tsx',
+                        'script', 'javascript',
+                        'typescript'
+                    ]
+                        .includes(modeName.toLowerCase())
                 )
                     (editorProperties as CodeEditorProperties).editor.mode =
-                        javascript()
+                        javascript({jsx: true, typescript: true})
                 else if (
                     css as (object | undefined) &&
                     [

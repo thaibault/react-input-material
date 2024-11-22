@@ -20,7 +20,7 @@
 import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
 import {TextFieldHelperTextProps} from '@rmwc/textfield/lib/textfield'
 
-import {useEffect, useId, useRef} from 'react'
+import {useEffect, useId, useLayoutEffect, useRef} from 'react'
 
 import {EditorWrapperProps} from '../type'
 // endregion
@@ -29,36 +29,78 @@ export const Index = (props: EditorWrapperProps) => {
     const id = props.id ?? defaultID
 
     const mdcTextFieldReference = useRef<HTMLLabelElement | null>(null)
+    const textareaReference = useRef<HTMLTextAreaElement | null>(null)
+    const materialTextField = useRef<MDCTextField | null>(null)
+
+    props.eventMapper.current = {
+        blur: (event: object) => {
+            if (textareaReference.current) {
+                const syntheticEvent = new Event('blur') as
+                    Event & { detail: object }
+                syntheticEvent.detail = event
+                textareaReference.current.dispatchEvent(syntheticEvent)
+            }
+        },
+        focus: (event: object) => {
+            if (textareaReference.current) {
+                const syntheticEvent = new Event('focus') as
+                    Event & { detail: object }
+                syntheticEvent.detail = event
+                textareaReference.current.dispatchEvent(syntheticEvent)
+            }
+        },
+        input: (value: number | string, event: object) => {
+            if (textareaReference.current) {
+                const syntheticEvent = new Event('input') as
+                    Event & { detail: object }
+                syntheticEvent.detail = event
+
+                textareaReference.current.value = String(value)
+                textareaReference.current.dispatchEvent(syntheticEvent)
+            }
+
+            /*
+                Since we do not operate on the native textarea element we need
+                to make sure that we stay in focus state when do clearing the
+                textarea's input value.
+            */
+            setTimeout(() => {
+                materialTextField.current?.getDefaultFoundation()
+                    .autoCompleteFocus()
+            })
+        }
+    }
 
     useEffect(
         () => {
             if (mdcTextFieldReference.current) {
-                const textField =
+                materialTextField.current =
                     new MDCTextField(mdcTextFieldReference.current)
                 if (props.foundationRef)
                     (
                         props.foundationRef as {
                             current: MDCTextFieldFoundation
                         }
-                    ).current = textField.getDefaultFoundation()
+                    ).current =
+                        materialTextField.current.getDefaultFoundation()
 
                 if (typeof props.value === 'string')
-                    textField.value = props.value
+                    materialTextField.current.value = props.value
                 if (typeof props.disabled === 'boolean')
-                    textField.disabled = props.disabled
+                    materialTextField.current.disabled = props.disabled
                 if (typeof props.invalid === 'boolean')
-                    textField.valid = !props.invalid
+                    materialTextField.current.valid = !props.invalid
                 if (typeof props.required === 'boolean')
-                    textField.required = props.required
+                    materialTextField.current.required = props.required
                 if (typeof props.minLength === 'number')
-                    textField.minLength = props.minLength
+                    materialTextField.current.minLength = props.minLength
                 if (typeof props.maxLength === 'number')
-                    textField.maxLength = props.maxLength
+                    materialTextField.current.maxLength = props.maxLength
 
-                textField.useNativeValidation = false
+                materialTextField.current.useNativeValidation = false
 
                 return () => {
-                    textField.destroy()
+                    materialTextField.current?.destroy()
                 }
             }
         },
@@ -78,26 +120,48 @@ export const Index = (props: EditorWrapperProps) => {
 
     useEffect(
         () => {
-            if (
-                props.editorViewReference.current &&
-                props.textareaReference.current
-            )
-                props.editorViewReference.current.style.height =
-                    String(
-                        props.textareaReference.current.clientHeight +
-                        (props.viewContentOffsetInPX || 0)
-                    ) +
-                    'px'
+            let id: null | ReturnType<typeof setTimeout> = null
+            const syncHeight = () => {
+                if (
+                    props.editorViewReference.current &&
+                    textareaReference.current?.clientHeight
+                )
+                    props.editorViewReference.current.style.height =
+                        String(
+                            textareaReference.current.clientHeight +
+                            (props.viewContentOffsetInPX || 0)
+                        ) +
+                        'px'
+                else
+                    id = setTimeout(() => {
+                        syncHeight()
+                    })
+            }
+
+            syncHeight()
+
+            return () => {
+                if (id !== null)
+                    clearTimeout(id)
+            }
         },
         [
             props.editorViewReference.current,
-            props.textareaReference.current?.clientHeight
+            textareaReference.current?.clientHeight
         ]
+    )
+
+    useEffect(
+        () => {
+            if (props.textareaReference)
+                props.textareaReference.current = textareaReference.current
+        },
+        [props.textareaReference, textareaReference.current]
     )
 
     const editorContent = <>
         <textarea
-            ref={props.textareaReference}
+            ref={textareaReference}
 
             className="mdc-text-field__input"
             style={{visibility: 'hidden', position: 'absolute'}}

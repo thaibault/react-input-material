@@ -94,11 +94,15 @@
     "@babel/plugin-transform-proto-to-assign": "^7.25.9",
     "@babel/preset-react": "^7.25.9",
     "@babel/runtime": "^7.26.0",
+    "@codemirror/autocomplete": "^6.18.3",
     "@codemirror/commands": "^6.7.1",
     "@codemirror/lang-css": "^6.3.0",
     "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/language": "^6.10.3",
+    "@codemirror/lint": "^6.8.3",
+    "@codemirror/search": "^6.5.8",
     "@codemirror/state": "^6.4.1",
-    "@codemirror/view": "^6.34.3",
+    "@codemirror/view": "^6.35.0",
     "@emotion/react": "^11.13.5",
     "@rmwc/card": "^14.3.5",
     "@rmwc/checkbox": "^14.3.5",
@@ -116,9 +120,9 @@
     "@rmwc/typography": "^14.3.5",
     "@stylistic/eslint-plugin-ts": "^2.11.0",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
-    "@tiptap/core": "^2.10.0",
-    "@tiptap/react": "^2.10.0",
-    "@tiptap/starter-kit": "^2.10.0",
+    "@tiptap/core": "^2.10.2",
+    "@tiptap/react": "^2.10.2",
+    "@tiptap/starter-kit": "^2.10.2",
     "@types/ejs": "^3.1.5",
     "@types/html-minifier": "^4.0.5",
     "@types/jquery": "^3.5.32",
@@ -133,7 +137,6 @@
     "@typescript-eslint/parser": "^8.15.0",
     "blob-util": "^2.0.2",
     "clientnode": "^3.0.1229",
-    "codemirror": "^6.0.1",
     "css-loader": "^7.1.2",
     "cssnano": "^7.0.6",
     "documentation-website": "^1.0.339",
@@ -172,9 +175,13 @@
   },
   "peerDependencies": {
     "@babel/runtime": "*",
+    "@codemirror/autocomplete": "*",
     "@codemirror/commands": "*",
     "@codemirror/lang-css": "*",
     "@codemirror/lang-javascript": "*",
+    "@codemirror/language": "*",
+    "@codemirror/lint": "*",
+    "@codemirror/search": "*",
     "@codemirror/state": "*",
     "@codemirror/view": "*",
     "@rmwc/card": "*",
@@ -196,7 +203,6 @@
     "@types/spark-md5": "*",
     "blob-util": "*",
     "clientnode": "*",
-    "codemirror": "*",
     "material-components-web": "*",
     "material-icons": "*",
     "react": "*",
@@ -208,6 +214,9 @@
     "@babel/runtime": {
       "optional": true
     },
+    "@codemirror/autocomplete": {
+      "optional": true
+    },
     "@codemirror/commands": {
       "optional": true
     },
@@ -215,6 +224,15 @@
       "optional": true
     },
     "@codemirror/lang-javascript": {
+      "optional": true
+    },
+    "@codemirror/language": {
+      "optional": true
+    },
+    "@codemirror/lint": {
+      "optional": true
+    },
+    "@codemirror/search": {
       "optional": true
     },
     "@codemirror/state": {
@@ -281,9 +299,6 @@
       "optional": true
     },
     "clientnode": {
-      "optional": true
-    },
-    "codemirror": {
       "optional": true
     },
     "material-components-web": {
@@ -479,16 +494,19 @@
       "module": {
         "aliases": {
           "#": "Remove unneeded optional dependencies.",
+          "@codemirror/autocomplete": "react-generic-dummy",
           "@codemirror/commands": "react-generic-dummy",
+          "@codemirror/language": "react-generic-dummy",
           "@codemirror/lang-css": "react-generic-dummy",
           "@codemirror/lang-javascript": "react-generic-dummy",
+          "@codemirror/lint": "react-generic-dummy",
+          "@codemirror/search": "react-generic-dummy",
           "@codemirror/state": "react-generic-dummy",
           "@codemirror/view": "react-generic-dummy",
           "@rmwc/tooltip": "react-generic-dummy",
           "@tiptap/core$": "react-generic-dummy",
           "@tiptap/react": "react-generic-dummy",
           "@tiptap/starter-kit$": "react-generic-dummy",
-          "codemirror": "react-generic-dummy",
           "react-useanimations$": "react-generic-dummy",
           "react-useanimations/lib/lock$": "react-generic-dummy",
           "react-useanimations/lib/plusToX$": "react-generic-dummy"
