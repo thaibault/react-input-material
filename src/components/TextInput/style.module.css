@@ -19,23 +19,30 @@ endregion */
         white-space: nowrap;
     }
 
-    .code-editor--has-content {
-        .cm-content {
-            opacity: 1;
-        }
-
-        .cm-gutters {
-            visibility: visible;
-        }
-    }
-
     .code-editor {
+        /*
+            NOTE: This is needed to let autocomplete divs for the intellisense
+            mechanism being visible and overflow.
+        */
+        overflow: visible;
+        z-index: 1;
+
         .cm-content {
             opacity: 0;
+            /* stylelint-disable selector-class-pattern */
+            .cm-activeLine {
+                background-color: rgba(0 0 0 / 5%);
+            }
+            /* stylelint-enable selector-class-pattern */
         }
 
         .cm-gutters {
             visibility: hidden;
+            /* stylelint-disable selector-class-pattern */
+            .cm-activeLineGutter {
+                background-color: rgba(0 0 0 / 5%);
+            }
+            /* stylelint-enable selector-class-pattern */
         }
 
         .cm-focused {
@@ -48,6 +55,29 @@ endregion */
             .cm-gutters {
                 visibility: visible;
             }
+        }
+
+        &.code-editor--has-content {
+            .cm-content {
+                opacity: 1;
+            }
+
+            .cm-gutters {
+                visibility: visible;
+            }
+        }
+
+        &.mdc-text-field--disabled .cm-editor {
+            opacity: 0.3;
+        }
+
+        .code-editor__view {
+            /* This class is needed to be imported in the component. */
+            /*
+                NOTE: This is needed to let autocomplete divs being visible and
+                overflow.
+            */
+            overflow: visible;
         }
     }
 
@@ -76,7 +106,11 @@ endregion */
             }
         }
 
-        &.mdc-text-field--disabled .richtext-editor-bar {
+        .richtext-editor__view {
+            /* This class is needed to be imported in the component. */
+        }
+
+        &.mdc-text-field--disabled .richtext-editor__bar {
             opacity: 0.3;
         }
 

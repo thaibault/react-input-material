@@ -49,7 +49,7 @@ import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
-import {MDCTextFieldFoundation} from '@material/textfield'
+import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
 
 import {MenuApi} from '@rmwc/menu'
 import {
@@ -166,14 +166,21 @@ Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
     onChange: (value: string, contentTree?: JSONContent) => void
 }
 
+export interface EditorWrapperEventWrapper {
+    blur: (event: object) => void
+    focus: (event: object) => void
+    input: (value: number | string, event: object) => void
+}
 export interface EditorWrapperProps extends Partial<EditorProperties> {
-    editorViewReference: MutableRefObject<HTMLDivElement | null>
-    textareaReference: MutableRefObject<HTMLTextAreaElement | null>
+    eventMapper: MutableRefObject<EditorWrapperEventWrapper | null>
+
+    materialTextField?: MutableRefObject<MDCTextField | null>
+    mdcTextFieldReference?: MutableRefObject<HTMLLabelElement | null>
+    textareaReference?: MutableRefObject<HTMLTextAreaElement | null>
 
     children: ReactNode
     barContentSlot?: ReactNode
 
-    viewContentOffsetInPX?: number
     classNamePrefix: string
 
     onLabelClick?: (event: MouseEvent<HTMLLabelElement>) => void
@@ -286,14 +293,25 @@ export interface SuggestionCreatorOptions<P> {
 */
 export type Editor = (
     'code' |
+
     'code(css)' |
+    'code(cascadingstylesheet)' |
+    'code(cascadingstylesheets)' |
+    'code(style)' |
+    'code(styles)' |
+
     'code(script)' |
+    'code(js)' |
+    'code(jsx)' |
+    'code(javascript)' |
+
+    'code(ts)' |
+    'code(tsx)' |
+    'code(typescript)' |
+
     'plain' |
     'text' |
-    'richtext(raw)' |
-    'richtext(simple)' |
-    'richtext(normal)' |
-    'richtext(advanced)'
+    'richtext'
 )
 export interface InputProperties<T = unknown> extends
     InputModelState, Properties<T>

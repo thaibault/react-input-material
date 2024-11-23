@@ -284,6 +284,7 @@ const Application = () => {
                     />
                     <TextInput<null | string>
                         name="simpleInputUnControlled"
+
                         onChange={onChange}
                         onChangeValue={onChangeTextInputValue}
                         enforceUncontrolled={true}
@@ -291,6 +292,7 @@ const Application = () => {
                     />
                     <TextInput<null | string>
                         name="simpleInputControlled"
+
                         onChange={onChange}
                         onChangeValue={onChangeTextInputValue}
                         triggerInitialPropertiesConsolidation={true}
@@ -306,8 +308,9 @@ const Application = () => {
                             ariaDescription: 'test'
                         }}
                         name="simpleInput2"
+                        showDeclaration
+
                         onChange={onChange}
-                        showDeclaration={true}
                     />
                     <TextInput<string>
                         model={useMemorizedValue({name: 'simpleInput2Model'})}
@@ -318,9 +321,10 @@ const Application = () => {
 
                     <TextInput<string>
                         declaration="Disabled"
+                        name="simpleInput3"
+
                         disabled
                         initialValue="simpleInputValue3"
-                        name="simpleInput3"
                         onChange={onChange}
                     />
                     <TextInput<string>
@@ -337,28 +341,31 @@ const Application = () => {
 
                     <TextInput<string>
                         declaration={
-                            'Very long declaration which should be dotted in' +
-                            'the end since it should fit into the available' +
-                            'space.'
+                            'Very long declaration which should be dotted ' +
+                            'in the end since it should fit into the ' +
+                            'available space.'
                         }
                         name="simpleInput4"
-                        onChange={onChange}
                         placeholder="100.000,00"
-                        required
                         showValidationState={false}
                         trailingIcon="clear_preset"
+
+                        onChange={onChange}
+                        required
                     />
                     <TextInput<string>
-                        default="simpleValue4Model"
                         icon="backup"
+                        placeholder="simpleInput4Model"
+                        trailingIcon="clear_preset"
+
+                        default="simpleValue4Model"
+                        initial-value="simpleInputValue4Model"
                         model={useMemorizedValue({
                             declaration: 'placeholder',
                             name: 'simpleInput4Model',
                             nullable: false
                         })}
                         onChange={onChange}
-                        placeholder="simpleInput4Model"
-                        trailingIcon="clear_preset"
                     />
 
                     <hr/>
@@ -367,23 +374,25 @@ const Application = () => {
                         declaration="pattern"
                         description="simpleInput5Description"
                         icon="search"
-                        initialValue="only a`s allowed"
                         name="simpleInput5"
+                        placeholder="simpleInput5Placeholder"
+
+                        initialValue="only a`s allowed"
                         onChange={onChange}
                         pattern="^a+$"
-                        placeholder="simpleInput5Placeholder"
                     />
                     <TextInput<string>
+                        name="simpleInput5Model"
+                        placeholder="simpleInput5ModelPlaceholder"
+                        trailingIcon="search"
+
                         initialValue="has a`s and b`s"
                         model={useMemorizedValue({
                             declaration: 'pattern',
                             description: 'simpleInput5ModelDescription',
                             pattern: ['.*a+.*', /.*b+(.*)/]
                         })}
-                        name="simpleInput5Model"
                         onChange={onChange}
-                        placeholder="simpleInput5ModelPlaceholder"
-                        trailingIcon="search"
                     />
 
                     <hr/>
@@ -392,25 +401,27 @@ const Application = () => {
                         declaration="password"
                         description="simpleInput6Description"
                         icon="search"
-                        initialValue="hans"
                         name="simpleInput6"
-                        onChange={onChange}
-                        pattern="a+"
                         placeholder="simpleInput6Placeholder"
                         tooltip="Please type in your password."
                         trailingIcon="password_preset"
+
+                        initialValue="hans"
+                        onChange={onChange}
+                        pattern="a+"
                     />
                     <TextInput<string>
+                        name="simpleInput6Model"
+                        placeholder="simpleInput6ModelPlaceholder"
+                        trailingIcon="password_preset"
+
                         initialValue="hans"
                         model={useMemorizedValue({
                             declaration: 'password',
                             description: 'simpleInput6ModelDescription',
                             pattern: 'a+'
                         })}
-                        name="simpleInput6Model"
                         onChange={onChange}
-                        placeholder="simpleInput6ModelPlaceholder"
-                        trailingIcon="password_preset"
                     />
                 </div>
                 {/* endregion */}
@@ -425,6 +436,7 @@ const Application = () => {
                 >
                     <TextInput<null | number>
                         name="numberInputControlled"
+
                         onChange={useMemorizedValue((
                             properties: InputProperties<null | number>
                         ) => {
@@ -444,11 +456,12 @@ const Application = () => {
                     <TextInput<number>
                         declaration="Number"
                         description="numberInput1Description"
+                        name="numberInput1"
+                        placeholder="100000"
+
                         maximum={200000}
                         minimum={10}
-                        name="numberInput1"
                         onChange={onChange}
-                        placeholder="100000"
                         required
                         type="number"
                     />
@@ -471,11 +484,13 @@ const Application = () => {
                     <TextInput<number>
                         declaration="Number"
                         description="numberInput2Description"
+                        minimumText="Please at least ${formatValue(minimum)}."
+                        name="numberInput2"
+                        placeholder="100.000"
+
                         maximum={200000}
                         minimum={10}
-                        name="numberInput2"
                         onChange={onChange}
-                        placeholder="100.000"
                         required
                         type="integer"
                     />
@@ -503,12 +518,13 @@ const Application = () => {
                     <TextInput<number>
                         declaration="Number"
                         description="numberInput3Description"
-                        maximum={200000}
-                        minimum={10}
                         minimumText="Please at least ${formatValue(minimum)}."
                         name="numberInput3"
-                        onChange={onChange}
                         placeholder="100.000"
+
+                        maximum={200000}
+                        minimum={10}
+                        onChange={onChange}
                         required
                         type="currency"
                     />
@@ -540,18 +556,21 @@ const Application = () => {
                         declaration="text"
                         description="textInput1Description"
                         editor="text"
-                        initialValue="a"
                         name="textInput1"
-                        onChange={onChange}
-                        required
                         rows={3}
                         themeConfiguration={useMemorizedValue({
                             primary: 'yellow',
                             secondary: 'blue'
                         })}
+
+                        initialValue="a"
+                        onChange={onChange}
+                        required
                     />
                     <TextInput<string>
                         editor="text"
+                        rows={2}
+
                         initialValue="a"
                         model={useMemorizedValue({
                             declaration: 'text',
@@ -560,7 +579,6 @@ const Application = () => {
                             nullable: false
                         })}
                         onChange={onChange}
-                        rows={2}
                     />
 
                     <hr/>
@@ -568,16 +586,21 @@ const Application = () => {
                     <TextInput<string>
                         declaration="code"
                         description="textInput2Description"
-                        disabled
-                        editor="code"
-                        initialValue="const value = 2"
                         name="textInput2"
-                        onChange={onChange}
+
+                        editor="code"
                         rows={2}
                         selectableEditor
+
+                        disabled
+                        initialValue="const value = 2"
+                        onChange={onChange}
                     />
                     <TextInput<string>
-                        editor="code"
+                        editor="code(js)"
+                        rows={6}
+                        selectableEditor
+
                         initialValue="const value = 2"
                         model={useMemorizedValue({
                             declaration: 'code',
@@ -586,8 +609,6 @@ const Application = () => {
                             nullable: false
                         })}
                         onChange={onChange}
-                        rows={6}
-                        selectableEditor
                     />
 
                     <hr/>
@@ -595,16 +616,22 @@ const Application = () => {
                     <TextInput<string>
                         declaration="code"
                         description="textInput3Description"
-                        editor="code(css)"
-                        maximumLength={10}
                         name="textInput3"
-                        onChange={onChange}
-                        required
+
+                        editor="code(css)"
                         rows={2}
                         selectableEditor
+
+                        maximumLength={10}
+                        required
+                        onChange={onChange}
                     />
                     <TextInput<string>
                         editor="code(css)"
+                        editorIsInitiallyActive
+                        rows={6}
+                        selectableEditor
+
                         model={useMemorizedValue({
                             declaration: 'code',
                             description: 'textInput3ModelDescription',
@@ -612,8 +639,6 @@ const Application = () => {
                             nullable: false
                         })}
                         onChange={onChange}
-                        rows={6}
-                        selectableEditor
                     />
 
                     <hr/>
@@ -621,31 +646,35 @@ const Application = () => {
                     <TextInput<string>
                         declaration="richtext(raw)"
                         description="textInput4Description"
-                        editor="richtext(raw)"
-                        minimumLength={10}
-                        maximumLength={100}
                         name="textInput4"
-                        onChange={onChange}
                         placeholder={
                             'Hello Mr. Smith,<br><br>this is a Placeholder.'
                         }
-                        required
+
+                        editor="richtext"
                         rows={2}
                         selectableEditor
+
+                        minimumLength={10}
+                        maximumLength={100}
+                        onChange={onChange}
+                        required
                     />
                     <TextInput<string>
-                        editor="richtext(simple)"
+                        editor="richtext"
+                        editorIsInitiallyActive
+                        rows={6}
+                        selectableEditor
+
                         initialValue="Hello Mr. Smith,<br><br>how are you?"
                         model={useMemorizedValue({
-                            declaration: 'richtext(simple)',
+                            declaration: 'richtext',
                             description: 'textInput4ModelDescription',
                             mutable: false,
                             name: 'textInput4Model',
                             nullable: false
                         })}
                         onChange={onChange}
-                        rows={6}
-                        selectableEditor
                     />
                 </div>
                 {/* endregion */}
@@ -1422,7 +1451,6 @@ const Application = () => {
                 ''
             }
         </div>
-
     </>)
 }
 window.onload = () => {

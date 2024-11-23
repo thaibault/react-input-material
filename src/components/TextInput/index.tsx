@@ -885,11 +885,10 @@ export const TextInputInner = function<Type = unknown>(
 
         let event: GenericEvent
         if (isObject(eventOrValue)) {
+            event = eventOrValue as unknown as GenericEvent
             const target: HTMLInputElement | null | undefined =
-                (eventOrValue as unknown as GenericEvent).target as
-                    HTMLInputElement | null ||
-                (eventOrValue as unknown as GenericEvent).detail as
-                    HTMLInputElement | null
+                event.target as HTMLInputElement | null ||
+                event.detail as HTMLInputElement | null
             if (target)
                 properties.value = typeof target.value === 'undefined' ?
                     null as Type :
@@ -1495,8 +1494,12 @@ export const TextInputInner = function<Type = unknown>(
         properties.type === 'string' &&
         properties.editorIsActive &&
         (
-            properties.editor.startsWith('code') ||
-            properties.editor.startsWith('richtext(')
+            properties.editor === 'code' ||
+            properties.editor.startsWith('code(') &&
+            properties.editor.endsWith(')') ||
+            properties.editor === 'richtext' ||
+            properties.editor.startsWith('richtext(') &&
+            properties.editor.endsWith(')')
         )
     )
 
@@ -1649,12 +1652,16 @@ export const TextInputInner = function<Type = unknown>(
                 editorProperties.editor = {}
                 if (
                     javascript as (object | undefined) &&
-                    ['js', 'script', 'javascript'].includes(
-                        modeName.toLowerCase()
-                    )
+                    [
+                        'js', 'jsx',
+                        'ts', 'tsx',
+                        'script', 'javascript',
+                        'typescript'
+                    ]
+                        .includes(modeName.toLowerCase())
                 )
                     (editorProperties as CodeEditorProperties).editor.mode =
-                        javascript()
+                        javascript({jsx: true, typescript: true})
                 else if (
                     css as (object | undefined) &&
                     [

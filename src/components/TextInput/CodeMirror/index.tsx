@@ -17,33 +17,107 @@
     endregion
 */
 // region imports
-import {javascript} from '@codemirror/lang-javascript'
-import {EditorState} from '@codemirror/state'
-import {EditorView, ViewUpdate} from '@codemirror/view'
+import {
+    autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap
+} from '@codemirror/autocomplete'
+import {defaultKeymap, history, historyKeymap} from '@codemirror/commands'
+import {
+    bracketMatching,
+    defaultHighlightStyle,
+    foldGutter,
+    foldKeymap,
+    indentOnInput,
+    syntaxHighlighting
+} from '@codemirror/language'
+import {lintKeymap} from '@codemirror/lint'
+import {searchKeymap, highlightSelectionMatches} from '@codemirror/search'
+import {EditorState, Extension, Text} from '@codemirror/state'
+import {
+    crosshairCursor,
+    drawSelection,
+    dropCursor,
+    EditorView,
+    highlightActiveLine,
+    highlightActiveLineGutter,
+    highlightSpecialChars,
+    KeyBinding,
+    keymap,
+    lineNumbers,
+    rectangularSelection,
+    ViewUpdate
+} from '@codemirror/view'
+
 import {Mapping} from 'clientnode'
 
-import {basicSetup} from 'codemirror'
-import {FocusEvent, useEffect, useRef, useState} from 'react'
+import {FocusEvent, useEffect, useRef} from 'react'
 
 import EditorWrapper from '../EditorWrapper'
 import cssClassNames from '../style.module'
-import {CodeMirrorProps} from '../type'
+import {CodeMirrorProps, EditorWrapperEventWrapper} from '../type'
 // endregion
+export const BASIC_KEYMAPS = [
+    ...closeBracketsKeymap,
+    ...defaultKeymap,
+    ...searchKeymap,
+    ...historyKeymap,
+    ...foldKeymap,
+    ...completionKeymap,
+    ...lintKeymap
+] as Array<KeyBinding>
+export const BASIC_EXTENSIONS: Extension = [
+    lineNumbers(),
+    highlightActiveLineGutter(),
+    highlightSpecialChars(),
+    history(),
+    foldGutter(),
+    drawSelection(),
+    dropCursor(),
+    EditorState.allowMultipleSelections.of(true),
+    indentOnInput(),
+    syntaxHighlighting(
+        defaultHighlightStyle, {fallback: true}
+    ),
+    bracketMatching(),
+    closeBrackets(),
+    autocompletion(),
+    rectangularSelection(),
+    crosshairCursor(),
+    highlightActiveLine(),
+    highlightSelectionMatches(),
+    keymap.of(BASIC_KEYMAPS)
+] as const
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
 export const Index = (props: CodeMirrorProps) => {
     if (!(
-        basicSetup as typeof basicSetup | undefined &&
-        javascript as typeof javascript | undefined &&
+        autocompletion as typeof autocompletion | undefined &&
+        history as typeof history | undefined &&
+        syntaxHighlighting as typeof syntaxHighlighting | undefined &&
+        lintKeymap as typeof lintKeymap | undefined &&
+        searchKeymap as typeof searchKeymap | undefined &&
         EditorState as typeof EditorState | undefined &&
         EditorView as typeof EditorView | undefined
     ))
         throw Error('Missing codemirror dependencies.')
 
-    const [value, setValue] = useState(String(props.value) || '')
+    const value = props.value ?? ''
 
     const editorViewReference = useRef<HTMLDivElement | null>(null)
+    const eventMapper = useRef<EditorWrapperEventWrapper | null>(null)
+    const editorView = useRef<EditorView | null>(null)
     const textareaReference = useRef<HTMLTextAreaElement | null>(null)
+
+    const onChange = (viewUpdate: ViewUpdate) => {
+        if (props.disabled)
+            return
+
+        const newValue = viewUpdate.state.doc.toString()
+
+        eventMapper.current?.input(newValue, viewUpdate)
+
+        if (props.onChange)
+            props.onChange(newValue)
+    }
 
     useEffect(
         () => {
@@ -51,50 +125,91 @@ export const Index = (props: CodeMirrorProps) => {
                 return
 
             const state = EditorState.create({
-                doc: value,
+                doc: String(value),
                 extensions: [
+                    BASIC_EXTENSIONS,
                     EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
-                        setValue((oldValue: string): string => {
-                            const newValue = viewUpdate.state.doc.toString()
-                            if (oldValue !== newValue) {
-                                const syntheticEvent = new Event('input') as
-                                    Event & { detail: ViewUpdate }
-                                syntheticEvent.detail = viewUpdate
-                                if (textareaReference.current) {
-                                    textareaReference.current.value = newValue
-                                    textareaReference.current.dispatchEvent(
-                                        syntheticEvent
-                                    )
-                                }
-
-                                if (props.onChange)
-                                    props.onChange(newValue)
-
-                                return newValue
-                            }
-
-                            return oldValue
-                        })
+                        if (
+                            viewUpdate.startState.doc.toString() !==
+                            viewUpdate.state.doc.toString()
+                        )
+                            onChange(viewUpdate)
                     }),
-                    basicSetup,
-                    props.editor?.mode ?? javascript()
+                    props.editor?.mode ? props.editor.mode : []
                 ]
             })
 
-            const editorView = new EditorView({
+            editorView.current = new EditorView({
                 state,
                 parent: editorViewReference.current
             })
 
             return () => {
-                editorView.destroy()
+                if (editorView.current) {
+                    editorView.current.destroy()
+                    editorView.current = null
+                }
             }
         },
-        [editorViewReference.current]
+        [editorViewReference.current, props.editor?.mode?.language.name]
+    )
+
+    useEffect(
+        () => {
+            if (
+                editorView.current &&
+                props.value !== editorView.current.state.doc.toString()
+            )
+                editorView.current.state.update(
+                    {changes: {from: 0, insert: Text.empty}},
+                    {changes: {from: 0, insert: String(props.value)}}
+                )
+        },
+        [editorView.current, props.value]
+    )
+
+    useEffect(
+        () => {
+            let id: null | ReturnType<typeof setTimeout> = null
+            const syncHeight = () => {
+                if (
+                    editorViewReference.current &&
+                    textareaReference.current?.clientHeight
+                ) {
+                    const scrollableViewNode: HTMLDivElement | null =
+                        editorViewReference.current
+                            .querySelector('.cm-scroller')
+                    if (scrollableViewNode) {
+                        const newHeightValue =
+                            String(textareaReference.current.clientHeight) +
+                            'px'
+                        editorViewReference.current.style.height =
+                            newHeightValue
+                        scrollableViewNode.style.height = newHeightValue
+
+                        return
+                    }
+                }
+
+                id = setTimeout(() => {
+                    syncHeight()
+                })
+            }
+
+            syncHeight()
+
+            return () => {
+                if (id !== null)
+                    clearTimeout(id)
+            }
+        },
+        [editorViewReference.current, textareaReference.current?.clientHeight]
     )
 
     return <EditorWrapper
-        editorViewReference={editorViewReference}
+        {...props}
+
+        eventMapper={eventMapper}
         textareaReference={textareaReference}
 
         value={value}
@@ -104,37 +219,25 @@ export const Index = (props: CodeMirrorProps) => {
         onLabelClick={() => {
             editorViewReference.current?.focus()
         }}
-
-        {...props}
     >
         <div
             ref={editorViewReference}
 
             onBlur={(event: FocusEvent<HTMLDivElement>) => {
-                if (textareaReference.current) {
-                    const syntheticEvent = new Event('blur') as
-                        Event & { detail: FocusEvent<HTMLDivElement> }
-                    syntheticEvent.detail = event
-                    textareaReference.current.dispatchEvent(syntheticEvent)
-                }
+                eventMapper.current?.blur(event)
 
                 if (props.onBlur)
                     props.onBlur(event)
             }}
             onFocus={(event: FocusEvent<HTMLDivElement>) => {
-                if (textareaReference.current) {
-                    const syntheticEvent = new Event('focus') as
-                        Event & { detail: FocusEvent<HTMLDivElement> }
-                    syntheticEvent.detail = event
-                    textareaReference.current.dispatchEvent(syntheticEvent)
-                }
+                eventMapper.current?.focus(event)
 
                 if (props.onFocus)
                     props.onFocus(event)
             }}
 
             className={
-                CSS_CLASS_NAMES.codeEditorView + ' mdc-text-field__input'
+                `${CSS_CLASS_NAMES.codeEditorView} mdc-text-field__input`
             }
         ></div>
     </EditorWrapper>
