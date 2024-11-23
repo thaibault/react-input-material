@@ -676,6 +676,9 @@ export const TextInputInner = function<Type = unknown>(
                 {label: 'Yes', value: true as unknown as string}
             ]
 
+        if (['plain', 'text'].includes(result.editor))
+            result.selectableEditor = false
+
         // NOTE: If only an editor is specified it should be displayed.
         if (!(result.selectableEditor || result.editor === 'plain'))
             result.editorIsActive = true

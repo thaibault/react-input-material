@@ -17,6 +17,8 @@
     endregion
 */
 // region imports
+import {EditorView as CodeEditorIndicator} from '@codemirror/view'
+import {EditorContent as RichTextEditorIndicator} from '@tiptap/react'
 import {Tab, TabBar} from '@rmwc/tabs'
 
 import {
@@ -588,7 +590,12 @@ const Application = () => {
                         description="textInput2Description"
                         name="textInput2"
 
-                        editor="code"
+                        editor={
+                            CodeEditorIndicator as
+                                typeof CodeEditorIndicator | undefined ?
+                                'code' :
+                                'text'
+                        }
                         rows={2}
                         selectableEditor
 
@@ -597,13 +604,18 @@ const Application = () => {
                         onChange={onChange}
                     />
                     <TextInput<string>
-                        editor="code(js)"
+                        editor={
+                            CodeEditorIndicator as
+                                typeof CodeEditorIndicator | undefined ?
+                                'code(js)' :
+                                'text'
+                        }
                         rows={6}
                         selectableEditor
 
                         initialValue="const value = 2"
                         model={useMemorizedValue({
-                            declaration: 'code',
+                            declaration: 'code(js)',
                             description: 'textInput2ModelDescription',
                             name: 'textInput2Model',
                             nullable: false
@@ -614,11 +626,16 @@ const Application = () => {
                     <hr/>
 
                     <TextInput<string>
-                        declaration="code"
+                        declaration="code(css)"
                         description="textInput3Description"
                         name="textInput3"
 
-                        editor="code(css)"
+                        editor={
+                            CodeEditorIndicator as
+                                typeof CodeEditorIndicator | undefined ?
+                                'code(css)' :
+                                'text'
+                        }
                         rows={2}
                         selectableEditor
 
@@ -627,13 +644,18 @@ const Application = () => {
                         onChange={onChange}
                     />
                     <TextInput<string>
-                        editor="code(css)"
+                        editor={
+                            CodeEditorIndicator as
+                                typeof CodeEditorIndicator | undefined ?
+                                'code(css)' :
+                                'text'
+                        }
                         editorIsInitiallyActive
                         rows={6}
                         selectableEditor
 
                         model={useMemorizedValue({
-                            declaration: 'code',
+                            declaration: 'code(css)',
                             description: 'textInput3ModelDescription',
                             name: 'textInput3Model',
                             nullable: false
@@ -644,14 +666,19 @@ const Application = () => {
                     <hr/>
 
                     <TextInput<string>
-                        declaration="richtext(raw)"
+                        declaration="richtext"
                         description="textInput4Description"
                         name="textInput4"
                         placeholder={
                             'Hello Mr. Smith,<br><br>this is a Placeholder.'
                         }
 
-                        editor="richtext"
+                        editor={
+                            RichTextEditorIndicator as
+                                typeof RichTextEditorIndicator | undefined ?
+                                'richtext' :
+                                'text'
+                        }
                         rows={2}
                         selectableEditor
 
@@ -661,7 +688,12 @@ const Application = () => {
                         required
                     />
                     <TextInput<string>
-                        editor="richtext"
+                        editor={
+                            RichTextEditorIndicator as
+                                typeof RichTextEditorIndicator | undefined ?
+                                'richtext' :
+                                'text'
+                        }
                         editorIsInitiallyActive
                         rows={6}
                         selectableEditor

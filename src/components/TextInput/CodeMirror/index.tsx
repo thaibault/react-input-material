@@ -55,37 +55,41 @@ import EditorWrapper from '../EditorWrapper'
 import cssClassNames from '../style.module'
 import {CodeMirrorProps, EditorWrapperEventWrapper} from '../type'
 // endregion
-export const BASIC_KEYMAPS = [
-    ...closeBracketsKeymap,
-    ...defaultKeymap,
-    ...searchKeymap,
-    ...historyKeymap,
-    ...foldKeymap,
-    ...completionKeymap,
-    ...lintKeymap
-] as Array<KeyBinding>
-export const BASIC_EXTENSIONS: Extension = [
-    lineNumbers(),
-    highlightActiveLineGutter(),
-    highlightSpecialChars(),
-    history(),
-    foldGutter(),
-    drawSelection(),
-    dropCursor(),
-    EditorState.allowMultipleSelections.of(true),
-    indentOnInput(),
-    syntaxHighlighting(
-        defaultHighlightStyle, {fallback: true}
-    ),
-    bracketMatching(),
-    closeBrackets(),
-    autocompletion(),
-    rectangularSelection(),
-    crosshairCursor(),
-    highlightActiveLine(),
-    highlightSelectionMatches(),
-    keymap.of(BASIC_KEYMAPS)
-] as const
+export const BASIC_KEYMAPS: Array<KeyBinding> =
+    autocompletion as typeof autocompletion | undefined ?
+        [
+            ...closeBracketsKeymap,
+            ...defaultKeymap,
+            ...searchKeymap,
+            ...historyKeymap,
+            ...foldKeymap,
+            ...completionKeymap,
+            ...lintKeymap
+        ] as Array<KeyBinding> :
+        []
+export const BASIC_EXTENSIONS: Extension =
+    EditorView as typeof EditorView | undefined ?
+        [
+            lineNumbers(),
+            highlightActiveLineGutter(),
+            highlightSpecialChars(),
+            history(),
+            foldGutter(),
+            drawSelection(),
+            dropCursor(),
+            EditorState.allowMultipleSelections.of(true),
+            indentOnInput(),
+            syntaxHighlighting(defaultHighlightStyle, {fallback: true}),
+            bracketMatching(),
+            closeBrackets(),
+            autocompletion(),
+            rectangularSelection(),
+            crosshairCursor(),
+            highlightActiveLine(),
+            highlightSelectionMatches(),
+            keymap.of(BASIC_KEYMAPS)
+        ] as const :
+        []
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
 export const Index = (props: CodeMirrorProps) => {

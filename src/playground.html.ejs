@@ -45,6 +45,17 @@
                 }
             }
 
+            /*
+                NOTE: Workaround because the styles will be removed during
+                css minification when used with nested styles together.
+            */
+            .playground {
+                display: flex;
+                flex-direction: row;
+                gap: 20px;
+                margin-top: 70px;
+            }
+
             .playground {
                 display: flex;
                 flex-direction: row;
