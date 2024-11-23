@@ -20,7 +20,7 @@
 import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
 import {TextFieldHelperTextProps} from '@rmwc/textfield/lib/textfield'
 
-import {useEffect, useId, useLayoutEffect, useRef} from 'react'
+import {useEffect, useId, useRef} from 'react'
 
 import {EditorWrapperProps} from '../type'
 // endregion
@@ -28,9 +28,9 @@ export const Index = (props: EditorWrapperProps) => {
     const defaultID = useId()
     const id = props.id ?? defaultID
 
+    const materialTextField = useRef<MDCTextField | null>(null)
     const mdcTextFieldReference = useRef<HTMLLabelElement | null>(null)
     const textareaReference = useRef<HTMLTextAreaElement | null>(null)
-    const materialTextField = useRef<MDCTextField | null>(null)
 
     props.eventMapper.current = {
         blur: (event: object) => {
@@ -76,6 +76,9 @@ export const Index = (props: EditorWrapperProps) => {
             if (mdcTextFieldReference.current) {
                 materialTextField.current =
                     new MDCTextField(mdcTextFieldReference.current)
+                if (props.materialTextField)
+                    props.materialTextField.current = materialTextField.current
+
                 if (props.foundationRef)
                     (
                         props.foundationRef as {
@@ -118,46 +121,17 @@ export const Index = (props: EditorWrapperProps) => {
         ]
     )
 
-    useEffect(
-        () => {
-            let id: null | ReturnType<typeof setTimeout> = null
-            const syncHeight = () => {
-                if (
-                    props.editorViewReference.current &&
-                    textareaReference.current?.clientHeight
-                )
-                    props.editorViewReference.current.style.height =
-                        String(
-                            textareaReference.current.clientHeight +
-                            (props.viewContentOffsetInPX || 0)
-                        ) +
-                        'px'
-                else
-                    id = setTimeout(() => {
-                        syncHeight()
-                    })
-            }
-
-            syncHeight()
-
-            return () => {
-                if (id !== null)
-                    clearTimeout(id)
-            }
-        },
-        [
-            props.editorViewReference.current,
-            textareaReference.current?.clientHeight
-        ]
-    )
-
-    useEffect(
-        () => {
-            if (props.textareaReference)
-                props.textareaReference.current = textareaReference.current
-        },
-        [props.textareaReference, textareaReference.current]
-    )
+    for (const [target, source] of [
+        [props.textareaReference, textareaReference],
+        [props.mdcTextFieldReference, mdcTextFieldReference]
+    ])
+        useEffect(
+            () => {
+                if (target && source)
+                    target.current = source.current
+            },
+            [target, source]
+        )
 
     const editorContent = <>
         <textarea

@@ -21,7 +21,7 @@ import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 import {Mapping} from 'clientnode'
-import {useRef} from 'react'
+import {useEffect, useRef} from 'react'
 import Dummy from 'react-generic-dummy'
 
 import EditorWrapper from '../EditorWrapper'
@@ -44,6 +44,7 @@ export const Index = (props: TiptapProps) => {
 
     const editorViewReference = useRef<HTMLDivElement | null>(null)
     const eventMapper = useRef<EditorWrapperEventWrapper | null>(null)
+    const textareaReference = useRef<HTMLTextAreaElement | null>(null)
 
     const extensions =
         props.editor?.extensions ||
@@ -82,19 +83,33 @@ export const Index = (props: TiptapProps) => {
     })
     const htmlContent = editor?.getHTML()
 
+    useEffect(
+        () => {
+            if (
+                editorViewReference.current &&
+                textareaReference.current?.clientHeight
+            )
+                editorViewReference.current.style.height =
+                    String(
+                        textareaReference.current.clientHeight +
+                        VIEW_CONTENT_OFFSET_IN_PX
+                    ) +
+                    'px'
+        },
+        [editorViewReference.current, textareaReference.current?.clientHeight]
+    )
+
     return <EditorWrapper
         {...props}
 
         eventMapper={eventMapper}
-
-        editorViewReference={editorViewReference}
+        textareaReference={textareaReference}
 
         barContentSlot={<MenuBar editor={editor}/>}
 
         value={htmlContent === '<p></p>' ? '' : htmlContent}
 
         classNamePrefix={CSS_CLASS_NAMES.richtextEditor}
-        viewContentOffsetInPX={VIEW_CONTENT_OFFSET_IN_PX}
 
         onLabelClick={() => {
             editor?.chain().focus().run()

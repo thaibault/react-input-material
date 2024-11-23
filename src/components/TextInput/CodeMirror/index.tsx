@@ -103,6 +103,7 @@ export const Index = (props: CodeMirrorProps) => {
     const editorViewReference = useRef<HTMLDivElement | null>(null)
     const eventMapper = useRef<EditorWrapperEventWrapper | null>(null)
     const editorView = useRef<EditorView | null>(null)
+    const textareaReference = useRef<HTMLTextAreaElement | null>(null)
 
     const onChange = (viewUpdate: ViewUpdate) => {
         if (props.disabled)
@@ -165,12 +166,38 @@ export const Index = (props: CodeMirrorProps) => {
         [editorView.current, props.value]
     )
 
+    useEffect(
+        () => {
+            let id: null | ReturnType<typeof setTimeout> = null
+            const syncHeight = () => {
+                if (
+                    editorViewReference.current &&
+                    textareaReference.current?.clientHeight
+                )
+                    editorViewReference.current.style.height =
+                        `${String(textareaReference.current.clientHeight)}px`
+                    // TODO set scroller height also
+                else
+                    id = setTimeout(() => {
+                        syncHeight()
+                    })
+            }
+
+            syncHeight()
+
+            return () => {
+                if (id !== null)
+                    clearTimeout(id)
+            }
+        },
+        [editorViewReference.current, textareaReference.current?.clientHeight]
+    )
+
     return <EditorWrapper
         {...props}
 
         eventMapper={eventMapper}
-
-        editorViewReference={editorViewReference}
+        textareaReference={textareaReference}
 
         value={value}
 

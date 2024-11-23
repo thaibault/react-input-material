@@ -50,7 +50,7 @@ import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
-import {MDCTextFieldFoundation} from '@material/textfield'
+import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
 
 import {MenuApi} from '@rmwc/menu'
 import {
@@ -173,15 +173,15 @@ export interface EditorWrapperEventWrapper {
     input: (value: number | string, event: object) => void
 }
 export interface EditorWrapperProps extends Partial<EditorProperties> {
-    eventMapper: MutableRefObject<EditorWrapperEventWrapper | null>,
+    eventMapper: MutableRefObject<EditorWrapperEventWrapper | null>
 
-    editorViewReference: MutableRefObject<HTMLDivElement | null>
+    materialTextField?: MutableRefObject<MDCTextField | null>
+    mdcTextFieldReference?: MutableRefObject<HTMLLabelElement | null>
     textareaReference?: MutableRefObject<HTMLTextAreaElement | null>
 
     children: ReactNode
     barContentSlot?: ReactNode
 
-    viewContentOffsetInPX?: number
     classNamePrefix: string
 
     onLabelClick?: (event: MouseEvent<HTMLLabelElement>) => void
