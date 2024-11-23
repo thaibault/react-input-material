@@ -91,7 +91,9 @@ export const CSS_CLASS_NAMES = cssClassNames as Mapping
 export const Index = (props: CodeMirrorProps) => {
     if (!(
         autocompletion as typeof autocompletion | undefined &&
-        defaultKeymap as typeof defaultKeymap | undefined &&
+        history as typeof history | undefined &&
+        syntaxHighlighting as typeof syntaxHighlighting | undefined &&
+        lintKeymap as typeof lintKeymap | undefined &&
         searchKeymap as typeof searchKeymap | undefined &&
         EditorState as typeof EditorState | undefined &&
         EditorView as typeof EditorView | undefined
@@ -173,14 +175,25 @@ export const Index = (props: CodeMirrorProps) => {
                 if (
                     editorViewReference.current &&
                     textareaReference.current?.clientHeight
-                )
-                    editorViewReference.current.style.height =
-                        `${String(textareaReference.current.clientHeight)}px`
-                    // TODO set scroller height also
-                else
-                    id = setTimeout(() => {
-                        syncHeight()
-                    })
+                ) {
+                    const scrollableViewNode: HTMLDivElement | null =
+                        editorViewReference.current
+                            .querySelector('.cm-scroller')
+                    if (scrollableViewNode) {
+                        const newHeightValue =
+                            String(textareaReference.current.clientHeight) +
+                            'px'
+                        editorViewReference.current.style.height =
+                            newHeightValue
+                        scrollableViewNode.style.height = newHeightValue
+
+                        return
+                    }
+                }
+
+                id = setTimeout(() => {
+                    syncHeight()
+                })
             }
 
             syncHeight()

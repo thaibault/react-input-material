@@ -885,11 +885,10 @@ export const TextInputInner = function<Type = unknown>(
 
         let event: GenericEvent
         if (isObject(eventOrValue)) {
+            event = eventOrValue as unknown as GenericEvent
             const target: HTMLInputElement | null | undefined =
-                (eventOrValue as unknown as GenericEvent).target as
-                    HTMLInputElement | null ||
-                (eventOrValue as unknown as GenericEvent).detail as
-                    HTMLInputElement | null
+                event.target as HTMLInputElement | null ||
+                event.detail as HTMLInputElement | null
             if (target)
                 properties.value = typeof target.value === 'undefined' ?
                     null as Type :
@@ -1646,6 +1645,7 @@ export const TextInputInner = function<Type = unknown>(
             properties.editor.startsWith('code(') &&
             properties.editor.endsWith(')')
         ) {
+            console.log('A')
             const modeName = properties.editor.substring(
                 'code('.length, properties.editor.length - 1
             )

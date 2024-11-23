@@ -34,7 +34,6 @@ import PropertyTypes, {
     symbol
 } from 'clientnode/dist/property-types'
 import {
-    FocusEvent,
     FocusEvent as ReactFocusEvent,
     ForwardRefExoticComponent,
     KeyboardEvent,
