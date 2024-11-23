@@ -1645,7 +1645,6 @@ export const TextInputInner = function<Type = unknown>(
             properties.editor.startsWith('code(') &&
             properties.editor.endsWith(')')
         ) {
-            console.log('A')
             const modeName = properties.editor.substring(
                 'code('.length, properties.editor.length - 1
             )
