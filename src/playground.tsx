@@ -263,8 +263,13 @@ const Application = () => {
                 }}
             >
                 {SECTIONS.map((name) =>
-                    <Tab key={name}>{name}</Tab>)
-                }
+                    <Tab key={name}>
+                        {name === 'text-input' ?
+                            <>name (with <sup>markup</sup>)</> :
+                            name
+                        }
+                    </Tab>
+                )}
             </TabBar>
         </div>
         {/* endregion */}
