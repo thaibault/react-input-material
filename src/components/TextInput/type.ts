@@ -496,18 +496,24 @@ export const inputPropertyTypes: ValidationMapping = {
     ),
     invertedPatternText: string,
     labels: oneOfType([arrayOf(arrayOf(string)), arrayOf(string), object]),
+
     maximum: oneOfType([number, string]),
+    maximumLength: number,
     maximumLengthText: string,
     maximumText: string,
+
     minimum: oneOfType([number, string]),
+    minimumLength: number,
     minimumLengthText: string,
     minimumText: string,
+
     onBlur: func,
     onChangeEditorIsActive: func,
     onKeyDown: func,
     onKeyUp: func,
     onSelect: func,
     onSelectionChange: func,
+
     outlined: boolean,
     pattern: oneOfType([arrayOf(oneOfType([object, string])), object, string]),
     patternText: string,
@@ -517,8 +523,10 @@ export const inputPropertyTypes: ValidationMapping = {
     searchSelection: boolean,
     selectableEditor: boolean,
     step: number,
+
     suggestionCreator: func,
     suggestSelection: boolean,
+
     trailingIcon: any,
     transformer: object
 } as const

@@ -682,6 +682,7 @@ const Application = () => {
                         rows={2}
                         selectableEditor
 
+                        initialValue="Hello Mr. Smith,<br><br>how are you?"
                         minimumLength={10}
                         maximumLength={100}
                         onChange={onChange}
