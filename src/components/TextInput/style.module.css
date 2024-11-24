@@ -72,7 +72,10 @@ endregion */
         }
 
         .code-editor__view {
-            /* This class is needed to be imported in the component. */
+            /*
+                This class is needed to be imported in the component. It should
+                defined something to prevent that a minification removes it.
+            */
             /*
                 NOTE: This is needed to let autocomplete divs being visible and
                 overflow.
@@ -106,7 +109,11 @@ endregion */
         }
 
         .richtext-editor__view {
-            /* This class is needed to be imported in the component. */
+            /*
+                This class is needed to be imported in the component. It should
+                defined something to prevent that a minification removes it.
+            */
+            display: block;
         }
 
         &.mdc-text-field--disabled .richtext-editor__bar {
