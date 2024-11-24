@@ -29,6 +29,14 @@
         <link rel="stylesheet" href="../node_modules/@material/ripple/dist/mdc.ripple.css">
         <!--endregion-->
         <style>
+            <%-
+                require('material-icons/iconfont/material-icons.css')
+                    .replace(
+                        /(url\()"?(?:\.\/)?(material-icons\.[^.")]+)"?(\))/g,
+                        '$1material-icons/iconfont/$2$3'
+                    )
+            %>
+
             .tab-bar {
                 position: fixed;
                 top: 0;
@@ -94,14 +102,6 @@
                     margin-bottom: 60px;
                 }
             }
-
-            <%-
-                require('material-icons/iconfont/material-icons.css')
-                    .replace(
-                        /(url\()"?(?:\.\/)?(material-icons\.[^.")]+)"?(\))/g,
-                        '$1material-icons/iconfont/$2$3'
-                    )
-            %>
         </style>
         <!--endregion-->
         <!--region polyfill-->
