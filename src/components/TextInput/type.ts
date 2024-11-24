@@ -21,7 +21,6 @@ import {JSONContent} from '@tiptap/core'
 
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode'
 import PropertyTypes, {
-    any,
     arrayOf,
     boolean,
     func,
@@ -468,43 +467,61 @@ export const inputPropertyTypes: ValidationMapping = {
         }),
         symbol
     ]),
+
     /*
         NOTE: Not yet working:
         editor: oneOf([
             'code',
+
             'code(css)',
+            'code(cascadingstylesheet)',
+            'code(cascadingstylesheets)',
+            'code(style)',
+            'code(styles)',
+
             'code(script)',
+            'code(js)',
+            'code(jsx)',
+            'code(javascript)',
+
+            'code(ts)',
+            'code(tsx)',
+            'code(typescript)',
+
             'plain',
             'text',
-            'richtext(raw)',
-            'richtext(simple)',
-            'richtext(normal)',
-            'richtext(advanced)'
+            'richtext'
         ]),
     */
     editor: string,
     editorIsActive: oneOfType([boolean, symbol]),
+    editorIsInitiallyActive: boolean,
+
     hidden: oneOfType([boolean, symbol]),
-    /*
-        NOTE: Not yet working:
-        icon: string | (IconOptions & {tooltip?: string | TooltipProps})
-    */
+
     icon: oneOfType([string, object]),
+    trailingIcon: oneOfType([string, object]),
+
+    inputProperties: object,
     inputProps: object,
+
     invertedPattern: oneOfType(
         [arrayOf(oneOfType([object, string])), object, string]
     ),
     invertedPatternText: string,
+
     labels: oneOfType([arrayOf(arrayOf(string)), arrayOf(string), object]),
 
     maximum: oneOfType([number, string]),
     maximumLength: number,
-    maximumLengthText: string,
-    maximumText: string,
 
     minimum: oneOfType([number, string]),
     minimumLength: number,
+
+    maximumLengthText: string,
     minimumLengthText: string,
+
+    maximumText: string,
     minimumText: string,
 
     onBlur: func,
@@ -515,19 +532,23 @@ export const inputPropertyTypes: ValidationMapping = {
     onSelectionChange: func,
 
     outlined: boolean,
+
     pattern: oneOfType([arrayOf(oneOfType([object, string])), object, string]),
     patternText: string,
+
     placeholder: string,
     representation: oneOfType([string, symbol]),
+
     rows: number,
+
     searchSelection: boolean,
     selectableEditor: boolean,
+
     step: number,
 
     suggestionCreator: func,
     suggestSelection: boolean,
 
-    trailingIcon: any,
     transformer: object
 } as const
 export const textInputRenderProperties: Array<string> =
