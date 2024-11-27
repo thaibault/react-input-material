@@ -290,7 +290,7 @@ export interface SuggestionCreatorOptions<P> {
     richtext(normal) -> texteditor with additional text formatting
     richtext(advanced) -> texteditor with advanced text formatting
 */
-export type Editor = (
+export type EditorType = (
     'code' |
 
     'code(css)' |
@@ -319,7 +319,7 @@ export interface InputProperties<T = unknown> extends
     children: (options: InputChildrenOptions<this, T>) => null | ReactElement
     cursor: Partial<CursorState> | null
 
-    editor: Editor
+    editor: EditorType
     editorIsActive: boolean
     editorIsInitiallyActive: boolean
 
