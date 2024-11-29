@@ -26,4 +26,5 @@ export {WrapStrict} from './components/WrapStrict'
 export {WrapThemeProvider} from './components/WrapThemeProvider'
 export {WrapTooltip} from './components/WrapTooltip'
 
+export * from './helper'
 export * from './type'
