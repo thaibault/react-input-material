@@ -458,15 +458,9 @@ export interface ConfigurationProperties {
     wrap?: boolean
 }
 
-/*
-TODO make sure not to overwrite types!
-Namespaces may help!
-
-export * from './components/FileInput/type'
-export * from './components/Inputs/type'
-export * from './components/Interval/type'
-export * from './components/RequireableCheckbox/type'
-export * from './components/TextInput/type'
-*/
-export type {EditorType} from './components/TextInput/type'
+export * as FileInput from './components/FileInput/type'
+export * as Inputs from './components/Inputs/type'
+export * as Interval from './components/Interval/type'
+export * as RequireableCheckbox from './components/RequireableCheckbox/type'
+export * as TextInput from './components/TextInput/type'
 // endregion
