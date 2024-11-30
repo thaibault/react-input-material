@@ -49,15 +49,15 @@ import {intervalClassName, intervalDisabledClassName} from './style.module'
 import cssClassNames from './style.module'
 
 import {
-    defaultIntervalProperties as defaultProperties,
-    IntervalAdapter as Adapter,
-    IntervalAdapterWithReferences as AdapterWithReferences,
-    IntervalComponent,
-    IntervalModelState as ModelState,
-    IntervalProperties as Properties,
-    intervalPropertyTypes as propertyTypes,
-    IntervalProps as Props,
-    IntervalValue as Value,
+    defaultProperties as defaultProperties,
+    Adapter as Adapter,
+    AdapterWithReferences as AdapterWithReferences,
+    Component,
+    ModelState as ModelState,
+    Properties as Properties,
+    propertyTypes as propertyTypes,
+    Props as Props,
+    Value as Value,
     IntervalInputProps
 } from './type'
 // endregion
@@ -68,9 +68,9 @@ const determineControlled = (props: Props) =>
     props.model?.value?.start?.value !== undefined ||
     props.value !== undefined &&
     !(
-        (props.value?.start as IntervalInputProps | null)?.value ===
+        (props.value?.start as Props | null)?.value ===
             undefined &&
-        (props.value?.end as IntervalInputProps | null)?.value === undefined
+        (props.value?.end as Props | null)?.value === undefined
     )
 const normalizeDateTimeToNumber = (
     value?: null | number | string, fallbackValue = 0
@@ -162,14 +162,14 @@ export const IntervalInner = function(
         )
 
     let endProperties =
-        properties.value?.end as IntervalInputProps | null ||
-        {} as IntervalInputProps
+        properties.value?.end as Props | null ||
+        {} as Props
     const iconProperties: IconOptions = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
         properties.icon as IconOptions
     let startProperties =
-        properties.value?.start as IntervalInputProps | null ||
-        {} as IntervalInputProps
+        properties.value?.start as Props | null ||
+        {} as Props
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
@@ -196,8 +196,8 @@ export const IntervalInner = function(
         properties.value =
             {end: {value: value.end}, start: {value: value.start}}
     const propertiesToForward =
-        mask<IntervalInputProps>(
-            properties as unknown as IntervalInputProps,
+        mask<Props>(
+            properties as unknown as Props,
             {exclude: {
                 className: true,
                 enforceUncontrolled: true,
@@ -266,8 +266,8 @@ export const IntervalInner = function(
     }
 
     const valueState: Value = {
-        start: (properties.value?.start as IntervalInputProps | null)?.value,
-        end: (properties.value?.end as IntervalInputProps | null)?.value
+        start: (properties.value?.start as Props | null)?.value,
+        end: (properties.value?.end as Props | null)?.value
     }
 
     consolidateBoundaries(valueState)
@@ -483,10 +483,10 @@ IntervalInner.displayName = 'Interval'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Interval: IntervalComponent<typeof IntervalInner> =
+export const Interval: Component<typeof IntervalInner> =
     memorize(forwardRef(IntervalInner)) as
         unknown as
-        IntervalComponent<typeof IntervalInner>
+        Component<typeof IntervalInner>
 // region static properties
 /// region web-component hints
 Interval.wrapped = IntervalInner

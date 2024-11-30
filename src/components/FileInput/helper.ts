@@ -38,11 +38,11 @@ import {
 import {DefaultProperties as DefaultBaseProperties} from '../../type'
 import {InputProps} from '../TextInput/type'
 import {
-    DefaultFileInputProperties as DefaultProperties,
-    FileInputModelState as ModelState,
-    FileValue,
-    FileRepresentationType as RepresentationType,
-    FileInputProperties
+    DefaultProperties as DefaultProperties,
+    ModelState as ModelState,
+    Value,
+    RepresentationType as RepresentationType,
+    Properties
 } from './type'
 // endregion
 // region constants
@@ -89,10 +89,10 @@ export const VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
  * @returns Input properties.
  */
 export const preserveStaticFileBaseNameInputGenerator = <
-    Type extends FileValue = FileValue, MediaTag extends ElementType = 'div'
+    Type extends Value = Value, MediaTag extends ElementType = 'div'
 >(
         prototype: InputProps<string>,
-        {name, value}: FileInputProperties<Type, MediaTag>
+        {name, value}: Properties<Type, MediaTag>
     ): InputProps<string> => ({
         ...prototype,
         disabled: true,
@@ -109,8 +109,8 @@ export const preserveStaticFileBaseNameInputGenerator = <
  * @param properties - File input properties to analyze.
  * @returns The determined content type.
  */
-export const determineContentType = <Type extends FileValue = FileValue>(
-    properties: FileInputProperties<Type>
+export const determineContentType = <Type extends Value = Value>(
+    properties: Properties<Type>
 ): null | string => {
     if (properties.value) {
         if ((properties.value.blob as Blob | null)?.type)
@@ -161,7 +161,7 @@ export const determineRepresentationType = (
  * invalid state.
  */
 export const determineValidationState = <
-    Type extends FileValue = FileValue,
+    Type extends Value = Value,
     P extends DefaultProperties<Type> = DefaultProperties<Type>
 >(properties: P, invalidName: boolean, currentState: ModelState): boolean => {
     const invalidMaximumSize = (): boolean => (
@@ -225,7 +225,7 @@ export const determineValidationState = <
  * @param value - File to derive string from.
  * @returns A promise holding base64 string.
  */
-export const deriveBase64String = <Type extends FileValue = FileValue>(
+export const deriveBase64String = <Type extends Value = Value>(
     value: Type
 ): Promise<string> =>
         value.blob ?

@@ -21,55 +21,53 @@ import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 
 import {
     BaseModel,
-    defaultModel,
-    defaultProperties,
+    defaultModel as baseDefaultModel,
+    defaultProperties as baseDefaultProperties,
     InputComponent,
-    ModelState,
-    modelStatePropertyTypes,
-    Properties,
-    propertyTypes,
-    State,
-    ValueState
+    ModelState as BaseModelState,
+    modelStatePropertyTypes as baseModelStatePropertyTypes,
+    Properties as BaseProperties,
+    propertyTypes as basePropertyTypes,
+    State as BaseState,
+    ValueState as BaseValueState
 } from '../../type'
 // endregion
-export interface CheckboxProperties extends Properties<boolean | null> {
+export interface Properties extends BaseProperties<boolean | null> {
     checked: boolean
     id: string
 }
-export type CheckboxModel = BaseModel<boolean | null>
-export type CheckboxModelState = ModelState
-export type CheckboxValueState = ValueState<boolean>
-export type CheckboxProps =
-    Partial<Omit<CheckboxProperties, 'model'>> &
+export type Model = BaseModel<boolean | null>
+export type ModelState = BaseModelState
+export type ValueState = BaseValueState<boolean>
+export type Props =
+    Partial<Omit<Properties, 'model'>> &
     {
         model?: (
-            Partial<Omit<CheckboxModel, 'state'>> &
-            {state?: Partial<CheckboxModelState>}
+            Partial<Omit<Model, 'state'>> &
+            {state?: Partial<ModelState>}
         )
     }
-export type DefaultCheckboxProperties =
-    Omit<CheckboxProps, 'model'> & {model: CheckboxModel}
-export type CheckboxState = State<boolean>
-export type CheckboxAdapter =
-    ComponentAdapter<CheckboxProperties, Omit<CheckboxState, 'value'>>
+export type DefaultProperties = Omit<Props, 'model'> & {model: Model}
+export type State = BaseState<boolean>
+export type Adapter = ComponentAdapter<Properties, Omit<State, 'value'>>
 
-export type CheckboxComponent<ComponentType> = InputComponent<
+export type Component<ComponentType> = InputComponent<
     boolean,
     ComponentType,
-    CheckboxProps,
-    CheckboxModelState,
-    DefaultCheckboxProperties,
-    CheckboxAdapter
+    Props,
+    ModelState,
+    DefaultProperties,
+    Adapter
 >
 // region constants
-export const checkboxPropertyTypes: ValidationMapping = {
-    ...propertyTypes,
-    ...modelStatePropertyTypes,
+export const propertyTypes: ValidationMapping = {
+    ...basePropertyTypes,
+    ...baseModelStatePropertyTypes,
     checked: boolean,
     id: string
 } as const
-export const defaultCheckboxModel: CheckboxModel = {
-    ...defaultModel as unknown as CheckboxModel,
+export const defaultModel: Model = {
+    ...baseDefaultModel as unknown as Model,
     default: false,
     type: 'boolean',
     value: false
@@ -78,10 +76,10 @@ export const defaultCheckboxModel: CheckboxModel = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultCheckboxProperties: DefaultCheckboxProperties = {
-    ...defaultProperties as CheckboxProps,
+export const defaultProperties: DefaultProperties = {
+    ...baseDefaultProperties as Props,
     default: false,
-    model: {...defaultCheckboxModel},
+    model: {...defaultModel},
     requiredText: 'Please check this field.'
 } as const
 // endregion

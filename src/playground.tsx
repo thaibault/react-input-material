@@ -38,24 +38,24 @@ import {useMemorizedValue} from 'react-generic-tools'
 
 import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
 import {
-    FileInputChildrenOptions, FileInputProperties, FileInputProps, FileValue
+    ChildrenOptions, Properties, Props, Value
 } from './components/FileInput/type'
-import {CheckboxProps} from './components/RequireableCheckbox/type'
+import {Props} from './components/RequireableCheckbox/type'
 import {
     InputProperties, InputProps, SuggestionCreatorOptions
 } from './components/TextInput/type'
 import {
-    InputsCreateItemOptions,
-    InputsCreatePrototypeOptions,
-    InputsProperties,
-    PartialInputsModel
+    CreateItemOptions,
+    CreatePrototypeOptions,
+    Properties,
+    PartialModel
 } from './components/Inputs/type'
 import {
-    IntervalConfiguration,
-    IntervalProperties,
-    IntervalProps,
-    IntervalValue,
-    PartialIntervalModel
+    Configuration,
+    Properties,
+    Props,
+    Value,
+    PartialModel
 } from './components/Interval/type'
 import {
     FileInput, TextInput, Inputs, Interval, RequireableCheckbox as Checkbox
@@ -112,12 +112,12 @@ const Application = () => {
     /// endregion
     /// region file
     const [fileInputValue, setFileInputValue] =
-        useState<FileValue | null | undefined>({
+        useState<Value | null | undefined>({
             blob: new Blob(['test'], {type: 'text/plain'}),
             name: 'test.txt'
         })
     const onChangeFileInputValue =
-        useMemorizedValue<(value?: FileValue | null) => void>(setFileInputValue)
+        useMemorizedValue<(value?: Value | null) => void>(setFileInputValue)
     /// endregion
     /// region selection
     interface SelectionValueType {
@@ -133,9 +133,9 @@ const Application = () => {
     /// endregion
     /// region interval
     const [intervalValue, setIntervalValue] =
-        useState<IntervalValue | null>({end: 120, start: 60})
+        useState<Value | null>({end: 120, start: 60})
     const onChangeIntervalValue =
-        useMemorizedValue<(value: IntervalValue | null) => void>(
+        useMemorizedValue<(value: Value | null) => void>(
             setIntervalValue
         )
     /// endregion
@@ -148,9 +148,9 @@ const Application = () => {
         )
     /// endregion
     /// region inputs
-    type IntervalInputsType = PartialInputsModel<
-        Partial<IntervalConfiguration> | Partial<IntervalValue> | null,
-        IntervalProps
+    type IntervalInputsType = PartialModel<
+        Partial<Configuration> | Partial<Value> | null,
+        Props
     >
     const [intervalInputsModel, setIntervalInputsModel] =
         useState<IntervalInputsType>({default: [
@@ -187,15 +187,15 @@ const Application = () => {
     })
 
     const createIntervalInputsPrototype = useMemorizedValue((
-        {item, lastValue, properties}: InputsCreatePrototypeOptions<
-            Partial<IntervalConfiguration> | Partial<IntervalValue> | null,
-            IntervalProps,
-            InputsProperties<
-                Partial<IntervalConfiguration> | Partial<IntervalValue> | null,
-                IntervalProps
+        {item, lastValue, properties}: CreatePrototypeOptions<
+            Partial<Configuration> | Partial<Value> | null,
+            Props,
+            Properties<
+                Partial<Configuration> | Partial<Value> | null,
+                Props
             >
         >
-    ): IntervalProps => {
+    ): Props => {
         const sixHoursInSeconds =
             new Date(1970, 0, 1, 6).getTime() / 1000
         const length = properties.value?.length
@@ -211,7 +211,7 @@ const Application = () => {
                     sixHoursInSeconds
             )
         const nextStartTime =
-            (nextStart as InputProps<number | string>).value ?? nextStart
+            (nextStart as Props<number | string>).value ?? nextStart
         const nextStartTimeInSeconds = typeof nextStartTime === 'number' ?
             nextStartTime :
             new Date(nextStartTime as string).getTime() / 1000
@@ -232,21 +232,21 @@ const Application = () => {
         )
     /// endregion
     /// region interval
-    const [intervalModel, setIntervalModel] = useState<PartialIntervalModel>({
+    const [intervalModel, setIntervalModel] = useState<PartialModel>({
         value: {
             start: {value: '1970-01-01T00:00:00.000Z'},
             end: {value: '1970-01-01T00:02:00.000Z'}
         }
     })
     const onChangeIntervalModel =
-        useMemorizedValue<(properties: IntervalProperties) => void>((
+        useMemorizedValue<(properties: Properties) => void>((
             properties
         ) => {
             const slicedProperties =
                 slicePropertiesForStateRecursively(properties) as
-                    IntervalProperties
+                    Properties
             onChange(slicedProperties)
-            setIntervalModel(slicedProperties.model as PartialIntervalModel)
+            setIntervalModel(slicedProperties.model as PartialModel)
         })
     /// endregion
     // endregion
@@ -445,7 +445,7 @@ const Application = () => {
                         name="numberInputControlled"
 
                         onChange={useMemorizedValue((
-                            properties: InputProperties<null | number>
+                            properties: Properties<null | number>
                         ) => {
                             onChange(properties)
                             onChangeNumberValue({
@@ -1017,7 +1017,7 @@ const Application = () => {
                         suggestionCreator={useMemorizedValue(
                             debounce<Array<string>>(
                                 (({query}: SuggestionCreatorOptions<
-                                    InputProperties<string>
+                                    Properties<string>
                                 >): Array<string> | Promise<Array<string>> => {
                                     if (!query || query.length < 3)
                                         return []
@@ -1065,7 +1065,7 @@ const Application = () => {
                         placeholder="selectionInput7ModelPlaceholder"
                         suggestionCreator={useMemorizedValue(
                             async ({query}: SuggestionCreatorOptions<
-                                InputProperties<string>
+                                Properties<string>
                             >): Promise<Mapping> => {
                                 await timeout(500)
 
@@ -1090,7 +1090,7 @@ const Application = () => {
                     <TextInput<null | string>
                         name="selectionInputControlled1"
                         onChange={useMemorizedValue(
-                            (properties: InputProperties<null | string>) => {
+                            (properties: Properties<null | string>) => {
                                 onChangeSelectionInputValue({
                                     representation: properties.representation,
                                     value: properties.value
@@ -1108,7 +1108,7 @@ const Application = () => {
                     <TextInput<null | string>
                         name="selectionInputControlled2"
                         onChange={useMemorizedValue(
-                            (properties: InputProperties<null | string>) => {
+                            (properties: Properties<null | string>) => {
                                 onChangeSelectionInputValue({
                                     representation: properties.representation,
                                     value: properties.value
@@ -1137,7 +1137,7 @@ const Application = () => {
                 >
                     <FileInput name="fileInput1" onChange={onChange} />
 
-                    <FileInput<FileValue>
+                    <FileInput<Value>
                         default={useMemorizedValue({
                             blob: {type: 'image/png'},
                             url: '/placeholder/150'
@@ -1158,8 +1158,8 @@ const Application = () => {
 
                         onChange={onChange}
                     >
-                        {useMemorizedValue(({value}: FileInputChildrenOptions<
-                            FileInputProperties
+                        {useMemorizedValue(({value}: ChildrenOptions<
+                            Properties
                         >): ReactNode =>
                             value?.blob ?
                                 <ul>
@@ -1220,12 +1220,12 @@ const Application = () => {
                     }}
                 >
                     {/* region file-input inputs */}
-                    <Inputs<FileValue | null, FileInputProps>
+                    <Inputs<Value | null, Props>
                         name="fileInputs"
                         createItem={useMemorizedValue(
                             ({
                                 index, item, properties: {name}
-                            }): FileInputProps => ({
+                            }): Props => ({
                                 ...item, name: `${name}-${String(index + 1)}`
                             })
                         )}
@@ -1236,19 +1236,19 @@ const Application = () => {
                         showInitialValidationState
                     >
                         {useMemorizedValue(({properties}) =>
-                            <FileInput {...properties as FileInputProps} />
+                            <FileInput {...properties as Props} />
                         )}
                     </Inputs>
                     {/* endregion */}
                     {/* region checkbox inputs */}
-                    <Inputs<boolean | null, CheckboxProps>
+                    <Inputs<boolean | null, Props>
                         createItem={useMemorizedValue(({
                             index, item, properties: {name}
-                        }: InputsCreateItemOptions<
+                        }: CreateItemOptions<
                             boolean | null,
-                            CheckboxProps,
-                            InputsProperties<boolean | null, CheckboxProps>
-                        >): CheckboxProps => ({
+                            Props,
+                            Properties<boolean | null, Props>
+                        >): Props => ({
                             ...item,
                             name: `${name}-${String(index + 1)}`
                         }))}
@@ -1270,11 +1270,11 @@ const Application = () => {
                     {/* region uncontrolled */}
                     <Inputs<
                         (
-                            Partial<IntervalConfiguration> |
-                            Partial<IntervalValue> |
+                            Partial<Configuration> |
+                            Partial<Value> |
                             null
                         ),
-                        IntervalProps
+                        Props
                     >
                         createPrototype={createIntervalInputsPrototype}
                         model={useMemorizedValue({
@@ -1301,11 +1301,11 @@ const Application = () => {
                     {/* region controlled */}
                     <Inputs<
                         (
-                            Partial<IntervalConfiguration> |
-                            Partial<IntervalValue> |
+                            Partial<Configuration> |
+                            Partial<Value> |
                             null
                         ),
-                        IntervalProps
+                        Props
                     >
                         createPrototype={createIntervalInputsPrototype}
                         model={intervalInputsModel}

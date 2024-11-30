@@ -62,17 +62,17 @@ import {
 
 import cssClassNames from './style.module'
 import {
-    CheckboxAdapter as Adapter,
-    CheckboxProperties as Properties,
-    CheckboxProps as Props,
-    DefaultCheckboxProperties as DefaultProperties,
-    defaultCheckboxProperties as defaultProperties,
-    CheckboxModelState as ModelState,
-    checkboxPropertyTypes as propertyTypes,
-    CheckboxComponent,
-    CheckboxValueState as ValueState,
-    CheckboxModelState,
-    CheckboxValueState
+    Adapter as Adapter,
+    Properties as Properties,
+    Props as Props,
+    DefaultProperties as DefaultProperties,
+    defaultProperties as defaultProperties,
+    ModelState as ModelState,
+    propertyTypes as propertyTypes,
+    Component,
+    ValueState as ValueState,
+    ModelState,
+    ValueState
 } from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
@@ -132,7 +132,7 @@ export const RequireableCheckboxInner = function(
             )
 
         determineValidationState(
-            result, result.model.state as CheckboxModelState
+            result, result.model.state as ModelState
         )
 
         result = getBaseConsolidatedProperties<Props, Properties>(result)
@@ -187,7 +187,7 @@ export const RequireableCheckboxInner = function(
 
             return changed ?
                 {...oldValueState, modelState: properties.model.state} as
-                    CheckboxValueState :
+                    ValueState :
                 oldValueState
         })
     }
@@ -318,7 +318,7 @@ export const RequireableCheckboxInner = function(
 
                 result = {
                     ...oldValueState,
-                    modelState: properties.model.state as CheckboxModelState
+                    modelState: properties.model.state as ModelState
                 }
 
                 triggerCallbackIfExists<Properties>(
@@ -385,7 +385,7 @@ export const RequireableCheckboxInner = function(
     const properties: Properties = getConsolidatedProperties(givenProperties)
 
     const currentValueState: ValueState = {
-        modelState: properties.model.state as CheckboxModelState,
+        modelState: properties.model.state as ModelState,
         value: properties.value as boolean | null
     }
     /*
@@ -482,11 +482,11 @@ RequireableCheckboxInner.displayName = 'RequireableCheckbox'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const RequireableCheckbox: CheckboxComponent<
+export const RequireableCheckbox: Component<
     typeof RequireableCheckboxInner
 > = memorize(forwardRef(RequireableCheckboxInner)) as
     unknown as
-    CheckboxComponent<typeof RequireableCheckboxInner>
+    Component<typeof RequireableCheckboxInner>
 // region static properties
 /// region web-component hints
 RequireableCheckbox.wrapped = RequireableCheckboxInner
