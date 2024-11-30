@@ -27,7 +27,11 @@ import {
 } from 'web-component-wrapper/type'
 import {IconOptions} from '@rmwc/types'
 
-import {defaultModelState, InputComponent, ModelState} from '../../type'
+import {
+    defaultModelState as baseDefaultModelState,
+    InputComponent,
+    ModelState as BaseModelState
+} from '../../type'
 import {
     defaultInputModel,
     InputAdapterWithReferences,
@@ -39,7 +43,7 @@ import {
 // endregion
 export type DateTimeRepresentation = number | string
 
-export interface IntervalValue {
+export interface Value {
     end?: DateTimeRepresentation | null
     start?: DateTimeRepresentation | null
 }
@@ -56,47 +60,47 @@ export type IntervalInputProps =
         maximum: DateTimeRepresentation
         minimum: DateTimeRepresentation
     }
-export interface IntervalConfiguration {
+export interface Configuration {
     end: Partial<IntervalInputModel> | Partial<IntervalInputProps>
     start: Partial<IntervalInputModel> | Partial<IntervalInputProps>
 }
 
-export type IntervalModelState = ModelState
-export interface IntervalModel {
+export type ModelState = BaseModelState
+export interface Model {
     name: string
-    state?: IntervalModelState
+    state?: ModelState
     value: {
         end: IntervalInputModel
         start: IntervalInputModel
     }
 }
 
-export interface IntervalProperties extends Omit<
+export interface Properties extends Omit<
     InputProperties<DateTimeRepresentation | null>,
     'icon' | 'model' | 'onChange' | 'onChangeValue' | 'value'
 > {
     icon: IconOptions
 
-    model: IntervalModel
+    model: Model
 
     onChange: (properties: this, event?: GenericEvent) => void
-    onChangeValue: (value: IntervalValue | null, event?: GenericEvent) => void
+    onChangeValue: (value: Value | null, event?: GenericEvent) => void
 
-    value: IntervalConfiguration
+    value: Configuration
 }
-type PartialIntervalValue =
+type PartialValue =
     Partial<Omit<InputModel<DateTimeRepresentation | null>, 'value'>> &
     {value: DateTimeRepresentation | null}
-export type PartialIntervalModel =
-    Partial<Omit<IntervalProperties['model'], 'state' | 'value'>> &
+export type PartialModel =
+    Partial<Omit<Properties['model'], 'state' | 'value'>> &
     {
         value?: {
-            end?: PartialIntervalValue
-            start?: PartialIntervalValue
+            end?: PartialValue
+            start?: PartialValue
         }
-        state?: Partial<IntervalModelState>
+        state?: Partial<ModelState>
     }
-export type IntervalProps =
+export type Props =
     Omit<
         InputProps<DateTimeRepresentation | null>,
           'icon' | 'model' | 'onChange' | 'onChangeValue' | 'value'
@@ -121,26 +125,25 @@ export type IntervalProps =
             }
         >
 
-        icon: IntervalProperties['icon'] | string
+        icon: Properties['icon'] | string
 
-        model?: PartialIntervalModel
+        model?: PartialModel
 
-        onChange: IntervalProperties['onChange']
-        onChangeValue: IntervalProperties['onChangeValue']
+        onChange: Properties['onChange']
+        onChangeValue: Properties['onChangeValue']
 
-        value?: IntervalConfiguration | IntervalValue | null
+        value?: Configuration | Value | null
     }>
 
-export type DefaultIntervalProperties =
-    Omit<IntervalProps, 'model'> & {model: IntervalModel}
+export type DefaultProperties =
+    Omit<Props, 'model'> & {model: Model}
 
 export type IntervalPropertyTypes = {
-    [key in keyof IntervalProperties]: ValueOf<typeof PropertyTypes>
+    [key in keyof Properties]: ValueOf<typeof PropertyTypes>
 }
 
-export type IntervalAdapter =
-    ComponentAdapter<IntervalProperties, {value?: IntervalValue | null}>
-export interface IntervalAdapterWithReferences extends IntervalAdapter {
+export type Adapter = ComponentAdapter<Properties, {value?: Value | null}>
+export interface AdapterWithReferences extends Adapter {
     references: {
         end: MutableRefObject<
             InputAdapterWithReferences<DateTimeRepresentation | null> | null
@@ -151,16 +154,16 @@ export interface IntervalAdapterWithReferences extends IntervalAdapter {
     }
 }
 
-export type IntervalComponent<ComponentType> = InputComponent<
-    IntervalConfiguration | IntervalValue | null,
+export type Component<ComponentType> = InputComponent<
+    Configuration | Value | null,
     ComponentType,
-    IntervalProps,
-    IntervalModelState,
-    DefaultIntervalProperties,
-    IntervalAdapter
+    Props,
+    ModelState,
+    DefaultProperties,
+    Adapter
 >
 // region constants
-export const intervalPropertyTypes: PropertiesValidationMap = {
+export const propertyTypes: PropertiesValidationMap = {
     ...inputPropertyTypes as Mapping<ValueOf<PropertiesValidationMap>>,
     value: shape<ValidationMap<{
         end: unknown
@@ -182,7 +185,7 @@ export const intervalPropertyTypes: PropertiesValidationMap = {
         ])
     })
 } as const
-export const defaultIntervalProperties: DefaultIntervalProperties = {
+export const defaultProperties: DefaultProperties = {
     icon: {icon: 'timelapse'},
 
     maximumText:
@@ -192,7 +195,7 @@ export const defaultIntervalProperties: DefaultIntervalProperties = {
 
     model: {
         name: 'NO_NAME_DEFINED',
-        state: {...defaultModelState},
+        state: {...baseDefaultModelState},
         value: {
             end: {
                 ...defaultInputModel as unknown as InputModel<number>,

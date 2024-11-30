@@ -17,7 +17,7 @@
 */
 // region imports
 import {ValueOf} from 'clientnode'
-import PropertyTypes, {func, number} from 'clientnode/dist/property-types'
+import BasePropertyTypes, {func, number} from 'clientnode/dist/property-types'
 import {
     ForwardRefExoticComponent,
     MutableRefObject,
@@ -33,75 +33,73 @@ import {
 } from '../TextInput/type'
 import {
     BaseModel,
-    defaultModel,
-    defaultProperties,
-    ModelState,
-    Properties,
-    propertyTypes,
-    State,
+    defaultModel as baseDefaultModel,
+    defaultProperties as baseDefaultProperties,
+    ModelState as BaseModelState,
+    Properties as BaseProperties,
+    propertyTypes as basePropertyTypes,
+    State as BaseState,
     StaticWebComponent
 } from '../../type'
 // endregion
-export interface InputsPropertiesItem<T, TS = unknown> {
+export interface PropertiesItem<T, TS = unknown> {
     model?: {
         state?: TS
         value?: T
     }
     value?: T
 }
-export interface InputsCreateOptions<T, IP> {
+export interface CreateOptions<T, IP> {
     index: number
     properties: IP
     values?: Array<T> | null
 }
-export interface InputsCreateItemOptions<
-    T, P extends InputsPropertiesItem<T>, IP
-> extends InputsCreateOptions<T, IP> {
+export interface CreateItemOptions<T, P extends PropertiesItem<T>, IP>
+    extends
+CreateOptions<T, IP> {
     item: Partial<P>
 }
-export interface InputsCreatePrototypeOptions<
-    T, P extends InputsPropertiesItem<T>, IP
-> extends InputsCreateItemOptions<T, P, IP> {
+export interface CreatePrototypeOptions<T, P extends PropertiesItem<T>, IP>
+    extends
+CreateItemOptions<T, P, IP> {
     lastValue: null | T | undefined
 }
 
-export interface InputsModelState extends ModelState {
+export interface ModelState extends BaseModelState {
     invalidMaximumNumber: boolean
     invalidMinimumNumber: boolean
 }
-export interface InputsModel<
-    T, P extends InputsPropertiesItem<T> = InputsPropertiesItem<T>
-> extends BaseModel<Array<P> | null> {
+export interface Model<T, P extends PropertiesItem<T> = PropertiesItem<T>>
+    extends
+BaseModel<Array<P> | null> {
     maximumNumber: number
     minimumNumber: number
 
-    state?: InputsModelState
+    state?: ModelState
 
     writable: boolean
 }
 
-export interface InputsChildrenOptions<
-    T, P extends InputsPropertiesItem<T>, IP
-> {
+export interface ChildrenOptions<T, P extends PropertiesItem<T>, IP> {
     index: number
     inputsProperties: IP
     properties: Partial<P>
 }
-export interface InputsProperties<
-    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
-> extends InputsModelState, Omit<Properties<Array<P> | null>, 'onChangeValue'> {
+export interface Properties<
+    T = unknown, P extends PropertiesItem<T> = BaseProperties<T>
+> extends ModelState, Omit<BaseProperties<Array<P> | null>, 'onChangeValue'> {
     addIcon: IconOptions
     removeIcon: IconOptions
 
-    children: (options: InputsChildrenOptions<T, P, this>) => ReactNode
+    children: (options: ChildrenOptions<T, P, this>) => ReactNode
 
-    createItem: (options: InputsCreateItemOptions<T, P, this>) => P
-    createPrototype: (options: InputsCreatePrototypeOptions<T, P, this>) => P
+    createItem: (options: CreateItemOptions<T, P, this>) => P
+    createPrototype: (options: CreatePrototypeOptions<T, P, this>) => P
 
     maximumNumber: number
     minimumNumber: number
 
-    model: InputsModel<T, P>
+    model: Model<T, P>
 
     onChangeValue: (
         values: Array<T> | null, event: unknown, properties: this
@@ -111,54 +109,54 @@ export interface InputsProperties<
 
     writable: boolean
 }
-export type PartialInputsModel<
-    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
+export type PartialModel<
+    T = unknown, P extends PropertiesItem<T> = BaseProperties<T>
 > = Partial<
-    Omit<InputsModel<T, P>, 'state'> & {state?: Partial<InputsModelState>}
+    Omit<Model<T, P>, 'state'> & {state?: Partial<ModelState>}
 >
-export type InputsProps<
-    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
+export type Props<
+    T = unknown, P extends PropertiesItem<T> = BaseProperties<T>
 > =
-    Partial<Omit<InputsProperties<T, P>, 'model' | 'value'>> &
+    Partial<Omit<Properties<T, P>, 'model' | 'value'>> &
     {
-        model?: PartialInputsModel<T, P>
+        model?: PartialModel<T, P>
         value?: Array<Partial<P>> | Array<T> | null
     }
 
-export type DefaultInputsProperties<
-    T = string, P extends InputsPropertiesItem<T> = InputProps<T>
+export type DefaultProperties<
+    T = string, P extends PropertiesItem<T> = InputProps<T>
 > =
-    Partial<Omit<InputsProperties<T, P>, 'default' | 'model' | 'value'>> &
-    {model: InputsModel<T, P>}
+    Partial<Omit<Properties<T, P>, 'default' | 'model' | 'value'>> &
+    {model: Model<T, P>}
 
-export type InputsPropertyTypes<
-    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
+export type PropertyTypes<
+    T = unknown, P extends PropertiesItem<T> = BaseProperties<T>
 > = {
-    [key in keyof InputsProperties<P>]: ValueOf<typeof PropertyTypes>
+    [key in keyof Properties<P>]: ValueOf<typeof BasePropertyTypes>
 }
 
-export type InputsState<T = unknown> = State<Array<null | T | undefined>>
+export type State<T = unknown> = BaseState<Array<null | T | undefined>>
 
-export type InputsAdapter<
-    T = unknown, P extends InputsPropertiesItem<T> = Properties<T>
-> = ComponentAdapter<InputsProperties<T, P>, InputsState<T>>
-export type InputsAdapterWithReferences<
+export type Adapter<
+    T = unknown, P extends PropertiesItem<T> = BaseProperties<T>
+> = ComponentAdapter<Properties<T, P>, State<T>>
+export type AdapterWithReferences<
     T = unknown,
-    P extends InputsPropertiesItem<T> = Properties<T>,
+    P extends PropertiesItem<T> = BaseProperties<T>,
     RefType = unknown
-> = InputsAdapter<T, P> & {references: Array<MutableRefObject<RefType>>}
+> = Adapter<T, P> & {references: Array<MutableRefObject<RefType>>}
 
-export interface InputsComponent<Type> extends
-    Omit<ForwardRefExoticComponent<InputsProps>, 'propTypes'>,
-    StaticWebComponent<Type, InputsModelState, DefaultInputsProperties>
+export interface Component<Type> extends
+    Omit<ForwardRefExoticComponent<Props>, 'propTypes'>,
+    StaticWebComponent<Type, ModelState, DefaultProperties>
 {
-    <T = string, P extends InputsPropertiesItem<T> = InputProperties<T>>(
-        props: InputsProps<T, P> & RefAttributes<InputsAdapter<T, P>>
+    <T = string, P extends PropertiesItem<T> = InputProperties<T>>(
+        props: Props<T, P> & RefAttributes<Adapter<T, P>>
     ): ReactElement
 }
 // region constants
-export const inputsPropertyTypes: ValidationMapping = {
-    ...propertyTypes,
+export const propertyTypes: ValidationMapping = {
+    ...basePropertyTypes,
     ...inputModelStatePropertyTypes,
     // We use that function (render prop) to produce input component instances.
     children: func,
@@ -171,13 +169,11 @@ export const inputsPropertyTypes: ValidationMapping = {
 } as const
 export const inputsRenderProperties: Array<string> =
     ['children', 'createItem', 'createPrototype']
-export const defaultInputsModel: InputsModel<
-    string, InputProperties<string>
-> = {
-    ...defaultModel as InputsModel<string, InputProperties<string>>,
+export const defaultModel: Model<string, InputProperties<string>> = {
+    ...baseDefaultModel as Model<string, InputProperties<string>>,
 
     state: {
-        ...defaultModel.state as InputsModelState,
+        ...baseDefaultModel.state as ModelState,
 
         invalidMaximumNumber: false,
         invalidMinimumNumber: false
@@ -192,8 +188,8 @@ export const defaultInputsModel: InputsModel<
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultInputsProperties: DefaultInputsProperties = {
-    ...defaultProperties as DefaultInputsProperties,
+export const defaultProperties: DefaultProperties = {
+    ...baseDefaultProperties as DefaultProperties,
 
     addIcon: {icon: 'add'},
     removeIcon: {icon: 'clear'},
@@ -201,6 +197,6 @@ export const defaultInputsProperties: DefaultInputsProperties = {
     createItem: ({item}): InputProps<string> => item,
     createPrototype: ({item}): InputProps<string> => item,
 
-    model: {...defaultInputsModel}
+    model: {...defaultModel}
 } as const
 // endregion

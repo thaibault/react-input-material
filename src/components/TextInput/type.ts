@@ -65,16 +65,16 @@ import {StarterKitOptions} from '@tiptap/starter-kit'
 import {
     BaseModel,
     CursorState,
-    defaultModel,
-    defaultModelState,
-    defaultProperties,
-    ModelState,
-    modelStatePropertyTypes,
-    Properties,
-    propertyTypes,
-    State,
+    defaultModel as baseDefaultModel,
+    defaultModelState as baseDefaultModelState,
+    defaultProperties as baseDefaultProperties,
+    ModelState as BaseModelState,
+    modelStatePropertyTypes as baseModelStatePropertyTypes,
+    Properties as BaseProperties,
+    propertyTypes as basePropertyTypes,
+    State as BaseState,
     StaticWebComponent,
-    ValueState
+    ValueState as BaseValueState
 } from '../../type'
 // endregion
 // region data transformation
@@ -227,7 +227,7 @@ export type InputSelection =
 export type NormalizedSelection =
     Array<Omit<FormattedSelectionOption, 'value'> & {value: unknown}>
 
-export interface InputModelState extends ModelState {
+export interface InputModelState extends BaseModelState {
     invalidMaximum: boolean
     invalidMinimum: boolean
 
@@ -243,8 +243,8 @@ export interface InputModel<T = unknown> extends BaseModel<T> {
 export type PartialInputModel<T = unknown> =
     Partial<Omit<InputModel<T>, 'state'>> &
     {state?: Partial<InputModelState>}
-export interface InputValueState<T = unknown, MS = ModelState> extends
-    ValueState<T, MS>
+export interface InputValueState<T = unknown, MS = BaseModelState> extends
+    BaseValueState<T, MS>
 {
     representation?: ReactNode
 }
@@ -313,7 +313,7 @@ export type EditorType = (
     'richtext'
 )
 export interface InputProperties<T = unknown> extends
-    InputModelState, Properties<T>
+    InputModelState, BaseProperties<T>
 {
     align: 'end' | 'start'
     children: (options: InputChildrenOptions<this, T>) => null | ReactElement
@@ -388,7 +388,7 @@ export type InputPropertyTypes<T = unknown> = {
     [key in keyof InputProperties<T>]: ValueOf<typeof PropertyTypes>
 }
 
-export interface InputState<T = unknown> extends State<T> {
+export interface InputState<T = unknown> extends BaseState<T> {
     cursor: CursorState
     editorIsActive: boolean
     hidden?: boolean
@@ -440,7 +440,7 @@ export interface TextInputComponent<Type> extends
 export const inputModelStatePropertyTypes: {
     [key in keyof InputModelState]: Requireable<boolean | symbol>
 } = {
-    ...modelStatePropertyTypes,
+    ...baseModelStatePropertyTypes,
 
     invalidMaximum: oneOfType([boolean, symbol]),
     invalidMinimum: oneOfType([boolean, symbol]),
@@ -452,7 +452,7 @@ export const inputModelStatePropertyTypes: {
     invalidPattern: oneOfType([boolean, symbol])
 } as const
 export const inputPropertyTypes: ValidationMapping = {
-    ...propertyTypes,
+    ...basePropertyTypes,
     ...inputModelStatePropertyTypes,
     /*
         NOTE: Not yet working:
@@ -554,7 +554,7 @@ export const inputPropertyTypes: ValidationMapping = {
 export const textInputRenderProperties: Array<string> =
     ['children', 'suggestionCreator']
 export const defaultInputModelState: InputModelState = {
-    ...defaultModelState,
+    ...baseDefaultModelState,
 
     invalidMaximum: false,
     invalidMinimum: false,
@@ -566,7 +566,7 @@ export const defaultInputModelState: InputModelState = {
     invalidPattern: false
 } as const
 export const defaultInputModel: InputModel<string> = {
-    ...defaultModel as InputModel<string>,
+    ...baseDefaultModel as InputModel<string>,
     state: defaultInputModelState
 } as const
 /*
@@ -574,7 +574,7 @@ export const defaultInputModel: InputModel<string> = {
     would permanently shadow them.
 */
 export const defaultInputProperties: DefaultInputProperties = {
-    ...defaultProperties as DefaultInputProperties,
+    ...baseDefaultProperties as DefaultInputProperties,
 
     cursor: {
         end: 0,

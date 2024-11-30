@@ -65,22 +65,22 @@ import {
 import {InputAdapter, InputProperties, InputProps} from '../TextInput/type'
 
 import {
-    defaultFileInputModelState as defaultModelState,
-    DefaultFileInputProperties as DefaultProperties,
-    defaultFileInputProperties as defaultProperties,
+    defaultModelState as defaultModelState,
+    DefaultProperties as DefaultProperties,
+    defaultProperties as defaultProperties,
     defaultFileNameInputProperties,
-    FileInputAdapter as Adapter,
-    FileInputModelState as ModelState,
-    FileInputProperties as Properties,
-    FileInputProps as Props,
-    FileValue,
-    FileInputValueState as ValueState,
-    fileInputPropertyTypes as propertyTypes,
-    fileInputRenderProperties as renderProperties,
-    FileRepresentationType as RepresentationType,
-    FileInputComponent,
-    FileInputModel,
-    DefaultFileInputProperties, FileInputProperties, FileInputModelState
+    Adapter as Adapter,
+    ModelState as ModelState,
+    Properties as Properties,
+    Props as Props,
+    Value,
+    ValueState as ValueState,
+    propertyTypes as propertyTypes,
+    renderProperties as renderProperties,
+    RepresentationType as RepresentationType,
+    InputComponent,
+    Model,
+    DefaultProperties, Properties, ModelState
 } from './type'
 import {
     CSS_CLASS_NAMES,
@@ -125,7 +125,7 @@ export {
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const FileInputInner = function<Type extends FileValue = FileValue>(
+export const FileInputInner = function<Type extends Value = Value>(
     props: Props<Type>, reference?: ForwardedRef<Adapter<Type>>
 ): ReactElement {
     const defaultID = useId()
@@ -142,7 +142,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
         const result: DefaultProperties<Type> =
             mapPropertiesIntoModel<Props<Type>, DefaultProperties<Type>>(
                 properties,
-                FileInput.defaultProperties.model as FileInputModel<Type>
+                FileInput.defaultProperties.model as Model<Type>
             )
 
         determineValidationState<Type>(
@@ -155,7 +155,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                 result.model.fileName.invalid ??
                 result.model!.state.invalidName
             */,
-            result.model.state as FileInputModelState
+            result.model.state as ModelState
         )
 
         return getBaseConsolidatedProperties<Props<Type>, Properties<Type>>(
@@ -249,7 +249,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     const onChangeValue = (
         eventSourceOrName?: Partial<Type> | string | SyntheticEvent,
         event?: SyntheticEvent,
-        inputProperties?: InputProperties<string>,
+        inputProperties?: Properties<string>,
         attachBlobProperty = false
     ): void => {
         if (!(properties.model.mutable && properties.model.writable))
@@ -332,9 +332,9 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
             onChange(event)
 
             if (determineValidationState<
-                Type, DefaultFileInputProperties<Type>
+                Type, DefaultProperties<Type>
             >(
-                properties as DefaultFileInputProperties<Type>,
+                properties as DefaultProperties<Type>,
                 nameInputReference.current?.properties?.invalid || false,
                 oldValueState.modelState
             ))
@@ -351,7 +351,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
 
             if (stateChanged) {
                 result.modelState =
-                    properties.model.state as FileInputModelState
+                    properties.model.state as ModelState
 
                 triggerCallbackIfExists<Properties<Type>>(
                     properties,
@@ -417,7 +417,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
 
                 result = {
                     ...oldValueState,
-                    modelState: properties.model.state as FileInputModelState
+                    modelState: properties.model.state as ModelState
                 }
 
                 triggerCallbackIfExists<Properties<Type>>(
@@ -503,7 +503,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
     /// region synchronize uncontrolled properties into state
     const currentValueState: ValueState<Type> = {
         attachBlobProperty: false,
-        modelState: properties.model.state as FileInputModelState,
+        modelState: properties.model.state as ModelState,
         value: properties.value as null | Type
     }
     /*
@@ -545,7 +545,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                 uploadButtonReference
             },
             state: {
-                modelState: properties.model.state as FileInputModelState,
+                modelState: properties.model.state as ModelState,
                 ...(controlled ? {} : {value: properties.value})
             }
         })
@@ -743,7 +743,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                     />
                                 </div> :
                                 (
-                                    properties.value as FileValue | null
+                                    properties.value as Value | null
                                 )?.source &&
                                 representationType === 'text' ?
                                     <pre
@@ -796,7 +796,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                             }
                             <Theme use="error" wrap={true}>
                                 <span id={`${id}-error-message`}>
-                                    {renderMessage<FileInputProperties<Type>>(
+                                    {renderMessage<Properties<Type>>(
                                         properties.invalidContentTypePattern &&
                                         properties.contentTypePatternText ||
 
@@ -828,7 +828,7 @@ export const FileInputInner = function<Type extends FileValue = FileValue>(
                                 {
                                     disabled: properties.disabled,
                                     value: (
-                                        properties.value as FileValue | null
+                                        properties.value as Value | null
                                     )?.name,
 
                                     ...mask(
@@ -962,7 +962,7 @@ FileInputInner.displayName = 'FileInput'
  */
 export const FileInput = memorize(forwardRef(FileInputInner)) as
     unknown as
-    FileInputComponent<typeof FileInputInner>
+    InputComponent<typeof FileInputInner>
 // region static properties
 /// region web-component hints
 FileInput.wrapped = FileInputInner

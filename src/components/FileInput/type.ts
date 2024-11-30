@@ -17,7 +17,7 @@
 */
 // region imports
 import {identity, ValueOf} from 'clientnode'
-import PropertyTypes, {
+import BasePropertyTypes, {
     arrayOf,
     boolean,
     func,
@@ -47,45 +47,45 @@ import {CardMediaProps} from '@rmwc/card'
 import {
     defaultInputModel,
     defaultInputProperties,
-    InputAdapter,
-    InputModel,
+    InputAdapter as BaseInputAdapter,
+    InputModel as BaseInputModel,
     inputPropertyTypes,
-    InputProps,
+    InputProps as BaseInputProps,
     PartialInputModel
 } from '../TextInput/type'
 import {
     BaseModel,
-    defaultModel,
-    defaultModelState,
-    defaultProperties,
-    modelPropertyTypes,
-    ModelState,
-    modelStatePropertyTypes,
+    defaultModel as baseDefaultModel,
+    defaultModelState as baseDefaultModelState,
+    defaultProperties as baseDefaultProperties,
+    modelPropertyTypes as baseModelPropertyTypes,
+    ModelState as BaseModelState,
+    modelStatePropertyTypes as baseModelStatePropertyTypes,
     Pattern,
-    Properties,
-    propertyTypes,
-    State,
+    Properties as BaseProperties,
+    propertyTypes as basePropertyTypes,
+    State as BaseState,
     StaticWebComponent,
-    ValueState
+    ValueState as BaseValueState
 } from '../../type'
 // endregion
-export type FileRepresentationType =
+export type RepresentationType =
     'binary' | 'image' | 'embedableText' | 'text' | 'video'
 export type BlobType = Blob | Buffer | string
-export interface FileValue {
+export interface Value {
     blob?: Partial<BlobType>
     hash?: string
     name?: string
     source?: string
     url?: string
 }
-export interface FileInputValueState<
-    Type extends FileValue = FileValue
-> extends ValueState<Type, FileInputModelState> {
+export interface ValueState<Type extends Value = Value> extends
+    BaseValueState<Type, ModelState>
+{
     attachBlobProperty: boolean
 }
 
-export interface FileInputModelState extends ModelState {
+export interface ModelState extends BaseModelState {
     invalidMaximumSize: boolean
     invalidMinimumSize: boolean
 
@@ -94,33 +94,31 @@ export interface FileInputModelState extends ModelState {
 
     invalidName: boolean
 }
-export interface FileInputModel<
-    Type extends FileValue = FileValue
-> extends BaseModel<null | Type> {
+export interface Model<Type extends Value = Value> extends
+    BaseModel<null | Type>
+{
     contentTypePattern?: Pattern
     invertedContentTypePattern?: Pattern
 
     maximumSize: number
     minimumSize: number
 
-    fileName: InputModel<string>
+    fileName: BaseInputModel<string>
 
-    state?: FileInputModelState
+    state?: ModelState
 }
 
-export interface FileInputChildrenOptions<
-    P, Type extends FileValue = FileValue
-> {
+export interface ChildrenOptions<P, Type extends Value = Value> {
     declaration: string
     invalid: boolean
     properties: P
     value?: null | Type
 }
-export interface FileInputProperties<
-    Type extends FileValue = FileValue, MediaTag extends ElementType = 'div'
-> extends Properties<null | Type>, FileInputModelState {
-    children?: (options: FileInputChildrenOptions<
-        FileInputProperties<Type, MediaTag>, Type
+export interface Properties<
+    Type extends Value = Value, MediaTag extends ElementType = 'div'
+> extends BaseProperties<null | Type>, ModelState {
+    children?: (options: ChildrenOptions<
+        Properties<Type, MediaTag>, Type
     >) => ReactNode
 
     contentTypePattern: Array<RegExp | string> | null | RegExp | string
@@ -139,13 +137,13 @@ export interface FileInputProperties<
     encoding: string
 
     generateFileNameInputProperties: (
-        prototype: InputProps<string>,
-        properties: FileInputProperties<Type, MediaTag>
-    ) => InputProps<string> | null
+        prototype: BaseInputProps<string>,
+        properties: Properties<Type, MediaTag>
+    ) => BaseInputProps<string> | null
 
     media: RMWCComponentProps<CardMediaProps, HTMLProps<HTMLElement>, MediaTag>
 
-    model: FileInputModel<Type>
+    model: Model<Type>
 
     outlined: boolean
 
@@ -160,58 +158,56 @@ export interface FileInputProperties<
         readChunkSizeInByte: number
     }
 }
-export type FileInputProps<Type extends FileValue = FileValue> =
-    Partial<Omit<FileInputProperties<Type>, 'model'>> &
+export type Props<Type extends Value = Value> =
+    Partial<Omit<Properties<Type>, 'model'>> &
     {
         model?: (
-            Partial<Omit<FileInputModel<Type>, 'fileName' | 'state'>> &
+            Partial<Omit<Model<Type>, 'fileName' | 'state'>> &
             {
                 fileName?: PartialInputModel<string>
-                state?: Partial<FileInputModelState>
+                state?: Partial<ModelState>
             }
         )
     }
 
-export type DefaultFileInputProperties<Type extends FileValue = FileValue> =
-    Omit<FileInputProps<Type>, 'model'> & {model: FileInputModel<Type>}
+export type DefaultProperties<Type extends Value = Value> =
+    Omit<Props<Type>, 'model'> & {model: Model<Type>}
 
-export type FileInputPropertyTypes = {
-    [key in keyof FileInputProperties]: ValueOf<typeof PropertyTypes>
+export type PropertyTypes = {
+    [key in keyof Properties]: ValueOf<typeof BasePropertyTypes>
 }
-export const fileInputRenderProperties: Array<string> =
+export const renderProperties: Array<string> =
     ['children', 'generateFileNameInputProperties']
 
-export interface FileInputState<
-    Type extends FileValue = FileValue
-> extends State<Type> {
-    modelState: FileInputModelState
+export interface State<Type extends Value = Value> extends BaseState<Type> {
+    modelState: ModelState
 }
 
-export type FileInputAdapter<Type extends FileValue = FileValue> =
+export type Adapter<Type extends Value = Value> =
     ComponentAdapter<
-        FileInputProperties<Type>, Omit<FileInputState<Type>, 'value'> &
+        Properties<Type>, Omit<State<Type>, 'value'> &
         {value?: null | Type}
     >
-export interface FileInputAdapterWithReferences extends FileInputAdapter {
+export interface AdapterWithReferences extends Adapter {
     references: {
         deleteButtonReference: MutableRefObject<HTMLButtonElement | null>
         downloadLinkReference: MutableRefObject<HTMLAnchorElement | null>
         fileInputReference: MutableRefObject<HTMLInputElement | null>
-        nameInputReference: MutableRefObject<InputAdapter<string> | null>
+        nameInputReference: MutableRefObject<BaseInputAdapter<string> | null>
         uploadButtonReference: MutableRefObject<HTMLButtonElement | null>
     }
 }
 
-export interface FileInputComponent<Type> extends
-    Omit<ForwardRefExoticComponent<FileInputProps>, 'propTypes'>,
-    StaticWebComponent<Type, FileInputModelState, DefaultFileInputProperties>
+export interface InputComponent<Type> extends
+    Omit<ForwardRefExoticComponent<Props>, 'propTypes'>,
+    StaticWebComponent<Type, ModelState, DefaultProperties>
 {
-    <T extends FileValue = FileValue>(
-        props: FileInputProps<T> & RefAttributes<FileInputAdapter<T>>
+    <T extends Value = Value>(
+        props: Props<T> & RefAttributes<Adapter<T>>
     ): ReactElement
 }
 // region constants
-export const dedicatedFileInputPropertyTypes: ValidationMapping = {
+export const dedicatedPropertyTypes: ValidationMapping = {
     contentTypePattern:
         oneOfType([arrayOf(oneOfType([object, string])), object, string]),
     invertedContentTypePattern:
@@ -220,18 +216,18 @@ export const dedicatedFileInputPropertyTypes: ValidationMapping = {
     maximumSize: number,
     minimumSize: number
 } as const
-export const fileInputModelPropertyTypes: ValidationMapping = {
-    ...modelPropertyTypes,
-    ...dedicatedFileInputPropertyTypes,
+export const modelPropertyTypes: ValidationMapping = {
+    ...baseModelPropertyTypes,
+    ...dedicatedPropertyTypes,
 
-    fileName: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
+    fileName: shape<ValidationMap<ValueOf<typeof BasePropertyTypes>>>(
         inputPropertyTypes
     )
 } as const
-export const fileInputModelStatePropertyTypes: {
-    [key in keyof FileInputModelState]: Requireable<boolean | symbol>
+export const modelStatePropertyTypes: {
+    [key in keyof ModelState]: Requireable<boolean | symbol>
 } = {
-    ...modelStatePropertyTypes,
+    ...baseModelStatePropertyTypes,
 
     invalidContentTypePattern: oneOfType([boolean, symbol]),
     invalidInvertedContentTypePattern: oneOfType([boolean, symbol]),
@@ -241,10 +237,10 @@ export const fileInputModelStatePropertyTypes: {
 
     invalidName: oneOfType([boolean, symbol])
 } as const
-export const fileInputPropertyTypes: ValidationMapping = {
-    ...propertyTypes,
-    ...dedicatedFileInputPropertyTypes,
-    ...fileInputModelStatePropertyTypes,
+export const propertyTypes: ValidationMapping = {
+    ...basePropertyTypes,
+    ...dedicatedPropertyTypes,
+    ...modelStatePropertyTypes,
 
     children: func,
 
@@ -255,8 +251,8 @@ export const fileInputPropertyTypes: ValidationMapping = {
     maximumSizeText: string,
     minimumSizeText: string,
 
-    model: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
-        fileInputModelPropertyTypes
+    model: shape<ValidationMap<ValueOf<typeof BasePropertyTypes>>>(
+        modelPropertyTypes
     ),
 
     deleteButton: oneOfType([object, string]),
@@ -272,8 +268,8 @@ export const fileInputPropertyTypes: ValidationMapping = {
 
     outlined: boolean
 } as const
-export const defaultFileInputModelState: FileInputModelState = {
-    ...defaultModelState,
+export const defaultModelState: ModelState = {
+    ...baseDefaultModelState,
     invalidContentTypePattern: false,
     invalidInvertedContentTypePattern: false,
 
@@ -282,8 +278,8 @@ export const defaultFileInputModelState: FileInputModelState = {
 
     invalidName: false
 } as const
-export const defaultFileInputModel: FileInputModel = {
-    ...defaultModel as BaseModel<FileValue>,
+export const defaultModel: Model = {
+    ...baseDefaultModel as BaseModel<Value>,
 
     contentTypePattern: /^.+\/.+$/,
     invertedContentTypePattern: undefined,
@@ -298,13 +294,13 @@ export const defaultFileInputModel: FileInputModel = {
     maximumSize: Infinity,
     minimumSize: 0,
 
-    state: defaultFileInputModelState
+    state: defaultModelState
 } as const
 /*
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultFileNameInputProperties: InputProps<string> = {
+export const defaultFileNameInputProperties: BaseInputProps<string> = {
     ...defaultInputProperties,
 
     emptyEqualsNull: false,
@@ -320,9 +316,9 @@ export const defaultFileNameInputProperties: InputProps<string> = {
 
     required: true
 } as const
-delete (defaultFileNameInputProperties as {model?: InputModel}).model
-export const defaultFileInputProperties: DefaultFileInputProperties = {
-    ...defaultProperties as unknown as Partial<DefaultFileInputProperties>,
+delete (defaultFileNameInputProperties as {model?: BaseInputModel}).model
+export const defaultProperties: DefaultProperties = {
+    ...baseDefaultProperties as unknown as Partial<DefaultProperties>,
 
     contentTypePatternText:
         'Your file\'s mime-type has to match the regular expression' +
@@ -353,7 +349,7 @@ export const defaultFileInputProperties: DefaultFileInputProperties = {
         sixteenByNine: true
     },
 
-    model: {...defaultFileInputModel},
+    model: {...defaultModel},
 
     sourceToBlobOptions: {endings: 'transparent', type: 'text/plain'},
 

@@ -458,9 +458,10 @@ export interface ConfigurationProperties {
     wrap?: boolean
 }
 
-export * as FileInput from './components/FileInput/type'
-export * as Inputs from './components/Inputs/type'
-export * as Interval from './components/Interval/type'
-export * as RequireableCheckbox from './components/RequireableCheckbox/type'
-export * as TextInput from './components/TextInput/type'
+export * as FileInputTypes from './components/FileInput/type'
+export * as InputsTypes from './components/Inputs/type'
+export * as IntervalTypes from './components/Interval/type'
+export * as RequireableCheckboxTypes
+from './components/RequireableCheckbox/type'
+export * as TextInputTypes from './components/TextInput/type'
 // endregion

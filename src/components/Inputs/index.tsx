@@ -65,24 +65,24 @@ import {defaultProperties} from '../../type'
 import {InputProps} from '../TextInput/type'
 
 import {
-    defaultInputsProperties,
-    DefaultInputsProperties,
-    inputsPropertyTypes as propertyTypes,
+    defaultProperties,
+    DefaultProperties,
+    propertyTypes as propertyTypes,
     inputsRenderProperties as renderProperties,
-    InputsAdapter as Adapter,
-    InputsAdapterWithReferences as AdapterWithReferences,
-    InputsComponent,
-    InputsModel as Model,
-    InputsModelState as ModelState,
-    InputsProperties,
-    InputsPropertiesItem,
-    InputsProps, InputsModelState
+    Adapter as Adapter,
+    AdapterWithReferences as AdapterWithReferences,
+    Component,
+    Model as Model,
+    ModelState as ModelState,
+    Properties,
+    PropertiesItem,
+    Props, ModelState
 } from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
-const getPrototype = function<T, P extends InputsPropertiesItem<T>>(
-    properties: InputsProperties<T, P>
+const getPrototype = function<T, P extends PropertiesItem<T>>(
+    properties: Properties<T, P>
 ): Partial<P> {
     return {
         ...defaultProperties as unknown as Partial<P>,
@@ -96,7 +96,7 @@ const getPrototype = function<T, P extends InputsPropertiesItem<T>>(
     } as Partial<P>
 }
 const inputPropertiesToValues = function<
-    T, P extends InputsPropertiesItem<T>
+    T, P extends PropertiesItem<T>
 >(inputProperties: Array<P> | null): Array<T> | null {
     return Array.isArray(inputProperties) ?
         inputProperties.map(({model, value}): T =>
@@ -104,8 +104,8 @@ const inputPropertiesToValues = function<
         ) :
         inputProperties
 }
-const getModelState = function<T, P extends InputsPropertiesItem<T>>(
-    inputsProperties: InputsProperties<T, P>
+const getModelState = function<T, P extends PropertiesItem<T>>(
+    inputsProperties: Properties<T, P>
 ): ModelState {
     const properties: Array<P> = inputsProperties.value || []
 
@@ -140,9 +140,9 @@ const getModelState = function<T, P extends InputsPropertiesItem<T>>(
         visited: properties.some(unpack('visited'))
     }
 }
-const getExternalProperties = function<T, P extends InputsPropertiesItem<T>>(
-    properties: InputsProperties<T, P>
-): InputsProperties<T, P> {
+const getExternalProperties = function<T, P extends PropertiesItem<T>>(
+    properties: Properties<T, P>
+): Properties<T, P> {
     const modelState = getModelState<T, P>(properties)
 
     return {
@@ -166,14 +166,14 @@ const getExternalProperties = function<T, P extends InputsPropertiesItem<T>>(
  */
 export const InputsInner = function<
     T = unknown,
-    P extends InputsPropertiesItem<T> = InputProps<T>,
+    P extends PropertiesItem<T> = InputProps<T>,
     State = Mapping<unknown>
 >(
-    props: InputsProps<T, P>, reference?: ForwardedRef<Adapter<T, P>>
+    props: Props<T, P>, reference?: ForwardedRef<Adapter<T, P>>
 ): ReactElement {
     // region consolidate properties
-    const givenProps: InputsProps<T, P> =
-        translateKnownSymbols(props) as InputsProps<T, P>
+    const givenProps: Props<T, P> =
+        translateKnownSymbols(props) as Props<T, P>
     /*
         Normalize value property (providing only value instead of props is
         allowed also).
@@ -191,9 +191,9 @@ export const InputsInner = function<
         default property object untouched for unchanged usage in other
         instances.
     */
-    const givenProperties: InputsProps<T, P> = extend<InputsProps<T, P>>(
+    const givenProperties: Props<T, P> = extend<Props<T, P>>(
         true,
-        copy<InputsProps<T, P>>(Inputs.defaultProperties as InputsProps<T, P>),
+        copy<Props<T, P>>(Inputs.defaultProperties as Props<T, P>),
         givenProps
     )
     // endregion
@@ -263,11 +263,11 @@ export const InputsInner = function<
         MutableRefObject<ComponentAdapter<P, State> | null>
     > = []
 
-    const properties: InputsProperties<T, P> =
-        getConsolidatedProperties<InputsProps<T, P>, InputsProperties<T, P>>(
+    const properties: Properties<T, P> =
+        getConsolidatedProperties<Props<T, P>, Properties<T, P>>(
             mapPropertiesIntoModel<
-                InputsProps<T, P>,
-                DefaultInputsProperties<T, P>
+                Props<T, P>,
+                DefaultProperties<T, P>
             >(
                 givenProperties,
                 Inputs.defaultProperties.model as unknown as Model<T, P>
@@ -303,7 +303,7 @@ export const InputsInner = function<
         if (properties.emptyEqualsNull && properties.value.length === 0)
             properties.value = null
 
-        triggerCallbackIfExists<InputsProperties<T, P>>(
+        triggerCallbackIfExists<Properties<T, P>>(
             properties,
             'change',
             controlled,
@@ -334,7 +334,7 @@ export const InputsInner = function<
         if (properties.emptyEqualsNull && values.length === 0)
             values = null
 
-        triggerCallbackIfExists<InputsProperties<T, P>>(
+        triggerCallbackIfExists<Properties<T, P>>(
             properties,
             'changeValue',
             controlled,
@@ -425,7 +425,7 @@ export const InputsInner = function<
         setValues = createDummyStateSetter<Array<T> | null>(values)
 
     if (!properties.model.state)
-        properties.model.state = {} as InputsModelState
+        properties.model.state = {} as ModelState
 
     properties.invalidMaximumNumber =
         properties.model.state.invalidMaximumNumber =
@@ -605,16 +605,16 @@ InputsInner.displayName = 'Inputs'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const Inputs: InputsComponent<typeof InputsInner> =
+export const Inputs: Component<typeof InputsInner> =
     memorize(forwardRef(InputsInner)) as
         unknown as
-        InputsComponent<typeof InputsInner>
+        Component<typeof InputsInner>
 // region static properties
 /// region web-component hints
 Inputs.wrapped = InputsInner
 Inputs.webComponentAdapterWrapped = 'react'
 /// endregion
-Inputs.defaultProperties = defaultInputsProperties
+Inputs.defaultProperties = defaultProperties
 Inputs.propTypes = propertyTypes as PropertiesValidationMap
 Inputs.renderProperties = renderProperties
 Inputs.strict = false
