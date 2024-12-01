@@ -18,11 +18,7 @@
 */
 // region imports
 import {TextInput} from '.'
-import {
-    DefaultProperties,
-    DefaultProperties as DefaultProperties,
-    DataTransformation
-} from './type'
+import {DefaultProperties, DataTransformation} from './type'
 // endregion
 const convertEdgeValueToString = (
     value: Date | number | string
