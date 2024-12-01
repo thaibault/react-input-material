@@ -38,7 +38,10 @@ import {
     triggerCallbackIfExists
 } from '../../helper'
 import TextInput from '../TextInput'
-import {InputProperties, InputAdapterWithReferences} from '../TextInput/type'
+import {
+    Properties as TextInputProperties,
+    AdapterWithReferences as TextInputAdapterWithReferences
+} from '../TextInput/type'
 import WrapConfigurations from '../WrapConfigurations'
 
 /*
@@ -49,16 +52,15 @@ import {intervalClassName, intervalDisabledClassName} from './style.module'
 import cssClassNames from './style.module'
 
 import {
-    defaultProperties as defaultProperties,
-    Adapter as Adapter,
-    AdapterWithReferences as AdapterWithReferences,
+    defaultProperties,
+    Adapter,
+    AdapterWithReferences,
     Component,
-    ModelState as ModelState,
-    Properties as Properties,
-    propertyTypes as propertyTypes,
-    Props as Props,
-    Value as Value,
-    IntervalInputProps
+    ModelState,
+    Properties,
+    propertyTypes,
+    Props,
+    Value
 } from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
@@ -81,8 +83,8 @@ const normalizeDateTimeToNumber = (
             new Date(value).getTime() / 1000 :
             fallbackValue
 const getModelState = (
-    startProperties: InputProperties<null | number | string>,
-    endProperties: InputProperties<null | number | string>
+    startProperties: TextInputProperties<null | number | string>,
+    endProperties: TextInputProperties<null | number | string>
 ): ModelState => ({
     dirty: startProperties.dirty || endProperties.dirty,
     focused: startProperties.focused || endProperties.focused,
@@ -99,8 +101,8 @@ const getModelState = (
 const getExternalProperties = (
     properties: Properties,
     iconProperties: IconOptions,
-    startProperties: InputProperties<null | number | string>,
-    endProperties: InputProperties<null | number | string>
+    startProperties: TextInputProperties<null | number | string>,
+    endProperties: TextInputProperties<null | number | string>
 ): Properties => {
     const modelState = getModelState(startProperties, endProperties)
 
@@ -273,9 +275,9 @@ export const IntervalInner = function(
     consolidateBoundaries(valueState)
 
     const endInputReference =
-        useRef<InputAdapterWithReferences<null | number | string>>(null)
+        useRef<TextInputAdapterWithReferences<null | number | string>>(null)
     const startInputReference=
-        useRef<InputAdapterWithReferences<null | number | string>>(null)
+        useRef<TextInputAdapterWithReferences<null | number | string>>(null)
 
     if (controlled)
         /*
@@ -292,9 +294,10 @@ export const IntervalInner = function(
                 iconProperties,
                 startInputReference.current?.properties ||
                 properties.value?.start as
-                    InputProperties<null | number | string>,
+                    TextInputProperties<null | number | string>,
                 endInputReference.current?.properties ||
-                properties.value?.end as InputProperties<null | number | string>
+                properties.value?.end as
+                    TextInputProperties<null | number | string>
             ),
             references: {end: endInputReference, start: startInputReference},
             state: controlled ? {} : {value: valueState}
@@ -303,14 +306,14 @@ export const IntervalInner = function(
     // region attach event handler
     if (properties.onChange) {
         startProperties.onChange = (
-            inputProperties: InputProperties<null | number | string>,
+            textInputProperties: TextInputProperties<null | number | string>,
             event?: GenericEvent
         ): void => {
-            const end: InputProperties<null | number | string> =
+            const end: TextInputProperties<null | number | string> =
                 endInputReference.current?.properties ||
                 endProperties as
                     unknown as
-                    InputProperties<null | number | string>
+                    TextInputProperties<null | number | string>
             end.value = end.model.value = normalizeDateTimeToNumber(
                 endInputReference.current?.properties?.value, -Infinity
             )
@@ -319,7 +322,7 @@ export const IntervalInner = function(
                     Math.max(
                         end.value,
                         normalizeDateTimeToNumber(
-                            inputProperties.value, -Infinity
+                            textInputProperties.value, -Infinity
                         )
                     )
                 )
@@ -327,9 +330,9 @@ export const IntervalInner = function(
             // NOTE: We need to reset internal temporary set boundaries.
             end.maximum = end.model.maximum = endConfiguration.maximum
             end.minimum = end.model.minimum = endConfiguration.minimum
-            inputProperties.maximum = inputProperties.model.maximum =
+            textInputProperties.maximum = textInputProperties.model.maximum =
                 startConfiguration.maximum
-            inputProperties.minimum = inputProperties.model.minimum =
+            textInputProperties.minimum = textInputProperties.model.minimum =
                 startConfiguration.minimum
 
             triggerCallbackIfExists<Properties>(
@@ -339,7 +342,7 @@ export const IntervalInner = function(
                 getExternalProperties(
                     properties as Properties,
                     iconProperties,
-                    inputProperties,
+                    textInputProperties,
                     end
                 ),
                 event || new Event('genericIntervalStartChange'),
@@ -347,14 +350,14 @@ export const IntervalInner = function(
             )
         }
         endProperties.onChange = (
-            inputProperties: InputProperties<null | number | string>,
+            textInputProperties: TextInputProperties<null | number | string>,
             event?: GenericEvent
         ): void => {
-            const start: InputProperties<null | number | string> =
+            const start: TextInputProperties<null | number | string> =
                 startInputReference.current?.properties ||
                 startProperties as
                     unknown as
-                    InputProperties<null | number | string>
+                    TextInputProperties<null | number | string>
             start.value = start.model.value = normalizeDateTimeToNumber(
                 startInputReference.current?.properties?.value, Infinity
             )
@@ -363,7 +366,7 @@ export const IntervalInner = function(
                     Math.min(
                         start.value,
                         normalizeDateTimeToNumber(
-                            inputProperties.value, Infinity
+                            textInputProperties.value, Infinity
                         )
                     )
                 )
@@ -371,9 +374,9 @@ export const IntervalInner = function(
             // NOTE: We need to reset internal temporary set boundaries.
             start.maximum = start.model.maximum = startConfiguration.maximum
             start.minimum = start.model.minimum = startConfiguration.minimum
-            inputProperties.maximum = inputProperties.model.maximum =
+            textInputProperties.maximum = textInputProperties.model.maximum =
                 endConfiguration.maximum
-            inputProperties.minimum = inputProperties.model.minimum =
+            textInputProperties.minimum = textInputProperties.model.minimum =
                 endConfiguration.minimum
 
             triggerCallbackIfExists<Properties>(
@@ -384,7 +387,7 @@ export const IntervalInner = function(
                     properties as Properties,
                     iconProperties,
                     start,
-                    inputProperties
+                    textInputProperties
                 ),
                 event || new Event('genericIntervalEndChange'),
                 properties

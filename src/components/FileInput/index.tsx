@@ -62,25 +62,28 @@ import {
     triggerCallbackIfExists,
     wrapStateSetter
 } from '../../helper'
-import {InputAdapter, InputProperties, InputProps} from '../TextInput/type'
+import {
+    Adapter as TextInputAdapter,
+    Properties as TextInputProperties,
+    Props as TextInputProps
+} from '../TextInput/type'
 
 import {
-    defaultModelState as defaultModelState,
-    DefaultProperties as DefaultProperties,
-    defaultProperties as defaultProperties,
+    defaultModelState,
+    DefaultProperties,
+    defaultProperties,
     defaultFileNameInputProperties,
-    Adapter as Adapter,
-    ModelState as ModelState,
-    Properties as Properties,
-    Props as Props,
+    Adapter,
+    ModelState,
+    Properties,
+    Props,
     Value,
-    ValueState as ValueState,
-    propertyTypes as propertyTypes,
-    renderProperties as renderProperties,
-    RepresentationType as RepresentationType,
+    ValueState,
+    propertyTypes,
+    renderProperties,
+    RepresentationType,
     InputComponent,
-    Model,
-    DefaultProperties, Properties, ModelState
+    Model
 } from './type'
 import {
     CSS_CLASS_NAMES,
@@ -249,7 +252,7 @@ export const FileInputInner = function<Type extends Value = Value>(
     const onChangeValue = (
         eventSourceOrName?: Partial<Type> | string | SyntheticEvent,
         event?: SyntheticEvent,
-        inputProperties?: Properties<string>,
+        inputProperties?: TextInputProperties<string>,
         attachBlobProperty = false
     ): void => {
         if (!(properties.model.mutable && properties.model.writable))
@@ -446,8 +449,9 @@ export const FileInputInner = function<Type extends Value = Value>(
         useRef<HTMLAnchorElement>(null)
     const fileInputReference: MutableRefObject<HTMLInputElement | null> =
         useRef<HTMLInputElement>(null)
-    const nameInputReference: MutableRefObject<InputAdapter<string> | null> =
-        useRef<InputAdapter<string>>(null)
+    const nameInputReference: (
+        MutableRefObject<TextInputAdapter<string> | null>
+    ) = useRef<TextInputAdapter<string>>(null)
     const uploadButtonReference: MutableRefObject<HTMLDivElement | null> =
         useRef<HTMLDivElement>(null)
     const iFrameReference: MutableRefObject<HTMLIFrameElement | null> =
@@ -531,7 +535,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                 fileInputReference: MutableRefObject<HTMLInputElement | null>
                 iFrameReference: MutableRefObject<HTMLIFrameElement | null>
                 nameInputReference:
-                    MutableRefObject<InputAdapter<string> | null>
+                    MutableRefObject<TextInputAdapter<string> | null>
                 uploadButtonReference: MutableRefObject<HTMLDivElement | null>
             }
         } => ({
@@ -838,7 +842,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                                                 properties.model.fileName
                                             )
                                         }
-                                    ) as InputProps<string>,
+                                    ) as TextInputProps<string>,
 
                                     default: properties.value.name,
                                     model: properties.model.fileName,

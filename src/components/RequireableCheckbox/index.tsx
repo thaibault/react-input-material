@@ -57,21 +57,20 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    defaultModelState, DefaultProperties as DefaultBaseProperties
+    defaultModelState as baseDefaultModelState,
+    DefaultProperties as BaseDefaultProperties
 } from '../../type'
 
 import cssClassNames from './style.module'
 import {
-    Adapter as Adapter,
-    Properties as Properties,
-    Props as Props,
-    DefaultProperties as DefaultProperties,
-    defaultProperties as defaultProperties,
-    ModelState as ModelState,
-    propertyTypes as propertyTypes,
-    Component,
-    ValueState as ValueState,
+    Adapter,
+    Properties,
+    Props,
+    DefaultProperties,
+    defaultProperties,
     ModelState,
+    propertyTypes,
+    Component,
     ValueState
 } from './type'
 // endregion
@@ -87,9 +86,9 @@ export function determineValidationState(
     properties: DefaultProperties, currentState: Partial<ModelState>
 ): boolean {
     return determineBaseValidationState<
-        boolean, DefaultBaseProperties<boolean>
+        boolean, BaseDefaultProperties<boolean>
     >(
-        properties as DefaultBaseProperties<boolean>,
+        properties as BaseDefaultProperties<boolean>,
         currentState,
         {invalidRequired: (): boolean =>
             properties.model.nullable === false && !properties.model.value
@@ -492,7 +491,7 @@ export const RequireableCheckbox: Component<
 RequireableCheckbox.wrapped = RequireableCheckboxInner
 RequireableCheckbox.webComponentAdapterWrapped = 'react'
 /// endregion
-RequireableCheckbox.defaultModelState = defaultModelState
+RequireableCheckbox.defaultModelState = baseDefaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where
     provided via "props" and should shadow a state saved valued.

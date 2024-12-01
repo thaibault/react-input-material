@@ -19,9 +19,9 @@
 // region imports
 import {TextInput} from '.'
 import {
-    DefaultInputProperties,
-    DefaultInputProperties as DefaultProperties,
-    InputDataTransformation
+    DefaultProperties,
+    DefaultProperties as DefaultProperties,
+    DataTransformation
 } from './type'
 // endregion
 const convertEdgeValueToString = (
@@ -49,7 +49,7 @@ const normalizeDateRepresentation = (
     return value
 }
 
-export const TRANSFORMER: InputDataTransformation = {
+export const TRANSFORMER: DataTransformation = {
     boolean: {
         parse: (value: boolean | number | string): boolean =>
             typeof value === 'boolean' ?
@@ -67,7 +67,7 @@ export const TRANSFORMER: InputDataTransformation = {
         format: {final: {
             options: {currency: 'USD'},
             transform: (
-                value: number, {currency: {format}}: InputDataTransformation
+                value: number, {currency: {format}}: DataTransformation
             ): string => {
                 const currency =
                     format?.final.options?.currency as null | string ?? 'USD'
@@ -89,7 +89,7 @@ export const TRANSFORMER: InputDataTransformation = {
         }},
         parse: (
             value: string,
-            transformation: InputDataTransformation,
+            transformation: DataTransformation,
             configuration: DefaultProperties<number>
         ): number =>
             transformation.float.parse ?
@@ -104,7 +104,7 @@ export const TRANSFORMER: InputDataTransformation = {
         // Converts given utc date representation into iso date time string.
         format: {final: {transform: (
             value: Date | number | string,
-            transformation: InputDataTransformation,
+            transformation: DataTransformation,
             configuration: DefaultProperties<number | string>
         ): string => {
             if (typeof value !== 'number') {
@@ -137,7 +137,7 @@ export const TRANSFORMER: InputDataTransformation = {
         }}},
         parse: (
             value: Date | number | string,
-            {date: {useISOString}}: InputDataTransformation
+            {date: {useISOString}}: DataTransformation
         ): number | string => {
             value = normalizeDateRepresentation(value)
 
@@ -172,7 +172,7 @@ export const TRANSFORMER: InputDataTransformation = {
         // Converts given utc date representation into iso date time string.
         format: {final: {transform: (
             value: number | string,
-            transformation: InputDataTransformation,
+            transformation: DataTransformation,
             configuration: DefaultProperties<number | string>
         ): string => {
             if (typeof value !== 'number') {
@@ -204,7 +204,7 @@ export const TRANSFORMER: InputDataTransformation = {
         }}},
         parse: (
             value: Date | number | string,
-            {date: {useISOString}}: InputDataTransformation
+            {date: {useISOString}}: DataTransformation
         ): number | string => {
             value = normalizeDateRepresentation(value)
 
@@ -245,7 +245,7 @@ export const TRANSFORMER: InputDataTransformation = {
         // Converts given date representation into utc iso date time string.
         format: {final: {transform: (
             value: number | string,
-            transformation: InputDataTransformation,
+            transformation: DataTransformation,
             configuration: DefaultProperties<number | string>
         ): string => {
             if (!transformation.datetime.format?.final.transform)
@@ -271,8 +271,8 @@ export const TRANSFORMER: InputDataTransformation = {
         */
         parse: (
             value: Date | number | string,
-            transformation: InputDataTransformation,
-            configuration: DefaultInputProperties<number | string>
+            transformation: DataTransformation,
+            configuration: DefaultProperties<number | string>
         ): number | string => {
             if (!transformation.datetime.parse)
                 throw new Error(
@@ -289,7 +289,7 @@ export const TRANSFORMER: InputDataTransformation = {
     'date-local': {
         format: {final: {transform: (
             value: number | string,
-            transformation: InputDataTransformation,
+            transformation: DataTransformation,
             configuration: DefaultProperties<number | string>
         ): string => {
             if (typeof value !== 'number') {
@@ -328,8 +328,8 @@ export const TRANSFORMER: InputDataTransformation = {
         */
         parse: (
             value: Date | number | string,
-            transformation: InputDataTransformation,
-            configuration: DefaultInputProperties<number | string>
+            transformation: DataTransformation,
+            configuration: DefaultProperties<number | string>
         ): number | string => {
             if (!transformation.datetime.parse)
                 throw new Error(
@@ -365,7 +365,7 @@ export const TRANSFORMER: InputDataTransformation = {
         */
         format: {final: {transform: (
             value: number | string,
-            transformation: InputDataTransformation,
+            transformation: DataTransformation,
             configuration: DefaultProperties<number | string>
         ): string => {
             if (typeof value !== 'number') {
@@ -413,7 +413,7 @@ export const TRANSFORMER: InputDataTransformation = {
         // Converts given date representation into unix time stamp.
         parse: (
             value: Date | number | string,
-            {date: {useISOString}}: InputDataTransformation
+            {date: {useISOString}}: DataTransformation
         ): number | string => {
             value = normalizeDateRepresentation(value)
 
@@ -467,7 +467,7 @@ export const TRANSFORMER: InputDataTransformation = {
         */
         format: {final: {transform: (
             value: number | string,
-            transformation: InputDataTransformation,
+            transformation: DataTransformation,
             configuration: DefaultProperties<number | string>
         ): string => {
             if (typeof value !== 'number') {
@@ -532,7 +532,7 @@ export const TRANSFORMER: InputDataTransformation = {
         */
         parse: (
             value: Date | number | string,
-            {date: {useISOString}}: InputDataTransformation
+            {date: {useISOString}}: DataTransformation
         ): number | string => {
             value = normalizeDateRepresentation(value)
 
@@ -577,7 +577,7 @@ export const TRANSFORMER: InputDataTransformation = {
 
     float: {
         format: {final: {transform: (
-            value: number, {float: {format}}: InputDataTransformation
+            value: number, {float: {format}}: DataTransformation
         ): string =>
             format ?
                 value === Infinity ?
@@ -591,7 +591,7 @@ export const TRANSFORMER: InputDataTransformation = {
         }},
         parse: (
             value: number | string,
-            _transformation: InputDataTransformation,
+            _transformation: DataTransformation,
             {maximum, minimum}: DefaultProperties<number>
         ): number => {
             if (typeof value === 'string')
@@ -614,7 +614,7 @@ export const TRANSFORMER: InputDataTransformation = {
     },
     integer: {
         format: {final: {transform: (
-            value: number, {integer: {format}}: InputDataTransformation
+            value: number, {integer: {format}}: DataTransformation
         ): string => (
             new Intl.NumberFormat(
                 TextInput.locales,
@@ -625,7 +625,7 @@ export const TRANSFORMER: InputDataTransformation = {
         }},
         parse: (
             value: number | string,
-            _transformation: InputDataTransformation,
+            _transformation: DataTransformation,
             {maximum, minimum}: DefaultProperties<number>
         ): number => {
             if (typeof value === 'string')

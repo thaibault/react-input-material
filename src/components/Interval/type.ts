@@ -33,12 +33,12 @@ import {
     ModelState as BaseModelState
 } from '../../type'
 import {
-    defaultInputModel,
-    InputAdapterWithReferences,
-    InputModel,
-    InputProperties,
-    InputProps,
-    inputPropertyTypes
+    defaultInputModel as defaultTextInputModel,
+    AdapterWithReferences as TextInputAdapterWithReferences,
+    Model as TextInputModel,
+    Properties as TextInputProperties,
+    Props as TextInputProps,
+    propertyTypes as textInputPropertyTypes
 } from '../TextInput/type'
 // endregion
 export type DateTimeRepresentation = number | string
@@ -48,21 +48,21 @@ export interface Value {
     start?: DateTimeRepresentation | null
 }
 
-export type IntervalInputModel =
-    Omit<InputModel<DateTimeRepresentation | null>, 'maximum' | 'minimum'> &
+export type IntervalTextInputModel =
+    Omit<TextInputModel<DateTimeRepresentation | null>, 'maximum' | 'minimum'> &
     {
         maximum: DateTimeRepresentation
         minimum: DateTimeRepresentation
     }
-export type IntervalInputProps =
-    Omit<InputProps<DateTimeRepresentation | null>, 'maximum' | 'minimum'> &
+export type IntervalTextInputProps =
+    Omit<TextInputProps<DateTimeRepresentation | null>, 'maximum' | 'minimum'> &
     {
         maximum: DateTimeRepresentation
         minimum: DateTimeRepresentation
     }
 export interface Configuration {
-    end: Partial<IntervalInputModel> | Partial<IntervalInputProps>
-    start: Partial<IntervalInputModel> | Partial<IntervalInputProps>
+    end: Partial<IntervalTextInputModel> | Partial<IntervalTextInputProps>
+    start: Partial<IntervalTextInputModel> | Partial<IntervalTextInputProps>
 }
 
 export type ModelState = BaseModelState
@@ -70,13 +70,13 @@ export interface Model {
     name: string
     state?: ModelState
     value: {
-        end: IntervalInputModel
-        start: IntervalInputModel
+        end: IntervalTextInputModel
+        start: IntervalTextInputModel
     }
 }
 
 export interface Properties extends Omit<
-    InputProperties<DateTimeRepresentation | null>,
+    TextInputProperties<DateTimeRepresentation | null>,
     'icon' | 'model' | 'onChange' | 'onChangeValue' | 'value'
 > {
     icon: IconOptions
@@ -89,7 +89,7 @@ export interface Properties extends Omit<
     value: Configuration
 }
 type PartialValue =
-    Partial<Omit<InputModel<DateTimeRepresentation | null>, 'value'>> &
+    Partial<Omit<TextInputModel<DateTimeRepresentation | null>, 'value'>> &
     {value: DateTimeRepresentation | null}
 export type PartialModel =
     Partial<Omit<Properties['model'], 'state' | 'value'>> &
@@ -102,13 +102,14 @@ export type PartialModel =
     }
 export type Props =
     Omit<
-        InputProps<DateTimeRepresentation | null>,
-          'icon' | 'model' | 'onChange' | 'onChangeValue' | 'value'
+        TextInputProps<DateTimeRepresentation | null>,
+        'icon' | 'model' | 'onChange' | 'onChangeValue' | 'value'
     > &
     Partial<{
         end: Partial<
             Omit<
-                InputProps<DateTimeRepresentation | null>, 'maximum' | 'minimum'
+                TextInputProps<DateTimeRepresentation | null>,
+                'maximum' | 'minimum'
             > &
             {
                 maximum: DateTimeRepresentation
@@ -117,7 +118,8 @@ export type Props =
         >
         start: Partial<
             Omit<
-                InputProps<DateTimeRepresentation | null>, 'maximum' | 'minimum'
+                TextInputProps<DateTimeRepresentation | null>,
+                'maximum' | 'minimum'
             > &
             {
                 maximum: DateTimeRepresentation
@@ -146,10 +148,12 @@ export type Adapter = ComponentAdapter<Properties, {value?: Value | null}>
 export interface AdapterWithReferences extends Adapter {
     references: {
         end: MutableRefObject<
-            InputAdapterWithReferences<DateTimeRepresentation | null> | null
+            TextInputAdapterWithReferences<DateTimeRepresentation | null> |
+            null
         >
         start: MutableRefObject<
-            InputAdapterWithReferences<DateTimeRepresentation | null> | null
+            TextInputAdapterWithReferences<DateTimeRepresentation | null> |
+            null
         >
     }
 }
@@ -164,7 +168,7 @@ export type Component<ComponentType> = InputComponent<
 >
 // region constants
 export const propertyTypes: PropertiesValidationMap = {
-    ...inputPropertyTypes as Mapping<ValueOf<PropertiesValidationMap>>,
+    ...textInputPropertyTypes as Mapping<ValueOf<PropertiesValidationMap>>,
     value: shape<ValidationMap<{
         end: unknown
         start: unknown
@@ -173,14 +177,14 @@ export const propertyTypes: PropertiesValidationMap = {
             number,
             string,
             shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
-                inputPropertyTypes
+                textInputPropertyTypes
             )
         ]),
         start: oneOfType<Validator<unknown>>([
             number,
             string,
             shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
-                inputPropertyTypes
+                textInputPropertyTypes
             )
         ])
     })
@@ -198,12 +202,12 @@ export const defaultProperties: DefaultProperties = {
         state: {...baseDefaultModelState},
         value: {
             end: {
-                ...defaultInputModel as unknown as InputModel<number>,
+                ...defaultTextInputModel as unknown as TextInputModel<number>,
                 description: 'End',
                 name: 'end'
             },
             start: {
-                ...defaultInputModel as unknown as InputModel<number>,
+                ...defaultTextInputModel as unknown as TextInputModel<number>,
                 description: 'Start',
                 name: 'start'
             }

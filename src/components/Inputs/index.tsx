@@ -61,22 +61,22 @@ import {
     translateKnownSymbols,
     triggerCallbackIfExists
 } from '../../helper'
-import {defaultProperties} from '../../type'
-import {InputProps} from '../TextInput/type'
+import {defaultProperties as baseDefaultProperties} from '../../type'
+import {Props as TextInputProps} from '../TextInput/type'
 
 import {
     defaultProperties,
     DefaultProperties,
-    propertyTypes as propertyTypes,
-    inputsRenderProperties as renderProperties,
-    Adapter as Adapter,
-    AdapterWithReferences as AdapterWithReferences,
+    propertyTypes,
+    renderProperties,
+    Adapter,
+    AdapterWithReferences,
     Component,
-    Model as Model,
-    ModelState as ModelState,
+    Model,
+    ModelState,
     Properties,
     PropertiesItem,
-    Props, ModelState
+    Props
 } from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
@@ -85,7 +85,7 @@ const getPrototype = function<T, P extends PropertiesItem<T>>(
     properties: Properties<T, P>
 ): Partial<P> {
     return {
-        ...defaultProperties as unknown as Partial<P>,
+        ...baseDefaultProperties as unknown as Partial<P>,
         className: CSS_CLASS_NAMES.inputsItemInput,
         triggerInitialPropertiesConsolidation:
             properties.triggerInitialPropertiesConsolidation,
@@ -166,7 +166,7 @@ const getExternalProperties = function<T, P extends PropertiesItem<T>>(
  */
 export const InputsInner = function<
     T = unknown,
-    P extends PropertiesItem<T> = InputProps<T>,
+    P extends PropertiesItem<T> = TextInputProps<T>,
     State = Mapping<unknown>
 >(
     props: Props<T, P>, reference?: ForwardedRef<Adapter<T, P>>
@@ -514,7 +514,7 @@ export const InputsInner = function<
                 properties: inputProperties
             }) :
             <TextInput
-                {...inputProperties as InputProps<T>}
+                {...inputProperties as TextInputProps<T>}
                 name={`${properties.name}-${String(index + 1)}`}
             />
 

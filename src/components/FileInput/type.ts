@@ -45,13 +45,13 @@ import {ComponentProps as RMWCComponentProps} from '@rmwc/types'
 import {CardMediaProps} from '@rmwc/card'
 
 import {
-    defaultInputModel,
-    defaultInputProperties,
-    InputAdapter as BaseInputAdapter,
-    InputModel as BaseInputModel,
-    inputPropertyTypes,
-    InputProps as BaseInputProps,
-    PartialInputModel
+    defaultInputModel as defaultTextInputModel,
+    defaultProperties as defaultTextInputProperties,
+    Adapter as TextInputAdapter,
+    Model as TextInputModel,
+    propertyTypes as textInputPropertyTypes,
+    Props as TextInputProps,
+    PartialModel as PartialTextInputModel
 } from '../TextInput/type'
 import {
     BaseModel,
@@ -103,7 +103,7 @@ export interface Model<Type extends Value = Value> extends
     maximumSize: number
     minimumSize: number
 
-    fileName: BaseInputModel<string>
+    fileName: TextInputModel<string>
 
     state?: ModelState
 }
@@ -137,9 +137,9 @@ export interface Properties<
     encoding: string
 
     generateFileNameInputProperties: (
-        prototype: BaseInputProps<string>,
+        prototype: TextInputProps<string>,
         properties: Properties<Type, MediaTag>
-    ) => BaseInputProps<string> | null
+    ) => TextInputProps<string> | null
 
     media: RMWCComponentProps<CardMediaProps, HTMLProps<HTMLElement>, MediaTag>
 
@@ -164,7 +164,7 @@ export type Props<Type extends Value = Value> =
         model?: (
             Partial<Omit<Model<Type>, 'fileName' | 'state'>> &
             {
-                fileName?: PartialInputModel<string>
+                fileName?: PartialTextInputModel<string>
                 state?: Partial<ModelState>
             }
         )
@@ -193,7 +193,7 @@ export interface AdapterWithReferences extends Adapter {
         deleteButtonReference: MutableRefObject<HTMLButtonElement | null>
         downloadLinkReference: MutableRefObject<HTMLAnchorElement | null>
         fileInputReference: MutableRefObject<HTMLInputElement | null>
-        nameInputReference: MutableRefObject<BaseInputAdapter<string> | null>
+        nameInputReference: MutableRefObject<TextInputAdapter<string> | null>
         uploadButtonReference: MutableRefObject<HTMLButtonElement | null>
     }
 }
@@ -221,7 +221,7 @@ export const modelPropertyTypes: ValidationMapping = {
     ...dedicatedPropertyTypes,
 
     fileName: shape<ValidationMap<ValueOf<typeof BasePropertyTypes>>>(
-        inputPropertyTypes
+        textInputPropertyTypes
     )
 } as const
 export const modelStatePropertyTypes: {
@@ -285,7 +285,7 @@ export const defaultModel: Model = {
     invertedContentTypePattern: undefined,
 
     fileName: {
-        ...defaultInputModel,
+        ...defaultTextInputModel,
         maximumLength: 1024,
         name: 'Name',
         pattern: /^[^/]+$/
@@ -300,8 +300,8 @@ export const defaultModel: Model = {
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultFileNameInputProperties: BaseInputProps<string> = {
-    ...defaultInputProperties,
+export const defaultFileNameInputProperties: TextInputProps<string> = {
+    ...defaultTextInputProperties,
 
     emptyEqualsNull: false,
 
@@ -316,7 +316,7 @@ export const defaultFileNameInputProperties: BaseInputProps<string> = {
 
     required: true
 } as const
-delete (defaultFileNameInputProperties as {model?: BaseInputModel}).model
+delete (defaultFileNameInputProperties as {model?: TextInputModel}).model
 export const defaultProperties: DefaultProperties = {
     ...baseDefaultProperties as unknown as Partial<DefaultProperties>,
 

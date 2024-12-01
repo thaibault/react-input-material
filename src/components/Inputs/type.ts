@@ -29,7 +29,7 @@ import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 import {IconOptions} from '@rmwc/types'
 
 import {
-    inputModelStatePropertyTypes, InputProperties, InputProps
+    modelStatePropertyTypes, Properties, Props
 } from '../TextInput/type'
 import {
     BaseModel,
@@ -124,7 +124,7 @@ export type Props<
     }
 
 export type DefaultProperties<
-    T = string, P extends PropertiesItem<T> = InputProps<T>
+    T = string, P extends PropertiesItem<T> = Props<T>
 > =
     Partial<Omit<Properties<T, P>, 'default' | 'model' | 'value'>> &
     {model: Model<T, P>}
@@ -150,14 +150,14 @@ export interface Component<Type> extends
     Omit<ForwardRefExoticComponent<Props>, 'propTypes'>,
     StaticWebComponent<Type, ModelState, DefaultProperties>
 {
-    <T = string, P extends PropertiesItem<T> = InputProperties<T>>(
+    <T = string, P extends PropertiesItem<T> = Properties<T>>(
         props: Props<T, P> & RefAttributes<Adapter<T, P>>
     ): ReactElement
 }
 // region constants
 export const propertyTypes: ValidationMapping = {
     ...basePropertyTypes,
-    ...inputModelStatePropertyTypes,
+    ...modelStatePropertyTypes,
     // We use that function (render prop) to produce input component instances.
     children: func,
 
@@ -167,10 +167,10 @@ export const propertyTypes: ValidationMapping = {
     maximumNumber: number,
     minimumNumber: number
 } as const
-export const inputsRenderProperties: Array<string> =
+export const renderProperties: Array<string> =
     ['children', 'createItem', 'createPrototype']
-export const defaultModel: Model<string, InputProperties<string>> = {
-    ...baseDefaultModel as Model<string, InputProperties<string>>,
+export const defaultModel: Model<string, Properties<string>> = {
+    ...baseDefaultModel as Model<string, Properties<string>>,
 
     state: {
         ...baseDefaultModel.state as ModelState,
@@ -194,8 +194,8 @@ export const defaultProperties: DefaultProperties = {
     addIcon: {icon: 'add'},
     removeIcon: {icon: 'clear'},
 
-    createItem: ({item}): InputProps<string> => item,
-    createPrototype: ({item}): InputProps<string> => item,
+    createItem: ({item}): Props<string> => item,
+    createPrototype: ({item}): Props<string> => item,
 
     model: {...defaultModel}
 } as const
