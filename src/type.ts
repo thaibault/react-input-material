@@ -239,7 +239,7 @@ export type StaticFunctionComponent<
     Type, P = Props, MS = ModelState, DP = DefaultProperties<Type>
 > = Omit<FunctionComponent<P>, 'propTypes'> & StaticComponent<Type, P, MS, DP>
 
-export interface InputComponent<
+export interface Component<
     ValueType,
     ComponentType,
     P = Props<ValueType>,

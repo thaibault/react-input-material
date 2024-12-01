@@ -82,7 +82,7 @@ import {
     propertyTypes,
     renderProperties,
     RepresentationType,
-    InputComponent,
+    Component,
     Model
 } from './type'
 import {
@@ -966,7 +966,7 @@ FileInputInner.displayName = 'FileInput'
  */
 export const FileInput = memorize(forwardRef(FileInputInner)) as
     unknown as
-    InputComponent<typeof FileInputInner>
+    Component<typeof FileInputInner>
 // region static properties
 /// region web-component hints
 FileInput.wrapped = FileInputInner

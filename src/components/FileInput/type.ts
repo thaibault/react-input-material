@@ -198,7 +198,7 @@ export interface AdapterWithReferences extends Adapter {
     }
 }
 
-export interface InputComponent<Type> extends
+export interface Component<Type> extends
     Omit<ForwardRefExoticComponent<Props>, 'propTypes'>,
     StaticWebComponent<Type, ModelState, DefaultProperties>
 {

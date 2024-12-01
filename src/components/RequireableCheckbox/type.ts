@@ -23,7 +23,7 @@ import {
     BaseModel,
     defaultModel as baseDefaultModel,
     defaultProperties as baseDefaultProperties,
-    InputComponent,
+    Component as BaseComponent,
     ModelState as BaseModelState,
     modelStatePropertyTypes as baseModelStatePropertyTypes,
     Properties as BaseProperties,
@@ -51,7 +51,7 @@ export type DefaultProperties = Omit<Props, 'model'> & {model: Model}
 export type State = BaseState<boolean>
 export type Adapter = ComponentAdapter<Properties, Omit<State, 'value'>>
 
-export type Component<ComponentType> = InputComponent<
+export type Component<ComponentType> = BaseComponent<
     boolean,
     ComponentType,
     Props,

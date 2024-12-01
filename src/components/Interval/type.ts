@@ -29,7 +29,7 @@ import {IconOptions} from '@rmwc/types'
 
 import {
     defaultModelState as baseDefaultModelState,
-    InputComponent,
+    Component as BaseComponent,
     ModelState as BaseModelState
 } from '../../type'
 import {
@@ -158,7 +158,7 @@ export interface AdapterWithReferences extends Adapter {
     }
 }
 
-export type Component<ComponentType> = InputComponent<
+export type Component<ComponentType> = BaseComponent<
     Configuration | Value | null,
     ComponentType,
     Props,
