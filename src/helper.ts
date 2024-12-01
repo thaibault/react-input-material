@@ -49,14 +49,14 @@ import {
 import {DateTimeRepresentation} from './components/Interval/type'
 import TextInput from './components/TextInput'
 import {
-    DataTransformSpecification,
-    DefaultInputProperties,
-    FormatSpecifications,
-    InputDataTransformation,
-    InputProps,
-    InputSelection,
-    NormalizedSelection,
-    Transformer
+    DataTransformSpecification as TextInputDataTransformSpecification,
+    DefaultProperties as TextInputDefaultProperties,
+    FormatSpecifications as TextInputFormatSpecifications,
+    DataTransformation as TextInputDataTransformation,
+    Props as TextInputProps,
+    Selection as TextInputSelection,
+    NormalizedSelection as TextInputNormalizedSelection,
+    Transformer as TextInputTransformer
 } from './components/TextInput/type'
 // endregion
 // region state
@@ -275,14 +275,14 @@ export const translateKnownSymbols = <Type = unknown>(
  */
 export function determineInitialRepresentation<
     T = unknown,
-    P extends InputProps<T> = InputProps<T>,
-    DP extends DefaultInputProperties<T> = DefaultInputProperties<T>
+    P extends TextInputProps<T> = TextInputProps<T>,
+    DP extends TextInputDefaultProperties<T> = TextInputDefaultProperties<T>
 >(
     properties: P,
     defaultProperties: DP,
     value: null | T,
-    transformer: InputDataTransformation,
-    selection?: NormalizedSelection | null
+    transformer: TextInputDataTransformation,
+    selection?: TextInputNormalizedSelection | null
 ): string {
     if (typeof properties.representation === 'string')
         return properties.representation
@@ -436,19 +436,19 @@ export const mapPropertiesIntoModel = <
         result.model.mutable = false
         delete result.disabled
     }
-    if ((result as unknown as DefaultInputProperties).invertedPattern) {
+    if ((result as unknown as TextInputDefaultProperties).invertedPattern) {
         result.model.invertedPattern =
             /* eslint-disable @typescript-eslint/no-non-null-assertion */
-            (result as unknown as DefaultInputProperties).invertedPattern!
+            (result as unknown as TextInputDefaultProperties).invertedPattern!
             /* eslint-enable @typescript-eslint/no-non-null-assertion */
-        delete (result as unknown as DefaultInputProperties).invertedPattern
+        delete (result as unknown as TextInputDefaultProperties).invertedPattern
     }
-    if ((result as unknown as DefaultInputProperties).pattern) {
+    if ((result as unknown as TextInputDefaultProperties).pattern) {
         result.model.pattern =
             /* eslint-disable @typescript-eslint/no-non-null-assertion */
-            (result as unknown as DefaultInputProperties).pattern!
+            (result as unknown as TextInputDefaultProperties).pattern!
             /* eslint-enable @typescript-eslint/no-non-null-assertion */
-        delete (result as unknown as DefaultInputProperties).pattern
+        delete (result as unknown as TextInputDefaultProperties).pattern
     }
     if (result.required) {
         result.model.nullable = false
@@ -516,9 +516,9 @@ export const getConsolidatedProperties = <
  * @param selection - Selection component property configuration.
  * @returns Normalized sorted listed of labels and values.
  */
-export function getLabelAndValues(selection?: NormalizedSelection | null): [
-    Array<ReactNode | string>, Array<unknown>
-] {
+export function getLabelAndValues(
+    selection?: TextInputNormalizedSelection | null
+): [Array<ReactNode | string>, Array<unknown>] {
     if (Array.isArray(selection)) {
         const labels: Array<string> = []
         const values: Array<unknown> = []
@@ -544,7 +544,7 @@ export function getLabelAndValues(selection?: NormalizedSelection | null): [
  * @returns Determined representation.
  */
 export function getRepresentationFromValueSelection(
-    value: unknown, selection?: NormalizedSelection | null
+    value: unknown, selection?: TextInputNormalizedSelection | null
 ): null | string {
     if (selection)
         for (const option of selection)
@@ -562,7 +562,8 @@ export function getRepresentationFromValueSelection(
  * @returns Determined value.
  */
 export function getValueFromSelection<T>(
-    label: ReactNode | string, selection: NormalizedSelection | null | undefined
+    label: ReactNode | string,
+    selection: TextInputNormalizedSelection | null | undefined
 ): T {
     if (Array.isArray(selection))
         for (const value of selection) {
@@ -593,9 +594,9 @@ export function getValueFromSelection<T>(
  * @returns Determined normalized sorted selection configuration.
  */
 export function normalizeSelection(
-    selection?: InputSelection | null,
+    selection?: TextInputSelection | null,
     labels?: Array<[string, string]> | Array<string> | Mapping | null
-): NormalizedSelection | null | undefined {
+): TextInputNormalizedSelection | null | undefined {
     if (!selection) {
         selection = labels
         labels = undefined
@@ -644,7 +645,7 @@ export function normalizeSelection(
         selectionIsOrdered = true
 
         if (selection.length) {
-            const result: NormalizedSelection = []
+            const result: TextInputNormalizedSelection = []
             let index = 0
             if (Array.isArray(selection[0]))
                 for (
@@ -658,7 +659,9 @@ export function normalizeSelection(
                     index += 1
                 }
             else if (isObject(selection[0]))
-                for (const option of selection as NormalizedSelection) {
+                for (
+                    const option of selection as TextInputNormalizedSelection
+                ) {
                     result.push({
                         ...option,
                         label: getLabel(option.value, index) ?? option.label
@@ -678,7 +681,7 @@ export function normalizeSelection(
             selection = result
         }
     } else {
-        const result: NormalizedSelection = []
+        const result: TextInputNormalizedSelection = []
         for (const value of Object.keys(selection as Mapping<unknown>))
             result.push({
                 label: getLabel(value) ?? (selection as Mapping)[value], value
@@ -698,20 +701,20 @@ export function normalizeSelection(
             index += 1
         }
 
-        selection = (selection as NormalizedSelection).sort(
+        selection = (selection as TextInputNormalizedSelection).sort(
             ({value: first}, {value: second}): number =>
                 (labelMapping.get(first as string) ?? 0) -
                 (labelMapping.get(second as string) ?? 0)
         )
     } else if (!selectionIsOrdered)
         // Sort alphabetically by labels.
-        selection = (selection as NormalizedSelection).sort(
+        selection = (selection as TextInputNormalizedSelection).sort(
             ({label: first}, {label: second}): number =>
                 (first as string).localeCompare(second as string)
         )
     // endregion
 
-    return selection as NormalizedSelection | undefined
+    return selection as TextInputNormalizedSelection | undefined
 }
 /// endregion
 /**
@@ -725,12 +728,12 @@ export function normalizeSelection(
 export const parseValue =
     <
         T = unknown,
-        P extends DefaultInputProperties<T> = DefaultInputProperties<T>,
+        P extends TextInputDefaultProperties<T> = TextInputDefaultProperties<T>,
         InputType = T
     >(
         configuration: P,
         value: InputType | undefined,
-        transformer: InputDataTransformation,
+        transformer: TextInputDataTransformation,
         trim = false
     ): T => {
         if (trim && typeof value === 'string')
@@ -746,15 +749,16 @@ export const parseValue =
         if (
             ![null, undefined].includes(value as null) &&
             transformer[
-                configuration.model.type as keyof InputDataTransformation
+                configuration.model.type as keyof TextInputDataTransformation
             ]?.parse
         ) {
             const parser = (
                 transformer[
-                    configuration.model.type as keyof InputDataTransformation
+                    configuration.model.type as
+                        keyof TextInputDataTransformation
                 ]?.parse as
                     unknown as
-                    DataTransformSpecification<T, InputType>['parse']
+                    TextInputDataTransformSpecification<T, InputType>['parse']
             )
             result =
                 parser && value ?
@@ -777,11 +781,11 @@ export const parseValue =
  */
 export function formatValue<
     T = unknown,
-    P extends DefaultInputProperties<T> = DefaultInputProperties<T>
+    P extends TextInputDefaultProperties<T> = TextInputDefaultProperties<T>
 >(
     configuration: P,
     value: null | T,
-    transformerMapping: InputDataTransformation,
+    transformerMapping: TextInputDataTransformation,
     final = true
 ): string {
     const methodName = final ? 'final' : 'intermediate'
@@ -794,10 +798,10 @@ export function formatValue<
 
     const format = transformerMapping[
         (configuration.type || configuration.model.type) as
-            keyof InputDataTransformation
-    ]?.format as FormatSpecifications<T> | undefined
+            keyof TextInputDataTransformation
+    ]?.format as TextInputFormatSpecifications<T> | undefined
     if (format) {
-        const transformer: Transformer<T> | undefined =
+        const transformer: TextInputTransformer<T> | undefined =
             format[methodName]?.transform || format.final.transform
 
         if (transformer)

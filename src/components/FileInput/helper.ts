@@ -36,7 +36,7 @@ import {
     determineValidationState as determineBaseValidationState
 } from '../../helper'
 import {DefaultProperties as DefaultBaseProperties} from '../../type'
-import {InputProps} from '../TextInput/type'
+import {Props} from '../TextInput/type'
 import {
     DefaultProperties as DefaultProperties,
     ModelState as ModelState,
@@ -91,9 +91,9 @@ export const VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
 export const preserveStaticFileBaseNameInputGenerator = <
     Type extends Value = Value, MediaTag extends ElementType = 'div'
 >(
-        prototype: InputProps<string>,
+        prototype: Props<string>,
         {name, value}: Properties<Type, MediaTag>
-    ): InputProps<string> => ({
+    ): Props<string> => ({
         ...prototype,
         disabled: true,
         value:

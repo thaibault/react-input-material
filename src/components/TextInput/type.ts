@@ -20,7 +20,7 @@ import {LanguageSupport} from '@codemirror/language'
 import {JSONContent} from '@tiptap/core'
 
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode'
-import PropertyTypes, {
+import BasePropertyTypes, {
     arrayOf,
     boolean,
     func,
@@ -80,8 +80,8 @@ import {
 // region data transformation
 export type Transformer<T = unknown> = (
     value: T,
-    transformer: InputDataTransformation,
-    configuration: DefaultInputProperties<T>
+    transformer: DataTransformation,
+    configuration: DefaultProperties<T>
 ) => string
 export interface FormatSpecification<T = unknown> {
     options?: PlainObject
@@ -97,17 +97,17 @@ export interface DataTransformSpecification<
     format?: FormatSpecifications<T>
     parse?: (
         value: InputType,
-        transformer: InputDataTransformation,
-        configuration: DefaultInputProperties<T>
+        transformer: DataTransformation,
+        configuration: DefaultProperties<T>
     ) => T
-    type?: NativeInputType,
+    type?: NativeType,
 }
 export interface DateTransformSpecification
     extends
 DataTransformSpecification<number | string, Date | number | string> {
     useISOString: boolean
 }
-export type InputDataTransformation =
+export type DataTransformation =
     {
         boolean: DataTransformSpecification<boolean>
 
@@ -141,7 +141,7 @@ export type InputDataTransformation =
     /* eslint-disable @typescript-eslint/consistent-indexed-object-style */
     {
         [key in Exclude<
-            NativeInputType,
+            NativeType,
             (
                 'date' | 'date-local' |
                 'datetime' | 'datetime-local' |
@@ -218,8 +218,7 @@ export interface CodeMirrorProperties extends EditorProperties {
 }
 export type CodeMirrorProps = Partial<CodeMirrorProperties>
 
-
-export type InputSelection =
+export type Selection =
     Array<boolean | number | null> |
     Array<[boolean | number | string | null, string]> |
     NormalizedSelection |
@@ -227,7 +226,7 @@ export type InputSelection =
 export type NormalizedSelection =
     Array<Omit<FormattedSelectionOption, 'value'> & {value: unknown}>
 
-export interface InputModelState extends BaseModelState {
+export interface ModelState extends BaseModelState {
     invalidMaximum: boolean
     invalidMinimum: boolean
 
@@ -237,18 +236,18 @@ export interface InputModelState extends BaseModelState {
     invalidInvertedPattern: boolean
     invalidPattern: boolean
 }
-export interface InputModel<T = unknown> extends BaseModel<T> {
-    state?: InputModelState
+export interface Model<T = unknown> extends BaseModel<T> {
+    state?: ModelState
 }
-export type PartialInputModel<T = unknown> =
-    Partial<Omit<InputModel<T>, 'state'>> &
-    {state?: Partial<InputModelState>}
-export interface InputValueState<T = unknown, MS = BaseModelState> extends
+export type PartialModel<T = unknown> =
+    Partial<Omit<Model<T>, 'state'>> &
+    {state?: Partial<ModelState>}
+export interface ValueState<T = unknown, MS = BaseModelState> extends
     BaseValueState<T, MS>
 {
     representation?: ReactNode
 }
-export type NativeInputType = (
+export type NativeType = (
     'date' |
     'datetime-local' |
     'time' |
@@ -258,7 +257,7 @@ export type NativeInputType = (
     'range' |
     'text'
 )
-export type TextInputType = (
+export type Type = (
     'date-local' |
     'datetime' |
     'time-local' |
@@ -267,9 +266,9 @@ export type TextInputType = (
     'float' |
     'integer' |
     'string' |
-    NativeInputType
+    NativeType
 )
-export interface InputChildrenOptions<P, T> {
+export interface ChildrenOptions<P, T> {
     index: number
     normalizedSelection?: NormalizedSelection | null
     properties: P
@@ -312,11 +311,11 @@ export type EditorType = (
     'text' |
     'richtext'
 )
-export interface InputProperties<T = unknown> extends
-    InputModelState, BaseProperties<T>
+export interface Properties<T = unknown> extends
+    ModelState, BaseProperties<T>
 {
     align: 'end' | 'start'
-    children: (options: InputChildrenOptions<this, T>) => null | ReactElement
+    children: (options: ChildrenOptions<this, T>) => null | ReactElement
     cursor: Partial<CursorState> | null
 
     editor: EditorType
@@ -344,7 +343,7 @@ export interface InputProperties<T = unknown> extends
     maximumText: string
     minimumText: string
 
-    model: InputModel<T>
+    model: Model<T>
 
     onChangeEditorIsActive: (
         isActive: boolean, event: MouseEvent | undefined, properties: this
@@ -370,46 +369,44 @@ export interface InputProperties<T = unknown> extends
     step: number
 
     suggestionCreator?: (options: SuggestionCreatorOptions<this>) =>
-        InputProperties['selection'] | Promise<InputProperties['selection']>
+        Properties['selection'] | Promise<Properties['selection']>
     suggestSelection: boolean
 
     transformer: RecursivePartial<DataTransformSpecification<
         T, Date | number | string
     >>
 }
-export type InputProps<T = unknown> =
-    Partial<Omit<InputProperties<T>, 'model'>> &
-    {model?: PartialInputModel<T>}
+export type Props<T = unknown> =
+    Partial<Omit<Properties<T>, 'model'>> &
+    {model?: PartialModel<T>}
 
-export type DefaultInputProperties<T = string> =
-    Omit<InputProps<T>, 'model'> & {model: InputModel<T>}
+export type DefaultProperties<T = string> =
+    Omit<Props<T>, 'model'> & {model: Model<T>}
 
-export type InputPropertyTypes<T = unknown> = {
-    [key in keyof InputProperties<T>]: ValueOf<typeof PropertyTypes>
+export type PropertyTypes<T = unknown> = {
+    [key in keyof Properties<T>]: ValueOf<typeof BasePropertyTypes>
 }
 
-export interface InputState<T = unknown> extends BaseState<T> {
+export interface State<T = unknown> extends BaseState<T> {
     cursor: CursorState
     editorIsActive: boolean
     hidden?: boolean
-    modelState: InputModelState
+    modelState: ModelState
     representation?: ReactNode | string
     selectionIsUnstable: boolean
     showDeclaration: boolean
 }
 
 // NOTE: We hold "selectionIsUnstable" state value as internal private one.
-export type InputAdapter<T = unknown> = ComponentAdapter<
-    InputProperties<T>,
-    Omit<InputState<T>, 'representation' | 'selectionIsUnstable' | 'value'> &
+export type Adapter<T = unknown> = ComponentAdapter<
+    Properties<T>,
+    Omit<State<T>, 'representation' | 'selectionIsUnstable' | 'value'> &
     {
         representation?: ReactNode | string
         value?: null | T
     }
 >
-export interface InputAdapterWithReferences<T = unknown> extends
-    InputAdapter<T>
-{
+export interface AdapterWithReferences<T = unknown> extends Adapter<T> {
     references: {
         foundationReference: MutableRefObject<
             MDCSelectFoundation | MDCTextFieldFoundation | null
@@ -425,20 +422,18 @@ export interface InputAdapterWithReferences<T = unknown> extends
     }
 }
 
-export interface TextInputComponent<Type> extends
-    Omit<ForwardRefExoticComponent<InputProps>, 'propTypes'>,
-    StaticWebComponent<Type, InputModelState, DefaultInputProperties>
+export interface Component<Type> extends
+    Omit<ForwardRefExoticComponent<Props>, 'propTypes'>,
+    StaticWebComponent<Type, ModelState, DefaultProperties>
 {
-    <T = string>(
-        props: InputProps<T> & RefAttributes<InputAdapter<T>>
-    ): ReactElement
+    <T = string>(props: Props<T> & RefAttributes<Adapter<T>>): ReactElement
 
     locales: Array<string>
-    transformer: InputDataTransformation
+    transformer: DataTransformation
 }
 // region constants
-export const inputModelStatePropertyTypes: {
-    [key in keyof InputModelState]: Requireable<boolean | symbol>
+export const modelStatePropertyTypes: {
+    [key in keyof ModelState]: Requireable<boolean | symbol>
 } = {
     ...baseModelStatePropertyTypes,
 
@@ -451,9 +446,9 @@ export const inputModelStatePropertyTypes: {
     invalidInvertedPattern: oneOfType([boolean, symbol]),
     invalidPattern: oneOfType([boolean, symbol])
 } as const
-export const inputPropertyTypes: ValidationMapping = {
+export const propertyTypes: ValidationMapping = {
     ...basePropertyTypes,
-    ...inputModelStatePropertyTypes,
+    ...modelStatePropertyTypes,
     /*
         NOTE: Not yet working:
         align: oneOf(['end', 'start']),
@@ -551,9 +546,9 @@ export const inputPropertyTypes: ValidationMapping = {
 
     transformer: object
 } as const
-export const textInputRenderProperties: Array<string> =
+export const renderProperties: Array<string> =
     ['children', 'suggestionCreator']
-export const defaultInputModelState: InputModelState = {
+export const defaultModelState: ModelState = {
     ...baseDefaultModelState,
 
     invalidMaximum: false,
@@ -565,16 +560,16 @@ export const defaultInputModelState: InputModelState = {
     invalidInvertedPattern: false,
     invalidPattern: false
 } as const
-export const defaultInputModel: InputModel<string> = {
-    ...baseDefaultModel as InputModel<string>,
-    state: defaultInputModelState
+export const defaultInputModel: Model<string> = {
+    ...baseDefaultModel as Model<string>,
+    state: defaultModelState
 } as const
 /*
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
 */
-export const defaultInputProperties: DefaultInputProperties = {
-    ...baseDefaultProperties as DefaultInputProperties,
+export const defaultProperties: DefaultProperties = {
+    ...baseDefaultProperties as DefaultProperties,
 
     cursor: {
         end: 0,

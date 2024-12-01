@@ -30,8 +30,8 @@ import {
 } from '../../helper'
 import {DefaultProperties as DefaultBaseProperties} from '../../type'
 import {
-    DefaultInputProperties as DefaultProperties,
-    InputModelState as ModelState
+    DefaultProperties as DefaultProperties,
+    ModelState as ModelState
 } from './type'
 
 /*

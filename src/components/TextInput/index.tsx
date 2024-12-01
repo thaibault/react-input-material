@@ -105,32 +105,29 @@ import {
 } from './helper'
 import RichTextEditorComponent from './Tiptap'
 import {
+    Adapter,
+    AdapterWithReferences,
     CodeMirrorProps as CodeEditorProps,
     CodeMirrorProperties as CodeEditorProperties,
+    Component,
+    DataTransformation,
     DataTransformSpecification,
-    defaultInputModelState as defaultModelState,
-    DefaultInputProperties as DefaultProperties,
-    defaultInputProperties as defaultProperties,
-    InputAdapter as Adapter,
-    InputAdapterWithReferences as AdapterWithReferences,
-    InputDataTransformation,
-    InputModelState as ModelState,
-    InputModelState,
-    InputProperties as Properties,
-    inputPropertyTypes as propertyTypes,
-    InputValueState as ValueState,
-    InputValueState,
-    InputProps as Props,
-    InputState as State,
-    InputModel as Model,
-    NativeInputType,
+    defaultModelState,
+    DefaultProperties,
+    defaultProperties,
+    EditorProperties,
+    Model,
+    ModelState,
+    NativeType,
     NormalizedSelection,
-    textInputRenderProperties as renderProperties,
-    TextInputComponent,
+    Properties,
+    propertyTypes,
+    Props,
+    renderProperties,
+    State,
     TiptapProps as RichTextEditorProps,
     TiptapProperties as RichTextEditorProperties,
-
-    EditorProperties
+    ValueState
 } from './type'
 import TRANSFORMER from './transformer'
 
@@ -427,7 +424,7 @@ export const TextInputInner = function<Type = unknown>(
      */
     const determineNativeType = (
         properties: Properties<Type>
-    ): NativeInputType =>
+    ): NativeType =>
         (
             properties.type === 'string' ?
                 properties.hidden ?
@@ -436,9 +433,9 @@ export const TextInputInner = function<Type = unknown>(
                         'search' :
                         'text' :
                 transformer[
-                    properties.type as keyof InputDataTransformation
+                    properties.type as keyof DataTransformation
                 ]?.type ?? properties.type
-        ) as NativeInputType
+        ) as NativeType
     /**
      * Render help or error texts with current validation state color.
      * @returns Determined renderable markup specification.
@@ -650,7 +647,7 @@ export const TextInputInner = function<Type = unknown>(
         )
 
         determineValidationState<Type>(
-            result, result.model.state as InputModelState
+            result, result.model.state as ModelState
         )
 
         return result
@@ -795,7 +792,7 @@ export const TextInputInner = function<Type = unknown>(
                     modelState: properties.model.state,
                     representation: properties.representation,
                     value: properties.value as null | Type
-                } as InputValueState<Type, InputModelState> :
+                } as ValueState<Type, ModelState> :
                 oldValueState
         })
     }
@@ -1240,7 +1237,7 @@ export const TextInputInner = function<Type = unknown>(
 
                 result = {
                     ...oldValueState,
-                    modelState: properties.model.state as InputModelState
+                    modelState: properties.model.state as ModelState
                 }
 
                 triggerCallbackIfExists<Properties<Type>>(
@@ -1306,10 +1303,10 @@ export const TextInputInner = function<Type = unknown>(
     )
 
     const type: TypeSpecification =
-        givenProperties.type as keyof InputDataTransformation | null ||
+        givenProperties.type as keyof DataTransformation | null ||
         givenProperties.model?.type ||
         'string'
-    const transformer: InputDataTransformation =
+    const transformer: DataTransformation =
         givenProperties.transformer ?
             {
                 ...TextInput.transformer,
@@ -1317,7 +1314,7 @@ export const TextInputInner = function<Type = unknown>(
                     true,
                     copy(
                         TextInput.transformer[
-                            type as keyof InputDataTransformation
+                            type as keyof DataTransformation
                         ] as DataTransformSpecification<Type> | null
                     ) ||
                     {},
@@ -1398,7 +1395,7 @@ export const TextInputInner = function<Type = unknown>(
         setShowDeclaration(properties.showDeclaration)
 
     const currentValueState: ValueState<Type, ModelState> = {
-        modelState: properties.model.state as InputModelState,
+        modelState: properties.model.state as ModelState,
         representation: properties.representation,
         value: properties.value || null
     }
@@ -1922,7 +1919,7 @@ TextInputInner.displayName = 'TextInput'
  */
 export const TextInput = memorize(forwardRef(TextInputInner)) as
     unknown as
-    TextInputComponent<typeof TextInputInner>
+    Component<typeof TextInputInner>
 // region static properties
 /// region web-component hints
 TextInput.wrapped = TextInputInner
