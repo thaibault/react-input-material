@@ -17,7 +17,7 @@
 */
 // region imports
 import {Mapping, ValueOf} from 'clientnode'
-import PropertyTypes, {
+import BasePropertyTypes, {
     number, oneOfType, shape, string, ValidationMap, Validator
 } from 'clientnode/dist/property-types'
 import {MutableRefObject} from 'react'
@@ -140,8 +140,8 @@ export type Props =
 export type DefaultProperties =
     Omit<Props, 'model'> & {model: Model}
 
-export type IntervalPropertyTypes = {
-    [key in keyof Properties]: ValueOf<typeof PropertyTypes>
+export type PropertyTypes = {
+    [key in keyof Properties]: ValueOf<typeof BasePropertyTypes>
 }
 
 export type Adapter = ComponentAdapter<Properties, {value?: Value | null}>
@@ -176,14 +176,14 @@ export const propertyTypes: PropertiesValidationMap = {
         end: oneOfType<Validator<unknown>>([
             number,
             string,
-            shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
+            shape<ValidationMap<ValueOf<typeof BasePropertyTypes>>>(
                 textInputPropertyTypes
             )
         ]),
         start: oneOfType<Validator<unknown>>([
             number,
             string,
-            shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
+            shape<ValidationMap<ValueOf<typeof BasePropertyTypes>>>(
                 textInputPropertyTypes
             )
         ])

@@ -52,10 +52,11 @@ import {intervalClassName, intervalDisabledClassName} from './style.module'
 import cssClassNames from './style.module'
 
 import {
-    defaultProperties,
     Adapter,
     AdapterWithReferences,
     Component,
+    defaultProperties,
+    IntervalTextInputProps,
     ModelState,
     Properties,
     propertyTypes,
@@ -70,9 +71,10 @@ const determineControlled = (props: Props) =>
     props.model?.value?.start?.value !== undefined ||
     props.value !== undefined &&
     !(
-        (props.value?.start as Props | null)?.value ===
+        (props.value?.start as IntervalTextInputProps | null)?.value ===
             undefined &&
-        (props.value?.end as Props | null)?.value === undefined
+        (props.value?.end as IntervalTextInputProps | null)?.value ===
+            undefined
     )
 const normalizeDateTimeToNumber = (
     value?: null | number | string, fallbackValue = 0
@@ -164,14 +166,14 @@ export const IntervalInner = function(
         )
 
     let endProperties =
-        properties.value?.end as Props | null ||
-        {} as Props
+        properties.value?.end as IntervalTextInputProps | null ||
+        {} as IntervalTextInputProps
     const iconProperties: IconOptions = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
         properties.icon as IconOptions
     let startProperties =
-        properties.value?.start as Props | null ||
-        {} as Props
+        properties.value?.start as IntervalTextInputProps | null ||
+        {} as IntervalTextInputProps
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
@@ -198,8 +200,8 @@ export const IntervalInner = function(
         properties.value =
             {end: {value: value.end}, start: {value: value.start}}
     const propertiesToForward =
-        mask<Props>(
-            properties as unknown as Props,
+        mask<IntervalTextInputProps>(
+            properties as unknown as IntervalTextInputProps,
             {exclude: {
                 className: true,
                 enforceUncontrolled: true,
@@ -268,8 +270,9 @@ export const IntervalInner = function(
     }
 
     const valueState: Value = {
-        start: (properties.value?.start as Props | null)?.value,
-        end: (properties.value?.end as Props | null)?.value
+        start:
+            (properties.value?.start as IntervalTextInputProps | null)?.value,
+        end: (properties.value?.end as IntervalTextInputProps | null)?.value
     }
 
     consolidateBoundaries(valueState)
