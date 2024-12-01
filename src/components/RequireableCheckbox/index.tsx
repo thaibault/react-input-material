@@ -64,13 +64,13 @@ import {
 import cssClassNames from './style.module'
 import {
     Adapter,
-    Properties,
-    Props,
+    Component,
     DefaultProperties,
     defaultProperties,
     ModelState,
+    Properties,
+    Props,
     propertyTypes,
-    Component,
     ValueState
 } from './type'
 // endregion
