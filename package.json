@@ -1,6 +1,6 @@
 {
   "name": "react-input-material",
-  "version": "0.0.689",
+  "version": "0.0.690",
   "description": "Reusable material design based input field with support for (richt-)text, code, selections, numbers, dates and so on.",
   "keywords": [
     "form-field",
@@ -150,7 +150,7 @@
     "css-loader": "^7.1.2",
     "cssnano": "^7.0.6",
     "documentation-website": "^1.0.340",
-    "eslint": "^9.15.0",
+    "eslint": "^9.16.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-jsdoc": "^50.6.0",
     "identity-obj-proxy": "^3.0.0",
