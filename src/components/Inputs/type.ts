@@ -43,6 +43,8 @@ import {
     State as BaseState,
     StaticWebComponent
 } from '../../type'
+
+console.log('TODO B', baseDefaultModel)
 // endregion
 export interface PropertiesItem<T, TS = unknown> {
     model?: {
