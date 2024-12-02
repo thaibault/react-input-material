@@ -457,11 +457,4 @@ export interface ConfigurationProperties {
     tooltip?: Properties['tooltip']
     wrap?: boolean
 }
-
-export * as FileInputTypes from './components/FileInput/type'
-export * as InputsTypes from './components/Inputs/type'
-export * as IntervalTypes from './components/Interval/type'
-export * as RequireableCheckboxTypes
-from './components/RequireableCheckbox/type'
-export * as TextInputTypes from './components/TextInput/type'
 // endregion
