@@ -34,10 +34,10 @@ import {
     ElementType,
     ForwardRefExoticComponent,
     HTMLProps,
-    MutableRefObject,
     ReactElement,
     ReactNode,
-    RefAttributes
+    RefAttributes,
+    RefObject
 } from 'react'
 
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
@@ -190,11 +190,11 @@ export type Adapter<Type extends Value = Value> =
     >
 export interface AdapterWithReferences extends Adapter {
     references: {
-        deleteButtonReference: MutableRefObject<HTMLButtonElement | null>
-        downloadLinkReference: MutableRefObject<HTMLAnchorElement | null>
-        fileInputReference: MutableRefObject<HTMLInputElement | null>
-        nameInputReference: MutableRefObject<TextInputAdapter<string> | null>
-        uploadButtonReference: MutableRefObject<HTMLButtonElement | null>
+        deleteButtonReference: RefObject<HTMLButtonElement | null>
+        downloadLinkReference: RefObject<HTMLAnchorElement | null>
+        fileInputReference: RefObject<HTMLInputElement | null>
+        nameInputReference: RefObject<TextInputAdapter<string> | null>
+        uploadButtonReference: RefObject<HTMLButtonElement | null>
     }
 }
 

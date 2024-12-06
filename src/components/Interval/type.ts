@@ -20,7 +20,10 @@ import {Mapping, ValueOf} from 'clientnode'
 import BasePropertyTypes, {
     number, oneOfType, shape, string, ValidationMap, Validator
 } from 'clientnode/dist/property-types'
-import {MutableRefObject} from 'react'
+import {
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject
+} from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
 import {
     ComponentAdapter, PropertiesValidationMap
@@ -147,11 +150,11 @@ export type PropertyTypes = {
 export type Adapter = ComponentAdapter<Properties, {value?: Value | null}>
 export interface AdapterWithReferences extends Adapter {
     references: {
-        end: MutableRefObject<
+        end: RefObject<
             TextInputAdapterWithReferences<DateTimeRepresentation | null> |
             null
         >
-        start: MutableRefObject<
+        start: RefObject<
             TextInputAdapterWithReferences<DateTimeRepresentation | null> |
             null
         >

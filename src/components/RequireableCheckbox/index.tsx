@@ -24,8 +24,9 @@ import {
     ForwardRefRenderFunction,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
-    MutableRefObject,
     ReactElement,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject,
     SyntheticEvent,
     useEffect,
     useImperativeHandle,
@@ -116,7 +117,7 @@ export function determineValidationState(
  * @returns React elements.
  */
 export const RequireableCheckboxInner = function(
-    props: Props, reference?: MutableRefObject<Adapter>
+    props: Props, reference?: RefObject<Adapter>
 ): ReactElement {
     // region property aggregation
     /**
@@ -340,9 +341,9 @@ export const RequireableCheckboxInner = function(
     // endregion
     // region properties
     /// region references
-    const inputReference: MutableRefObject<HTMLInputElement | null> =
+    const inputReference: RefObject<HTMLInputElement | null> =
         useRef<HTMLInputElement>(null)
-    const foundationRef: MutableRefObject<MDCCheckboxFoundation | null> =
+    const foundationRef: RefObject<MDCCheckboxFoundation | null> =
         useRef<MDCCheckboxFoundation>(null)
     /// endregion
     const givenProps: Props = translateKnownSymbols(props)
@@ -405,8 +406,8 @@ export const RequireableCheckboxInner = function(
         reference,
         (): Adapter & {
             references: {
-                foundationRef: MutableRefObject<MDCCheckboxFoundation | null>
-                inputReference: MutableRefObject<HTMLInputElement | null>
+                foundationRef: RefObject<MDCCheckboxFoundation | null>
+                inputReference: RefObject<HTMLInputElement | null>
             }
         } => ({
             properties,

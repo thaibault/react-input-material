@@ -21,9 +21,10 @@ import {AnyFunction, FirstParameter} from 'clientnode'
 import {
     forwardRef,
     ForwardRefRenderFunction,
-    FunctionComponent,
-    MutableRefObject,
-    ReactElement
+    FunctionComponent, PropsWithoutRef,
+    ReactElement,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject
 } from 'react'
 import {Theme} from '@rmwc/theme'
 import {ThemePropT} from '@rmwc/types'
@@ -80,7 +81,7 @@ export function createWrapConfigurationsComponent<
         {theme: ThemePropT}
     > = (
         {strict, theme, themeConfiguration, tooltip, wrap, ...properties},
-        reference?: MutableRefObject<Reference>
+        reference?: RefObject<Reference>
     ): ReactElement => {
         const wrapped: ReactElement = <WrappedComponent {...{
             ...(properties as FirstParameter<Type>),
@@ -114,7 +115,12 @@ export function createWrapConfigurationsComponent<
     }
 
     return options.withReference ?
-        forwardRef(component as ForwardRefRenderFunction<typeof component>) :
+        forwardRef(
+            component as
+                ForwardRefRenderFunction<
+                    typeof component, PropsWithoutRef<FirstParameter<Type>>
+                >
+        ) :
         component
 }
 

@@ -24,9 +24,10 @@ import {
     ForwardedRef,
     forwardRef,
     memo as memorize,
-    MutableRefObject,
     ReactElement,
     ReactNode,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject,
     useImperativeHandle,
     useEffect,
     useState
@@ -259,9 +260,7 @@ export const InputsInner = function<
         // NOTE: Indicates to be filled later from state.
         givenProperties.value = []
 
-    const references: Array<
-        MutableRefObject<ComponentAdapter<P, State> | null>
-    > = []
+    const references: Array<RefObject<ComponentAdapter<P, State> | null>> = []
 
     const properties: Properties<T, P> =
         getConsolidatedProperties<Props<T, P>, Properties<T, P>>(
@@ -355,7 +354,7 @@ export const InputsInner = function<
             NOTE: We cannot use "useRef" here since the number of calls would
             be variable und therefor break the rules of hooks.
         */
-        const reference: MutableRefObject<ComponentAdapter<P, State> | null> =
+        const reference: RefObject<ComponentAdapter<P, State> | null> =
             createRef<ComponentAdapter<P, State>>()
         references.push(reference)
 
