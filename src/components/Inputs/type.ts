@@ -20,10 +20,11 @@ import {ValueOf} from 'clientnode'
 import BasePropertyTypes, {func, number} from 'clientnode/dist/property-types'
 import {
     ForwardRefExoticComponent,
-    MutableRefObject,
     ReactElement,
     ReactNode,
-    RefAttributes
+    RefAttributes,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject
 } from 'react'
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 import {IconOptions} from '@rmwc/types'
@@ -146,7 +147,7 @@ export type AdapterWithReferences<
     T = unknown,
     P extends PropertiesItem<T> = BaseProperties<T>,
     RefType = unknown
-> = Adapter<T, P> & {references: Array<MutableRefObject<RefType>>}
+> = Adapter<T, P> & {references: Array<RefObject<RefType>>}
 
 export interface Component<Type> extends
     Omit<ForwardRefExoticComponent<Props>, 'propTypes'>,

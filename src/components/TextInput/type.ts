@@ -37,10 +37,11 @@ import {
     ForwardRefExoticComponent,
     KeyboardEvent,
     MouseEvent,
-    MutableRefObject,
     ReactElement,
     ReactNode,
-    RefAttributes
+    RefAttributes,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject
 } from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
 
@@ -171,11 +172,11 @@ export interface EditorWrapperEventWrapper {
     input: (value: number | string, event: object) => void
 }
 export interface EditorWrapperProps extends Partial<EditorProperties> {
-    eventMapper: MutableRefObject<EditorWrapperEventWrapper | null>
+    eventMapper: RefObject<EditorWrapperEventWrapper | null>
 
-    materialTextField?: MutableRefObject<MDCTextField | null>
-    mdcTextFieldReference?: MutableRefObject<HTMLLabelElement | null>
-    textareaReference?: MutableRefObject<HTMLTextAreaElement | null>
+    materialTextField?: RefObject<MDCTextField | null>
+    mdcTextFieldReference?: RefObject<HTMLLabelElement | null>
+    textareaReference?: RefObject<HTMLTextAreaElement | null>
 
     children: ReactNode
     barContentSlot?: ReactNode
@@ -408,17 +409,17 @@ export type Adapter<T = unknown> = ComponentAdapter<
 >
 export interface AdapterWithReferences<T = unknown> extends Adapter<T> {
     references: {
-        foundationReference: MutableRefObject<
+        foundationReference: RefObject<
             MDCSelectFoundation | MDCTextFieldFoundation | null
         >
-        inputReference: MutableRefObject<
+        inputReference: RefObject<
             HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
         >
-        suggestionMenuAPIReference: MutableRefObject<MenuApi | null>
-        suggestionMenuFoundationReference: MutableRefObject<
+        suggestionMenuAPIReference: RefObject<MenuApi | null>
+        suggestionMenuFoundationReference: RefObject<
             MDCMenuFoundation | null
         >
-        wrapperReference: MutableRefObject<HTMLDivElement | null>
+        wrapperReference: RefObject<HTMLDivElement | null>
     }
 }
 

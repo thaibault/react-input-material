@@ -54,9 +54,10 @@ import React, {
     KeyboardEvent as ReactKeyboardEvent,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
-    MutableRefObject,
     ReactElement,
     ReactNode,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject,
     useEffect,
     useId,
     useImperativeHandle,
@@ -66,7 +67,10 @@ import React, {
 import GenericAnimate from 'react-generic-animate'
 import {GenericEvent} from 'react-generic-tools/type'
 import Dummy from 'react-generic-dummy'
-import {TransitionProps} from 'react-transition-group/Transition'
+import {
+    TransitionChildren,
+    TransitionProps
+} from 'react-transition-group/Transition'
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
@@ -530,24 +534,26 @@ export const TextInputInner = function<Type = unknown>(
      * @returns Wrapped component.
      */
     const wrapAnimationConditionally = (
-        content: ReactNode,
+        content: TransitionChildren,
         propertiesOrInCondition: (
             boolean | Partial<TransitionProps<HTMLElement | undefined>>
         ) = {},
         condition = true
     ): ReactNode => {
         if (typeof propertiesOrInCondition === 'boolean')
-            return condition ?
+            return (condition ?
                 <GenericAnimate in={propertiesOrInCondition}>
                     {content}
                 </GenericAnimate> :
                 propertiesOrInCondition ? content : ''
+            ) as ReactNode
 
-        return condition ?
+        return (condition ?
             <GenericAnimate {...propertiesOrInCondition}>
                 {content}
             </GenericAnimate> :
             propertiesOrInCondition.in ? content : ''
+        ) as ReactNode
     }
     /**
      * If given icon options has an additional tooltip configuration integrate
@@ -1260,18 +1266,18 @@ export const TextInputInner = function<Type = unknown>(
     // endregion
     // region properties
     /// region references
-    const foundationReference: MutableRefObject<
+    const foundationReference: RefObject<
         MDCSelectFoundation | MDCTextFieldFoundation | null
     > = useRef<MDCSelectFoundation | MDCTextFieldFoundation>(null)
-    const inputReference: MutableRefObject<
+    const inputReference: RefObject<
         HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
     > = useRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(null)
-    const suggestionMenuAPIReference: MutableRefObject<MenuApi | null> =
+    const suggestionMenuAPIReference: RefObject<MenuApi | null> =
         useRef<MenuApi>(null)
-    const suggestionMenuFoundationReference: MutableRefObject<
+    const suggestionMenuFoundationReference: RefObject<
         MDCMenuFoundation | null
     > = useRef<MDCMenuFoundation>(null)
-    const wrapperReference: MutableRefObject<HTMLDivElement | null> =
+    const wrapperReference: RefObject<HTMLDivElement | null> =
         useRef<HTMLDivElement>(null)
     /// endregion
     const givenProps: Props<Type> = translateKnownSymbols(props)
@@ -1702,7 +1708,7 @@ export const TextInputInner = function<Type = unknown>(
                     enhanced={true}
 
                     foundationRef={foundationReference as
-                        MutableRefObject<MDCSelectFoundation | null>
+                        RefObject<MDCSelectFoundation | null>
                     }
                     inputRef={inputReference as
                         unknown as
@@ -1746,11 +1752,10 @@ export const TextInputInner = function<Type = unknown>(
                     }
                     foundationRef={
                         foundationReference as
-                            MutableRefObject<MDCTextFieldFoundation | null>
+                            RefObject<MDCTextFieldFoundation | null>
                     }
                     inputRef={
-                        inputReference as
-                            MutableRefObject<HTMLTextAreaElement | null>
+                        inputReference as RefObject<HTMLTextAreaElement | null>
                     }
                     onChange={onChangeValue as (value: string) => void}
                     ripple={properties.ripple}
@@ -1860,10 +1865,10 @@ export const TextInputInner = function<Type = unknown>(
                             properties.maximumLength >= 0
                         }
                         foundationRef={foundationReference as
-                            MutableRefObject<MDCTextFieldFoundation | null>
+                            RefObject<MDCTextFieldFoundation | null>
                         }
                         inputRef={inputReference as
-                            MutableRefObject<HTMLInputElement | null>
+                            RefObject<HTMLInputElement | null>
                         }
                         onChange={onChangeValue}
                         ripple={properties.ripple}

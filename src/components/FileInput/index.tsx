@@ -25,8 +25,9 @@ import {
     forwardRef,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
-    MutableRefObject,
     ReactElement,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject,
     SyntheticEvent,
     useEffect, useId,
     useImperativeHandle,
@@ -443,18 +444,17 @@ export const FileInputInner = function<Type extends Value = Value>(
     // endregion
     // region properties
     /// region references
-    const deleteButtonReference: MutableRefObject<HTMLButtonElement | null> =
+    const deleteButtonReference: RefObject<HTMLButtonElement | null> =
         useRef<HTMLButtonElement>(null)
-    const downloadLinkReference: MutableRefObject<HTMLAnchorElement | null> =
+    const downloadLinkReference: RefObject<HTMLAnchorElement | null> =
         useRef<HTMLAnchorElement>(null)
-    const fileInputReference: MutableRefObject<HTMLInputElement | null> =
+    const fileInputReference: RefObject<HTMLInputElement | null> =
         useRef<HTMLInputElement>(null)
-    const nameInputReference: (
-        MutableRefObject<TextInputAdapter<string> | null>
-    ) = useRef<TextInputAdapter<string>>(null)
-    const uploadButtonReference: MutableRefObject<HTMLDivElement | null> =
+    const nameInputReference: RefObject<TextInputAdapter<string> | null> =
+        useRef<TextInputAdapter<string>>(null)
+    const uploadButtonReference: RefObject<HTMLDivElement | null> =
         useRef<HTMLDivElement>(null)
-    const iFrameReference: MutableRefObject<HTMLIFrameElement | null> =
+    const iFrameReference: RefObject<HTMLIFrameElement | null> =
         useRef<HTMLIFrameElement>(null)
     /// endregion
     const givenProps: Props<Type> = translateKnownSymbols(props)
@@ -528,15 +528,12 @@ export const FileInputInner = function<Type extends Value = Value>(
         reference,
         (): Adapter<Type> & {
             references: {
-                deleteButtonReference:
-                    MutableRefObject<HTMLButtonElement | null>
-                downloadLinkReference:
-                    MutableRefObject<HTMLAnchorElement | null>
-                fileInputReference: MutableRefObject<HTMLInputElement | null>
-                iFrameReference: MutableRefObject<HTMLIFrameElement | null>
-                nameInputReference:
-                    MutableRefObject<TextInputAdapter<string> | null>
-                uploadButtonReference: MutableRefObject<HTMLDivElement | null>
+                deleteButtonReference: RefObject<HTMLButtonElement | null>
+                downloadLinkReference: RefObject<HTMLAnchorElement | null>
+                fileInputReference: RefObject<HTMLInputElement | null>
+                iFrameReference: RefObject<HTMLIFrameElement | null>
+                nameInputReference: RefObject<TextInputAdapter<string> | null>
+                uploadButtonReference: RefObject<HTMLDivElement | null>
             }
         } => ({
             properties,
