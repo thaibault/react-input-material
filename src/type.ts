@@ -17,7 +17,7 @@
 */
 // region imports
 import {Mapping, ValueOf} from 'clientnode'
-import PropertyTypes, {
+import {
     any,
     arrayOf,
     boolean,
@@ -26,12 +26,13 @@ import PropertyTypes, {
     object,
     objectOf,
     oneOfType,
+    PropertyTypes,
     Requireable,
     shape,
     string,
     symbol,
     ValidationMap
-} from 'clientnode/dist/property-types'
+} from 'clientnode/property-types'
 import {
     ComponentClass,
     FocusEvent,

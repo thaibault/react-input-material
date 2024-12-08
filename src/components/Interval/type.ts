@@ -18,8 +18,13 @@
 // region imports
 import {Mapping, ValueOf} from 'clientnode'
 import BasePropertyTypes, {
-    number, oneOfType, shape, string, ValidationMap, Validator
-} from 'clientnode/dist/property-types'
+    number,
+    oneOfType,
+    shape,
+    string,
+    ValidationMap,
+    Validator
+} from 'clientnode/property-types'
 import {
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject

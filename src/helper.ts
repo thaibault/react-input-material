@@ -32,7 +32,7 @@ import {
     timeout,
     ValueOf
 } from 'clientnode'
-import {NullSymbol, UndefinedSymbol} from 'clientnode/dist/property-types'
+import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 
 import {ReactNode, useState} from 'react'
 

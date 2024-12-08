@@ -31,7 +31,7 @@ import BasePropertyTypes, {
     shape,
     string,
     symbol
-} from 'clientnode/dist/property-types'
+} from 'clientnode/property-types'
 import {
     FocusEvent as ReactFocusEvent,
     ForwardRefExoticComponent,

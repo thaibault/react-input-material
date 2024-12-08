@@ -29,7 +29,7 @@ import BasePropertyTypes, {
     string,
     symbol,
     ValidationMap
-} from 'clientnode/dist/property-types'
+} from 'clientnode/property-types'
 import {
     ElementType,
     ForwardRefExoticComponent,
