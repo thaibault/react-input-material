@@ -1574,7 +1574,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/view@npm:^6.0.0, @codemirror/view@npm:^6.17.0, @codemirror/view@npm:^6.23.0, @codemirror/view@npm:^6.27.0, @codemirror/view@npm:^6.35.0, @codemirror/view@npm:^6.35.1":
+"@codemirror/view@npm:^6.0.0, @codemirror/view@npm:^6.17.0, @codemirror/view@npm:^6.23.0, @codemirror/view@npm:^6.27.0, @codemirror/view@npm:^6.35.0":
   version: 6.35.1
   resolution: "@codemirror/view@npm:6.35.1"
   dependencies:
@@ -1582,6 +1582,17 @@ __metadata:
     style-mod: "npm:^4.1.0"
     w3c-keyname: "npm:^2.2.4"
   checksum: 10c0/0c412c39c849101c73d01fc2905fb0c42f97393610bcc5033c05659c36493b5728bd9304903fc107a994c7752bf930d0a451d15650d9fb4327e20d9441458f6c
+  languageName: node
+  linkType: hard
+
+"@codemirror/view@npm:^6.35.2":
+  version: 6.35.2
+  resolution: "@codemirror/view@npm:6.35.2"
+  dependencies:
+    "@codemirror/state": "npm:^6.4.0"
+    style-mod: "npm:^4.1.0"
+    w3c-keyname: "npm:^2.2.4"
+  checksum: 10c0/2f129a65ceb946d77981eaa230e859aa3f989b6d51c2a491f88953e32a91c59a2d5d2676f1944c9f50241eb3bbd301f786d047571834900c676edc981263fdf5
   languageName: node
   linkType: hard
 
@@ -13393,9 +13404,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-generic-animate@npm:^0.0.64":
-  version: 0.0.64
-  resolution: "react-generic-animate@npm:0.0.64"
+"react-generic-animate@npm:^0.0.65":
+  version: 0.0.65
+  resolution: "react-generic-animate@npm:0.0.65"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/react": "*"
@@ -13426,13 +13437,13 @@ __metadata:
       optional: true
     react-useanimations:
       optional: true
-  checksum: 10c0/36f3d20bf482b307f07185c95133fc82f9b014c1bf0688f580dbfd19004e5d53e8e90de3c5cbd07071c5c11f7e45cf397367b3bfbfca3151f14b7cc2ebcb019b
+  checksum: 10c0/2678994cddac752f0155a9bb3d092fc19be0a18198a8655acf1efe6d469bb4c42156092539988a04d09509c0cf163c0347cfde87d7415a3c02128ed449d546e9
   languageName: node
   linkType: hard
 
-"react-generic-dummy@npm:^0.0.87":
-  version: 0.0.87
-  resolution: "react-generic-dummy@npm:0.0.87"
+"react-generic-dummy@npm:^0.0.88":
+  version: 0.0.88
+  resolution: "react-generic-dummy@npm:0.0.88"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/react": "*"
@@ -13454,13 +13465,13 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/c65393775edfc1eca1e10aa6aeebf55017a434d6108d6bdfb470bd7641df6f94ee70bfc33e23fb07eb907bbb672ef152d1fd5aa699477898539bd5ccfae504fd
+  checksum: 10c0/ad7c733ea18c1e6dbeb71c8e7b19346abfb5fa2ca2538a0767651d57e619e74cbdd1a83479658ce3815f0d28ad990b849a61083bacbc68ef7388f9cf77551831
   languageName: node
   linkType: hard
 
-"react-generic-tools@npm:^0.0.59":
-  version: 0.0.59
-  resolution: "react-generic-tools@npm:0.0.59"
+"react-generic-tools@npm:^0.0.60":
+  version: 0.0.60
+  resolution: "react-generic-tools@npm:0.0.60"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/prop-types": "*"
@@ -13483,7 +13494,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/e90847f17c42288bbbddc0556d09a3d151dd5d79c74d3ddc24062ca7ca8a507adcd991264ac072642f48d47229f9669b21c0f30040170f429b2ba47e99f0b8cc
+  checksum: 10c0/48f69dad5cf06ebf883b8cf061ff1cf93bcfad4712d1110183ec7067fd1f7e69d406bae7e63468ef129d35c4d1ea806e412e1ac01cfd5015a930c3f17f05f39e
   languageName: node
   linkType: hard
 
@@ -13503,7 +13514,7 @@ __metadata:
     "@codemirror/lint": "npm:^6.8.4"
     "@codemirror/search": "npm:^6.5.8"
     "@codemirror/state": "npm:^6.4.1"
-    "@codemirror/view": "npm:^6.35.1"
+    "@codemirror/view": "npm:^6.35.2"
     "@emotion/react": "npm:^11.13.5"
     "@rmwc/card": "npm:^14.3.5"
     "@rmwc/checkbox": "npm:^14.3.5"
@@ -13558,9 +13569,9 @@ __metadata:
     prop-types: "npm:^15.8.1"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
-    react-generic-animate: "npm:^0.0.64"
-    react-generic-dummy: "npm:^0.0.87"
-    react-generic-tools: "npm:^0.0.59"
+    react-generic-animate: "npm:^0.0.65"
+    react-generic-dummy: "npm:^0.0.88"
+    react-generic-tools: "npm:^0.0.60"
     react-transition-group: "npm:^4.4.5"
     react-useanimations: "npm:^2.10.0"
     spark-md5: "npm:^3.0.2"
