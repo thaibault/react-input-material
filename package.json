@@ -146,7 +146,7 @@
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",
     "blob-util": "^2.0.2",
-    "clientnode": "^3.0.1235",
+    "clientnode": "^3.0.1237",
     "css-loader": "^7.1.2",
     "cssnano": "^7.0.6",
     "documentation-website": "^1.0.340",
@@ -169,7 +169,7 @@
     "react-dom": "^18.3.1",
     "react-generic-animate": "^0.0.65",
     "react-generic-dummy": "^0.0.88",
-    "react-generic-tools": "^0.0.60",
+    "react-generic-tools": "^0.0.61",
     "react-transition-group": "^4.4.5",
     "react-useanimations": "^2.10.0",
     "spark-md5": "^3.0.2",
@@ -180,7 +180,7 @@
     "typescript-eslint": "^8.17.0",
     "typescript-plugin-css-modules": "^5.1.0",
     "web-component-wrapper": "^0.0.507",
-    "weboptimizer": "^2.0.1542",
+    "weboptimizer": "^2.0.1543",
     "webpack-dev-server": "^5.1.0"
   },
   "peerDependencies": {

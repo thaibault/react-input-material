@@ -15,8 +15,7 @@
 */
 // region imports
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
-import {Mapping} from 'clientnode'
-import {testEach} from 'clientnode/dist/test-helper'
+import {Mapping, testEach} from 'clientnode'
 import {useMemorizedValue} from 'react-generic-tools'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 import {TestHookResult} from 'react-generic-tools/type'

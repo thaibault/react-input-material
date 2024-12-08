@@ -16,20 +16,22 @@
     endregion
 */
 // region imports
-import {identity, ValueOf} from 'clientnode'
-import BasePropertyTypes, {
+import {
     arrayOf,
     boolean,
     func,
+    identity,
     number,
     object,
     oneOfType,
+    PropertyTypes as BasePropertyTypes,
     Requireable,
     shape,
     string,
     symbol,
-    ValidationMap
-} from 'clientnode/dist/property-types'
+    ValidationMap,
+    ValueOf
+} from 'clientnode'
 import {
     ElementType,
     ForwardRefExoticComponent,

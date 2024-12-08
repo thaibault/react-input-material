@@ -15,8 +15,7 @@
 */
 // region imports
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
-import {AnyFunction} from 'clientnode'
-import {testEach} from 'clientnode/dist/test-helper'
+import {AnyFunction, testEach} from 'clientnode'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
 import TextInput, {suggestionMatches} from '../components/TextInput'

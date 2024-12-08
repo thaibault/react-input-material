@@ -16,8 +16,9 @@
     endregion
 */
 // region imports
-import {ValueOf} from 'clientnode'
-import BasePropertyTypes, {func, number} from 'clientnode/dist/property-types'
+import {
+    func, number, PropertyTypes as BasePropertyTypes, ValueOf
+} from 'clientnode'
 import {
     ForwardRefExoticComponent,
     ReactElement,

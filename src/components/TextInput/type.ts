@@ -19,19 +19,23 @@
 import {LanguageSupport} from '@codemirror/language'
 import {JSONContent} from '@tiptap/core'
 
-import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode'
-import BasePropertyTypes, {
+import {
     arrayOf,
     boolean,
     func,
     number,
     object,
     oneOfType,
+    Mapping,
+    PlainObject,
+    PropertyTypes as BasePropertyTypes,
+    RecursivePartial,
     Requireable,
     shape,
     string,
-    symbol
-} from 'clientnode/dist/property-types'
+    symbol,
+    ValueOf
+} from 'clientnode'
 import {
     FocusEvent as ReactFocusEvent,
     ForwardRefExoticComponent,

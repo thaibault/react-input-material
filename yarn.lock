@@ -7122,9 +7122,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clientnode@npm:3.0.1232":
-  version: 3.0.1232
-  resolution: "clientnode@npm:3.0.1232"
+"clientnode@npm:3.0.1237, clientnode@npm:^3.0.1237":
+  version: 3.0.1237
+  resolution: "clientnode@npm:3.0.1237"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/prop-types": "*"
@@ -7142,31 +7142,7 @@ __metadata:
       optional: true
     prop-types:
       optional: true
-  checksum: 10c0/98fea1a42936ae65c9620eca2c07cce253e4c0eb3f1ae46f0d54685634b5d27e7fccda020c450c39069f658d1f9005454a781ddd9cca15927d02c802eaf302f0
-  languageName: node
-  linkType: hard
-
-"clientnode@npm:^3.0.1235":
-  version: 3.0.1235
-  resolution: "clientnode@npm:3.0.1235"
-  peerDependencies:
-    "@babel/runtime": "*"
-    "@types/prop-types": "*"
-    jquery: "*"
-    node-fetch: "*"
-    prop-types: "*"
-  peerDependenciesMeta:
-    "@babel/runtime":
-      optional: true
-    "@types/prop-types":
-      optional: true
-    jquery:
-      optional: true
-    node-fetch:
-      optional: true
-    prop-types:
-      optional: true
-  checksum: 10c0/288b55ace46a14158542322a8e7b1b9e2b2563147ef4bc751baf59d859af19d350bfd39fb65da922079afdc8b648067c0f9a6f3fe8ae995bbea3e9154a38bf05
+  checksum: 10c0/fd0bfdbd8dc541e29e483100b19a196bbf9672786bb937c22e3b82a8d11d1f93d5e85c0c14854ac48a504294417e35c98f7920bc9e8092a367f0fa4d11359a69
   languageName: node
   linkType: hard
 
@@ -13469,9 +13445,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-generic-tools@npm:^0.0.60":
-  version: 0.0.60
-  resolution: "react-generic-tools@npm:0.0.60"
+"react-generic-tools@npm:^0.0.61":
+  version: 0.0.61
+  resolution: "react-generic-tools@npm:0.0.61"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/prop-types": "*"
@@ -13494,7 +13470,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/48f69dad5cf06ebf883b8cf061ff1cf93bcfad4712d1110183ec7067fd1f7e69d406bae7e63468ef129d35c4d1ea806e412e1ac01cfd5015a930c3f17f05f39e
+  checksum: 10c0/215847d62ffefa48a3006d9fec662d3869736fb5ccaf388252916ec717d569857f9e07ac0c5bb82c505021ae4d4c33fbc749daa198206c27228f7408d6bf31d8
   languageName: node
   linkType: hard
 
@@ -13548,7 +13524,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.17.0"
     "@typescript-eslint/parser": "npm:^8.17.0"
     blob-util: "npm:^2.0.2"
-    clientnode: "npm:^3.0.1235"
+    clientnode: "npm:^3.0.1237"
     css-loader: "npm:^7.1.2"
     cssnano: "npm:^7.0.6"
     documentation-website: "npm:^1.0.340"
@@ -13571,7 +13547,7 @@ __metadata:
     react-dom: "npm:^18.3.1"
     react-generic-animate: "npm:^0.0.65"
     react-generic-dummy: "npm:^0.0.88"
-    react-generic-tools: "npm:^0.0.60"
+    react-generic-tools: "npm:^0.0.61"
     react-transition-group: "npm:^4.4.5"
     react-useanimations: "npm:^2.10.0"
     spark-md5: "npm:^3.0.2"
@@ -13582,7 +13558,7 @@ __metadata:
     typescript-eslint: "npm:^8.17.0"
     typescript-plugin-css-modules: "npm:^5.1.0"
     web-component-wrapper: "npm:^0.0.507"
-    weboptimizer: "npm:^2.0.1542"
+    weboptimizer: "npm:^2.0.1543"
     webpack-dev-server: "npm:^5.1.0"
   peerDependencies:
     "@babel/runtime": "*"
@@ -15608,9 +15584,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"weboptimizer@npm:^2.0.1542":
-  version: 2.0.1542
-  resolution: "weboptimizer@npm:2.0.1542"
+"weboptimizer@npm:^2.0.1543":
+  version: 2.0.1543
+  resolution: "weboptimizer@npm:2.0.1543"
   dependencies:
     "@babel/core": "npm:^7.26.0"
     "@babel/plugin-proposal-class-properties": "npm:^7.18.6"
@@ -15624,7 +15600,7 @@ __metadata:
     babel-loader: "npm:^9.2.1"
     babel-plugin-transform-modern-regexp: "npm:^0.0.6"
     babel-preset-minify: "npm:^0.5.2"
-    clientnode: "npm:3.0.1232"
+    clientnode: "npm:3.0.1237"
     ejs: "npm:^3.1.10"
     exports-loader: "npm:^5.0.0"
     extract-loader: "npm:^5.1.0"
@@ -15750,7 +15726,7 @@ __metadata:
       optional: true
   bin:
     weboptimizer: index.js
-  checksum: 10c0/1a4431f91cb83942a837da73924043a60c8e3b21c7b56df3a505246ab4628bd2bd543b3d289583c2d42479a050b4f337098814dd70a11061bf7058dcdd92c8a8
+  checksum: 10c0/2f04b683150ee7e797f6696369ad83d5eebb68e49cf0d1131d99f905f44263a98ad688412ca26bafe2435390d93d348cb2fa5dd07309e8335a2f4b9038617220
   languageName: node
   linkType: hard
 
