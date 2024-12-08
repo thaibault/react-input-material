@@ -16,11 +16,12 @@
     endregion
 */
 // region imports
-import {any,
+import {Mapping, ValueOf} from 'clientnode'
+import {
+    any,
     arrayOf,
     boolean,
     func,
-    Mapping,
     number,
     object,
     objectOf,
@@ -30,9 +31,8 @@ import {any,
     shape,
     string,
     symbol,
-    ValidationMap,
-    ValueOf
-} from 'clientnode'
+    ValidationMap
+} from 'clientnode/property-types'
 import {
     ComponentClass,
     FocusEvent,

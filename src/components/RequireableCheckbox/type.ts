@@ -16,7 +16,7 @@
     endregion
 */
 // region imports
-import {boolean, string} from 'clientnode'
+import {boolean, string} from 'clientnode/property-types'
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 
 import {

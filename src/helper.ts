@@ -28,12 +28,11 @@ import {
     isFunction,
     isObject,
     Mapping,
-    NullSymbol,
     PositiveEvaluationResult,
     timeout,
-    UndefinedSymbol,
     ValueOf
 } from 'clientnode'
+import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 
 import {ReactNode, useState} from 'react'
 
