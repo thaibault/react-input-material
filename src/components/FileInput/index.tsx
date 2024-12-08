@@ -29,7 +29,8 @@ import {
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
     SyntheticEvent,
-    useEffect, useId,
+    useEffect,
+    useId,
     useImperativeHandle,
     useRef,
     useState
