@@ -483,8 +483,7 @@ export const TextInputInner = function<Type = unknown>(
             />
         </GenericAnimate>
         <GenericAnimate
-            id={`${id}-declaration`}
-            in={properties.showDeclaration}
+            id={`${id}-declaration`} in={properties.showDeclaration}
         >
             {properties.declaration}
         </GenericAnimate>
