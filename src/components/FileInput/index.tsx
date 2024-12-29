@@ -739,8 +739,6 @@ export const FileInputInner = function<Type extends Value = Value>(
                                     <iframe
                                         ref={iFrameReference}
                                         style={{border: 0, overflow: 'hidden'}}
-                                        frameBorder="0"
-                                        scrolling="no"
                                         src={properties.value.url}
                                     />
                                 </div> :

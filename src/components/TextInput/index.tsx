@@ -454,7 +454,6 @@ export const TextInputInner = function<Type = unknown>(
         >
             <IconButton
                 icon={{
-                    // TODO make configurable
                     'aria-label':
                         properties.editorIsActive ?
                             'plain' :
@@ -476,7 +475,6 @@ export const TextInputInner = function<Type = unknown>(
                 aria-label="declaration"
 
                 checked={properties.showDeclaration}
-                // TODO make configurable
                 icon="more_horiz"
                 onIcon="more_vert"
                 onChange={onChangeShowDeclaration}
@@ -1473,7 +1471,7 @@ export const TextInputInner = function<Type = unknown>(
         disabled: properties.disabled,
         helpText: {
             children: renderHelpText(),
-            persistent: Boolean(properties.declaration)
+            persistent: true
         },
         invalid: (
             properties.invalid &&
