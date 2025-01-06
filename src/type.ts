@@ -59,7 +59,19 @@ export interface CursorState {
     end: number
     start: number
 }
-export type TypeSpecification = Array<string> | string
+export const PrimitiveTypes = [
+    'boolean',
+
+    'DateTime',
+
+    'integer',
+    'number',
+
+    'string'
+] as const
+export type PrimitiveType = typeof PrimitiveTypes[number]
+export type Type = boolean | number | string // | 'any' | PrimitiveType
+export type TypeSpecification = Array<TypeSpecification> | Type
 //// region model
 export interface BaseSelectionMapping {
     label: string
