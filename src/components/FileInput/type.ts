@@ -16,7 +16,7 @@
     endregion
 */
 // region imports
-import {identity, ValueOf} from 'clientnode'
+import {identity, Mapping, ValueOf} from 'clientnode'
 import BasePropertyTypes, {
     arrayOf,
     boolean,
@@ -95,8 +95,10 @@ export interface ModelState extends BaseModelState {
     invalidName: boolean
 }
 export interface Model<Type extends Value = Value> extends
-    BaseModel<null | Type>
+    Omit<BaseModel<null | Type>, 'default'>
 {
+    default?: Mapping<Type>
+
     contentTypePattern?: Pattern
     invertedContentTypePattern?: Pattern
 
@@ -117,6 +119,8 @@ export interface ChildrenOptions<P, Type extends Value = Value> {
 export interface Properties<
     Type extends Value = Value, MediaTag extends ElementType = 'div'
 > extends BaseProperties<null | Type>, ModelState {
+    default?: Mapping<Type>
+
     children?: (options: ChildrenOptions<
         Properties<Type, MediaTag>, Type
     >) => ReactNode

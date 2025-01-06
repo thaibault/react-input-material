@@ -460,8 +460,24 @@ export const FileInputInner = function<Type extends Value = Value>(
     /// endregion
     const givenProps: Props<Type> = translateKnownSymbols(props)
 
+    const defaultValue =
+        givenProps.default || givenProps.model?.default
+    const firstDefaultFileName =
+        defaultValue && Object.keys(defaultValue).length ?
+            Object.keys(defaultValue)[0] :
+            null
     const initialValue: null | Type = determineInitialValue<Type>(
-        givenProps, FileInput.defaultProperties.model.default as Type
+        {
+            ...givenProps,
+            default: defaultValue && firstDefaultFileName ?
+                defaultValue[firstDefaultFileName] :
+                null
+        },
+        FileInput.defaultProperties.model.default &&
+        Object.keys(FileInput.defaultProperties.model.default).length ?
+            Object.values(FileInput.defaultProperties.model.default)[0] as
+                Type :
+            undefined
     )
     /*
         NOTE: Extend default properties with given properties while letting
@@ -473,6 +489,13 @@ export const FileInputInner = function<Type extends Value = Value>(
         copy(FileInput.defaultProperties as DefaultProperties<Type>),
         givenProps
     )
+
+    if (
+        firstDefaultFileName &&
+        givenProperties.model?.fileName &&
+        !givenProperties.model.fileName.default
+    )
+        givenProperties.model.fileName.default = firstDefaultFileName
     /*
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).

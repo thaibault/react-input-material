@@ -90,8 +90,8 @@ const getPrototype = function<T, P extends PropertiesItem<T>>(
         className: CSS_CLASS_NAMES.inputsItemInput,
         triggerInitialPropertiesConsolidation:
             properties.triggerInitialPropertiesConsolidation,
-        ...(properties.default && properties.default.length > 0 ?
-            properties.default[0] :
+        ...(properties.default && (properties.default as Array<T>).length > 0 ?
+            (properties.default as Array<T>)[0] :
             {}
         )
     } as Partial<P>
@@ -226,7 +226,9 @@ export const InputsInner = function<
         inputPropertiesToValues<T, P>(
             determineInitialValue<Array<P> | null>(
                 givenProps,
-                copy(Inputs.defaultProperties.model.default) as Array<P> | null
+                copy(Inputs.defaultProperties.model.default) as
+                    unknown as
+                    Array<P> | null
             ) ||
             null
         )

@@ -89,8 +89,6 @@ export interface CommonBaseModel<Type = unknown> {
     description: string
     name: string
 
-    default?: Type
-
     emptyEqualsNull: boolean
 
     maximum: number | string
@@ -210,8 +208,7 @@ export interface TypedProperties<T = unknown> extends BaseProperties<T> {
     onFocus: (event: FocusEvent, properties: this) => void
     onTouch: (event: GenericEvent, properties: this) => void
 }
-export type Properties<T = unknown> =
-    TypedProperties<T> & CommonBaseModel<T>
+export type Properties<T = unknown> = TypedProperties<T> & CommonBaseModel<T>
 export type Props<T = unknown> =
     Partial<Omit<Properties<T>, 'model'>> &
     {
