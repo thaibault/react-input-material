@@ -33,10 +33,13 @@ import {
 } from '../../type'
 // endregion
 export interface Properties extends BaseProperties<boolean | null> {
+    default?: boolean
     checked: boolean
     id: string
 }
-export type Model = BaseModel<boolean | null>
+export interface Model extends BaseModel<boolean | null> {
+    default?: boolean
+}
 export type ModelState = BaseModelState
 export type ValueState = BaseValueState<boolean>
 export type Props =

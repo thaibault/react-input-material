@@ -1149,8 +1149,10 @@ const Application = () => {
 
                     <FileInput<FileInputValue>
                         default={useMemorizedValue({
-                            blob: {type: 'image/png'},
-                            url: '/placeholder/150'
+                            placeholder: {
+                                blob: {type: 'image/png'},
+                                url: '/placeholder/150'
+                            }
                         })}
 
                         contentTypePattern="^text/(?:plain|(?:x-)?csv|xml)$"
@@ -1164,7 +1166,7 @@ const Application = () => {
                             preserveStaticFileBaseNameInputGenerator
                         }
 
-                        name="fileInputUnControlled"
+                        name="fileInputUnControlled1"
 
                         onChange={onChange}
                     >
@@ -1210,6 +1212,18 @@ const Application = () => {
                                 ''
                         )}
                     </FileInput>
+
+                    <FileInput
+                        default={useMemorizedValue({
+                            placeholder: {
+                                blob: {type: 'image/png'},
+                                url: '/placeholder/150'
+                            }
+                        })}
+                        name="fileInputUnControlled2"
+                        onChange={onChange}
+                    />
+
                     <FileInput
                         name="fileInputControlled"
                         onChange={onChange}
@@ -1240,7 +1254,8 @@ const Application = () => {
                             })
                         )}
                         model={useMemorizedValue({
-                            default: [{name: 'inputs1-1'}], name: 'inputs1'
+                            default: [{name: 'inputs1-1'}],
+                            name: 'inputs1'
                         })}
                         onChange={onChange}
                         showInitialValidationState

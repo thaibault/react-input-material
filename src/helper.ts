@@ -317,8 +317,13 @@ export function determineInitialRepresentation<
  * @param alternateValue - Alternate value to respect.
  * @returns Determined value.
  */
-export const determineInitialValue = <Type = unknown>(
-    properties: BaseProps,
+export const determineInitialValue = <Type = unknown, DefaultType = unknown>(
+    properties:
+        BaseProps &
+        {
+            default?: DefaultType
+            model?: {default?: DefaultType}
+        },
     defaultValue?: Type,
     alternateValue?: Type
 ): null | Type => {
@@ -426,7 +431,13 @@ export const mapPropertiesIntoModel = <
         NOTE: Default props seems not to respect nested layers to merge, so we
         have to manage this for nested model structure.
     */
-    const result: DP = extend<DP>(
+    const result: (
+        DP &
+        {
+            default?: unknown
+            model?: {default?: unknown}
+        }
+    ) = extend<DP>(
         true,
         {model: copy<DP['model']>(defaultModel)} as DP,
         properties as unknown as DP

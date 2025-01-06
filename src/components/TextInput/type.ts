@@ -238,6 +238,7 @@ export interface ModelState extends BaseModelState {
     invalidPattern: boolean
 }
 export interface Model<T = unknown> extends BaseModel<T> {
+    default?: T
     state?: ModelState
 }
 export type PartialModel<T = unknown> =
@@ -315,6 +316,8 @@ export type EditorType = (
 export interface Properties<T = unknown> extends
     ModelState, BaseProperties<T>
 {
+    default?: T
+
     align: 'end' | 'start'
     children: (options: ChildrenOptions<this, T>) => null | ReactElement
     cursor: Partial<CursorState> | null

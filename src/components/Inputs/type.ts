@@ -75,6 +75,8 @@ export interface ModelState extends BaseModelState {
 export interface Model<T, P extends PropertiesItem<T> = PropertiesItem<T>>
     extends
 BaseModel<Array<P> | null> {
+    default?: Array<P> | null
+
     maximumNumber: number
     minimumNumber: number
 
@@ -91,6 +93,8 @@ export interface ChildrenOptions<T, P extends PropertiesItem<T>, IP> {
 export interface Properties<
     T = unknown, P extends PropertiesItem<T> = BaseProperties<T>
 > extends ModelState, Omit<BaseProperties<Array<P> | null>, 'onChangeValue'> {
+    default?: T
+
     addIcon: IconOptions
     removeIcon: IconOptions
 
