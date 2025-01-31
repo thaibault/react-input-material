@@ -430,7 +430,7 @@ export interface Component<Type> extends
     Omit<ForwardRefExoticComponent<Props>, 'propTypes'>,
     StaticWebComponent<Type, ModelState, DefaultProperties>
 {
-    <T = string>(props: Props<T> & RefAttributes<Adapter<T>>): ReactElement
+    <T = unknown>(props: Props<T> & RefAttributes<Adapter<T>>): ReactElement
 
     locales: Array<string>
     transformer: DataTransformation
