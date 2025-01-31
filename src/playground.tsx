@@ -1147,12 +1147,12 @@ const Application = () => {
                 >
                     <FileInput name="fileInput1" onChange={onChange} />
 
-                    <FileInput<FileInputValue>
+                    <FileInput
                         default={useMemorizedValue({
                             placeholder: {
                                 blob: {type: 'image/png'},
                                 url: '/placeholder/150'
-                            }
+                            } as FileInputValue
                         })}
 
                         contentTypePattern="^text/(?:plain|(?:x-)?csv|xml)$"
