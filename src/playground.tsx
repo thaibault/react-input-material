@@ -32,12 +32,13 @@ import {
     UnknownFunction
 } from 'clientnode'
 
-import {ReactNode, useState} from 'react'
+import {createRef, ReactNode, useState} from 'react'
 import {createRoot} from 'react-dom/client'
 import {useMemorizedValue} from 'react-generic-tools'
 
 import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
 import {
+    AdapterWithReferences,
     ChildrenOptions,
     Properties as FileInputProperties,
     Props as FileInputProps,
@@ -256,6 +257,8 @@ const Application = () => {
         })
     /// endregion
     // endregion
+    const fileInputUnControlledHeadlessReference =
+        createRef<AdapterWithReferences>()
     return (<>
         {/* region navigation */}
         <div className="tab-bar">
@@ -1232,9 +1235,24 @@ const Application = () => {
                         value={fileInputValue}
                     />
 
+                    <button
+                        onClick={() => {
+                            fileInputUnControlledHeadlessReference
+                                .current?.references.fileInputReference
+                                .current?.click()
+                        }}
+                    >Add medium</button>
                     <FileInput
-                        name="fileInputUnControlledHeadless"
+                        name="fileInputUncontrolledHeadless"
+
+                        deleteButton={null}
+                        downloadButton={null}
+                        editButton={null}
+                        newButton={null}
+
                         onChange={onChange}
+
+                        ref={fileInputUnControlledHeadlessReference}
                     />
                 </div>
                 {/* endregion */}

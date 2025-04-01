@@ -901,10 +901,33 @@ export const FileInputInner = function<Type extends Value = Value>(
                     type="file"
                 />
             </CardPrimaryAction>
-            {!properties.disabled || properties.value ?
+            {(
+                (
+                    !properties.disabled &&
+                    (
+                        properties.value ?
+                            properties.editButton :
+                            properties.newButton
+                    )
+                ) ||
+                (
+                    properties.value &&
+                    (
+                        (!properties.disabled && properties.deleteButton) ||
+                        (properties.value.url && properties.downloadButton)
+                    )
+                )
+            ) ?
                 <CardActions>
                     <CardActionButtons>
-                        {!properties.disabled ?
+                        {(
+                            !properties.disabled &&
+                            (
+                                properties.value ?
+                                    properties.editButton :
+                                    properties.newButton
+                            )
+                        ) ?
                             <CardActionButton
                                 onClick={() => {
                                     fileInputReference.current?.click()
@@ -921,8 +944,10 @@ export const FileInputInner = function<Type extends Value = Value>(
                         }
                         {properties.value ?
                             <>
-                                {properties.disabled ?
-                                    '' :
+                                {(
+                                    !properties.disabled &&
+                                    properties.deleteButton
+                                ) ?
                                     <CardActionButton
                                         onClick={() => {
                                             onChangeValue()
@@ -931,9 +956,13 @@ export const FileInputInner = function<Type extends Value = Value>(
                                         ripple={properties.ripple}
                                     >
                                         {properties.deleteButton}
-                                    </CardActionButton>
+                                    </CardActionButton> :
+                                    ''
                                 }
-                                {properties.value.url ?
+                                {(
+                                    properties.value.url &&
+                                    properties.downloadButton
+                                ) ?
                                     <CardActionButton
                                         onClick={() => {
                                             downloadLinkReference
