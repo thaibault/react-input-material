@@ -1231,6 +1231,11 @@ const Application = () => {
                         triggerInitialPropertiesConsolidation={true}
                         value={fileInputValue}
                     />
+
+                    <FileInput
+                        name="fileInputUnControlledHeadless"
+                        onChange={onChange}
+                    />
                 </div>
                 {/* endregion */}
 

@@ -368,6 +368,7 @@
       "server": {
         "proxy": [
           {
+            "changeOrigin": true,
             "context": [
               "/placeholder"
             ],
@@ -375,7 +376,7 @@
               "^/placeholder": ""
             },
             "secure": false,
-            "target": "https://via.placeholder.com"
+            "target": "https://placehold.co"
           }
         ]
       }
