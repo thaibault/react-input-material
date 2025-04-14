@@ -41,7 +41,7 @@ endregion */
         width: 100%;
 
         &.mdc-select--disabled .mdc-select__dropdown-icon {
-            color: rgba(0 0 0 / 38%);
+            color: rgb(0 0 0 / 38%);
         }
 
         .mdc-select__menu {
