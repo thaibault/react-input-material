@@ -31,7 +31,7 @@ endregion */
             opacity: 0;
             /* stylelint-disable selector-class-pattern */
             .cm-activeLine {
-                background-color: rgba(0 0 0 / 5%);
+                background-color: rgb(0 0 0 / 5%);
             }
             /* stylelint-enable selector-class-pattern */
         }
@@ -40,7 +40,7 @@ endregion */
             visibility: hidden;
             /* stylelint-disable selector-class-pattern */
             .cm-activeLineGutter {
-                background-color: rgba(0 0 0 / 5%);
+                background-color: rgb(0 0 0 / 5%);
             }
             /* stylelint-enable selector-class-pattern */
         }
@@ -85,7 +85,7 @@ endregion */
     }
 
     .richtext-editor {
-        border-bottom: 1px solid rgba(0 0 0 / 42%);
+        border-bottom: 1px solid rgb(0 0 0 / 42%);
 
         .richtext-editor__bar {
             padding-left: 6px;

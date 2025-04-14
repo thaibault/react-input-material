@@ -68,8 +68,7 @@ import GenericAnimate from 'react-generic-animate'
 import {GenericEvent} from 'react-generic-tools/type'
 import Dummy from 'react-generic-dummy'
 import {
-    TransitionChildren,
-    TransitionProps
+    TransitionChildren, TransitionProps
 } from 'react-transition-group/Transition'
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
@@ -109,7 +108,6 @@ import {
 } from './helper'
 import RichTextEditorComponent from './Tiptap'
 import {
-    Adapter,
     AdapterWithReferences,
     CodeMirrorProps as CodeEditorProps,
     CodeMirrorProperties as CodeEditorProperties,
@@ -169,7 +167,7 @@ export const INPUT_TRANSFORMER = TRANSFORMER
  * @returns React elements.
  */
 export const TextInputInner = function<Type = unknown>(
-    props: Props<Type>, reference?: ForwardedRef<Adapter<Type>>
+    props: Props<Type>, reference?: ForwardedRef<AdapterWithReferences<Type>>
 ): ReactElement {
     const defaultID = useId()
     const id = props.id ?? defaultID
