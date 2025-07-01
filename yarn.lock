@@ -5436,7 +5436,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.3.1":
+"@types/react-dom@npm:^18.3.7":
   version: 18.3.7
   resolution: "@types/react-dom@npm:18.3.7"
   peerDependencies:
@@ -5454,7 +5454,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^18.3.12":
+"@types/react@npm:^18.3.23":
   version: 18.3.23
   resolution: "@types/react@npm:18.3.23"
   dependencies:
@@ -7848,6 +7848,30 @@ __metadata:
     prop-types:
       optional: true
   checksum: 10c0/8f20bef6cb1ed8f64dbf2ed7dabf4d09575ea3dcca3eeb1f6b80c9a37230f78a3f42acfd12738c42b78472113aa80b459dd17c7e27b5cabbb1e8d6ff124e33d6
+  languageName: node
+  linkType: hard
+
+"clientnode@npm:3.0.1299":
+  version: 3.0.1299
+  resolution: "clientnode@npm:3.0.1299"
+  peerDependencies:
+    "@babel/runtime": "*"
+    "@types/prop-types": "*"
+    jquery: "*"
+    node-fetch: "*"
+    prop-types: "*"
+  peerDependenciesMeta:
+    "@babel/runtime":
+      optional: true
+    "@types/prop-types":
+      optional: true
+    jquery:
+      optional: true
+    node-fetch:
+      optional: true
+    prop-types:
+      optional: true
+  checksum: 10c0/3dfa19267a15afe2802e7c0b8268232d0e08d81d58645aa58d67550f14242951e79e5eb26b5481b52d1b917ae434ca13d0d9a78554cb812ff32c95ddf525e7c4
   languageName: node
   linkType: hard
 
@@ -14094,15 +14118,15 @@ __metadata:
     "@types/jquery": "npm:^3.5.32"
     "@types/jsdom": "npm:^21.1.7"
     "@types/node": "npm:^24.0.8"
-    "@types/react": "npm:^18.3.12"
-    "@types/react-dom": "npm:^18.3.1"
+    "@types/react": "npm:^18.3.23"
+    "@types/react-dom": "npm:^18.3.7"
     "@types/react-transition-group": "npm:^4.4.12"
     "@types/spark-md5": "npm:^3.0.5"
     "@types/webpack-env": "npm:^1.18.8"
     "@typescript-eslint/eslint-plugin": "npm:^8.35.1"
     "@typescript-eslint/parser": "npm:^8.35.1"
     blob-util: "npm:^2.0.2"
-    clientnode: "npm:3.0.1298"
+    clientnode: "npm:3.0.1299"
     css-loader: "npm:^7.1.2"
     cssnano: "npm:^7.0.7"
     documentation-website: "npm:^1.0.391"
