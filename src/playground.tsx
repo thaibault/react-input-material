@@ -28,8 +28,7 @@ import {
     LOCALES,
     Mapping,
     represent,
-    timeout,
-    UnknownFunction
+    timeout
 } from 'clientnode'
 
 import {createRef, ReactNode, useState} from 'react'
@@ -1024,7 +1023,7 @@ const Application = () => {
                         placeholder="selectionInput6ModelPlaceholder"
                         searchSelection
                         suggestionCreator={useMemorizedValue(
-                            debounce<Array<string>>(
+                            debounce<Array<string> | Promise<Array<string>>>(
                                 (({query}: SuggestionCreatorOptions<
                                     TextInputProperties<string>
                                 >): Array<string> | Promise<Array<string>> => {
@@ -1043,9 +1042,13 @@ const Application = () => {
                                                 !query || name.includes(query)
                                             )
                                         )
-                                }) as UnknownFunction,
+                                }) as
+                                    (...parameters: Array<unknown>) =>
+                                        Array<string> | Promise<Array<string>>,
                                 1000
-                            )
+                            ) as TextInputProperties<string>[
+                                'suggestionCreator'
+                            ]
                         )}
                     />
 
