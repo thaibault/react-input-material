@@ -81,7 +81,7 @@ export const Index = (props: TiptapProps) => {
         },
         ...(props.editor?.options || {})
     })
-    const htmlContent = editor?.getHTML()
+    const htmlContent = editor.getHTML()
 
     useEffect(
         () => {
@@ -112,7 +112,7 @@ export const Index = (props: TiptapProps) => {
         classNamePrefix={CSS_CLASS_NAMES.richtextEditor}
 
         onLabelClick={() => {
-            editor?.chain().focus().run()
+            editor.chain().focus().run()
         }}
     >
         <EditorContent
