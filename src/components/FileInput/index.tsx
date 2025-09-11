@@ -780,7 +780,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                                     '' :
                     properties.value?.blob &&
                     properties.value.blob instanceof Blob ?
-                        // NOTE: Only blobs have to red asynchronously.
+                        // NOTE: Only blobs have to be red asynchronously.
                         <CircularProgress size="large" /> :
                         ''
                 }
