@@ -448,7 +448,7 @@ export const RequireableCheckboxInner = function(
                 onClick={onClick}
                 onFocus={onFocus}
                 ripple={properties.ripple}
-                value={String(properties.value as unknown as string)}
+                value={String(properties.value as unknown)}
             >
                 {(
                     properties.invalid &&
