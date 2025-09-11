@@ -36,11 +36,7 @@ import {
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
-import {MDCCheckboxFoundation} from '@material/checkbox'
-
-import {Checkbox} from '@rmwc/checkbox'
-import {Theme} from '@rmwc/theme'
-
+import Checkbox from '@low-level-component-implementations/Checkbox'
 /*
 "namedExport" version of css-loader:
 
@@ -343,8 +339,6 @@ export const RequireableCheckboxInner = function(
     /// region references
     const inputReference: RefObject<HTMLInputElement | null> =
         useRef<HTMLInputElement>(null)
-    const foundationRef: RefObject<MDCCheckboxFoundation | null> =
-        useRef<MDCCheckboxFoundation>(null)
     /// endregion
     const givenProps: Props = translateKnownSymbols(props)
 
@@ -404,14 +398,9 @@ export const RequireableCheckboxInner = function(
     // region export references
     useImperativeHandle(
         reference,
-        (): Adapter & {
-            references: {
-                foundationRef: RefObject<MDCCheckboxFoundation | null>
-                inputReference: RefObject<HTMLInputElement | null>
-            }
-        } => ({
+        (): Adapter & {reference: unknown} => ({
             properties,
-            references: {foundationRef, inputReference},
+            reference: inputReference,
             state: {
                 modelState: properties.model.state,
                 ...(controlled ?
@@ -436,19 +425,16 @@ export const RequireableCheckboxInner = function(
             style={properties.styles}
         >
             <Checkbox
-                checked={Boolean(properties.value)}
+                value={Boolean(properties.value)}
                 disabled={properties.disabled}
-                foundationRef={foundationRef}
                 id={properties.id || properties.name}
                 indeterminate={properties.value === null}
-                inputRef={inputReference}
+                ref={inputReference}
                 name={properties.name}
                 onBlur={onBlur}
                 onChange={onChangeValue}
                 onClick={onClick}
                 onFocus={onFocus}
-                ripple={properties.ripple}
-                value={String(properties.value as unknown)}
             >
                 {(
                     properties.invalid &&

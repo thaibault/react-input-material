@@ -36,6 +36,10 @@ selections, numbers, dates and so on.
 
 ### Low-level component compatibility layer
 
+#### Generic
+
+- Tooltip
+
 #### FileInput
 
 - Card
@@ -52,19 +56,6 @@ selections, numbers, dates and so on.
 #### RequireableCheckbox
 
 - Checkbox
-    - Inputs:
-        - classNames: string[]
-        - styles: object
-        - ref: object
-        - value: boolean
-        - id: string
-        - indeterminate: boolean
-        - name: string
-    - Outputs:
-        - onBlur
-        - onChange
-        - onClick
-        - onFocus
 
 #### Inputs
 
@@ -89,3 +80,4 @@ selections, numbers, dates and so on.
 
 #### TextInput
 
+- TODO
