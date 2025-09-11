@@ -67,7 +67,7 @@
     "dist/index.css",
     "dist/index.d.ts",
     "dist/index.js",
-    "dist/material-fixes.css",
+    "dist/rmwc-implementation/material-fixes.css",
     "dist/type.d.ts",
     "dist/type.js"
   ],
@@ -409,12 +409,12 @@
         "./components/WrapStrict": "./components/WrapStrict",
         "./components/WrapThemeProvider": "./components/WrapThemeProvider",
         "./components/WrapTooltip": "./components/WrapTooltip",
+        "./rmwc-implementation/material-fixes": "./rmwc-implementation/material-fixes",
         "helper": "./helper",
         "index": [
           "./index.css",
           "./index.ts"
         ],
-        "material-fixes": "./material-fixes",
         "type": "./type"
       },
       "supportedBrowsers": [

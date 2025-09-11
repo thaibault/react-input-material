@@ -33,3 +33,59 @@ Use case
 
 Reusable material design based input field with support for (richt-)text, code,
 selections, numbers, dates and so on.
+
+### Low-level component compatibility layer
+
+#### FileInput
+
+- Card
+    - Inputs:
+        - classNames: string[]
+        - styles: object
+        - ref: object
+    - Outputs:
+        - onBlur
+        - onClick
+        - onFocus
+- CircularProgress
+
+#### RequireableCheckbox
+
+- Checkbox
+    - Inputs:
+        - classNames: string[]
+        - styles: object
+        - ref: object
+        - value: boolean
+        - id: string
+        - indeterminate: boolean
+        - name: string
+    - Outputs:
+        - onBlur
+        - onChange
+        - onClick
+        - onFocus
+
+#### Inputs
+
+- IconButton
+    - Inputs:
+        - classNames: string[]
+        - styles: object
+        - ref: object
+        - icon: string
+        - onIcon: string
+    - Outputs:
+        - onClick
+
+#### Interval
+
+- Icon
+    - Inputs:
+        - classNames: string[]
+        - styles: object
+        - ref: object
+        - icon: string
+
+#### TextInput
+
