@@ -1,7 +1,10 @@
 {
     "compilerOptions": {
         "declaration": true,
-        "declarationDir": "dist/"
+        "declarationDir": "dist/",
+        "paths": {
+          "@low-level-component-implementations/*": ["./src/implementations/rmwc/*"]
+        }
     },
     "extends": "./node_modules/weboptimizer/tsconfig.application.json",
     "include": [

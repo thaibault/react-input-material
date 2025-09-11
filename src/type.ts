@@ -34,13 +34,13 @@ import {
     ValidationMap
 } from 'clientnode/property-types'
 import {
-    ComponentClass,
+    ComponentClass, FocusEvent as ReactFocusEvent,
     FocusEvent,
     ForwardRefExoticComponent,
-    FunctionComponent,
+    FunctionComponent, MouseEvent as ReactMouseEvent,
     MouseEvent,
     ReactElement,
-    RefAttributes
+    RefAttributes, SyntheticEvent
 } from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
 import {
@@ -466,5 +466,26 @@ export interface ConfigurationProperties {
     themeConfiguration?: ThemeProviderProps['options']
     tooltip?: Properties['tooltip']
     wrap?: boolean
+}
+// endregion
+// region low-level-components-interface
+export interface CheckboxProperties {
+    id: string
+
+    classNames: Array<string>
+    styles: object
+
+    ref: object
+
+    value: boolean
+    disabled: boolean
+    indeterminate: boolean
+
+    name: string
+
+    onBlur: (event: SyntheticEvent) => void
+    onChange: (event: SyntheticEvent) => void
+    onClick: (event: ReactMouseEvent) => void
+    onFocus: (event: ReactFocusEvent) => void
 }
 // endregion

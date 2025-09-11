@@ -67,7 +67,7 @@
     "dist/index.css",
     "dist/index.d.ts",
     "dist/index.js",
-    "dist/rmwc-implementation/material-fixes.css",
+    "dist/implementations/rmwc/material-fixes.css",
     "dist/type.d.ts",
     "dist/type.js"
   ],
@@ -409,7 +409,7 @@
         "./components/WrapStrict": "./components/WrapStrict",
         "./components/WrapThemeProvider": "./components/WrapThemeProvider",
         "./components/WrapTooltip": "./components/WrapTooltip",
-        "./rmwc-implementation/material-fixes": "./rmwc-implementation/material-fixes",
+        "./implementations/rmwc/material-fixes": "./implementations/rmwc/material-fixes",
         "helper": "./helper",
         "index": [
           "./index.css",
@@ -519,6 +519,7 @@
           "@codemirror/search": "react-generic-dummy",
           "@codemirror/state": "react-generic-dummy",
           "@codemirror/view": "react-generic-dummy",
+          "@low-level-component-implementations": "implementations/rmwc",
           "@rmwc/tooltip": "react-generic-dummy",
           "@tiptap/core$": "react-generic-dummy",
           "@tiptap/react": "react-generic-dummy",
