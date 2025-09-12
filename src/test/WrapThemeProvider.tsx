@@ -17,7 +17,7 @@
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
-import WrapThemeProvider from '../components/WrapThemeProvider'
+import WrapThemeProvider from '../components/Wrapper/WrapThemeProvider'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 

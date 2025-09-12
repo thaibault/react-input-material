@@ -53,7 +53,7 @@ import {Theme} from '@rmwc/theme'
 import {Typography} from '@rmwc/typography'
 
 import TextInput from '../TextInput'
-import {WrapConfigurations} from '../WrapConfigurations'
+import {WrapConfigurations} from '../Wrapper/WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
     determineInitialValue,

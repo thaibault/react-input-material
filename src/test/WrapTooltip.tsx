@@ -17,7 +17,7 @@
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
-import WrapTooltip from '../components/WrapTooltip'
+import WrapTooltip from '../components/Wrapper/WrapTooltip'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 describe('WrapTooltip', () => {

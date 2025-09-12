@@ -469,26 +469,43 @@ export interface ConfigurationProperties {
 // endregion
 // region low-level-components-interface
 export interface CheckboxProperties {
-    id: string
+    id?: string
 
-    classNames: Array<string>
-    styles: object
+    classNames?: Array<string>
+    styles?: object
 
     value: boolean
-    disabled: boolean
-    indeterminate: boolean
+    disabled?: boolean
+    indeterminate?: boolean
 
     name: string
-    children: ReactNode
+    children?: ReactNode
 
-    onBlur: (event: SyntheticEvent) => void
-    onChange: (event: SyntheticEvent) => void
-    onClick: (event: ReactMouseEvent) => void
-    onFocus: (event: ReactFocusEvent) => void
+    onBlur?: (event: SyntheticEvent) => void
+    onChange?: (event: SyntheticEvent) => void
+    onClick?: (event: ReactMouseEvent) => void
+    onFocus?: (event: ReactFocusEvent) => void
 }
 export interface ErrorProperties {
     children: string
 }
+
+export declare type IconSize =
+    'extra-small' | 'small' | 'medium' | 'large' | 'extra-large'
+export interface IconProperties {
+    classNames?: Array<string>
+    styles?: object
+
+    size?: IconSize
+
+    value: string
+}
+export interface IconButtonProperties extends IconProperties {
+    onValue?: string
+
+    onChange?: (event: SyntheticEvent) => void
+}
+
 export interface TooltipProperties {
     children: ReactNode
     value: string

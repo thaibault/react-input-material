@@ -21,7 +21,8 @@ import {AnyFunction, FirstParameter} from 'clientnode'
 import {
     forwardRef,
     ForwardRefRenderFunction,
-    FunctionComponent, PropsWithoutRef,
+    FunctionComponent,
+    PropsWithoutRef,
     ReactElement,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject
@@ -32,7 +33,7 @@ import {ThemePropT} from '@rmwc/types'
 import {WrapStrict} from './WrapStrict'
 import {WrapThemeProvider} from './WrapThemeProvider'
 import {WrapTooltip} from './WrapTooltip'
-import {ConfigurationProperties} from '../type'
+import {ConfigurationProperties} from '../../type'
 //  endregion
 /**
  * Wraps a theme provider, strict wrapper and tooltip to given element if

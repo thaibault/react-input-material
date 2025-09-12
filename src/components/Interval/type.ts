@@ -33,12 +33,11 @@ import {GenericEvent} from 'react-generic-tools/type'
 import {
     ComponentAdapter, PropertiesValidationMap
 } from 'web-component-wrapper/type'
-import {IconOptions} from '@rmwc/types'
 
 import {
     defaultModelState as baseDefaultModelState,
     Component as BaseComponent,
-    ModelState as BaseModelState
+    ModelState as BaseModelState, IconProperties
 } from '../../type'
 import {
     defaultInputModel as defaultTextInputModel,
@@ -87,7 +86,7 @@ export interface Properties extends Omit<
     TextInputProperties<DateTimeRepresentation | null>,
     'icon' | 'model' | 'onChange' | 'onChangeValue' | 'value'
 > {
-    icon: IconOptions
+    icon: IconProperties
 
     model: Model
 
@@ -135,7 +134,7 @@ export type Props =
             }
         >
 
-        icon: Properties['icon'] | string
+        icon: IconProperties | string
 
         model?: PartialModel
 
@@ -198,7 +197,7 @@ export const propertyTypes: PropertiesValidationMap = {
     })
 } as const
 export const defaultProperties: DefaultProperties = {
-    icon: {icon: 'timelapse'},
+    icon: {value: 'timelapse'},
 
     maximumText:
         'Please provide something earlier than ${formatValue(maximum)}.',

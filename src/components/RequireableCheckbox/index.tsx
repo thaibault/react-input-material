@@ -43,7 +43,7 @@ import Error from '@low-level-component-implementations/Error'
 
 import {requireableCheckboxClassName} from './style.module'
 */
-import {WrapConfigurations} from '../WrapConfigurations'
+import {WrapConfigurations} from '../Wrapper/WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
     determineInitialValue,

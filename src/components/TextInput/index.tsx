@@ -73,8 +73,8 @@ import {
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
-import WrapConfigurations from '../WrapConfigurations'
-import WrapTooltip from '../WrapTooltip'
+import WrapConfigurations from '../Wrapper/WrapConfigurations'
+import WrapTooltip from '../Wrapper/WrapTooltip'
 import {
     deriveMissingPropertiesFromState as deriveMissingBasePropertiesFromState,
     determineInitialValue,

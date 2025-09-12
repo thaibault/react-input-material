@@ -8,9 +8,9 @@ import {
     useImperativeHandle,
     useRef
 } from 'react'
+import {MDCCheckboxFoundation} from '@material/checkbox'
 
 import {CheckboxProperties} from '../../type'
-import {MDCCheckboxFoundation} from '@material/checkbox'
 
 export const Checkbox = forwardRef((
     properties: CheckboxProperties, reference?: ForwardedRef<unknown>
@@ -32,7 +32,7 @@ export const Checkbox = forwardRef((
     )
 
     return <div
-        className={properties.classNames.join(' ')}
+        className={properties.classNames?.join(' ')}
         style={properties.styles}
     >
         <RMWCCheckbox
@@ -49,7 +49,6 @@ export const Checkbox = forwardRef((
             onClick={properties.onClick}
             onFocus={properties.onFocus}
 
-            ripple={true}
             value={String(properties.value as unknown)}
 
             ref={baseReference}

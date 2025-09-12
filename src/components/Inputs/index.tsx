@@ -28,6 +28,7 @@ import {
     ReactNode,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
+    SyntheticEvent,
     useImperativeHandle,
     useEffect,
     useState
@@ -35,7 +36,8 @@ import {
 import {
     ComponentAdapter, PropertiesValidationMap
 } from 'web-component-wrapper/type'
-import {IconButton, IconButtonOnChangeEventT} from '@rmwc/icon-button'
+
+import IconButton from '@low-level-component-implementations/IconButton'
 
 import TextInput from '../TextInput'
 /*
@@ -53,7 +55,7 @@ import {
 */
 import cssClassNames from './style.module'
 
-import WrapConfigurations from '../WrapConfigurations'
+import WrapConfigurations from '../Wrapper/WrapConfigurations'
 import {
     createDummyStateSetter,
     determineInitialValue,
@@ -446,7 +448,7 @@ export const InputsInner = function<
         })
     )
 
-    const add = (event?: IconButtonOnChangeEventT): void => {
+    const add = (event?: SyntheticEvent): void => {
         setValues((values: Array<T> | null): Array<T> | null => {
             /*
                 NOTE: This is needed since the event handler is provided to icon
@@ -484,7 +486,7 @@ export const InputsInner = function<
         })
     }
     const createRemoveCallback = (index: number) =>
-        (event?: IconButtonOnChangeEventT) => {
+        (event?: SyntheticEvent) => {
             setValues((values: Array<T> | null): Array<T> | null => {
                 values = triggerOnChangeValue(
                     values, event as unknown as GenericEvent, null as T, index
@@ -498,10 +500,9 @@ export const InputsInner = function<
     // endregion
     // region render
     const addButton: ReactElement = <IconButton
-        className={CSS_CLASS_NAMES.inputsAddButton}
+        classNames={[CSS_CLASS_NAMES.inputsAddButton]}
 
-        icon={properties.addIcon}
-        onIcon={properties.addIcon}
+        value={properties.addIcon}
 
         onChange={add}
     />
@@ -542,12 +543,11 @@ export const InputsInner = function<
                         {properties.disabled ?
                             '' :
                             <IconButton
-                                className={
-                                    CSS_CLASS_NAMES.inputsItemRemove
+                                classNames={
+                                    [CSS_CLASS_NAMES.inputsItemRemove]
                                 }
 
-                                icon={properties.removeIcon}
-                                onIcon={properties.removeIcon}
+                                value={properties.removeIcon}
 
                                 onChange={createRemoveCallback(index)}
                             />

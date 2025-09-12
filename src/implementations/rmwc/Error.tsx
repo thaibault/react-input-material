@@ -10,10 +10,10 @@ import {
 import {ErrorProperties} from '../../type'
 
 export const Error = forwardRef((
-    properties: ErrorProperties, reference?: ForwardedRef<unknown>
+    {children}: ErrorProperties, reference?: ForwardedRef<unknown>
 ): ReactElement =>
     <Theme ref={reference as RefObject<HTMLDivElement | null>} use="error">
-        {properties.children}
+        {children}
     </Theme>
 )
 

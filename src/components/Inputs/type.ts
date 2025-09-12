@@ -27,7 +27,6 @@ import {
     MutableRefObject as RefObject
 } from 'react'
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
-import {IconOptions} from '@rmwc/types'
 
 import {
     modelStatePropertyTypes as textInputModelStatePropertyTypes,
@@ -95,8 +94,8 @@ export interface Properties<
 > extends ModelState, Omit<BaseProperties<Array<P> | null>, 'onChangeValue'> {
     default?: T
 
-    addIcon: IconOptions
-    removeIcon: IconOptions
+    addIcon: string
+    removeIcon: string
 
     children: (options: ChildrenOptions<T, P, this>) => ReactNode
 
@@ -198,8 +197,8 @@ export const defaultModel: Model<string, TextInputProperties<string>> = {
 export const defaultProperties: DefaultProperties = {
     ...baseDefaultProperties as DefaultProperties,
 
-    addIcon: {icon: 'add'},
-    removeIcon: {icon: 'clear'},
+    addIcon: 'add',
+    removeIcon: 'clear',
 
     createItem: ({item}): TextInputProps<string> => item,
     createPrototype: ({item}): TextInputProps<string> => item,

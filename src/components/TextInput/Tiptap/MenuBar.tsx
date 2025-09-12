@@ -22,7 +22,7 @@ import {ChainedCommands, Editor} from '@tiptap/core'
 
 import {createContext, useContext} from 'react'
 
-import WrapTooltip from '../../WrapTooltip'
+import WrapTooltip from '../../Wrapper/WrapTooltip'
 
 import {RichTextEditorButtonProps} from '../type'
 // endregion
