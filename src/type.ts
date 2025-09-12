@@ -39,7 +39,7 @@ import {
     ForwardRefExoticComponent,
     FunctionComponent, MouseEvent as ReactMouseEvent,
     MouseEvent,
-    ReactElement,
+    ReactElement, ReactNode,
     RefAttributes, SyntheticEvent
 } from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
@@ -475,17 +475,19 @@ export interface CheckboxProperties {
     classNames: Array<string>
     styles: object
 
-    ref: object
-
     value: boolean
     disabled: boolean
     indeterminate: boolean
 
     name: string
+    children: ReactNode
 
     onBlur: (event: SyntheticEvent) => void
     onChange: (event: SyntheticEvent) => void
     onClick: (event: ReactMouseEvent) => void
     onFocus: (event: ReactFocusEvent) => void
+}
+export interface ErrorProperties {
+    children: string
 }
 // endregion

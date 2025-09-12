@@ -1,6 +1,7 @@
 import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox'
 import {
-    ForwardRefRenderFunction,
+    ForwardedRef,
+    forwardRef,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
     ReactElement,
@@ -11,9 +12,9 @@ import {
 import {CheckboxProperties} from '../../type'
 import {MDCCheckboxFoundation} from '@material/checkbox'
 
-export const Checkbox = function(
-    properties: CheckboxProperties, reference?: RefObject<unknown>
-): ReactElement {
+export const Checkbox = forwardRef((
+    properties: CheckboxProperties, reference?: ForwardedRef<unknown>
+): ReactElement => {
     const baseReference: RefObject<HTMLInputElement | null> =
         useRef<HTMLInputElement>(null)
     const foundationReference: RefObject<MDCCheckboxFoundation | null> =
@@ -30,27 +31,32 @@ export const Checkbox = function(
         })
     )
 
-    return <RMWCCheckbox
-        checked={properties.value}
-        disabled={properties.disabled}
+    return <div
+        className={properties.classNames.join(' ')}
+        style={properties.styles}
+    >
+        <RMWCCheckbox
+            checked={properties.value}
+            disabled={properties.disabled}
 
-        id={properties.name}
-        indeterminate={properties.indeterminate}
+            id={properties.name}
+            indeterminate={properties.indeterminate}
 
-        name={properties.name}
+            name={properties.name}
 
-        onBlur={properties.onBlur}
-        onChange={properties.onChange}
-        onClick={properties.onClick}
-        onFocus={properties.onFocus}
+            onBlur={properties.onBlur}
+            onChange={properties.onChange}
+            onClick={properties.onClick}
+            onFocus={properties.onFocus}
 
-        ripple={true}
-        value={String(properties.value as unknown)}
+            ripple={true}
+            value={String(properties.value as unknown)}
 
-        ref={baseReference}
-        inputRef={inputReference}
-        foundationRef={foundationReference}
-    />
-} as ForwardRefRenderFunction<RefObject<unknown>, CheckboxProperties>
+            ref={baseReference}
+            inputRef={inputReference}
+            foundationRef={foundationReference}
+        >{properties.children}</RMWCCheckbox>
+    </div>
+})
 
 export default Checkbox
