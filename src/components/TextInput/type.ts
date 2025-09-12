@@ -56,7 +56,6 @@ import {
     FormattedOption as FormattedSelectionOption, SelectProps
 } from '@rmwc/select'
 import {TextFieldProps} from '@rmwc/textfield'
-import {TooltipProps} from '@rmwc/tooltip'
 import {IconOptions} from '@rmwc/types'
 
 import {ChainedCommands, type EditorOptions, Extensions} from '@tiptap/core'
@@ -328,8 +327,8 @@ export interface Properties<T = unknown> extends
 
     hidden?: boolean
 
-    icon: string | (IconOptions & {tooltip?: string | TooltipProps})
-    trailingIcon: string | (IconOptions & {tooltip?: string | TooltipProps})
+    icon: string | (IconOptions & {tooltip?: string})
+    trailingIcon: string | (IconOptions & {tooltip?: string})
 
     inputProperties: Partial<
         CodeMirrorProps | TiptapProps | SelectProps | TextFieldProps
