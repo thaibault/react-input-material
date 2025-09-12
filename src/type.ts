@@ -50,7 +50,6 @@ import {
 } from 'web-component-wrapper/type'
 import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
-import {TooltipProps} from '@rmwc/tooltip'
 import {RipplePropT} from '@rmwc/types'
 // endregion
 // region exports
@@ -170,7 +169,7 @@ CommonBaseModel<T>, ModelState {
     showInitialValidationState: boolean
     showValidationState: boolean
 
-    tooltip: string | TooltipProps
+    tooltip: string
 
     triggerInitialPropertiesConsolidation: boolean
 }
@@ -489,5 +488,9 @@ export interface CheckboxProperties {
 }
 export interface ErrorProperties {
     children: string
+}
+export interface TooltipProperties {
+    children: ReactNode
+    value: string
 }
 // endregion

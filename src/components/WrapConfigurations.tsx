@@ -51,7 +51,7 @@ export const WrapConfigurations: FunctionComponent<
     ConfigurationProperties & {children: ReactElement}
 > = ({children, strict, themeConfiguration, tooltip, wrap}): ReactElement =>
     <WrapStrict strict={Boolean(strict)}>
-        <WrapTooltip options={tooltip}>
+        <WrapTooltip value={tooltip}>
             <WrapThemeProvider configuration={themeConfiguration} wrap={wrap}>
                 {children}
             </WrapThemeProvider>

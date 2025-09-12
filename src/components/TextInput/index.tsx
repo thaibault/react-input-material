@@ -568,7 +568,7 @@ export const TextInputInner = function<Type = unknown>(
             const nestedOptions: IconOptions = {...options}
             options.strategy = 'component'
 
-            options.icon = <WrapTooltip options={tooltip}>
+            options.icon = <WrapTooltip value={tooltip}>
                 <Icon icon={nestedOptions} />
             </WrapTooltip>
         }

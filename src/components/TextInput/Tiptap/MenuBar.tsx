@@ -47,7 +47,7 @@ const Button = ({
 
     const description = label ?? activeIndicator ?? iconName
 
-    return <WrapTooltip options={description}>
+    return <WrapTooltip value={description}>
         <IconButton
             checked={checked}
             className={checked ? 'mdc-icon-button--checked' : ''}

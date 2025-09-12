@@ -17,11 +17,10 @@
     endregion
 */
 // region imports
-import {isObject} from 'clientnode'
 import {FunctionComponent, ReactElement} from 'react'
 import Dummy from 'react-generic-dummy'
-import {Typography} from '@rmwc/typography'
-import {Tooltip} from '@rmwc/tooltip'
+
+import Tooltip from '@low-level-component-implementations/Tooltip'
 
 import {Properties} from '../type'
 // endregion
@@ -33,50 +32,15 @@ export const isDummy: boolean =
  * configuration.
  * @param properties - Component provided properties.
  * @param properties.children - Component or string to wrap.
- * @param properties.options - Tooltip options.
+ * @param properties.value - Tooltip value.
  * @returns Wrapped given content.
  */
 export const WrapTooltip: FunctionComponent<{
     children: ReactElement
-    options?: Properties['tooltip'] | null
-}> = ({children, options}): ReactElement => {
-    if (typeof options === 'string') {
-        if (isDummy)
-            return <div className="generic-tooltip" title={options}>
-                {children}
-            </div>
-
-        return <Tooltip
-            overlay={<Typography use="caption">{options}</Typography>}
-        >
-            <div className="generic-tooltip">{children}</div>
-        </Tooltip>
-    }
-
-    if (isObject(options)) {
-        if (typeof options.overlay === 'string') {
-            if (isDummy)
-                return <div
-                    className="generic-tooltip" title={options.overlay}
-                >
-                    {children}
-                </div>
-
-            options = {
-                ...options,
-                overlay: <Typography use="caption">
-                    {options.overlay}
-                </Typography>
-            }
-        }
-
-        if (isDummy)
-            return <div className="generic-tooltip">{children}</div>
-
-        return <Tooltip {...options}>
-            <div className="generic-tooltip">{children}</div>
-        </Tooltip>
-    }
+    value?: Properties['tooltip'] | null
+}> = ({children, value}): ReactElement => {
+    if (typeof value === 'string')
+        return <Tooltip value={value}>{children}</Tooltip>
 
     return <>{children}</>
 }
