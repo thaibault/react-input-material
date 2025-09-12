@@ -37,6 +37,7 @@ import {
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
 import Checkbox from '@low-level-component-implementations/Checkbox'
+import Error from '@low-level-component-implementations/Error'
 /*
 "namedExport" version of css-loader:
 
@@ -417,40 +418,41 @@ export const RequireableCheckboxInner = function(
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
     >
-        <div
-            className={[CSS_CLASS_NAMES.requireableCheckbox]
-                .concat(properties.className)
-                .join(' ')
+        <Checkbox
+            value={Boolean(properties.value)}
+            disabled={properties.disabled}
+            indeterminate={properties.value === null}
+
+            id={properties.id || properties.name}
+            name={properties.name}
+
+            ref={inputReference}
+
+            classNames={
+                [CSS_CLASS_NAMES.requireableCheckbox]
+                    .concat(properties.className)
             }
-            style={properties.styles}
+            styles={properties.styles}
+
+            onBlur={onBlur}
+            onChange={onChangeValue}
+            onClick={onClick}
+            onFocus={onFocus}
         >
-            <Checkbox
-                value={Boolean(properties.value)}
-                disabled={properties.disabled}
-                id={properties.id || properties.name}
-                indeterminate={properties.value === null}
-                ref={inputReference}
-                name={properties.name}
-                onBlur={onBlur}
-                onChange={onChangeValue}
-                onClick={onClick}
-                onFocus={onFocus}
-            >
-                {(
-                    properties.invalid &&
-                    properties.showValidationState &&
-                    (
-                        properties.showInitialValidationState ||
-                        properties.visited
-                    )
-                ) ?
-                    <Theme use="error">
-                        {properties.description || properties.name}
-                    </Theme> :
-                    properties.description || properties.name
-                }
-            </Checkbox>
-        </div>
+            {(
+                properties.invalid &&
+                properties.showValidationState &&
+                (
+                    properties.showInitialValidationState ||
+                    properties.visited
+                )
+            ) ?
+                <Error>
+                    {properties.description || properties.name}
+                </Error> :
+                properties.description || properties.name
+            }
+        </Checkbox>
     </WrapConfigurations>
     // endregion
 } as ForwardRefRenderFunction<Adapter, Props>
