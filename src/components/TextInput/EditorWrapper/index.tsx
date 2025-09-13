@@ -203,10 +203,11 @@ export const Index = (props: EditorWrapperProps) => {
                 )
                 .join(' ')}
         >
-            {props.ripple ?
-                <span className="mdc-text-field__ripple"></span> :
-                ''
-            }
+            {/*
+                Optional:
+
+                <span className="mdc-text-field__ripple"></span>
+            */}
             <span className="mdc-floating-label" id={`${id}-label`}>
                 {props.label}
             </span>
@@ -218,10 +219,11 @@ export const Index = (props: EditorWrapperProps) => {
                 editorContent
             }
 
-            {props.ripple ?
-                <span className="mdc-line-ripple"></span> :
-                ''
-            }
+            {/*
+                Optional:
+
+                <span className="mdc-line-ripple"></span>
+            */}
         </label>
         {helpText.children ?
             <div className="mdc-text-field-helper-line">

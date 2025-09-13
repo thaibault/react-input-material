@@ -468,6 +468,9 @@ export interface ConfigurationProperties {
 }
 // endregion
 // region low-level-components-interface
+export declare type Size =
+    'extra-small' | 'small' | 'medium' | 'large' | 'extra-large'
+
 export interface CheckboxProperties {
     id?: string
 
@@ -486,23 +489,32 @@ export interface CheckboxProperties {
     onClick?: (event: ReactMouseEvent) => void
     onFocus?: (event: ReactFocusEvent) => void
 }
+
+export interface CircularProgressProperties {
+    size?: Size
+}
+
 export interface ErrorProperties {
     children: string
 }
 
-export declare type IconSize =
-    'extra-small' | 'small' | 'medium' | 'large' | 'extra-large'
 export interface IconProperties {
+    ariaLabel?: string
+
     classNames?: Array<string>
     styles?: object
 
-    size?: IconSize
+    size?: Size
 
-    value: string
+    icon: string
 }
 export interface IconButtonProperties extends IconProperties {
-    onValue?: string
+    onIcon?: string
 
+    value?: boolean
+    disabled?: boolean
+
+    onClick?: (event: ReactMouseEvent) => void
     onChange?: (event: SyntheticEvent) => void
 }
 

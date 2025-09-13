@@ -31,22 +31,27 @@ export const IconButton = forwardRef((
     )
 
     return <RMWCIconButton
+        checked={properties.value}
+        disabled={properties.disabled}
+
         className={properties.classNames?.join(' ')}
         style={properties.styles}
 
         icon={{
-            icon: properties.value,
+            icon: properties.icon,
             size: properties.size?.replace('extra-small', 'xsmall')
                 .replace('extra-large', 'xlarge') as
                     IconSizeT
         }}
         onIcon={{
-            icon: properties.onValue || properties.value,
+            icon: properties.onIcon || properties.icon,
             size: properties.size?.replace('extra-small', 'xsmall')
                 .replace('extra-large', 'xlarge') as
                     IconSizeT
         }}
+        label={properties.ariaLabel}
 
+        onClick={properties.onClick}
         onChange={
             properties.onChange as
                 unknown as

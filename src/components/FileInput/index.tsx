@@ -48,9 +48,11 @@ import {
     CardMedia,
     CardPrimaryAction
 } from '@rmwc/card'
-import {CircularProgress} from '@rmwc/circular-progress'
 import {Theme} from '@rmwc/theme'
 import {Typography} from '@rmwc/typography'
+
+import CircularProgress from
+    '@low-level-component-implementations/CircularProgress'
 
 import TextInput from '../TextInput'
 import {WrapConfigurations} from '../Wrapper/WrapConfigurations'

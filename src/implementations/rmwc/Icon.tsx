@@ -17,8 +17,9 @@ export const Icon = forwardRef((
         className={properties.classNames?.join(' ')}
         style={properties.styles}
 
+        label={properties.ariaLabel}
         icon={{
-            icon: properties.value,
+            icon: properties.icon,
             size: properties.size?.replace('extra-small', 'xsmall')
                 .replace('extra-large', 'xlarge') as
                     IconSizeT

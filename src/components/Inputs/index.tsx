@@ -502,7 +502,7 @@ export const InputsInner = function<
     const addButton: ReactElement = <IconButton
         classNames={[CSS_CLASS_NAMES.inputsAddButton]}
 
-        value={properties.addIcon}
+        icon={properties.addIcon}
 
         onChange={add}
     />
@@ -547,7 +547,7 @@ export const InputsInner = function<
                                     [CSS_CLASS_NAMES.inputsItemRemove]
                                 }
 
-                                value={properties.removeIcon}
+                                icon={properties.removeIcon}
 
                                 onChange={createRemoveCallback(index)}
                             />
