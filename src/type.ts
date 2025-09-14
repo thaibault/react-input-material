@@ -34,13 +34,18 @@ import {
     ValidationMap
 } from 'clientnode/property-types'
 import {
-    ComponentClass, FocusEvent as ReactFocusEvent,
+    ComponentClass,
+    FocusEvent as ReactFocusEvent,
     FocusEvent,
     ForwardRefExoticComponent,
-    FunctionComponent, MouseEvent as ReactMouseEvent,
+    FunctionComponent,
+    KeyboardEvent as ReactKeyboardEvent,
+    MouseEvent as ReactMouseEvent,
     MouseEvent,
-    ReactElement, ReactNode,
-    RefAttributes, SyntheticEvent
+    ReactElement,
+    ReactNode,
+    RefAttributes,
+    SyntheticEvent
 } from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
 import {
@@ -51,6 +56,7 @@ import {
 import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {RipplePropT} from '@rmwc/types'
+import {NormalizedSelection} from './components/TextInput/type'
 // endregion
 // region exports
 /// region generic
@@ -157,7 +163,7 @@ CommonBaseModel<T>, ModelState {
 
     ripple: RipplePropT
 
-    rootProps: Mapping<boolean | number | string>
+    elementProperties: Mapping<boolean | number | string>
     /*
         NOTE: selection allows more options than when configuring via "model"
         to be aligned to backend view of selections.
@@ -376,7 +382,7 @@ export const propertyTypes: ValidationMapping = {
 
     ripple: oneOfType([boolean, object]),
 
-    rootProps: object,
+    elementProperties: object,
 
     showDeclaration: oneOfType([boolean, symbol]),
 
@@ -473,12 +479,15 @@ export type IconStrategy =
 export type Size =
     'extra-small' | 'small' | 'medium' | 'large' | 'extra-large'
 
-export interface CheckboxProperties {
+export interface LowLevelBaseComponentProperties {
     id?: string
-
     classNames?: Array<string>
     styles?: object
 
+    elementProperties?: Mapping<unknown>
+}
+
+export interface CheckboxProperties extends LowLevelBaseComponentProperties {
     value: boolean
     disabled?: boolean
     indeterminate?: boolean
@@ -500,17 +509,12 @@ export interface ErrorProperties {
     children: string
 }
 
-export interface IconProperties {
-    classNames?: Array<string>
-    styles?: object
-
+export interface IconProperties extends LowLevelBaseComponentProperties {
     size?: Size
 
     icon: ReactNode
 
     strategy?: IconStrategy
-
-    elementProperties?: Mapping<unknown>
 }
 export interface IconButtonProperties extends IconProperties {
     onIcon?: string
@@ -520,6 +524,16 @@ export interface IconButtonProperties extends IconProperties {
 
     onClick?: (event: ReactMouseEvent) => void
     onChange?: (event: SyntheticEvent) => void
+}
+
+export interface SelectProperties extends LowLevelBaseComponentProperties {
+    options: NormalizedSelection
+    name: string
+    value: unknown
+
+    onChange?: (event: SyntheticEvent) => void
+    onClick?: (event: ReactMouseEvent) => void
+    onKeyDown?: (event: ReactKeyboardEvent) => void
 }
 
 export interface TooltipProperties {

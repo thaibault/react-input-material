@@ -51,8 +51,7 @@ import {
 import {Theme} from '@rmwc/theme'
 import {Typography} from '@rmwc/typography'
 
-import CircularProgress from
-    '#implementations/CircularProgress'
+import CircularProgress from '#implementations/CircularProgress'
 
 import TextInput from '../TextInput'
 import {WrapConfigurations} from '../Wrapper/WrapConfigurations'

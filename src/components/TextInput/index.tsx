@@ -28,16 +28,9 @@ import {ListApi} from '@rmwc/list'
 import {
     Menu, MenuApi, MenuSurface, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
 } from '@rmwc/menu'
-import {Select, SelectProps} from '@rmwc/select'
+import {SelectProps} from '@rmwc/select'
 import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
-import {IconOptions} from '@rmwc/types'
-
-import CircularProgress from
-    '#implementations/CircularProgress'
-import Icon from '#implementations/Icon'
-import IconButton from
-    '#implementations/IconButton'
 
 import {
     camelCaseToDelimited,
@@ -75,6 +68,11 @@ import {
 } from 'react-transition-group/Transition'
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
+
+import CircularProgress from '#implementations/CircularProgress'
+import Icon from '#implementations/Icon'
+import IconButton from '#implementations/IconButton'
+import Select from '#implementations/Select'
 
 import WrapConfigurations from '../Wrapper/WrapConfigurations'
 import WrapTooltip from '../Wrapper/WrapTooltip'
@@ -245,7 +243,7 @@ export const TextInputInner = function<Type = unknown>(
      * opening and hidden state.
      */
     useEffect(() => {
-        if (useSelection) {
+        if (isSelection) {
             const selectionWrapper: HTMLElement | null | undefined =
                 wrapperReference.current?.querySelector(
                     '[aria-haspopup="listbox"]'
@@ -274,7 +272,7 @@ export const TextInputInner = function<Type = unknown>(
      * @returns Nothing.
      */
     useEffect((): undefined | (() => void) => {
-        if (useSelection) {
+        if (isSelection) {
             const selectionWrapper: HTMLElement | null | undefined =
                 wrapperReference.current?.querySelector(
                     '[aria-haspopup="listbox"]'
@@ -572,7 +570,7 @@ export const TextInputInner = function<Type = unknown>(
      */
     const wrapIconWithTooltip = (
         options?: Properties['icon']
-    ): IconOptions | undefined => {
+    ): IconProperties | undefined => {
         if (typeof options === 'object' && options.tooltip) {
             const tooltip: Properties['tooltip'] = options.tooltip
             options = {...options}
@@ -585,7 +583,7 @@ export const TextInputInner = function<Type = unknown>(
             </WrapTooltip>
         }
 
-        return options as IconOptions | undefined
+        return options as IconProperties | undefined
     }
     /// endregion
     /// region property aggregation
@@ -992,7 +990,7 @@ export const TextInputInner = function<Type = unknown>(
                     )
                 }
 
-                if (useSelection || selectedIndex !== -1)
+                if (isSelection || selectedIndex !== -1)
                     triggerCallbackIfExists<Properties<Type>>(
                         properties,
                         'select',
@@ -1189,7 +1187,7 @@ export const TextInputInner = function<Type = unknown>(
             textareas.
         */
         if (
-            useSelection ||
+            isSelection ||
             properties.type === 'string' &&
             properties.editor !== 'plain'
         )
@@ -1500,7 +1498,7 @@ export const TextInputInner = function<Type = unknown>(
     if (properties.icon)
         materialProperties.icon = wrapIconWithTooltip(
             applyIconPreset(properties.icon)
-        ) as IconOptions
+        )
 
     const isAdvancedEditor: boolean = (
         !properties.selection &&
@@ -1599,7 +1597,7 @@ export const TextInputInner = function<Type = unknown>(
             index += 1
         }
     }
-    const useSelection: boolean =
+    const isSelection: boolean =
         (Boolean(normalizedSelection) || Boolean(properties.labels)) &&
         !useSuggestions
     /// endregion
@@ -1709,20 +1707,12 @@ export const TextInputInner = function<Type = unknown>(
         >
             {wrapAnimationConditionally(
                 <Select
-                    {...genericProperties as SelectProps}
-                    {...materialProperties as SelectProps}
+                    ref={inputReference}
 
-                    enhanced={true}
-
-                    foundationRef={foundationReference as
-                        RefObject<MDCSelectFoundation | null>
-                    }
-                    inputRef={inputReference as
-                        unknown as
-                        (reference: HTMLSelectElement | null) => void
-                    }
+                    name={properties.name}
 
                     onChange={onChangeValue}
+                    onClick={onClick}
                     onKeyDown={(event: ReactKeyboardEvent): void => {
                         /*
                             Avoid scrolling page interactions when navigating
@@ -1732,18 +1722,17 @@ export const TextInputInner = function<Type = unknown>(
                             event.preventDefault()
                     }}
 
-                    options={normalizedSelection as SelectProps['options']}
-
-                    rootProps={{
-                        name: properties.name,
-                        onClick: onClick,
-                        ...properties.rootProps
-                    }}
+                    options={normalizedSelection as NormalizedSelection}
                     value={String(properties.value)}
 
-                    {...properties.inputProperties as SelectProps}
+                    elementProperties={{
+                        ...genericProperties,
+                        ...materialProperties,
+                        ...properties.elementProperties,
+                        ...properties.inputProperties
+                    }}
                 />,
-                useSelection
+                isSelection
             )}
             {wrapAnimationConditionally(
                 <EditorComponent
@@ -1766,7 +1755,7 @@ export const TextInputInner = function<Type = unknown>(
                     }
                     onChange={onChangeValue as (value: string) => void}
                     ripple={properties.ripple}
-                    rootProps={{
+                    elementProperties={{
                         name: properties.name,
                         onClick,
                         onKeyUp,
@@ -1778,7 +1767,7 @@ export const TextInputInner = function<Type = unknown>(
                             the input focusable.
                         */
                         tabIndex: properties.disabled ? '0' : '-1',
-                        ...properties.rootProps
+                        ...properties.elementProperties
                     }}
                     trailingIcon={wrapIconWithTooltip(applyIconPreset(
                         properties.trailingIcon
@@ -1891,7 +1880,7 @@ export const TextInputInner = function<Type = unknown>(
                                 the input focusable.
                             */
                             tabIndex: properties.disabled ? '0' : '-1',
-                            ...properties.rootProps
+                            ...properties.elementProperties
                         }}
                         textarea={
                             properties.type === 'string' &&
@@ -1905,7 +1894,7 @@ export const TextInputInner = function<Type = unknown>(
                         {...properties.inputProperties as TextFieldProps}
                     />
                 </div>,
-                !(isAdvancedEditor || useSelection),
+                !(isAdvancedEditor || isSelection),
                 properties.editor.startsWith('code')
             )}
         </div>
