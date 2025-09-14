@@ -468,7 +468,9 @@ export interface ConfigurationProperties {
 }
 // endregion
 // region low-level-components-interface
-export declare type Size =
+export type IconStrategy =
+    'auto' | 'ligature' | 'className' | 'url' | 'component' | 'custom'
+export type Size =
     'extra-small' | 'small' | 'medium' | 'large' | 'extra-large'
 
 export interface CheckboxProperties {
@@ -499,14 +501,16 @@ export interface ErrorProperties {
 }
 
 export interface IconProperties {
-    ariaLabel?: string
-
     classNames?: Array<string>
     styles?: object
 
     size?: Size
 
-    icon: string
+    icon: ReactNode
+
+    strategy?: IconStrategy
+
+    elementProperties?: Mapping<unknown>
 }
 export interface IconButtonProperties extends IconProperties {
     onIcon?: string

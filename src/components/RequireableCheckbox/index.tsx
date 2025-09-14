@@ -36,8 +36,8 @@ import {
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
-import Checkbox from '@low-level-component-implementations/Checkbox'
-import Error from '@low-level-component-implementations/Error'
+import Checkbox from '#implementations/Checkbox'
+import Error from '#implementations/Error'
 /*
 "namedExport" version of css-loader:
 

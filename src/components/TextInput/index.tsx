@@ -24,9 +24,6 @@ import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
 import {MDCTextFieldFoundation} from '@material/textfield'
 
-import {CircularProgress} from '@rmwc/circular-progress'
-import {Icon} from '@rmwc/icon'
-import {IconButton, IconButtonOnChangeEventT} from '@rmwc/icon-button'
 import {ListApi} from '@rmwc/list'
 import {
     Menu, MenuApi, MenuSurface, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
@@ -35,6 +32,12 @@ import {Select, SelectProps} from '@rmwc/select'
 import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
 import {IconOptions} from '@rmwc/types'
+
+import CircularProgress from
+    '#implementations/CircularProgress'
+import Icon from '#implementations/Icon'
+import IconButton from
+    '#implementations/IconButton'
 
 import {
     camelCaseToDelimited,
@@ -62,7 +65,7 @@ import React, {
     useId,
     useImperativeHandle,
     useRef,
-    useState
+    useState, SyntheticEvent
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
 import {GenericEvent} from 'react-generic-tools/type'
@@ -92,7 +95,7 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState, EditorState, Selection, TypeSpecification
+    CursorState, EditorState, IconProperties, Selection, TypeSpecification
 } from '../../type'
 
 import CodeEditorComponent from './CodeMirror'
@@ -312,7 +315,7 @@ export const TextInputInner = function<Type = unknown>(
      */
     const applyIconPreset = (
         options?: Properties['icon']
-    ): IconOptions | string | undefined => {
+    ): Properties['icon'] | undefined => {
         if (options === 'clear_preset') {
             const handler = (
                 event: ReactKeyboardEvent | ReactMouseEvent
@@ -352,10 +355,13 @@ export const TextInputInner = function<Type = unknown>(
                     }
                 </GenericAnimate>,
 
-                'aria-hidden': hide ? 'true' : 'false',
-                onClick: handler,
-                onKeyDown: handler,
-                tabIndex: hide ? -1 : 0,
+                elementProperties: {
+                    'aria-hidden': hide ? 'true' : 'false',
+                    'tab-index': hide ? -1 : 0,
+
+                    onClick: handler,
+                    onKeyDown: handler
+                },
                 strategy: 'component',
                 tooltip: 'Clear input'
             }
@@ -399,8 +405,10 @@ export const TextInputInner = function<Type = unknown>(
                     /> :
                     properties.hidden ? 'lock_open' : 'lock',
 
-                onClick: handler,
-                onKeyDown: handler,
+                elementProperties: {
+                    onClick: handler,
+                    onKeyDown: handler
+                },
                 strategy: 'component',
                 tooltip: `${(properties.hidden ? 'Show' : 'Hide')} password`
             }
@@ -411,8 +419,9 @@ export const TextInputInner = function<Type = unknown>(
                 options = {icon: options}
 
             if (!Object.prototype.hasOwnProperty.call(options, 'onClick')) {
-                options.tabIndex = -1
-                options['aria-hidden'] = true
+                options.elementProperties = options.elementProperties ?? {}
+                options.elementProperties.tabIndex = -1
+                options.elementProperties['aria-hidden'] = true
             }
         }
 
@@ -451,20 +460,21 @@ export const TextInputInner = function<Type = unknown>(
             }
         >
             <IconButton
-                icon={{
-                    'aria-label':
-                        properties.editorIsActive ?
-                            'plain' :
-                            properties.editor.startsWith('code') ?
-                                'code' :
-                                'richtext',
-                    icon: properties.editorIsActive ?
+                elementProperties={{
+                    'aria-label': properties.editorIsActive ?
+                        'plain' :
+                        properties.editor.startsWith('code') ?
+                            'code' :
+                            'richtext'
+                }}
+                icon={
+                    properties.editorIsActive ?
                         'subject' :
                         properties.editor.startsWith('code') ?
                             'code' :
-                            'text_format',
-                    onClick: onChangeEditorIsActive
-                }}
+                            'text_format'
+                }
+                onClick={onChangeEditorIsActive}
             />
         </GenericAnimate>
         <GenericAnimate in={Boolean(properties.declaration)}>
@@ -472,9 +482,11 @@ export const TextInputInner = function<Type = unknown>(
                 aria-expanded={properties.showDeclaration ? 'true' : 'false'}
                 aria-label="declaration"
 
-                checked={properties.showDeclaration}
+                value={properties.showDeclaration}
+
                 icon="more_horiz"
                 onIcon="more_vert"
+
                 onChange={onChangeShowDeclaration}
             />
         </GenericAnimate>
@@ -565,11 +577,11 @@ export const TextInputInner = function<Type = unknown>(
             const tooltip: Properties['tooltip'] = options.tooltip
             options = {...options}
             delete options.tooltip
-            const nestedOptions: IconOptions = {...options}
+            const nestedOptions: IconProperties = {...options}
             options.strategy = 'component'
 
             options.icon = <WrapTooltip value={tooltip}>
-                <Icon icon={nestedOptions} />
+                <Icon {...nestedOptions} />
             </WrapTooltip>
         }
 
@@ -851,7 +863,7 @@ export const TextInputInner = function<Type = unknown>(
      * Triggered when show declaration indicator should be changed.
      * @param event - Potential event object.
      */
-    const onChangeShowDeclaration = (event?: IconButtonOnChangeEventT) => {
+    const onChangeShowDeclaration = (event?: SyntheticEvent) => {
         setShowDeclaration((value: boolean): boolean => {
             properties.showDeclaration = !value
 
@@ -1487,7 +1499,7 @@ export const TextInputInner = function<Type = unknown>(
     }
     if (properties.icon)
         materialProperties.icon = wrapIconWithTooltip(
-            applyIconPreset(properties.icon) as IconOptions
+            applyIconPreset(properties.icon)
         ) as IconOptions
 
     const isAdvancedEditor: boolean = (

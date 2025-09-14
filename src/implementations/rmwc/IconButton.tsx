@@ -41,15 +41,16 @@ export const IconButton = forwardRef((
             icon: properties.icon,
             size: properties.size?.replace('extra-small', 'xsmall')
                 .replace('extra-large', 'xlarge') as
-                    IconSizeT
+                    IconSizeT,
+            strategy: properties.strategy
         }}
         onIcon={{
             icon: properties.onIcon || properties.icon,
             size: properties.size?.replace('extra-small', 'xsmall')
                 .replace('extra-large', 'xlarge') as
-                    IconSizeT
+                    IconSizeT,
+            strategy: properties.strategy
         }}
-        label={properties.ariaLabel}
 
         onClick={properties.onClick}
         onChange={
@@ -60,6 +61,8 @@ export const IconButton = forwardRef((
 
         ref={baseReference}
         foundationRef={foundationReference}
+
+        {...properties.elementProperties}
     />
 })
 

@@ -16,13 +16,14 @@ export const Icon = forwardRef((
     <RMWCIcon
         className={properties.classNames?.join(' ')}
         style={properties.styles}
+        {...properties.elementProperties}
 
-        label={properties.ariaLabel}
         icon={{
             icon: properties.icon,
             size: properties.size?.replace('extra-small', 'xsmall')
                 .replace('extra-large', 'xlarge') as
-                    IconSizeT
+                    IconSizeT,
+            strategy: properties.strategy
         }}
 
         ref={reference as RefObject<HTMLElement> | null}

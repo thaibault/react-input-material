@@ -29,7 +29,7 @@ import {
     useState
 } from 'react'
 
-import Icon from '@low-level-component-implementations/Icon'
+import Icon from '#implementations/Icon'
 
 import {
     createDummyStateSetter,
@@ -170,7 +170,7 @@ export const IntervalInner = function(
         properties.value?.end as IntervalTextInputProps | null ||
         {} as IntervalTextInputProps
     const iconProperties: IconProperties = typeof properties.icon === 'string' ?
-        {value: properties.icon} :
+        {icon: properties.icon} :
         properties.icon as IconProperties
     let startProperties =
         properties.value?.start as IntervalTextInputProps | null ||

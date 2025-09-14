@@ -21,7 +21,7 @@ import {ChainedCommands, Editor} from '@tiptap/core'
 
 import {createContext, useContext} from 'react'
 
-import IconButton from '@low-level-component-implementations/IconButton'
+import IconButton from '#implementations/IconButton'
 
 import WrapTooltip from '../../Wrapper/WrapTooltip'
 
@@ -62,9 +62,10 @@ const Button = ({
 
             size="extra-small"
 
-            ariaLabel={description}
             icon={iconName}
             onIcon={checkedIconName ?? iconName}
+
+            elementProperties={{ariaLabel: description}}
         />
     </WrapTooltip>
 }

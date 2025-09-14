@@ -37,7 +37,7 @@ import {
     ComponentAdapter, PropertiesValidationMap
 } from 'web-component-wrapper/type'
 
-import IconButton from '@low-level-component-implementations/IconButton'
+import IconButton from '#implementations/IconButton'
 
 import TextInput from '../TextInput'
 /*

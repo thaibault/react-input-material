@@ -56,7 +56,6 @@ import {
     FormattedOption as FormattedSelectionOption, SelectProps
 } from '@rmwc/select'
 import {TextFieldProps} from '@rmwc/textfield'
-import {IconOptions} from '@rmwc/types'
 
 import {ChainedCommands, type EditorOptions, Extensions} from '@tiptap/core'
 import {EditorEvents} from '@tiptap/react'
@@ -68,6 +67,7 @@ import {
     defaultModel as baseDefaultModel,
     defaultModelState as baseDefaultModelState,
     defaultProperties as baseDefaultProperties,
+    IconProperties,
     ModelState as BaseModelState,
     modelStatePropertyTypes as baseModelStatePropertyTypes,
     Properties as BaseProperties,
@@ -327,8 +327,8 @@ export interface Properties<T = unknown> extends
 
     hidden?: boolean
 
-    icon: string | (IconOptions & {tooltip?: string})
-    trailingIcon: string | (IconOptions & {tooltip?: string})
+    icon: string | (IconProperties & {tooltip?: string})
+    trailingIcon: string | (IconProperties & {tooltip?: string})
 
     inputProperties: Partial<
         CodeMirrorProps | TiptapProps | SelectProps | TextFieldProps

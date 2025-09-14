@@ -197,7 +197,7 @@ export const propertyTypes: PropertiesValidationMap = {
     })
 } as const
 export const defaultProperties: DefaultProperties = {
-    icon: {value: 'timelapse'},
+    icon: {icon: 'timelapse'},
 
     maximumText:
         'Please provide something earlier than ${formatValue(maximum)}.',
