@@ -24,15 +24,20 @@ import {useEffect, useId, useRef} from 'react'
 
 import {EditorWrapperProps} from '../type'
 // endregion
-export const Index = (props: EditorWrapperProps) => {
+export const Index = (properties: EditorWrapperProps) => {
     const defaultID = useId()
-    const id = props.id ?? defaultID
+    const id = properties.id ?? defaultID
 
     const materialTextField = useRef<MDCTextField | null>(null)
     const mdcTextFieldReference = useRef<HTMLLabelElement | null>(null)
     const textareaReference = useRef<HTMLTextAreaElement | null>(null)
 
-    props.eventMapper.current = {
+    /*
+        The event mapper can be used by the consuming parent component to
+        synchronize an instantiated editor with the native textarea element
+        here.
+    */
+    properties.eventMapper.current = {
         blur: (event: object) => {
             if (textareaReference.current) {
                 const syntheticEvent = new Event('blur') as
@@ -76,29 +81,29 @@ export const Index = (props: EditorWrapperProps) => {
             if (mdcTextFieldReference.current) {
                 materialTextField.current =
                     new MDCTextField(mdcTextFieldReference.current)
-                if (props.materialTextField)
-                    props.materialTextField.current = materialTextField.current
+                if (properties.materialTextField)
+                    properties.materialTextField.current = materialTextField.current
 
-                if (props.foundationRef)
+                if (properties.foundationRef)
                     (
-                        props.foundationRef as {
+                        properties.foundationRef as {
                             current: MDCTextFieldFoundation
                         }
                     ).current =
                         materialTextField.current.getDefaultFoundation()
 
-                if (typeof props.value === 'string')
-                    materialTextField.current.value = props.value
-                if (typeof props.disabled === 'boolean')
-                    materialTextField.current.disabled = props.disabled
-                if (typeof props.invalid === 'boolean')
-                    materialTextField.current.valid = !props.invalid
-                if (typeof props.required === 'boolean')
-                    materialTextField.current.required = props.required
-                if (typeof props.minLength === 'number')
-                    materialTextField.current.minLength = props.minLength
-                if (typeof props.maxLength === 'number')
-                    materialTextField.current.maxLength = props.maxLength
+                if (typeof properties.value === 'string')
+                    materialTextField.current.value = properties.value
+                if (typeof properties.disabled === 'boolean')
+                    materialTextField.current.disabled = properties.disabled
+                if (typeof properties.invalid === 'boolean')
+                    materialTextField.current.valid = !properties.invalid
+                if (typeof properties.required === 'boolean')
+                    materialTextField.current.required = properties.required
+                if (typeof properties.minLength === 'number')
+                    materialTextField.current.minLength = properties.minLength
+                if (typeof properties.maxLength === 'number')
+                    materialTextField.current.maxLength = properties.maxLength
 
                 materialTextField.current.useNativeValidation = false
 
@@ -110,20 +115,20 @@ export const Index = (props: EditorWrapperProps) => {
         [
             mdcTextFieldReference.current,
 
-            props.foundationRef,
+            properties.foundationRef,
 
-            props.value,
-            props.disabled,
-            props.invalid,
-            props.required,
-            props.minLength,
-            props.maxLength
+            properties.value,
+            properties.disabled,
+            properties.invalid,
+            properties.required,
+            properties.minLength,
+            properties.maxLength
         ]
     )
 
     for (const [target, source] of [
-        [props.textareaReference, textareaReference],
-        [props.mdcTextFieldReference, mdcTextFieldReference]
+        [properties.textareaReference, textareaReference],
+        [properties.mdcTextFieldReference, mdcTextFieldReference]
     ])
         useEffect(
             () => {
@@ -139,7 +144,7 @@ export const Index = (props: EditorWrapperProps) => {
 
             className="mdc-text-field__input"
             style={{visibility: 'hidden', position: 'absolute'}}
-            rows={props.rows}
+            rows={properties.rows}
 
             aria-labelledby={`${id}-label`}
             aria-controls={`${id}-helper`}
@@ -147,57 +152,57 @@ export const Index = (props: EditorWrapperProps) => {
 
             readOnly
 
-            value={props.value}
+            value={properties.value}
 
-            minLength={props.minLength}
-            maxLength={props.maxLength}
+            minLength={properties.minLength}
+            maxLength={properties.maxLength}
         ></textarea>
 
-        {props.children}
+        {properties.children}
 
-        {props.barContentSlot ?
-            <div className={`${props.classNamePrefix}__bar`}>
-                {props.barContentSlot}
+        {properties.barContentSlot ?
+            <div className={`${properties.classNamePrefix}__bar`}>
+                {properties.barContentSlot}
 
-                {props.characterCount ?
+                {properties.characterCount ?
                     <div className="mdc-text-field-character-counter"></div> :
                     ''
                 }
             </div> :
-            props.characterCount ?
+            properties.characterCount ?
                 <div className="mdc-text-field-character-counter"></div> :
                 ''
         }
     </>
 
     const helpText: TextFieldHelperTextProps =
-        typeof props.helpText === 'object' ?
-            props.helpText as TextFieldHelperTextProps :
-            {children: props.helpText}
+        typeof properties.helpText === 'object' ?
+            properties.helpText as TextFieldHelperTextProps :
+            {children: properties.helpText}
 
     return <>
         <label
             ref={mdcTextFieldReference}
             onClick={(event) => {
-                if (props.onLabelClick)
-                    props.onLabelClick(event)
+                if (properties.onLabelClick)
+                    properties.onLabelClick(event)
             }}
             className={[
-                props.classNamePrefix,
+                properties.classNamePrefix,
                 'mdc-text-field',
                 'mdc-text-field--textarea'
             ]
-                .concat(props.value === '' ?
+                .concat(properties.value === '' ?
                     'mdc-text-field--textarea' :
-                    `${props.classNamePrefix}--has-content`
+                    `${properties.classNamePrefix}--has-content`
                 )
-                .concat(props.disabled ? 'mdc-text-field--disabled' : [])
-                .concat(props.outlined ?
+                .concat(properties.disabled ? 'mdc-text-field--disabled' : [])
+                .concat(properties.outlined ?
                     'mdc-text-field--outlined' :
                     'mdc-text-field--filled'
                 )
                 .concat(
-                    props.characterCount ?
+                    properties.characterCount ?
                         'mdc-text-field--with-internal-counter' :
                         []
                 )
@@ -209,10 +214,10 @@ export const Index = (props: EditorWrapperProps) => {
                 <span className="mdc-text-field__ripple"></span>
             */}
             <span className="mdc-floating-label" id={`${id}-label`}>
-                {props.label}
+                {properties.label}
             </span>
 
-            {props.resizeable ?
+            {properties.resizeable ?
                 <span className="mdc-text-field__resizer">
                     {editorContent}
                 </span> :
@@ -239,10 +244,10 @@ export const Index = (props: EditorWrapperProps) => {
                     id={`${id}-helper`}
                 >
                     {(
-                        props.helpText as TextFieldHelperTextProps | undefined
+                        properties.helpText as TextFieldHelperTextProps | undefined
                     )?.children ?
-                        (props.helpText as TextFieldHelperTextProps).children :
-                        props.helpText as string
+                        (properties.helpText as TextFieldHelperTextProps).children :
+                        properties.helpText as string
                     }
                 </div>
             </div> :

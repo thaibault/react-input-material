@@ -49,7 +49,7 @@ import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 
 import {MDCMenuFoundation} from '@material/menu'
 import {MDCSelectFoundation} from '@material/select'
-import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
+import {MDCTextFieldFoundation} from '@material/textfield'
 
 import {MenuApi} from '@rmwc/menu'
 import {
@@ -73,7 +73,7 @@ import {
     Properties as BaseProperties,
     propertyTypes as basePropertyTypes,
     State as BaseState,
-    StaticWebComponent,
+    StaticWebComponent, TextAreaProperties,
     ValueState as BaseValueState
 } from '../../type'
 // endregion
@@ -154,35 +154,15 @@ export type DataTransformation =
 // endregion
 export interface EditorProperties
     extends
-Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
+Omit<NonNullable<TextAreaProperties>, 'textarea' | 'value'> {
     id: string
     value: number | string
 
-    minLength: number
-    maxLength: number
+    minimumLength: number
+    maximumLength: number
     rows: number
 
     onChange: (value: string, contentTree?: JSONContent) => void
-}
-
-export interface EditorWrapperEventWrapper {
-    blur: (event: object) => void
-    focus: (event: object) => void
-    input: (value: number | string, event: object) => void
-}
-export interface EditorWrapperProps extends Partial<EditorProperties> {
-    eventMapper: RefObject<EditorWrapperEventWrapper | null>
-
-    materialTextField?: RefObject<MDCTextField | null>
-    mdcTextFieldReference?: RefObject<HTMLLabelElement | null>
-    textareaReference?: RefObject<HTMLTextAreaElement | null>
-
-    children: ReactNode
-    barContentSlot?: ReactNode
-
-    classNamePrefix: string
-
-    onLabelClick?: (event: MouseEvent<HTMLLabelElement>) => void
 }
 
 export interface RichTextEditorButtonProps {

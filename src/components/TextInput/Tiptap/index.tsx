@@ -24,62 +24,62 @@ import {Mapping} from 'clientnode'
 import {useEffect, useRef} from 'react'
 import Dummy from 'react-generic-dummy'
 
-import EditorWrapper from '../EditorWrapper'
+import TextArea, {Reference} from '#implementations/TextArea'
+
 import cssClassNames from '../style.module'
-import {EditorWrapperEventWrapper, TiptapProps} from '../type'
+import {TiptapProps} from '../type'
 
 import MenuBar from './MenuBar'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 export const VIEW_CONTENT_OFFSET_IN_PX = 8
 
-export const Index = (props: TiptapProps) => {
+export const Index = (properties: TiptapProps) => {
     if (
         !(useEditor as typeof useEditor | undefined) ||
         (StarterKit as unknown as Partial<typeof Dummy>).isDummy
     )
         throw Error('Missing tiptap dependencies.')
 
-    const value = props.value ?? ''
+    const value = properties.value ?? ''
 
+    const reference = useRef<Reference | null>(null)
     const editorViewReference = useRef<HTMLDivElement | null>(null)
-    const eventMapper = useRef<EditorWrapperEventWrapper | null>(null)
-    const textareaReference = useRef<HTMLTextAreaElement | null>(null)
 
     const extensions =
-        props.editor?.extensions ||
-        [StarterKit.configure(props.editor?.starterKitOptions || {})]
+        properties.editor?.extensions ||
+        [StarterKit.configure(properties.editor?.starterKitOptions || {})]
 
     const editor = useEditor({
         extensions,
 
-        editable: !props.disabled,
+        editable: !properties.disabled,
         content: String(value),
         onBlur: (editorEvent: EditorEvents['focus']) => {
-            eventMapper.current?.blur(editorEvent)
+            reference.current?.eventMapper.blur(editorEvent)
 
-            if (props.onBlur)
-                props.onBlur(editorEvent)
+            if (properties.onBlur)
+                properties.onBlur(editorEvent)
         },
         onFocus: (editorEvent: EditorEvents['focus']) => {
-            eventMapper.current?.focus(editorEvent)
+            reference.current?.eventMapper.focus(editorEvent)
 
-            if (props.onFocus)
-                props.onFocus(editorEvent)
+            if (properties.onFocus)
+                properties.onFocus(editorEvent)
         },
         onUpdate: (editorEvent) => {
             const html = editorEvent.editor.getHTML()
 
-            eventMapper.current?.input(
+            reference.current?.eventMapper.input(
                 html === '<p></p>' ? '' : html, editorEvent
             )
 
-            if (props.onChange)
-                props.onChange(
+            if (properties.onChange)
+                properties.onChange(
                     html, {contentTree: editorEvent.editor.getJSON()}
                 )
         },
-        ...(props.editor?.options || {})
+        ...(properties.editor?.options || {})
     })
     const htmlContent = editor.getHTML()
 
@@ -87,23 +87,25 @@ export const Index = (props: TiptapProps) => {
         () => {
             if (
                 editorViewReference.current &&
-                textareaReference.current?.clientHeight
+                reference.current?.textarea.current?.clientHeight
             )
                 editorViewReference.current.style.height =
                     String(
-                        textareaReference.current.clientHeight +
+                        reference.current.textarea.current.clientHeight +
                         VIEW_CONTENT_OFFSET_IN_PX
                     ) +
                     'px'
         },
-        [editorViewReference.current, textareaReference.current?.clientHeight]
+        [
+            editorViewReference.current,
+            reference.current?.textarea.current?.clientHeight
+        ]
     )
 
-    return <EditorWrapper
-        {...props}
+    return <TextArea
+        ref={reference}
 
-        eventMapper={eventMapper}
-        textareaReference={textareaReference}
+        {...properties}
 
         barContentSlot={<MenuBar editor={editor}/>}
 
@@ -122,7 +124,7 @@ export const Index = (props: TiptapProps) => {
             editor={editor}
             innerRef={editorViewReference}
         />
-    </EditorWrapper>
+    </TextArea>
 }
 
 export default Index

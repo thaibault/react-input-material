@@ -33,7 +33,7 @@ import {
     symbol,
     ValidationMap
 } from 'clientnode/property-types'
-import React, {
+import {
     ComponentClass,
     FocusEvent as ReactFocusEvent,
     FocusEvent,
@@ -41,7 +41,7 @@ import React, {
     FunctionComponent,
     KeyboardEvent as ReactKeyboardEvent,
     MouseEvent as ReactMouseEvent,
-    MouseEvent,
+    MouseEvent, MutableRefObject as RefObject,
     ReactElement,
     ReactNode,
     RefAttributes,
@@ -57,6 +57,7 @@ import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {RipplePropT} from '@rmwc/types'
 import {NormalizedSelection} from './components/TextInput/type'
+import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
 // endregion
 // region exports
 /// region generic
@@ -487,7 +488,7 @@ export interface TooltipProperties {
 export interface HelpTextProperties {
     persistent?: boolean
     validationMsg?: boolean
-    children: React.ReactNode
+    children: ReactNode
 }
 export type HelpText = ReactNode | HelpTextProperties
 
@@ -498,7 +499,7 @@ export interface LowLevelBaseComponentProperties {
 
     elementProperties?: Mapping<unknown>
 
-    helpText?: React.ReactNode | HelpText;
+    helpText?: ReactNode | HelpText;
 }
 
 export interface CheckboxProperties extends LowLevelBaseComponentProperties {
@@ -550,15 +551,56 @@ export interface SelectProperties extends LowLevelBaseComponentProperties {
     onKeyDown?: (event: ReactKeyboardEvent) => void
 }
 
-export interface TextAreaProperties extends LowLevelBaseComponentProperties {
+export interface TextInputProperties extends LowLevelBaseComponentProperties {
     value?: string | number
+
     characterCount?: boolean
+
     invalid?: boolean
+
     disabled?: boolean
     required?: boolean
-    label?: React.ReactNode
+    maximumLength?: number
+    minimumLength?: number
+
+    label?: ReactNode
+
     leadingIcon?: IconProperties
     trailingIcon?: IconProperties
+
+    onLabelClick?: (event: ReactMouseEvent) => void
+}
+
+export interface TextFieldProperties extends TextInputProperties {
+    maximum?: number
+    minimum?: number
+
+    step?: number
+}
+
+export interface TextAreaEventWrapper {
+    blur: (event: object) => void
+    focus: (event: object) => void
+    input: (value: number | string, event: object) => void
+}
+
+export interface TextAreaReference {
+    textarea: RefObject<HTMLTextAreaElement | null>
+    foundation: RefObject<MDCTextFieldFoundation | null>
+    input: RefObject<HTMLInputElement | null>
+    label: RefObject<HTMLLabelElement | null>
+    materialTextField: RefObject<MDCTextField | null>
+    eventMapper: TextAreaEventWrapper
+}
+
+export interface TextAreaProperties extends TextInputProperties {
+    classNamePrefix?: string
+
     resizeable?: boolean
+    rows?: number
+
+    // If provided the default textarea becomes readonly and hidden.
+    children?: ReactNode
+    barContentSlot?: ReactNode
 }
 // endregion
