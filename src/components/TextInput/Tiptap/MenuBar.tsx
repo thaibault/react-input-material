@@ -65,7 +65,7 @@ const Button = ({
             icon={iconName}
             onIcon={checkedIconName ?? iconName}
 
-            elementProperties={{ariaLabel: description}}
+            elementProperties={{'aria-label': description}}
         />
     </WrapTooltip>
 }

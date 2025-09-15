@@ -33,7 +33,7 @@ import {
     symbol,
     ValidationMap
 } from 'clientnode/property-types'
-import {
+import React, {
     ComponentClass,
     FocusEvent as ReactFocusEvent,
     FocusEvent,
@@ -479,12 +479,26 @@ export type IconStrategy =
 export type Size =
     'extra-small' | 'small' | 'medium' | 'large' | 'extra-large'
 
+export interface TooltipProperties {
+    children: ReactNode
+    value: string
+}
+
+export interface HelpTextProperties {
+    persistent?: boolean
+    validationMsg?: boolean
+    children: React.ReactNode
+}
+export type HelpText = ReactNode | HelpTextProperties
+
 export interface LowLevelBaseComponentProperties {
     id?: string
     classNames?: Array<string>
     styles?: object
 
     elementProperties?: Mapping<unknown>
+
+    helpText?: React.ReactNode | HelpText;
 }
 
 export interface CheckboxProperties extends LowLevelBaseComponentProperties {
@@ -536,8 +550,15 @@ export interface SelectProperties extends LowLevelBaseComponentProperties {
     onKeyDown?: (event: ReactKeyboardEvent) => void
 }
 
-export interface TooltipProperties {
-    children: ReactNode
-    value: string
+export interface TextAreaProperties extends LowLevelBaseComponentProperties {
+    value?: string | number
+    characterCount?: boolean
+    invalid?: boolean
+    disabled?: boolean
+    required?: boolean
+    label?: React.ReactNode
+    leadingIcon?: IconProperties
+    trailingIcon?: IconProperties
+    resizeable?: boolean
 }
 // endregion

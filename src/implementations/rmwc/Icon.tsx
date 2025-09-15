@@ -16,7 +16,7 @@ export const Icon = forwardRef((
     <RMWCIcon
         className={properties.classNames?.join(' ')}
         style={properties.styles}
-        {...properties.elementProperties}
+        {...(properties.elementProperties ?? {})}
 
         icon={{
             icon: properties.icon,

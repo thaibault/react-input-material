@@ -93,7 +93,8 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState, EditorState, IconProperties, Selection, TypeSpecification
+    CursorState, EditorState, IconProperties, Selection,
+    SelectProperties, TypeSpecification
 } from '../../type'
 
 import CodeEditorComponent from './CodeMirror'
@@ -1475,7 +1476,7 @@ export const TextInputInner = function<Type = unknown>(
         onFocus: triggerOnFocusAndOpenSuggestions,
         placeholder: properties.placeholder
     }
-    const materialProperties: SelectProps | TextFieldProps = {
+    const materialProperties: SelectProperties | TextFieldProps = {
         disabled: properties.disabled,
         helpText: {
             children: renderHelpText(),
@@ -1725,9 +1726,10 @@ export const TextInputInner = function<Type = unknown>(
                     options={normalizedSelection as NormalizedSelection}
                     value={String(properties.value)}
 
+                    {...genericProperties}
+                    {...materialProperties}
+
                     elementProperties={{
-                        ...genericProperties,
-                        ...materialProperties,
                         ...properties.elementProperties,
                         ...properties.inputProperties
                     }}
@@ -1755,7 +1757,7 @@ export const TextInputInner = function<Type = unknown>(
                     }
                     onChange={onChangeValue as (value: string) => void}
                     ripple={properties.ripple}
-                    elementProperties={{
+                    rootProps={{
                         name: properties.name,
                         onClick,
                         onKeyUp,

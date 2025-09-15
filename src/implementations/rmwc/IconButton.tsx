@@ -62,7 +62,7 @@ export const IconButton = forwardRef((
         ref={baseReference}
         foundationRef={foundationReference}
 
-        {...properties.elementProperties}
+        {...(properties.elementProperties ?? {})}
     />
 })
 
