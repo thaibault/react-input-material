@@ -1,3 +1,8 @@
+import {MDCIconButtonToggleFoundation} from '@material/icon-button'
+import {
+    IconButton as RMWCIconButton, IconButtonOnChangeEventT
+} from '@rmwc/icon-button'
+import {IconSizeT} from '@rmwc/types'
 import {
     ForwardedRef,
     forwardRef,
@@ -7,12 +12,8 @@ import {
     useImperativeHandle,
     useRef
 } from 'react'
-import {MDCIconButtonToggleFoundation} from '@material/icon-button'
-import {IconButton as RMWCIconButton} from '@rmwc/icon-button'
 
-import {IconButtonProperties} from '../../type'
-import {IconSizeT} from '@rmwc/types'
-import {IconButtonOnChangeEventT} from '@rmwc/icon-button/lib/icon-button'
+import {IconButtonProperties} from '../type'
 
 export const IconButton = forwardRef((
     properties: IconButtonProperties, reference?: ForwardedRef<unknown>

@@ -1,4 +1,5 @@
 import {Tooltip as RMWCTooltip} from '@rmwc/tooltip'
+import {Typography} from '@rmwc/typography'
 import {
     ForwardedRef,
     forwardRef,
@@ -8,8 +9,7 @@ import {
 } from 'react'
 import Dummy from 'react-generic-dummy'
 
-import {TooltipProperties} from '../../type'
-import {Typography} from '@rmwc/typography'
+import {TooltipProperties} from '../type'
 
 export const isDummy: boolean =
     !(RMWCTooltip as typeof Tooltip | undefined) ||

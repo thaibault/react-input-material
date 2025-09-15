@@ -7,7 +7,7 @@ import {
     ReactElement
 } from 'react'
 
-import {ErrorProperties} from '../../type'
+import {ErrorProperties} from '../type'
 
 export const Error = forwardRef((
     {children}: ErrorProperties, reference?: ForwardedRef<unknown>

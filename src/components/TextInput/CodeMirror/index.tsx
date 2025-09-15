@@ -51,9 +51,11 @@ import {Mapping} from 'clientnode'
 
 import {FocusEvent, useEffect, useRef} from 'react'
 
-import EditorWrapper from '../EditorWrapper'
+import TextArea from '#implementations/TextArea'
+
 import cssClassNames from '../style.module'
-import {CodeMirrorProps, EditorWrapperEventWrapper} from '../type'
+import {CodeMirrorProps} from '../type'
+import {TextAreaReference} from '../../../implementations/type'
 // endregion
 export const BASIC_KEYMAPS: Array<KeyBinding> =
     autocompletion as typeof autocompletion | undefined ?
@@ -106,10 +108,9 @@ export const Index = (props: CodeMirrorProps) => {
 
     const value = props.value ?? ''
 
+    const reference = useRef<TextAreaReference | null>(null)
     const editorViewReference = useRef<HTMLDivElement | null>(null)
-    const eventMapper = useRef<EditorWrapperEventWrapper | null>(null)
     const editorView = useRef<EditorView | null>(null)
-    const textareaReference = useRef<HTMLTextAreaElement | null>(null)
 
     const onChange = (viewUpdate: ViewUpdate) => {
         if (props.disabled)
@@ -117,7 +118,7 @@ export const Index = (props: CodeMirrorProps) => {
 
         const newValue = viewUpdate.state.doc.toString()
 
-        eventMapper.current?.input(newValue, viewUpdate)
+        reference.current?.eventMapper.input(newValue, viewUpdate)
 
         if (props.onChange)
             props.onChange(newValue)
@@ -178,14 +179,16 @@ export const Index = (props: CodeMirrorProps) => {
             const syncHeight = () => {
                 if (
                     editorViewReference.current &&
-                    textareaReference.current?.clientHeight
+                    reference.current?.textarea.current?.clientHeight
                 ) {
                     const scrollableViewNode: HTMLDivElement | null =
                         editorViewReference.current
                             .querySelector('.cm-scroller')
                     if (scrollableViewNode) {
                         const newHeightValue =
-                            String(textareaReference.current.clientHeight) +
+                            String(
+                                reference.current.textarea.current.clientHeight
+                            ) +
                             'px'
                         editorViewReference.current.style.height =
                             newHeightValue
@@ -207,14 +210,16 @@ export const Index = (props: CodeMirrorProps) => {
                     clearTimeout(id)
             }
         },
-        [editorViewReference.current, textareaReference.current?.clientHeight]
+        [
+            editorViewReference.current,
+            reference.current?.textarea.current?.clientHeight
+        ]
     )
 
-    return <EditorWrapper
-        {...props}
+    return <TextArea
+        ref={reference}
 
-        eventMapper={eventMapper}
-        textareaReference={textareaReference}
+        {...props}
 
         value={value}
 
@@ -228,13 +233,13 @@ export const Index = (props: CodeMirrorProps) => {
             ref={editorViewReference}
 
             onBlur={(event: FocusEvent<HTMLDivElement>) => {
-                eventMapper.current?.blur(event)
+                reference.current?.eventMapper.blur(event)
 
                 if (props.onBlur)
                     props.onBlur(event)
             }}
             onFocus={(event: FocusEvent<HTMLDivElement>) => {
-                eventMapper.current?.focus(event)
+                reference.current?.eventMapper.focus(event)
 
                 if (props.onFocus)
                     props.onFocus(event)
@@ -244,7 +249,7 @@ export const Index = (props: CodeMirrorProps) => {
                 `${CSS_CLASS_NAMES.codeEditorView} mdc-text-field__input`
             }
         ></div>
-    </EditorWrapper>
+    </TextArea>
 }
 
 export default Index

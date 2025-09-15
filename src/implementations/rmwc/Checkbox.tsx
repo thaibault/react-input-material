@@ -1,3 +1,4 @@
+import {MDCCheckboxFoundation} from '@material/checkbox'
 import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox'
 import {
     ForwardedRef,
@@ -8,9 +9,8 @@ import {
     useImperativeHandle,
     useRef
 } from 'react'
-import {MDCCheckboxFoundation} from '@material/checkbox'
 
-import {CheckboxProperties} from '../../type'
+import {CheckboxProperties} from '../type'
 
 export const Checkbox = forwardRef((
     properties: CheckboxProperties, reference?: ForwardedRef<unknown>

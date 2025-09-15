@@ -51,6 +51,8 @@ import {intervalClassName, intervalDisabledClassName} from './style.module'
 */
 import cssClassNames from './style.module'
 
+import {IconProperties} from '../../implementations/type'
+
 import {
     Adapter,
     AdapterWithReferences,
@@ -63,7 +65,6 @@ import {
     Props,
     Value
 } from './type'
-import {IconProperties} from '../../type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper

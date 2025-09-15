@@ -24,8 +24,9 @@ import {Mapping} from 'clientnode'
 import {useEffect, useRef} from 'react'
 import Dummy from 'react-generic-dummy'
 
-import TextArea, {Reference} from '#implementations/TextArea'
+import TextArea from '#implementations/TextArea'
 
+import {TextAreaReference} from '../../../implementations/type'
 import cssClassNames from '../style.module'
 import {TiptapProps} from '../type'
 
@@ -43,7 +44,7 @@ export const Index = (properties: TiptapProps) => {
 
     const value = properties.value ?? ''
 
-    const reference = useRef<Reference | null>(null)
+    const reference = useRef<TextAreaReference | null>(null)
     const editorViewReference = useRef<HTMLDivElement | null>(null)
 
     const extensions =

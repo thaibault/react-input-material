@@ -1,3 +1,5 @@
+import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
+import {TextFieldHelperTextProps} from '@rmwc/textfield'
 import {
     ForwardedRef,
     forwardRef,
@@ -8,9 +10,12 @@ import {
     useRef
 } from 'react'
 
-import {TextAreaProperties, TextAreaReference} from '../../type'
-import {TextFieldHelperTextProps} from '@rmwc/textfield/lib/textfield'
-import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
+import {TextAreaProperties, TextAreaReference} from '../type'
+
+export interface Reference extends TextAreaReference {
+    materialTextField: RefObject<MDCTextField | null>
+    foundation: RefObject<MDCTextFieldFoundation | null>
+}
 
 export const OUTLINED = false
 

@@ -1,3 +1,5 @@
+import {MDCSelectFoundation} from '@material/select'
+import {OptionsType, Select as RMWCSelect} from '@rmwc/select'
 import {
     ForwardedRef,
     forwardRef,
@@ -8,10 +10,7 @@ import {
     useRef
 } from 'react'
 
-import {SelectProperties} from '../../type'
-import {Select as RMWCSelect} from '@rmwc/select'
-import {MDCSelectFoundation} from '@material/select'
-import {OptionsType} from '@rmwc/select/lib/select'
+import {SelectProperties} from '../type'
 
 export const Select = forwardRef((
     properties: SelectProperties, reference?: ForwardedRef<unknown>

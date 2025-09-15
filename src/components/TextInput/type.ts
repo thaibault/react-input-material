@@ -61,19 +61,19 @@ import {ChainedCommands, type EditorOptions, Extensions} from '@tiptap/core'
 import {EditorEvents} from '@tiptap/react'
 import {StarterKitOptions} from '@tiptap/starter-kit'
 
+import {IconProperties, TextAreaProperties} from '../../implementations/type'
 import {
     BaseModel,
     CursorState,
     defaultModel as baseDefaultModel,
     defaultModelState as baseDefaultModelState,
     defaultProperties as baseDefaultProperties,
-    IconProperties,
     ModelState as BaseModelState,
     modelStatePropertyTypes as baseModelStatePropertyTypes,
     Properties as BaseProperties,
     propertyTypes as basePropertyTypes,
     State as BaseState,
-    StaticWebComponent, TextAreaProperties,
+    StaticWebComponent,
     ValueState as BaseValueState
 } from '../../type'
 // endregion

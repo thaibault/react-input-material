@@ -1,3 +1,5 @@
+import {Icon as RMWCIcon} from '@rmwc/icon'
+import {IconSizeT} from '@rmwc/types'
 import {
     ForwardedRef,
     forwardRef,
@@ -5,10 +7,8 @@ import {
     MutableRefObject as RefObject,
     ReactElement
 } from 'react'
-import {Icon as RMWCIcon} from '@rmwc/icon'
 
-import {IconProperties} from '../../type'
-import {IconSizeT} from '@rmwc/types'
+import {IconProperties} from '../type'
 
 export const Icon = forwardRef((
     properties: IconProperties, reference?: ForwardedRef<unknown>

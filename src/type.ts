@@ -35,17 +35,12 @@ import {
 } from 'clientnode/property-types'
 import {
     ComponentClass,
-    FocusEvent as ReactFocusEvent,
     FocusEvent,
     ForwardRefExoticComponent,
     FunctionComponent,
-    KeyboardEvent as ReactKeyboardEvent,
-    MouseEvent as ReactMouseEvent,
-    MouseEvent, MutableRefObject as RefObject,
+    MouseEvent,
     ReactElement,
-    ReactNode,
-    RefAttributes,
-    SyntheticEvent
+    RefAttributes
 } from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
 import {
@@ -56,8 +51,6 @@ import {
 import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
 import {RipplePropT} from '@rmwc/types'
-import {NormalizedSelection} from './components/TextInput/type'
-import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
 // endregion
 // region exports
 /// region generic
@@ -472,135 +465,5 @@ export interface ConfigurationProperties {
     themeConfiguration?: ThemeProviderProps['options']
     tooltip?: Properties['tooltip']
     wrap?: boolean
-}
-// endregion
-// region low-level-components-interface
-export type IconStrategy =
-    'auto' | 'ligature' | 'className' | 'url' | 'component' | 'custom'
-export type Size =
-    'extra-small' | 'small' | 'medium' | 'large' | 'extra-large'
-
-export interface TooltipProperties {
-    children: ReactNode
-    value: string
-}
-
-export interface HelpTextProperties {
-    persistent?: boolean
-    validationMsg?: boolean
-    children: ReactNode
-}
-export type HelpText = ReactNode | HelpTextProperties
-
-export interface LowLevelBaseComponentProperties {
-    id?: string
-    classNames?: Array<string>
-    styles?: object
-
-    elementProperties?: Mapping<unknown>
-
-    helpText?: ReactNode | HelpText;
-}
-
-export interface CheckboxProperties extends LowLevelBaseComponentProperties {
-    value: boolean
-    disabled?: boolean
-    indeterminate?: boolean
-
-    name: string
-    children?: ReactNode
-
-    onBlur?: (event: SyntheticEvent) => void
-    onChange?: (event: SyntheticEvent) => void
-    onClick?: (event: ReactMouseEvent) => void
-    onFocus?: (event: ReactFocusEvent) => void
-}
-
-export interface CircularProgressProperties {
-    size?: Size
-}
-
-export interface ErrorProperties {
-    children: string
-}
-
-export interface IconProperties extends LowLevelBaseComponentProperties {
-    size?: Size
-
-    icon: ReactNode
-
-    strategy?: IconStrategy
-}
-export interface IconButtonProperties extends IconProperties {
-    onIcon?: string
-
-    value?: boolean
-    disabled?: boolean
-
-    onClick?: (event: ReactMouseEvent) => void
-    onChange?: (event: SyntheticEvent) => void
-}
-
-export interface SelectProperties extends LowLevelBaseComponentProperties {
-    options: NormalizedSelection
-    name: string
-    value: unknown
-
-    onChange?: (event: SyntheticEvent) => void
-    onClick?: (event: ReactMouseEvent) => void
-    onKeyDown?: (event: ReactKeyboardEvent) => void
-}
-
-export interface TextInputProperties extends LowLevelBaseComponentProperties {
-    value?: string | number
-
-    characterCount?: boolean
-
-    invalid?: boolean
-
-    disabled?: boolean
-    required?: boolean
-    maximumLength?: number
-    minimumLength?: number
-
-    label?: ReactNode
-
-    leadingIcon?: IconProperties
-    trailingIcon?: IconProperties
-
-    onLabelClick?: (event: ReactMouseEvent) => void
-}
-
-export interface TextFieldProperties extends TextInputProperties {
-    maximum?: number
-    minimum?: number
-
-    step?: number
-}
-
-export interface TextAreaEventWrapper {
-    blur: (event: object) => void
-    focus: (event: object) => void
-    input: (value: number | string, event: object) => void
-}
-
-export interface TextAreaReference {
-    textarea: RefObject<HTMLTextAreaElement | null>
-    foundation: RefObject<MDCTextFieldFoundation | null>
-    input: RefObject<HTMLInputElement | null>
-    label: RefObject<HTMLLabelElement | null>
-    materialTextField: RefObject<MDCTextField | null>
-    eventMapper: TextAreaEventWrapper
-}
-
-export interface TextAreaProperties extends TextInputProperties {
-    classNamePrefix?: string
-
-    resizeable?: boolean
-    rows?: number
-
-    // If provided the default textarea becomes readonly and hidden.
-    children?: ReactNode
-    barContentSlot?: ReactNode
 }
 // endregion

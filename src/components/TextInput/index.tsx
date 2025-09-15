@@ -93,9 +93,13 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState, EditorState, IconProperties, Selection,
-    SelectProperties, TypeSpecification
+    CursorState, EditorState, Selection, TypeSpecification
 } from '../../type'
+import {
+    IconProperties,
+    SelectProperties,
+    TextAreaReference
+} from '../../implementations/type'
 
 import CodeEditorComponent from './CodeMirror'
 import {
@@ -1276,7 +1280,11 @@ export const TextInputInner = function<Type = unknown>(
         MDCSelectFoundation | MDCTextFieldFoundation | null
     > = useRef<MDCSelectFoundation | MDCTextFieldFoundation>(null)
     const inputReference: RefObject<
-        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
+        HTMLInputElement |
+        HTMLSelectElement |
+        HTMLTextAreaElement |
+        TextAreaReference |
+        null
     > = useRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(null)
     const suggestionMenuAPIReference: RefObject<MenuApi | null> =
         useRef<MenuApi>(null)
@@ -1712,7 +1720,11 @@ export const TextInputInner = function<Type = unknown>(
 
                     name={properties.name}
 
-                    onChange={onChangeValue}
+                    onChange={
+                        onChangeValue as
+                            unknown as
+                            (event: SyntheticEvent) => void
+                    }
                     onClick={onClick}
                     onKeyDown={(event: ReactKeyboardEvent): void => {
                         /*
@@ -1742,18 +1754,13 @@ export const TextInputInner = function<Type = unknown>(
                     {...materialProperties}
                     {...constraints}
 
-                    align={properties.align}
                     characterCount={
                         typeof properties.maximumLength === 'number' &&
                         !isNaN(properties.maximumLength) &&
                         properties.maximumLength >= 0
                     }
-                    foundationRef={
-                        foundationReference as
-                            RefObject<MDCTextFieldFoundation | null>
-                    }
                     inputRef={
-                        inputReference as RefObject<HTMLTextAreaElement | null>
+                        inputReference
                     }
                     onChange={onChangeValue as (value: string) => void}
                     ripple={properties.ripple}

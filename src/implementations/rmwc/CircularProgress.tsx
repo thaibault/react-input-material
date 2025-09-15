@@ -1,6 +1,7 @@
 import {
     CircularProgress as RMWCCircularProgress
 } from '@rmwc/circular-progress'
+import {IconSizeT} from '@rmwc/types'
 import {
     ForwardedRef,
     forwardRef,
@@ -9,8 +10,7 @@ import {
     ReactElement
 } from 'react'
 
-import {CircularProgressProperties} from '../../type'
-import {IconSizeT} from '@rmwc/types'
+import {CircularProgressProperties} from '../type'
 
 export const CircularProgress = forwardRef((
     {size}: CircularProgressProperties, reference?: ForwardedRef<unknown>

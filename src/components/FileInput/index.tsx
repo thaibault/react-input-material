@@ -17,6 +17,16 @@
     endregion
 */
 // region imports
+import {
+    Card,
+    CardActionButton,
+    CardActionButtons,
+    CardActions,
+    CardMedia,
+    CardPrimaryAction
+} from '@rmwc/card'
+import {Theme} from '@rmwc/theme'
+import {Typography} from '@rmwc/typography'
 import {dataURLToBlob} from 'blob-util'
 import {copy, equals, extend, mask} from 'clientnode'
 import {
@@ -39,17 +49,6 @@ import GenericAnimate from 'react-generic-animate'
 
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
-
-import {
-    Card,
-    CardActionButton,
-    CardActionButtons,
-    CardActions,
-    CardMedia,
-    CardPrimaryAction
-} from '@rmwc/card'
-import {Theme} from '@rmwc/theme'
-import {Typography} from '@rmwc/typography'
 
 import CircularProgress from '#implementations/CircularProgress'
 
