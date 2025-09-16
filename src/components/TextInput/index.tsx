@@ -1738,7 +1738,7 @@ export const TextInputInner = function<Type = unknown>(
             )}
             {wrapAnimationConditionally(
                 <EditorComponent
-                    {...(textInputProperties as unknown as EditorProperties)}
+                    {...textInputProperties}
                     {...typeTextInputProperties}
                     {...typeTextConstraints}
 
