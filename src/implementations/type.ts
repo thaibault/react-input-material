@@ -92,6 +92,8 @@ export interface InputReference {
 }
 
 export interface InputProperties extends LowLevelBaseComponentProperties {
+    ref?: RefObject<InputReference | null>
+
     disabled?: boolean
 
     name: string
