@@ -71,6 +71,7 @@ import {
     propertyTypes,
     ValueState
 } from './type'
+import {InputReference} from '../../implementations/type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
@@ -338,8 +339,8 @@ export const RequireableCheckboxInner = function(
     // endregion
     // region properties
     /// region references
-    const inputReference: RefObject<HTMLInputElement | null> =
-        useRef<HTMLInputElement>(null)
+    const inputReference: RefObject<InputReference | null> =
+        useRef<InputReference>(null)
     /// endregion
     const givenProps: Props = translateKnownSymbols(props)
 

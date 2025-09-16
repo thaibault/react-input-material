@@ -34,10 +34,11 @@ import {
     ComponentAdapter, PropertiesValidationMap
 } from 'web-component-wrapper/type'
 
+import {IconProperties} from '../../implementations/type'
 import {
     defaultModelState as baseDefaultModelState,
     Component as BaseComponent,
-    ModelState as BaseModelState, IconProperties
+    ModelState as BaseModelState
 } from '../../type'
 import {
     defaultInputModel as defaultTextInputModel,

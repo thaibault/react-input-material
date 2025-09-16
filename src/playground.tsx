@@ -369,7 +369,7 @@ const Application = () => {
                         required
                     />
                     <TextInput<string>
-                        icon="backup"
+                        leadingIcon="backup"
                         placeholder="simpleInput4Model"
                         trailingIcon="clear_preset"
 
@@ -388,7 +388,7 @@ const Application = () => {
                     <TextInput<string>
                         declaration="pattern"
                         description="simpleInput5Description"
-                        icon="search"
+                        leadingIcon="search"
                         name="simpleInput5"
                         placeholder="simpleInput5Placeholder"
 
@@ -415,7 +415,7 @@ const Application = () => {
                     <TextInput<string>
                         declaration="password"
                         description="simpleInput6Description"
-                        icon="search"
+                        leadingIcon="search"
                         name="simpleInput6"
                         placeholder="simpleInput6Placeholder"
                         tooltip="Please type in your password."
