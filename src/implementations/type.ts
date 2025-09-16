@@ -159,6 +159,8 @@ export interface TextAreaReference extends InputReference {
 }
 
 export interface TextAreaProperties extends TypeTextInputProperties {
+    ref?: RefObject<TextAreaReference | null>
+
     classNamePrefix?: string
 
     resizeable?: boolean

@@ -1181,7 +1181,7 @@ export const TextInputInner = function<Type = unknown>(
             !properties.disabled &&
             useSuggestions &&
             'ArrowDown' === event.code &&
-            event.target === inputReference.current
+            event.target === inputReference.current?.input.current
         )
             (
                 suggestionMenuAPIReference.current as unknown as ListApi | null
@@ -1497,7 +1497,8 @@ export const TextInputInner = function<Type = unknown>(
         characterCount:
             typeof properties.maximumLength === 'number' &&
             !isNaN(properties.maximumLength) &&
-            properties.maximumLength >= 0
+            properties.maximumLength >= 0,
+        value: properties.representation as string
     }
 
     const isAdvancedEditor: boolean = (
@@ -1737,7 +1738,7 @@ export const TextInputInner = function<Type = unknown>(
             )}
             {wrapAnimationConditionally(
                 <EditorComponent
-                    {...textInputProperties as EditorProperties}
+                    {...(textInputProperties as unknown as EditorProperties)}
                     {...typeTextInputProperties}
                     {...typeTextConstraints}
 
@@ -1747,16 +1748,14 @@ export const TextInputInner = function<Type = unknown>(
                         onClick,
                         onKeyUp,
                         /*
-                            NOTE: Disabled input fields are not focusable
-                            via keyboard which makes them unreachable for
-                            blind people using e.g. screen readers.
-                            That's wgy the label gets a tabindex to make
-                            the input focusable.
+                            NOTE: Disabled input fields are not focusable via
+                            keyboard which makes them unreachable for blind
+                            people using e.g. screen readers. That's wgy the
+                            label gets a tabindex to make the input focusable.
                         */
                         tabIndex: properties.disabled ? '0' : '-1',
                         ...properties.elementProperties
                     }}
-                    value={properties.representation as string}
 
                     {...editorProperties as
                         unknown as
@@ -1850,10 +1849,11 @@ export const TextInputInner = function<Type = unknown>(
                                 {...textInputProperties}
                                 {...typeTextInputProperties}
                                 {...typeTextConstraints}
+
                                 align={properties.align}
 
                                 onChange={onChangeValue}
-                                rootProps={{
+                                elementProperties={{
                                     name: properties.name,
                                     onClick,
                                     onKeyUp,
@@ -1877,7 +1877,6 @@ export const TextInputInner = function<Type = unknown>(
                                 )}
 
                                 type={determineNativeType(properties)}
-                                value={properties.representation as string}
 
                                 {...properties.inputProperties}
                             />

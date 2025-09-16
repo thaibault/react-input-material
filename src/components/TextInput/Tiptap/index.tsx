@@ -26,7 +26,10 @@ import Dummy from 'react-generic-dummy'
 
 import TextArea from '#implementations/TextArea'
 
-import {TextAreaReference} from '../../../implementations/type'
+import {
+    TextAreaProperties,
+    TextAreaReference
+} from '../../../implementations/type'
 import cssClassNames from '../style.module'
 import {TiptapProps} from '../type'
 
@@ -88,25 +91,25 @@ export const Index = (properties: TiptapProps) => {
         () => {
             if (
                 editorViewReference.current &&
-                reference.current?.textarea.current?.clientHeight
+                reference.current?.input.current?.clientHeight
             )
                 editorViewReference.current.style.height =
                     String(
-                        reference.current.textarea.current.clientHeight +
+                        reference.current.input.current.clientHeight +
                         VIEW_CONTENT_OFFSET_IN_PX
                     ) +
                     'px'
         },
         [
             editorViewReference.current,
-            reference.current?.textarea.current?.clientHeight
+            reference.current?.input.current?.clientHeight
         ]
     )
 
     return <TextArea
         ref={reference}
 
-        {...properties}
+        {...(properties as TextAreaProperties)}
 
         barContentSlot={<MenuBar editor={editor}/>}
 

@@ -55,7 +55,10 @@ import TextArea from '#implementations/TextArea'
 
 import cssClassNames from '../style.module'
 import {CodeMirrorProps} from '../type'
-import {TextAreaReference} from '../../../implementations/type'
+import {
+    TextAreaProperties,
+    TextAreaReference
+} from '../../../implementations/type'
 // endregion
 export const BASIC_KEYMAPS: Array<KeyBinding> =
     autocompletion as typeof autocompletion | undefined ?
@@ -94,7 +97,9 @@ export const BASIC_EXTENSIONS: Extension =
         []
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
-export const Index = (props: CodeMirrorProps) => {
+export const Index = (
+    properties: CodeMirrorProps
+) => {
     if (!(
         autocompletion as typeof autocompletion | undefined &&
         history as typeof history | undefined &&
@@ -106,22 +111,22 @@ export const Index = (props: CodeMirrorProps) => {
     ))
         throw Error('Missing codemirror dependencies.')
 
-    const value = props.value ?? ''
+    const value = properties.value ?? ''
 
     const reference = useRef<TextAreaReference | null>(null)
     const editorViewReference = useRef<HTMLDivElement | null>(null)
     const editorView = useRef<EditorView | null>(null)
 
     const onChange = (viewUpdate: ViewUpdate) => {
-        if (props.disabled)
+        if (properties.disabled)
             return
 
         const newValue = viewUpdate.state.doc.toString()
 
         reference.current?.eventMapper.input(newValue, viewUpdate)
 
-        if (props.onChange)
-            props.onChange(newValue)
+        if (properties.onChange)
+            properties.onChange(newValue)
     }
 
     useEffect(
@@ -140,7 +145,7 @@ export const Index = (props: CodeMirrorProps) => {
                         )
                             onChange(viewUpdate)
                     }),
-                    props.editor?.mode ? props.editor.mode : []
+                    properties.editor?.mode ? properties.editor.mode : []
                 ]
             })
 
@@ -156,21 +161,21 @@ export const Index = (props: CodeMirrorProps) => {
                 }
             }
         },
-        [editorViewReference.current, props.editor?.mode?.language.name]
+        [editorViewReference.current, properties.editor?.mode?.language.name]
     )
 
     useEffect(
         () => {
             if (
                 editorView.current &&
-                props.value !== editorView.current.state.doc.toString()
+                properties.value !== editorView.current.state.doc.toString()
             )
                 editorView.current.state.update(
                     {changes: {from: 0, insert: Text.empty}},
-                    {changes: {from: 0, insert: String(props.value)}}
+                    {changes: {from: 0, insert: String(properties.value)}}
                 )
         },
-        [editorView.current, props.value]
+        [editorView.current, properties.value]
     )
 
     useEffect(
@@ -179,7 +184,7 @@ export const Index = (props: CodeMirrorProps) => {
             const syncHeight = () => {
                 if (
                     editorViewReference.current &&
-                    reference.current?.textarea.current?.clientHeight
+                    reference.current?.input.current?.clientHeight
                 ) {
                     const scrollableViewNode: HTMLDivElement | null =
                         editorViewReference.current
@@ -187,7 +192,7 @@ export const Index = (props: CodeMirrorProps) => {
                     if (scrollableViewNode) {
                         const newHeightValue =
                             String(
-                                reference.current.textarea.current.clientHeight
+                                reference.current.input.current.clientHeight
                             ) +
                             'px'
                         editorViewReference.current.style.height =
@@ -212,14 +217,14 @@ export const Index = (props: CodeMirrorProps) => {
         },
         [
             editorViewReference.current,
-            reference.current?.textarea.current?.clientHeight
+            reference.current?.input.current?.clientHeight
         ]
     )
 
     return <TextArea
         ref={reference}
 
-        {...props}
+        {...(properties as TextAreaProperties)}
 
         value={value}
 
@@ -235,14 +240,14 @@ export const Index = (props: CodeMirrorProps) => {
             onBlur={(event: FocusEvent<HTMLDivElement>) => {
                 reference.current?.eventMapper.blur(event)
 
-                if (props.onBlur)
-                    props.onBlur(event)
+                if (properties.onBlur)
+                    properties.onBlur(event)
             }}
             onFocus={(event: FocusEvent<HTMLDivElement>) => {
                 reference.current?.eventMapper.focus(event)
 
-                if (props.onFocus)
-                    props.onFocus(event)
+                if (properties.onFocus)
+                    properties.onFocus(event)
             }}
 
             className={
