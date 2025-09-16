@@ -21,15 +21,11 @@ import {javascript} from '@codemirror/lang-javascript'
 import {css} from '@codemirror/lang-css'
 
 import {MDCMenuFoundation} from '@material/menu'
-import {MDCSelectFoundation} from '@material/select'
-import {MDCTextFieldFoundation} from '@material/textfield'
 
 import {ListApi} from '@rmwc/list'
 import {
     Menu, MenuApi, MenuSurface, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
 } from '@rmwc/menu'
-import {SelectProps} from '@rmwc/select'
-import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
 
 import {
@@ -73,6 +69,7 @@ import CircularProgress from '#implementations/CircularProgress'
 import Icon from '#implementations/Icon'
 import IconButton from '#implementations/IconButton'
 import Select from '#implementations/Select'
+import TextField from '#implementations/TextField'
 
 import WrapConfigurations from '../Wrapper/WrapConfigurations'
 import WrapTooltip from '../Wrapper/WrapTooltip'
@@ -97,8 +94,10 @@ import {
 } from '../../type'
 import {
     IconProperties,
-    SelectProperties,
-    TextAreaReference
+    InputReference,
+    LowLevelBaseComponentProperties,
+    TextInputProperties,
+    TypeTextInputProperties
 } from '../../implementations/type'
 
 import CodeEditorComponent from './CodeMirror'
@@ -115,7 +114,6 @@ import {
 import RichTextEditorComponent from './Tiptap'
 import {
     AdapterWithReferences,
-    CodeMirrorProps as CodeEditorProps,
     CodeMirrorProperties as CodeEditorProperties,
     Component,
     DataTransformation,
@@ -133,11 +131,11 @@ import {
     Props,
     renderProperties,
     State,
-    TiptapProps as RichTextEditorProps,
     TiptapProperties as RichTextEditorProperties,
     ValueState
 } from './type'
 import TRANSFORMER from './transformer'
+import TextArea from '#implementations/TextArea'
 
 export {
     CODE_EDITOR_OPTIONS,
@@ -184,7 +182,11 @@ export const TextInputInner = function<Type = unknown>(
      * with input element.
      */
     useEffect(() => {
-        if (inputReference.current) {
+        if (inputReference.current?.input.current) {
+            const inputDomNode = inputReference.current.input.current as
+                HTMLInputElement |
+                HTMLSelectElement |
+                HTMLTextAreaElement
             const determinedInputProps: Mapping<boolean | number | string> = {}
             const propsToRemove: Array<string> = []
 
@@ -200,7 +202,7 @@ export const TextInputInner = function<Type = unknown>(
 
             // Apply aria attributes regarding searching.
             if (useSuggestions) {
-                if (inputReference.current.getAttribute('type') !== 'search')
+                if (inputDomNode.getAttribute('type') !== 'search')
                     determinedInputProps.role = 'searchbox'
 
                 determinedInputProps.ariaAutocomplete =
@@ -225,19 +227,17 @@ export const TextInputInner = function<Type = unknown>(
 
                 if (typeof value === 'boolean')
                     if (value)
-                        inputReference.current.setAttribute(attributeName, '')
+                        inputDomNode.setAttribute(attributeName, '')
                     else
-                        inputReference.current.removeAttribute(attributeName)
+                        inputDomNode.removeAttribute(attributeName)
                 else
-                    inputReference.current.setAttribute(
-                        attributeName, String(value)
-                    )
+                    inputDomNode.setAttribute(attributeName, String(value))
             }
 
             for (const name of propsToRemove) {
                 const attributeName: string = camelCaseToDelimited(name)
-                if (inputReference.current.hasAttribute(attributeName))
-                    inputReference.current.removeAttribute(attributeName)
+                if (inputDomNode.hasAttribute(attributeName))
+                    inputDomNode.removeAttribute(attributeName)
             }
         }
     })
@@ -317,8 +317,8 @@ export const TextInputInner = function<Type = unknown>(
      * @returns Given potential extended icon configuration.
      */
     const applyIconPreset = (
-        options?: Properties['icon']
-    ): Properties['icon'] | undefined => {
+        options?: Properties['leadingIcon']
+    ): Properties['leadingIcon'] | undefined => {
         if (options === 'clear_preset') {
             const handler = (
                 event: ReactKeyboardEvent | ReactMouseEvent
@@ -574,7 +574,7 @@ export const TextInputInner = function<Type = unknown>(
      * @returns Resolved icon configuration.
      */
     const wrapIconWithTooltip = (
-        options?: Properties['icon']
+        options?: Properties['leadingIcon']
     ): IconProperties | undefined => {
         if (typeof options === 'object' && options.tooltip) {
             const tooltip: Properties['tooltip'] = options.tooltip
@@ -1276,16 +1276,8 @@ export const TextInputInner = function<Type = unknown>(
     // endregion
     // region properties
     /// region references
-    const foundationReference: RefObject<
-        MDCSelectFoundation | MDCTextFieldFoundation | null
-    > = useRef<MDCSelectFoundation | MDCTextFieldFoundation>(null)
-    const inputReference: RefObject<
-        HTMLInputElement |
-        HTMLSelectElement |
-        HTMLTextAreaElement |
-        TextAreaReference |
-        null
-    > = useRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(null)
+    const inputReference: RefObject<InputReference | null> =
+        useRef<InputReference>(null)
     const suggestionMenuAPIReference: RefObject<MenuApi | null> =
         useRef<MenuApi>(null)
     const suggestionMenuFoundationReference: RefObject<
@@ -1460,7 +1452,6 @@ export const TextInputInner = function<Type = unknown>(
             return {
                 properties,
                 references: {
-                    foundationReference,
                     inputReference,
                     suggestionMenuAPIReference,
                     suggestionMenuFoundationReference,
@@ -1473,41 +1464,41 @@ export const TextInputInner = function<Type = unknown>(
     // endregion
     // region render
     /// region intermediate render properties
-    const genericProperties: Partial<
-        CodeEditorProps | RichTextEditorProps | SelectProps | TextFieldProps
-    > = {
+    const textInputProperties: Partial<TextInputProperties> = {
+        ref: inputReference,
         /*
             NOTE: If not set label with forbidden symbols will automatically
             be used.
         */
         id,
-        onFocus: triggerOnFocusAndOpenSuggestions,
-        placeholder: properties.placeholder
-    }
-    const materialProperties: SelectProperties | TextFieldProps = {
+        onFocus: triggerOnFocusAndOpenSuggestions as
+            LowLevelBaseComponentProperties['onFocus'],
         disabled: properties.disabled,
         helpText: {
             children: renderHelpText(),
             persistent: true
         },
-        invalid: (
-            properties.invalid &&
-            properties.showValidationState &&
-            (properties.showInitialValidationState || properties.visited)
-        ),
-        label: properties.description || properties.name,
-        outlined: properties.outlined
+        name: properties.description || properties.name
         /*
-            NOTE: Validation is not handle by the material component kike this:
+            NOTE: Validation is not handled by the low level component like
+            this:
 
             pattern: properties.pattern,
             required: properties.required
         */
     }
-    if (properties.icon)
-        materialProperties.icon = wrapIconWithTooltip(
-            applyIconPreset(properties.icon)
-        )
+    const typeTextInputProperties: Partial<TypeTextInputProperties> = {
+        invalid: (
+            properties.invalid &&
+            properties.showValidationState &&
+            (properties.showInitialValidationState || properties.visited)
+        ),
+        placeholder: properties.placeholder,
+        characterCount:
+            typeof properties.maximumLength === 'number' &&
+            !isNaN(properties.maximumLength) &&
+            properties.maximumLength >= 0
+    }
 
     const isAdvancedEditor: boolean = (
         !properties.selection &&
@@ -1611,34 +1602,34 @@ export const TextInputInner = function<Type = unknown>(
         !useSuggestions
     /// endregion
     /// region determine type specific constraints
-    const constraints: Mapping<unknown> = {}
+    const typeTextConstraints: Mapping<unknown> = {}
     if (properties.type === 'number') {
-        constraints.step = properties.step
+        typeTextConstraints.step = properties.step
 
         if (properties.maximum !== Infinity)
-            constraints.max = properties.maximum
+            typeTextConstraints.max = properties.maximum
         if (properties.minimum !== -Infinity)
-            constraints.min = properties.minimum
+            typeTextConstraints.min = properties.minimum
     } else if (properties.type === 'string') {
         if (
             properties.maximumLength >= 0 &&
             properties.maximumLength !== Infinity
         )
-            constraints.maxLength = properties.maximumLength
+            typeTextConstraints.maxLength = properties.maximumLength
         if (properties.minimumLength > 0)
-            constraints.minLength = properties.minimumLength
+            typeTextConstraints.minLength = properties.minimumLength
 
         if (properties.editor !== 'plain')
-            constraints.rows = properties.rows
+            typeTextConstraints.rows = properties.rows
     } else if ([
         'date', 'date-local',
         'datetime', 'datetime-local',
         'time', 'time-local'
     ].includes(properties.type as string)) {
-        constraints.step = properties.step
+        typeTextConstraints.step = properties.step
 
         if (properties.maximum !== Infinity)
-            constraints.max = formatValue<Type>(
+            typeTextConstraints.max = formatValue<Type>(
                 properties,
                 properties.maximum as
                     unknown as
@@ -1646,7 +1637,7 @@ export const TextInputInner = function<Type = unknown>(
                 transformer
             )
         if (properties.minimum !== -Infinity)
-            constraints.min = formatValue<Type>(
+            typeTextConstraints.min = formatValue<Type>(
                 properties,
                 properties.minimum as
                     unknown as
@@ -1716,7 +1707,7 @@ export const TextInputInner = function<Type = unknown>(
         >
             {wrapAnimationConditionally(
                 <Select
-                    ref={inputReference}
+                    {...textInputProperties}
 
                     name={properties.name}
 
@@ -1738,33 +1729,20 @@ export const TextInputInner = function<Type = unknown>(
                     options={normalizedSelection as NormalizedSelection}
                     value={String(properties.value)}
 
-                    {...genericProperties}
-                    {...materialProperties}
+                    elementProperties={properties.elementProperties}
 
-                    elementProperties={{
-                        ...properties.elementProperties,
-                        ...properties.inputProperties
-                    }}
+                    {...properties.inputProperties}
                 />,
                 isSelection
             )}
             {wrapAnimationConditionally(
                 <EditorComponent
-                    {...genericProperties as EditorProperties}
-                    {...materialProperties}
-                    {...constraints}
+                    {...textInputProperties as EditorProperties}
+                    {...typeTextInputProperties}
+                    {...typeTextConstraints}
 
-                    characterCount={
-                        typeof properties.maximumLength === 'number' &&
-                        !isNaN(properties.maximumLength) &&
-                        properties.maximumLength >= 0
-                    }
-                    inputRef={
-                        inputReference
-                    }
                     onChange={onChangeValue as (value: string) => void}
-                    ripple={properties.ripple}
-                    rootProps={{
+                    elementProperties={{
                         name: properties.name,
                         onClick,
                         onKeyUp,
@@ -1778,13 +1756,12 @@ export const TextInputInner = function<Type = unknown>(
                         tabIndex: properties.disabled ? '0' : '-1',
                         ...properties.elementProperties
                     }}
-                    trailingIcon={wrapIconWithTooltip(applyIconPreset(
-                        properties.trailingIcon
-                    ))}
-                    type={determineNativeType(properties)}
                     value={properties.representation as string}
 
-                    {...editorProperties as Partial<EditorProperties>}
+                    {...editorProperties as
+                        unknown as
+                        Partial<EditorProperties>
+                    }
                     {...properties.inputProperties as Partial<EditorProperties>}
                 />,
                 isAdvancedEditor,
@@ -1859,49 +1836,52 @@ export const TextInputInner = function<Type = unknown>(
                         </MenuSurfaceAnchor> :
                         ''
                     }
-                    <TextField
-                        {...genericProperties as TextFieldProps}
-                        {...materialProperties}
-                        {...constraints}
-                        align={properties.align}
-                        characterCount={
-                            typeof properties.maximumLength === 'number' &&
-                            !isNaN(properties.maximumLength) &&
-                            properties.maximumLength >= 0
-                        }
-                        foundationRef={foundationReference as
-                            RefObject<MDCTextFieldFoundation | null>
-                        }
-                        inputRef={inputReference as
-                            RefObject<HTMLInputElement | null>
-                        }
-                        onChange={onChangeValue}
-                        ripple={properties.ripple}
-                        rootProps={{
-                            name: properties.name,
-                            onClick,
-                            onKeyUp,
-                            /*
-                                NOTE: Disabled input fields are not focusable
-                                via keyboard which makes them unreachable for
-                                blind people using e.g. screen readers.
-                                That's wgy the label gets a tabindex to make
-                                the input focusable.
-                            */
-                            tabIndex: properties.disabled ? '0' : '-1',
-                            ...properties.elementProperties
-                        }}
-                        textarea={
-                            properties.type === 'string' &&
-                            properties.editor !== 'plain'
-                        }
-                        trailingIcon={wrapIconWithTooltip(applyIconPreset(
-                            properties.trailingIcon
-                        ))}
-                        type={determineNativeType(properties)}
-                        value={properties.representation as string}
-                        {...properties.inputProperties as TextFieldProps}
-                    />
+                    {
+                        properties.type === 'string' &&
+                        properties.editor !== 'plain' ?
+                            <TextArea
+                                {...textInputProperties}
+                                {...typeTextInputProperties}
+                                {...typeTextConstraints}
+
+                                onChange={onChangeValue}
+                            /> :
+                            <TextField
+                                {...textInputProperties}
+                                {...typeTextInputProperties}
+                                {...typeTextConstraints}
+                                align={properties.align}
+
+                                onChange={onChangeValue}
+                                rootProps={{
+                                    name: properties.name,
+                                    onClick,
+                                    onKeyUp,
+                                    /*
+                                        NOTE: Disabled input fields are not
+                                        focusable via keyboard which makes them
+                                        unreachable for blind people using e.g.
+                                        screen readers. That's wgy the label
+                                        gets a tabindex to make the input
+                                        focusable.
+                                    */
+                                    tabIndex: properties.disabled ? '0' : '-1',
+                                    ...properties.elementProperties
+                                }}
+
+                                leadingIcon={wrapIconWithTooltip(
+                                    applyIconPreset(properties.leadingIcon)
+                                )}
+                                trailingIcon={wrapIconWithTooltip(
+                                    applyIconPreset(properties.trailingIcon)
+                                )}
+
+                                type={determineNativeType(properties)}
+                                value={properties.representation as string}
+
+                                {...properties.inputProperties}
+                            />
+                    }
                 </div>,
                 !(isAdvancedEditor || isSelection),
                 properties.editor.startsWith('code')

@@ -933,7 +933,6 @@ export const FileInputInner = function<Type extends Value = Value>(
                                     fileInputReference.current?.click()
                                 }}
                                 ref={uploadButtonReference}
-                                ripple={properties.ripple}
                             >
                                 {properties.value ?
                                     properties.editButton :
@@ -953,7 +952,6 @@ export const FileInputInner = function<Type extends Value = Value>(
                                             onChangeValue()
                                         }}
                                         ref={deleteButtonReference}
-                                        ripple={properties.ripple}
                                     >
                                         {properties.deleteButton}
                                     </CardActionButton> :
@@ -968,7 +966,6 @@ export const FileInputInner = function<Type extends Value = Value>(
                                             downloadLinkReference
                                                 .current?.click()
                                         }}
-                                        ripple={properties.ripple}
                                     >
                                         <a
                                             className={

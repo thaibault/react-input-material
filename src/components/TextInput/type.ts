@@ -48,8 +48,6 @@ import {GenericEvent} from 'react-generic-tools/type'
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 
 import {MDCMenuFoundation} from '@material/menu'
-import {MDCSelectFoundation} from '@material/select'
-import {MDCTextFieldFoundation} from '@material/textfield'
 
 import {MenuApi} from '@rmwc/menu'
 import {
@@ -61,7 +59,11 @@ import {ChainedCommands, type EditorOptions, Extensions} from '@tiptap/core'
 import {EditorEvents} from '@tiptap/react'
 import {StarterKitOptions} from '@tiptap/starter-kit'
 
-import {IconProperties, TextAreaProperties} from '../../implementations/type'
+import {
+    IconProperties,
+    InputReference,
+    TextAreaProperties
+} from '../../implementations/type'
 import {
     BaseModel,
     CursorState,
@@ -154,7 +156,7 @@ export type DataTransformation =
 // endregion
 export interface EditorProperties
     extends
-Omit<NonNullable<TextAreaProperties>, 'textarea' | 'value'> {
+Omit<NonNullable<TextAreaProperties>, 'onChange' | 'textarea' | 'value'> {
     id: string
     value: number | string
 
@@ -176,7 +178,9 @@ export interface RichTextEditorButtonProps {
 
     label?: string
 }
-export interface TiptapProperties extends EditorProperties {
+export interface TiptapProperties extends
+    Omit<EditorProperties, 'onBlur' | 'onFocus'>
+{
     onBlur: (event: EditorEvents['focus']) => void
     onFocus: (event: EditorEvents['focus']) => void
 
@@ -188,7 +192,9 @@ export interface TiptapProperties extends EditorProperties {
 }
 export type TiptapProps = Partial<TiptapProperties>
 
-export interface CodeMirrorProperties extends EditorProperties {
+export interface CodeMirrorProperties extends
+    Omit<EditorProperties, 'onBlur' | 'onFocus'>
+{
     onBlur: (event: ReactFocusEvent<HTMLDivElement>) => void
     onFocus: (event: ReactFocusEvent<HTMLDivElement>) => void
 
@@ -307,7 +313,7 @@ export interface Properties<T = unknown> extends
 
     hidden?: boolean
 
-    icon: string | (IconProperties & {tooltip?: string})
+    leadingIcon: string | (IconProperties & {tooltip?: string})
     trailingIcon: string | (IconProperties & {tooltip?: string})
 
     inputProperties: Partial<
@@ -335,8 +341,6 @@ export interface Properties<T = unknown> extends
     onKeyUp: (event: KeyboardEvent, properties: this) => void
     onSelect: (event: GenericEvent, properties: this) => void
     onSelectionChange: (event: GenericEvent, properties: this) => void
-
-    outlined: boolean
 
     pattern: Array<RegExp | string> | null | RegExp | string
     patternText: string
@@ -391,12 +395,7 @@ export type Adapter<T = unknown> = ComponentAdapter<
 >
 export interface AdapterWithReferences<T = unknown> extends Adapter<T> {
     references: {
-        foundationReference: RefObject<
-            MDCSelectFoundation | MDCTextFieldFoundation | null
-        >
-        inputReference: RefObject<
-            HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
-        >
+        inputReference: RefObject<InputReference | null>
         suggestionMenuAPIReference: RefObject<MenuApi | null>
         suggestionMenuFoundationReference: RefObject<
             MDCMenuFoundation | null

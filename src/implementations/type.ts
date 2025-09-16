@@ -25,7 +25,7 @@ import {
     ReactNode,
     SyntheticEvent
 } from 'react'
-import {NormalizedSelection} from '../components/TextInput/type'
+import {NativeType, NormalizedSelection} from '../components/TextInput/type'
 // endregion
 // region exports
 export type IconStrategy =
@@ -52,20 +52,12 @@ export interface LowLevelBaseComponentProperties {
 
     elementProperties?: Mapping<unknown>
 
-    helpText?: ReactNode | HelpText;
-}
+    helpText?: ReactNode | HelpText
 
-export interface CheckboxProperties extends LowLevelBaseComponentProperties {
-    value: boolean
-    disabled?: boolean
-    indeterminate?: boolean
-
-    name: string
-    children?: ReactNode
-
-    onBlur?: (event: SyntheticEvent) => void
-    onChange?: (event: SyntheticEvent) => void
     onClick?: (event: ReactMouseEvent) => void
+    onKeyUp?: (event: ReactKeyboardEvent) => void
+    onKeyDown?: (event: ReactKeyboardEvent) => void
+    onBlur?: (event: SyntheticEvent) => void
     onFocus?: (event: ReactFocusEvent) => void
 }
 
@@ -90,45 +82,66 @@ export interface IconButtonProperties extends IconProperties {
     value?: boolean
     disabled?: boolean
 
-    onClick?: (event: ReactMouseEvent) => void
     onChange?: (event: SyntheticEvent) => void
 }
 
-export interface SelectProperties extends LowLevelBaseComponentProperties {
-    options: NormalizedSelection
+export type InputDomNodes =
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+export interface InputReference {
+    input: RefObject<InputDomNodes | null>
+}
+
+export interface InputProperties extends LowLevelBaseComponentProperties {
+    disabled?: boolean
+
     name: string
-    value: unknown
 
     onChange?: (event: SyntheticEvent) => void
-    onClick?: (event: ReactMouseEvent) => void
-    onKeyDown?: (event: ReactKeyboardEvent) => void
 }
 
-export interface TextInputProperties extends LowLevelBaseComponentProperties {
+export interface CheckboxProperties extends InputProperties {
+    indeterminate?: boolean
+
+    children?: ReactNode
+
+    value: boolean
+}
+
+export type TextInputProperties = InputProperties
+
+export interface SelectProperties extends TextInputProperties {
+    options: NormalizedSelection
+
+    value: unknown
+}
+
+export interface TypeTextInputProperties extends TextInputProperties {
     value?: string | number
 
     characterCount?: boolean
 
     invalid?: boolean
 
-    disabled?: boolean
     required?: boolean
     maximumLength?: number
     minimumLength?: number
 
     label?: ReactNode
-
-    leadingIcon?: IconProperties
-    trailingIcon?: IconProperties
+    placeholder?: string
 
     onLabelClick?: (event: ReactMouseEvent) => void
 }
 
-export interface TextFieldProperties extends TextInputProperties {
+export interface TextFieldProperties extends TypeTextInputProperties {
+    type?: NativeType
+
     maximum?: number
     minimum?: number
 
     step?: number
+
+    leadingIcon?: IconProperties
+    trailingIcon?: IconProperties
 }
 
 export interface TextAreaEventWrapper {
@@ -137,14 +150,13 @@ export interface TextAreaEventWrapper {
     input: (value: number | string, event: object) => void
 }
 
-export interface TextAreaReference {
-    textarea: RefObject<HTMLTextAreaElement | null>
-    input: RefObject<HTMLInputElement | null>
+export interface TextAreaReference extends InputReference {
+    input: RefObject<HTMLTextAreaElement | null>
     label: RefObject<HTMLLabelElement | null>
     eventMapper: TextAreaEventWrapper
 }
 
-export interface TextAreaProperties extends TextInputProperties {
+export interface TextAreaProperties extends TypeTextInputProperties {
     classNamePrefix?: string
 
     resizeable?: boolean

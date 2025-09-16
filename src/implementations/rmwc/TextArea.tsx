@@ -26,20 +26,17 @@ export const TextArea = forwardRef((
     const id = properties.id ?? defaultID
     const classNamePrefix = properties.classNamePrefix ?? 'text-area'
 
-    const baseReference: RefObject<HTMLTextAreaElement | null> =
+    const inputReference: RefObject<HTMLTextAreaElement | null> =
         useRef<HTMLTextAreaElement>(null)
     const materialTextFieldReference = useRef<MDCTextField | null>(null)
     const labelReference: RefObject<HTMLLabelElement | null> =
         useRef<HTMLLabelElement>(null)
-    const inputReference: RefObject<HTMLInputElement | null> =
-        useRef<HTMLInputElement>(null)
     const foundationReference: RefObject<MDCTextFieldFoundation | null> =
         useRef<MDCTextFieldFoundation>(null)
 
     useImperativeHandle(
         reference,
         () => ({
-            textarea: baseReference,
             foundation: foundationReference,
             input: inputReference,
             label: labelReference,
@@ -51,29 +48,29 @@ export const TextArea = forwardRef((
             */
             eventMapper: {
                 blur: (event: object) => {
-                    if (baseReference.current) {
+                    if (inputReference.current) {
                         const syntheticEvent = new Event('blur') as
                             Event & { detail: object }
                         syntheticEvent.detail = event
-                        baseReference.current.dispatchEvent(syntheticEvent)
+                        inputReference.current.dispatchEvent(syntheticEvent)
                     }
                 },
                 focus: (event: object) => {
-                    if (baseReference.current) {
+                    if (inputReference.current) {
                         const syntheticEvent = new Event('focus') as
                             Event & { detail: object }
                         syntheticEvent.detail = event
-                        baseReference.current.dispatchEvent(syntheticEvent)
+                        inputReference.current.dispatchEvent(syntheticEvent)
                     }
                 },
                 input: (value: number | string, event: object) => {
-                    if (baseReference.current) {
+                    if (inputReference.current) {
                         const syntheticEvent = new Event('input') as
                             Event & { detail: object }
                         syntheticEvent.detail = event
 
-                        baseReference.current.value = String(value)
-                        baseReference.current.dispatchEvent(syntheticEvent)
+                        inputReference.current.value = String(value)
+                        inputReference.current.dispatchEvent(syntheticEvent)
                     }
 
                     /*
@@ -138,7 +135,7 @@ export const TextArea = forwardRef((
 
     const editorContent = <>
         <textarea
-            ref={baseReference}
+            ref={inputReference}
 
             className="mdc-text-field__input"
             style={properties.children ?

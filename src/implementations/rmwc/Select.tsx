@@ -10,10 +10,10 @@ import {
     useRef
 } from 'react'
 
-import {SelectProperties} from '../type'
+import {InputReference, SelectProperties} from '../type'
 
 export const Select = forwardRef((
-    properties: SelectProperties, reference?: ForwardedRef<unknown>
+    properties: SelectProperties, reference?: ForwardedRef<InputReference>
 ): ReactElement => {
     const baseReference: RefObject<HTMLSelectElement | null> =
         useRef<HTMLSelectElement>(null)

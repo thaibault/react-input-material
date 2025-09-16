@@ -50,7 +50,6 @@ import {
 } from 'web-component-wrapper/type'
 import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
-import {RipplePropT} from '@rmwc/types'
 // endregion
 // region exports
 /// region generic
@@ -154,8 +153,6 @@ CommonBaseModel<T>, ModelState {
 
     required: boolean
     requiredText: string
-
-    ripple: RipplePropT
 
     elementProperties: Mapping<boolean | number | string>
     /*
@@ -358,7 +355,6 @@ export const propertyTypes: ValidationMapping = {
     enforceUncontrolled: boolean,
 
     initialValue: any,
-    inputProperties: object,
     model: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
         modelPropertyTypes
     ),
@@ -374,8 +370,7 @@ export const propertyTypes: ValidationMapping = {
     required: boolean,
     requiredText: string,
 
-    ripple: oneOfType([boolean, object]),
-
+    inputProperties: object,
     elementProperties: object,
 
     showDeclaration: oneOfType([boolean, symbol]),

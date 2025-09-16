@@ -10,10 +10,10 @@ import {
     useRef
 } from 'react'
 
-import {CheckboxProperties} from '../type'
+import {CheckboxProperties, InputReference} from '../type'
 
 export const Checkbox = forwardRef((
-    properties: CheckboxProperties, reference?: ForwardedRef<unknown>
+    properties: CheckboxProperties, reference?: ForwardedRef<InputReference>
 ): ReactElement => {
     const baseReference: RefObject<HTMLInputElement | null> =
         useRef<HTMLInputElement>(null)
