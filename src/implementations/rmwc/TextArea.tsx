@@ -94,22 +94,24 @@ export const TextArea = forwardRef((
                 materialTextFieldReference.current =
                     new MDCTextField(labelReference.current)
 
-                console.log('A', materialTextFieldReference.current.maxLength)
-
                 foundationReference.current =
                     materialTextFieldReference.current.getDefaultFoundation()
 
                 if (typeof properties.value === 'string')
                     materialTextFieldReference.current.value = properties.value
+
                 if (typeof properties.disabled === 'boolean')
                     materialTextFieldReference.current.disabled =
                         properties.disabled
+
                 if (typeof properties.invalid === 'boolean')
                     materialTextFieldReference.current.valid =
                         !properties.invalid
+
                 if (typeof properties.required === 'boolean')
                     materialTextFieldReference.current.required =
                         properties.required
+
                 if (typeof properties.minimumLength === 'number')
                     materialTextFieldReference.current.minLength =
                         properties.minimumLength
@@ -136,6 +138,13 @@ export const TextArea = forwardRef((
             properties.maximumLength
         ]
     )
+
+    // NOTE: Character count is only supported if maximum length is given.
+    const isMaximumLength =
+        typeof properties.maximumLength === 'number' &&
+        !isNaN(properties.maximumLength) &&
+        properties.maximumLength !== Infinity &&
+        properties.maximumLength >= 0
 
     const editorContent = <>
         <textarea
@@ -177,12 +186,12 @@ export const TextArea = forwardRef((
             <div className={`${classNamePrefix}__bar`}>
                 {properties.barContentSlot}
 
-                {properties.characterCount ?
+                {properties.characterCount && isMaximumLength ?
                     <div className="mdc-text-field-character-counter"></div> :
                     ''
                 }
             </div> :
-            properties.characterCount ?
+            properties.characterCount && isMaximumLength ?
                 <div className="mdc-text-field-character-counter"></div> :
                 ''
         }
@@ -221,7 +230,7 @@ export const TextArea = forwardRef((
                     eslint-enable @typescript-eslint/no-unnecessary-condition
                 */
                 .concat(
-                    properties.characterCount ?
+                    properties.characterCount && isMaximumLength ?
                         'mdc-text-field--with-internal-counter' :
                         []
                 )

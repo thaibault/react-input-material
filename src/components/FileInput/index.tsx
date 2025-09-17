@@ -847,6 +847,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                     {properties.value ?
                         <TextInput
                             ref={nameInputReference}
+
                             {...properties.generateFileNameInputProperties(
                                 {
                                     disabled: properties.disabled,

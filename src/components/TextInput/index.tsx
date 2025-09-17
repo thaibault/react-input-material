@@ -1625,6 +1625,7 @@ export const TextInputInner = function<Type = unknown>(
             typeTextConstraints.rows = properties.rows
     } else if ([
         'date', 'date-local',
+        'date', 'date-local',
         'datetime', 'datetime-local',
         'time', 'time-local'
     ].includes(properties.type as string)) {
@@ -1697,14 +1698,18 @@ export const TextInputInner = function<Type = unknown>(
         tooltip={properties.tooltip}
     >
         <div
+            ref={wrapperReference}
+
             className={[CSS_CLASS_NAMES.textInput]
                 .concat(properties.className)
                 .join(' ')
             }
+            style={properties.styles}
+
             onBlur={onBlur}
             onKeyDown={onKeyDown}
-            ref={wrapperReference}
-            style={properties.styles}
+
+
             {...(useSuggestions ? {role: 'search'} : {})}
         >
             {wrapAnimationConditionally(
@@ -1747,7 +1752,7 @@ export const TextInputInner = function<Type = unknown>(
                         /*
                             NOTE: Disabled input fields are not focusable via
                             keyboard which makes them unreachable for blind
-                            people using e.g. screen readers. That's wgy the
+                            people using e.g. screen readers. That's why the
                             label gets a tabindex to make the input focusable.
                         */
                         tabIndex: properties.disabled ? '0' : '-1',

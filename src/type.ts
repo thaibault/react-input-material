@@ -100,6 +100,8 @@ export interface CommonBaseModel<Type = unknown> {
 
     trim: boolean
 
+    inputProperties: Mapping<unknown>
+
     value?: Type
 }
 export interface ModelState {
@@ -414,7 +416,7 @@ export const defaultModel: BaseModel<string> = {
     maximum: Infinity,
     minimum: -Infinity,
 
-    maximumLength: -1,
+    maximumLength: Infinity,
     minimumLength: 0,
 
     mutable: true,
@@ -430,7 +432,9 @@ export const defaultModel: BaseModel<string> = {
 
     trim: true,
 
-    type: 'string'
+    type: 'string',
+
+    inputProperties: {}
 } as const
 /*
     NOTE: Avoid setting any properties already defined in model here since they
@@ -439,6 +443,8 @@ export const defaultModel: BaseModel<string> = {
 export const defaultProperties: DefaultProperties = {
     className: [],
     styles: {},
+    elementProperties: {},
+    inputProperties: {},
 
     enforceUncontrolled: false,
 

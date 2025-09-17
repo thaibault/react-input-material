@@ -21,7 +21,10 @@ import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 import {Mapping} from 'clientnode'
-import {useEffect, useRef} from 'react'
+import {
+    ForwardedRef, forwardRef,
+    MutableRefObject as RefObject, ReactElement, useEffect, useRef
+} from 'react'
 import Dummy from 'react-generic-dummy'
 
 import TextArea from '#implementations/TextArea'
@@ -38,7 +41,10 @@ import MenuBar from './MenuBar'
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 export const VIEW_CONTENT_OFFSET_IN_PX = 8
 
-export const Index = (properties: TiptapProps) => {
+export const Index = forwardRef((
+    properties: TiptapProps,
+    givenReference?: ForwardedRef<TextAreaReference>
+): ReactElement => {
     if (
         !(useEditor as typeof useEditor | undefined) ||
         (StarterKit as unknown as Partial<typeof Dummy>).isDummy
@@ -47,7 +53,10 @@ export const Index = (properties: TiptapProps) => {
 
     const value = properties.value ?? ''
 
-    const reference = useRef<TextAreaReference | null>(null)
+    const localReference = useRef<TextAreaReference | null>(null)
+    const reference: RefObject<TextAreaReference | null> =
+        (givenReference as null | RefObject<TextAreaReference | null>) ??
+        localReference
     const editorViewReference = useRef<HTMLDivElement | null>(null)
 
     const extensions =
@@ -129,6 +138,6 @@ export const Index = (properties: TiptapProps) => {
             innerRef={editorViewReference}
         />
     </TextArea>
-}
+})
 
 export default Index

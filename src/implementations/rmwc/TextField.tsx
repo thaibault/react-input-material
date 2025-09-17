@@ -38,19 +38,26 @@ export const TextField = forwardRef((
         })
     )
 
+    properties = {...properties, maximumLength: 10}
+
+    // NOTE: Character count is only supported if maximum length is given.
+    const isMaximumLength =
+        typeof properties.maximumLength === 'number' &&
+        !isNaN(properties.maximumLength) &&
+        properties.maximumLength !== Infinity &&
+        properties.maximumLength >= 0
+
     return <div
         className={properties.classNames?.join(' ')}
         style={properties.styles}
     >
         <RMWCTextField
-            characterCount={
-                typeof properties.maximumLength === 'number' &&
-                !isNaN(properties.maximumLength) &&
-                properties.maximumLength >= 0
-            }
+            characterCount={properties.characterCount && isMaximumLength}
 
             label={properties.name}
             placeholder={properties.placeholder}
+
+            maxLength={isMaximumLength ? properties.maximumLength : Infinity}
 
             ref={baseReference}
             foundationRef={foundationReference}

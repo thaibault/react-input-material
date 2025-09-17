@@ -89,7 +89,7 @@ const SECTIONS = [
 const Application = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(2)
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
     const activeSection = SECTIONS[activeTabIndex]
 
     const onChange: ((properties: BaseProps) => void) =
@@ -654,7 +654,6 @@ const Application = () => {
                         required
                         onChange={onChange}
                     />
-                    {/*
                     <TextInput<string>
                         editor={
                             CodeEditorIndicator as
@@ -721,7 +720,6 @@ const Application = () => {
                         })}
                         onChange={onChange}
                     />
-                    */}
                 </div>
                 {/* endregion */}
                 {/* region time */}
@@ -1270,7 +1268,6 @@ const Application = () => {
                     }}
                 >
                     {/* region file-input inputs */}
-                    {/*
                     <Inputs<FileInputValue | null, FileInputProps>
                         name="fileInputs"
                         createItem={useMemorizedValue(
@@ -1291,10 +1288,8 @@ const Application = () => {
                             <FileInput {...properties as FileInputProps} />
                         )}
                     </Inputs>
-                    */}
                     {/* endregion */}
                     {/* region checkbox inputs */}
-                    {/*
                     <Inputs<boolean | null, CheckboxProps>
                         createItem={useMemorizedValue(({
                             index, item, properties: {name}
@@ -1319,11 +1314,9 @@ const Application = () => {
                             <Checkbox {...properties} />
                         )}
                     </Inputs>
-                    */}
                     {/* endregion */}
-                    {/* region interval inputs */}
+                    {/** region interval inputs */}
                     {/* region uncontrolled */}
-                    {/*
                     <Inputs<
                         (
                             Partial<IntervalConfiguration> |
@@ -1353,10 +1346,8 @@ const Application = () => {
                             <Interval {...properties} step={60} />
                         )}
                     </Inputs>
-                    */}
                     {/* endregion */}
                     {/* region controlled */}
-                    {/*
                     <Inputs<
                         (
                             Partial<IntervalConfiguration> |
@@ -1385,10 +1376,8 @@ const Application = () => {
                             )} />
                         )}
                     </Inputs>
-                    */}
                     {/* endregion */}
-                    {/* endregion */}
-                    {/*
+                    {/** endregion */}
                     <Inputs
                         name="textInputInputsControlled"
                         onChange={onChange}
@@ -1396,7 +1385,6 @@ const Application = () => {
                         triggerInitialPropertiesConsolidation={true}
                         value={textInputInputsValue}
                     />
-                    */}
                 </div>
                 {/* endregion */}
                 {/* region interval */}
