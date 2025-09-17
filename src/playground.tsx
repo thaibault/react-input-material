@@ -43,7 +43,7 @@ import {
     Props as FileInputProps,
     Value as FileInputValue
 } from './components/FileInput/type'
-import {Props as CheckboxProps} from './components/RequireableCheckbox/type'
+import {Props as CheckboxProps} from './components/Checkbox/type'
 import {
     Properties as TextInputProperties,
     Props as TextInputProps,
@@ -62,9 +62,7 @@ import {
     Value as IntervalValue,
     PartialModel as IntervalPartialModel
 } from './components/Interval/type'
-import {
-    FileInput, TextInput, Inputs, Interval, RequireableCheckbox as Checkbox
-} from './index'
+import {Checkbox, FileInput, TextInput, Inputs, Interval} from './index'
 import {BaseProps} from './type'
 import {slicePropertiesForStateRecursively} from './helper'
 // endregion
@@ -85,13 +83,13 @@ const SECTIONS = [
     'inputs',
     'interval',
 
-    'requireable-checkbox'
+    'checkbox'
 ] as const
 // endregion
 const Application = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(2)
     const activeSection = SECTIONS[activeTabIndex]
 
     const onChange: ((properties: BaseProps) => void) =
@@ -656,6 +654,7 @@ const Application = () => {
                         required
                         onChange={onChange}
                     />
+                    {/*
                     <TextInput<string>
                         editor={
                             CodeEditorIndicator as
@@ -722,6 +721,7 @@ const Application = () => {
                         })}
                         onChange={onChange}
                     />
+                    */}
                 </div>
                 {/* endregion */}
                 {/* region time */}
@@ -1270,6 +1270,7 @@ const Application = () => {
                     }}
                 >
                     {/* region file-input inputs */}
+                    {/*
                     <Inputs<FileInputValue | null, FileInputProps>
                         name="fileInputs"
                         createItem={useMemorizedValue(
@@ -1290,8 +1291,10 @@ const Application = () => {
                             <FileInput {...properties as FileInputProps} />
                         )}
                     </Inputs>
+                    */}
                     {/* endregion */}
                     {/* region checkbox inputs */}
+                    {/*
                     <Inputs<boolean | null, CheckboxProps>
                         createItem={useMemorizedValue(({
                             index, item, properties: {name}
@@ -1316,9 +1319,11 @@ const Application = () => {
                             <Checkbox {...properties} />
                         )}
                     </Inputs>
+                    */}
                     {/* endregion */}
                     {/* region interval inputs */}
                     {/* region uncontrolled */}
+                    {/*
                     <Inputs<
                         (
                             Partial<IntervalConfiguration> |
@@ -1348,8 +1353,10 @@ const Application = () => {
                             <Interval {...properties} step={60} />
                         )}
                     </Inputs>
+                    */}
                     {/* endregion */}
                     {/* region controlled */}
+                    {/*
                     <Inputs<
                         (
                             Partial<IntervalConfiguration> |
@@ -1378,8 +1385,10 @@ const Application = () => {
                             )} />
                         )}
                     </Inputs>
+                    */}
                     {/* endregion */}
                     {/* endregion */}
+                    {/*
                     <Inputs
                         name="textInputInputsControlled"
                         onChange={onChange}
@@ -1387,6 +1396,7 @@ const Application = () => {
                         triggerInitialPropertiesConsolidation={true}
                         value={textInputInputsValue}
                     />
+                    */}
                 </div>
                 {/* endregion */}
                 {/* region interval */}
@@ -1454,9 +1464,9 @@ const Application = () => {
 
                 {/* region checkbox */}
                 <div
-                    className="playground__inputs__requireable-checkbox"
+                    className="playground__inputs__checkbox"
                     style={{
-                        display: activeSection === 'requireable-checkbox' ?
+                        display: activeSection === 'checkbox' ?
                             'block' :
                             'none'
                     }}

@@ -100,6 +100,7 @@ LowLevelBaseComponentProperties {
     disabled?: boolean
 
     name: string
+    label?: ReactNode
 
     onChange?: (eventOrValue: GenericEvent<Type> | Type) => void
 }
@@ -135,7 +136,6 @@ TextInputProperties<Type> {
     maximumLength?: number
     minimumLength?: number
 
-    label?: ReactNode
     placeholder?: string
 
     onLabelClick?: (event: ReactMouseEvent) => void

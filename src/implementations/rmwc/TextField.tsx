@@ -1,6 +1,5 @@
 import {MDCTextFieldFoundation} from '@material/textfield'
 import {TextField as RMWCTextField} from '@rmwc/textfield'
-import {IconPropT} from '@rmwc/types'
 
 import React, {
     ForwardedRef,
@@ -13,6 +12,7 @@ import React, {
 } from 'react'
 
 import {InputReference, TextFieldProperties} from '../type'
+import Icon from './Icon'
 
 export interface Reference extends InputReference {
     foundation: RefObject<MDCTextFieldFoundation | null>
@@ -72,8 +72,18 @@ export const TextField = forwardRef((
                 ...properties.elementProperties
             }}
 
-            icon={properties.leadingIcon as IconPropT}
-            trailingIcon={properties.trailingIcon as IconPropT}
+            icon={properties.leadingIcon ?
+                typeof properties.leadingIcon === 'string' ?
+                    properties.leadingIcon :
+                    <Icon {...properties.leadingIcon} /> :
+                undefined
+            }
+            trailingIcon={properties.trailingIcon ?
+                typeof properties.trailingIcon === 'string' ?
+                    properties.trailingIcon :
+                    <Icon {...properties.trailingIcon} /> :
+                undefined
+            }
 
             type={properties.type}
             value={properties.value}

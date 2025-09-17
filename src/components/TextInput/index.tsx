@@ -1478,7 +1478,8 @@ export const TextInputInner = function<Type = unknown>(
             children: renderHelpText(),
             persistent: true
         },
-        name: properties.description || properties.name
+        name: properties.name || properties.description,
+        label: properties.description || properties.name
         /*
             NOTE: Validation is not handled by the low level component like
             this:
@@ -1616,9 +1617,9 @@ export const TextInputInner = function<Type = unknown>(
             properties.maximumLength >= 0 &&
             properties.maximumLength !== Infinity
         )
-            typeTextConstraints.maxLength = properties.maximumLength
+            typeTextConstraints.maximumLength = properties.maximumLength
         if (properties.minimumLength > 0)
-            typeTextConstraints.minLength = properties.minimumLength
+            typeTextConstraints.minimumLength = properties.minimumLength
 
         if (properties.editor !== 'plain')
             typeTextConstraints.rows = properties.rows

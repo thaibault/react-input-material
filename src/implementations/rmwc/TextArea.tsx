@@ -5,7 +5,9 @@ import {
     forwardRef,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
-    ReactElement, useEffect, useId,
+    ReactElement,
+    useEffect,
+    useId,
     useImperativeHandle,
     useRef
 } from 'react'
@@ -92,6 +94,8 @@ export const TextArea = forwardRef((
                 materialTextFieldReference.current =
                     new MDCTextField(labelReference.current)
 
+                console.log('A', materialTextFieldReference.current.maxLength)
+
                 foundationReference.current =
                     materialTextFieldReference.current.getDefaultFoundation()
 
@@ -137,6 +141,11 @@ export const TextArea = forwardRef((
         <textarea
             ref={inputReference}
 
+            id={id}
+            name={properties.name}
+
+            disabled={properties.disabled}
+
             className="mdc-text-field__input"
             style={properties.children ?
                 {
@@ -158,6 +167,8 @@ export const TextArea = forwardRef((
 
             minLength={properties.minimumLength}
             maxLength={properties.maximumLength}
+
+            onChange={properties.onChange}
         ></textarea>
 
         {properties.children}

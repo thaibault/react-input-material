@@ -31,6 +31,10 @@ export const IconButton = forwardRef((
         })
     )
 
+    const size = properties.size?.replace('extra-small', 'xsmall')
+        .replace('extra-large', 'xlarge') as
+        IconSizeT
+
     return <RMWCIconButton
         checked={properties.value}
         disabled={properties.disabled}
@@ -40,16 +44,12 @@ export const IconButton = forwardRef((
 
         icon={{
             icon: properties.icon,
-            size: properties.size?.replace('extra-small', 'xsmall')
-                .replace('extra-large', 'xlarge') as
-                    IconSizeT,
+            size,
             strategy: properties.strategy
         }}
         onIcon={{
             icon: properties.onIcon || properties.icon,
-            size: properties.size?.replace('extra-small', 'xsmall')
-                .replace('extra-large', 'xlarge') as
-                    IconSizeT,
+            size,
             strategy: properties.strategy
         }}
 

@@ -17,6 +17,6 @@ This library written by Torben Sickert stand under a creative commons naming
 
     @import "./components/TextInput/import.module";
 */
-@import "./components/RequireableCheckbox/import.module.css";
+@import "./components/Checkbox/import.module.css";
 
 @import "./implementations/rmwc/material-fixes.css";

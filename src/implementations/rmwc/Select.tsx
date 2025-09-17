@@ -54,6 +54,8 @@ export const SelectInner = function<Type = unknown>(
         options={properties.options as OptionsType}
 
         value={String(properties.value)}
+
+        label={properties.label as string}
     />
 }
 export const Select =

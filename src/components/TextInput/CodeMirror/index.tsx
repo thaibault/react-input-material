@@ -49,7 +49,16 @@ import {
 
 import {Mapping} from 'clientnode'
 
-import {FocusEvent, useEffect, useRef} from 'react'
+import {
+    FocusEvent,
+    ForwardedRef,
+    forwardRef,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject,
+    ReactElement,
+    useEffect,
+    useRef
+} from 'react'
 
 import TextArea from '#implementations/TextArea'
 
@@ -97,9 +106,10 @@ export const BASIC_EXTENSIONS: Extension =
         []
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
-export const Index = (
-    properties: CodeMirrorProps
-) => {
+export const Index = forwardRef((
+    properties: CodeMirrorProps,
+    givenReference?: ForwardedRef<TextAreaReference>
+): ReactElement => {
     if (!(
         autocompletion as typeof autocompletion | undefined &&
         history as typeof history | undefined &&
@@ -113,7 +123,10 @@ export const Index = (
 
     const value = properties.value ?? ''
 
-    const reference = useRef<TextAreaReference | null>(null)
+    const localReference = useRef<TextAreaReference | null>(null)
+    const reference: RefObject<TextAreaReference | null> =
+        (givenReference as null | RefObject<TextAreaReference | null>) ??
+        localReference
     const editorViewReference = useRef<HTMLDivElement | null>(null)
     const editorView = useRef<EditorView | null>(null)
 
@@ -226,7 +239,7 @@ export const Index = (
 
         {...(properties as TextAreaProperties)}
 
-        value={value}
+        value={value as string | undefined}
 
         classNamePrefix={CSS_CLASS_NAMES.codeEditor}
 
@@ -255,6 +268,6 @@ export const Index = (
             }
         ></div>
     </TextArea>
-}
+})
 
 export default Index
