@@ -60,14 +60,12 @@ import {
     useRef
 } from 'react'
 
-import TextArea from '#implementations/TextArea'
-
+import {TextAreaProperties} from '../../../implementations/type'
+import EditorWrapper, {
+    Reference as InputEventMapperReference
+} from '../InputEventMapperWrapper'
 import cssClassNames from '../style.module'
 import {CodeMirrorProps} from '../type'
-import {
-    TextAreaProperties,
-    TextAreaReference
-} from '../../../implementations/type'
 // endregion
 export const BASIC_KEYMAPS: Array<KeyBinding> =
     autocompletion as typeof autocompletion | undefined ?
@@ -108,7 +106,7 @@ export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
 export const Index = forwardRef((
     properties: CodeMirrorProps,
-    givenReference?: ForwardedRef<TextAreaReference>
+    givenReference?: ForwardedRef<InputEventMapperReference>
 ): ReactElement => {
     if (!(
         autocompletion as typeof autocompletion | undefined &&
@@ -123,9 +121,11 @@ export const Index = forwardRef((
 
     const value = properties.value ?? ''
 
-    const localReference = useRef<TextAreaReference | null>(null)
-    const reference: RefObject<TextAreaReference | null> =
-        (givenReference as null | RefObject<TextAreaReference | null>) ??
+    const localReference = useRef<InputEventMapperReference | null>(null)
+    const reference: RefObject<InputEventMapperReference | null> =
+        (
+            givenReference as null | RefObject<InputEventMapperReference | null>
+        ) ??
         localReference
     const editorViewReference = useRef<HTMLDivElement | null>(null)
     const editorView = useRef<EditorView | null>(null)
@@ -197,7 +197,8 @@ export const Index = forwardRef((
             const syncHeight = () => {
                 if (
                     editorViewReference.current &&
-                    reference.current?.input.current?.clientHeight
+                    reference.current?.input.current?.input
+                        .current?.clientHeight
                 ) {
                     const scrollableViewNode: HTMLDivElement | null =
                         editorViewReference.current
@@ -205,7 +206,8 @@ export const Index = forwardRef((
                     if (scrollableViewNode) {
                         const newHeightValue =
                             String(
-                                reference.current.input.current.clientHeight
+                                reference.current.input.current.input.current
+                                    .clientHeight
                             ) +
                             'px'
                         editorViewReference.current.style.height =
@@ -230,11 +232,11 @@ export const Index = forwardRef((
         },
         [
             editorViewReference.current,
-            reference.current?.input.current?.clientHeight
+            reference.current?.input.current?.input.current?.clientHeight
         ]
     )
 
-    return <TextArea
+    return <EditorWrapper
         ref={reference}
 
         {...(properties as TextAreaProperties)}
@@ -267,7 +269,7 @@ export const Index = forwardRef((
                 `${CSS_CLASS_NAMES.codeEditorView} mdc-text-field__input`
             }
         ></div>
-    </TextArea>
+    </EditorWrapper>
 })
 
 export default Index

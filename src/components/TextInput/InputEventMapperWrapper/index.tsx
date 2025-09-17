@@ -1,14 +1,7 @@
-import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
-import {TextFieldHelperTextProps} from '@rmwc/textfield'
 import {
     ForwardedRef,
     forwardRef,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
     ReactElement,
-    ReactNode,
-    useEffect,
-    useId,
     useImperativeHandle,
     useRef
 } from 'react'
@@ -21,9 +14,10 @@ import {
     TextAreaReference
 } from '../../../implementations/type'
 
+export type Reference = EventMapperWrapperReference<TextAreaReference>
+
 export const Index = forwardRef((
-    properties: TextAreaProperties,
-    reference?: ForwardedRef<EventMapperWrapperReference<TextAreaReference>>
+    properties: TextAreaProperties, reference?: ForwardedRef<Reference>
 ): ReactElement => {
     const inputReference = useRef<TextAreaReference | null>(null)
     useImperativeHandle(
@@ -72,7 +66,7 @@ export const Index = forwardRef((
                         do clearing the textarea's input value.
                     */
                     setTimeout(() => {
-                        foundationReference.current?.autoCompleteFocus()
+                        // TODO foundationReference.current?.autoCompleteFocus()
                     })
                 }
             }

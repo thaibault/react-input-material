@@ -42,49 +42,7 @@ export const TextArea = forwardRef((
             foundation: foundationReference,
             input: inputReference,
             label: labelReference,
-            materialTextField: materialTextFieldReference,
-            /*
-                The event mapper can be used by the consuming parent component
-                to synchronize an instantiated editor with the native textarea
-                element here.
-            */
-            eventMapper: {
-                blur: (event: object) => {
-                    if (inputReference.current) {
-                        const syntheticEvent = new Event('blur') as
-                            Event & { detail: object }
-                        syntheticEvent.detail = event
-                        inputReference.current.dispatchEvent(syntheticEvent)
-                    }
-                },
-                focus: (event: object) => {
-                    if (inputReference.current) {
-                        const syntheticEvent = new Event('focus') as
-                            Event & { detail: object }
-                        syntheticEvent.detail = event
-                        inputReference.current.dispatchEvent(syntheticEvent)
-                    }
-                },
-                input: (value: number | string, event: object) => {
-                    if (inputReference.current) {
-                        const syntheticEvent = new Event('input') as
-                            Event & { detail: object }
-                        syntheticEvent.detail = event
-
-                        inputReference.current.value = String(value)
-                        inputReference.current.dispatchEvent(syntheticEvent)
-                    }
-
-                    /*
-                        Since we do not operate on the native textarea element
-                        we need to make sure that we stay in focus state when
-                        do clearing the textarea's input value.
-                    */
-                    setTimeout(() => {
-                        foundationReference.current?.autoCompleteFocus()
-                    })
-                }
-            }
+            materialTextField: materialTextFieldReference
         })
     )
 

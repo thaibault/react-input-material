@@ -27,12 +27,10 @@ import {
 } from 'react'
 import Dummy from 'react-generic-dummy'
 
-import TextArea from '#implementations/TextArea'
-
-import {
-    TextAreaProperties,
-    TextAreaReference
-} from '../../../implementations/type'
+import {TextAreaProperties} from '../../../implementations/type'
+import EditorWrapper, {
+    Reference as InputEventMapperReference
+} from '../InputEventMapperWrapper'
 import cssClassNames from '../style.module'
 import {TiptapProps} from '../type'
 
@@ -43,7 +41,7 @@ export const VIEW_CONTENT_OFFSET_IN_PX = 8
 
 export const Index = forwardRef((
     properties: TiptapProps,
-    givenReference?: ForwardedRef<TextAreaReference>
+    givenReference?: ForwardedRef<InputEventMapperReference>
 ): ReactElement => {
     if (
         !(useEditor as typeof useEditor | undefined) ||
@@ -53,9 +51,11 @@ export const Index = forwardRef((
 
     const value = properties.value ?? ''
 
-    const localReference = useRef<TextAreaReference | null>(null)
-    const reference: RefObject<TextAreaReference | null> =
-        (givenReference as null | RefObject<TextAreaReference | null>) ??
+    const localReference = useRef<InputEventMapperReference | null>(null)
+    const reference: RefObject<InputEventMapperReference | null> =
+        (
+            givenReference as null | RefObject<InputEventMapperReference | null>
+        ) ??
         localReference
     const editorViewReference = useRef<HTMLDivElement | null>(null)
 
@@ -100,22 +100,23 @@ export const Index = forwardRef((
         () => {
             if (
                 editorViewReference.current &&
-                reference.current?.input.current?.clientHeight
+                reference.current?.input.current?.input.current?.clientHeight
             )
                 editorViewReference.current.style.height =
                     String(
-                        reference.current.input.current.clientHeight +
+                        reference.current.input.current.input.current
+                            .clientHeight +
                         VIEW_CONTENT_OFFSET_IN_PX
                     ) +
                     'px'
         },
         [
             editorViewReference.current,
-            reference.current?.input.current?.clientHeight
+            reference.current?.input.current?.input.current?.clientHeight
         ]
     )
 
-    return <TextArea
+    return <EditorWrapper
         ref={reference}
 
         {...(properties as TextAreaProperties)}
@@ -137,7 +138,7 @@ export const Index = forwardRef((
             editor={editor}
             innerRef={editorViewReference}
         />
-    </TextArea>
+    </EditorWrapper>
 })
 
 export default Index
