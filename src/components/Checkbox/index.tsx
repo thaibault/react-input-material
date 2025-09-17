@@ -72,6 +72,7 @@ import {
     ValueState
 } from './type'
 import {InputReference} from '../../implementations/type'
+import {GenericEvent} from 'react-generic-tools/type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
@@ -215,9 +216,16 @@ export const CheckboxInner = function(
      * Triggered when ever the value changes.
      * @param event - Event object.
      */
-    const onChangeValue = (event: SyntheticEvent): void => {
+    const onChangeValue = (
+        event: GenericEvent<boolean> | boolean
+    ): void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
+
+        if (typeof event === 'boolean')
+            event = {target: {checked: event}} as
+                unknown as
+                GenericEvent<boolean>
 
         properties.value = Boolean(
             (event.target as unknown as {checked: boolean | null}).checked

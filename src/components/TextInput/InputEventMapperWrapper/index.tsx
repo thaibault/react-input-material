@@ -59,15 +59,6 @@ export const Index = forwardRef((
                         inputReference.current.input.current
                             .dispatchEvent(syntheticEvent)
                     }
-
-                    /*
-                        Since we do not operate on the native textarea element
-                        we need to make sure that we stay in focus state when
-                        do clearing the textarea's input value.
-                    */
-                    setTimeout(() => {
-                        // TODO foundationReference.current?.autoCompleteFocus()
-                    })
                 }
             }
         })

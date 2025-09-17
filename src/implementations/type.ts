@@ -111,6 +111,7 @@ export interface CheckboxProperties extends InputProperties<boolean> {
     children?: ReactNode
 
     value: boolean
+    onChange?: (eventOrValue: GenericEvent<boolean> | boolean) => void
 }
 
 export type TextInputProperties<Type> = InputProperties<Type>

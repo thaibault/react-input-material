@@ -136,6 +136,16 @@ export const TextArea = forwardRef((
             maxLength={properties.maximumLength}
 
             onChange={properties.onChange}
+            onInput={() => {
+                /*
+                    Since we do not operate on the native textarea element we
+                    need to make sure that we stay in focus state when do
+                    clearing the textarea's input value.
+                */
+                setTimeout(() => {
+                    foundationReference.current?.autoCompleteFocus()
+                })
+            }}
         ></textarea>
 
         {properties.children}
