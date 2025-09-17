@@ -895,7 +895,7 @@ export const TextInputInner = function<Type = unknown>(
      * selection.
      */
     const onChangeValue = (
-        eventOrValue: GenericEvent | Type, selectedIndex = -1
+        eventOrValue: GenericEvent<Type> | Type, selectedIndex = -1
     ): void => {
         setIsSuggestionOpen(true)
 
@@ -1273,7 +1273,7 @@ export const TextInputInner = function<Type = unknown>(
             return result
         })
     }
-    // endregion
+    // endregions
     // region properties
     /// region references
     const inputReference: RefObject<InputReference | null> =
@@ -1464,7 +1464,7 @@ export const TextInputInner = function<Type = unknown>(
     // endregion
     // region render
     /// region intermediate render properties
-    const textInputProperties: Partial<TextInputProperties> = {
+    const textInputProperties: Partial<TextInputProperties<Type>> = {
         ref: inputReference,
         /*
             NOTE: If not set label with forbidden symbols will automatically
@@ -1487,7 +1487,7 @@ export const TextInputInner = function<Type = unknown>(
             required: properties.required
         */
     }
-    const typeTextInputProperties: Partial<TypeTextInputProperties> = {
+    const typeTextInputProperties: Partial<TypeTextInputProperties<Type>> = {
         invalid: (
             properties.invalid &&
             properties.showValidationState &&
@@ -1498,7 +1498,7 @@ export const TextInputInner = function<Type = unknown>(
             typeof properties.maximumLength === 'number' &&
             !isNaN(properties.maximumLength) &&
             properties.maximumLength >= 0,
-        value: properties.representation as string
+        value: properties.representation as Type
     }
 
     const isAdvancedEditor: boolean = (
@@ -1707,16 +1707,12 @@ export const TextInputInner = function<Type = unknown>(
             {...(useSuggestions ? {role: 'search'} : {})}
         >
             {wrapAnimationConditionally(
-                <Select
+                <Select<Type>
                     {...textInputProperties}
 
                     name={properties.name}
 
-                    onChange={
-                        onChangeValue as
-                            unknown as
-                            (event: SyntheticEvent) => void
-                    }
+                    onChange={onChangeValue}
                     onClick={onClick}
                     onKeyDown={(event: ReactKeyboardEvent): void => {
                         /*
@@ -1728,7 +1724,7 @@ export const TextInputInner = function<Type = unknown>(
                     }}
 
                     options={normalizedSelection as NormalizedSelection}
-                    value={String(properties.value)}
+                    value={properties.value}
 
                     elementProperties={properties.elementProperties}
 
@@ -1742,7 +1738,7 @@ export const TextInputInner = function<Type = unknown>(
                     {...typeTextInputProperties}
                     {...typeTextConstraints}
 
-                    onChange={onChangeValue as (value: string) => void}
+                    onChange={onChangeValue}
                     elementProperties={{
                         name: properties.name,
                         onClick,

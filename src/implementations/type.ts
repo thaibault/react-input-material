@@ -26,6 +26,7 @@ import {
     SyntheticEvent
 } from 'react'
 import {NativeType, NormalizedSelection} from '../components/TextInput/type'
+import {GenericEvent} from 'react-generic-tools/type'
 // endregion
 // region exports
 export type IconStrategy =
@@ -91,17 +92,19 @@ export interface InputReference {
     input: RefObject<InputDomNodes | null>
 }
 
-export interface InputProperties extends LowLevelBaseComponentProperties {
+export interface InputProperties<Type>
+    extends
+LowLevelBaseComponentProperties {
     ref?: RefObject<InputReference | null>
 
     disabled?: boolean
 
     name: string
 
-    onChange?: (event: SyntheticEvent) => void
+    onChange?: (eventOrValue: GenericEvent<Type> | Type) => void
 }
 
-export interface CheckboxProperties extends InputProperties {
+export interface CheckboxProperties extends InputProperties<boolean> {
     indeterminate?: boolean
 
     children?: ReactNode
@@ -109,16 +112,20 @@ export interface CheckboxProperties extends InputProperties {
     value: boolean
 }
 
-export type TextInputProperties = InputProperties
+export type TextInputProperties<Type> = InputProperties<Type>
 
-export interface SelectProperties extends TextInputProperties {
+export interface SelectProperties<Type>
+    extends
+TextInputProperties<Type> {
     options: NormalizedSelection
 
-    value: unknown
+    value: Type
 }
 
-export interface TypeTextInputProperties extends TextInputProperties {
-    value?: string | number
+export interface TypeTextInputProperties<Type>
+    extends
+TextInputProperties<Type> {
+    value?: Type
 
     characterCount?: boolean
 
@@ -134,7 +141,7 @@ export interface TypeTextInputProperties extends TextInputProperties {
     onLabelClick?: (event: ReactMouseEvent) => void
 }
 
-export interface TextFieldProperties extends TypeTextInputProperties {
+export interface TextFieldProperties extends TypeTextInputProperties<string> {
     type?: NativeType
 
     maximum?: number
@@ -158,7 +165,7 @@ export interface TextAreaReference extends InputReference {
     eventMapper: TextAreaEventWrapper
 }
 
-export interface TextAreaProperties extends TypeTextInputProperties {
+export interface TextAreaProperties extends TypeTextInputProperties<string> {
     ref?: RefObject<TextAreaReference | null>
 
     classNamePrefix?: string

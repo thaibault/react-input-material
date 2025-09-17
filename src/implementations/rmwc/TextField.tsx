@@ -1,4 +1,4 @@
-import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
+import {MDCTextFieldFoundation} from '@material/textfield'
 import {TextField as RMWCTextField} from '@rmwc/textfield'
 import {IconPropT} from '@rmwc/types'
 

@@ -2,7 +2,7 @@ import {MDCSelectFoundation} from '@material/select'
 import {OptionsType, Select as RMWCSelect} from '@rmwc/select'
 import {
     ForwardedRef,
-    forwardRef,
+    forwardRef, memo as memorize,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
     ReactElement,
@@ -12,9 +12,10 @@ import {
 
 import {InputReference, SelectProperties} from '../type'
 
-export const Select = forwardRef((
-    properties: SelectProperties, reference?: ForwardedRef<InputReference>
-): ReactElement => {
+export const SelectInner = function<Type = unknown>(
+    properties: SelectProperties<Type>,
+    reference?: ForwardedRef<InputReference>
+): ReactElement {
     const baseReference: RefObject<HTMLSelectElement | null> =
         useRef<HTMLSelectElement>(null)
     const foundationReference: RefObject<MDCSelectFoundation | null> =
@@ -54,6 +55,8 @@ export const Select = forwardRef((
 
         value={String(properties.value)}
     />
-})
+}
+export const Select =
+    memorize(forwardRef(SelectInner)) as typeof SelectInner
 
 export default Select
