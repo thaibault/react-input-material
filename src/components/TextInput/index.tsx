@@ -183,10 +183,18 @@ export const TextInputInner = function<Type = unknown>(
      */
     useEffect(() => {
         if (inputReference.current?.input.current) {
-            const inputDomNode = inputReference.current.input.current as
+            let inputDomNode = inputReference.current.input.current as
                 HTMLInputElement |
                 HTMLSelectElement |
-                HTMLTextAreaElement
+                HTMLTextAreaElement |
+                TextAreaReference
+            if ((inputDomNode as Partial<TextAreaReference>).input?.current)
+                inputDomNode =
+                    (inputDomNode as TextAreaReference).input.current as
+                        HTMLTextAreaElement
+            else
+                return
+
             const determinedInputProps: Mapping<boolean | number | string> = {}
             const propsToRemove: Array<string> = []
 

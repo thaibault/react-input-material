@@ -150,8 +150,8 @@ export interface TextFieldProperties extends TypeTextInputProperties<string> {
 
     step?: number
 
-    leadingIcon?: IconProperties
-    trailingIcon?: IconProperties
+    leadingIcon?: IconProperties | string
+    trailingIcon?: IconProperties | string
 }
 
 export interface InputEventWrapper {
