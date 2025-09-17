@@ -95,7 +95,8 @@ import {
 import {
     IconProperties,
     InputReference,
-    LowLevelBaseComponentProperties,
+    LowLevelBaseComponentProperties, SelectProperties,
+    TextAreaProperties, TextAreaReference, TextFieldProperties,
     TextInputProperties,
     TypeTextInputProperties
 } from '../../implementations/type'
@@ -113,15 +114,14 @@ import {
 } from './helper'
 import RichTextEditorComponent from './Tiptap'
 import {
-    AdapterWithReferences,
+    AdapterWithReferences, CodeMirrorProperties,
     CodeMirrorProperties as CodeEditorProperties,
     Component,
     DataTransformation,
     DataTransformSpecification,
     defaultModelState,
     DefaultProperties,
-    defaultProperties,
-    EditorProperties,
+    defaultProperties, EditorProperties,
     Model,
     ModelState,
     NativeType,
@@ -130,7 +130,7 @@ import {
     propertyTypes,
     Props,
     renderProperties,
-    State,
+    State, TiptapProperties,
     TiptapProperties as RichTextEditorProperties,
     ValueState
 } from './type'
@@ -1730,11 +1730,14 @@ export const TextInputInner = function<Type = unknown>(
                     }}
 
                     options={normalizedSelection as NormalizedSelection}
-                    value={properties.value}
+                    value={properties.value as Type}
 
                     elementProperties={properties.elementProperties}
 
-                    {...properties.inputProperties}
+                    {
+                        ...properties.inputProperties as
+                            Partial<SelectProperties<Type>>
+                    }
                 />,
                 isSelection
             )}
@@ -1744,7 +1747,7 @@ export const TextInputInner = function<Type = unknown>(
                     {...typeTextInputProperties}
                     {...typeTextConstraints}
 
-                    onChange={onChangeValue}
+                    onChange={onChangeValue as EditorProperties['onChange']}
                     elementProperties={{
                         name: properties.name,
                         onClick,
@@ -1760,10 +1763,11 @@ export const TextInputInner = function<Type = unknown>(
                     }}
 
                     {...editorProperties as
-                        unknown as
-                        Partial<EditorProperties>
+                        Partial<CodeMirrorProperties | TiptapProperties>
                     }
-                    {...properties.inputProperties as Partial<EditorProperties>}
+                    {...properties.inputProperties as
+                        Partial<CodeMirrorProperties | TiptapProperties>
+                    }
                 />,
                 isAdvancedEditor,
                 properties.editor.startsWith('code')
@@ -1841,20 +1845,33 @@ export const TextInputInner = function<Type = unknown>(
                         properties.type === 'string' &&
                         properties.editor !== 'plain' ?
                             <TextArea
-                                {...textInputProperties}
-                                {...typeTextInputProperties}
-                                {...typeTextConstraints}
+                                {...textInputProperties as
+                                    Partial<TextInputProperties<string>>
+                                }
+                                {...typeTextInputProperties as
+                                    Partial<TypeTextInputProperties<string>>
+                                }
+                                {...typeTextConstraints as
+                                    Partial<TypeTextInputProperties<string>>
+                                }
 
-                                onChange={onChangeValue}
+                                ref={inputReference as
+                                    RefObject<TextAreaReference>
+                                }
+
+                                onChange={
+                                    onChangeValue as
+                                        TextAreaProperties['onChange']
+                                }
                             /> :
                             <TextField
                                 {...textInputProperties}
                                 {...typeTextInputProperties}
                                 {...typeTextConstraints}
 
-                                align={properties.align}
-
-                                onChange={onChangeValue}
+                                onChange={onChangeValue as
+                                    TextFieldProperties['onChange']
+                                }
                                 elementProperties={{
                                     name: properties.name,
                                     onClick,
@@ -1880,7 +1897,9 @@ export const TextInputInner = function<Type = unknown>(
 
                                 type={determineNativeType(properties)}
 
-                                {...properties.inputProperties}
+                                {...properties.inputProperties as
+                                    Partial<TextFieldProperties>
+                                }
                             />
                     }
                 </div>,

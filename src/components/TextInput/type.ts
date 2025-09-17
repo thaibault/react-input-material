@@ -53,7 +53,6 @@ import {MenuApi} from '@rmwc/menu'
 import {
     FormattedOption as FormattedSelectionOption, SelectProps
 } from '@rmwc/select'
-import {TextFieldProps} from '@rmwc/textfield'
 
 import {ChainedCommands, type EditorOptions, Extensions} from '@tiptap/core'
 import {EditorEvents} from '@tiptap/react'
@@ -61,7 +60,7 @@ import {StarterKitOptions} from '@tiptap/starter-kit'
 
 import {
     IconProperties,
-    InputReference,
+    InputReference, SelectProperties,
     TextAreaProperties
 } from '../../implementations/type'
 import {
@@ -298,13 +297,13 @@ export type EditorType = (
     'text' |
     'richtext'
 )
-export interface Properties<T = unknown> extends
-    ModelState, BaseProperties<T>
+export interface Properties<Type = unknown> extends
+    ModelState, BaseProperties<Type>
 {
-    default?: T
+    default?: Type
 
     align: 'end' | 'start'
-    children: (options: ChildrenOptions<this, T>) => null | ReactElement
+    children: (options: ChildrenOptions<this, Type>) => null | ReactElement
     cursor: Partial<CursorState> | null
 
     editor: EditorType
@@ -317,7 +316,10 @@ export interface Properties<T = unknown> extends
     trailingIcon: string | (IconProperties & {tooltip?: string})
 
     inputProperties: Partial<
-        CodeMirrorProps | TiptapProps | SelectProps | TextFieldProps
+        CodeMirrorProps |
+        SelectProperties<Type> |
+        TiptapProps |
+        TextAreaProperties
     >
     inputProps?: Mapping<boolean | number | string>
 
@@ -332,7 +334,7 @@ export interface Properties<T = unknown> extends
     maximumText: string
     minimumText: string
 
-    model: Model<T>
+    model: Model<Type>
 
     onChangeEditorIsActive: (
         isActive: boolean, event: MouseEvent | undefined, properties: this
@@ -360,7 +362,7 @@ export interface Properties<T = unknown> extends
     suggestSelection: boolean
 
     transformer: RecursivePartial<DataTransformSpecification<
-        T, Date | number | string
+        Type, Date | number | string
     >>
 }
 export type Props<T = unknown> =

@@ -117,9 +117,9 @@ export const Index = forwardRef((
     )
 
     return <EditorWrapper
-        ref={reference}
-
         {...(properties as TextAreaProperties)}
+
+        ref={reference}
 
         barContentSlot={<MenuBar editor={editor}/>}
 

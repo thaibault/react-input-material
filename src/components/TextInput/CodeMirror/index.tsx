@@ -237,9 +237,9 @@ export const Index = forwardRef((
     )
 
     return <EditorWrapper
-        ref={reference}
-
         {...(properties as TextAreaProperties)}
+
+        ref={reference}
 
         value={value as string | undefined}
 

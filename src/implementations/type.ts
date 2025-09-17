@@ -99,7 +99,7 @@ LowLevelBaseComponentProperties {
 
     disabled?: boolean
 
-    name: string
+    name?: string
     label?: ReactNode
 
     onChange?: (eventOrValue: GenericEvent<Type> | Type) => void
