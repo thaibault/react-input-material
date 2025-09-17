@@ -153,16 +153,19 @@ export interface TextFieldProperties extends TypeTextInputProperties<string> {
     trailingIcon?: IconProperties
 }
 
-export interface TextAreaEventWrapper {
+export interface InputEventWrapper {
     blur: (event: object) => void
     focus: (event: object) => void
     input: (value: number | string, event: object) => void
+}
+export interface EventMapperWrapperReference<Type = unknown> {
+    input: Type
+    eventMapper: InputEventWrapper
 }
 
 export interface TextAreaReference extends InputReference {
     input: RefObject<HTMLTextAreaElement | null>
     label: RefObject<HTMLLabelElement | null>
-    eventMapper: TextAreaEventWrapper
 }
 
 export interface TextAreaProperties extends TypeTextInputProperties<string> {
