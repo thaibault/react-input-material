@@ -192,7 +192,7 @@ export const TextArea = forwardRef((
             onKeyUp={properties.onKeyUp}
             onKeyDown={properties.onKeyDown}
 
-            {...properties.elementProperties}
+            {...properties.domNodeProperties}
         ></textarea>
 
         {properties.children}

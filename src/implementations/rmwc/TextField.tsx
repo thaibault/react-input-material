@@ -56,6 +56,8 @@ export const TextField = forwardRef((
             label={properties.name}
             placeholder={properties.placeholder}
 
+            helpText={properties.helpText}
+
             maxLength={isMaximumLength ? properties.maximumLength : Infinity}
 
             ref={baseReference}
@@ -76,13 +78,13 @@ export const TextField = forwardRef((
                         tabindex to make the input focusable.
                     */
                     'tab-index': properties.disabled ? '0' : '-1',
-                    ...properties.elementProperties
+                    ...properties.domNodeProperties
                 },
                 properties.name,
                 properties.onClick,
                 properties.onKeyUp,
                 properties.disabled,
-                properties.elementProperties
+                properties.domNodeProperties
             )}
 
             icon={properties.leadingIcon ?
@@ -100,6 +102,8 @@ export const TextField = forwardRef((
 
             type={properties.type}
             value={properties.value}
+
+            {...properties.componentProperties}
         />
     </div>
 })

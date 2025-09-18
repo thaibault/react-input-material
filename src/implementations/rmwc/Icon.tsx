@@ -8,12 +8,20 @@ import {useMemorizedValue} from 'react-generic-tools'
 export const Icon = forwardRef((
     properties: IconProperties, reference?: ForwardedRef<HTMLElement | null>
 ): ReactElement => {
-    const fallbackElementProperties = useMemorizedValue({})
+    const fallbackComponentProperties = useMemorizedValue({})
 
     return <RMWCIcon
         className={properties.classNames?.join(' ')}
         style={properties.styles}
-        {...properties.elementProperties ?? fallbackElementProperties}
+        {...properties.componentProperties ?? fallbackComponentProperties}
+
+        onClick={properties.onClick}
+
+        onKeyDown={properties.onKeyDown}
+        onKeyUp={properties.onKeyUp}
+
+        onFocus={properties.onFocus}
+        onBlur={properties.onBlur}
 
         icon={useMemorizedValue(
             {

@@ -89,7 +89,7 @@ const SECTIONS = [
 const Application = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(2)
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
     const activeSection = SECTIONS[activeTabIndex]
 
     const onChange: ((properties: BaseProps) => void) =
@@ -292,7 +292,9 @@ const Application = () => {
                 >
                     <TextInput<string>
                         name="simpleInput1"
-                        inputProperties={useMemorizedValue({outlined: true})}
+                        componentProperties={
+                            useMemorizedValue({outlined: true})
+                        }
                         onChange={onChange}
                     />
                     <TextInput<null | string>
@@ -742,7 +744,9 @@ const Application = () => {
                     />
                     <TextInput<string>
                         initialValue="2025-01-01T00:00:00.000Z"
-                        inputProperties={useMemorizedValue({outlined: true})}
+                        componentProperties={
+                            useMemorizedValue({outlined: true})
+                        }
                         model={useMemorizedValue({
                             name: 'timeInput1Model', type: 'date'
                         })}
@@ -762,7 +766,9 @@ const Application = () => {
                     />
                     <TextInput<string>
                         initialValue="2025-01-01T23:00:00.000Z"
-                        inputProperties={useMemorizedValue({outlined: true})}
+                        componentProperties={
+                            useMemorizedValue({outlined: true})
+                        }
                         model={useMemorizedValue({
                             name: 'timeInput2Model', type: 'date-local'
                         })}
@@ -856,7 +862,9 @@ const Application = () => {
                     />
                     <TextInput<string>
                         initialValue="1970-01-01T00:20:00.000Z"
-                        inputProperties={useMemorizedValue({outlined: true})}
+                        componentProperties={
+                            useMemorizedValue({outlined: true})
+                        }
                         model={useMemorizedValue({
                             name: 'timeInput7Model', type: 'time-local'
                         })}

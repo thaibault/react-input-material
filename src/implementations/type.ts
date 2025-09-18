@@ -34,39 +34,42 @@ export type IconStrategy =
 export type Size =
     'extra-small' | 'small' | 'medium' | 'large' | 'extra-large'
 
-export interface TooltipProperties {
+export interface BaseProperties {
+    componentProperties?: Mapping<unknown>
+    domNodeProperties?: Mapping<unknown>
+}
+
+export interface TooltipProperties extends BaseProperties {
     children: ReactNode
     value: string
 }
 
-export interface HelpTextProperties {
+export interface HelpTextProperties extends BaseProperties {
     persistent?: boolean
     validationMsg?: boolean
     children: ReactNode
 }
 export type HelpText = ReactNode | HelpTextProperties
 
-export interface LowLevelBaseComponentProperties {
+export interface LowLevelBaseComponentProperties extends BaseProperties {
     id?: string
     classNames?: Array<string>
     styles?: object
 
-    elementProperties?: Mapping<unknown>
-
-    helpText?: ReactNode | HelpText
-
     onClick?: (event: ReactMouseEvent) => void
+
+    onFocus?: (event: ReactFocusEvent) => void
+    onBlur?: (event: SyntheticEvent) => void
+
     onKeyUp?: (event: ReactKeyboardEvent) => void
     onKeyDown?: (event: ReactKeyboardEvent) => void
-    onBlur?: (event: SyntheticEvent) => void
-    onFocus?: (event: ReactFocusEvent) => void
 }
 
-export interface CircularProgressProperties {
+export interface CircularProgressProperties extends BaseProperties {
     size?: Size
 }
 
-export interface ErrorProperties {
+export interface ErrorProperties extends BaseProperties {
     children: string
 }
 
@@ -101,6 +104,10 @@ LowLevelBaseComponentProperties {
 
     name?: string
     label?: ReactNode
+
+    domNodeProperties?: Mapping<unknown>
+
+    helpText?: ReactNode | HelpText
 
     onChange?: (eventOrValue: GenericEvent<Type> | Type) => void
 }

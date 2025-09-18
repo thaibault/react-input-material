@@ -100,8 +100,6 @@ export interface CommonBaseModel<Type = unknown> {
 
     trim: boolean
 
-    inputProperties: Mapping<unknown>
-
     value?: Type
 }
 export interface ModelState {
@@ -156,7 +154,8 @@ CommonBaseModel<T>, ModelState {
     required: boolean
     requiredText: string
 
-    elementProperties: Mapping<boolean | number | string>
+    componentProperties: Mapping<unknown>
+    domNodeProperties: Mapping<unknown>
     /*
         NOTE: selection allows more options than when configuring via "model"
         to be aligned to backend view of selections.
@@ -372,8 +371,8 @@ export const propertyTypes: ValidationMapping = {
     required: boolean,
     requiredText: string,
 
-    inputProperties: object,
-    elementProperties: object,
+    componentProperties: object,
+    domNodeProperties: object,
 
     showDeclaration: oneOfType([boolean, symbol]),
 
@@ -432,9 +431,7 @@ export const defaultModel: BaseModel<string> = {
 
     trim: true,
 
-    type: 'string',
-
-    inputProperties: {}
+    type: 'string'
 } as const
 /*
     NOTE: Avoid setting any properties already defined in model here since they
@@ -443,8 +440,9 @@ export const defaultModel: BaseModel<string> = {
 export const defaultProperties: DefaultProperties = {
     className: [],
     styles: {},
-    elementProperties: {},
-    inputProperties: {},
+
+    componentProperties: {},
+    domNodeProperties: {},
 
     enforceUncontrolled: false,
 

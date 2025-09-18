@@ -36,7 +36,7 @@ export const IconButton = forwardRef((
         .replace('extra-large', 'xlarge') as
         IconSizeT
 
-    const fallbackElementProperties = useMemorizedValue({})
+    const fallbackComponentProperties = useMemorizedValue({})
 
     return <RMWCIconButton
         checked={properties.value}
@@ -77,7 +77,7 @@ export const IconButton = forwardRef((
         ref={baseReference}
         foundationRef={foundationReference}
 
-        {...properties.elementProperties ?? fallbackElementProperties}
+        {...properties.componentProperties ?? fallbackComponentProperties}
     />
 })
 

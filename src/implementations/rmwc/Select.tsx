@@ -38,11 +38,11 @@ export const SelectInner = function<Type = unknown>(
             {
                 name: properties.name,
                 onClick: properties.onClick,
-                ...properties.elementProperties
+                ...properties.domNodeProperties
             },
             properties.name,
             properties.onClick,
-            properties.elementProperties
+            properties.domNodeProperties
         )}
 
         enhanced
@@ -62,6 +62,8 @@ export const SelectInner = function<Type = unknown>(
         value={String(properties.value)}
 
         label={properties.label as string}
+
+        {...properties.componentProperties}
     />
 }
 export const Select =

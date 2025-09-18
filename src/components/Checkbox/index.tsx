@@ -446,6 +446,9 @@ export const CheckboxInner = function(
             onChange={onChangeValue}
             onClick={onClick}
             onFocus={onFocus}
+
+            componentProperties={properties.componentProperties}
+            domNodeProperties={properties.domNodeProperties}
         >
             {(
                 properties.invalid &&
@@ -455,9 +458,7 @@ export const CheckboxInner = function(
                     properties.visited
                 )
             ) ?
-                <Error>
-                    {properties.description || properties.name}
-                </Error> :
+                <Error>{properties.description || properties.name}</Error> :
                 properties.description || properties.name
             }
         </LowLevelCheckbox>

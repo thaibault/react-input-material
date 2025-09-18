@@ -54,6 +54,8 @@ export const Checkbox = forwardRef((
             ref={baseReference}
             inputRef={inputReference}
             foundationRef={foundationReference}
+
+            {...properties.componentProperties}
         >{properties.children}</RMWCCheckbox>
     </div>
 })

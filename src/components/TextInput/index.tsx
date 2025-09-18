@@ -95,8 +95,10 @@ import {
 import {
     IconProperties,
     InputReference,
-    LowLevelBaseComponentProperties, SelectProperties,
-    TextAreaProperties, TextAreaReference, TextFieldProperties,
+    LowLevelBaseComponentProperties,
+    TextAreaProperties,
+    TextAreaReference,
+    TextFieldProperties,
     TextInputProperties,
     TypeTextInputProperties
 } from '../../implementations/type'
@@ -369,13 +371,14 @@ export const TextInputInner = function<Type = unknown>(
                     }
                 </GenericAnimate>,
 
-                elementProperties: {
+                componentProperties: {
                     'aria-hidden': hide ? 'true' : 'false',
-                    'tab-index': hide ? -1 : 0,
-
-                    onClick: handler,
-                    onKeyDown: handler
+                    'tab-index': hide ? -1 : 0
                 },
+
+                onClick: handler,
+                onKeyDown: handler,
+
                 strategy: 'component',
                 tooltip: 'Clear input'
             }
@@ -419,10 +422,9 @@ export const TextInputInner = function<Type = unknown>(
                     /> :
                     properties.hidden ? 'lock_open' : 'lock',
 
-                elementProperties: {
-                    onClick: handler,
-                    onKeyDown: handler
-                },
+                onClick: handler,
+                onKeyDown: handler,
+
                 strategy: 'component',
                 tooltip: `${(properties.hidden ? 'Show' : 'Hide')} password`
             }
@@ -433,9 +435,9 @@ export const TextInputInner = function<Type = unknown>(
                 options = {icon: options}
 
             if (!Object.prototype.hasOwnProperty.call(options, 'onClick')) {
-                options.elementProperties = options.elementProperties ?? {}
-                options.elementProperties['tab-index'] = -1
-                options.elementProperties['aria-hidden'] = true
+                options.domNodeProperties = options.domNodeProperties ?? {}
+                options.domNodeProperties['tab-index'] = -1
+                options.domNodeProperties['aria-hidden'] = true
             }
         }
 
@@ -474,7 +476,7 @@ export const TextInputInner = function<Type = unknown>(
             }
         >
             <IconButton
-                elementProperties={{
+                domNodeProperties={{
                     'aria-label': properties.editorIsActive ?
                         'plain' :
                         properties.editor.startsWith('code') ?
@@ -1483,7 +1485,8 @@ export const TextInputInner = function<Type = unknown>(
         */
         id,
 
-        elementProperties: properties.elementProperties,
+        componentProperties: properties.componentProperties,
+        domNodeProperties: properties.domNodeProperties,
 
         onClick,
         onFocus: triggerOnFocusAndOpenSuggestions as
@@ -1524,9 +1527,9 @@ export const TextInputInner = function<Type = unknown>(
             makes them unreachable for blind people using e.g. screen readers.
             That's why the label gets a tabindex to make the input focusable.
         */
-        elementProperties: {
+        domNodeProperties: {
             'tab-index': properties.disabled ? '0' : '-1',
-            ...properties.elementProperties
+            ...properties.domNodeProperties
         },
 
         onKeyUp
@@ -1760,13 +1763,6 @@ export const TextInputInner = function<Type = unknown>(
 
                     options={normalizedSelection as NormalizedSelection}
                     value={properties.value as Type}
-
-                    elementProperties={properties.elementProperties}
-
-                    {
-                        ...properties.inputProperties as
-                            Partial<SelectProperties<Type>>
-                    }
                 />,
                 isSelection
             )}
@@ -1787,9 +1783,6 @@ export const TextInputInner = function<Type = unknown>(
                             {...editorProperties as
                                 Partial<CodeMirrorProperties>
                             }
-                            {...properties.inputProperties as
-                                Partial<CodeMirrorProperties>
-                            }
 
                             ref={inputReference as
                                 RefObject<InputEventMapperReference>
@@ -1807,9 +1800,6 @@ export const TextInputInner = function<Type = unknown>(
                         onChange={onChangeValue as TiptapProperties['onChange']}
 
                         {...editorProperties as Partial<TiptapProperties>}
-                        {...properties.inputProperties as
-                            Partial<TiptapProperties>
-                        }
 
                         ref={inputReference as
                             RefObject<InputEventMapperReference>
@@ -1928,10 +1918,6 @@ export const TextInputInner = function<Type = unknown>(
                                 )}
 
                                 type={determineNativeType(properties)}
-
-                                {...properties.inputProperties as
-                                    Partial<TextFieldProperties>
-                                }
                             />
                     }
                 </div>,

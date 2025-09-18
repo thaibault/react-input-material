@@ -7,7 +7,7 @@ import {ForwardedRef, forwardRef, ReactElement} from 'react'
 import {CircularProgressProperties} from '../type'
 
 export const CircularProgress = forwardRef((
-    {size}: CircularProgressProperties,
+    {componentProperties, size}: CircularProgressProperties,
     reference?: ForwardedRef<HTMLDivElement | null>
 ): ReactElement =>
     <RMWCCircularProgress
@@ -17,6 +17,7 @@ export const CircularProgress = forwardRef((
                 .replace('extra-large', 'xlarge') as
                     IconSizeT
         }
+        {...componentProperties}
     />
 )
 

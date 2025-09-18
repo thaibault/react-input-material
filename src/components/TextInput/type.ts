@@ -318,7 +318,7 @@ export interface Properties<Type = unknown> extends
     leadingIcon: string | (IconProperties & {tooltip?: string})
     trailingIcon: string | (IconProperties & {tooltip?: string})
 
-    inputProperties: Partial<
+    domNodeProperties: Partial<
         CodeMirrorProps |
         SelectProperties<Type> |
         TiptapProps |
@@ -488,7 +488,6 @@ export const propertyTypes: ValidationMapping = {
     icon: oneOfType([string, object]),
     trailingIcon: oneOfType([string, object]),
 
-    inputProperties: object,
     inputProps: object,
 
     invertedPattern: oneOfType(

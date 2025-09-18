@@ -16,20 +16,21 @@ export const isDummy: boolean =
     Boolean((RMWCTooltip as unknown as Partial<typeof Dummy>).isDummy)
 
 export const Tooltip = forwardRef((
-    {children, value}: TooltipProperties, reference?: ForwardedRef<unknown>
+    properties: TooltipProperties, reference?: ForwardedRef<unknown>
 ): ReactElement => {
     if (isDummy)
         return <div
             className="generic-tooltip"
             ref={reference as RefObject<HTMLDivElement>}
-            title={value}
-        >{children}</div>
+            title={properties.value}
+        >{properties.children}</div>
 
     return <RMWCTooltip
-        overlay={<Typography use="caption">{value}</Typography>}
+        overlay={<Typography use="caption">{properties.value}</Typography>}
         ref={reference as RefObject<HTMLDivElement> | null}
+        {...properties.componentProperties}
     >
-        <div className="generic-tooltip">{children}</div>
+        <div className="generic-tooltip">{properties.children}</div>
     </RMWCTooltip>
 })
 
