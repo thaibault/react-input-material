@@ -370,8 +370,8 @@ export const TextInputInner = function<Type = unknown>(
                 </GenericAnimate>,
 
                 elementProperties: {
-                    ariaHidden: hide ? 'true' : 'false',
-                    tabIndex: hide ? -1 : 0,
+                    'aria-hidden': hide ? 'true' : 'false',
+                    'tab-index': hide ? -1 : 0,
 
                     onClick: handler,
                     onKeyDown: handler
@@ -434,8 +434,8 @@ export const TextInputInner = function<Type = unknown>(
 
             if (!Object.prototype.hasOwnProperty.call(options, 'onClick')) {
                 options.elementProperties = options.elementProperties ?? {}
-                options.elementProperties.tabIndex = -1
-                options.elementProperties.ariaHidden = true
+                options.elementProperties['tab-index'] = -1
+                options.elementProperties['aria-hidden'] = true
             }
         }
 
@@ -475,7 +475,7 @@ export const TextInputInner = function<Type = unknown>(
         >
             <IconButton
                 elementProperties={{
-                    ariaLabel: properties.editorIsActive ?
+                    'aria-label': properties.editorIsActive ?
                         'plain' :
                         properties.editor.startsWith('code') ?
                             'code' :
@@ -1525,7 +1525,7 @@ export const TextInputInner = function<Type = unknown>(
             That's why the label gets a tabindex to make the input focusable.
         */
         elementProperties: {
-            tabIndex: properties.disabled ? '0' : '-1',
+            'tab-index': properties.disabled ? '0' : '-1',
             ...properties.elementProperties
         },
 
@@ -1770,48 +1770,52 @@ export const TextInputInner = function<Type = unknown>(
                 />,
                 isSelection
             )}
-            {isCodeEditor ?
-                wrapAnimationConditionally(
-                    <CodeEditorComponent
-                        {...textInputProperties}
+            {isAdvancedEditor ?
+                isCodeEditor ?
+                    wrapAnimationConditionally(
+                        <CodeEditorComponent
+                            {...textInputProperties}
+                            {...typeTextInputProperties as
+                                Partial<CodeMirrorProperties>
+                            }
+                            {...typeTextConstraints}
+
+                            onChange={onChangeValue as
+                                CodeMirrorProperties['onChange']
+                            }
+
+                            {...editorProperties as
+                                Partial<CodeMirrorProperties>
+                            }
+                            {...properties.inputProperties as
+                                Partial<CodeMirrorProperties>
+                            }
+
+                            ref={inputReference as
+                                RefObject<InputEventMapperReference>
+                            }
+                        />,
+                        isAdvancedEditor
+                    ) :
+                    <RichTextEditorComponent
+                        {...textInputProperties as Partial<TiptapProperties>}
                         {...typeTextInputProperties as
-                            Partial<CodeMirrorProperties>
+                            Partial<TiptapProperties>
                         }
                         {...typeTextConstraints}
 
-                        onChange={onChangeValue as
-                            CodeMirrorProperties['onChange']
-                        }
+                        onChange={onChangeValue as TiptapProperties['onChange']}
 
-                        {...editorProperties as
-                            Partial<CodeMirrorProperties>
-                        }
+                        {...editorProperties as Partial<TiptapProperties>}
                         {...properties.inputProperties as
-                            Partial<CodeMirrorProperties>
+                            Partial<TiptapProperties>
                         }
 
                         ref={inputReference as
                             RefObject<InputEventMapperReference>
                         }
-                    />,
-                    isAdvancedEditor
-                ) :
-                <RichTextEditorComponent
-                    {...textInputProperties as Partial<TiptapProperties>}
-                    {...typeTextInputProperties as Partial<TiptapProperties>}
-                    {...typeTextConstraints}
-
-                    onChange={onChangeValue as TiptapProperties['onChange']}
-
-                    {...editorProperties as Partial<TiptapProperties>}
-                    {...properties.inputProperties as
-                        Partial<TiptapProperties>
-                    }
-
-                    ref={inputReference as
-                        RefObject<InputEventMapperReference>
-                    }
-                />
+                    /> :
+                ''
             }
             {wrapAnimationConditionally(
                 <div>

@@ -75,7 +75,7 @@ export const TextField = forwardRef((
                         using e.g. screen readers. That's wgy the label gets a
                         tabindex to make the input focusable.
                     */
-                    tabIndex: properties.disabled ? '0' : '-1',
+                    'tab-index': properties.disabled ? '0' : '-1',
                     ...properties.elementProperties
                 },
                 properties.name,
