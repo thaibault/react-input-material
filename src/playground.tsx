@@ -290,6 +290,7 @@ const Application = () => {
                             'none'
                     }}
                 >
+                    {/*
                     <TextInput<string>
                         name="simpleInput1"
                         componentProperties={
@@ -438,6 +439,7 @@ const Application = () => {
                         })}
                         onChange={onChange}
                     />
+                    */}
                 </div>
                 {/* endregion */}
                 {/* region number */}
@@ -449,6 +451,7 @@ const Application = () => {
                             'none'
                     }}
                 >
+                    {/*
                     <TextInput<null | number>
                         name="numberInputControlled"
 
@@ -556,6 +559,7 @@ const Application = () => {
                         })}
                         onChange={onChange}
                     />
+                    */}
                 </div>
                 {/* endregion */}
                 {/* region text */}
@@ -567,6 +571,7 @@ const Application = () => {
                             'none'
                     }}
                 >
+                    {/*
                     <TextInput<string>
                         declaration="text"
                         description="textInput1Description"
@@ -642,6 +647,7 @@ const Application = () => {
 
                     <hr/>
 
+                    */}
                     <TextInput<string>
                         declaration="code(css)"
                         description="textInput3Description"
@@ -654,12 +660,14 @@ const Application = () => {
                                 'text'
                         }
                         rows={2}
+
                         selectableEditor
 
                         maximumLength={10}
                         required
                         onChange={onChange}
                     />
+                    {/*
                     <TextInput<string>
                         editor={
                             CodeEditorIndicator as
@@ -726,6 +734,7 @@ const Application = () => {
                         })}
                         onChange={onChange}
                     />
+                    */}
                 </div>
                 {/* endregion */}
                 {/* region time */}
@@ -737,6 +746,7 @@ const Application = () => {
                             'none'
                     }}
                 >
+                    {/*
                     <TextInput<number>
                         default={
                             new Date('2025-01-01T00:00:00.000Z')
@@ -875,6 +885,7 @@ const Application = () => {
                         onChange={onChange}
                         step={60}
                     />
+                    */}
                 </div>
                 {/* endregion */}
                 {/* region selection */}
@@ -886,6 +897,7 @@ const Application = () => {
                             'none'
                     }}
                 >
+                    {/*
                     <TextInput<string>
                         declaration="selection"
                         description="selectionInput1Description"
@@ -1149,6 +1161,7 @@ const Application = () => {
                         )}
                         value={selectionInput.value}
                     />
+                    */}
                 </div>
                 {/* endregion */}
 
@@ -1161,6 +1174,7 @@ const Application = () => {
                             'none'
                     }}
                 >
+                    {/*
                     <FileInput name="fileInput1" onChange={onChange} />
 
                     <FileInput
@@ -1267,6 +1281,7 @@ const Application = () => {
 
                         ref={fileInputUnControlledHeadlessReference}
                     />
+                    */}
                 </div>
                 {/* endregion */}
 
@@ -1280,6 +1295,7 @@ const Application = () => {
                     }}
                 >
                     {/* region file-input inputs */}
+                    {/*
                     <Inputs<FileInputValue | null, FileInputProps>
                         name="fileInputs"
                         createItem={useMemorizedValue(
@@ -1300,8 +1316,10 @@ const Application = () => {
                             <FileInput {...properties as FileInputProps} />
                         )}
                     </Inputs>
+                    */}
                     {/* endregion */}
                     {/* region checkbox inputs */}
+                    {/*
                     <Inputs<boolean | null, CheckboxProps>
                         createItem={useMemorizedValue(({
                             index, item, properties: {name}
@@ -1326,9 +1344,11 @@ const Application = () => {
                             <Checkbox {...properties} />
                         )}
                     </Inputs>
+                    */}
                     {/* endregion */}
                     {/* * region interval inputs */}
                     {/* region uncontrolled */}
+                    {/*
                     <Inputs<
                         (
                             Partial<IntervalConfiguration> |
@@ -1358,8 +1378,10 @@ const Application = () => {
                             <Interval {...properties} step={60} />
                         )}
                     </Inputs>
+                    */}
                     {/* endregion */}
                     {/* region controlled */}
+                    {/*
                     <Inputs<
                         (
                             Partial<IntervalConfiguration> |
@@ -1388,8 +1410,10 @@ const Application = () => {
                             )} />
                         )}
                     </Inputs>
+                    */}
                     {/* endregion */}
                     {/* * endregion */}
+                    {/*
                     <Inputs
                         name="textInputInputsControlled"
                         onChange={onChange}
@@ -1397,6 +1421,7 @@ const Application = () => {
                         triggerInitialPropertiesConsolidation={true}
                         value={textInputInputsValue}
                     />
+                    */}
                 </div>
                 {/* endregion */}
                 {/* region interval */}
@@ -1408,6 +1433,7 @@ const Application = () => {
                             'none'
                     }}
                 >
+                    {/*
                     <Interval
                         name="intervalInput1"
                         onChange={onChange}
@@ -1459,6 +1485,7 @@ const Application = () => {
                         step={60}
                         triggerInitialPropertiesConsolidation={true}
                     />
+                    */}
                 </div>
                 {/* endregion */}
 
@@ -1471,6 +1498,7 @@ const Application = () => {
                             'none'
                     }}
                 >
+                    {/*
                     <Checkbox name="checkbox1" onChange={onChange} />
                     <Checkbox
                         name="CheckboxControlled"
@@ -1530,6 +1558,7 @@ const Application = () => {
                         showInitialValidationState
                         tooltip="Check this one!"
                     />
+                    */}
                 </div>
                 {/* endregion */}
             </div>
