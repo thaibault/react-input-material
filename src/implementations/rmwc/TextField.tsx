@@ -53,7 +53,7 @@ export const TextField = forwardRef((
         <RMWCTextField
             characterCount={properties.characterCount && isMaximumLength}
 
-            label={properties.name}
+            label={properties.label}
             placeholder={properties.placeholder}
 
             helpText={properties.helpText}

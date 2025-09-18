@@ -89,7 +89,7 @@ const SECTIONS = [
 const Application = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(2)
     const activeSection = SECTIONS[activeTabIndex]
 
     const onChange: ((properties: BaseProps) => void) =
@@ -581,6 +581,10 @@ const Application = () => {
                         initialValue="a"
                         onChange={onChange}
                         required
+
+                        componentProperties={
+                            useMemorizedValue({outlined: true})
+                        }
                     />
                     <TextInput<string>
                         editor="text"
