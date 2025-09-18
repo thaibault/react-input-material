@@ -96,24 +96,15 @@ export const Index = forwardRef((
     })
     const htmlContent = editor.getHTML()
 
+    const clientHeight =
+        reference.current?.input?.current?.input?.current?.clientHeight
     useEffect(
         () => {
-            if (
-                editorViewReference.current &&
-                reference.current?.input.current?.input.current?.clientHeight
-            )
+            if (editorViewReference.current && clientHeight)
                 editorViewReference.current.style.height =
-                    String(
-                        reference.current.input.current.input.current
-                            .clientHeight +
-                        VIEW_CONTENT_OFFSET_IN_PX
-                    ) +
-                    'px'
+                    String(clientHeight + VIEW_CONTENT_OFFSET_IN_PX) + 'px'
         },
-        [
-            editorViewReference.current,
-            reference.current?.input.current?.input.current?.clientHeight
-        ]
+        [editorViewReference.current, clientHeight]
     )
 
     return <EditorWrapper

@@ -185,7 +185,7 @@ export const TextInputInner = function<Type = unknown>(
      * with input element.
      */
     useEffect(() => {
-        if (inputReference.current?.input.current) {
+        if (inputReference.current?.input?.current) {
             let inputDomNode = inputReference.current.input.current as
                 HTMLInputElement |
                 HTMLSelectElement |
@@ -1192,7 +1192,7 @@ export const TextInputInner = function<Type = unknown>(
             !properties.disabled &&
             useSuggestions &&
             'ArrowDown' === event.code &&
-            event.target === inputReference.current?.input.current
+            event.target === inputReference.current?.input?.current
         )
             (
                 suggestionMenuAPIReference.current as unknown as ListApi | null

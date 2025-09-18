@@ -124,7 +124,8 @@ export const Index = forwardRef((
     const localReference = useRef<InputEventMapperReference | null>(null)
     const reference: RefObject<InputEventMapperReference | null> =
         (
-            givenReference as null | RefObject<InputEventMapperReference | null>
+            givenReference as
+                null | RefObject<InputEventMapperReference | null>
         ) ??
         localReference
     const editorViewReference = useRef<HTMLDivElement | null>(null)
@@ -152,6 +153,8 @@ export const Index = forwardRef((
                 extensions: [
                     BASIC_EXTENSIONS,
                     EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
+                        // TODO prevent update if given string is longer than
+                        // "properties.maximumLength"
                         if (
                             viewUpdate.startState.doc.toString() !==
                             viewUpdate.state.doc.toString()
@@ -191,25 +194,18 @@ export const Index = forwardRef((
         [editorView.current, properties.value]
     )
 
+    const clientHeight =
+        reference.current?.input?.current?.input?.current?.clientHeight
     useEffect(
         () => {
             let id: null | ReturnType<typeof setTimeout> = null
             const syncHeight = () => {
-                if (
-                    editorViewReference.current &&
-                    reference.current?.input.current?.input
-                        .current?.clientHeight
-                ) {
+                if (editorViewReference.current && clientHeight) {
                     const scrollableViewNode: HTMLDivElement | null =
                         editorViewReference.current
                             .querySelector('.cm-scroller')
                     if (scrollableViewNode) {
-                        const newHeightValue =
-                            String(
-                                reference.current.input.current.input.current
-                                    .clientHeight
-                            ) +
-                            'px'
+                        const newHeightValue = String(clientHeight) + 'px'
                         editorViewReference.current.style.height =
                             newHeightValue
                         scrollableViewNode.style.height = newHeightValue
@@ -230,10 +226,7 @@ export const Index = forwardRef((
                     clearTimeout(id)
             }
         },
-        [
-            editorViewReference.current,
-            reference.current?.input.current?.input.current?.clientHeight
-        ]
+        [editorViewReference.current, clientHeight]
     )
 
     return <EditorWrapper

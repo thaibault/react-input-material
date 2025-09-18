@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import {TextAreaProperties, TextAreaReference} from '../type'
+import {NOOP} from 'clientnode'
 
 export interface Reference extends TextAreaReference {
     materialTextField: RefObject<MDCTextField | null>
@@ -97,6 +98,52 @@ export const TextArea = forwardRef((
         ]
     )
 
+    /*
+       NOTE: Applying the event listeners declaratively do not work to observe
+       events triggered by advanced editors manually.
+    */
+    useEffect(
+        () => {
+            const onInput = properties.children ?
+                () => {
+                    /*
+                        Since we do not operate on the native textarea element
+                        we need to make sure that we stay in focus state when
+                        do clearing the textarea's input value.
+                    */
+                    setTimeout(() => {
+                        foundationReference.current?.autoCompleteFocus()
+                    })
+                } :
+                NOOP
+            inputReference.current?.addEventListener('input', onInput)
+
+            const onFocus = properties.children ?
+                () => {
+                    /*
+                        Since we do not operate on the native textarea element
+                        we need to make sure that we maintain focus state when
+                        focusing the advanced editor.
+                    */
+                    setTimeout(() => {
+                        foundationReference.current?.activateFocus()
+                    })
+                } :
+                NOOP
+            inputReference.current?.addEventListener('focus', onFocus)
+
+            return () => {
+                inputReference.current?.removeEventListener('input', onInput)
+                inputReference.current?.removeEventListener('focus', onFocus)
+            }
+        },
+        [
+            foundationReference.current,
+            inputReference.current,
+            properties.children
+        ]
+    )
+
     // NOTE: Character count is only supported if maximum length is given.
     const isMaximumLength =
         typeof properties.maximumLength === 'number' &&
@@ -136,16 +183,6 @@ export const TextArea = forwardRef((
             maxLength={properties.maximumLength}
 
             onChange={properties.onChange}
-            onInput={() => {
-                /*
-                    Since we do not operate on the native textarea element we
-                    need to make sure that we stay in focus state when do
-                    clearing the textarea's input value.
-                */
-                setTimeout(() => {
-                    foundationReference.current?.autoCompleteFocus()
-                })
-            }}
 
             onClick={properties.onClick}
 

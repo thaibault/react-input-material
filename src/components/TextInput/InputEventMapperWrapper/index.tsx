@@ -14,7 +14,7 @@ import {
     TextAreaReference
 } from '../../../implementations/type'
 
-export type Reference = EventMapperWrapperReference<TextAreaReference>
+export type Reference = EventMapperWrapperReference<Partial<TextAreaReference>>
 
 export const Index = forwardRef((
     properties: TextAreaProperties, reference?: ForwardedRef<Reference>
@@ -44,6 +44,7 @@ export const Index = forwardRef((
                         const syntheticEvent = new Event('focus') as
                             Event & { detail: object }
                         syntheticEvent.detail = event
+
                         inputReference.current.input.current
                             .dispatchEvent(syntheticEvent)
                     }
@@ -56,6 +57,7 @@ export const Index = forwardRef((
 
                         inputReference.current.input.current.value =
                             String(value)
+
                         inputReference.current.input.current
                             .dispatchEvent(syntheticEvent)
                     }
