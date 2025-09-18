@@ -61,7 +61,7 @@ import {StarterKitOptions} from '@tiptap/starter-kit'
 import {
     IconProperties,
     InputReference, SelectProperties,
-    TextAreaProperties
+    TextAreaProperties, TextFieldProperties
 } from '../../implementations/type'
 import {
     BaseModel,
@@ -77,6 +77,9 @@ import {
     StaticWebComponent,
     ValueState as BaseValueState
 } from '../../type'
+import {
+    Reference as InputEventMapperReference
+} from './InputEventMapperWrapper'
 // endregion
 // region data transformation
 export type Transformer<T = unknown> = (
@@ -319,7 +322,9 @@ export interface Properties<Type = unknown> extends
         CodeMirrorProps |
         SelectProperties<Type> |
         TiptapProps |
-        TextAreaProperties
+        TextAreaProperties |
+        TextFieldProperties |
+        Mapping<unknown>
     >
     inputProps?: Mapping<boolean | number | string>
 
@@ -397,7 +402,9 @@ export type Adapter<T = unknown> = ComponentAdapter<
 >
 export interface AdapterWithReferences<T = unknown> extends Adapter<T> {
     references: {
-        inputReference: RefObject<InputReference | null>
+        inputReference: RefObject<
+            InputReference | InputEventMapperReference | null
+        >
         suggestionMenuAPIReference: RefObject<MenuApi | null>
         suggestionMenuFoundationReference: RefObject<
             MDCMenuFoundation | null

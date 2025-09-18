@@ -45,7 +45,7 @@ selections, numbers, dates and so on.
 - Card
 - CircularProgress
 
-#### RequireableCheckbox
+#### Checkbox
 
 - Checkbox
 
@@ -59,4 +59,8 @@ selections, numbers, dates and so on.
 
 #### TextInput
 
-- TODO
+- Select
+- TextArea (with advanced editor integration interface)
+- TextField
+- Menu
+  - TODO

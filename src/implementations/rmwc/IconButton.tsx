@@ -14,6 +14,7 @@ import {
 } from 'react'
 
 import {IconButtonProperties} from '../type'
+import {useMemorizedValue} from 'react-generic-tools'
 
 export const IconButton = forwardRef((
     properties: IconButtonProperties, reference?: ForwardedRef<unknown>
@@ -35,6 +36,8 @@ export const IconButton = forwardRef((
         .replace('extra-large', 'xlarge') as
         IconSizeT
 
+    const fallbackElementProperties = useMemorizedValue({})
+
     return <RMWCIconButton
         checked={properties.value}
         disabled={properties.disabled}
@@ -42,16 +45,27 @@ export const IconButton = forwardRef((
         className={properties.classNames?.join(' ')}
         style={properties.styles}
 
-        icon={{
-            icon: properties.icon,
+        icon={useMemorizedValue(
+            {
+                icon: properties.icon,
+                size,
+                strategy: properties.strategy
+            },
+            properties.icon,
             size,
-            strategy: properties.strategy
-        }}
-        onIcon={{
-            icon: properties.onIcon || properties.icon,
+            properties.strategy
+        )}
+        onIcon={useMemorizedValue(
+            {
+                icon: properties.onIcon || properties.icon,
+                size,
+                strategy: properties.strategy
+            },
+            properties.onIcon,
+            properties.icon,
             size,
-            strategy: properties.strategy
-        }}
+            properties.strategy
+        )}
 
         onClick={properties.onClick}
         onChange={
@@ -63,7 +77,7 @@ export const IconButton = forwardRef((
         ref={baseReference}
         foundationRef={foundationReference}
 
-        {...(properties.elementProperties ?? {})}
+        {...properties.elementProperties ?? fallbackElementProperties}
     />
 })
 

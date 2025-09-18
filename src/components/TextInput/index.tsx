@@ -121,7 +121,7 @@ import {
     DataTransformSpecification,
     defaultModelState,
     DefaultProperties,
-    defaultProperties, EditorProperties,
+    defaultProperties,
     Model,
     ModelState,
     NativeType,
@@ -136,6 +136,9 @@ import {
 } from './type'
 import TRANSFORMER from './transformer'
 import TextArea from '#implementations/TextArea'
+import {
+    Reference as InputEventMapperReference
+} from './InputEventMapperWrapper'
 
 export {
     CODE_EDITOR_OPTIONS,
@@ -367,8 +370,8 @@ export const TextInputInner = function<Type = unknown>(
                 </GenericAnimate>,
 
                 elementProperties: {
-                    'aria-hidden': hide ? 'true' : 'false',
-                    'tab-index': hide ? -1 : 0,
+                    ariaHidden: hide ? 'true' : 'false',
+                    tabIndex: hide ? -1 : 0,
 
                     onClick: handler,
                     onKeyDown: handler
@@ -432,7 +435,7 @@ export const TextInputInner = function<Type = unknown>(
             if (!Object.prototype.hasOwnProperty.call(options, 'onClick')) {
                 options.elementProperties = options.elementProperties ?? {}
                 options.elementProperties.tabIndex = -1
-                options.elementProperties['aria-hidden'] = true
+                options.elementProperties.ariaHidden = true
             }
         }
 
@@ -472,7 +475,7 @@ export const TextInputInner = function<Type = unknown>(
         >
             <IconButton
                 elementProperties={{
-                    'aria-label': properties.editorIsActive ?
+                    ariaLabel: properties.editorIsActive ?
                         'plain' :
                         properties.editor.startsWith('code') ?
                             'code' :
@@ -548,7 +551,7 @@ export const TextInputInner = function<Type = unknown>(
      * @param content - Component or string to wrap.
      * @param propertiesOrInCondition - Animation properties or in condition
      * only.
-     * @param condition - Show condition.
+     * @param doAnimationCondition - Show condition.
      * @returns Wrapped component.
      */
     const wrapAnimationConditionally = (
@@ -556,17 +559,17 @@ export const TextInputInner = function<Type = unknown>(
         propertiesOrInCondition: (
             boolean | Partial<TransitionProps<HTMLElement | undefined>>
         ) = {},
-        condition = true
+        doAnimationCondition = true
     ): ReactNode => {
         if (typeof propertiesOrInCondition === 'boolean')
-            return (condition ?
+            return (doAnimationCondition ?
                 <GenericAnimate in={propertiesOrInCondition}>
                     {content}
                 </GenericAnimate> :
                 propertiesOrInCondition ? content : ''
             ) as ReactNode
 
-        return (condition ?
+        return (doAnimationCondition ?
             <GenericAnimate {...propertiesOrInCondition}>
                 {content}
             </GenericAnimate> :
@@ -1284,8 +1287,8 @@ export const TextInputInner = function<Type = unknown>(
     // endregions
     // region properties
     /// region references
-    const inputReference: RefObject<InputReference | null> =
-        useRef<InputReference>(null)
+    const inputReference =
+        useRef<InputReference | InputEventMapperReference>(null)
     const suggestionMenuAPIReference: RefObject<MenuApi | null> =
         useRef<MenuApi>(null)
     const suggestionMenuFoundationReference: RefObject<
@@ -1473,14 +1476,19 @@ export const TextInputInner = function<Type = unknown>(
     // region render
     /// region intermediate render properties
     const textInputProperties: Partial<TextInputProperties<Type>> = {
-        ref: inputReference,
+        ref: inputReference as RefObject<InputReference>,
         /*
             NOTE: If not set label with forbidden symbols will automatically
             be used.
         */
         id,
+
+        elementProperties: properties.elementProperties,
+
+        onClick,
         onFocus: triggerOnFocusAndOpenSuggestions as
             LowLevelBaseComponentProperties['onFocus'],
+
         disabled: properties.disabled,
         helpText: {
             children: renderHelpText(),
@@ -1502,12 +1510,26 @@ export const TextInputInner = function<Type = unknown>(
             properties.showValidationState &&
             (properties.showInitialValidationState || properties.visited)
         ),
+
         placeholder: properties.placeholder,
         characterCount:
             typeof properties.maximumLength === 'number' &&
             !isNaN(properties.maximumLength) &&
             properties.maximumLength >= 0,
-        value: properties.representation as Type
+
+        value: properties.representation as Type,
+
+        /*
+            NOTE: Disabled input fields are not focusable via keyboard which
+            makes them unreachable for blind people using e.g. screen readers.
+            That's why the label gets a tabindex to make the input focusable.
+        */
+        elementProperties: {
+            tabIndex: properties.disabled ? '0' : '-1',
+            ...properties.elementProperties
+        },
+
+        onKeyUp
     }
 
     const isAdvancedEditor: boolean = (
@@ -1523,6 +1545,8 @@ export const TextInputInner = function<Type = unknown>(
             properties.editor.endsWith(')')
         )
     )
+    const isCodeEditor =
+        isAdvancedEditor && properties.editor.startsWith('code')
 
     const currentRenderableSuggestions: Array<ReactElement> = []
     const currentSuggestionLabels: Array<ReactNode | string> = []
@@ -1657,11 +1681,8 @@ export const TextInputInner = function<Type = unknown>(
             )
     }
     /// endregion
-    const EditorComponent = properties.editor.startsWith('code') ?
-        CodeEditorComponent :
-        RichTextEditorComponent
-    const editorProperties =
-        {} as CodeEditorProperties | RichTextEditorProperties
+    const editorProperties = {} as
+        CodeEditorProperties | RichTextEditorProperties
     if (isAdvancedEditor)
         if (
             properties.editor.startsWith('code(') &&
@@ -1749,37 +1770,49 @@ export const TextInputInner = function<Type = unknown>(
                 />,
                 isSelection
             )}
-            {wrapAnimationConditionally(
-                <EditorComponent
-                    {...textInputProperties}
-                    {...typeTextInputProperties}
+            {isCodeEditor ?
+                wrapAnimationConditionally(
+                    <CodeEditorComponent
+                        {...textInputProperties}
+                        {...typeTextInputProperties as
+                            Partial<CodeMirrorProperties>
+                        }
+                        {...typeTextConstraints}
+
+                        onChange={onChangeValue as
+                            CodeMirrorProperties['onChange']
+                        }
+
+                        {...editorProperties as
+                            Partial<CodeMirrorProperties>
+                        }
+                        {...properties.inputProperties as
+                            Partial<CodeMirrorProperties>
+                        }
+
+                        ref={inputReference as
+                            RefObject<InputEventMapperReference>
+                        }
+                    />,
+                    isAdvancedEditor
+                ) :
+                <RichTextEditorComponent
+                    {...textInputProperties as Partial<TiptapProperties>}
+                    {...typeTextInputProperties as Partial<TiptapProperties>}
                     {...typeTextConstraints}
 
-                    onChange={onChangeValue as EditorProperties['onChange']}
-                    elementProperties={{
-                        name: properties.name,
-                        onClick,
-                        onKeyUp,
-                        /*
-                            NOTE: Disabled input fields are not focusable via
-                            keyboard which makes them unreachable for blind
-                            people using e.g. screen readers. That's why the
-                            label gets a tabindex to make the input focusable.
-                        */
-                        tabIndex: properties.disabled ? '0' : '-1',
-                        ...properties.elementProperties
-                    }}
+                    onChange={onChangeValue as TiptapProperties['onChange']}
 
-                    {...editorProperties as
-                        Partial<CodeMirrorProperties | TiptapProperties>
-                    }
+                    {...editorProperties as Partial<TiptapProperties>}
                     {...properties.inputProperties as
-                        Partial<CodeMirrorProperties | TiptapProperties>
+                        Partial<TiptapProperties>
                     }
-                />,
-                isAdvancedEditor,
-                properties.editor.startsWith('code')
-            )}
+
+                    ref={inputReference as
+                        RefObject<InputEventMapperReference>
+                    }
+                />
+            }
             {wrapAnimationConditionally(
                 <div>
                     {useSuggestions ?
@@ -1874,27 +1907,14 @@ export const TextInputInner = function<Type = unknown>(
                             /> :
                             <TextField
                                 {...textInputProperties}
-                                {...typeTextInputProperties}
+                                {...typeTextInputProperties as
+                                    Partial<TextFieldProperties>
+                                }
                                 {...typeTextConstraints}
 
                                 onChange={onChangeValue as
                                     TextFieldProperties['onChange']
                                 }
-                                elementProperties={{
-                                    name: properties.name,
-                                    onClick,
-                                    onKeyUp,
-                                    /*
-                                        NOTE: Disabled input fields are not
-                                        focusable via keyboard which makes them
-                                        unreachable for blind people using e.g.
-                                        screen readers. That's wgy the label
-                                        gets a tabindex to make the input
-                                        focusable.
-                                    */
-                                    tabIndex: properties.disabled ? '0' : '-1',
-                                    ...properties.elementProperties
-                                }}
 
                                 leadingIcon={wrapIconWithTooltip(
                                     applyIconPreset(properties.leadingIcon)

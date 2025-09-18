@@ -1,20 +1,13 @@
 import {Theme} from '@rmwc/theme'
-import {
-    ForwardedRef,
-    forwardRef,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
-    ReactElement
-} from 'react'
+import {ForwardedRef, forwardRef, ReactElement} from 'react'
 
 import {ErrorProperties} from '../type'
 
 export const Error = forwardRef((
-    {children}: ErrorProperties, reference?: ForwardedRef<unknown>
+    {children}: ErrorProperties,
+    reference?: ForwardedRef<HTMLDivElement | null>
 ): ReactElement =>
-    <Theme ref={reference as RefObject<HTMLDivElement | null>} use="error">
-        {children}
-    </Theme>
+    <Theme ref={reference} use="error">{children}</Theme>
 )
 
 export default Error

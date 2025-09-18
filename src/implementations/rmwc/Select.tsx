@@ -11,6 +11,7 @@ import {
 } from 'react'
 
 import {InputReference, SelectProperties} from '../type'
+import {useMemorizedValue} from 'react-generic-tools'
 
 export const SelectInner = function<Type = unknown>(
     properties: SelectProperties<Type>,
@@ -33,11 +34,16 @@ export const SelectInner = function<Type = unknown>(
     )
 
     return <RMWCSelect
-        rootProps={{
-            name: properties.name,
-            onClick: properties.onClick,
-            ...properties.elementProperties
-        }}
+        rootProps={useMemorizedValue(
+            {
+                name: properties.name,
+                onClick: properties.onClick,
+                ...properties.elementProperties
+            },
+            properties.name,
+            properties.onClick,
+            properties.elementProperties
+        )}
 
         enhanced
 

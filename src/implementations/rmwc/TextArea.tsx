@@ -146,6 +146,16 @@ export const TextArea = forwardRef((
                     foundationReference.current?.autoCompleteFocus()
                 })
             }}
+
+            onClick={properties.onClick}
+
+            onBlur={properties.onBlur}
+            onFocus={properties.onFocus}
+
+            onKeyUp={properties.onKeyUp}
+            onKeyDown={properties.onKeyDown}
+
+            {...properties.elementProperties}
         ></textarea>
 
         {properties.children}

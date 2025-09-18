@@ -1,33 +1,35 @@
 import {Icon as RMWCIcon} from '@rmwc/icon'
 import {IconSizeT} from '@rmwc/types'
-import {
-    ForwardedRef,
-    forwardRef,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
-    ReactElement
-} from 'react'
+import {ForwardedRef, forwardRef, ReactElement} from 'react'
 
 import {IconProperties} from '../type'
+import {useMemorizedValue} from 'react-generic-tools'
 
 export const Icon = forwardRef((
-    properties: IconProperties, reference?: ForwardedRef<unknown>
-): ReactElement =>
-    <RMWCIcon
+    properties: IconProperties, reference?: ForwardedRef<HTMLElement | null>
+): ReactElement => {
+    const fallbackElementProperties = useMemorizedValue({})
+
+    return <RMWCIcon
         className={properties.classNames?.join(' ')}
         style={properties.styles}
-        {...(properties.elementProperties ?? {})}
+        {...properties.elementProperties ?? fallbackElementProperties}
 
-        icon={{
-            icon: properties.icon,
-            size: properties.size?.replace('extra-small', 'xsmall')
-                .replace('extra-large', 'xlarge') as
-                    IconSizeT,
-            strategy: properties.strategy
-        }}
+        icon={useMemorizedValue(
+            {
+                icon: properties.icon,
+                size: properties.size?.replace('extra-small', 'xsmall')
+                    .replace('extra-large', 'xlarge') as
+                        IconSizeT,
+                strategy: properties.strategy
+            },
+            properties.icon,
+            properties.size,
+            properties.strategy
+        )}
 
-        ref={reference as RefObject<HTMLElement> | null}
+        ref={reference}
     />
-)
+})
 
 export default Icon

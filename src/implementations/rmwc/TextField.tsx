@@ -13,6 +13,7 @@ import React, {
 
 import {InputReference, TextFieldProperties} from '../type'
 import Icon from './Icon'
+import {useMemorizedValue} from 'react-generic-tools'
 
 export interface Reference extends InputReference {
     foundation: RefObject<MDCTextFieldFoundation | null>
@@ -37,8 +38,6 @@ export const TextField = forwardRef((
             input: inputReference
         })
     )
-
-    properties = {...properties, maximumLength: 10}
 
     // NOTE: Character count is only supported if maximum length is given.
     const isMaximumLength =
@@ -65,19 +64,26 @@ export const TextField = forwardRef((
 
             onChange={properties.onChange}
             ripple
-            rootProps={{
-                name: properties.name,
-                onClick: properties.onClick,
-                onKeyUp: properties.onKeyUp,
-                /*
-                    NOTE: Disabled input fields are not focusable via keyboard
-                    which makes them unreachable for blind people using e.g.
-                    screen readers. That's wgy the label gets a tabindex to
-                    make the input focusable.
-                */
-                tabIndex: properties.disabled ? '0' : '-1',
-                ...properties.elementProperties
-            }}
+            rootProps={useMemorizedValue(
+                {
+                    name: properties.name,
+                    onClick: properties.onClick,
+                    onKeyUp: properties.onKeyUp,
+                    /*
+                        NOTE: Disabled input fields are not focusable via
+                        keyboard which makes them unreachable for blind people
+                        using e.g. screen readers. That's wgy the label gets a
+                        tabindex to make the input focusable.
+                    */
+                    tabIndex: properties.disabled ? '0' : '-1',
+                    ...properties.elementProperties
+                },
+                properties.name,
+                properties.onClick,
+                properties.onKeyUp,
+                properties.disabled,
+                properties.elementProperties
+            )}
 
             icon={properties.leadingIcon ?
                 typeof properties.leadingIcon === 'string' ?
