@@ -41,7 +41,7 @@ import Error from '#implementations/Error'
 /*
 "namedExport" version of css-loader:
 
-import {requireableCheckboxClassName} from './style.module'
+import {checkboxClassName} from './style.module'
 */
 import {WrapConfigurations} from '../Wrapper/WrapConfigurations'
 import {
@@ -438,8 +438,7 @@ export const CheckboxInner = function(
             ref={inputReference}
 
             classNames={
-                [CSS_CLASS_NAMES.requireableCheckbox]
-                    .concat(properties.className)
+                [CSS_CLASS_NAMES.checkbox].concat(properties.className)
             }
             styles={properties.styles}
 

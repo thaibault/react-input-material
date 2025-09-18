@@ -1315,7 +1315,7 @@ const Application = () => {
                         )}
                     </Inputs>
                     {/* endregion */}
-                    {/** region interval inputs */}
+                    {/* * region interval inputs */}
                     {/* region uncontrolled */}
                     <Inputs<
                         (
@@ -1377,7 +1377,7 @@ const Application = () => {
                         )}
                     </Inputs>
                     {/* endregion */}
-                    {/** endregion */}
+                    {/* * endregion */}
                     <Inputs
                         name="textInputInputsControlled"
                         onChange={onChange}
