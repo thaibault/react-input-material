@@ -1,3 +1,21 @@
+// -*- coding: utf-8 -*-
+/** @module TextField */
+'use strict'
+/* !
+    region header
+    [Project page](https://torben.website/react-material-input)
+
+    Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
+
+    License
+    -------
+
+    This library written by Torben Sickert stand under a creative commons
+    naming 3.0 unported license.
+    See https://creativecommons.org/licenses/by/3.0/deed.de
+    endregion
+*/
+// region imports
 import {MDCTextFieldFoundation} from '@material/textfield'
 import {TextField as RMWCTextField} from '@rmwc/textfield'
 
@@ -14,7 +32,7 @@ import React, {
 import {InputReference, TextFieldProperties} from '../type'
 import Icon from './Icon'
 import {useMemorizedValue} from 'react-generic-tools'
-
+// endregion
 export interface Reference extends InputReference {
     foundation: RefObject<MDCTextFieldFoundation | null>
     input: RefObject<HTMLInputElement | null>

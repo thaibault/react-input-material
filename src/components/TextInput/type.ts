@@ -47,9 +47,6 @@ import {GenericEvent} from 'react-generic-tools/type'
 
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 
-import {MDCMenuFoundation} from '@material/menu'
-
-import {MenuApi} from '@rmwc/menu'
 import {
     FormattedOption as FormattedSelectionOption, SelectProps
 } from '@rmwc/select'
@@ -406,14 +403,9 @@ export type Adapter<T = unknown> = ComponentAdapter<
 >
 export interface AdapterWithReferences<T = unknown> extends Adapter<T> {
     references: {
-        inputReference: RefObject<
-            InputReference | InputEventMapperReference | null
-        >
-        suggestionMenuAPIReference: RefObject<MenuApi | null>
-        suggestionMenuFoundationReference: RefObject<
-            MDCMenuFoundation | null
-        >
-        wrapperReference: RefObject<HTMLDivElement | null>
+        input: RefObject<InputReference | InputEventMapperReference | null>
+        menu: RefObject<unknown>
+        wrapper: RefObject<HTMLDivElement | null>
     }
 }
 

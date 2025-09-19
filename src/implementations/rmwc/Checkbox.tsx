@@ -1,3 +1,21 @@
+// -*- coding: utf-8 -*-
+/** @module Checkbox */
+'use strict'
+/* !
+    region header
+    [Project page](https://torben.website/react-material-input)
+
+    Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
+
+    License
+    -------
+
+    This library written by Torben Sickert stand under a creative commons
+    naming 3.0 unported license.
+    See https://creativecommons.org/licenses/by/3.0/deed.de
+    endregion
+*/
+// region imports
 import {MDCCheckboxFoundation} from '@material/checkbox'
 import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox'
 import {
@@ -11,7 +29,7 @@ import {
 } from 'react'
 
 import {CheckboxProperties, InputReference} from '../type'
-
+// endregion
 export const Checkbox = forwardRef((
     properties: CheckboxProperties, reference?: ForwardedRef<InputReference>
 ): ReactElement => {

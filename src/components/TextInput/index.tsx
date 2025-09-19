@@ -20,12 +20,6 @@
 import {javascript} from '@codemirror/lang-javascript'
 import {css} from '@codemirror/lang-css'
 
-import {MDCMenuFoundation} from '@material/menu'
-
-import {ListApi} from '@rmwc/list'
-import {
-    Menu, MenuApi, MenuSurface, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
-} from '@rmwc/menu'
 import {Theme} from '@rmwc/theme'
 
 import {
@@ -65,9 +59,9 @@ import {
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
-import CircularProgress from '#implementations/CircularProgress'
 import Icon from '#implementations/Icon'
 import IconButton from '#implementations/IconButton'
+import Menu from '#implementations/Menu'
 import Select from '#implementations/Select'
 import TextField from '#implementations/TextField'
 
@@ -96,6 +90,7 @@ import {
     IconProperties,
     InputReference,
     LowLevelBaseComponentProperties,
+    MenuReference,
     TextAreaProperties,
     TextAreaReference,
     TextFieldProperties,
@@ -118,14 +113,15 @@ import {
     UseAnimations
 } from './helper'
 import {
-    AdapterWithReferences, CodeMirrorProperties,
+    AdapterWithReferences,
     CodeMirrorProperties as CodeEditorProperties,
     Component,
     DataTransformation,
     DataTransformSpecification,
     defaultModelState,
     DefaultProperties,
-    defaultProperties, EditorReference,
+    defaultProperties,
+    EditorReference,
     Model,
     ModelState,
     NativeType,
@@ -134,7 +130,7 @@ import {
     propertyTypes,
     Props,
     renderProperties,
-    State, TiptapProperties,
+    State,
     TiptapProperties as RichTextEditorProperties,
     ValueState
 } from './type'
@@ -1203,9 +1199,7 @@ export const TextInputInner = function<Type = unknown>(
             'ArrowDown' === event.code &&
             event.target === inputReference.current?.input?.current
         )
-            (
-                suggestionMenuAPIReference.current as unknown as ListApi | null
-            )?.focusItemAtIndex(0)
+            menuReference.current?.focusItem(0)
 
         /*
             NOTE: We do not want to forward keydown enter events coming from
@@ -1298,13 +1292,8 @@ export const TextInputInner = function<Type = unknown>(
     /// region references
     const inputReference =
         useRef<InputReference | InputEventMapperReference>(null)
-    const suggestionMenuAPIReference: RefObject<MenuApi | null> =
-        useRef<MenuApi>(null)
-    const suggestionMenuFoundationReference: RefObject<
-        MDCMenuFoundation | null
-    > = useRef<MDCMenuFoundation>(null)
-    const wrapperReference: RefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement>(null)
+    const wrapperReference = useRef<HTMLDivElement>(null)
+    const menuReference = useRef<MenuReference>(null)
     /// endregion
     const givenProps: Props<Type> = translateKnownSymbols(props)
 
@@ -1472,10 +1461,9 @@ export const TextInputInner = function<Type = unknown>(
             return {
                 properties,
                 references: {
-                    inputReference,
-                    suggestionMenuAPIReference,
-                    suggestionMenuFoundationReference,
-                    wrapperReference
+                    input: inputReference,
+                    menu: menuReference,
+                    wrapper: wrapperReference
                 },
                 state
             }
@@ -1558,7 +1546,9 @@ export const TextInputInner = function<Type = unknown>(
     const isCodeEditor =
         isAdvancedEditor && properties.editor.startsWith('code')
 
-    const currentRenderableSuggestions: Array<ReactElement> = []
+    const currentRenderableSuggestions: (
+        Array<Array<ReactElement> | ReactElement>
+    ) = []
     const currentSuggestionLabels: Array<ReactNode | string> = []
     const currentSuggestionValues: Array<unknown> = []
     const useSuggestions = Boolean(
@@ -1583,16 +1573,7 @@ export const TextInputInner = function<Type = unknown>(
                 })
 
                 if (result) {
-                    currentRenderableSuggestions.push(
-                        <MenuItem
-                            className={
-                                CSS_CLASS_NAMES.textInputSuggestionsSuggestion
-                            }
-                            key={index}
-                        >
-                            {result}
-                        </MenuItem>
-                    )
+                    currentRenderableSuggestions.push(result)
                     currentSuggestionLabels.push(suggestion)
                     currentSuggestionValues.push(suggestionValues[index])
                 }
@@ -1604,35 +1585,29 @@ export const TextInputInner = function<Type = unknown>(
                 )
             ) {
                 currentRenderableSuggestions.push(
-                    <MenuItem
-                        className={
-                            CSS_CLASS_NAMES.textInputSuggestionsSuggestion
+                    (mark(
+                        suggestion,
+                        (
+                            properties.representation as string | null
+                        )?.split(' ') || '',
+                        {
+                            marker: (foundWord: string): ReactElement =>
+                                <span className={
+                                    CSS_CLASS_NAMES
+                                        .textInputSuggestionsSuggestionMark
+                                }>
+                                    {foundWord}
+                                </span>,
+                            normalizer: (value: unknown): string =>
+                                String(value).toLowerCase(),
+                            skipTagDelimitedParts: null
                         }
-                        key={index}
-                    >
-                        {(mark(
-                            suggestion,
-                            (
-                                properties.representation as string | null
-                            )?.split(' ') || '',
-                            {
-                                marker: (foundWord: string): ReactElement =>
-                                    <span className={
-                                        CSS_CLASS_NAMES
-                                            .textInputSuggestionsSuggestionMark
-                                    }>
-                                        {foundWord}
-                                    </span>,
-                                normalizer: (value: unknown): string =>
-                                    String(value).toLowerCase(),
-                                skipTagDelimitedParts: null
-                            }
-                        ) as Array<ReactElement | string>).map((
-                            item: ReactElement | string, index: number
+                    ) as Array<ReactElement | string>)
+                        .map((
+                            item: ReactNode | string, index: number
                         ): ReactElement =>
                             <span key={index}>{item}</span>
-                        )}
-                    </MenuItem>
+                        )
                 )
                 currentSuggestionLabels.push(suggestion)
                 currentSuggestionValues.push(suggestionValues[index])
@@ -1779,16 +1754,16 @@ export const TextInputInner = function<Type = unknown>(
                         <CodeEditorComponent
                             {...textInputProperties}
                             {...typeTextInputProperties as
-                                Partial<CodeMirrorProperties>
+                                Partial<CodeEditorProperties>
                             }
                             {...typeTextConstraints}
 
                             onChange={onChangeValue as
-                                CodeMirrorProperties['onChange']
+                                CodeEditorProperties['onChange']
                             }
 
                             {...editorProperties as
-                                Partial<CodeMirrorProperties>
+                                Partial<CodeEditorProperties>
                             }
 
                             ref={inputReference as
@@ -1798,15 +1773,21 @@ export const TextInputInner = function<Type = unknown>(
                         isAdvancedEditor
                     ) :
                     <RichTextEditorComponent
-                        {...textInputProperties as Partial<TiptapProperties>}
+                        {...textInputProperties as
+                            Partial<RichTextEditorProperties>
+                        }
                         {...typeTextInputProperties as
-                            Partial<TiptapProperties>
+                            Partial<RichTextEditorProperties>
                         }
                         {...typeTextConstraints}
 
-                        onChange={onChangeValue as TiptapProperties['onChange']}
+                        onChange={onChangeValue as
+                            RichTextEditorProperties['onChange']
+                        }
 
-                        {...editorProperties as Partial<TiptapProperties>}
+                        {...editorProperties as
+                            Partial<RichTextEditorProperties>
+                        }
 
                         ref={inputReference as RefObject<TipTapReference>}
                     /> :
@@ -1815,70 +1796,49 @@ export const TextInputInner = function<Type = unknown>(
             {wrapAnimationConditionally(
                 <div>
                     {useSuggestions ?
-                        <MenuSurfaceAnchor
+                        <Menu
+                            ref={menuReference}
+
                             onKeyDown={preventEnterKeyPropagation}
-                        >
-                            {selection instanceof AbortController ?
-                                <MenuSurface
-                                    anchorCorner="bottomLeft"
-                                    className={
-                                        CSS_CLASS_NAMES.textInputSuggestions +
-                                        ' ' +
-                                        CSS_CLASS_NAMES
-                                            .textInputSuggestionsPending
-                                    }
-                                    open={true}
-                                >
-                                    <CircularProgress size="large" />
-                                </MenuSurface> :
-                                <Menu
-                                    anchorCorner="bottomLeft"
-                                    apiRef={(instance: MenuApi | null) => {
-                                        suggestionMenuAPIReference.current =
-                                            instance
-                                    }}
-                                    className={
-                                        CSS_CLASS_NAMES.textInputSuggestions
-                                    }
-                                    focusOnOpen={false}
-                                    foundationRef={
-                                        suggestionMenuFoundationReference
-                                    }
-                                    onFocus={onFocus}
-                                    onSelect={(event: MenuOnSelectEventT) => {
-                                        onChangeValue(
-                                            currentSuggestionValues[
-                                                (event as
-                                                    {detail: {index: number}}
-                                                ).detail.index
-                                            ] as Type,
-                                            (event as {detail: {index: number}})
-                                                .detail.index
+                            pending={selection instanceof AbortController}
+
+                            classNames={[CSS_CLASS_NAMES.textInputSuggestions]}
+                            pendingClassNames={[
+                                CSS_CLASS_NAMES.textInputSuggestionsPending
+                            ]}
+                            onFocus={onFocus}
+                            onSelect={(event: SyntheticEvent) => {
+                                onChangeValue(
+                                    currentSuggestionValues[
+                                        (event as
+                                            unknown as
+                                            {detail: {index: number}}
                                         )
-                                        setIsSuggestionOpen(false)
-                                    }}
-                                    open={
-                                        Boolean(
-                                            currentSuggestionLabels.length
-                                        ) &&
-                                        isSuggestionOpen &&
-                                        /*
-                                            NOTE: If single possibility is
-                                            already selected avoid showing this
-                                            suggestion.
-                                        */
-                                        !(
-                                            currentSuggestionLabels.length ===
-                                                1 &&
-                                            currentSuggestionLabels[0] ===
-                                                properties.representation
-                                        )
-                                    }
-                                >
-                                    {currentRenderableSuggestions}
-                                </Menu>
+                                            .detail.index
+                                    ] as Type,
+                                    (event as
+                                        unknown as
+                                        {detail: {index: number}}
+                                    ).detail.index
+                                )
+                                setIsSuggestionOpen(false)
+                            }}
+                            open={
+                                Boolean(currentSuggestionLabels.length) &&
+                                isSuggestionOpen &&
+                                /*
+                                    NOTE: If single possibility is already
+                                    selected avoid showing this suggestion.
+                                */
+                                !(
+                                    currentSuggestionLabels.length === 1 &&
+                                    currentSuggestionLabels[0] ===
+                                        properties.representation
+                                )
                             }
-                        </MenuSurfaceAnchor> :
+
+                            options={currentRenderableSuggestions}
+                        /> :
                         ''
                     }
                     {

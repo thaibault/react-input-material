@@ -1,10 +1,26 @@
+// -*- coding: utf-8 -*-
+/** @module Select */
+'use strict'
+/* !
+    region header
+    [Project page](https://torben.website/react-material-input)
+
+    Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
+
+    License
+    -------
+
+    This library written by Torben Sickert stand under a creative commons
+    naming 3.0 unported license.
+    See https://creativecommons.org/licenses/by/3.0/deed.de
+    endregion
+*/
+// region imports
 import {MDCSelectFoundation} from '@material/select'
 import {OptionsType, Select as RMWCSelect} from '@rmwc/select'
 import {
     ForwardedRef,
     forwardRef, memo as memorize,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
     ReactElement,
     useImperativeHandle,
     useRef
@@ -12,17 +28,14 @@ import {
 
 import {InputReference, SelectProperties} from '../type'
 import {useMemorizedValue} from 'react-generic-tools'
-
+// endregion
 export const SelectInner = function<Type = unknown>(
     properties: SelectProperties<Type>,
     reference?: ForwardedRef<InputReference>
 ): ReactElement {
-    const baseReference: RefObject<HTMLSelectElement | null> =
-        useRef<HTMLSelectElement>(null)
-    const foundationReference: RefObject<MDCSelectFoundation | null> =
-        useRef<MDCSelectFoundation>(null)
-    const inputReference: RefObject<HTMLSelectElement | null> =
-        useRef<HTMLSelectElement>(null)
+    const baseReference = useRef<HTMLSelectElement>(null)
+    const foundationReference = useRef<MDCSelectFoundation>(null)
+    const inputReference = useRef<HTMLSelectElement>(null)
 
     useImperativeHandle(
         reference,
@@ -68,7 +81,6 @@ export const SelectInner = function<Type = unknown>(
         {...properties.componentProperties}
     />
 }
-export const Select =
-    memorize(forwardRef(SelectInner)) as typeof SelectInner
+export const Select = memorize(forwardRef(SelectInner)) as typeof SelectInner
 
 export default Select

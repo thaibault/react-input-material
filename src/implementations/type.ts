@@ -131,6 +131,22 @@ TextInputProperties<Type> {
     value: Type
 }
 
+export interface MenuProperties extends LowLevelBaseComponentProperties {
+    options: Array<ReactNode>
+
+    itemClassNames?: Array<string>
+    pendingClassNames?: Array<string>
+
+    open?: boolean
+    pending?: boolean
+
+    onSelect?: (event: SyntheticEvent) => void
+}
+
+export interface MenuReference {
+    focusItem: (index: number) => void
+}
+
 export interface TypeTextInputProperties<Type>
     extends
 TextInputProperties<Type> {
