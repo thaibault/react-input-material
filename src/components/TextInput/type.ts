@@ -156,6 +156,10 @@ export type DataTransformation =
     }
     /* eslint-enable @typescript-eslint/consistent-indexed-object-style */
 // endregion
+export interface EditorReference {
+    input: RefObject<InputEventMapperReference | null>
+}
+
 export interface EditorProperties
     extends
 Omit<NonNullable<TextAreaProperties>, 'onChange' | 'textarea' | 'value'> {

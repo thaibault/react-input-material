@@ -56,16 +56,16 @@ import {
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
     ReactElement,
-    useEffect,
+    useEffect, useImperativeHandle,
     useRef
 } from 'react'
 
 import {TextAreaProperties} from '../../../implementations/type'
-import EditorWrapper, {
+import InputEventMapper, {
     Reference as InputEventMapperReference
 } from '../InputEventMapperWrapper'
 import cssClassNames from '../style.module'
-import {CodeMirrorProps} from '../type'
+import {CodeMirrorProps, EditorReference} from '../type'
 // endregion
 export const BASIC_KEYMAPS: Array<KeyBinding> =
     autocompletion as typeof autocompletion | undefined ?
@@ -104,9 +104,13 @@ export const BASIC_EXTENSIONS: Extension =
         []
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
+export interface Reference extends EditorReference {
+    editorView: RefObject<EditorView | null>
+    editorViewReference: RefObject<HTMLDivElement | null>
+}
+
 export const Index = forwardRef((
-    properties: CodeMirrorProps,
-    givenReference?: ForwardedRef<InputEventMapperReference>
+    properties: CodeMirrorProps, reference?: ForwardedRef<Reference>
 ): ReactElement => {
     if (!(
         autocompletion as typeof autocompletion | undefined &&
@@ -121,15 +125,19 @@ export const Index = forwardRef((
 
     const value = properties.value ?? ''
 
-    const localReference = useRef<InputEventMapperReference | null>(null)
-    const reference: RefObject<InputEventMapperReference | null> =
-        (
-            givenReference as
-                null | RefObject<InputEventMapperReference | null>
-        ) ??
-        localReference
-    const editorViewReference = useRef<HTMLDivElement | null>(null)
+    const inputEventMapperReference =
+        useRef<InputEventMapperReference | null>(null)
     const editorView = useRef<EditorView | null>(null)
+    const editorViewReference = useRef<HTMLDivElement | null>(null)
+
+    useImperativeHandle(
+        reference,
+        () => ({
+            input: inputEventMapperReference,
+            editorView,
+            editorViewReference
+        })
+    )
 
     const onChange = (viewUpdate: ViewUpdate) => {
         if (properties.disabled)
@@ -137,7 +145,8 @@ export const Index = forwardRef((
 
         const newValue = viewUpdate.state.doc.toString()
 
-        reference.current?.eventMapper.input(newValue, viewUpdate)
+        inputEventMapperReference.current?.eventMapper
+            .input(newValue, viewUpdate)
 
         if (properties.onChange)
             properties.onChange(newValue)
@@ -195,7 +204,8 @@ export const Index = forwardRef((
     )
 
     const clientHeight =
-        reference.current?.input?.current?.input?.current?.clientHeight
+        inputEventMapperReference
+            .current?.input?.current?.input?.current?.clientHeight
     useEffect(
         () => {
             let id: null | ReturnType<typeof setTimeout> = null
@@ -229,10 +239,10 @@ export const Index = forwardRef((
         [editorViewReference.current, clientHeight]
     )
 
-    return <EditorWrapper
+    return <InputEventMapper
         {...(properties as TextAreaProperties)}
 
-        ref={reference}
+        ref={inputEventMapperReference}
 
         value={value as string | undefined}
 
@@ -246,13 +256,13 @@ export const Index = forwardRef((
             ref={editorViewReference}
 
             onBlur={(event: FocusEvent<HTMLDivElement>) => {
-                reference.current?.eventMapper.blur(event)
+                inputEventMapperReference.current?.eventMapper.blur(event)
 
                 if (properties.onBlur)
                     properties.onBlur(event)
             }}
             onFocus={(event: FocusEvent<HTMLDivElement>) => {
-                reference.current?.eventMapper.focus(event)
+                inputEventMapperReference.current?.eventMapper.focus(event)
 
                 if (properties.onFocus)
                     properties.onFocus(event)
@@ -262,7 +272,7 @@ export const Index = forwardRef((
                 `${CSS_CLASS_NAMES.codeEditorView} mdc-text-field__input`
             }
         ></div>
-    </EditorWrapper>
+    </InputEventMapper>
 })
 
 export default Index

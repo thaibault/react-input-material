@@ -103,7 +103,10 @@ import {
     TypeTextInputProperties
 } from '../../implementations/type'
 
-import CodeEditorComponent from './CodeMirror'
+import CodeEditorComponent, {
+    Reference as CodeMirrorReference
+} from './CodeMirror'
+import RichTextEditorComponent, {Reference as TipTapReference} from './Tiptap'
 import {
     CSS_CLASS_NAMES,
     determineValidationState,
@@ -114,7 +117,6 @@ import {
     TIPTAP_DEFAULT_OPTIONS,
     UseAnimations
 } from './helper'
-import RichTextEditorComponent from './Tiptap'
 import {
     AdapterWithReferences, CodeMirrorProperties,
     CodeMirrorProperties as CodeEditorProperties,
@@ -123,7 +125,7 @@ import {
     DataTransformSpecification,
     defaultModelState,
     DefaultProperties,
-    defaultProperties,
+    defaultProperties, EditorReference,
     Model,
     ModelState,
     NativeType,
@@ -188,17 +190,22 @@ export const TextInputInner = function<Type = unknown>(
      */
     useEffect(() => {
         if (inputReference.current?.input?.current) {
-            let inputDomNode = inputReference.current.input.current as
-                HTMLInputElement |
-                HTMLSelectElement |
-                HTMLTextAreaElement |
-                TextAreaReference
-            if ((inputDomNode as Partial<TextAreaReference>).input?.current)
-                inputDomNode =
-                    (inputDomNode as TextAreaReference).input.current as
-                        HTMLTextAreaElement
-            else
+            let input = inputReference.current.input.current as
+                HTMLElement |
+                TextAreaReference |
+                EditorReference
+            if ((input as Partial<TextAreaReference>).input?.current) {
+                input =
+                    (input as Partial<TextAreaReference | EditorReference>)
+                    .input?.current as
+                        HTMLElement | TextAreaReference
+                if ((input as Partial<TextAreaReference>).input?.current)
+                    input =
+                        (input as Partial<TextAreaReference>).input?.current as
+                            HTMLElement
+            } else
                 return
+            const inputDomNode = input as HTMLElement
 
             const determinedInputProps: Mapping<boolean | number | string> = {}
             const propsToRemove: Array<string> = []
@@ -1286,7 +1293,7 @@ export const TextInputInner = function<Type = unknown>(
             return result
         })
     }
-    // endregions
+    // endregion
     // region properties
     /// region references
     const inputReference =
@@ -1785,7 +1792,7 @@ export const TextInputInner = function<Type = unknown>(
                             }
 
                             ref={inputReference as
-                                RefObject<InputEventMapperReference>
+                                RefObject<CodeMirrorReference>
                             }
                         />,
                         isAdvancedEditor
@@ -1801,9 +1808,7 @@ export const TextInputInner = function<Type = unknown>(
 
                         {...editorProperties as Partial<TiptapProperties>}
 
-                        ref={inputReference as
-                            RefObject<InputEventMapperReference>
-                        }
+                        ref={inputReference as RefObject<TipTapReference>}
                     /> :
                 ''
             }

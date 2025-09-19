@@ -23,25 +23,29 @@ import StarterKit from '@tiptap/starter-kit'
 import {Mapping} from 'clientnode'
 import {
     ForwardedRef, forwardRef,
-    MutableRefObject as RefObject, ReactElement, useEffect, useRef
+    MutableRefObject as RefObject, ReactElement, useEffect,
+    useImperativeHandle, useRef
 } from 'react'
 import Dummy from 'react-generic-dummy'
 
 import {TextAreaProperties} from '../../../implementations/type'
-import EditorWrapper, {
+import InputEventMapper, {
     Reference as InputEventMapperReference
 } from '../InputEventMapperWrapper'
 import cssClassNames from '../style.module'
-import {TiptapProps} from '../type'
+import {EditorReference, TiptapProps} from '../type'
 
 import MenuBar from './MenuBar'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 export const VIEW_CONTENT_OFFSET_IN_PX = 8
 
+export interface Reference extends EditorReference {
+    editorViewReference: RefObject<HTMLDivElement | null>
+}
+
 export const Index = forwardRef((
-    properties: TiptapProps,
-    givenReference?: ForwardedRef<InputEventMapperReference>
+    properties: TiptapProps, reference?: ForwardedRef<Reference>
 ): ReactElement => {
     if (
         !(useEditor as typeof useEditor | undefined) ||
@@ -51,13 +55,17 @@ export const Index = forwardRef((
 
     const value = properties.value ?? ''
 
-    const localReference = useRef<InputEventMapperReference | null>(null)
-    const reference: RefObject<InputEventMapperReference | null> =
-        (
-            givenReference as null | RefObject<InputEventMapperReference | null>
-        ) ??
-        localReference
+    const inputEventMapperReference =
+        useRef<InputEventMapperReference | null>(null)
     const editorViewReference = useRef<HTMLDivElement | null>(null)
+
+    useImperativeHandle(
+        reference,
+        () => ({
+            input: inputEventMapperReference,
+            editorViewReference
+        })
+    )
 
     const extensions =
         properties.editor?.extensions ||
@@ -69,13 +77,13 @@ export const Index = forwardRef((
         editable: !properties.disabled,
         content: String(value),
         onBlur: (editorEvent: EditorEvents['focus']) => {
-            reference.current?.eventMapper.blur(editorEvent)
+            inputEventMapperReference.current?.eventMapper.blur(editorEvent)
 
             if (properties.onBlur)
                 properties.onBlur(editorEvent)
         },
         onFocus: (editorEvent: EditorEvents['focus']) => {
-            reference.current?.eventMapper.focus(editorEvent)
+            inputEventMapperReference.current?.eventMapper.focus(editorEvent)
 
             if (properties.onFocus)
                 properties.onFocus(editorEvent)
@@ -83,7 +91,7 @@ export const Index = forwardRef((
         onUpdate: (editorEvent) => {
             const html = editorEvent.editor.getHTML()
 
-            reference.current?.eventMapper.input(
+            inputEventMapperReference.current?.eventMapper.input(
                 html === '<p></p>' ? '' : html, editorEvent
             )
 
@@ -97,7 +105,8 @@ export const Index = forwardRef((
     const htmlContent = editor.getHTML()
 
     const clientHeight =
-        reference.current?.input?.current?.input?.current?.clientHeight
+        inputEventMapperReference
+            .current?.input?.current?.input?.current?.clientHeight
     useEffect(
         () => {
             if (editorViewReference.current && clientHeight)
@@ -107,10 +116,10 @@ export const Index = forwardRef((
         [editorViewReference.current, clientHeight]
     )
 
-    return <EditorWrapper
+    return <InputEventMapper
         {...(properties as TextAreaProperties)}
 
-        ref={reference}
+        ref={inputEventMapperReference}
 
         barContentSlot={<MenuBar editor={editor}/>}
 
@@ -129,7 +138,7 @@ export const Index = forwardRef((
             editor={editor}
             innerRef={editorViewReference}
         />
-    </EditorWrapper>
+    </InputEventMapper>
 })
 
 export default Index
