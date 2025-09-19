@@ -318,7 +318,7 @@ const Application = () => {
 
                     <TextInput<string>
                         declaration="This text can be seen initially."
-                        inputProps={{
+                        attributes={{
                             ariaChecked: false,
                             ariaDescription: 'test'
                         }}

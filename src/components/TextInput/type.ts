@@ -330,7 +330,7 @@ export interface Properties<Type = unknown> extends
         TextFieldProperties |
         Mapping<unknown>
     >
-    inputProps?: Mapping<boolean | number | string>
+    attributes?: Mapping<boolean | number | string>
 
     invertedPattern: Array<RegExp | string> | null | RegExp | string
     invertedPatternText: string
@@ -492,7 +492,7 @@ export const propertyTypes: ValidationMapping = {
     icon: oneOfType([string, object]),
     trailingIcon: oneOfType([string, object]),
 
-    inputProps: object,
+    attributes: object,
 
     invertedPattern: oneOfType(
         [arrayOf(oneOfType([object, string])), object, string]

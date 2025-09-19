@@ -237,12 +237,12 @@ export const TextInputInner = function<Type = unknown>(
             else
                 propsToRemove.push('ariaDescribedby')
 
-            const inputProps = {
-                ...determinedInputProps, ...properties.inputProps || {}
+            const attributes = {
+                ...determinedInputProps, ...properties.attributes || {}
             }
 
             // Apply configured native input properties.
-            for (const [name, value] of Object.entries(inputProps)) {
+            for (const [name, value] of Object.entries(attributes)) {
                 const attributeName: string = camelCaseToDelimited(name)
 
                 if (typeof value === 'boolean')
