@@ -53,6 +53,8 @@ export const TextField = forwardRef((
         <RMWCTextField
             characterCount={properties.characterCount && isMaximumLength}
 
+            disabled={properties.disabled}
+
             label={properties.label}
             placeholder={properties.placeholder}
 
@@ -83,7 +85,6 @@ export const TextField = forwardRef((
                 properties.name,
                 properties.onClick,
                 properties.onKeyUp,
-                properties.disabled,
                 properties.domNodeProperties
             )}
 

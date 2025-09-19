@@ -207,7 +207,7 @@ export const TextInputInner = function<Type = unknown>(
                 return
             const inputDomNode = input as HTMLElement
 
-            const determinedInputProps: Mapping<boolean | number | string> = {}
+            const determinedAttributes: Mapping<boolean | number | string> = {}
             const propsToRemove: Array<string> = []
 
             // Apply aria attributes regarding validation state.
@@ -215,17 +215,17 @@ export const TextInputInner = function<Type = unknown>(
                 propsToRemove.push('ariaErrormessage')
                 propsToRemove.push('ariaInvalid')
             } else {
-                determinedInputProps.ariaErrormessage =
+                determinedAttributes.ariaErrormessage =
                     `${id}-error-message`
-                determinedInputProps.ariaInvalid = 'true'
+                determinedAttributes.ariaInvalid = 'true'
             }
 
             // Apply aria attributes regarding searching.
             if (useSuggestions) {
                 if (inputDomNode.getAttribute('type') !== 'search')
-                    determinedInputProps.role = 'searchbox'
+                    determinedAttributes.role = 'searchbox'
 
-                determinedInputProps.ariaAutocomplete =
+                determinedAttributes.ariaAutocomplete =
                     properties.searchSelection ? 'inline' : 'list'
             } else {
                 propsToRemove.push('searchbox')
@@ -233,12 +233,12 @@ export const TextInputInner = function<Type = unknown>(
             }
 
             if (properties.showDeclaration)
-                determinedInputProps.ariaDescribedby = `${id}-declaration`
+                determinedAttributes.ariaDescribedby = `${id}-declaration`
             else
                 propsToRemove.push('ariaDescribedby')
 
             const attributes = {
-                ...determinedInputProps, ...properties.attributes || {}
+                ...determinedAttributes, ...properties.attributes || {}
             }
 
             // Apply configured native input properties.

@@ -34,6 +34,8 @@ export const SelectInner = function<Type = unknown>(
     )
 
     return <RMWCSelect
+        disabled={properties.disabled}
+
         rootProps={useMemorizedValue(
             {
                 name: properties.name,
