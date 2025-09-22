@@ -113,6 +113,13 @@ LowLevelBaseComponentProperties {
     onChange?: (eventOrValue: GenericEvent<Type> | Type) => void
 }
 
+export interface CardReference {
+}
+
+export interface CardProperties extends LowLevelBaseComponentProperties {
+    ref?: RefObject<CardReference | null>
+}
+
 export interface CheckboxProperties extends InputProperties<boolean> {
     indeterminate?: boolean
 
@@ -132,6 +139,10 @@ TextInputProperties<Type> {
     value: Type
 }
 
+export interface MenuReference {
+    focusItem: (index: number) => void
+}
+
 export interface MenuProperties extends LowLevelBaseComponentProperties {
     ref?: RefObject<MenuReference | null>
 
@@ -144,10 +155,6 @@ export interface MenuProperties extends LowLevelBaseComponentProperties {
     pending?: boolean
 
     onSelect?: (event: SyntheticEvent) => void
-}
-
-export interface MenuReference {
-    focusItem: (index: number) => void
 }
 
 export interface TypeTextInputProperties<Type>
