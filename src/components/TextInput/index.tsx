@@ -1293,7 +1293,8 @@ export const TextInputInner = function<Type = unknown>(
     const inputReference =
         useRef<InputReference | InputEventMapperReference>(null)
     const wrapperReference = useRef<HTMLDivElement>(null)
-    const menuReference = useRef<MenuReference>(null)
+    const menuReference: RefObject<MenuReference | null> =
+        useRef<MenuReference>(null)
     /// endregion
     const givenProps: Props<Type> = translateKnownSymbols(props)
 
@@ -1586,7 +1587,7 @@ export const TextInputInner = function<Type = unknown>(
             ) {
                 currentRenderableSuggestions.push(
                     (mark(
-                        suggestion,
+                        console.log('S', suggestion) || suggestion,
                         (
                             properties.representation as string | null
                         )?.split(' ') || '',

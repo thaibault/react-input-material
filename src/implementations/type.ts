@@ -21,6 +21,7 @@ import {
     FocusEvent as ReactFocusEvent,
     KeyboardEvent as ReactKeyboardEvent,
     MouseEvent as ReactMouseEvent,
+    // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
     ReactNode,
     SyntheticEvent
@@ -132,6 +133,8 @@ TextInputProperties<Type> {
 }
 
 export interface MenuProperties extends LowLevelBaseComponentProperties {
+    ref?: RefObject<MenuReference | null>
+
     options: Array<ReactNode>
 
     itemClassNames?: Array<string>

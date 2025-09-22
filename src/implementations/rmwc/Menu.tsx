@@ -27,7 +27,10 @@ import {
 } from '@rmwc/menu'
 import React, {
     ForwardedRef,
-    forwardRef, memo as memorize, MutableRefObject as RefObject,
+    forwardRef,
+    memo as memorize,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject,
     ReactElement,
     useImperativeHandle,
     useRef
