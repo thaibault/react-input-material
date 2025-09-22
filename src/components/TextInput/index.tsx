@@ -1803,9 +1803,13 @@ export const TextInputInner = function<Type = unknown>(
                             pending={selection instanceof AbortController}
 
                             classNames={[CSS_CLASS_NAMES.textInputSuggestions]}
+                            itemClassNames={[
+                                CSS_CLASS_NAMES.textInputSuggestionsSuggestion
+                            ]}
                             pendingClassNames={[
                                 CSS_CLASS_NAMES.textInputSuggestionsPending
                             ]}
+
                             onFocus={onFocus}
                             onSelect={(event: SyntheticEvent) => {
                                 onChangeValue(
