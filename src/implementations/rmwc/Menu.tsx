@@ -85,8 +85,8 @@ export const MenuInner = function(
                 anchorCorner="bottomLeft"
 
                 apiRef={(instance: MenuApi | null) => {
-                    // @ts-expect-error rmwc used old ref assigning way here.
-                    suggestionMenuAPIReference.current = instance
+                    (suggestionMenuAPIReference as {current: MenuApi | null})
+                        .current = instance
                 }}
                 className={properties.classNames?.join(' ')}
 

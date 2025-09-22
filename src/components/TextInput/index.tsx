@@ -1585,31 +1585,30 @@ export const TextInputInner = function<Type = unknown>(
                     suggestion as string, properties.representation as string
                 )
             ) {
-                currentRenderableSuggestions.push(
-                    (mark(
-                        console.log('S', suggestion) || suggestion,
-                        (
-                            properties.representation as string | null
-                        )?.split(' ') || '',
-                        {
-                            marker: (foundWord: string): ReactElement =>
-                                <span className={
-                                    CSS_CLASS_NAMES
-                                        .textInputSuggestionsSuggestionMark
-                                }>
-                                    {foundWord}
-                                </span>,
-                            normalizer: (value: unknown): string =>
-                                String(value).toLowerCase(),
-                            skipTagDelimitedParts: null
-                        }
-                    ) as Array<ReactElement | string>)
-                        .map((
+                const marked = (mark(
+                    suggestion,
+                    (
+                        properties.representation as string | null
+                    )?.split(' ') || '',
+                    {
+                        marker: (foundWord: string): ReactElement =>
+                            <span className={
+                                CSS_CLASS_NAMES
+                                    .textInputSuggestionsSuggestionMark
+                            }>
+                                {foundWord}
+                            </span>,
+                        normalizer: (value: unknown): string =>
+                            String(value).toLowerCase(),
+                        skipTagDelimitedParts: null
+                    }
+                ) as Array<ReactElement | string>)
+                    .map((
                             item: ReactNode | string, index: number
                         ): ReactElement =>
                             <span key={index}>{item}</span>
-                        )
-                )
+                    )
+                currentRenderableSuggestions.push(marked)
                 currentSuggestionLabels.push(suggestion)
                 currentSuggestionValues.push(suggestionValues[index])
             }
