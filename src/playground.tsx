@@ -487,6 +487,7 @@ const Application = () => {
                             description: 'numberInput1ModelDescription',
                             maximum: 200000,
                             minimum: 10,
+                            mutable: false,
                             name: 'numberInput1Model',
                             nullable: false,
                             type: 'number'
@@ -1280,7 +1281,7 @@ const Application = () => {
                             'none'
                     }}
                 >
-                    {/* region file-input inputs */}
+                    {/* region file */}
                     <Inputs<FileInputValue | null, FileInputProps>
                         name="fileInputs"
                         createItem={useMemorizedValue(
@@ -1302,7 +1303,7 @@ const Application = () => {
                         )}
                     </Inputs>
                     {/* endregion */}
-                    {/* region checkbox inputs */}
+                    {/* region checkbox */}
                     <Inputs<boolean | null, CheckboxProps>
                         createItem={useMemorizedValue(({
                             index, item, properties: {name}
