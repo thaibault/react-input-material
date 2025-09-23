@@ -124,6 +124,9 @@ export interface MediaCardReference {
     card?: RefObject<HTMLDivElement | null>
     fileInput?: RefObject<HTMLInputElement | null>
     iFrame?: RefObject<HTMLIFrameElement | null>
+
+    uploadButton?: RefObject<HTMLDivElement | null>
+    downloadLink?: RefObject<HTMLAnchorElement | null>
 }
 
 export interface MediaCardProperties extends LowLevelBaseComponentProperties {
@@ -134,6 +137,14 @@ export interface MediaCardProperties extends LowLevelBaseComponentProperties {
     infoClassNames?: Array<string>
     infoBodyClassNames?: Array<string>
     fileInputClassNames?: Array<string>
+    downloadLinkClassNames?: Array<string>
+
+    deleteButton: ReactNode
+    downloadButton: ReactNode
+    editButton: ReactNode
+    newButton: ReactNode
+
+    fileName?: string
 
     name: string
     description?: string
@@ -149,8 +160,9 @@ export interface MediaCardProperties extends LowLevelBaseComponentProperties {
     disabled?: boolean
     invalid?: boolean
     errorMessage?: string
+    empty?: boolean
 
-    onChange?: (event: SyntheticEvent) => void
+    onChange?: (event?: SyntheticEvent) => void
 }
 
 export interface CheckboxProperties extends InputProperties<boolean> {

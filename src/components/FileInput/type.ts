@@ -33,7 +33,6 @@ import BasePropertyTypes, {
 import {
     ElementType,
     ForwardRefExoticComponent,
-    HTMLProps,
     ReactElement,
     ReactNode,
     RefAttributes,
@@ -41,8 +40,6 @@ import {
 } from 'react'
 
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
-import {ComponentProps as RMWCComponentProps} from '@rmwc/types'
-import {CardMediaProps} from '@rmwc/card'
 
 import {
     defaultInputModel as defaultTextInputModel,
@@ -149,8 +146,6 @@ export interface Properties<
         prototype: TextInputProps<string>,
         properties: Properties<Type, MediaTag>
     ) => TextInputProps<string> | null
-
-    media: RMWCComponentProps<CardMediaProps, HTMLProps<HTMLElement>, MediaTag>
 
     model: Model<Type>
 
@@ -353,10 +348,6 @@ export const defaultProperties: DefaultProperties = {
     encoding: 'utf-8',
 
     generateFileNameInputProperties: identity,
-
-    media: {
-        sixteenByNine: true
-    },
 
     model: {...defaultModel},
 

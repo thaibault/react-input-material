@@ -17,7 +17,6 @@
     endregion
 */
 // region imports
-import {CardActionButton, CardActionButtons, CardActions} from '@rmwc/card'
 import {dataURLToBlob} from 'blob-util'
 import {copy, equals, extend, mask} from 'clientnode'
 import {
@@ -435,15 +434,8 @@ export const FileInputInner = function<Type extends Value = Value>(
     // endregion
     // region references
     const mediaCardReference = useRef<MediaCardReference>(null)
-
-    const deleteButtonReference: RefObject<HTMLButtonElement | null> =
-        useRef<HTMLButtonElement>(null)
-    const downloadLinkReference: RefObject<HTMLAnchorElement | null> =
-        useRef<HTMLAnchorElement>(null)
     const nameInputReference: RefObject<TextInputAdapter<string> | null> =
         useRef<TextInputAdapter<string>>(null)
-    const uploadButtonReference: RefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement>(null)
     // endregion
     // region properties
     const givenProps: Props<Type> = translateKnownSymbols(props)
@@ -541,19 +533,13 @@ export const FileInputInner = function<Type extends Value = Value>(
         (): Adapter<Type> & {
             references: {
                 mediaCard: RefObject<MediaCardReference | null>
-                deleteButton: RefObject<HTMLButtonElement | null>
-                downloadLink: RefObject<HTMLAnchorElement | null>
                 nameInput: RefObject<TextInputAdapter<string> | null>
-                uploadButton: RefObject<HTMLDivElement | null>
             }
         } => ({
             properties,
             references: {
                 mediaCard: mediaCardReference,
-                deleteButton: deleteButtonReference,
-                downloadLink: downloadLinkReference,
-                nameInput: nameInputReference,
-                uploadButton: uploadButtonReference
+                nameInput: nameInputReference
             },
             state: {
                 modelState: properties.model.state as ModelState,
@@ -726,9 +712,17 @@ export const FileInputInner = function<Type extends Value = Value>(
                 [CSS_CLASS_NAMES.fileInputTextRepresentation]
             }
             infoClassNames={[CSS_CLASS_NAMES.fileInputInfo]}
+            downloadLinkClassNames={[CSS_CLASS_NAMES.fileInputDownload]}
             infoBodyClassNames={[CSS_CLASS_NAMES.fileInputInfoBody]}
             fileInputClassNames={[CSS_CLASS_NAMES.fileInputNative]}
             styles={properties.styles}
+
+            deleteButton={properties.deleteButton}
+            downloadButton={properties.downloadButton}
+            editButton={properties.editButton}
+            newButton={properties.newButton}
+
+            fileName={properties.value?.name}
 
             type={properties.value?.url ?
                 representationType === RepresentationType.IMAGE ?
@@ -749,6 +743,7 @@ export const FileInputInner = function<Type extends Value = Value>(
 
             disabled={properties.disabled}
             invalid={invalid}
+            empty={!properties.value}
 
             description={properties.description}
             name={properties.name}
@@ -757,11 +752,8 @@ export const FileInputInner = function<Type extends Value = Value>(
                 properties.invalidContentTypePattern &&
                 properties.contentTypePatternText ||
 
-                properties[
-                    'invalidInvertedContentTypePattern'
-                    ] &&
-                properties
-                    .invertedContentTypePatternText ||
+                properties.invalidInvertedContentTypePattern &&
+                properties.invertedContentTypePatternText ||
 
                 properties.invalidMaximumSize &&
                 properties.maximumSizeText ||
@@ -824,98 +816,6 @@ export const FileInputInner = function<Type extends Value = Value>(
                 ''
             }
         </MediaCard>
-
-        {(
-            (
-                !properties.disabled &&
-                (
-                    properties.value ?
-                        properties.editButton :
-                        properties.newButton
-                )
-            ) ||
-            (
-                properties.value &&
-                (
-                    (!properties.disabled && properties.deleteButton) ||
-                    (properties.value.url && properties.downloadButton)
-                )
-            )
-        ) ?
-            <CardActions>
-                <CardActionButtons>
-                    {(
-                        !properties.disabled &&
-                        (
-                            properties.value ?
-                                properties.editButton :
-                                properties.newButton
-                        )
-                    ) ?
-                        <CardActionButton
-                            onClick={() => {
-                                mediaCardReference
-                                    .current?.fileInput?.current?.click()
-                            }}
-                            ref={uploadButtonReference}
-                        >
-                            {properties.value ?
-                                properties.editButton :
-                                properties.newButton
-                            }
-                        </CardActionButton> :
-                        ''
-                    }
-                    {properties.value ?
-                        <>
-                            {(
-                                !properties.disabled &&
-                                properties.deleteButton
-                            ) ?
-                                <CardActionButton
-                                    onClick={() => {
-                                        onChangeValue()
-                                    }}
-                                    ref={deleteButtonReference}
-                                >
-                                    {properties.deleteButton}
-                                </CardActionButton> :
-                                ''
-                            }
-                            {(
-                                properties.value.url &&
-                                properties.downloadButton
-                            ) ?
-                                <CardActionButton
-                                    onClick={() => {
-                                        downloadLinkReference
-                                            .current?.click()
-                                    }}
-                                >
-                                    <a
-                                        className={
-                                            CSS_CLASS_NAMES
-                                                .fileInputDownload
-                                        }
-                                        download={properties.value.name}
-                                        href={properties.value.url}
-                                        ref={downloadLinkReference}
-                                        target="_blank"
-                                        {...(contentType ?
-                                            {type: contentType} :
-                                            {}
-                                        )}
-                                    >{properties.downloadButton}</a>
-                                </CardActionButton> :
-                                ''
-                            }
-                        </> :
-                        ''
-                    }
-                </CardActionButtons>
-            </CardActions> :
-            ''
-        }
     </WrapConfigurations>
     // endregion
 }

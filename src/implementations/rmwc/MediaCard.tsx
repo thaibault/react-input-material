@@ -26,13 +26,13 @@ import {
     CardMedia,
     CardPrimaryAction
 } from '@rmwc/card'
-import {mask} from 'clientnode'
 import React, {
     ForwardedRef,
     forwardRef,
     memo as memorize,
     ReactElement,
-    ReactNode, useId,
+    ReactNode,
+    useId,
     useImperativeHandle,
     useRef
 } from 'react'
@@ -41,18 +41,8 @@ import GenericAnimate from 'react-generic-animate'
 import CircularProgress from './CircularProgress'
 
 import {
-    MediaCardProperties,
-    MediaCardReference,
-    MediaCardRepresentationType
+    MediaCardProperties, MediaCardReference, MediaCardRepresentationType
 } from '../type'
-import {
-    defaultFileNameInputProperties,
-    Properties,
-    Value
-} from '../../components/FileInput/type'
-import TextInput from '../../components/TextInput'
-import {Props as TextInputProps} from '../../components/TextInput/type'
-
 // endregion
 export const MediaCardInner = function(
     properties: MediaCardProperties,
@@ -60,20 +50,28 @@ export const MediaCardInner = function(
 ): ReactElement {
     const defaultID = useId()
     const id = properties.id ?? defaultID
-
+    // region references
     const cardReference = useRef<HTMLDivElement | null>(null)
     const fileInputReference = useRef<HTMLInputElement | null>(null)
     const iFrameReference = useRef<HTMLIFrameElement | null>(null)
+
+    const deleteButtonReference = useRef<HTMLButtonElement>(null)
+    const downloadLinkReference = useRef<HTMLAnchorElement>(null)
+    const uploadButtonReference = useRef<HTMLDivElement>(null)
 
     useImperativeHandle(
         reference,
         () => ({
             card: cardReference,
             fileInput: fileInputReference,
-            iFrame: iFrameReference
+            iFrame: iFrameReference,
+
+            deleteButton: deleteButtonReference,
+            downloadLink: downloadLinkReference,
+            uploadButton: uploadButtonReference
         })
     )
-
+    // endregion
     const determineMediaContent = (): ReactNode => {
         if (properties.type === MediaCardRepresentationType.PENDING)
             return <CircularProgress size="large" />
@@ -83,6 +81,7 @@ export const MediaCardInner = function(
             properties.url
         )
             return <CardMedia
+                sixteenByNine
                 style={{backgroundImage: `url(${properties.url})`}}
             />
 
@@ -133,6 +132,7 @@ export const MediaCardInner = function(
                         description
                     }
                 </Typography>
+
                 <GenericAnimate
                     in={properties.invalid || Boolean(properties.declaration)}
                 >
@@ -163,6 +163,7 @@ export const MediaCardInner = function(
 
                 {properties.children}
             </div>
+
             {/* TODO use "accept" attribute for better validation. */}
             <input
                 disabled={properties.disabled}
@@ -183,16 +184,16 @@ export const MediaCardInner = function(
             (
                 !properties.disabled &&
                 (
-                    properties.value ?
-                        properties.editButton :
-                        properties.newButton
+                    properties.empty ?
+                        properties.newButton :
+                        properties.editButton
                 )
             ) ||
             (
-                properties.value &&
+                !properties.empty &&
                 (
                     (!properties.disabled && properties.deleteButton) ||
-                    (properties.value.url && properties.downloadButton)
+                    (properties.url && properties.downloadButton)
                 )
             )
         ) ?
@@ -201,9 +202,9 @@ export const MediaCardInner = function(
                     {(
                         !properties.disabled &&
                         (
-                            properties.value ?
-                                properties.editButton :
-                                properties.newButton
+                            properties.empty ?
+                                properties.newButton :
+                                properties.editButton
                         )
                     ) ?
                         <CardActionButton
@@ -212,14 +213,15 @@ export const MediaCardInner = function(
                             }}
                             ref={uploadButtonReference}
                         >
-                            {properties.value ?
-                                properties.editButton :
-                                properties.newButton
+                            {properties.empty ?
+                                properties.newButton :
+                                properties.editButton
                             }
                         </CardActionButton> :
                         ''
                     }
-                    {properties.value ?
+                    {properties.empty ?
+                        '' :
                         <>
                             {(
                                 !properties.disabled &&
@@ -227,7 +229,8 @@ export const MediaCardInner = function(
                             ) ?
                                 <CardActionButton
                                     onClick={() => {
-                                        onChangeValue()
+                                        if (properties.onChange)
+                                            properties.onChange()
                                     }}
                                     ref={deleteButtonReference}
                                 >
@@ -236,7 +239,7 @@ export const MediaCardInner = function(
                                 ''
                             }
                             {(
-                                properties.value.url &&
+                                properties.url &&
                                 properties.downloadButton
                             ) ?
                                 <CardActionButton
@@ -247,23 +250,27 @@ export const MediaCardInner = function(
                                 >
                                     <a
                                         className={
-                                            CSS_CLASS_NAMES
-                                                .fileInputDownload
+                                            properties
+                                                .downloadLinkClassNames?.join(
+                                                    ' '
+                                                )
                                         }
-                                        download={properties.value.name}
-                                        href={properties.value.url}
+                                        download={properties.fileName}
+
+                                        href={properties.url}
                                         ref={downloadLinkReference}
+
                                         target="_blank"
-                                        {...(contentType ?
-                                                {type: contentType} :
-                                                {}
+
+                                        {...(properties.contentType ?
+                                            {type: properties.contentType} :
+                                            {}
                                         )}
                                     >{properties.downloadButton}</a>
                                 </CardActionButton> :
                                 ''
                             }
-                        </> :
-                        ''
+                        </>
                     }
                 </CardActionButtons>
             </CardActions> :
@@ -271,6 +278,7 @@ export const MediaCardInner = function(
         }
     </Card>
 }
-export const MediaCard = memorize(forwardRef(MediaCardInner)) as typeof MediaCardInner
+export const MediaCard = memorize(forwardRef(MediaCardInner)) as
+    typeof MediaCardInner
 
 export default MediaCard

@@ -15,7 +15,7 @@
 */
 // region imports
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
-import {AnyFunction, timeout} from 'clientnode'
+import {AnyFunction} from 'clientnode'
 import {testEach} from 'clientnode/test-helper'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
@@ -275,7 +275,7 @@ describe('TextInput', () => {
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
-    test('render', async () => {
+    test('render', () => {
         expect(render(<TextInput/>)).toBeDefined()
 
         expect(render(<TextInput/>)?.querySelector('input')).toBeDefined()
