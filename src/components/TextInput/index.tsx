@@ -204,12 +204,12 @@ export const TextInputInner = function<Type = unknown>(
             const inputDomNode = input as HTMLElement
 
             const determinedAttributes: Mapping<boolean | number | string> = {}
-            const propsToRemove: Array<string> = []
+            const attributesToRemove: Array<string> = []
 
             // Apply aria attributes regarding validation state.
             if (properties.valid) {
-                propsToRemove.push('ariaErrormessage')
-                propsToRemove.push('ariaInvalid')
+                attributesToRemove.push('ariaErrormessage')
+                attributesToRemove.push('ariaInvalid')
             } else {
                 determinedAttributes.ariaErrormessage =
                     `${id}-error-message`
@@ -224,14 +224,14 @@ export const TextInputInner = function<Type = unknown>(
                 determinedAttributes.ariaAutocomplete =
                     properties.searchSelection ? 'inline' : 'list'
             } else {
-                propsToRemove.push('searchbox')
-                propsToRemove.push('ariaAutocomplete')
+                attributesToRemove.push('searchbox')
+                attributesToRemove.push('ariaAutocomplete')
             }
 
             if (properties.showDeclaration)
                 determinedAttributes.ariaDescribedby = `${id}-declaration`
             else
-                propsToRemove.push('ariaDescribedby')
+                attributesToRemove.push('ariaDescribedby')
 
             const attributes = {
                 ...determinedAttributes, ...properties.attributes || {}
@@ -250,7 +250,7 @@ export const TextInputInner = function<Type = unknown>(
                     inputDomNode.setAttribute(attributeName, String(value))
             }
 
-            for (const name of propsToRemove) {
+            for (const name of attributesToRemove) {
                 const attributeName: string = camelCaseToDelimited(name)
                 if (inputDomNode.hasAttribute(attributeName))
                     inputDomNode.removeAttribute(attributeName)
