@@ -65,6 +65,7 @@ import {
     StaticWebComponent,
     ValueState as BaseValueState
 } from '../../type'
+import {MediaCardReference} from '../../implementations/type'
 // endregion
 export enum RepresentationType {
     BINARY = 'binary',
@@ -194,11 +195,8 @@ export type Adapter<Type extends Value = Value> =
     >
 export interface AdapterWithReferences extends Adapter {
     references: {
-        deleteButtonReference: RefObject<HTMLButtonElement | null>
-        downloadLinkReference: RefObject<HTMLAnchorElement | null>
-        fileInputReference: RefObject<HTMLInputElement | null>
-        nameInputReference: RefObject<TextInputAdapter<string> | null>
-        uploadButtonReference: RefObject<HTMLButtonElement | null>
+        mediaCard: RefObject<MediaCardReference | null>
+        nameInput: RefObject<TextInputAdapter<string> | null>
     }
 }
 
