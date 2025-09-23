@@ -481,7 +481,7 @@ export const propertyTypes: ValidationMapping = {
 
     hidden: oneOfType([boolean, symbol]),
 
-    icon: oneOfType([string, object]),
+    leadingIcon: oneOfType([string, object]),
     trailingIcon: oneOfType([string, object]),
 
     attributes: object,
