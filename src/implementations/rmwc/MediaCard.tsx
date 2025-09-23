@@ -32,6 +32,7 @@ import React, {
     forwardRef,
     memo as memorize,
     ReactElement,
+    ReactNode, useId,
     useImperativeHandle,
     useRef
 } from 'react'
@@ -49,95 +50,93 @@ import {
     Properties,
     Value
 } from '../../components/FileInput/type'
-import {renderMessage} from '../../helper'
 import TextInput from '../../components/TextInput'
 import {Props as TextInputProps} from '../../components/TextInput/type'
 
 // endregion
-export interface Reference extends MediaCardReference {
-}
-
 export const MediaCardInner = function(
-    {content, contentType, type, url}: MediaCardProperties,
+    properties: MediaCardProperties,
     reference?: ForwardedRef<MediaCardReference | null>
 ): ReactElement {
+    const defaultID = useId()
+    const id = properties.id ?? defaultID
+
     const cardReference = useRef<HTMLDivElement | null>(null)
+    const fileInputReference = useRef<HTMLInputElement | null>(null)
     const iFrameReference = useRef<HTMLIFrameElement | null>(null)
 
     useImperativeHandle(
         reference,
         () => ({
             card: cardReference,
+            fileInput: fileInputReference,
             iFrame: iFrameReference
         })
     )
 
+    const determineMediaContent = (): ReactNode => {
+        if (properties.type === MediaCardRepresentationType.PENDING)
+            return <CircularProgress size="large" />
+
+        if (
+            properties.type === MediaCardRepresentationType.IMAGE &&
+            properties.url
+        )
+            return <CardMedia
+                style={{backgroundImage: `url(${properties.url})`}}
+            />
+
+        if (properties.type === MediaCardRepresentationType.VIDEO)
+            return <video autoPlay loop muted>
+                <source src={properties.url} type={properties.contentType}/>
+            </video>
+
+        if (properties.type === MediaCardRepresentationType.IFRAME)
+            return <div className={
+                (properties.iframeWrapperClassNames)?.join(' ')
+            }>
+                <iframe
+                    ref={iFrameReference}
+                    style={{border: 0, overflow: 'hidden'}}
+                    src={properties.url}
+                />
+            </div>
+
+        if (properties.type === MediaCardRepresentationType.TEXT)
+            return <pre className={
+                properties.textRepresentationClassNames?.join(' ')
+            }>{properties.content}</pre>
+
+        return ''
+    }
+
+    const description = properties.description ?
+        properties.description :
+        properties.name
+
     return <Card
         ref={cardReference}
+
+        className={properties.classNames?.join(' ')}
+        style={properties.styles}
+
+        onBlur={properties.onBlur}
+        onClick={properties.onClick}
+        onFocus={properties.onFocus}
     >
         <CardPrimaryAction>
-            {type === MediaCardRepresentationType.PENDING ?
-                <CircularProgress size="large" /> :
-                type === MediaCardRepresentationType.IMAGE ?
-                    <CardMedia
-                        {...properties.media}
-                        style={{backgroundImage: `url(${url})`}}
-                    /> :
-                    type === MediaCardRepresentationType.VIDEO ?
-                        <video autoPlay loop muted>
-                            <source
-                                src={url}
-                                type={contentType}
-                            />
-                        </video> :
-                        type === MediaCardRepresentationType.TEXT ?
-                            <div className={
-                                [CSS_CLASS_NAMES.fileInputIframeWrapper]
-                                    .concat(
-                                        ['text/html', 'text/plain']
-                                            .includes(contentType) ?
-                                            CSS_CLASS_NAMES[
-                                                'fileInputIframeWrapper' +
-                                                'Padding'
-                                            ] :
-                                            []
-                                    )
-                                    .join(' ')
-                            }>
-                                <iframe
-                                    ref={iFrameReference}
-                                    style={{border: 0, overflow: 'hidden'}}
-                                    src={url}
-                                />
-                            </div> :
-                            type === MediaCardRepresentationType.TEXT ?
-                                <pre
-                                    className={
-                                        CSS_CLASS_NAMES
-                                            .fileInputTextRepresentation
-                                    }
-                                >
-                                    {content}
-                                </pre> :
-                                ''
-            }
-            <div className={CSS_CLASS_NAMES.fileInputInfo}>
+            {determineMediaContent()}
+            <div className={properties.infoClassNames?.join(' ')}>
                 <Typography tag="h2" use="headline6">
-                    {invalid ?
-                        <Theme use="error">{
-                            properties.description ?
-                                properties.description :
-                                properties.name
-                        }</Theme> :
-                        properties.description ?
-                            properties.description :
-                            properties.name
+                    {properties.invalid ?
+                        <Theme use="error">{description}</Theme> :
+                        description
                     }
                 </Typography>
                 <GenericAnimate
-                    in={invalid || Boolean(properties.declaration)}
+                    in={properties.invalid || Boolean(properties.declaration)}
                 >
-                    <div className={CSS_CLASS_NAMES.fileInputInfoBody}>
+                    <div className={properties.infoBodyClassNames?.join(' ')}>
                         {properties.declaration ?
                             <Typography
                                 style={{marginTop: '-1rem'}}
@@ -145,7 +144,7 @@ export const MediaCardInner = function(
                                 theme="textSecondaryOnBackground"
                                 use="subtitle2"
                             >
-                                {invalid ?
+                                {properties.invalid ?
                                     <Theme use="error">
                                         {properties.declaration}
                                     </Theme> :
@@ -156,83 +155,24 @@ export const MediaCardInner = function(
                         }
                         <Theme use="error" wrap={true}>
                             <span id={`${id}-error-message`}>
-                                {renderMessage<Properties<Type>>(
-                                    properties.invalidContentTypePattern &&
-                                    properties.contentTypePatternText ||
-
-                                    properties[
-                                        'invalidInvertedContentTypePattern'
-                                        ] &&
-                                    properties
-                                        .invertedContentTypePatternText ||
-
-                                    properties.invalidMaximumSize &&
-                                    properties.maximumSizeText ||
-
-                                    properties.invalidMinimumSize &&
-                                    properties.minimumSizeText ||
-
-                                    properties.invalidRequired &&
-                                    properties.requiredText,
-
-                                    properties
-                                )}
+                                {properties.errorMessage}
                             </span>
                         </Theme>
                     </div>
                 </GenericAnimate>
-                {properties.value ?
-                    <TextInput
-                        ref={nameInputReference}
 
-                        {...properties.generateFileNameInputProperties(
-                            {
-                                disabled: properties.disabled,
-                                value: (
-                                    properties.value as Value | null
-                                )?.name,
-
-                                ...mask(
-                                    defaultFileNameInputProperties,
-                                    {
-                                        exclude: Object.keys(
-                                            properties.model.fileName
-                                        )
-                                    }
-                                ) as TextInputProps<string>,
-
-                                default: properties.value.name,
-                                model: properties.model.fileName,
-                                onChangeValue: onChangeValue,
-                                triggerInitialPropertiesConsolidation
-                            },
-                            properties as
-                                Omit<Properties<Type>, 'value'> &
-                                {value: Type & {name: string}}
-                        )}
-                    /> :
-                    ''
-                }
-                {properties.children ?
-                    properties.children({
-                        declaration: properties.declaration,
-                        invalid,
-                        properties,
-                        value: properties.value
-                    }) :
-                    ''
-                }
+                {properties.children}
             </div>
             {/* TODO use "accept" attribute for better validation. */}
             <input
                 disabled={properties.disabled}
 
-                className={CSS_CLASS_NAMES.fileInputNative}
+                className={properties.fileInputClassNames?.join(' ')}
                 id={id}
 
                 name={properties.name}
 
-                onChange={onChangeValue}
+                onChange={properties.onChange}
 
                 ref={fileInputReference}
 

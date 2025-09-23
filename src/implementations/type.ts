@@ -122,16 +122,35 @@ export enum MediaCardRepresentationType {
 }
 export interface MediaCardReference {
     card?: RefObject<HTMLDivElement | null>
+    fileInput?: RefObject<HTMLInputElement | null>
     iFrame?: RefObject<HTMLIFrameElement | null>
 }
 
 export interface MediaCardProperties extends LowLevelBaseComponentProperties {
     ref?: RefObject<MediaCardReference | null>
 
+    iframeWrapperClassNames?: Array<string>
+    textRepresentationClassNames?: Array<string>
+    infoClassNames?: Array<string>
+    infoBodyClassNames?: Array<string>
+    fileInputClassNames?: Array<string>
+
+    name: string
+    description?: string
+    declaration?: string
+
+    children?: ReactNode
+
     type?: MediaCardRepresentationType
     url?: string
     content?: ReactNode
     contentType?: string
+
+    disabled?: boolean
+    invalid?: boolean
+    errorMessage?: string
+
+    onChange?: (event: SyntheticEvent) => void
 }
 
 export interface CheckboxProperties extends InputProperties<boolean> {

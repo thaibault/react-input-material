@@ -69,8 +69,13 @@ import {
     ValueState as BaseValueState
 } from '../../type'
 // endregion
-export type RepresentationType =
-    'binary' | 'image' | 'embedableText' | 'text' | 'video'
+export enum RepresentationType {
+    BINARY = 'binary',
+    IMAGE = 'image',
+    EMBEDABLE_TEXT = 'embedableText',
+    TEXT = 'text',
+    VIDEO = 'video'
+}
 export type BlobType = Blob | Buffer | string
 export interface Value {
     blob?: Partial<BlobType>

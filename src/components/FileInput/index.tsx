@@ -17,16 +17,7 @@
     endregion
 */
 // region imports
-import {
-    Card,
-    CardActionButton,
-    CardActionButtons,
-    CardActions,
-    CardMedia,
-    CardPrimaryAction
-} from '@rmwc/card'
-import {Theme} from '@rmwc/theme'
-import {Typography} from '@rmwc/typography'
+import {CardActionButton, CardActionButtons, CardActions} from '@rmwc/card'
 import {dataURLToBlob} from 'blob-util'
 import {copy, equals, extend, mask} from 'clientnode'
 import {
@@ -35,22 +26,19 @@ import {
     forwardRef,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
-    ReactElement,
-    // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
+    ReactElement,
     SyntheticEvent,
     useEffect,
-    useId,
     useImperativeHandle,
     useRef,
     useState
 } from 'react'
-import GenericAnimate from 'react-generic-animate'
 
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
-import CircularProgress from '#implementations/CircularProgress'
+import MediaCard from '#implementations/MediaCard'
 
 import TextInput from '../TextInput'
 import {WrapConfigurations} from '../Wrapper/WrapConfigurations'
@@ -71,30 +59,34 @@ import {
 } from '../TextInput/type'
 
 import {
+    Adapter,
+    Component,
+    defaultFileNameInputProperties,
     defaultModelState,
     DefaultProperties,
     defaultProperties,
-    defaultFileNameInputProperties,
-    Adapter,
+    Model,
     ModelState,
     Properties,
-    Props,
-    Value,
-    ValueState,
     propertyTypes,
+    Props,
     renderProperties,
     RepresentationType,
-    Component,
-    Model
+    Value,
+    ValueState
 } from './type'
 import {
     CSS_CLASS_NAMES,
+    deriveBase64String,
     determineContentType,
     determineRepresentationType,
     determineValidationState,
-    deriveBase64String,
     readBinaryDataIntoText
 } from './helper'
+import {
+    MediaCardReference,
+    MediaCardRepresentationType
+} from '../../implementations/type'
 
 export {
     CSS_CLASS_NAMES,
@@ -133,8 +125,6 @@ export {
 export const FileInputInner = function<Type extends Value = Value>(
     props: Props<Type>, reference?: ForwardedRef<Adapter<Type>>
 ): ReactElement {
-    const defaultID = useId()
-    const id = props.id ?? defaultID
     // region property aggregation
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -262,9 +252,9 @@ export const FileInputInner = function<Type extends Value = Value>(
 
         if (
             eventSourceOrName &&
-            fileInputReference.current &&
+            mediaCardReference.current?.fileInput?.current &&
             (eventSourceOrName as SyntheticEvent).target ===
-                fileInputReference.current
+            mediaCardReference.current.fileInput.current
         ) {
             event = eventSourceOrName as SyntheticEvent
 
@@ -443,21 +433,19 @@ export const FileInputInner = function<Type extends Value = Value>(
         })
     }
     // endregion
-    // region properties
-    /// region references
+    // region references
+    const mediaCardReference = useRef<MediaCardReference>(null)
+
     const deleteButtonReference: RefObject<HTMLButtonElement | null> =
         useRef<HTMLButtonElement>(null)
     const downloadLinkReference: RefObject<HTMLAnchorElement | null> =
         useRef<HTMLAnchorElement>(null)
-    const fileInputReference: RefObject<HTMLInputElement | null> =
-        useRef<HTMLInputElement>(null)
     const nameInputReference: RefObject<TextInputAdapter<string> | null> =
         useRef<TextInputAdapter<string>>(null)
     const uploadButtonReference: RefObject<HTMLDivElement | null> =
         useRef<HTMLDivElement>(null)
-    const iFrameReference: RefObject<HTMLIFrameElement | null> =
-        useRef<HTMLIFrameElement>(null)
-    /// endregion
+    // endregion
+    // region properties
     const givenProps: Props<Type> = translateKnownSymbols(props)
 
     const defaultValue =
@@ -552,22 +540,20 @@ export const FileInputInner = function<Type extends Value = Value>(
         reference,
         (): Adapter<Type> & {
             references: {
-                deleteButtonReference: RefObject<HTMLButtonElement | null>
-                downloadLinkReference: RefObject<HTMLAnchorElement | null>
-                fileInputReference: RefObject<HTMLInputElement | null>
-                iFrameReference: RefObject<HTMLIFrameElement | null>
-                nameInputReference: RefObject<TextInputAdapter<string> | null>
-                uploadButtonReference: RefObject<HTMLDivElement | null>
+                mediaCard: RefObject<MediaCardReference | null>
+                deleteButton: RefObject<HTMLButtonElement | null>
+                downloadLink: RefObject<HTMLAnchorElement | null>
+                nameInput: RefObject<TextInputAdapter<string> | null>
+                uploadButton: RefObject<HTMLDivElement | null>
             }
         } => ({
             properties,
             references: {
-                deleteButtonReference,
-                downloadLinkReference,
-                fileInputReference,
-                iFrameReference,
-                nameInputReference,
-                uploadButtonReference
+                mediaCard: mediaCardReference,
+                deleteButton: deleteButtonReference,
+                downloadLink: downloadLinkReference,
+                nameInput: nameInputReference,
+                uploadButton: uploadButtonReference
             },
             state: {
                 modelState: properties.model.state as ModelState,
@@ -614,7 +600,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                     blob = properties.value.blob
                     // Derive missing source from given blob.
                     valueChanged.source = await (
-                        representationType === 'text' ?
+                        representationType === RepresentationType.TEXT ?
                             readBinaryDataIntoText(blob, properties.encoding) :
                             deriveBase64String(properties.value)
                     )
@@ -624,7 +610,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                         (await fetch(properties.value.url)).blob()
                     )
 
-                    if (representationType === 'text')
+                    if (representationType === RepresentationType.TEXT)
                         // Derive missing source from given data url.
                         valueChanged.source = await readBinaryDataIntoText(
                             blob, properties.encoding
@@ -704,7 +690,9 @@ export const FileInputInner = function<Type extends Value = Value>(
         determineContentType<Type>(properties) ?? 'application/binary'
     // region render
     const representationType: RepresentationType =
-        contentType ? determineRepresentationType(contentType) : 'binary'
+        contentType ?
+            determineRepresentationType(contentType) :
+            RepresentationType.BINARY
     const invalid: boolean = (
         properties.invalid &&
         properties.showValidationState &&
@@ -718,281 +706,216 @@ export const FileInputInner = function<Type extends Value = Value>(
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
     >
-        <Card
-            className={
-                [CSS_CLASS_NAMES.fileInput]
-                    .concat(properties.className)
-                    .join(' ')
+        <MediaCard
+            ref={mediaCardReference}
+
+            id={props.id}
+
+            classNames={
+                [CSS_CLASS_NAMES.fileInput].concat(properties.className)
             }
+            iframeWrapperClassNames={
+                [CSS_CLASS_NAMES.fileInputIframeWrapper]
+                    .concat(
+                        ['text/html', 'text/plain'].includes(contentType) ?
+                            CSS_CLASS_NAMES.fileInputIframeWrapperPadding :
+                            []
+                    )
+            }
+            textRepresentationClassNames={
+                [CSS_CLASS_NAMES.fileInputTextRepresentation]
+            }
+            infoClassNames={[CSS_CLASS_NAMES.fileInputInfo]}
+            infoBodyClassNames={[CSS_CLASS_NAMES.fileInputInfoBody]}
+            fileInputClassNames={[CSS_CLASS_NAMES.fileInputNative]}
+            styles={properties.styles}
+
+            type={properties.value?.url ?
+                representationType === RepresentationType.IMAGE ?
+                    MediaCardRepresentationType.IMAGE :
+                    representationType === RepresentationType.VIDEO ?
+                        MediaCardRepresentationType.VIDEO :
+                        representationType ===
+                        RepresentationType.EMBEDABLE_TEXT ?
+                            MediaCardRepresentationType.IFRAME :
+                            representationType === RepresentationType.TEXT ?
+                                MediaCardRepresentationType.TEXT :
+                                undefined :
+                properties.value?.blob &&
+                properties.value.blob instanceof Blob ?
+                    MediaCardRepresentationType.PENDING :
+                    undefined
+            }
+
+            disabled={properties.disabled}
+            invalid={invalid}
+
+            description={properties.description}
+            name={properties.name}
+
+            errorMessage={renderMessage<Properties<Type>>(
+                properties.invalidContentTypePattern &&
+                properties.contentTypePatternText ||
+
+                properties[
+                    'invalidInvertedContentTypePattern'
+                    ] &&
+                properties
+                    .invertedContentTypePatternText ||
+
+                properties.invalidMaximumSize &&
+                properties.maximumSizeText ||
+
+                properties.invalidMinimumSize &&
+                properties.minimumSizeText ||
+
+                properties.invalidRequired &&
+                properties.requiredText,
+
+                properties
+            )}
+
+            url={properties.value?.url}
+            contentType={contentType}
+            content={properties.value?.source}
+
             onBlur={onBlur}
             onClick={onClick}
+            onChange={onChangeValue}
             onFocus={onFocus}
-            style={properties.styles}
         >
-            <CardPrimaryAction>
-                {properties.value?.url ?
-                    representationType === 'image' ?
-                        <CardMedia
-                            {...properties.media}
-                            style={{
-                                backgroundImage: `url(${properties.value.url})`
-                            }}
-                        /> :
-                        representationType === 'video' ?
-                            <video autoPlay loop muted>
-                                <source
-                                    src={properties.value.url}
-                                    type={contentType}
-                                />
-                            </video> :
-                            representationType === 'embedableText' ?
-                                <div className={
-                                    [CSS_CLASS_NAMES.fileInputIframeWrapper]
-                                        .concat(
-                                            ['text/html', 'text/plain']
-                                                .includes(contentType) ?
-                                                CSS_CLASS_NAMES[
-                                                    'fileInputIframeWrapper' +
-                                                    'Padding'
-                                                ] :
-                                                []
-                                        )
-                                        .join(' ')
-                                }>
-                                    <iframe
-                                        ref={iFrameReference}
-                                        style={{border: 0, overflow: 'hidden'}}
-                                        src={properties.value.url}
-                                    />
-                                </div> :
-                                (
-                                    properties.value as Value | null
-                                )?.source &&
-                                representationType === 'text' ?
-                                    <pre
-                                        className={
-                                            CSS_CLASS_NAMES
-                                                .fileInputTextRepresentation
-                                        }
-                                    >
-                                        {properties.value.source}
-                                    </pre> :
-                                    '' :
-                    properties.value?.blob &&
-                    properties.value.blob instanceof Blob ?
-                        // NOTE: Only blobs have to be red asynchronously.
-                        <CircularProgress size="large" /> :
-                        ''
-                }
-                <div className={CSS_CLASS_NAMES.fileInputInfo}>
-                    <Typography tag="h2" use="headline6">
-                        {invalid ?
-                            <Theme use="error">{
-                                properties.description ?
-                                    properties.description :
-                                    properties.name
-                            }</Theme> :
-                            properties.description ?
-                                properties.description :
-                                properties.name
-                        }
-                    </Typography>
-                    <GenericAnimate
-                        in={invalid || Boolean(properties.declaration)}
-                    >
-                        <div className={CSS_CLASS_NAMES.fileInputInfoBody}>
-                            {properties.declaration ?
-                                <Typography
-                                    style={{marginTop: '-1rem'}}
-                                    tag="h3"
-                                    theme="textSecondaryOnBackground"
-                                    use="subtitle2"
-                                >
-                                    {invalid ?
-                                        <Theme use="error">
-                                            {properties.declaration}
-                                        </Theme> :
-                                        properties.declaration
-                                    }
-                                </Typography> :
-                                ''
-                            }
-                            <Theme use="error" wrap={true}>
-                                <span id={`${id}-error-message`}>
-                                    {renderMessage<Properties<Type>>(
-                                        properties.invalidContentTypePattern &&
-                                        properties.contentTypePatternText ||
+            {properties.value ?
+                <TextInput
+                    ref={nameInputReference}
 
-                                        properties[
-                                            'invalidInvertedContentTypePattern'
-                                        ] &&
-                                        properties
-                                            .invertedContentTypePatternText ||
+                    {...properties.generateFileNameInputProperties(
+                        {
+                            disabled: properties.disabled,
+                            value: (properties.value as Value | null)?.name,
 
-                                        properties.invalidMaximumSize &&
-                                        properties.maximumSizeText ||
-
-                                        properties.invalidMinimumSize &&
-                                        properties.minimumSizeText ||
-
-                                        properties.invalidRequired &&
-                                        properties.requiredText,
-
-                                        properties
-                                    )}
-                                </span>
-                            </Theme>
-                        </div>
-                    </GenericAnimate>
-                    {properties.value ?
-                        <TextInput
-                            ref={nameInputReference}
-
-                            {...properties.generateFileNameInputProperties(
+                            ...mask(
+                                defaultFileNameInputProperties,
                                 {
-                                    disabled: properties.disabled,
-                                    value: (
-                                        properties.value as Value | null
-                                    )?.name,
-
-                                    ...mask(
-                                        defaultFileNameInputProperties,
-                                        {
-                                            exclude: Object.keys(
-                                                properties.model.fileName
-                                            )
-                                        }
-                                    ) as TextInputProps<string>,
-
-                                    default: properties.value.name,
-                                    model: properties.model.fileName,
-                                    onChangeValue: onChangeValue,
-                                    triggerInitialPropertiesConsolidation
-                                },
-                                properties as
-                                    Omit<Properties<Type>, 'value'> &
-                                    {value: Type & {name: string}}
-                            )}
-                        /> :
-                        ''
-                    }
-                    {properties.children ?
-                        properties.children({
-                            declaration: properties.declaration,
-                            invalid,
-                            properties,
-                            value: properties.value
-                        }) :
-                        ''
-                    }
-                </div>
-                {/* TODO use "accept" attribute for better validation. */}
-                <input
-                    disabled={properties.disabled}
-
-                    className={CSS_CLASS_NAMES.fileInputNative}
-                    id={id}
-
-                    name={properties.name}
-
-                    onChange={onChangeValue}
-
-                    ref={fileInputReference}
-
-                    type="file"
-                />
-            </CardPrimaryAction>
-            {(
-                (
-                    !properties.disabled &&
-                    (
-                        properties.value ?
-                            properties.editButton :
-                            properties.newButton
-                    )
-                ) ||
-                (
-                    properties.value &&
-                    (
-                        (!properties.disabled && properties.deleteButton) ||
-                        (properties.value.url && properties.downloadButton)
-                    )
-                )
-            ) ?
-                <CardActions>
-                    <CardActionButtons>
-                        {(
-                            !properties.disabled &&
-                            (
-                                properties.value ?
-                                    properties.editButton :
-                                    properties.newButton
-                            )
-                        ) ?
-                            <CardActionButton
-                                onClick={() => {
-                                    fileInputReference.current?.click()
-                                }}
-                                ref={uploadButtonReference}
-                            >
-                                {properties.value ?
-                                    properties.editButton :
-                                    properties.newButton
+                                    exclude: Object.keys(
+                                        properties.model.fileName
+                                    )
                                 }
-                            </CardActionButton> :
-                            ''
-                        }
-                        {properties.value ?
-                            <>
-                                {(
-                                    !properties.disabled &&
-                                    properties.deleteButton
-                                ) ?
-                                    <CardActionButton
-                                        onClick={() => {
-                                            onChangeValue()
-                                        }}
-                                        ref={deleteButtonReference}
-                                    >
-                                        {properties.deleteButton}
-                                    </CardActionButton> :
-                                    ''
-                                }
-                                {(
-                                    properties.value.url &&
-                                    properties.downloadButton
-                                ) ?
-                                    <CardActionButton
-                                        onClick={() => {
-                                            downloadLinkReference
-                                                .current?.click()
-                                        }}
-                                    >
-                                        <a
-                                            className={
-                                                CSS_CLASS_NAMES
-                                                    .fileInputDownload
-                                            }
-                                            download={properties.value.name}
-                                            href={properties.value.url}
-                                            ref={downloadLinkReference}
-                                            target="_blank"
-                                            {...(contentType ?
-                                                {type: contentType} :
-                                                {}
-                                            )}
-                                        >{properties.downloadButton}</a>
-                                    </CardActionButton> :
-                                    ''
-                                }
-                            </> :
-                            ''
-                        }
-                    </CardActionButtons>
-                </CardActions> :
+                            ) as TextInputProps<string>,
+
+                            default: properties.value.name,
+                            model: properties.model.fileName,
+                            onChangeValue: onChangeValue,
+                            triggerInitialPropertiesConsolidation
+                        },
+                        properties as
+                            Omit<Properties<Type>, 'value'> &
+                            {value: Type & {name: string}}
+                    )}
+                /> :
                 ''
             }
-        </Card>
+            {properties.children ?
+                properties.children({
+                    declaration: properties.declaration,
+                    invalid,
+                    properties,
+                    value: properties.value
+                }) :
+                ''
+            }
+        </MediaCard>
+
+        {(
+            (
+                !properties.disabled &&
+                (
+                    properties.value ?
+                        properties.editButton :
+                        properties.newButton
+                )
+            ) ||
+            (
+                properties.value &&
+                (
+                    (!properties.disabled && properties.deleteButton) ||
+                    (properties.value.url && properties.downloadButton)
+                )
+            )
+        ) ?
+            <CardActions>
+                <CardActionButtons>
+                    {(
+                        !properties.disabled &&
+                        (
+                            properties.value ?
+                                properties.editButton :
+                                properties.newButton
+                        )
+                    ) ?
+                        <CardActionButton
+                            onClick={() => {
+                                mediaCardReference
+                                    .current?.fileInput?.current?.click()
+                            }}
+                            ref={uploadButtonReference}
+                        >
+                            {properties.value ?
+                                properties.editButton :
+                                properties.newButton
+                            }
+                        </CardActionButton> :
+                        ''
+                    }
+                    {properties.value ?
+                        <>
+                            {(
+                                !properties.disabled &&
+                                properties.deleteButton
+                            ) ?
+                                <CardActionButton
+                                    onClick={() => {
+                                        onChangeValue()
+                                    }}
+                                    ref={deleteButtonReference}
+                                >
+                                    {properties.deleteButton}
+                                </CardActionButton> :
+                                ''
+                            }
+                            {(
+                                properties.value.url &&
+                                properties.downloadButton
+                            ) ?
+                                <CardActionButton
+                                    onClick={() => {
+                                        downloadLinkReference
+                                            .current?.click()
+                                    }}
+                                >
+                                    <a
+                                        className={
+                                            CSS_CLASS_NAMES
+                                                .fileInputDownload
+                                        }
+                                        download={properties.value.name}
+                                        href={properties.value.url}
+                                        ref={downloadLinkReference}
+                                        target="_blank"
+                                        {...(contentType ?
+                                            {type: contentType} :
+                                            {}
+                                        )}
+                                    >{properties.downloadButton}</a>
+                                </CardActionButton> :
+                                ''
+                            }
+                        </> :
+                        ''
+                    }
+                </CardActionButtons>
+            </CardActions> :
+            ''
+        }
     </WrapConfigurations>
     // endregion
 }
