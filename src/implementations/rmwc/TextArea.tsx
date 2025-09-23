@@ -269,9 +269,11 @@ export const TextArea = forwardRef((
                 )
                 .join(' ')}
         >
-            {properties.componentProperties?.ripple !== false ?
-                <span className="mdc-text-field__ripple"></span> :
-                ''
+            {
+                properties.componentProperties?.ripple !== false &&
+                !properties.children ?
+                    <span className="mdc-text-field__ripple"></span> :
+                    ''
             }
             <span className="mdc-floating-label" id={`${id}-label`}>
                 {properties.label}
