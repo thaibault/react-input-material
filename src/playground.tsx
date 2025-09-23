@@ -72,13 +72,13 @@ if (TextInput.transformer.currency.format)
     TextInput.transformer.currency.format.final.options = {currency: 'EUR'}
 
 const SECTIONS = [
-    'simple-input',
-    'number-input',
-    'text-input',
-    'time-input',
-    'selection-input',
+    'simple',
+    'number',
+    'text',
+    'time',
+    'selection',
 
-    'file-input',
+    'file',
 
     'inputs',
     'interval',
@@ -270,7 +270,7 @@ const Application = () => {
             >
                 {SECTIONS.map((name) =>
                     <Tab key={name}>
-                        {name === 'text-input' ?
+                        {name === 'text' ?
                             <>{name} (with <sup>markup</sup>)</> :
                             name
                         }
@@ -285,9 +285,7 @@ const Application = () => {
                 <div
                     className="playground__inputs__simple-input"
                     style={{
-                        display: activeSection === 'simple-input' ?
-                            'block' :
-                            'none'
+                        display: activeSection === 'simple' ? 'block' : 'none'
                     }}
                 >
                     <TextInput<string>
@@ -444,9 +442,7 @@ const Application = () => {
                 <div
                     className="playground__inputs__number-input"
                     style={{
-                        display: activeSection === 'number-input' ?
-                            'block' :
-                            'none'
+                        display: activeSection === 'number' ? 'block' : 'none'
                     }}
                 >
                     <TextInput<null | number>
@@ -563,9 +559,7 @@ const Application = () => {
                 <div
                     className="playground__inputs__text-input"
                     style={{
-                        display: activeSection === 'text-input' ?
-                            'block' :
-                            'none'
+                        display: activeSection === 'text' ? 'block' : 'none'
                     }}
                 >
                     <TextInput<string>
@@ -734,9 +728,7 @@ const Application = () => {
                 <div
                     className="playground__inputs__time-input"
                     style={{
-                        display: activeSection === 'time-input' ?
-                            'block' :
-                            'none'
+                        display: activeSection === 'time' ? 'block' : 'none'
                     }}
                 >
                     <TextInput<number>
@@ -883,7 +875,7 @@ const Application = () => {
                 <div
                     className="playground__inputs__selection-input"
                     style={{
-                        display: activeSection === 'selection-input' ?
+                        display: activeSection === 'selection' ?
                             'block' :
                             'none'
                     }}
@@ -1158,7 +1150,7 @@ const Application = () => {
                 <div
                     className="playground__inputs__file-input"
                     style={{
-                        display: activeSection === 'file-input' ?
+                        display: activeSection === 'file' ?
                             'block' :
                             'none'
                     }}
