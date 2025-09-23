@@ -49,11 +49,23 @@ import {
 
 import {Mapping} from 'clientnode'
 
-import {FocusEvent, useEffect, useRef} from 'react'
+import {
+    FocusEvent,
+    ForwardedRef,
+    forwardRef,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject,
+    ReactElement,
+    useEffect, useImperativeHandle,
+    useRef
+} from 'react'
 
-import EditorWrapper from '../EditorWrapper'
+import {TextAreaProperties} from '../../../implementations/type'
+import InputEventMapper, {
+    Reference as InputEventMapperReference
+} from '../InputEventMapperWrapper'
 import cssClassNames from '../style.module'
-import {CodeMirrorProps, EditorWrapperEventWrapper} from '../type'
+import {CodeMirrorProps, EditorReference} from '../type'
 // endregion
 export const BASIC_KEYMAPS: Array<KeyBinding> =
     autocompletion as typeof autocompletion | undefined ?
@@ -92,7 +104,14 @@ export const BASIC_EXTENSIONS: Extension =
         []
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
-export const Index = (props: CodeMirrorProps) => {
+export interface Reference extends EditorReference {
+    editorView: RefObject<EditorView | null>
+    editorViewReference: RefObject<HTMLDivElement | null>
+}
+
+export const Index = forwardRef((
+    properties: CodeMirrorProps, reference?: ForwardedRef<Reference>
+): ReactElement => {
     if (!(
         autocompletion as typeof autocompletion | undefined &&
         history as typeof history | undefined &&
@@ -104,23 +123,33 @@ export const Index = (props: CodeMirrorProps) => {
     ))
         throw Error('Missing codemirror dependencies.')
 
-    const value = props.value ?? ''
+    const value = properties.value ?? ''
 
-    const editorViewReference = useRef<HTMLDivElement | null>(null)
-    const eventMapper = useRef<EditorWrapperEventWrapper | null>(null)
+    const inputEventMapperReference =
+        useRef<InputEventMapperReference | null>(null)
     const editorView = useRef<EditorView | null>(null)
-    const textareaReference = useRef<HTMLTextAreaElement | null>(null)
+    const editorViewReference = useRef<HTMLDivElement | null>(null)
+
+    useImperativeHandle(
+        reference,
+        () => ({
+            input: inputEventMapperReference,
+            editorView,
+            editorViewReference
+        })
+    )
 
     const onChange = (viewUpdate: ViewUpdate) => {
-        if (props.disabled)
+        if (properties.disabled)
             return
 
         const newValue = viewUpdate.state.doc.toString()
 
-        eventMapper.current?.input(newValue, viewUpdate)
+        inputEventMapperReference.current?.eventMapper
+            .input(newValue, viewUpdate)
 
-        if (props.onChange)
-            props.onChange(newValue)
+        if (properties.onChange)
+            properties.onChange(newValue)
     }
 
     useEffect(
@@ -133,13 +162,15 @@ export const Index = (props: CodeMirrorProps) => {
                 extensions: [
                     BASIC_EXTENSIONS,
                     EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
+                        // TODO prevent update if given string is longer than
+                        // "properties.maximumLength"
                         if (
                             viewUpdate.startState.doc.toString() !==
                             viewUpdate.state.doc.toString()
                         )
                             onChange(viewUpdate)
                     }),
-                    props.editor?.mode ? props.editor.mode : []
+                    properties.editor?.mode ? properties.editor.mode : []
                 ]
             })
 
@@ -155,38 +186,36 @@ export const Index = (props: CodeMirrorProps) => {
                 }
             }
         },
-        [editorViewReference.current, props.editor?.mode?.language.name]
+        [editorViewReference.current, properties.editor?.mode?.language.name]
     )
 
     useEffect(
         () => {
             if (
                 editorView.current &&
-                props.value !== editorView.current.state.doc.toString()
+                properties.value !== editorView.current.state.doc.toString()
             )
                 editorView.current.state.update(
                     {changes: {from: 0, insert: Text.empty}},
-                    {changes: {from: 0, insert: String(props.value)}}
+                    {changes: {from: 0, insert: String(properties.value)}}
                 )
         },
-        [editorView.current, props.value]
+        [editorView.current, properties.value]
     )
 
+    const clientHeight =
+        inputEventMapperReference
+            .current?.input?.current?.input?.current?.clientHeight
     useEffect(
         () => {
             let id: null | ReturnType<typeof setTimeout> = null
             const syncHeight = () => {
-                if (
-                    editorViewReference.current &&
-                    textareaReference.current?.clientHeight
-                ) {
+                if (editorViewReference.current && clientHeight) {
                     const scrollableViewNode: HTMLDivElement | null =
                         editorViewReference.current
                             .querySelector('.cm-scroller')
                     if (scrollableViewNode) {
-                        const newHeightValue =
-                            String(textareaReference.current.clientHeight) +
-                            'px'
+                        const newHeightValue = String(clientHeight) + 'px'
                         editorViewReference.current.style.height =
                             newHeightValue
                         scrollableViewNode.style.height = newHeightValue
@@ -207,16 +236,15 @@ export const Index = (props: CodeMirrorProps) => {
                     clearTimeout(id)
             }
         },
-        [editorViewReference.current, textareaReference.current?.clientHeight]
+        [editorViewReference.current, clientHeight]
     )
 
-    return <EditorWrapper
-        {...props}
+    return <InputEventMapper
+        {...(properties as TextAreaProperties)}
 
-        eventMapper={eventMapper}
-        textareaReference={textareaReference}
+        ref={inputEventMapperReference}
 
-        value={value}
+        value={value as string | undefined}
 
         classNamePrefix={CSS_CLASS_NAMES.codeEditor}
 
@@ -228,23 +256,23 @@ export const Index = (props: CodeMirrorProps) => {
             ref={editorViewReference}
 
             onBlur={(event: FocusEvent<HTMLDivElement>) => {
-                eventMapper.current?.blur(event)
+                inputEventMapperReference.current?.eventMapper.blur(event)
 
-                if (props.onBlur)
-                    props.onBlur(event)
+                if (properties.onBlur)
+                    properties.onBlur(event)
             }}
             onFocus={(event: FocusEvent<HTMLDivElement>) => {
-                eventMapper.current?.focus(event)
+                inputEventMapperReference.current?.eventMapper.focus(event)
 
-                if (props.onFocus)
-                    props.onFocus(event)
+                if (properties.onFocus)
+                    properties.onFocus(event)
             }}
 
             className={
                 `${CSS_CLASS_NAMES.codeEditorView} mdc-text-field__input`
             }
         ></div>
-    </EditorWrapper>
-}
+    </InputEventMapper>
+})
 
 export default Index

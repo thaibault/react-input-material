@@ -43,7 +43,7 @@ import {
     Props as FileInputProps,
     Value as FileInputValue
 } from './components/FileInput/type'
-import {Props as CheckboxProps} from './components/RequireableCheckbox/type'
+import {Props as CheckboxProps} from './components/Checkbox/type'
 import {
     Properties as TextInputProperties,
     Props as TextInputProps,
@@ -62,9 +62,7 @@ import {
     Value as IntervalValue,
     PartialModel as IntervalPartialModel
 } from './components/Interval/type'
-import {
-    FileInput, TextInput, Inputs, Interval, RequireableCheckbox as Checkbox
-} from './index'
+import {Checkbox, FileInput, TextInput, Inputs, Interval} from './index'
 import {BaseProps} from './type'
 import {slicePropertiesForStateRecursively} from './helper'
 // endregion
@@ -85,7 +83,7 @@ const SECTIONS = [
     'inputs',
     'interval',
 
-    'requireable-checkbox'
+    'checkbox'
 ] as const
 // endregion
 const Application = () => {
@@ -294,7 +292,9 @@ const Application = () => {
                 >
                     <TextInput<string>
                         name="simpleInput1"
-                        inputProperties={useMemorizedValue({outlined: true})}
+                        componentProperties={
+                            useMemorizedValue({outlined: true})
+                        }
                         onChange={onChange}
                     />
                     <TextInput<null | string>
@@ -318,7 +318,7 @@ const Application = () => {
 
                     <TextInput<string>
                         declaration="This text can be seen initially."
-                        inputProps={{
+                        attributes={{
                             ariaChecked: false,
                             ariaDescription: 'test'
                         }}
@@ -369,7 +369,7 @@ const Application = () => {
                         required
                     />
                     <TextInput<string>
-                        icon="backup"
+                        leadingIcon="backup"
                         placeholder="simpleInput4Model"
                         trailingIcon="clear_preset"
 
@@ -388,7 +388,7 @@ const Application = () => {
                     <TextInput<string>
                         declaration="pattern"
                         description="simpleInput5Description"
-                        icon="search"
+                        leadingIcon="search"
                         name="simpleInput5"
                         placeholder="simpleInput5Placeholder"
 
@@ -415,7 +415,7 @@ const Application = () => {
                     <TextInput<string>
                         declaration="password"
                         description="simpleInput6Description"
-                        icon="search"
+                        leadingIcon="search"
                         name="simpleInput6"
                         placeholder="simpleInput6Placeholder"
                         tooltip="Please type in your password."
@@ -581,6 +581,10 @@ const Application = () => {
                         initialValue="a"
                         onChange={onChange}
                         required
+
+                        componentProperties={
+                            useMemorizedValue({outlined: true})
+                        }
                     />
                     <TextInput<string>
                         editor="text"
@@ -650,6 +654,7 @@ const Application = () => {
                                 'text'
                         }
                         rows={2}
+
                         selectableEditor
 
                         maximumLength={10}
@@ -744,7 +749,9 @@ const Application = () => {
                     />
                     <TextInput<string>
                         initialValue="2025-01-01T00:00:00.000Z"
-                        inputProperties={useMemorizedValue({outlined: true})}
+                        componentProperties={
+                            useMemorizedValue({outlined: true})
+                        }
                         model={useMemorizedValue({
                             name: 'timeInput1Model', type: 'date'
                         })}
@@ -764,7 +771,9 @@ const Application = () => {
                     />
                     <TextInput<string>
                         initialValue="2025-01-01T23:00:00.000Z"
-                        inputProperties={useMemorizedValue({outlined: true})}
+                        componentProperties={
+                            useMemorizedValue({outlined: true})
+                        }
                         model={useMemorizedValue({
                             name: 'timeInput2Model', type: 'date-local'
                         })}
@@ -858,7 +867,9 @@ const Application = () => {
                     />
                     <TextInput<string>
                         initialValue="1970-01-01T00:20:00.000Z"
-                        inputProperties={useMemorizedValue({outlined: true})}
+                        componentProperties={
+                            useMemorizedValue({outlined: true})
+                        }
                         model={useMemorizedValue({
                             name: 'timeInput7Model', type: 'time-local'
                         })}
@@ -1241,8 +1252,8 @@ const Application = () => {
                     <button
                         onClick={() => {
                             fileInputUnControlledHeadlessReference
-                                .current?.references.fileInputReference
-                                .current?.click()
+                                .current?.references
+                                .mediaCard.current?.fileInput?.current?.click()
                         }}
                     >Add medium</button>
                     <FileInput
@@ -1317,7 +1328,7 @@ const Application = () => {
                         )}
                     </Inputs>
                     {/* endregion */}
-                    {/* region interval inputs */}
+                    {/* * region interval inputs */}
                     {/* region uncontrolled */}
                     <Inputs<
                         (
@@ -1379,7 +1390,7 @@ const Application = () => {
                         )}
                     </Inputs>
                     {/* endregion */}
-                    {/* endregion */}
+                    {/* * endregion */}
                     <Inputs
                         name="textInputInputsControlled"
                         onChange={onChange}
@@ -1454,9 +1465,9 @@ const Application = () => {
 
                 {/* region checkbox */}
                 <div
-                    className="playground__inputs__requireable-checkbox"
+                    className="playground__inputs__checkbox"
                     style={{
-                        display: activeSection === 'requireable-checkbox' ?
+                        display: activeSection === 'checkbox' ?
                             'block' :
                             'none'
                     }}

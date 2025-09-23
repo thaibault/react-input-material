@@ -20,9 +20,9 @@
 import {FunctionComponent, ReactElement} from 'react'
 import Dummy from 'react-generic-dummy'
 
-import Tooltip from '@low-level-component-implementations/Tooltip'
+import Tooltip from '#implementations/Tooltip'
 
-import {Properties} from '../type'
+import {Properties} from '../../type'
 // endregion
 export const isDummy: boolean =
     !(Tooltip as typeof Tooltip | undefined) ||

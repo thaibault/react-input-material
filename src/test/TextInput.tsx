@@ -19,7 +19,9 @@ import {AnyFunction} from 'clientnode'
 import {testEach} from 'clientnode/test-helper'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
-import TextInput, {suggestionMatches} from '../components/TextInput'
+import TextInput, {
+    CSS_CLASS_NAMES, suggestionMatches
+} from '../components/TextInput'
 
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
@@ -273,7 +275,6 @@ describe('TextInput', () => {
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
-    // TODO
     test('render', () => {
         expect(render(<TextInput/>)).toBeDefined()
 
@@ -285,5 +286,22 @@ describe('TextInput', () => {
         expect(
             render(<TextInput name="test"/>)?.querySelector('[name="test"]')
         ).not.toStrictEqual(null)
+
+        const domNode = render(<TextInput<string>
+            selection={['hans hans', 'peter peter']}
+            suggestSelection
+            value="ans"
+        />)
+
+        const textResults =
+            domNode?.querySelector(
+                `.${CSS_CLASS_NAMES.textInputSuggestionsSuggestion}`
+            // NOTE We want to filter span wrapping spans.
+            )?.querySelectorAll('span:not(span span)')
+                .values()
+                .toArray()
+                .map((domNode) => domNode.textContent)
+
+        expect(textResults).toStrictEqual(['h', 'ans', ' h', 'ans'])
     })
 })

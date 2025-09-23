@@ -19,8 +19,6 @@
 // region imports
 import {copy, extend, mask} from 'clientnode'
 import {GenericEvent} from 'react-generic-tools/type'
-import {Icon} from '@rmwc/icon'
-import {IconOptions} from '@rmwc/types'
 import {
     ForwardedRef,
     forwardRef,
@@ -30,6 +28,8 @@ import {
     useRef,
     useState
 } from 'react'
+
+import Icon from '#implementations/Icon'
 
 import {
     createDummyStateSetter,
@@ -42,7 +42,7 @@ import {
     Properties as TextInputProperties,
     AdapterWithReferences as TextInputAdapterWithReferences
 } from '../TextInput/type'
-import WrapConfigurations from '../WrapConfigurations'
+import WrapConfigurations from '../Wrapper/WrapConfigurations'
 
 /*
 "namedExport" version of css-loader:
@@ -50,6 +50,8 @@ import WrapConfigurations from '../WrapConfigurations'
 import {intervalClassName, intervalDisabledClassName} from './style.module'
 */
 import cssClassNames from './style.module'
+
+import {IconProperties} from '../../implementations/type'
 
 import {
     Adapter,
@@ -102,7 +104,7 @@ const getModelState = (
 })
 const getExternalProperties = (
     properties: Properties,
-    iconProperties: IconOptions,
+    iconProperties: IconProperties,
     startProperties: TextInputProperties<null | number | string>,
     endProperties: TextInputProperties<null | number | string>
 ): Properties => {
@@ -168,9 +170,9 @@ export const IntervalInner = function(
     let endProperties =
         properties.value?.end as IntervalTextInputProps | null ||
         {} as IntervalTextInputProps
-    const iconProperties: IconOptions = typeof properties.icon === 'string' ?
+    const iconProperties: IconProperties = typeof properties.icon === 'string' ?
         {icon: properties.icon} :
-        properties.icon as IconOptions
+        properties.icon as IconProperties
     let startProperties =
         properties.value?.start as IntervalTextInputProps | null ||
         {} as IntervalTextInputProps
@@ -235,9 +237,9 @@ export const IntervalInner = function(
     )
 
     if (!startProperties.className)
-        startProperties.className = `${CSS_CLASS_NAMES.interval}__start`
-    if (!iconProperties.className)
-        iconProperties.className = `${CSS_CLASS_NAMES.interval}__icon`
+        startProperties.className = [`${CSS_CLASS_NAMES.interval}__start`]
+    if (!iconProperties.classNames)
+        iconProperties.classNames = [`${CSS_CLASS_NAMES.interval}__icon`]
     if (!endProperties.className)
         endProperties.className = `${CSS_CLASS_NAMES.interval}__end`
 
@@ -471,7 +473,7 @@ export const IntervalInner = function(
             style={properties.styles}
         >
             <TextInput {...startProperties} ref={startInputReference} />
-            <Icon icon={iconProperties} />
+            <Icon {...properties.icon as IconProperties} />
             <TextInput {...endProperties} ref={endInputReference} />
         </div>
     </WrapConfigurations>

@@ -1,20 +1,31 @@
+// -*- coding: utf-8 -*-
+/** @module Error */
+'use strict'
+/* !
+    region header
+    [Project page](https://torben.website/react-material-input)
+
+    Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
+
+    License
+    -------
+
+    This library written by Torben Sickert stand under a creative commons
+    naming 3.0 unported license.
+    See https://creativecommons.org/licenses/by/3.0/deed.de
+    endregion
+*/
+// region imports
 import {Theme} from '@rmwc/theme'
-import {
-    ForwardedRef,
-    forwardRef,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
-    ReactElement
-} from 'react'
+import {ForwardedRef, forwardRef, ReactElement} from 'react'
 
-import {ErrorProperties} from '../../type'
-
+import {ErrorProperties} from '../type'
+// endregion
 export const Error = forwardRef((
-    properties: ErrorProperties, reference?: ForwardedRef<unknown>
+    {children}: ErrorProperties,
+    reference?: ForwardedRef<HTMLDivElement | null>
 ): ReactElement =>
-    <Theme ref={reference as RefObject<HTMLDivElement | null>} use="error">
-        {properties.children}
-    </Theme>
+    <Theme ref={reference} use="error">{children}</Theme>
 )
 
 export default Error

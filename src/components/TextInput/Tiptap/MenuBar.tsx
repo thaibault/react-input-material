@@ -17,12 +17,13 @@
     endregion
 */
 // region imports
-import {IconButton} from '@rmwc/icon-button'
 import {ChainedCommands, Editor} from '@tiptap/core'
 
 import {createContext, useContext} from 'react'
 
-import WrapTooltip from '../../WrapTooltip'
+import IconButton from '#implementations/IconButton'
+
+import WrapTooltip from '../../Wrapper/WrapTooltip'
 
 import {RichTextEditorButtonProps} from '../type'
 // endregion
@@ -49,16 +50,22 @@ const Button = ({
 
     return <WrapTooltip value={description}>
         <IconButton
-            checked={checked}
-            className={checked ? 'mdc-icon-button--checked' : ''}
+            value={checked}
             disabled={!enabled}
+
+            classNames={checked ? ['mdc-icon-button--checked'] : []}
+
             onClick={(event) => {
                 event.stopPropagation()
                 action(editor.chain().focus()).run()
             }}
-            icon={{icon: iconName, size: 'xsmall'}}
-            onIcon={{icon: checkedIconName ?? iconName, size: 'xsmall'}}
-            label={description}
+
+            size="extra-small"
+
+            icon={iconName}
+            onIcon={checkedIconName ?? iconName}
+
+            domNodeProperties={{'aria-label': description}}
         />
     </WrapTooltip>
 }

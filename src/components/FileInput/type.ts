@@ -33,7 +33,6 @@ import BasePropertyTypes, {
 import {
     ElementType,
     ForwardRefExoticComponent,
-    HTMLProps,
     ReactElement,
     ReactNode,
     RefAttributes,
@@ -41,8 +40,6 @@ import {
 } from 'react'
 
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
-import {ComponentProps as RMWCComponentProps} from '@rmwc/types'
-import {CardMediaProps} from '@rmwc/card'
 
 import {
     defaultInputModel as defaultTextInputModel,
@@ -68,9 +65,15 @@ import {
     StaticWebComponent,
     ValueState as BaseValueState
 } from '../../type'
+import {MediaCardReference} from '../../implementations/type'
 // endregion
-export type RepresentationType =
-    'binary' | 'image' | 'embedableText' | 'text' | 'video'
+export enum RepresentationType {
+    BINARY = 'binary',
+    IMAGE = 'image',
+    EMBEDABLE_TEXT = 'embedableText',
+    TEXT = 'text',
+    VIDEO = 'video'
+}
 export type BlobType = Blob | Buffer | string
 export interface Value {
     blob?: Partial<BlobType>
@@ -145,8 +148,6 @@ export interface Properties<
         properties: Properties<Type, MediaTag>
     ) => TextInputProps<string> | null
 
-    media: RMWCComponentProps<CardMediaProps, HTMLProps<HTMLElement>, MediaTag>
-
     model: Model<Type>
 
     outlined: boolean
@@ -194,11 +195,8 @@ export type Adapter<Type extends Value = Value> =
     >
 export interface AdapterWithReferences extends Adapter {
     references: {
-        deleteButtonReference: RefObject<HTMLButtonElement | null>
-        downloadLinkReference: RefObject<HTMLAnchorElement | null>
-        fileInputReference: RefObject<HTMLInputElement | null>
-        nameInputReference: RefObject<TextInputAdapter<string> | null>
-        uploadButtonReference: RefObject<HTMLButtonElement | null>
+        mediaCard: RefObject<MediaCardReference | null>
+        nameInput: RefObject<TextInputAdapter<string> | null>
     }
 }
 
@@ -348,10 +346,6 @@ export const defaultProperties: DefaultProperties = {
     encoding: 'utf-8',
 
     generateFileNameInputProperties: identity,
-
-    media: {
-        sixteenByNine: true
-    },
 
     model: {...defaultModel},
 

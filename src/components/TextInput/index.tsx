@@ -20,21 +20,7 @@
 import {javascript} from '@codemirror/lang-javascript'
 import {css} from '@codemirror/lang-css'
 
-import {MDCMenuFoundation} from '@material/menu'
-import {MDCSelectFoundation} from '@material/select'
-import {MDCTextFieldFoundation} from '@material/textfield'
-
-import {CircularProgress} from '@rmwc/circular-progress'
-import {Icon} from '@rmwc/icon'
-import {IconButton, IconButtonOnChangeEventT} from '@rmwc/icon-button'
-import {ListApi} from '@rmwc/list'
-import {
-    Menu, MenuApi, MenuSurface, MenuSurfaceAnchor, MenuItem, MenuOnSelectEventT
-} from '@rmwc/menu'
-import {Select, SelectProps} from '@rmwc/select'
-import {TextField, TextFieldProps} from '@rmwc/textfield'
 import {Theme} from '@rmwc/theme'
-import {IconOptions} from '@rmwc/types'
 
 import {
     camelCaseToDelimited,
@@ -62,7 +48,7 @@ import React, {
     useId,
     useImperativeHandle,
     useRef,
-    useState
+    useState, SyntheticEvent
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
 import {GenericEvent} from 'react-generic-tools/type'
@@ -73,8 +59,14 @@ import {
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
-import WrapConfigurations from '../WrapConfigurations'
-import WrapTooltip from '../WrapTooltip'
+import Icon from '#implementations/Icon'
+import IconButton from '#implementations/IconButton'
+import Menu from '#implementations/Menu'
+import Select from '#implementations/Select'
+import TextField from '#implementations/TextField'
+
+import WrapConfigurations from '../Wrapper/WrapConfigurations'
+import WrapTooltip from '../Wrapper/WrapTooltip'
 import {
     deriveMissingPropertiesFromState as deriveMissingBasePropertiesFromState,
     determineInitialValue,
@@ -94,8 +86,22 @@ import {
 import {
     CursorState, EditorState, Selection, TypeSpecification
 } from '../../type'
+import {
+    IconProperties,
+    InputReference,
+    LowLevelBaseComponentProperties,
+    MenuReference,
+    TextAreaProperties,
+    TextAreaReference,
+    TextFieldProperties,
+    TextInputProperties,
+    TypeTextInputProperties
+} from '../../implementations/type'
 
-import CodeEditorComponent from './CodeMirror'
+import CodeEditorComponent, {
+    Reference as CodeMirrorReference
+} from './CodeMirror'
+import RichTextEditorComponent, {Reference as TipTapReference} from './Tiptap'
 import {
     CSS_CLASS_NAMES,
     determineValidationState,
@@ -106,10 +112,8 @@ import {
     TIPTAP_DEFAULT_OPTIONS,
     UseAnimations
 } from './helper'
-import RichTextEditorComponent from './Tiptap'
 import {
     AdapterWithReferences,
-    CodeMirrorProps as CodeEditorProps,
     CodeMirrorProperties as CodeEditorProperties,
     Component,
     DataTransformation,
@@ -117,7 +121,7 @@ import {
     defaultModelState,
     DefaultProperties,
     defaultProperties,
-    EditorProperties,
+    EditorReference,
     Model,
     ModelState,
     NativeType,
@@ -127,11 +131,14 @@ import {
     Props,
     renderProperties,
     State,
-    TiptapProps as RichTextEditorProps,
     TiptapProperties as RichTextEditorProperties,
     ValueState
 } from './type'
 import TRANSFORMER from './transformer'
+import TextArea from '#implementations/TextArea'
+import {
+    Reference as InputEventMapperReference
+} from './InputEventMapperWrapper'
 
 export {
     CODE_EDITOR_OPTIONS,
@@ -178,8 +185,25 @@ export const TextInputInner = function<Type = unknown>(
      * with input element.
      */
     useEffect(() => {
-        if (inputReference.current) {
-            const determinedInputProps: Mapping<boolean | number | string> = {}
+        if (inputReference.current?.input?.current) {
+            let input = inputReference.current.input.current as
+                HTMLElement |
+                TextAreaReference |
+                EditorReference
+            if ((input as Partial<TextAreaReference>).input?.current) {
+                input =
+                    (input as Partial<TextAreaReference | EditorReference>)
+                    .input?.current as
+                        HTMLElement | TextAreaReference
+                if ((input as Partial<TextAreaReference>).input?.current)
+                    input =
+                        (input as Partial<TextAreaReference>).input?.current as
+                            HTMLElement
+            } else
+                return
+            const inputDomNode = input as HTMLElement
+
+            const determinedAttributes: Mapping<boolean | number | string> = {}
             const propsToRemove: Array<string> = []
 
             // Apply aria attributes regarding validation state.
@@ -187,17 +211,17 @@ export const TextInputInner = function<Type = unknown>(
                 propsToRemove.push('ariaErrormessage')
                 propsToRemove.push('ariaInvalid')
             } else {
-                determinedInputProps.ariaErrormessage =
+                determinedAttributes.ariaErrormessage =
                     `${id}-error-message`
-                determinedInputProps.ariaInvalid = 'true'
+                determinedAttributes.ariaInvalid = 'true'
             }
 
             // Apply aria attributes regarding searching.
             if (useSuggestions) {
-                if (inputReference.current.getAttribute('type') !== 'search')
-                    determinedInputProps.role = 'searchbox'
+                if (inputDomNode.getAttribute('type') !== 'search')
+                    determinedAttributes.role = 'searchbox'
 
-                determinedInputProps.ariaAutocomplete =
+                determinedAttributes.ariaAutocomplete =
                     properties.searchSelection ? 'inline' : 'list'
             } else {
                 propsToRemove.push('searchbox')
@@ -205,33 +229,31 @@ export const TextInputInner = function<Type = unknown>(
             }
 
             if (properties.showDeclaration)
-                determinedInputProps.ariaDescribedby = `${id}-declaration`
+                determinedAttributes.ariaDescribedby = `${id}-declaration`
             else
                 propsToRemove.push('ariaDescribedby')
 
-            const inputProps = {
-                ...determinedInputProps, ...properties.inputProps || {}
+            const attributes = {
+                ...determinedAttributes, ...properties.attributes || {}
             }
 
             // Apply configured native input properties.
-            for (const [name, value] of Object.entries(inputProps)) {
+            for (const [name, value] of Object.entries(attributes)) {
                 const attributeName: string = camelCaseToDelimited(name)
 
                 if (typeof value === 'boolean')
                     if (value)
-                        inputReference.current.setAttribute(attributeName, '')
+                        inputDomNode.setAttribute(attributeName, '')
                     else
-                        inputReference.current.removeAttribute(attributeName)
+                        inputDomNode.removeAttribute(attributeName)
                 else
-                    inputReference.current.setAttribute(
-                        attributeName, String(value)
-                    )
+                    inputDomNode.setAttribute(attributeName, String(value))
             }
 
             for (const name of propsToRemove) {
                 const attributeName: string = camelCaseToDelimited(name)
-                if (inputReference.current.hasAttribute(attributeName))
-                    inputReference.current.removeAttribute(attributeName)
+                if (inputDomNode.hasAttribute(attributeName))
+                    inputDomNode.removeAttribute(attributeName)
             }
         }
     })
@@ -242,7 +264,7 @@ export const TextInputInner = function<Type = unknown>(
      * opening and hidden state.
      */
     useEffect(() => {
-        if (useSelection) {
+        if (isSelection) {
             const selectionWrapper: HTMLElement | null | undefined =
                 wrapperReference.current?.querySelector(
                     '[aria-haspopup="listbox"]'
@@ -271,7 +293,7 @@ export const TextInputInner = function<Type = unknown>(
      * @returns Nothing.
      */
     useEffect((): undefined | (() => void) => {
-        if (useSelection) {
+        if (isSelection) {
             const selectionWrapper: HTMLElement | null | undefined =
                 wrapperReference.current?.querySelector(
                     '[aria-haspopup="listbox"]'
@@ -311,8 +333,8 @@ export const TextInputInner = function<Type = unknown>(
      * @returns Given potential extended icon configuration.
      */
     const applyIconPreset = (
-        options?: Properties['icon']
-    ): IconOptions | string | undefined => {
+        options?: Properties['leadingIcon']
+    ): Properties['leadingIcon'] | undefined => {
         if (options === 'clear_preset') {
             const handler = (
                 event: ReactKeyboardEvent | ReactMouseEvent
@@ -352,10 +374,14 @@ export const TextInputInner = function<Type = unknown>(
                     }
                 </GenericAnimate>,
 
-                'aria-hidden': hide ? 'true' : 'false',
+                componentProperties: {
+                    'aria-hidden': hide ? 'true' : 'false',
+                    'tab-index': hide ? -1 : 0
+                },
+
                 onClick: handler,
                 onKeyDown: handler,
-                tabIndex: hide ? -1 : 0,
+
                 strategy: 'component',
                 tooltip: 'Clear input'
             }
@@ -401,6 +427,7 @@ export const TextInputInner = function<Type = unknown>(
 
                 onClick: handler,
                 onKeyDown: handler,
+
                 strategy: 'component',
                 tooltip: `${(properties.hidden ? 'Show' : 'Hide')} password`
             }
@@ -411,8 +438,9 @@ export const TextInputInner = function<Type = unknown>(
                 options = {icon: options}
 
             if (!Object.prototype.hasOwnProperty.call(options, 'onClick')) {
-                options.tabIndex = -1
-                options['aria-hidden'] = true
+                options.domNodeProperties = options.domNodeProperties ?? {}
+                options.domNodeProperties['tab-index'] = -1
+                options.domNodeProperties['aria-hidden'] = true
             }
         }
 
@@ -451,20 +479,21 @@ export const TextInputInner = function<Type = unknown>(
             }
         >
             <IconButton
-                icon={{
-                    'aria-label':
-                        properties.editorIsActive ?
-                            'plain' :
-                            properties.editor.startsWith('code') ?
-                                'code' :
-                                'richtext',
-                    icon: properties.editorIsActive ?
+                domNodeProperties={{
+                    'aria-label': properties.editorIsActive ?
+                        'plain' :
+                        properties.editor.startsWith('code') ?
+                            'code' :
+                            'richtext'
+                }}
+                icon={
+                    properties.editorIsActive ?
                         'subject' :
                         properties.editor.startsWith('code') ?
                             'code' :
-                            'text_format',
-                    onClick: onChangeEditorIsActive
-                }}
+                            'text_format'
+                }
+                onClick={onChangeEditorIsActive}
             />
         </GenericAnimate>
         <GenericAnimate in={Boolean(properties.declaration)}>
@@ -472,9 +501,11 @@ export const TextInputInner = function<Type = unknown>(
                 aria-expanded={properties.showDeclaration ? 'true' : 'false'}
                 aria-label="declaration"
 
-                checked={properties.showDeclaration}
+                value={properties.showDeclaration}
+
                 icon="more_horiz"
                 onIcon="more_vert"
+
                 onChange={onChangeShowDeclaration}
             />
         </GenericAnimate>
@@ -525,7 +556,7 @@ export const TextInputInner = function<Type = unknown>(
      * @param content - Component or string to wrap.
      * @param propertiesOrInCondition - Animation properties or in condition
      * only.
-     * @param condition - Show condition.
+     * @param doAnimationCondition - Show condition.
      * @returns Wrapped component.
      */
     const wrapAnimationConditionally = (
@@ -533,17 +564,17 @@ export const TextInputInner = function<Type = unknown>(
         propertiesOrInCondition: (
             boolean | Partial<TransitionProps<HTMLElement | undefined>>
         ) = {},
-        condition = true
+        doAnimationCondition = true
     ): ReactNode => {
         if (typeof propertiesOrInCondition === 'boolean')
-            return (condition ?
+            return (doAnimationCondition ?
                 <GenericAnimate in={propertiesOrInCondition}>
                     {content}
                 </GenericAnimate> :
                 propertiesOrInCondition ? content : ''
             ) as ReactNode
 
-        return (condition ?
+        return (doAnimationCondition ?
             <GenericAnimate {...propertiesOrInCondition}>
                 {content}
             </GenericAnimate> :
@@ -559,21 +590,21 @@ export const TextInputInner = function<Type = unknown>(
      * @returns Resolved icon configuration.
      */
     const wrapIconWithTooltip = (
-        options?: Properties['icon']
-    ): IconOptions | undefined => {
+        options?: Properties['leadingIcon']
+    ): IconProperties | undefined => {
         if (typeof options === 'object' && options.tooltip) {
             const tooltip: Properties['tooltip'] = options.tooltip
             options = {...options}
             delete options.tooltip
-            const nestedOptions: IconOptions = {...options}
+            const nestedOptions: IconProperties = {...options}
             options.strategy = 'component'
 
             options.icon = <WrapTooltip value={tooltip}>
-                <Icon icon={nestedOptions} />
+                <Icon {...nestedOptions} />
             </WrapTooltip>
         }
 
-        return options as IconOptions | undefined
+        return options as IconProperties | undefined
     }
     /// endregion
     /// region property aggregation
@@ -851,7 +882,7 @@ export const TextInputInner = function<Type = unknown>(
      * Triggered when show declaration indicator should be changed.
      * @param event - Potential event object.
      */
-    const onChangeShowDeclaration = (event?: IconButtonOnChangeEventT) => {
+    const onChangeShowDeclaration = (event?: SyntheticEvent) => {
         setShowDeclaration((value: boolean): boolean => {
             properties.showDeclaration = !value
 
@@ -880,7 +911,7 @@ export const TextInputInner = function<Type = unknown>(
      * selection.
      */
     const onChangeValue = (
-        eventOrValue: GenericEvent | Type, selectedIndex = -1
+        eventOrValue: GenericEvent<Type> | Type, selectedIndex = -1
     ): void => {
         setIsSuggestionOpen(true)
 
@@ -980,7 +1011,7 @@ export const TextInputInner = function<Type = unknown>(
                     )
                 }
 
-                if (useSelection || selectedIndex !== -1)
+                if (isSelection || selectedIndex !== -1)
                     triggerCallbackIfExists<Properties<Type>>(
                         properties,
                         'select',
@@ -1166,18 +1197,16 @@ export const TextInputInner = function<Type = unknown>(
             !properties.disabled &&
             useSuggestions &&
             'ArrowDown' === event.code &&
-            event.target === inputReference.current
+            event.target === inputReference.current?.input?.current
         )
-            (
-                suggestionMenuAPIReference.current as unknown as ListApi | null
-            )?.focusItemAtIndex(0)
+            menuReference.current?.focusItem(0)
 
         /*
             NOTE: We do not want to forward keydown enter events coming from
             textareas.
         */
         if (
-            useSelection ||
+            isSelection ||
             properties.type === 'string' &&
             properties.editor !== 'plain'
         )
@@ -1261,19 +1290,11 @@ export const TextInputInner = function<Type = unknown>(
     // endregion
     // region properties
     /// region references
-    const foundationReference: RefObject<
-        MDCSelectFoundation | MDCTextFieldFoundation | null
-    > = useRef<MDCSelectFoundation | MDCTextFieldFoundation>(null)
-    const inputReference: RefObject<
-        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
-    > = useRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(null)
-    const suggestionMenuAPIReference: RefObject<MenuApi | null> =
-        useRef<MenuApi>(null)
-    const suggestionMenuFoundationReference: RefObject<
-        MDCMenuFoundation | null
-    > = useRef<MDCMenuFoundation>(null)
-    const wrapperReference: RefObject<HTMLDivElement | null> =
-        useRef<HTMLDivElement>(null)
+    const inputReference =
+        useRef<InputReference | InputEventMapperReference>(null)
+    const wrapperReference = useRef<HTMLDivElement>(null)
+    const menuReference: RefObject<MenuReference | null> =
+        useRef<MenuReference>(null)
     /// endregion
     const givenProps: Props<Type> = translateKnownSymbols(props)
 
@@ -1441,11 +1462,9 @@ export const TextInputInner = function<Type = unknown>(
             return {
                 properties,
                 references: {
-                    foundationReference,
-                    inputReference,
-                    suggestionMenuAPIReference,
-                    suggestionMenuFoundationReference,
-                    wrapperReference
+                    input: inputReference,
+                    menu: menuReference,
+                    wrapper: wrapperReference
                 },
                 state
             }
@@ -1454,41 +1473,63 @@ export const TextInputInner = function<Type = unknown>(
     // endregion
     // region render
     /// region intermediate render properties
-    const genericProperties: Partial<
-        CodeEditorProps | RichTextEditorProps | SelectProps | TextFieldProps
-    > = {
+    const textInputProperties: Partial<TextInputProperties<Type>> = {
+        ref: inputReference as RefObject<InputReference>,
         /*
             NOTE: If not set label with forbidden symbols will automatically
             be used.
         */
         id,
-        onFocus: triggerOnFocusAndOpenSuggestions,
-        placeholder: properties.placeholder
-    }
-    const materialProperties: SelectProps | TextFieldProps = {
+
+        componentProperties: properties.componentProperties,
+        domNodeProperties: properties.domNodeProperties,
+
+        onClick,
+        onFocus: triggerOnFocusAndOpenSuggestions as
+            LowLevelBaseComponentProperties['onFocus'],
+
         disabled: properties.disabled,
         helpText: {
             children: renderHelpText(),
             persistent: true
         },
-        invalid: (
-            properties.invalid &&
-            properties.showValidationState &&
-            (properties.showInitialValidationState || properties.visited)
-        ),
-        label: properties.description || properties.name,
-        outlined: properties.outlined
+        name: properties.name || properties.description,
+        label: properties.description || properties.name
         /*
-            NOTE: Validation is not handle by the material component kike this:
+            NOTE: Validation is not handled by the low level component like
+            this:
 
             pattern: properties.pattern,
             required: properties.required
         */
     }
-    if (properties.icon)
-        materialProperties.icon = wrapIconWithTooltip(
-            applyIconPreset(properties.icon) as IconOptions
-        ) as IconOptions
+    const typeTextInputProperties: Partial<TypeTextInputProperties<Type>> = {
+        invalid: (
+            properties.invalid &&
+            properties.showValidationState &&
+            (properties.showInitialValidationState || properties.visited)
+        ),
+
+        placeholder: properties.placeholder,
+        characterCount:
+            typeof properties.maximumLength === 'number' &&
+            !isNaN(properties.maximumLength) &&
+            properties.maximumLength >= 0,
+
+        value: properties.representation as Type,
+
+        /*
+            NOTE: Disabled input fields are not focusable via keyboard which
+            makes them unreachable for blind people using e.g. screen readers.
+            That's why the label gets a tabindex to make the input focusable.
+        */
+        domNodeProperties: {
+            'tab-index': properties.disabled ? '0' : '-1',
+            ...properties.domNodeProperties
+        },
+
+        onKeyUp
+    }
 
     const isAdvancedEditor: boolean = (
         !properties.selection &&
@@ -1503,8 +1544,12 @@ export const TextInputInner = function<Type = unknown>(
             properties.editor.endsWith(')')
         )
     )
+    const isCodeEditor =
+        isAdvancedEditor && properties.editor.startsWith('code')
 
-    const currentRenderableSuggestions: Array<ReactElement> = []
+    const currentRenderableSuggestions: (
+        Array<Array<ReactElement> | ReactElement>
+    ) = []
     const currentSuggestionLabels: Array<ReactNode | string> = []
     const currentSuggestionValues: Array<unknown> = []
     const useSuggestions = Boolean(
@@ -1529,16 +1574,7 @@ export const TextInputInner = function<Type = unknown>(
                 })
 
                 if (result) {
-                    currentRenderableSuggestions.push(
-                        <MenuItem
-                            className={
-                                CSS_CLASS_NAMES.textInputSuggestionsSuggestion
-                            }
-                            key={index}
-                        >
-                            {result}
-                        </MenuItem>
-                    )
+                    currentRenderableSuggestions.push(result)
                     currentSuggestionLabels.push(suggestion)
                     currentSuggestionValues.push(suggestionValues[index])
                 }
@@ -1549,37 +1585,30 @@ export const TextInputInner = function<Type = unknown>(
                     suggestion as string, properties.representation as string
                 )
             ) {
-                currentRenderableSuggestions.push(
-                    <MenuItem
-                        className={
-                            CSS_CLASS_NAMES.textInputSuggestionsSuggestion
-                        }
-                        key={index}
-                    >
-                        {(mark(
-                            suggestion,
-                            (
-                                properties.representation as string | null
-                            )?.split(' ') || '',
-                            {
-                                marker: (foundWord: string): ReactElement =>
-                                    <span className={
-                                        CSS_CLASS_NAMES
-                                            .textInputSuggestionsSuggestionMark
-                                    }>
-                                        {foundWord}
-                                    </span>,
-                                normalizer: (value: unknown): string =>
-                                    String(value).toLowerCase(),
-                                skipTagDelimitedParts: null
-                            }
-                        ) as Array<ReactElement | string>).map((
-                            item: ReactElement | string, index: number
+                const marked = (mark(
+                    suggestion,
+                    (
+                        properties.representation as string | null
+                    )?.split(' ') || '',
+                    {
+                        marker: (foundWord: string): ReactElement =>
+                            <span className={
+                                CSS_CLASS_NAMES
+                                    .textInputSuggestionsSuggestionMark
+                            }>
+                                {foundWord}
+                            </span>,
+                        normalizer: (value: unknown): string =>
+                            String(value).toLowerCase(),
+                        skipTagDelimitedParts: null
+                    }
+                ) as Array<ReactElement | string>)
+                    .map((
+                            item: ReactNode | string, index: number
                         ): ReactElement =>
                             <span key={index}>{item}</span>
-                        )}
-                    </MenuItem>
-                )
+                    )
+                currentRenderableSuggestions.push(marked)
                 currentSuggestionLabels.push(suggestion)
                 currentSuggestionValues.push(suggestionValues[index])
             }
@@ -1587,39 +1616,40 @@ export const TextInputInner = function<Type = unknown>(
             index += 1
         }
     }
-    const useSelection: boolean =
+    const isSelection: boolean =
         (Boolean(normalizedSelection) || Boolean(properties.labels)) &&
         !useSuggestions
     /// endregion
     /// region determine type specific constraints
-    const constraints: Mapping<unknown> = {}
+    const typeTextConstraints: Mapping<unknown> = {}
     if (properties.type === 'number') {
-        constraints.step = properties.step
+        typeTextConstraints.step = properties.step
 
         if (properties.maximum !== Infinity)
-            constraints.max = properties.maximum
+            typeTextConstraints.max = properties.maximum
         if (properties.minimum !== -Infinity)
-            constraints.min = properties.minimum
+            typeTextConstraints.min = properties.minimum
     } else if (properties.type === 'string') {
         if (
             properties.maximumLength >= 0 &&
             properties.maximumLength !== Infinity
         )
-            constraints.maxLength = properties.maximumLength
+            typeTextConstraints.maximumLength = properties.maximumLength
         if (properties.minimumLength > 0)
-            constraints.minLength = properties.minimumLength
+            typeTextConstraints.minimumLength = properties.minimumLength
 
         if (properties.editor !== 'plain')
-            constraints.rows = properties.rows
+            typeTextConstraints.rows = properties.rows
     } else if ([
+        'date', 'date-local',
         'date', 'date-local',
         'datetime', 'datetime-local',
         'time', 'time-local'
     ].includes(properties.type as string)) {
-        constraints.step = properties.step
+        typeTextConstraints.step = properties.step
 
         if (properties.maximum !== Infinity)
-            constraints.max = formatValue<Type>(
+            typeTextConstraints.max = formatValue<Type>(
                 properties,
                 properties.maximum as
                     unknown as
@@ -1627,7 +1657,7 @@ export const TextInputInner = function<Type = unknown>(
                 transformer
             )
         if (properties.minimum !== -Infinity)
-            constraints.min = formatValue<Type>(
+            typeTextConstraints.min = formatValue<Type>(
                 properties,
                 properties.minimum as
                     unknown as
@@ -1636,11 +1666,8 @@ export const TextInputInner = function<Type = unknown>(
             )
     }
     /// endregion
-    const EditorComponent = properties.editor.startsWith('code') ?
-        CodeEditorComponent :
-        RichTextEditorComponent
-    const editorProperties =
-        {} as CodeEditorProperties | RichTextEditorProperties
+    const editorProperties = {} as
+        CodeEditorProperties | RichTextEditorProperties
     if (isAdvancedEditor)
         if (
             properties.editor.startsWith('code(') &&
@@ -1685,32 +1712,28 @@ export const TextInputInner = function<Type = unknown>(
         tooltip={properties.tooltip}
     >
         <div
+            ref={wrapperReference}
+
             className={[CSS_CLASS_NAMES.textInput]
                 .concat(properties.className)
                 .join(' ')
             }
+            style={properties.styles}
+
             onBlur={onBlur}
             onKeyDown={onKeyDown}
-            ref={wrapperReference}
-            style={properties.styles}
+
+
             {...(useSuggestions ? {role: 'search'} : {})}
         >
             {wrapAnimationConditionally(
-                <Select
-                    {...genericProperties as SelectProps}
-                    {...materialProperties as SelectProps}
+                <Select<Type>
+                    {...textInputProperties}
 
-                    enhanced={true}
-
-                    foundationRef={foundationReference as
-                        RefObject<MDCSelectFoundation | null>
-                    }
-                    inputRef={inputReference as
-                        unknown as
-                        (reference: HTMLSelectElement | null) => void
-                    }
+                    name={properties.name}
 
                     onChange={onChangeValue}
+                    onClick={onClick}
                     onKeyDown={(event: ReactKeyboardEvent): void => {
                         /*
                             Avoid scrolling page interactions when navigating
@@ -1720,180 +1743,154 @@ export const TextInputInner = function<Type = unknown>(
                             event.preventDefault()
                     }}
 
-                    options={normalizedSelection as SelectProps['options']}
-
-                    rootProps={{
-                        name: properties.name,
-                        onClick: onClick,
-                        ...properties.rootProps
-                    }}
-                    value={String(properties.value)}
-
-                    {...properties.inputProperties as SelectProps}
+                    options={normalizedSelection as NormalizedSelection}
+                    value={properties.value as Type}
                 />,
-                useSelection
+                isSelection
             )}
-            {wrapAnimationConditionally(
-                <EditorComponent
-                    {...genericProperties as EditorProperties}
-                    {...materialProperties}
-                    {...constraints}
+            {isAdvancedEditor ?
+                isCodeEditor ?
+                    wrapAnimationConditionally(
+                        <CodeEditorComponent
+                            {...textInputProperties}
+                            {...typeTextInputProperties as
+                                Partial<CodeEditorProperties>
+                            }
+                            {...typeTextConstraints}
 
-                    align={properties.align}
-                    characterCount={
-                        typeof properties.maximumLength === 'number' &&
-                        !isNaN(properties.maximumLength) &&
-                        properties.maximumLength >= 0
-                    }
-                    foundationRef={
-                        foundationReference as
-                            RefObject<MDCTextFieldFoundation | null>
-                    }
-                    inputRef={
-                        inputReference as RefObject<HTMLTextAreaElement | null>
-                    }
-                    onChange={onChangeValue as (value: string) => void}
-                    ripple={properties.ripple}
-                    rootProps={{
-                        name: properties.name,
-                        onClick,
-                        onKeyUp,
-                        /*
-                            NOTE: Disabled input fields are not focusable
-                            via keyboard which makes them unreachable for
-                            blind people using e.g. screen readers.
-                            That's wgy the label gets a tabindex to make
-                            the input focusable.
-                        */
-                        tabIndex: properties.disabled ? '0' : '-1',
-                        ...properties.rootProps
-                    }}
-                    trailingIcon={wrapIconWithTooltip(applyIconPreset(
-                        properties.trailingIcon
-                    ))}
-                    type={determineNativeType(properties)}
-                    value={properties.representation as string}
+                            onChange={onChangeValue as
+                                CodeEditorProperties['onChange']
+                            }
 
-                    {...editorProperties as Partial<EditorProperties>}
-                    {...properties.inputProperties as Partial<EditorProperties>}
-                />,
-                isAdvancedEditor,
-                properties.editor.startsWith('code')
-            )}
+                            {...editorProperties as
+                                Partial<CodeEditorProperties>
+                            }
+
+                            ref={inputReference as
+                                RefObject<CodeMirrorReference>
+                            }
+                        />,
+                        isAdvancedEditor
+                    ) :
+                    <RichTextEditorComponent
+                        {...textInputProperties as
+                            Partial<RichTextEditorProperties>
+                        }
+                        {...typeTextInputProperties as
+                            Partial<RichTextEditorProperties>
+                        }
+                        {...typeTextConstraints}
+
+                        onChange={onChangeValue as
+                            RichTextEditorProperties['onChange']
+                        }
+
+                        {...editorProperties as
+                            Partial<RichTextEditorProperties>
+                        }
+
+                        ref={inputReference as RefObject<TipTapReference>}
+                    /> :
+                ''
+            }
             {wrapAnimationConditionally(
                 <div>
                     {useSuggestions ?
-                        <MenuSurfaceAnchor
+                        <Menu
+                            ref={menuReference}
+
                             onKeyDown={preventEnterKeyPropagation}
-                        >
-                            {selection instanceof AbortController ?
-                                <MenuSurface
-                                    anchorCorner="bottomLeft"
-                                    className={
-                                        CSS_CLASS_NAMES.textInputSuggestions +
-                                        ' ' +
-                                        CSS_CLASS_NAMES
-                                            .textInputSuggestionsPending
-                                    }
-                                    open={true}
-                                >
-                                    <CircularProgress size="large" />
-                                </MenuSurface> :
-                                <Menu
-                                    anchorCorner="bottomLeft"
-                                    apiRef={(instance: MenuApi | null) => {
-                                        suggestionMenuAPIReference.current =
-                                            instance
-                                    }}
-                                    className={
-                                        CSS_CLASS_NAMES.textInputSuggestions
-                                    }
-                                    focusOnOpen={false}
-                                    foundationRef={
-                                        suggestionMenuFoundationReference
-                                    }
-                                    onFocus={onFocus}
-                                    onSelect={(event: MenuOnSelectEventT) => {
-                                        onChangeValue(
-                                            currentSuggestionValues[
-                                                (event as
-                                                    {detail: {index: number}}
-                                                ).detail.index
-                                            ] as Type,
-                                            (event as {detail: {index: number}})
-                                                .detail.index
+                            pending={selection instanceof AbortController}
+
+                            classNames={[CSS_CLASS_NAMES.textInputSuggestions]}
+                            itemClassNames={[
+                                CSS_CLASS_NAMES.textInputSuggestionsSuggestion
+                            ]}
+                            pendingClassNames={[
+                                CSS_CLASS_NAMES.textInputSuggestionsPending
+                            ]}
+
+                            onFocus={onFocus}
+                            onSelect={(event: SyntheticEvent) => {
+                                onChangeValue(
+                                    currentSuggestionValues[
+                                        (event as
+                                            unknown as
+                                            {detail: {index: number}}
                                         )
-                                        setIsSuggestionOpen(false)
-                                    }}
-                                    open={
-                                        Boolean(
-                                            currentSuggestionLabels.length
-                                        ) &&
-                                        isSuggestionOpen &&
-                                        /*
-                                            NOTE: If single possibility is
-                                            already selected avoid showing this
-                                            suggestion.
-                                        */
-                                        !(
-                                            currentSuggestionLabels.length ===
-                                                1 &&
-                                            currentSuggestionLabels[0] ===
-                                                properties.representation
-                                        )
-                                    }
-                                >
-                                    {currentRenderableSuggestions}
-                                </Menu>
+                                            .detail.index
+                                    ] as Type,
+                                    (event as
+                                        unknown as
+                                        {detail: {index: number}}
+                                    ).detail.index
+                                )
+                                setIsSuggestionOpen(false)
+                            }}
+                            open={
+                                Boolean(currentSuggestionLabels.length) &&
+                                isSuggestionOpen &&
+                                /*
+                                    NOTE: If single possibility is already
+                                    selected avoid showing this suggestion.
+                                */
+                                !(
+                                    currentSuggestionLabels.length === 1 &&
+                                    currentSuggestionLabels[0] ===
+                                        properties.representation
+                                )
                             }
-                        </MenuSurfaceAnchor> :
+
+                            options={currentRenderableSuggestions}
+                        /> :
                         ''
                     }
-                    <TextField
-                        {...genericProperties as TextFieldProps}
-                        {...materialProperties}
-                        {...constraints}
-                        align={properties.align}
-                        characterCount={
-                            typeof properties.maximumLength === 'number' &&
-                            !isNaN(properties.maximumLength) &&
-                            properties.maximumLength >= 0
-                        }
-                        foundationRef={foundationReference as
-                            RefObject<MDCTextFieldFoundation | null>
-                        }
-                        inputRef={inputReference as
-                            RefObject<HTMLInputElement | null>
-                        }
-                        onChange={onChangeValue}
-                        ripple={properties.ripple}
-                        rootProps={{
-                            name: properties.name,
-                            onClick,
-                            onKeyUp,
-                            /*
-                                NOTE: Disabled input fields are not focusable
-                                via keyboard which makes them unreachable for
-                                blind people using e.g. screen readers.
-                                That's wgy the label gets a tabindex to make
-                                the input focusable.
-                            */
-                            tabIndex: properties.disabled ? '0' : '-1',
-                            ...properties.rootProps
-                        }}
-                        textarea={
-                            properties.type === 'string' &&
-                            properties.editor !== 'plain'
-                        }
-                        trailingIcon={wrapIconWithTooltip(applyIconPreset(
-                            properties.trailingIcon
-                        ))}
-                        type={determineNativeType(properties)}
-                        value={properties.representation as string}
-                        {...properties.inputProperties as TextFieldProps}
-                    />
+                    {
+                        properties.type === 'string' &&
+                        properties.editor !== 'plain' ?
+                            <TextArea
+                                {...textInputProperties as
+                                    Partial<TextInputProperties<string>>
+                                }
+                                {...typeTextInputProperties as
+                                    Partial<TypeTextInputProperties<string>>
+                                }
+                                {...typeTextConstraints as
+                                    Partial<TypeTextInputProperties<string>>
+                                }
+
+                                ref={inputReference as
+                                    RefObject<TextAreaReference>
+                                }
+
+                                onChange={
+                                    onChangeValue as
+                                        TextAreaProperties['onChange']
+                                }
+                            /> :
+                            <TextField
+                                {...textInputProperties}
+                                {...typeTextInputProperties as
+                                    Partial<TextFieldProperties>
+                                }
+                                {...typeTextConstraints}
+
+                                onChange={onChangeValue as
+                                    TextFieldProperties['onChange']
+                                }
+
+                                leadingIcon={wrapIconWithTooltip(
+                                    applyIconPreset(properties.leadingIcon)
+                                )}
+                                trailingIcon={wrapIconWithTooltip(
+                                    applyIconPreset(properties.trailingIcon)
+                                )}
+
+                                type={determineNativeType(properties)}
+                            />
+                    }
                 </div>,
-                !(isAdvancedEditor || useSelection),
+                !(isAdvancedEditor || isSelection),
                 properties.editor.startsWith('code')
             )}
         </div>

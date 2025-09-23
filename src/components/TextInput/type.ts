@@ -47,21 +47,19 @@ import {GenericEvent} from 'react-generic-tools/type'
 
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 
-import {MDCMenuFoundation} from '@material/menu'
-import {MDCSelectFoundation} from '@material/select'
-import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
-
-import {MenuApi} from '@rmwc/menu'
 import {
     FormattedOption as FormattedSelectionOption, SelectProps
 } from '@rmwc/select'
-import {TextFieldProps} from '@rmwc/textfield'
-import {IconOptions} from '@rmwc/types'
 
 import {ChainedCommands, type EditorOptions, Extensions} from '@tiptap/core'
 import {EditorEvents} from '@tiptap/react'
 import {StarterKitOptions} from '@tiptap/starter-kit'
 
+import {
+    IconProperties,
+    InputReference, SelectProperties,
+    TextAreaProperties, TextFieldProperties
+} from '../../implementations/type'
 import {
     BaseModel,
     CursorState,
@@ -76,6 +74,9 @@ import {
     StaticWebComponent,
     ValueState as BaseValueState
 } from '../../type'
+import {
+    Reference as InputEventMapperReference
+} from './InputEventMapperWrapper'
 // endregion
 // region data transformation
 export type Transformer<T = unknown> = (
@@ -152,37 +153,21 @@ export type DataTransformation =
     }
     /* eslint-enable @typescript-eslint/consistent-indexed-object-style */
 // endregion
+export interface EditorReference {
+    input: RefObject<InputEventMapperReference | null>
+}
+
 export interface EditorProperties
     extends
-Omit<NonNullable<TextFieldProps>, 'textarea' | 'value'> {
+Omit<NonNullable<TextAreaProperties>, 'onChange' | 'textarea' | 'value'> {
     id: string
     value: number | string
 
-    minLength: number
-    maxLength: number
+    minimumLength: number
+    maximumLength: number
     rows: number
 
     onChange: (value: string, contentTree?: JSONContent) => void
-}
-
-export interface EditorWrapperEventWrapper {
-    blur: (event: object) => void
-    focus: (event: object) => void
-    input: (value: number | string, event: object) => void
-}
-export interface EditorWrapperProps extends Partial<EditorProperties> {
-    eventMapper: RefObject<EditorWrapperEventWrapper | null>
-
-    materialTextField?: RefObject<MDCTextField | null>
-    mdcTextFieldReference?: RefObject<HTMLLabelElement | null>
-    textareaReference?: RefObject<HTMLTextAreaElement | null>
-
-    children: ReactNode
-    barContentSlot?: ReactNode
-
-    classNamePrefix: string
-
-    onLabelClick?: (event: MouseEvent<HTMLLabelElement>) => void
 }
 
 export interface RichTextEditorButtonProps {
@@ -196,7 +181,9 @@ export interface RichTextEditorButtonProps {
 
     label?: string
 }
-export interface TiptapProperties extends EditorProperties {
+export interface TiptapProperties extends
+    Omit<EditorProperties, 'onBlur' | 'onFocus'>
+{
     onBlur: (event: EditorEvents['focus']) => void
     onFocus: (event: EditorEvents['focus']) => void
 
@@ -208,7 +195,9 @@ export interface TiptapProperties extends EditorProperties {
 }
 export type TiptapProps = Partial<TiptapProperties>
 
-export interface CodeMirrorProperties extends EditorProperties {
+export interface CodeMirrorProperties extends
+    Omit<EditorProperties, 'onBlur' | 'onFocus'>
+{
     onBlur: (event: ReactFocusEvent<HTMLDivElement>) => void
     onFocus: (event: ReactFocusEvent<HTMLDivElement>) => void
 
@@ -312,13 +301,13 @@ export type EditorType = (
     'text' |
     'richtext'
 )
-export interface Properties<T = unknown> extends
-    ModelState, BaseProperties<T>
+export interface Properties<Type = unknown> extends
+    ModelState, BaseProperties<Type>
 {
-    default?: T
+    default?: Type
 
     align: 'end' | 'start'
-    children: (options: ChildrenOptions<this, T>) => null | ReactElement
+    children: (options: ChildrenOptions<this, Type>) => null | ReactElement
     cursor: Partial<CursorState> | null
 
     editor: EditorType
@@ -327,13 +316,18 @@ export interface Properties<T = unknown> extends
 
     hidden?: boolean
 
-    icon: string | (IconOptions & {tooltip?: string})
-    trailingIcon: string | (IconOptions & {tooltip?: string})
+    leadingIcon: string | (IconProperties & {tooltip?: string})
+    trailingIcon: string | (IconProperties & {tooltip?: string})
 
-    inputProperties: Partial<
-        CodeMirrorProps | TiptapProps | SelectProps | TextFieldProps
+    domNodeProperties: Partial<
+        CodeMirrorProps |
+        SelectProperties<Type> |
+        TiptapProps |
+        TextAreaProperties |
+        TextFieldProperties |
+        Mapping<unknown>
     >
-    inputProps?: Mapping<boolean | number | string>
+    attributes?: Mapping<boolean | number | string>
 
     invertedPattern: Array<RegExp | string> | null | RegExp | string
     invertedPatternText: string
@@ -346,7 +340,7 @@ export interface Properties<T = unknown> extends
     maximumText: string
     minimumText: string
 
-    model: Model<T>
+    model: Model<Type>
 
     onChangeEditorIsActive: (
         isActive: boolean, event: MouseEvent | undefined, properties: this
@@ -355,8 +349,6 @@ export interface Properties<T = unknown> extends
     onKeyUp: (event: KeyboardEvent, properties: this) => void
     onSelect: (event: GenericEvent, properties: this) => void
     onSelectionChange: (event: GenericEvent, properties: this) => void
-
-    outlined: boolean
 
     pattern: Array<RegExp | string> | null | RegExp | string
     patternText: string
@@ -376,7 +368,7 @@ export interface Properties<T = unknown> extends
     suggestSelection: boolean
 
     transformer: RecursivePartial<DataTransformSpecification<
-        T, Date | number | string
+        Type, Date | number | string
     >>
 }
 export type Props<T = unknown> =
@@ -411,17 +403,9 @@ export type Adapter<T = unknown> = ComponentAdapter<
 >
 export interface AdapterWithReferences<T = unknown> extends Adapter<T> {
     references: {
-        foundationReference: RefObject<
-            MDCSelectFoundation | MDCTextFieldFoundation | null
-        >
-        inputReference: RefObject<
-            HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
-        >
-        suggestionMenuAPIReference: RefObject<MenuApi | null>
-        suggestionMenuFoundationReference: RefObject<
-            MDCMenuFoundation | null
-        >
-        wrapperReference: RefObject<HTMLDivElement | null>
+        input: RefObject<InputReference | InputEventMapperReference | null>
+        menu: RefObject<unknown>
+        wrapper: RefObject<HTMLDivElement | null>
     }
 }
 
@@ -500,8 +484,7 @@ export const propertyTypes: ValidationMapping = {
     icon: oneOfType([string, object]),
     trailingIcon: oneOfType([string, object]),
 
-    inputProperties: object,
-    inputProps: object,
+    attributes: object,
 
     invertedPattern: oneOfType(
         [arrayOf(oneOfType([object, string])), object, string]

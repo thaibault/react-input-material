@@ -34,13 +34,13 @@ import {
     ValidationMap
 } from 'clientnode/property-types'
 import {
-    ComponentClass, FocusEvent as ReactFocusEvent,
+    ComponentClass,
     FocusEvent,
     ForwardRefExoticComponent,
-    FunctionComponent, MouseEvent as ReactMouseEvent,
+    FunctionComponent,
     MouseEvent,
-    ReactElement, ReactNode,
-    RefAttributes, SyntheticEvent
+    ReactElement,
+    RefAttributes
 } from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
 import {
@@ -50,7 +50,6 @@ import {
 } from 'web-component-wrapper/type'
 import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
-import {RipplePropT} from '@rmwc/types'
 // endregion
 // region exports
 /// region generic
@@ -155,9 +154,8 @@ CommonBaseModel<T>, ModelState {
     required: boolean
     requiredText: string
 
-    ripple: RipplePropT
-
-    rootProps: Mapping<boolean | number | string>
+    componentProperties: Mapping<unknown>
+    domNodeProperties: Mapping<unknown>
     /*
         NOTE: selection allows more options than when configuring via "model"
         to be aligned to backend view of selections.
@@ -358,7 +356,6 @@ export const propertyTypes: ValidationMapping = {
     enforceUncontrolled: boolean,
 
     initialValue: any,
-    inputProperties: object,
     model: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
         modelPropertyTypes
     ),
@@ -374,9 +371,8 @@ export const propertyTypes: ValidationMapping = {
     required: boolean,
     requiredText: string,
 
-    ripple: oneOfType([boolean, object]),
-
-    rootProps: object,
+    componentProperties: object,
+    domNodeProperties: object,
 
     showDeclaration: oneOfType([boolean, symbol]),
 
@@ -419,7 +415,7 @@ export const defaultModel: BaseModel<string> = {
     maximum: Infinity,
     minimum: -Infinity,
 
-    maximumLength: -1,
+    maximumLength: Infinity,
     minimumLength: 0,
 
     mutable: true,
@@ -445,6 +441,9 @@ export const defaultProperties: DefaultProperties = {
     className: [],
     styles: {},
 
+    componentProperties: {},
+    domNodeProperties: {},
+
     enforceUncontrolled: false,
 
     model: {...defaultModel},
@@ -465,32 +464,5 @@ export interface ConfigurationProperties {
     themeConfiguration?: ThemeProviderProps['options']
     tooltip?: Properties['tooltip']
     wrap?: boolean
-}
-// endregion
-// region low-level-components-interface
-export interface CheckboxProperties {
-    id: string
-
-    classNames: Array<string>
-    styles: object
-
-    value: boolean
-    disabled: boolean
-    indeterminate: boolean
-
-    name: string
-    children: ReactNode
-
-    onBlur: (event: SyntheticEvent) => void
-    onChange: (event: SyntheticEvent) => void
-    onClick: (event: ReactMouseEvent) => void
-    onFocus: (event: ReactFocusEvent) => void
-}
-export interface ErrorProperties {
-    children: string
-}
-export interface TooltipProperties {
-    children: ReactNode
-    value: string
 }
 // endregion

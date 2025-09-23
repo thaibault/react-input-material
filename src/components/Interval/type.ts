@@ -33,8 +33,8 @@ import {GenericEvent} from 'react-generic-tools/type'
 import {
     ComponentAdapter, PropertiesValidationMap
 } from 'web-component-wrapper/type'
-import {IconOptions} from '@rmwc/types'
 
+import {IconProperties} from '../../implementations/type'
 import {
     defaultModelState as baseDefaultModelState,
     Component as BaseComponent,
@@ -87,7 +87,7 @@ export interface Properties extends Omit<
     TextInputProperties<DateTimeRepresentation | null>,
     'icon' | 'model' | 'onChange' | 'onChangeValue' | 'value'
 > {
-    icon: IconOptions
+    icon: IconProperties
 
     model: Model
 
@@ -135,7 +135,7 @@ export type Props =
             }
         >
 
-        icon: Properties['icon'] | string
+        icon: IconProperties | string
 
         model?: PartialModel
 

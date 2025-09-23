@@ -137,20 +137,20 @@ export const determineRepresentationType = (
     contentType = contentType.replace(/; *charset=.+$/, '')
 
     if (TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType))
-        return 'text'
+        return RepresentationType.TEXT
 
     if (EMBEDABLE_TEXT_CONTENT_TYPE_REGULAR_EXPRESSION.test(
         contentType
     ))
-        return 'embedableText'
+        return RepresentationType.EMBEDABLE_TEXT
 
     if (IMAGE_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType))
-        return 'image'
+        return RepresentationType.IMAGE
 
     if (VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION.test(contentType))
-        return 'video'
+        return RepresentationType.VIDEO
 
-    return 'binary'
+    return RepresentationType.BINARY
 }
 /**
  * Derives validation state from provided properties and state.

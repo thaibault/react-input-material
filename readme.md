@@ -42,42 +42,25 @@ selections, numbers, dates and so on.
 
 #### FileInput
 
-- Card
-    - Inputs:
-        - classNames: string[]
-        - styles: object
-        - ref: object
-    - Outputs:
-        - onBlur
-        - onClick
-        - onFocus
+- MediaCard
 - CircularProgress
 
-#### RequireableCheckbox
+#### Checkbox
 
 - Checkbox
 
 #### Inputs
 
 - IconButton
-    - Inputs:
-        - classNames: string[]
-        - styles: object
-        - ref: object
-        - icon: string
-        - onIcon: string
-    - Outputs:
-        - onClick
 
 #### Interval
 
 - Icon
-    - Inputs:
-        - classNames: string[]
-        - styles: object
-        - ref: object
-        - icon: string
 
 #### TextInput
 
-- TODO
+- Select
+- TextArea (with advanced editor integration interface)
+- TextField
+- Menu
+  - TODO

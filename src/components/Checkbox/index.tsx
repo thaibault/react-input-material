@@ -1,6 +1,6 @@
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
-/** @module RequireableCheckbox */
+/** @module Checkbox */
 'use strict'
 /* !
     region header
@@ -36,14 +36,14 @@ import {
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
-import Checkbox from '@low-level-component-implementations/Checkbox'
-import Error from '@low-level-component-implementations/Error'
+import LowLevelCheckbox from '#implementations/Checkbox'
+import Error from '#implementations/Error'
 /*
 "namedExport" version of css-loader:
 
-import {requireableCheckboxClassName} from './style.module'
+import {checkboxClassName} from './style.module'
 */
-import {WrapConfigurations} from '../WrapConfigurations'
+import {WrapConfigurations} from '../Wrapper/WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
     determineInitialValue,
@@ -71,6 +71,8 @@ import {
     propertyTypes,
     ValueState
 } from './type'
+import {InputReference} from '../../implementations/type'
+import {GenericEvent} from 'react-generic-tools/type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
@@ -113,7 +115,7 @@ export function determineValidationState(
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const RequireableCheckboxInner = function(
+export const CheckboxInner = function(
     props: Props, reference?: RefObject<Adapter>
 ): ReactElement {
     // region property aggregation
@@ -125,7 +127,7 @@ export const RequireableCheckboxInner = function(
     const getConsolidatedProperties = (properties: Props): Properties => {
         let result: DefaultProperties =
             mapPropertiesIntoModel<Props, DefaultProperties>(
-                properties, RequireableCheckbox.defaultProperties.model
+                properties, Checkbox.defaultProperties.model
             )
 
         determineValidationState(
@@ -214,9 +216,16 @@ export const RequireableCheckboxInner = function(
      * Triggered when ever the value changes.
      * @param event - Event object.
      */
-    const onChangeValue = (event: SyntheticEvent): void => {
+    const onChangeValue = (
+        event: GenericEvent<boolean> | boolean
+    ): void => {
         if (!(properties.model.mutable && properties.model.writable))
             return
+
+        if (typeof event === 'boolean')
+            event = {target: {checked: event}} as
+                unknown as
+                GenericEvent<boolean>
 
         properties.value = Boolean(
             (event.target as unknown as {checked: boolean | null}).checked
@@ -338,14 +347,14 @@ export const RequireableCheckboxInner = function(
     // endregion
     // region properties
     /// region references
-    const inputReference: RefObject<HTMLInputElement | null> =
-        useRef<HTMLInputElement>(null)
+    const inputReference: RefObject<InputReference | null> =
+        useRef<InputReference>(null)
     /// endregion
     const givenProps: Props = translateKnownSymbols(props)
 
     const initialValue: boolean | null = determineInitialValue<boolean | null>(
         givenProps,
-        RequireableCheckbox.defaultProperties.model.default,
+        Checkbox.defaultProperties.model.default,
         givenProps.checked
     )
     /*
@@ -354,14 +363,14 @@ export const RequireableCheckboxInner = function(
         instances.
     */
     const givenProperties: Props = extend(
-        true, copy(RequireableCheckbox.defaultProperties), givenProps
+        true, copy(Checkbox.defaultProperties), givenProps
     )
     /*
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
     */
     let [valueState, setValueState] = useState<ValueState>({
-        modelState: {...RequireableCheckbox.defaultModelState},
+        modelState: {...Checkbox.defaultModelState},
         value: initialValue
     })
 
@@ -414,11 +423,11 @@ export const RequireableCheckboxInner = function(
     // endregion
     // region render
     return <WrapConfigurations
-        strict={RequireableCheckbox.strict}
+        strict={Checkbox.strict}
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
     >
-        <Checkbox
+        <LowLevelCheckbox
             value={Boolean(properties.value)}
             disabled={properties.disabled}
             indeterminate={properties.value === null}
@@ -429,8 +438,7 @@ export const RequireableCheckboxInner = function(
             ref={inputReference}
 
             classNames={
-                [CSS_CLASS_NAMES.requireableCheckbox]
-                    .concat(properties.className)
+                [CSS_CLASS_NAMES.checkbox].concat(properties.className)
             }
             styles={properties.styles}
 
@@ -438,6 +446,9 @@ export const RequireableCheckboxInner = function(
             onChange={onChangeValue}
             onClick={onClick}
             onFocus={onFocus}
+
+            componentProperties={properties.componentProperties}
+            domNodeProperties={properties.domNodeProperties}
         >
             {(
                 properties.invalid &&
@@ -447,17 +458,15 @@ export const RequireableCheckboxInner = function(
                     properties.visited
                 )
             ) ?
-                <Error>
-                    {properties.description || properties.name}
-                </Error> :
+                <Error>{properties.description || properties.name}</Error> :
                 properties.description || properties.name
             }
-        </Checkbox>
+        </LowLevelCheckbox>
     </WrapConfigurations>
     // endregion
 } as ForwardRefRenderFunction<Adapter, Props>
 // NOTE: This is useful in react dev tools.
-RequireableCheckboxInner.displayName = 'RequireableCheckbox'
+CheckboxInner.displayName = 'Checkbox'
 /**
  * Wrapping web component compatible react component.
  * @property defaultModelState - Initial model state.
@@ -470,22 +479,22 @@ RequireableCheckboxInner.displayName = 'RequireableCheckbox'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const RequireableCheckbox: Component<
-    typeof RequireableCheckboxInner
-> = memorize(forwardRef(RequireableCheckboxInner)) as
+export const Checkbox: Component<
+    typeof CheckboxInner
+> = memorize(forwardRef(CheckboxInner)) as
     unknown as
-    Component<typeof RequireableCheckboxInner>
+    Component<typeof CheckboxInner>
 // region static properties
 /// region web-component hints
-RequireableCheckbox.wrapped = RequireableCheckboxInner
-RequireableCheckbox.webComponentAdapterWrapped = 'react'
+Checkbox.wrapped = CheckboxInner
+Checkbox.webComponentAdapterWrapped = 'react'
 /// endregion
-RequireableCheckbox.defaultModelState = baseDefaultModelState
+Checkbox.defaultModelState = baseDefaultModelState
 /*
     NOTE: We set values to "undefined" to identify whether these values where
     provided via "props" and should shadow a state saved valued.
 */
-RequireableCheckbox.defaultProperties = {
+Checkbox.defaultProperties = {
     ...defaultProperties,
     model: {
         ...defaultProperties.model,
@@ -495,7 +504,7 @@ RequireableCheckbox.defaultProperties = {
     },
     value: undefined
 }
-RequireableCheckbox.propTypes = propertyTypes as PropertiesValidationMap
-RequireableCheckbox.strict = false
+Checkbox.propTypes = propertyTypes as PropertiesValidationMap
+Checkbox.strict = false
 // endregion
-export default RequireableCheckbox
+export default Checkbox

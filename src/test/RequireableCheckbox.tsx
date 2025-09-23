@@ -17,30 +17,27 @@
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
-import RequireableCheckbox from '../components/RequireableCheckbox'
+import Checkbox from '../components/Checkbox'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 
-describe('RequireableCheckbox', (): void => {
+describe('Checkbox', (): void => {
     test('render', (): void => {
-        expect(render(<RequireableCheckbox/>)).toBeDefined()
+        expect(render(<Checkbox/>)).toBeDefined()
 
         expect(
-            render(<RequireableCheckbox/>)?.querySelector('input')
+            render(<Checkbox/>)?.querySelector('input')
         ).toBeDefined()
-        expect(
-            render(<RequireableCheckbox/>)?.getAttribute('class')
-        ).toStrictEqual('requireable-checkbox')
+        expect(render(<Checkbox/>)?.getAttribute('class'))
+            .toStrictEqual('checkbox')
 
         expect(
-            render(
-                <RequireableCheckbox/>
-            )?.querySelector('input')?.getAttribute('id')
+            render(<Checkbox/>)?.querySelector('input')?.getAttribute('id')
         ).toStrictEqual('NO_NAME_DEFINED')
     })
     test('render id', () => {
         const domNode: HTMLDivElement | null =
-            render(<RequireableCheckbox id="test" name="test"/>)
+            render(<Checkbox id="test" name="test"/>)
 
         expect(domNode?.querySelector('input')?.getAttribute('id'))
             .toStrictEqual('test')
