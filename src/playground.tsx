@@ -89,7 +89,7 @@ const SECTIONS = [
 const Application = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(4)
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
     const activeSection = SECTIONS[activeTabIndex]
 
     const onChange: ((properties: BaseProps) => void) =
@@ -1253,8 +1253,7 @@ const Application = () => {
                         onClick={() => {
                             fileInputUnControlledHeadlessReference
                                 .current?.references
-                                .mediaCard?.current?.fileInput?.current?.click(
-                                )
+                                .mediaCard.current?.fileInput?.current?.click()
                         }}
                     >Add medium</button>
                     <FileInput
