@@ -42,7 +42,7 @@ selections, numbers, dates and so on.
 
 #### FileInput
 
-- Card
+- MediaCard
 - CircularProgress
 
 #### Checkbox

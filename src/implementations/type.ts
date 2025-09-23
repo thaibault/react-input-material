@@ -113,11 +113,25 @@ LowLevelBaseComponentProperties {
     onChange?: (eventOrValue: GenericEvent<Type> | Type) => void
 }
 
-export interface CardReference {
+export enum MediaCardRepresentationType {
+    IMAGE = 'image',
+    IFRAME = 'iframe',
+    TEXT = 'text',
+    VIDEO = 'video',
+    PENDING = 'pending'
+}
+export interface MediaCardReference {
+    card?: RefObject<HTMLDivElement | null>
+    iFrame?: RefObject<HTMLIFrameElement | null>
 }
 
-export interface CardProperties extends LowLevelBaseComponentProperties {
-    ref?: RefObject<CardReference | null>
+export interface MediaCardProperties extends LowLevelBaseComponentProperties {
+    ref?: RefObject<MediaCardReference | null>
+
+    type?: MediaCardRepresentationType
+    url?: string
+    content?: ReactNode
+    contentType?: string
 }
 
 export interface CheckboxProperties extends InputProperties<boolean> {
