@@ -512,8 +512,6 @@ export const propertyTypes: ValidationMapping = {
     onSelect: func,
     onSelectionChange: func,
 
-    outlined: boolean,
-
     pattern: oneOfType([arrayOf(oneOfType([object, string])), object, string]),
     patternText: string,
 
