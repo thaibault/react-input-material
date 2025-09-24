@@ -189,7 +189,8 @@ export const TextInputInner = function<Type = unknown>(
             let input = inputReference.current.input.current as
                 HTMLElement |
                 TextAreaReference |
-                EditorReference
+                EditorReference |
+                undefined
             if ((input as Partial<TextAreaReference>).input?.current) {
                 input =
                     (input as Partial<TextAreaReference | EditorReference>)
@@ -199,8 +200,11 @@ export const TextInputInner = function<Type = unknown>(
                     input =
                         (input as Partial<TextAreaReference>).input?.current as
                             HTMLElement
-            } else
+            }
+
+            if (!input)
                 return
+
             const inputDomNode = input as HTMLElement
 
             const determinedAttributes: Mapping<boolean | number | string> = {}
