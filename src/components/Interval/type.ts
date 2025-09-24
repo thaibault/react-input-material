@@ -22,6 +22,7 @@ import BasePropertyTypes, {
     oneOfType,
     shape,
     string,
+    symbol,
     ValidationMap,
     Validator
 } from 'clientnode/property-types'
@@ -177,25 +178,28 @@ export type Component<ComponentType> = BaseComponent<
 // region constants
 export const propertyTypes: PropertiesValidationMap = {
     ...textInputPropertyTypes as Mapping<ValueOf<PropertiesValidationMap>>,
-    value: shape<ValidationMap<{
-        end: unknown
-        start: unknown
-    }>>({
-        end: oneOfType<Validator<unknown>>([
-            number,
-            string,
-            shape<ValidationMap<ValueOf<typeof BasePropertyTypes>>>(
-                textInputPropertyTypes
-            )
-        ]),
-        start: oneOfType<Validator<unknown>>([
-            number,
-            string,
-            shape<ValidationMap<ValueOf<typeof BasePropertyTypes>>>(
-                textInputPropertyTypes
-            )
-        ])
-    })
+    value: oneOfType([
+        shape<ValidationMap<{
+            end: unknown
+            start: unknown
+        }>>({
+            end: oneOfType<Validator<unknown>>([
+                number,
+                string,
+                shape<ValidationMap<ValueOf<typeof BasePropertyTypes>>>(
+                    textInputPropertyTypes
+                )
+            ]),
+            start: oneOfType<Validator<unknown>>([
+                number,
+                string,
+                shape<ValidationMap<ValueOf<typeof BasePropertyTypes>>>(
+                    textInputPropertyTypes
+                )
+            ])
+        }),
+        symbol
+    ])
 } as const
 export const defaultProperties: DefaultProperties = {
     icon: {icon: 'timelapse'},
