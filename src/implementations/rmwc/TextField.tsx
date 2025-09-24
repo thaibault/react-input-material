@@ -74,11 +74,12 @@ export const TextField = forwardRef((
             disabled={properties.disabled}
 
             label={properties.label}
+            name={properties.name}
             placeholder={properties.placeholder}
 
             helpText={properties.helpText}
 
-            maxLength={isMaximumLength ? properties.maximumLength : Infinity}
+            maxLength={isMaximumLength ? properties.maximumLength : undefined}
 
             ref={baseReference}
             foundationRef={foundationReference}
