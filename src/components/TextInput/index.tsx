@@ -1493,6 +1493,12 @@ export const TextInputInner = function<Type = unknown>(
             LowLevelBaseComponentProperties['onFocus'],
 
         disabled: properties.disabled,
+        invalid: (
+            properties.invalid &&
+            properties.showValidationState &&
+            (properties.showInitialValidationState || properties.visited)
+        ),
+
         helpText: {
             children: renderHelpText(),
             persistent: true
@@ -1508,12 +1514,6 @@ export const TextInputInner = function<Type = unknown>(
         */
     }
     const typeTextInputProperties: Partial<TypeTextInputProperties<Type>> = {
-        invalid: (
-            properties.invalid &&
-            properties.showValidationState &&
-            (properties.showInitialValidationState || properties.visited)
-        ),
-
         placeholder: properties.placeholder,
         characterCount:
             typeof properties.maximumLength === 'number' &&

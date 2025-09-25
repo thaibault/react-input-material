@@ -430,6 +430,7 @@ export const CheckboxInner = function(
         <LowLevelCheckbox
             value={Boolean(properties.value)}
             disabled={properties.disabled}
+            invalid={properties.invalid}
             indeterminate={properties.value === null}
 
             id={properties.id || properties.name}

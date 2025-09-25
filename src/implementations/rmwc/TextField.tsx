@@ -72,6 +72,7 @@ export const TextField = forwardRef((
             characterCount={properties.characterCount && isMaximumLength}
 
             disabled={properties.disabled}
+            invalid={properties.invalid}
 
             label={properties.label}
             name={properties.name}

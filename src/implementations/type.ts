@@ -102,6 +102,7 @@ LowLevelBaseComponentProperties {
     ref?: RefObject<InputReference | null>
 
     disabled?: boolean
+    invalid?: boolean
 
     name?: string
     label?: ReactNode
@@ -208,8 +209,6 @@ TextInputProperties<Type> {
     value?: Type
 
     characterCount?: boolean
-
-    invalid?: boolean
 
     required?: boolean
     maximumLength?: number

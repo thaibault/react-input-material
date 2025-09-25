@@ -74,29 +74,30 @@ export const TextArea = forwardRef((
                 foundationReference.current =
                     materialTextFieldReference.current.getDefaultFoundation()
 
-                if (typeof properties.value === 'string')
+                if (typeof properties.value === 'string') {
+                    foundationReference.current.setValue(properties.value)
                     materialTextFieldReference.current.value = properties.value
+                }
 
-                if (typeof properties.disabled === 'boolean')
+                if (typeof properties.disabled === 'boolean') {
+                    foundationReference.current.setDisabled(
+                        properties.disabled
+                    )
                     materialTextFieldReference.current.disabled =
                         properties.disabled
+                }
 
-                if (typeof properties.invalid === 'boolean')
+                if (typeof properties.invalid === 'boolean') {
+                    foundationReference.current.setValid(!properties.invalid)
                     materialTextFieldReference.current.valid =
                         !properties.invalid
+                }
 
                 if (typeof properties.required === 'boolean')
                     materialTextFieldReference.current.required =
                         properties.required
 
-                if (typeof properties.minimumLength === 'number')
-                    materialTextFieldReference.current.minLength =
-                        properties.minimumLength
-                if (typeof properties.maximumLength === 'number')
-                    materialTextFieldReference.current.maxLength =
-                        properties.maximumLength
-
-                materialTextFieldReference.current.useNativeValidation = false
+                foundationReference.current.setUseNativeValidation(false)
 
                 return () => {
                     materialTextFieldReference.current?.destroy()
@@ -267,7 +268,9 @@ export const TextArea = forwardRef((
                         'mdc-text-field--with-internal-counter' :
                         []
                 )
-                .join(' ')}
+                .concat(properties.invalid ? 'mdc-text-field--invalid' : [])
+                .join(' ')
+            }
         >
             {
                 properties.componentProperties?.ripple !== false &&
