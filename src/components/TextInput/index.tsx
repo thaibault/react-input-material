@@ -135,7 +135,7 @@ import {
     ValueState
 } from './type'
 import TRANSFORMER from './transformer'
-import TextArea from '#implementations/TextArea'
+import Index from '#implementations/TextArea'
 import {
     Reference as InputEventMapperReference
 } from './InputEventMapperWrapper'
@@ -1852,7 +1852,7 @@ export const TextInputInner = function<Type = unknown>(
                     {
                         properties.type === 'string' &&
                         properties.editor !== 'plain' ?
-                            <TextArea
+                            <Index
                                 {...textInputProperties as
                                     Partial<TextInputProperties<string>>
                                 }

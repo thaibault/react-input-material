@@ -11,4 +11,8 @@ This library written by Torben Sickert stand under a creative commons naming
 endregion */
 .checkbox {
     display: block;
+
+    &.checkbox--invalid {
+        --mdc-checkbox-unchecked-color: var(--mdc-theme-error);
+    }
 }

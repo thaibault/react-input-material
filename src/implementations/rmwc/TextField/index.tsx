@@ -29,8 +29,8 @@ import React, {
     useRef
 } from 'react'
 
-import {InputReference, TextFieldProperties} from '../type'
-import Icon from './Icon'
+import {InputReference, TextFieldProperties} from '../../type'
+import Icon from '../Icon'
 import {useMemorizedValue} from 'react-generic-tools'
 // endregion
 export interface Reference extends InputReference {

@@ -6,7 +6,7 @@ import {
     useRef
 } from 'react'
 
-import TextArea from '#implementations/TextArea'
+import Index from '#implementations/TextArea'
 
 import {
     EventMapperWrapperReference,
@@ -66,9 +66,9 @@ export const Index = forwardRef((
         })
     )
 
-    return <TextArea ref={inputReference} {...properties}>
+    return <Index ref={inputReference} {...properties}>
         {properties.children}
-    </TextArea>
+    </Index>
 })
 
 export default Index

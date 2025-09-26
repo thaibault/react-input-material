@@ -20,13 +20,14 @@ import {MDCSelectFoundation} from '@material/select'
 import {OptionsType, Select as RMWCSelect} from '@rmwc/select'
 import {
     ForwardedRef,
-    forwardRef, memo as memorize,
+    forwardRef,
+    memo as memorize,
     ReactElement,
     useImperativeHandle,
     useRef
 } from 'react'
 
-import {InputReference, SelectProperties} from '../type'
+import {InputReference, SelectProperties} from '../../type'
 import {useMemorizedValue} from 'react-generic-tools'
 // endregion
 export const SelectInner = function<Type = unknown>(

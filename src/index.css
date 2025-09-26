@@ -11,12 +11,12 @@ This library written by Torben Sickert stand under a creative commons naming
  endregion */
 @import "react-generic-animate/index.compiled.css";
 
-@import "./components/FileInput/import.module.css";
+@import "./implementations/rmwc/MediaCard/import.module.css";
 /*
     Included in File Input:
 
     @import "./components/TextInput/import.module";
 */
-@import "./components/Checkbox/import.module.css";
+@import "./implementations/rmwc/Checkbox/import.module.css";
 
 @import "./implementations/rmwc/material-fixes.css";

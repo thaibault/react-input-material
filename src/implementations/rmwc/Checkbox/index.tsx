@@ -19,26 +19,17 @@
 import {MDCCheckboxFoundation} from '@material/checkbox'
 import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox'
 import {
-    ForwardedRef,
-    forwardRef,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
-    ReactElement,
-    useImperativeHandle,
-    useRef
+    ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useRef
 } from 'react'
 
-import {CheckboxProperties, InputReference} from '../type'
+import {CheckboxProperties, InputReference} from '../../type'
 // endregion
 export const Checkbox = forwardRef((
     properties: CheckboxProperties, reference?: ForwardedRef<InputReference>
 ): ReactElement => {
-    const baseReference: RefObject<HTMLInputElement | null> =
-        useRef<HTMLInputElement>(null)
-    const foundationReference: RefObject<MDCCheckboxFoundation | null> =
-        useRef<MDCCheckboxFoundation>(null)
-    const inputReference: RefObject<HTMLInputElement | null> =
-        useRef<HTMLInputElement>(null)
+    const baseReference = useRef<HTMLInputElement>(null)
+    const foundationReference = useRef<MDCCheckboxFoundation>(null)
+    const inputReference = useRef<HTMLInputElement>(null)
 
     useImperativeHandle(
         reference,
@@ -50,7 +41,11 @@ export const Checkbox = forwardRef((
     )
 
     return <div
-        className={properties.classNames?.join(' ')}
+        className={
+            [...(properties.classNames ?? [])]
+                .concat(properties.invalid ? 'checkbox--invalid' : [])
+                .join(' ')
+        }
         style={properties.styles}
     >
         <RMWCCheckbox
@@ -59,6 +54,8 @@ export const Checkbox = forwardRef((
 
             id={properties.name}
             indeterminate={properties.indeterminate}
+
+            aria-invalid={properties.invalid ? true : undefined}
 
             name={properties.name}
 

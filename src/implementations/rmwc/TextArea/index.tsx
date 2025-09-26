@@ -30,7 +30,7 @@ import {
     useRef
 } from 'react'
 
-import {TextAreaProperties, TextAreaReference} from '../type'
+import {TextAreaProperties, TextAreaReference} from '../../type'
 import {NOOP} from 'clientnode'
 // endregion
 export interface Reference extends TextAreaReference {
