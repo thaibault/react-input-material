@@ -38,11 +38,11 @@ import React, {
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
 
-import CircularProgress from './CircularProgress'
+import CircularProgress from '../CircularProgress'
 
 import {
     MediaCardProperties, MediaCardReference, MediaCardRepresentationType
-} from '../type'
+} from '../../type'
 // endregion
 export const MediaCardInner = function(
     properties: MediaCardProperties,

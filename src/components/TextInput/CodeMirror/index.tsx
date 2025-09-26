@@ -56,7 +56,8 @@ import {
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
     ReactElement,
-    useEffect, useImperativeHandle,
+    useEffect,
+    useImperativeHandle,
     useRef
 } from 'react'
 
@@ -203,13 +204,13 @@ export const Index = forwardRef((
         [editorView.current, properties.value]
     )
 
-    const clientHeight =
-        inputEventMapperReference
-            .current?.input?.current?.input?.current?.clientHeight
+    const textAreaDomNode =
+        inputEventMapperReference.current?.input?.current?.input?.current
     useEffect(
         () => {
-            let id: null | ReturnType<typeof setTimeout> = null
-            const syncHeight = () => {
+            const resizeObserver = new ResizeObserver(() => {
+                const clientHeight = textAreaDomNode?.clientHeight
+
                 if (editorViewReference.current && clientHeight) {
                     const scrollableViewNode: HTMLDivElement | null =
                         editorViewReference.current
@@ -223,20 +224,15 @@ export const Index = forwardRef((
                         return
                     }
                 }
-
-                id = setTimeout(() => {
-                    syncHeight()
-                })
-            }
-
-            syncHeight()
+            })
+            if (textAreaDomNode)
+                resizeObserver.observe(textAreaDomNode)
 
             return () => {
-                if (id !== null)
-                    clearTimeout(id)
+                resizeObserver.disconnect()
             }
         },
-        [editorViewReference.current, clientHeight]
+        [editorViewReference.current, textAreaDomNode]
     )
 
     return <InputEventMapper

@@ -649,11 +649,11 @@ const Application = () => {
                                 'text'
                         }
                         rows={2}
-
                         selectableEditor
 
                         maximumLength={10}
                         required
+
                         onChange={onChange}
                     />
                     <TextInput<string>

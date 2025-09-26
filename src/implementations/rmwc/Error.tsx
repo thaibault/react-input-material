@@ -22,10 +22,12 @@ import {ForwardedRef, forwardRef, ReactElement} from 'react'
 import {ErrorProperties} from '../type'
 // endregion
 export const Error = forwardRef((
-    {children}: ErrorProperties,
+    {children, applyToChildren}: ErrorProperties,
     reference?: ForwardedRef<HTMLDivElement | null>
 ): ReactElement =>
-    <Theme ref={reference} use="error">{children}</Theme>
+    <Theme ref={reference} use="error" wrap={applyToChildren}>
+        {children}
+    </Theme>
 )
 
 export default Error

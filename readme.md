@@ -42,12 +42,12 @@ selections, numbers, dates and so on.
 
 #### FileInput
 
-- MediaCard
+- Index
 - CircularProgress
 
-#### Checkbox
+#### Index
 
-- Checkbox
+- Index
 
 #### Inputs
 
@@ -59,8 +59,8 @@ selections, numbers, dates and so on.
 
 #### TextInput
 
-- Select
-- TextArea (with advanced editor integration interface)
-- TextField
+- Index
+- Index (with advanced editor integration interface)
+- Index
 - Menu
   - TODO

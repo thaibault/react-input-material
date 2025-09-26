@@ -20,8 +20,6 @@
 import {javascript} from '@codemirror/lang-javascript'
 import {css} from '@codemirror/lang-css'
 
-import {Theme} from '@rmwc/theme'
-
 import {
     camelCaseToDelimited,
     copy,
@@ -59,6 +57,7 @@ import {
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
+import Error from '#implementations/Error'
 import Icon from '#implementations/Icon'
 import IconButton from '#implementations/IconButton'
 import Menu from '#implementations/Menu'
@@ -84,7 +83,7 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState, EditorState, Selection, TypeSpecification
+    CursorState, EditorState, Selection, TypeSpecification, NormalizedSelection
 } from '../../type'
 import {
     IconProperties,
@@ -125,7 +124,6 @@ import {
     Model,
     ModelState,
     NativeType,
-    NormalizedSelection,
     Properties,
     propertyTypes,
     Props,
@@ -135,7 +133,7 @@ import {
     ValueState
 } from './type'
 import TRANSFORMER from './transformer'
-import TextArea from '#implementations/TextArea'
+import Index from '#implementations/TextArea'
 import {
     Reference as InputEventMapperReference
 } from './InputEventMapperWrapper'
@@ -526,7 +524,7 @@ export const TextInputInner = function<Type = unknown>(
                 (properties.showInitialValidationState || properties.visited)
             }
         >
-            <Theme use="error" wrap={true}>
+            <Error applyToChildren>
                 <span id={`${id}-error-message`}>
                     {renderMessage(
                         properties.invalidMaximum &&
@@ -552,7 +550,7 @@ export const TextInputInner = function<Type = unknown>(
                         }
                     )}
                 </span>
-            </Theme>
+            </Error>
         </GenericAnimate>
     </>
     /**
@@ -1049,7 +1047,7 @@ export const TextInputInner = function<Type = unknown>(
             const abortController = new AbortController()
 
             const onResultsRetrieved = (
-                results: Properties['selection']
+                results?: Selection
             ): void => {
                 if (abortController.signal.aborted)
                     return
@@ -1493,6 +1491,12 @@ export const TextInputInner = function<Type = unknown>(
             LowLevelBaseComponentProperties['onFocus'],
 
         disabled: properties.disabled,
+        invalid: (
+            properties.invalid &&
+            properties.showValidationState &&
+            (properties.showInitialValidationState || properties.visited)
+        ),
+
         helpText: {
             children: renderHelpText(),
             persistent: true
@@ -1508,12 +1512,6 @@ export const TextInputInner = function<Type = unknown>(
         */
     }
     const typeTextInputProperties: Partial<TypeTextInputProperties<Type>> = {
-        invalid: (
-            properties.invalid &&
-            properties.showValidationState &&
-            (properties.showInitialValidationState || properties.visited)
-        ),
-
         placeholder: properties.placeholder,
         characterCount:
             typeof properties.maximumLength === 'number' &&
@@ -1852,7 +1850,7 @@ export const TextInputInner = function<Type = unknown>(
                     {
                         properties.type === 'string' &&
                         properties.editor !== 'plain' ?
-                            <TextArea
+                            <Index
                                 {...textInputProperties as
                                     Partial<TextInputProperties<string>>
                                 }

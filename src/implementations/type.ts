@@ -26,8 +26,10 @@ import {
     ReactNode,
     SyntheticEvent
 } from 'react'
-import {NativeType, NormalizedSelection} from '../components/TextInput/type'
 import {GenericEvent} from 'react-generic-tools/type'
+
+import {NativeType} from '../components/TextInput/type'
+import {NormalizedSelection} from '../type'
 // endregion
 // region exports
 export type IconStrategy =
@@ -71,7 +73,9 @@ export interface CircularProgressProperties extends BaseProperties {
 }
 
 export interface ErrorProperties extends BaseProperties {
-    children: string
+    applyToChildren?: boolean
+
+    children: ReactNode
 }
 
 export interface IconProperties extends LowLevelBaseComponentProperties {
@@ -102,6 +106,7 @@ LowLevelBaseComponentProperties {
     ref?: RefObject<InputReference | null>
 
     disabled?: boolean
+    invalid?: boolean
 
     name?: string
     label?: ReactNode
@@ -208,8 +213,6 @@ TextInputProperties<Type> {
     value?: Type
 
     characterCount?: boolean
-
-    invalid?: boolean
 
     required?: boolean
     maximumLength?: number

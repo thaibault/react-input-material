@@ -30,5 +30,5 @@ Plain CSS:
 @import "@material/button/dist/mdc.button.css";
 @import "@material/card/dist/mdc.card.css";
 
-@import "../TextInput/import.module";
+@import "../TextField/import.module";
 /* endregion */

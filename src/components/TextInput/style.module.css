@@ -12,13 +12,6 @@ endregion */
 .text-input {
     display: block;
 
-    .mdc-text-field-helper-text {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        width: 100%;
-        white-space: nowrap;
-    }
-
     .code-editor {
         /*
             NOTE: This is needed to let autocomplete divs for the intellisense
@@ -67,10 +60,6 @@ endregion */
             }
         }
 
-        &.mdc-text-field--disabled .cm-editor {
-            opacity: 0.3;
-        }
-
         .code-editor__view {
             /*
                 This class is needed to be imported in the component. It should
@@ -97,14 +86,6 @@ endregion */
                 > span {
                     align-self: flex-start;
                 }
-
-                .mdc-icon-button--checked {
-                    color: var(--mdc-theme-secondary);
-                }
-            }
-
-            .mdc-text-field-character-counter {
-                margin-right: 10px;
             }
         }
 
@@ -114,16 +95,6 @@ endregion */
                 defined something to prevent that a minification removes it.
             */
             display: block;
-        }
-
-        &.mdc-text-field--disabled .richtext-editor__bar {
-            opacity: 0.3;
-        }
-
-        &.mdc-text-field--with-internal-counter .richtext-editor__bar {
-            display: flex;
-            flex-wrap: wrap;
-            width: 100%;
         }
 
         .tiptap:focus-visible {
@@ -148,7 +119,6 @@ endregion */
         }
 
         .text-input__suggestions__suggestion__mark {
-            color: var(--mdc-theme-secondary);
             display: contents;
         }
     }

@@ -48,7 +48,6 @@ import {
     StaticWebComponent as StaticBaseWebComponent,
     ValidationMapping
 } from 'web-component-wrapper/type'
-import {SelectProps} from '@rmwc/select'
 import {ThemeProviderProps} from '@rmwc/theme'
 // endregion
 // region exports
@@ -71,7 +70,7 @@ export type PrimitiveType = typeof PrimitiveTypes[number]
 export type Type = boolean | number | string // | 'any' | PrimitiveType
 export type TypeSpecification = Array<TypeSpecification> | Type
 //// region model
-export interface BaseSelectionMapping {
+export interface SelectionOption {
     label: string
     /*
         NOTE: Databases may support any value here but the current selection
@@ -80,8 +79,8 @@ export interface BaseSelectionMapping {
      */
     value: unknown
 }
-export type BaseSelection =
-    Array<BaseSelectionMapping> | Array<unknown> | Mapping<unknown>
+export type NormalizedSelection = Array<SelectionOption>
+export type Selection = Array<unknown> | Mapping<unknown> | NormalizedSelection
 export interface CommonBaseModel<Type = unknown> {
     declaration: string
     description: string
@@ -95,7 +94,7 @@ export interface CommonBaseModel<Type = unknown> {
     maximumLength: number
     minimumLength: number
 
-    selection?: BaseSelection
+    selection?: Selection
     type: TypeSpecification
 
     trim: boolean
@@ -130,7 +129,6 @@ export interface BaseModel<T = unknown> extends CommonBaseModel<T> {
     state?: ModelState
 }
 //// endregion
-export type Selection = Array<boolean | number> | SelectProps['options']
 export interface BaseProperties<T = unknown>
     extends
 CommonBaseModel<T>, ModelState {
@@ -160,7 +158,7 @@ CommonBaseModel<T>, ModelState {
         NOTE: selection allows more options than when configuring via "model"
         to be aligned to backend view of selections.
      */
-    selection: Selection
+    selection?: Selection
 
     showDeclaration: boolean
 
