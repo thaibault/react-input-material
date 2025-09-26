@@ -20,8 +20,6 @@
 import {javascript} from '@codemirror/lang-javascript'
 import {css} from '@codemirror/lang-css'
 
-import {Theme} from '@rmwc/theme'
-
 import {
     camelCaseToDelimited,
     copy,
@@ -59,6 +57,7 @@ import {
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
+import Error from '#implementations/Error'
 import Icon from '#implementations/Icon'
 import IconButton from '#implementations/IconButton'
 import Menu from '#implementations/Menu'
@@ -84,7 +83,7 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState, EditorState, Selection, TypeSpecification
+    CursorState, EditorState, Selection, TypeSpecification, NormalizedSelection
 } from '../../type'
 import {
     IconProperties,
@@ -125,7 +124,6 @@ import {
     Model,
     ModelState,
     NativeType,
-    NormalizedSelection,
     Properties,
     propertyTypes,
     Props,
@@ -526,7 +524,7 @@ export const TextInputInner = function<Type = unknown>(
                 (properties.showInitialValidationState || properties.visited)
             }
         >
-            <Theme use="error" wrap={true}>
+            <Error applyToChildren>
                 <span id={`${id}-error-message`}>
                     {renderMessage(
                         properties.invalidMaximum &&
@@ -552,7 +550,7 @@ export const TextInputInner = function<Type = unknown>(
                         }
                     )}
                 </span>
-            </Theme>
+            </Error>
         </GenericAnimate>
     </>
     /**
@@ -1049,7 +1047,7 @@ export const TextInputInner = function<Type = unknown>(
             const abortController = new AbortController()
 
             const onResultsRetrieved = (
-                results: Properties['selection']
+                results?: Selection
             ): void => {
                 if (abortController.signal.aborted)
                     return

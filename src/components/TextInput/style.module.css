@@ -1,0 +1,140 @@
+/* !/usr/bin/env css
+-*- coding: utf-8 -*- */
+/* region header
+Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
+
+License
+-------
+
+This library written by Torben Sickert stand under a creative commons naming
+3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
+endregion */
+.text-input {
+    display: block;
+
+    .code-editor {
+        /*
+            NOTE: This is needed to let autocomplete divs for the intellisense
+            mechanism being visible and overflow.
+        */
+        overflow: visible;
+        z-index: 1;
+
+        .cm-content {
+            opacity: 0;
+            /* stylelint-disable selector-class-pattern */
+            .cm-activeLine {
+                background-color: rgb(0 0 0 / 5%);
+            }
+            /* stylelint-enable selector-class-pattern */
+        }
+
+        .cm-gutters {
+            visibility: hidden;
+            /* stylelint-disable selector-class-pattern */
+            .cm-activeLineGutter {
+                background-color: rgb(0 0 0 / 5%);
+            }
+            /* stylelint-enable selector-class-pattern */
+        }
+
+        .cm-focused {
+            outline: none;
+
+            .cm-content {
+                opacity: 1;
+            }
+
+            .cm-gutters {
+                visibility: visible;
+            }
+        }
+
+        &.code-editor--has-content {
+            .cm-content {
+                opacity: 1;
+            }
+
+            .cm-gutters {
+                visibility: visible;
+            }
+        }
+
+        .code-editor__view {
+            /*
+                This class is needed to be imported in the component. It should
+                defined something to prevent that a minification removes it.
+            */
+            /*
+                NOTE: This is needed to let autocomplete divs being visible and
+                overflow.
+            */
+            overflow: visible;
+        }
+    }
+
+    .richtext-editor {
+        border-bottom: 1px solid rgb(0 0 0 / 42%);
+
+        .richtext-editor__bar {
+            padding-left: 6px;
+            width: calc(100% - 6px);
+
+            .richtext-editor-menu-bar {
+                display: contents;
+
+                > span {
+                    align-self: flex-start;
+                }
+            }
+        }
+
+        .richtext-editor__view {
+            /*
+                This class is needed to be imported in the component. It should
+                defined something to prevent that a minification removes it.
+            */
+            display: block;
+        }
+
+        .tiptap:focus-visible {
+            outline: none;
+        }
+    }
+
+    .text-input__suggestions {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        bottom: unset !important;
+        top: 54px !important;
+        width: 100%;
+
+        &.text-input__suggestions--pending {
+            padding: 10px;
+        }
+
+        .text-input__suggestions__suggestion {
+            visibility: visible;
+            white-space: break-spaces;
+        }
+
+        .text-input__suggestions__suggestion__mark {
+            display: contents;
+        }
+    }
+    /* Clears the 'X' from Internet Explorer */
+    input[type="search"]::-ms-clear,
+    input[type="search"]::-ms-reveal {
+        display: none;
+
+        height: 0;
+        width: 0;
+    }
+    /* Clears the 'X' from Chrome */
+    input[type="search"]::-webkit-search-cancel-button,
+    input[type="search"]::-webkit-search-decoration,
+    input[type="search"]::-webkit-search-results-button,
+    input[type="search"]::-webkit-search-results-decoration {
+        display: none;
+    }
+}

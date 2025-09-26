@@ -43,6 +43,7 @@ import {
     DefaultBaseProperties,
     DefaultProperties,
     ModelState,
+    NormalizedSelection,
     TypeSpecification,
     ValueState
 } from './type'
@@ -55,7 +56,6 @@ import {
     DataTransformation as TextInputDataTransformation,
     Props as TextInputProps,
     Selection as TextInputSelection,
-    NormalizedSelection as TextInputNormalizedSelection,
     Transformer as TextInputTransformer
 } from './components/TextInput/type'
 // endregion
@@ -282,7 +282,7 @@ export function determineInitialRepresentation<
     defaultProperties: DP,
     value: null | T,
     transformer: TextInputDataTransformation,
-    selection?: TextInputNormalizedSelection | null
+    selection?: NormalizedSelection | null
 ): string {
     if (typeof properties.representation === 'string')
         return properties.representation
@@ -528,7 +528,7 @@ export const getConsolidatedProperties = <
  * @returns Normalized sorted listed of labels and values.
  */
 export function getLabelAndValues(
-    selection?: TextInputNormalizedSelection | null
+    selection?: NormalizedSelection | null
 ): [Array<ReactNode | string>, Array<unknown>] {
     if (Array.isArray(selection)) {
         const labels: Array<string> = []
@@ -555,7 +555,7 @@ export function getLabelAndValues(
  * @returns Determined representation.
  */
 export function getRepresentationFromValueSelection(
-    value: unknown, selection?: TextInputNormalizedSelection | null
+    value: unknown, selection?: NormalizedSelection | null
 ): null | string {
     if (selection)
         for (const option of selection)
@@ -574,7 +574,7 @@ export function getRepresentationFromValueSelection(
  */
 export function getValueFromSelection<T>(
     label: ReactNode | string,
-    selection: TextInputNormalizedSelection | null | undefined
+    selection: NormalizedSelection | null | undefined
 ): T {
     if (Array.isArray(selection))
         for (const value of selection) {
@@ -607,7 +607,7 @@ export function getValueFromSelection<T>(
 export function normalizeSelection(
     selection?: TextInputSelection | null,
     labels?: Array<[string, string]> | Array<string> | Mapping | null
-): TextInputNormalizedSelection | null | undefined {
+): NormalizedSelection | null | undefined {
     if (!selection) {
         selection = labels
         labels = undefined
@@ -656,7 +656,7 @@ export function normalizeSelection(
         selectionIsOrdered = true
 
         if (selection.length) {
-            const result: TextInputNormalizedSelection = []
+            const result: NormalizedSelection = []
             let index = 0
             if (Array.isArray(selection[0]))
                 for (
@@ -670,9 +670,7 @@ export function normalizeSelection(
                     index += 1
                 }
             else if (isObject(selection[0]))
-                for (
-                    const option of selection as TextInputNormalizedSelection
-                ) {
+                for (const option of selection as NormalizedSelection) {
                     result.push({
                         ...option,
                         label: getLabel(option.value, index) ?? option.label
@@ -692,8 +690,8 @@ export function normalizeSelection(
             selection = result
         }
     } else {
-        const result: TextInputNormalizedSelection = []
-        for (const value of Object.keys(selection as Mapping<unknown>))
+        const result: NormalizedSelection = []
+        for (const value of Object.keys(selection))
             result.push({
                 label: getLabel(value) ?? (selection as Mapping)[value], value
             })
@@ -712,20 +710,20 @@ export function normalizeSelection(
             index += 1
         }
 
-        selection = (selection as TextInputNormalizedSelection).sort(
+        selection = (selection as NormalizedSelection).sort(
             ({value: first}, {value: second}): number =>
                 (labelMapping.get(first as string) ?? 0) -
                 (labelMapping.get(second as string) ?? 0)
         )
     } else if (!selectionIsOrdered)
         // Sort alphabetically by labels.
-        selection = (selection as TextInputNormalizedSelection).sort(
+        selection = (selection as NormalizedSelection).sort(
             ({label: first}, {label: second}): number =>
-                (first as string).localeCompare(second as string)
+                first.localeCompare(second)
         )
     // endregion
 
-    return selection as TextInputNormalizedSelection | undefined
+    return selection as NormalizedSelection | undefined
 }
 /// endregion
 /**

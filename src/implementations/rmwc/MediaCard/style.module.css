@@ -10,12 +10,6 @@ This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
 .file-input {
-    /*
-        Dummy value to avoid removing this class name during static
-        optimisation.
-    */
-    visibility: visible;
-
     .mdc-typography--headline6,
     .mdc-typography--subtitle2 {
         margin-left: 10px;
@@ -84,9 +78,5 @@ endregion */
         &::-webkit-scrollbar {
             display: none;
         }
-    }
-
-    .file-input__native {
-        display: none;
     }
 }

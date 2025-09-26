@@ -44,12 +44,7 @@ import {
     MutableRefObject as RefObject
 } from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
-
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
-
-import {
-    FormattedOption as FormattedSelectionOption, SelectProps
-} from '@rmwc/select'
 
 import {ChainedCommands, type EditorOptions, Extensions} from '@tiptap/core'
 import {EditorEvents} from '@tiptap/react'
@@ -62,10 +57,12 @@ import {
 } from '../../implementations/type'
 import {
     BaseModel,
+    Selection as BaseSelection,
     CursorState,
     defaultModel as baseDefaultModel,
     defaultModelState as baseDefaultModelState,
     defaultProperties as baseDefaultProperties,
+    NormalizedSelection,
     ModelState as BaseModelState,
     modelStatePropertyTypes as baseModelStatePropertyTypes,
     Properties as BaseProperties,
@@ -208,12 +205,7 @@ export interface CodeMirrorProperties extends
 export type CodeMirrorProps = Partial<CodeMirrorProperties>
 
 export type Selection =
-    Array<boolean | number | null> |
-    Array<[boolean | number | string | null, string]> |
-    NormalizedSelection |
-    SelectProps['options']
-export type NormalizedSelection =
-    Array<Omit<FormattedSelectionOption, 'value'> & {value: unknown}>
+    Array<[boolean | number | string | null, string]> | BaseSelection
 
 export interface ModelState extends BaseModelState {
     invalidMaximum: boolean

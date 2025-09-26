@@ -23,7 +23,10 @@ import {
 } from 'react'
 
 import {CheckboxProperties, InputReference} from '../../type'
+import cssClassNames from './style.module'
 // endregion
+const CSS_CLASS_NAMES = cssClassNames
+
 export const Checkbox = forwardRef((
     properties: CheckboxProperties, reference?: ForwardedRef<InputReference>
 ): ReactElement => {
@@ -43,7 +46,10 @@ export const Checkbox = forwardRef((
     return <div
         className={
             [...(properties.classNames ?? [])]
-                .concat(properties.invalid ? 'checkbox--invalid' : [])
+                .concat(properties.invalid ?
+                    CSS_CLASS_NAMES.checkboxInvalid :
+                    []
+                )
                 .join(' ')
         }
         style={properties.styles}
