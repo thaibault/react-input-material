@@ -89,7 +89,7 @@ const SECTIONS = [
 const Application = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(4)
     const activeSection = SECTIONS[activeTabIndex]
 
     const onChange: ((properties: BaseProps) => void) =
@@ -998,8 +998,9 @@ const Application = () => {
                             description: 'selectionInput5ModelDescription',
                             name: 'selectionInput5Model',
                             nullable: false,
-                            selection: {a: 'A', b: 'B', c: 'C'}
+                            selection: ['a', 'b', 'c']
                         })}
+                        labels={useMemorizedValue({a: 'A', b: 'B', c: 'C'})}
                         onChange={onChange}
                     />
 

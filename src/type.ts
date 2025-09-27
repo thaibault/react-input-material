@@ -24,7 +24,6 @@ import {
     func,
     number,
     object,
-    objectOf,
     oneOfType,
     PropertyTypes,
     Requireable,
@@ -70,6 +69,7 @@ export type PrimitiveType = typeof PrimitiveTypes[number]
 export type Type = boolean | number | string // | 'any' | PrimitiveType
 export type TypeSpecification = Array<TypeSpecification> | Type
 //// region model
+export type SelectionValue = boolean | number | string
 export interface SelectionOption {
     label: string
     /*
@@ -77,10 +77,12 @@ export interface SelectionOption {
         input does not allow this via typescript but seems to work with any
         value.
      */
-    value: unknown
+    value: SelectionValue
 }
 export type NormalizedSelection = Array<SelectionOption>
-export type Selection = Array<unknown> | Mapping<unknown> | NormalizedSelection
+export type ModelSelection = Array<SelectionValue> | NormalizedSelection
+export type Selection =
+    Array<[SelectionValue, string]> | Mapping | ModelSelection
 export interface CommonBaseModel<Type = unknown> {
     declaration: string
     description: string
@@ -94,7 +96,6 @@ export interface CommonBaseModel<Type = unknown> {
     maximumLength: number
     minimumLength: number
 
-    selection?: Selection
     type: TypeSpecification
 
     trim: boolean
@@ -120,6 +121,8 @@ export type Pattern = Array<RegExp | string> | RegExp | string
 export interface BaseModel<T = unknown> extends CommonBaseModel<T> {
     pattern?: Pattern
     invertedPattern?: Pattern
+
+    selection?: ModelSelection
 
     mutable: boolean
     writable: boolean
@@ -266,17 +269,17 @@ export const baseModelPropertyTypes: ValidationMapping = {
 
     default: any,
 
+    // NOTE: Corresponds to type "ModelSelection".
     selection: oneOfType([
-        arrayOf(oneOfType([
-            arrayOf(oneOfType([number, string])),
-            number,
-            objectOf(oneOfType([number, string])),
-            string
-        ])),
-        objectOf(oneOfType([number, string]))
+        arrayOf(oneOfType([boolean, number, string])),
+        arrayOf(shape({
+            label: string,
+            value: oneOfType([boolean, number, string])
+        }))
     ]),
     /*
-        NOTE: Also not yet working:
+        NOTE: Not yet working:
+
         type: oneOf([
             'date',
             'date-local',
@@ -357,6 +360,17 @@ export const propertyTypes: ValidationMapping = {
     model: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
         modelPropertyTypes
     ),
+
+    // NOTE: Overwrites model selection and corresponds to type "Selection".
+    selection: oneOfType([
+        arrayOf(arrayOf(oneOfType([boolean, number, string]))),
+        object,
+        arrayOf(oneOfType([boolean, number, string])),
+        arrayOf(shape({
+            label: string,
+            value: oneOfType([boolean, number, string])
+        }))
+    ]),
 
     onChange: func,
     onChangeValue: func,

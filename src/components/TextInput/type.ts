@@ -21,6 +21,7 @@ import {JSONContent} from '@tiptap/core'
 
 import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode'
 import BasePropertyTypes, {
+    any,
     arrayOf,
     boolean,
     func,
@@ -57,7 +58,6 @@ import {
 } from '../../implementations/type'
 import {
     BaseModel,
-    Selection as BaseSelection,
     CursorState,
     defaultModel as baseDefaultModel,
     defaultModelState as baseDefaultModelState,
@@ -67,6 +67,7 @@ import {
     modelStatePropertyTypes as baseModelStatePropertyTypes,
     Properties as BaseProperties,
     propertyTypes as basePropertyTypes,
+    Selection,
     State as BaseState,
     StaticWebComponent,
     ValueState as BaseValueState
@@ -204,9 +205,6 @@ export interface CodeMirrorProperties extends
 }
 export type CodeMirrorProps = Partial<CodeMirrorProperties>
 
-export type Selection =
-    Array<[boolean | number | string | null, string]> | BaseSelection
-
 export interface ModelState extends BaseModelState {
     invalidMaximum: boolean
     invalidMinimum: boolean
@@ -324,7 +322,7 @@ export interface Properties<Type = unknown> extends
     invertedPattern: Array<RegExp | string> | null | RegExp | string
     invertedPatternText: string
 
-    labels: Array<[string, string]> | Array<string> | Mapping
+    labels: Selection
 
     maximumLengthText: string
     minimumLengthText: string
@@ -483,7 +481,11 @@ export const propertyTypes: ValidationMapping = {
     ),
     invertedPatternText: string,
 
-    labels: oneOfType([arrayOf(arrayOf(string)), arrayOf(string), object]),
+    labels: oneOfType([
+        arrayOf(arrayOf(oneOfType([any, string]))),
+        arrayOf(string),
+        object
+    ]),
 
     maximum: oneOfType([number, string]),
     maximumLength: number,

@@ -700,13 +700,6 @@ export const TextInputInner = function<Type = unknown>(
                     Props<Type>
             )
 
-        if (!result.selection && result.type === 'boolean')
-            // NOTE: Select-Fields restricts values to strings.
-            result.selection = [
-                {label: 'No', value: false as unknown as string},
-                {label: 'Yes', value: true as unknown as string}
-            ]
-
         if (['plain', 'text'].includes(result.editor))
             result.selectableEditor = false
 
@@ -1057,8 +1050,8 @@ export const TextInputInner = function<Type = unknown>(
                     pending (slower) asynchronous request.
                 */
                 setSelection((
-                    oldSelection: AbortController | Properties['selection']
-                ): Properties['selection'] => {
+                    oldSelection?: AbortController | Properties['selection']
+                ): Properties['selection'] | undefined => {
                     if (
                         oldSelection instanceof AbortController &&
                         !oldSelection.signal.aborted
@@ -1101,7 +1094,7 @@ export const TextInputInner = function<Type = unknown>(
 
             if ((result as Promise<Properties['selection']> | null)?.then) {
                 setSelection((
-                    oldSelection: AbortController | Properties['selection']
+                    oldSelection?: AbortController | Properties['selection']
                 ): AbortController => {
                     if (
                         oldSelection instanceof AbortController &&
@@ -1347,7 +1340,7 @@ export const TextInputInner = function<Type = unknown>(
                 )
             } :
             TextInput.transformer
-
+    // region selection normalization
     let [selection, setSelection] =
         useState<AbortController | Properties['selection']>()
     if (givenProperties.selection || givenProperties.model?.selection)
@@ -1355,7 +1348,14 @@ export const TextInputInner = function<Type = unknown>(
             givenProperties.selection ||
             givenProperties.model?.selection as
                 Selection
-
+    if (
+        !selection &&
+        (givenProperties.type || givenProperties.model?.type) === 'boolean'
+    )
+        selection = [
+            {label: 'No', value: false},
+            {label: 'Yes', value: true}
+        ]
     const normalizedSelection: NormalizedSelection | null | undefined =
         selection instanceof AbortController ?
             [] :
@@ -1364,7 +1364,7 @@ export const TextInputInner = function<Type = unknown>(
         selection instanceof AbortController ?
             [[], []] :
             getLabelAndValues(normalizedSelection)
-
+    // endregion
     /*
         NOTE: This values have to share the same state item since they have to
         be updated in one event loop (set state callback).
