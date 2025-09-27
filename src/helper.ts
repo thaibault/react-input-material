@@ -44,6 +44,7 @@ import {
     DefaultProperties,
     ModelState,
     NormalizedSelection,
+    Selection,
     TypeSpecification,
     ValueState
 } from './type'
@@ -55,7 +56,6 @@ import {
     FormatSpecifications as TextInputFormatSpecifications,
     DataTransformation as TextInputDataTransformation,
     Props as TextInputProps,
-    Selection as TextInputSelection,
     Transformer as TextInputTransformer
 } from './components/TextInput/type'
 // endregion
@@ -605,8 +605,7 @@ export function getValueFromSelection<T>(
  * @returns Determined normalized sorted selection configuration.
  */
 export function normalizeSelection(
-    selection?: TextInputSelection | null,
-    labels?: Array<[string, string]> | Array<string> | Mapping | null
+    selection?: Selection | null, labels?: Selection | null
 ): NormalizedSelection | null | undefined {
     if (!selection) {
         selection = labels
@@ -623,8 +622,11 @@ export function normalizeSelection(
             if (Array.isArray(labels)) {
                 if (labels.length)
                     if (Array.isArray(labels[0])) {
-                        for (const [labelValue, label] of labels)
-                            if ((labelValue as unknown as T) === value)
+                        for (
+                            const [labelValue, label] of labels as
+                                Array<[unknown, string]>
+                        )
+                            if ((labelValue as T) === value)
                                 return label
                     } else if (
                         typeof index === 'number' && index < labels.length
@@ -693,7 +695,7 @@ export function normalizeSelection(
         const result: NormalizedSelection = []
         for (const value of Object.keys(selection))
             result.push({
-                label: getLabel(value) ?? (selection as Mapping)[value], value
+                label: getLabel(value) ?? selection[value], value
             })
 
         selection = result
@@ -702,9 +704,9 @@ export function normalizeSelection(
     // region arrange with given ordering
     if (Array.isArray(labels) && labels.length && Array.isArray(labels[0])) {
         // Respect ordering given by labels.
-        const labelMapping: Map<string, number> = new Map<string, number>()
+        const labelMapping: Map<unknown, number> = new Map<string, number>()
         let index = 0
-        for (const [value] of labels) {
+        for (const [value] of labels as Array<[unknown, string]>) {
             labelMapping.set(value, index)
 
             index += 1
