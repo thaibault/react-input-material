@@ -1421,7 +1421,7 @@ export const TextInputInner = function<Type = unknown>(
     const currentValueState: ValueState<Type, ModelState> = {
         modelState: properties.model.state as ModelState,
         representation: properties.representation,
-        value: properties.value || null
+        value: properties.value ?? null
     }
     /*
         NOTE: If value is controlled only trigger/save state changes when model
