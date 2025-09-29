@@ -409,7 +409,7 @@
         "./components/Wrapper/WrapStrict": "./components/Wrapper/WrapStrict",
         "./components/Wrapper/WrapThemeProvider": "./components/Wrapper/WrapThemeProvider",
         "./components/Wrapper/WrapTooltip": "./components/Wrapper/WrapTooltip",
-        "./material-fixes": "./implementations/rmwc/material-fixes",
+        "./implementations/rmwc/material-fixes": "./implementations/rmwc/material-fixes",
         "helper": "./helper",
         "index": [
           "./index.css",
