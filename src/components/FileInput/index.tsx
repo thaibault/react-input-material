@@ -699,21 +699,7 @@ export const FileInputInner = function<Type extends Value = Value>(
             classNames={
                 [CSS_CLASS_NAMES.fileInput].concat(properties.className)
             }
-            iframeWrapperClassNames={
-                [CSS_CLASS_NAMES.fileInputIframeWrapper]
-                    .concat(
-                        ['text/html', 'text/plain'].includes(contentType) ?
-                            CSS_CLASS_NAMES.fileInputIframeWrapperPadding :
-                            []
-                    )
-            }
             imageClassNames={properties.imageClassNames}
-            textRepresentationClassNames={
-                [CSS_CLASS_NAMES.fileInputTextRepresentation]
-            }
-            infoClassNames={[CSS_CLASS_NAMES.fileInputInfo]}
-            downloadLinkClassNames={[CSS_CLASS_NAMES.fileInputDownload]}
-            infoBodyClassNames={[CSS_CLASS_NAMES.fileInputInfoBody]}
 
             styles={properties.styles}
 
