@@ -19,6 +19,7 @@
 import {MDCTextFieldFoundation} from '@material/textfield'
 import {TextField as RMWCTextField} from '@rmwc/textfield'
 
+import {Mapping} from 'clientnode'
 import React, {
     ForwardedRef,
     forwardRef,
@@ -28,11 +29,15 @@ import React, {
     useImperativeHandle,
     useRef
 } from 'react'
+import {useMemorizedValue} from 'react-generic-tools'
 
 import {InputReference, TextFieldProperties} from '../../type'
 import Icon from '../Icon'
-import {useMemorizedValue} from 'react-generic-tools'
+
+import cssClassNames from './style.module'
 // endregion
+export const CSS_CLASS_NAMES = cssClassNames as Mapping
+
 export interface Reference extends InputReference {
     foundation: RefObject<MDCTextFieldFoundation | null>
     input: RefObject<HTMLInputElement | null>

@@ -19,16 +19,16 @@
 // region imports
 import {dataURLToBlob} from 'blob-util'
 import {copy, equals, extend, mask} from 'clientnode'
-import {
+import React, {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
     forwardRef,
     memo as memorize,
     MouseEvent as ReactMouseEvent,
-    MutableRefObject as RefObject,
+    // NOTE: can be "RefObject" directly when migrated to react19.
     ReactElement,
     SyntheticEvent,
-    useEffect,
+    useEffect, useId,
     useImperativeHandle,
     useRef,
     useState
@@ -58,7 +58,7 @@ import {
 } from '../TextInput/type'
 
 import {
-    Adapter,
+    AdapterWithReferences,
     Component,
     defaultFileNameInputProperties,
     defaultModelState,
@@ -122,7 +122,7 @@ export {
  * @returns React elements.
  */
 export const FileInputInner = function<Type extends Value = Value>(
-    props: Props<Type>, reference?: ForwardedRef<Adapter<Type>>
+    props: Props<Type>, reference?: ForwardedRef<AdapterWithReferences<Type>>
 ): ReactElement {
     // region property aggregation
     /**
@@ -156,6 +156,26 @@ export const FileInputInner = function<Type extends Value = Value>(
             result
         )
     }
+    // endregion
+    // region references
+    const fileInputReference = useRef<HTMLInputElement | null>(null)
+    const mediaCardReference = useRef<MediaCardReference>(null)
+    const nameInputReference = useRef<TextInputAdapter<string>>(null)
+    useImperativeHandle(
+        reference,
+        (): AdapterWithReferences<Type> => ({
+            properties,
+            references: {
+                fileInput: fileInputReference,
+                mediaCard: mediaCardReference,
+                nameInput: nameInputReference
+            },
+            state: {
+                modelState: properties.model.state as ModelState,
+                ...(controlled ? {} : {value: properties.value})
+            }
+        })
+    )
     // endregion
     // region event handler
     /**
@@ -251,9 +271,9 @@ export const FileInputInner = function<Type extends Value = Value>(
 
         if (
             eventSourceOrName &&
-            mediaCardReference.current?.fileInput?.current &&
+            fileInputReference.current &&
             (eventSourceOrName as SyntheticEvent).target ===
-            mediaCardReference.current.fileInput.current
+                fileInputReference.current
         ) {
             event = eventSourceOrName as SyntheticEvent
 
@@ -432,11 +452,6 @@ export const FileInputInner = function<Type extends Value = Value>(
         })
     }
     // endregion
-    // region references
-    const mediaCardReference = useRef<MediaCardReference>(null)
-    const nameInputReference: RefObject<TextInputAdapter<string> | null> =
-        useRef<TextInputAdapter<string>>(null)
-    // endregion
     // region properties
     const givenProps: Props<Type> = translateKnownSymbols(props)
 
@@ -528,26 +543,10 @@ export const FileInputInner = function<Type extends Value = Value>(
         setValueState =
             wrapStateSetter<ValueState<Type>>(setValueState, currentValueState)
     /// endregion
-    useImperativeHandle(
-        reference,
-        (): Adapter<Type> & {
-            references: {
-                mediaCard: RefObject<MediaCardReference | null>
-                nameInput: RefObject<TextInputAdapter<string> | null>
-            }
-        } => ({
-            properties,
-            references: {
-                mediaCard: mediaCardReference,
-                nameInput: nameInputReference
-            },
-            state: {
-                modelState: properties.model.state as ModelState,
-                ...(controlled ? {} : {value: properties.value})
-            }
-        })
-    )
     // endregion
+    const defaultID = useId()
+    const id = properties.id ?? defaultID
+
     useEffect((): void => {
         (async (): Promise<void> => {
             const valueChanged: Partial<Type> = {}
@@ -714,7 +713,7 @@ export const FileInputInner = function<Type extends Value = Value>(
             infoClassNames={[CSS_CLASS_NAMES.fileInputInfo]}
             downloadLinkClassNames={[CSS_CLASS_NAMES.fileInputDownload]}
             infoBodyClassNames={[CSS_CLASS_NAMES.fileInputInfoBody]}
-            fileInputClassNames={[CSS_CLASS_NAMES.fileInputNative]}
+
             styles={properties.styles}
 
             deleteButton={properties.deleteButton}
@@ -773,9 +772,32 @@ export const FileInputInner = function<Type extends Value = Value>(
 
             onBlur={onBlur}
             onClick={onClick}
+            onClickAddOrEdit={() => {
+                fileInputReference.current?.click()
+            }}
             onChange={onChangeValue}
             onFocus={onFocus}
         >
+            {/* TODO use "accept" attribute for better validation. */}
+            <input
+                disabled={properties.disabled}
+
+                className={
+                    [CSS_CLASS_NAMES.fileInputNative]
+                        .concat(properties.fileInputClassNames ?? [])
+                        .join(' ')
+                }
+                id={id}
+
+                name={properties.name}
+
+                onChange={onChangeValue}
+
+                ref={fileInputReference}
+
+                type="file"
+            />
+
             {properties.value ?
                 <TextInput
                     ref={nameInputReference}

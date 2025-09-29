@@ -137,7 +137,7 @@ CommonBaseModel<T>, ModelState {
 
     enforceUncontrolled: boolean
 
-    id: string
+    id?: string
     label: string
     name: string
 

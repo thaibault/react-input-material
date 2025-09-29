@@ -128,6 +128,8 @@ export interface Properties<
         Properties<Type, MediaTag>, Type
     >) => ReactNode
 
+    fileInputClassNames?: Array<string>
+
     contentTypePattern: Array<RegExp | string> | null | RegExp | string
     invertedContentTypePattern: Array<RegExp | string> | null | RegExp | string
 
@@ -193,8 +195,11 @@ export type Adapter<Type extends Value = Value> =
         Properties<Type>, Omit<State<Type>, 'value'> &
         {value?: null | Type}
     >
-export interface AdapterWithReferences extends Adapter {
+export interface AdapterWithReferences<
+    Type extends Value = Value
+> extends Adapter<Type> {
     references: {
+        fileInput: RefObject<HTMLInputElement | null>
         mediaCard: RefObject<MediaCardReference | null>
         nameInput: RefObject<TextInputAdapter<string> | null>
     }

@@ -127,7 +127,6 @@ export enum MediaCardRepresentationType {
 }
 export interface MediaCardReference {
     card?: RefObject<HTMLDivElement | null>
-    fileInput?: RefObject<HTMLInputElement | null>
     iFrame?: RefObject<HTMLIFrameElement | null>
 
     uploadButton?: RefObject<HTMLDivElement | null>
@@ -141,8 +140,8 @@ export interface MediaCardProperties extends LowLevelBaseComponentProperties {
     textRepresentationClassNames?: Array<string>
     infoClassNames?: Array<string>
     infoBodyClassNames?: Array<string>
-    fileInputClassNames?: Array<string>
     downloadLinkClassNames?: Array<string>
+    imageClassNames?: Array<string>
 
     deleteButton: ReactNode
     downloadButton: ReactNode
@@ -168,6 +167,7 @@ export interface MediaCardProperties extends LowLevelBaseComponentProperties {
     empty?: boolean
 
     onChange?: (event?: SyntheticEvent) => void
+    onClickAddOrEdit?: (event?: ReactMouseEvent) => void
 }
 
 export interface CheckboxProperties extends InputProperties<boolean> {

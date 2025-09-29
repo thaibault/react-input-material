@@ -1246,8 +1246,7 @@ const Application = () => {
                     <button
                         onClick={() => {
                             fileInputUnControlledHeadlessReference
-                                .current?.references
-                                .mediaCard.current?.fileInput?.current?.click()
+                                .current?.references.fileInput.current?.click()
                         }}
                     >Add medium</button>
                     <FileInput

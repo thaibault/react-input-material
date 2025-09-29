@@ -38,12 +38,15 @@ import React, {
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
 
-import CircularProgress from '../CircularProgress'
-
 import {
     MediaCardProperties, MediaCardReference, MediaCardRepresentationType
 } from '../../type'
+import CircularProgress from '../CircularProgress'
+import cssClassNames from './style.module'
+import {Mapping} from 'clientnode'
 // endregion
+export const CSS_CLASS_NAMES = cssClassNames as Mapping
+
 export const MediaCardInner = function(
     properties: MediaCardProperties,
     reference?: ForwardedRef<MediaCardReference | null>
@@ -52,7 +55,6 @@ export const MediaCardInner = function(
     const id = properties.id ?? defaultID
     // region references
     const cardReference = useRef<HTMLDivElement | null>(null)
-    const fileInputReference = useRef<HTMLInputElement | null>(null)
     const iFrameReference = useRef<HTMLIFrameElement | null>(null)
 
     const deleteButtonReference = useRef<HTMLButtonElement>(null)
@@ -63,7 +65,6 @@ export const MediaCardInner = function(
         reference,
         () => ({
             card: cardReference,
-            fileInput: fileInputReference,
             iFrame: iFrameReference,
 
             deleteButton: deleteButtonReference,
@@ -82,6 +83,7 @@ export const MediaCardInner = function(
         )
             return <CardMedia
                 sixteenByNine
+                className={properties.imageClassNames?.join(' ')}
                 style={{backgroundImage: `url(${properties.url})`}}
             />
 
@@ -92,7 +94,7 @@ export const MediaCardInner = function(
 
         if (properties.type === MediaCardRepresentationType.IFRAME)
             return <div className={
-                (properties.iframeWrapperClassNames)?.join(' ')
+                properties.iframeWrapperClassNames?.join(' ')
             }>
                 <iframe
                     ref={iFrameReference}
@@ -163,22 +165,6 @@ export const MediaCardInner = function(
 
                 {properties.children}
             </div>
-
-            {/* TODO use "accept" attribute for better validation. */}
-            <input
-                disabled={properties.disabled}
-
-                className={properties.fileInputClassNames?.join(' ')}
-                id={id}
-
-                name={properties.name}
-
-                onChange={properties.onChange}
-
-                ref={fileInputReference}
-
-                type="file"
-            />
         </CardPrimaryAction>
         {(
             (
@@ -208,9 +194,7 @@ export const MediaCardInner = function(
                         )
                     ) ?
                         <CardActionButton
-                            onClick={() => {
-                                fileInputReference.current?.click()
-                            }}
+                            onClick={properties.onClickAddOrEdit}
                             ref={uploadButtonReference}
                         >
                             {properties.empty ?
