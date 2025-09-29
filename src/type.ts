@@ -16,7 +16,7 @@
     endregion
 */
 // region imports
-import {Mapping, ValueOf} from 'clientnode'
+import {Mapping, Primitive, ValueOf} from 'clientnode'
 import {
     any,
     arrayOf,
@@ -69,20 +69,13 @@ export type PrimitiveType = typeof PrimitiveTypes[number]
 export type Type = boolean | number | string // | 'any' | PrimitiveType
 export type TypeSpecification = Array<TypeSpecification> | Type
 //// region model
-export type SelectionValue = boolean | number | string
 export interface SelectionOption {
     label: string
-    /*
-        NOTE: Databases may support any value here but the current selection
-        input does not allow this via typescript but seems to work with any
-        value.
-     */
-    value: SelectionValue
+    value: Primitive
 }
 export type NormalizedSelection = Array<SelectionOption>
-export type ModelSelection = Array<SelectionValue> | NormalizedSelection
-export type Selection =
-    Array<[SelectionValue, string]> | Mapping | ModelSelection
+export type ModelSelection = Array<Primitive> | Mapping | NormalizedSelection
+export type Selection = Array<[Primitive, string]> | ModelSelection
 export interface CommonBaseModel<Type = unknown> {
     declaration: string
     description: string
