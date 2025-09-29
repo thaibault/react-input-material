@@ -707,6 +707,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                             []
                     )
             }
+            imageClassNames={properties.imageClassNames}
             textRepresentationClassNames={
                 [CSS_CLASS_NAMES.fileInputTextRepresentation]
             }
