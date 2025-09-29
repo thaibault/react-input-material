@@ -129,6 +129,7 @@ export interface Properties<
     >) => ReactNode
 
     fileInputClassNames?: Array<string>
+    imageClassNames?: Array<string>
 
     contentTypePattern: Array<RegExp | string> | null | RegExp | string
     invertedContentTypePattern: Array<RegExp | string> | null | RegExp | string
