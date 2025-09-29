@@ -94,7 +94,16 @@ export const MediaCardInner = function(
 
         if (properties.type === MediaCardRepresentationType.IFRAME)
             return <div className={
-                properties.iframeWrapperClassNames?.join(' ')
+                [CSS_CLASS_NAMES.fileInputIframeWrapper]
+                    .concat(
+                        ['text/html', 'text/plain'].includes(
+                            properties.contentType as string
+                        ) ?
+                            CSS_CLASS_NAMES.fileInputIframeWrapperPadding :
+                            []
+                    )
+                    .concat(properties.iframeWrapperClassNames ?? [])
+                    .join(' ')
             }>
                 <iframe
                     ref={iFrameReference}
@@ -105,7 +114,9 @@ export const MediaCardInner = function(
 
         if (properties.type === MediaCardRepresentationType.TEXT)
             return <pre className={
-                properties.textRepresentationClassNames?.join(' ')
+                [CSS_CLASS_NAMES.fileInputTextRepresentation]
+                    .concat(properties.textRepresentationClassNames ?? [])
+                    .join(' ')
             }>{properties.content}</pre>
 
         return ''
@@ -127,7 +138,11 @@ export const MediaCardInner = function(
     >
         <CardPrimaryAction>
             {determineMediaContent()}
-            <div className={properties.infoClassNames?.join(' ')}>
+            <div className={
+                [CSS_CLASS_NAMES.fileInputInfo]
+                    .concat(properties.infoClassNames ?? [])
+                    .join(' ')
+            }>
                 <Typography tag="h2" use="headline6">
                     {properties.invalid ?
                         <Theme use="error">{description}</Theme> :
@@ -138,7 +153,11 @@ export const MediaCardInner = function(
                 <GenericAnimate
                     in={properties.invalid || Boolean(properties.declaration)}
                 >
-                    <div className={properties.infoBodyClassNames?.join(' ')}>
+                    <div className={
+                        [CSS_CLASS_NAMES.fileInputInfoBody]
+                            .concat(properties.infoBodyClassNames ?? [])
+                            .join(' ')
+                    }>
                         {properties.declaration ?
                             <Typography
                                 style={{marginTop: '-1rem'}}
@@ -234,10 +253,11 @@ export const MediaCardInner = function(
                                 >
                                     <a
                                         className={
-                                            properties
-                                                .downloadLinkClassNames?.join(
-                                                    ' '
-                                                )
+                                            [CSS_CLASS_NAMES.fileInputDownload]
+                                                .concat(properties
+                                                    .downloadLinkClassNames ??
+                                                    []
+                                                ).join(' ')
                                         }
                                         download={properties.fileName}
 
