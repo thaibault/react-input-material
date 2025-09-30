@@ -17,29 +17,7 @@ endregion */
         white-space: nowrap;
     }
 
-    .code-editor.mdc-text-field--disabled .cm-editor {
-        opacity: 0.3;
-    }
-
-    .richtext-editor {
-        .richtext-editor__bar {
-            .richtext-editor-menu-bar .mdc-icon-button--checked {
-                color: var(--mdc-theme-secondary);
-            }
-
-            .mdc-text-field-character-counter {
-                margin-right: 10px;
-            }
-        }
-
-        &.mdc-text-field--disabled .richtext-editor__bar {
-            opacity: 0.3;
-        }
-
-        &.mdc-text-field--with-internal-counter .richtext-editor__bar {
-            display: flex;
-            flex-wrap: wrap;
-            width: 100%;
-        }
+    .text-input__suggestions__suggestion__mark {
+        color: var(--mdc-theme-secondary);
     }
 }
