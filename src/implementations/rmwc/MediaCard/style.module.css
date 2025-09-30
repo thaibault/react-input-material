@@ -25,6 +25,10 @@ endregion */
 
     .file-input__download {
         text-decoration: none;
+
+        color: var(
+            --mdc-text-button-label-text-color, var(--mdc-theme-primary)
+        );
     }
 
     .text-input .mdc-text-field {

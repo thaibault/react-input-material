@@ -18,6 +18,7 @@
 // region imports
 import {MDCCheckboxFoundation} from '@material/checkbox'
 import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox'
+import {Mapping} from 'clientnode'
 import {
     ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useRef
 } from 'react'

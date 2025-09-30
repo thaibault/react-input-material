@@ -326,5 +326,7 @@ export const TextArea = forwardRef((
         }
     </>
 })
+// NOTE: We need to refer classes to avoid loosing them due to tree shacking.
+;(TextArea as unknown as Mapping<unknown>).CSS_CLASS_NAMES = CSS_CLASS_NAMES
 
 export default TextArea

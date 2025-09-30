@@ -31,7 +31,7 @@ import {
     Mapping,
     mark
 } from 'clientnode'
-import React, {
+import {
     FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardedRef,

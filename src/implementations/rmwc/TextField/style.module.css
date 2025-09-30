@@ -9,15 +9,6 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
-.text-input {
-    .mdc-text-field-helper-text {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        width: 100%;
-        white-space: nowrap;
-    }
-
-    .text-input__suggestions__suggestion__mark {
-        color: var(--mdc-theme-secondary);
-    }
+.text-input__suggestions__suggestion__mark {
+    color: var(--mdc-theme-secondary);
 }

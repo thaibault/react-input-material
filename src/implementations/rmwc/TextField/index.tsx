@@ -20,7 +20,7 @@ import {MDCTextFieldFoundation} from '@material/textfield'
 import {TextField as RMWCTextField} from '@rmwc/textfield'
 
 import {Mapping} from 'clientnode'
-import React, {
+import {
     ForwardedRef,
     forwardRef,
     // NOTE: can be "RefObject" directly when migrated to react19.
@@ -133,5 +133,7 @@ export const TextField = forwardRef((
         />
     </div>
 })
+// NOTE: We need to refer classes to avoid loosing them due to tree shacking.
+;(TextField as unknown as Mapping<unknown>).CSS_CLASS_NAMES = CSS_CLASS_NAMES
 
 export default TextField

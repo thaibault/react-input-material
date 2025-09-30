@@ -19,4 +19,4 @@ This library written by Torben Sickert stand under a creative commons naming
 */
 @import "./implementations/rmwc/Checkbox/import.module.css";
 
-@import "./implementations/rmwc/material-fixes.css";
+@import "./implementations/rmwc/material.css";

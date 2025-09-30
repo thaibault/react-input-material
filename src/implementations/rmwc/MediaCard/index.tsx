@@ -26,7 +26,7 @@ import {
     CardMedia,
     CardPrimaryAction
 } from '@rmwc/card'
-import React, {
+import {
     ForwardedRef,
     forwardRef,
     memo as memorize,
@@ -44,6 +44,7 @@ import {
 import CircularProgress from '../CircularProgress'
 import cssClassNames from './style.module'
 import {Mapping} from 'clientnode'
+import TextArea from '#implementations/TextArea'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames as Mapping
 
