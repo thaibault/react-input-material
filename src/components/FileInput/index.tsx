@@ -19,7 +19,7 @@
 // region imports
 import {dataURLToBlob} from 'blob-util'
 import {copy, equals, extend, mask} from 'clientnode'
-import React, {
+import {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
     forwardRef,

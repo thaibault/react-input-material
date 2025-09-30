@@ -25,7 +25,7 @@ import {
     MenuSurfaceAnchor,
     MenuProps as RMWCMenuProps
 } from '@rmwc/menu'
-import React, {
+import {
     ForwardedRef,
     forwardRef,
     memo as memorize,

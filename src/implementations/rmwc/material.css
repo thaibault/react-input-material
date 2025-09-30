@@ -9,6 +9,7 @@ License
 This library written by Torben Sickert stand under a creative commons naming
 3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
 endregion */
+/* region material fixes */
 .text-input {
     label,
     .mdc-form-field {
@@ -58,6 +59,13 @@ endregion */
         }
     }
 
+    .mdc-text-field-helper-text {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 100%;
+        white-space: nowrap;
+    }
+
     .mdc-text-field {
         /* stylelint-disable-next-line selector-class-pattern */
         .ace_editor.mdc-text-field__input {
@@ -74,6 +82,7 @@ endregion */
         }
     }
 }
+/* endregion */
 
 .generic-tooltip {
     display: inline;
