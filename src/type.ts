@@ -268,7 +268,8 @@ export const baseModelPropertyTypes: ValidationMapping = {
         arrayOf(shape({
             label: string,
             value: oneOfType([boolean, number, string])
-        }))
+        })),
+        object
     ]),
     /*
         NOTE: Not yet working:
@@ -357,12 +358,12 @@ export const propertyTypes: ValidationMapping = {
     // NOTE: Overwrites model selection and corresponds to type "Selection".
     selection: oneOfType([
         arrayOf(arrayOf(oneOfType([boolean, number, string]))),
-        object,
         arrayOf(oneOfType([boolean, number, string])),
         arrayOf(shape({
             label: string,
             value: oneOfType([boolean, number, string])
-        }))
+        })),
+        object
     ]),
 
     onChange: func,
