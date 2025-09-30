@@ -1593,21 +1593,22 @@ export const TextInputInner = function<Type = unknown>(
                         properties.representation as string | null
                     )?.split(' ') || '',
                     {
-                        marker: (foundWord: string): ReactElement =>
-                            <span className={
-                                CSS_CLASS_NAMES
-                                    .textInputSuggestionsSuggestionMark
-                            }>
-                                {foundWord}
-                            </span>,
-                        normalizer: (value: unknown): string =>
-                            String(value).toLowerCase(),
+                        marker: (foundWord: string): Array<string> =>
+                            [foundWord],
                         skipTagDelimitedParts: null
                     }
-                ) as Array<ReactElement | string>)
+                ) as Array<[string] | string>)
                     .map((
-                            item: ReactNode | string, index: number
-                        ): ReactElement =>
+                        item: string | [string], index: number
+                    ): ReactElement =>
+                        Array.isArray(item) ?
+                            <span
+                                className={
+                                    CSS_CLASS_NAMES
+                                        .textInputSuggestionsSuggestionMark
+                                }
+                                key={index}
+                            >{item[0]}</span> :
                             <span key={index}>{item}</span>
                     )
                 currentRenderableSuggestions.push(marked)

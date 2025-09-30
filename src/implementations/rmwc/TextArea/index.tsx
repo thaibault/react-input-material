@@ -31,8 +31,12 @@ import {
 } from 'react'
 
 import {TextAreaProperties, TextAreaReference} from '../../type'
-import {NOOP} from 'clientnode'
+import {Mapping, NOOP} from 'clientnode'
+
+import cssClassNames from './style.module'
 // endregion
+export const CSS_CLASS_NAMES = cssClassNames as Mapping
+
 export interface Reference extends TextAreaReference {
     materialTextField: RefObject<MDCTextField | null>
     foundation: RefObject<MDCTextFieldFoundation | null>

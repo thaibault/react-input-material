@@ -1,0 +1,38 @@
+/* !/usr/bin/env css
+-*- coding: utf-8 -*- */
+/* region header
+Copyright Torben Sickert (info["~at~"]torben.website) 16.12.2012
+
+License
+-------
+
+This library written by Torben Sickert stand under a creative commons naming
+3.0 unported license. See https://creativecommons.org/licenses/by/3.0/deed.de
+endregion */
+.text-input {
+    .code-editor.mdc-text-field--disabled .cm-editor {
+        opacity: 0.3;
+    }
+
+    .richtext-editor {
+        .richtext-editor__bar {
+            .richtext-editor-menu-bar .mdc-icon-button--checked {
+                color: var(--mdc-theme-secondary);
+            }
+
+            .mdc-text-field-character-counter {
+                margin-right: 10px;
+            }
+        }
+
+        &.mdc-text-field--disabled .richtext-editor__bar {
+            opacity: 0.3;
+        }
+
+        &.mdc-text-field--with-internal-counter .richtext-editor__bar {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+    }
+}
