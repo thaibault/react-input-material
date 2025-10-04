@@ -17,6 +17,9 @@
     endregion
 */
 // region imports
+import {Theme} from '@rmwc/theme'
+import {ThemePropT} from '@rmwc/types'
+
 import {AnyFunction, FirstParameter} from 'clientnode'
 import {
     forwardRef,
@@ -27,8 +30,6 @@ import {
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject
 } from 'react'
-import {Theme} from '@rmwc/theme'
-import {ThemePropT} from '@rmwc/types'
 
 import {WrapStrict} from './WrapStrict'
 import {WrapThemeProvider} from './WrapThemeProvider'

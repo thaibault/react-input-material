@@ -21,6 +21,7 @@ import {
     IconButton as RMWCIconButton, IconButtonOnChangeEventT
 } from '@rmwc/icon-button'
 import {IconSizeT} from '@rmwc/types'
+
 import {
     ForwardedRef,
     forwardRef,
@@ -30,9 +31,9 @@ import {
     useImperativeHandle,
     useRef
 } from 'react'
+import {useMemorizedValue} from 'react-generic-tools'
 
 import {IconButtonProperties} from '../type'
-import {useMemorizedValue} from 'react-generic-tools'
 // endregion
 export const IconButton = forwardRef((
     properties: IconButtonProperties, reference?: ForwardedRef<unknown>

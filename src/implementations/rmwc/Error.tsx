@@ -17,6 +17,7 @@
 */
 // region imports
 import {Theme} from '@rmwc/theme'
+
 import {ForwardedRef, forwardRef, ReactElement} from 'react'
 
 import {ErrorProperties} from '../type'

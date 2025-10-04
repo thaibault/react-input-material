@@ -25,6 +25,7 @@ import {
     MenuSurfaceAnchor,
     MenuProps as RMWCMenuProps
 } from '@rmwc/menu'
+
 import {
     ForwardedRef,
     forwardRef,

@@ -89,7 +89,7 @@ const SECTIONS = [
 const Application = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(6)
     const activeSection = SECTIONS[activeTabIndex]
 
     const onChange: ((properties: BaseProps) => void) =
@@ -1310,7 +1310,12 @@ const Application = () => {
                         maximumNumber={2}
                         minimumNumber={2}
                         model={useMemorizedValue({
-                            default: [{type: 'boolean', value: false}],
+                            default: [{
+                                type: 'boolean',
+                                value: false,
+                                required: true,
+                                showInitialValidationState: true
+                            }],
                             name: 'checkboxInputs'
                         })}
                         onChange={onChange}

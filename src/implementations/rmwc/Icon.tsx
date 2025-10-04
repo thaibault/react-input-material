@@ -18,10 +18,11 @@
 // region imports
 import {Icon as RMWCIcon} from '@rmwc/icon'
 import {IconSizeT} from '@rmwc/types'
+
 import {ForwardedRef, forwardRef, ReactElement} from 'react'
+import {useMemorizedValue} from 'react-generic-tools'
 
 import {IconProperties} from '../type'
-import {useMemorizedValue} from 'react-generic-tools'
 // endregion
 export const Icon = forwardRef((
     properties: IconProperties, reference?: ForwardedRef<HTMLElement | null>

@@ -18,6 +18,7 @@
 */
 // region imports
 import {copy, equals, extend} from 'clientnode'
+
 import {
     FocusEvent as ReactFocusEvent,
     forwardRef,
