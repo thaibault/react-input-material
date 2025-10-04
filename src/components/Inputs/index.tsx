@@ -31,7 +31,8 @@ import {
     SyntheticEvent,
     useImperativeHandle,
     useEffect,
-    useState
+    useState,
+    useRef
 } from 'react'
 import {
     ComponentAdapter, PropertiesValidationMap
@@ -64,7 +65,9 @@ import {
     translateKnownSymbols,
     triggerCallbackIfExists
 } from '../../helper'
-import {defaultProperties as baseDefaultProperties} from '../../type'
+import {
+    defaultProperties as baseDefaultProperties, ValueState
+} from '../../type'
 import {Props as TextInputProps} from '../TextInput/type'
 
 import {
@@ -113,8 +116,12 @@ const getModelState = function<T, P extends PropertiesItem<T>>(
     const properties: Array<P> = inputsProperties.value || []
 
     const unpack = (name: string, defaultValue = false) =>
-        (properties: P) =>
-            properties[name as keyof P] as unknown as boolean | null ??
+        (properties: P): boolean =>
+            (properties as unknown as Mapping<boolean | undefined>)[name] ??
+            (
+                properties.model?.state &&
+                (properties.model.state as Mapping<boolean>)[name]
+            ) as boolean | undefined ??
             defaultValue
 
     const validMaximumNumber: boolean =
@@ -122,11 +129,15 @@ const getModelState = function<T, P extends PropertiesItem<T>>(
     const validMinimumNumber: boolean =
         inputsProperties.minimumNumber <= properties.length
 
-    const valid: boolean = validMaximumNumber && validMinimumNumber
+    const constraintsSatisfied: boolean =
+        validMaximumNumber && validMinimumNumber
+    const invalid =
+        !constraintsSatisfied ||
+        properties.some(unpack('invalid', false))
 
     return {
-        invalid: !valid || properties.some(unpack('invalid', true)),
-        valid: valid && properties.every(unpack('valid')),
+        invalid,
+        valid: !invalid,
 
         invalidMaximumNumber: !validMaximumNumber,
         invalidMinimumNumber: !validMinimumNumber,
@@ -178,8 +189,8 @@ export const InputsInner = function<
     const givenProps: Props<T, P> =
         translateKnownSymbols(props) as Props<T, P>
     /*
-        Normalize value property (providing only value instead of props is
-        allowed also).
+        Normalize value property (providing only value instead of props which
+        allowed from the outside).
     */
     if (Array.isArray(givenProps.value))
         for (let index = 0; index < givenProps.value.length; index += 1)
@@ -250,33 +261,8 @@ export const InputsInner = function<
         ) &&
         Boolean(givenProperties.onChange || givenProperties.onChangeValue)
     // endregion
-    // region prepare environment
-    /*
-        NOTE: Avoid writing into mutable model object properties. So project
-        value to properties directly.
-    */
-    if (
-        givenProperties.model?.value !== undefined &&
-        givenProperties.value === undefined
-    )
-        givenProperties.value = givenProperties.model.value
-    if (givenProperties.value === undefined)
-        // NOTE: Indicates to be filled later from state.
-        givenProperties.value = []
-
-    const references: Array<RefObject<ComponentAdapter<P, State> | null>> = []
-
-    const properties: Properties<T, P> =
-        getConsolidatedProperties<Props<T, P>, Properties<T, P>>(
-            mapPropertiesIntoModel<
-                Props<T, P>,
-                DefaultProperties<T, P>
-            >(
-                givenProperties,
-                Inputs.defaultProperties.model as unknown as Model<T, P>
-            )
-        )
-
+    // region functions
+    /// region callbacks
     const triggerOnChange = (
         values?: Array<T> | null,
         event?: GenericEvent | null,
@@ -288,7 +274,7 @@ export const InputsInner = function<
 
         if (values && !isDeleteChange)
             properties.value = values.map((_: T, index): P =>
-                references[index]?.current?.properties ||
+                references.current[index]?.current?.properties ||
                 (properties.value as Array<P>)[index]
             )
 
@@ -348,19 +334,107 @@ export const InputsInner = function<
 
         return values
     }
+    const add = (event?: SyntheticEvent): void => {
+        setValues((values: Array<T> | null): Array<T> | null => {
+            event?.stopPropagation()
+
+            const newProperties: Partial<P> = properties.createPrototype({
+                index: values?.length || 0,
+                item: getPrototype<T, P>(properties),
+                lastValue: values?.length ? values[values.length - 1] : null,
+                properties,
+                values
+            })
+
+            triggerOnChange(
+                values, event as unknown as GenericEvent, newProperties
+            )
+
+            const result = triggerOnChangeValue(
+                values,
+                event as unknown as GenericEvent,
+                (newProperties.value ?? newProperties.model?.value ?? null) as T
+            )
+
+            /**
+             * NOTE: new Properties are not yet consolidated by nested input
+             * component. So save that info for further rendering.
+             */
+            setNewInputState({
+                name: 'added', event: event as unknown as GenericEvent
+            })
+
+            return result
+        })
+    }
+    const createRemoveCallback = (index: number) =>
+        (event?: SyntheticEvent) => {
+            setValues((values: Array<T> | null): Array<T> | null => {
+                values = triggerOnChangeValue(
+                    values, event as unknown as GenericEvent, null as T, index
+                )
+                triggerOnChange(
+                    values, event as unknown as GenericEvent, undefined, index
+                )
+                return values
+            })
+            references.current.splice(index, 1)
+        }
+    /// endregion
+    const renderInput = (
+        inputProperties: Partial<P>, index: number
+    ): ReactNode =>
+        isFunction(properties.children) ?
+            properties.children({
+                index,
+                inputsProperties: properties,
+                properties: inputProperties
+            }) :
+            <TextInput
+                {...inputProperties as TextInputProps<T>}
+                name={`${properties.name}-${String(index + 1)}`}
+            />
+    // endregion
+    // region prepare environment
+    /*
+        NOTE: Avoid writing into mutable model object properties. So project
+        value to properties directly.
+    */
+    if (
+        givenProperties.model?.value !== undefined &&
+        givenProperties.value === undefined
+    )
+        givenProperties.value = givenProperties.model.value
+    if (givenProperties.value === undefined)
+        // NOTE: Indicates to be filled later from state.
+        givenProperties.value = []
+
+    const properties: Properties<T, P> =
+        getConsolidatedProperties<Props<T, P>, Properties<T, P>>(
+            mapPropertiesIntoModel<Props<T, P>, DefaultProperties<T, P>>(
+                givenProperties,
+                Inputs.defaultProperties.model as unknown as Model<T, P>
+            )
+        )
+
+    const references =
+        useRef<Array<RefObject<ComponentAdapter<P, State> | null>>>([])
 
     for (let index = 0; index < Math.max(
         properties.model.value?.length || 0,
         properties.value?.length || 0,
         !controlled && values?.length || 0
     ); index += 1) {
-        /*
-            NOTE: We cannot use "useRef" here since the number of calls would
-            be variable und therefor break the rules of hooks.
-        */
-        const reference: RefObject<ComponentAdapter<P, State> | null> =
-            createRef<ComponentAdapter<P, State>>()
-        references.push(reference)
+        let reference: RefObject<ComponentAdapter<P, State> | null>
+        if (references.current.length < index + 1) {
+            /*
+                NOTE: We cannot use "useRef" here since the number of calls
+                would be variable und therefor break the rules of hooks.
+            */
+            reference = createRef<ComponentAdapter<P, State>>()
+            references.current.push(reference)
+        } else
+            reference = references.current[index]
 
         if (!properties.value)
             properties.value = []
@@ -386,6 +460,10 @@ export const InputsInner = function<
                     )
                 },
                 onChangeValue: (value: T, event?: GenericEvent) => {
+                    /*
+                        NOTE: Only values are synchronized with nested
+                        components.
+                    */
                     setValues((values: Array<T> | null): Array<T> | null =>
                         triggerOnChangeValue(values, event, value, index)
                     )
@@ -432,71 +510,21 @@ export const InputsInner = function<
 
     properties.invalidMaximumNumber =
         properties.model.state.invalidMaximumNumber =
-        properties.maximumNumber < (properties.value?.length || 0)
+            properties.maximumNumber < (properties.value?.length || 0)
     properties.invalidMinimumNumber =
         properties.model.state.invalidMinimumNumber =
-        properties.minimumNumber > (properties.value?.length || 0)
+            properties.minimumNumber > (properties.value?.length || 0)
 
     useImperativeHandle(
         reference,
         (): AdapterWithReferences<T, P> => ({
             properties: properties,
-            references,
+            references: references.current,
             state: controlled ?
                 {} :
                 {value: inputPropertiesToValues(properties.value)}
         })
     )
-
-    const add = (event?: SyntheticEvent): void => {
-        setValues((values: Array<T> | null): Array<T> | null => {
-            /*
-                NOTE: This is needed since the event handler is provided to icon
-                and button component contained in rmwc's "IconButton".
-            */
-            event?.stopPropagation()
-
-            const newProperties: Partial<P> = properties.createPrototype({
-                index: values?.length || 0,
-                item: getPrototype<T, P>(properties),
-                lastValue: values?.length ? values[values.length - 1] : null,
-                properties,
-                values
-            })
-
-            triggerOnChange(
-                values, event as unknown as GenericEvent, newProperties
-            )
-
-            const result = triggerOnChangeValue(
-                values,
-                event as unknown as GenericEvent,
-                (newProperties.value ?? newProperties.model?.value ?? null) as T
-            )
-
-            /**
-             * NOTE: new Properties are not yet consolidated by nested input
-             * component. So save that info for further rendering.
-             */
-            setNewInputState({
-                name: 'added', event: event as unknown as GenericEvent
-            })
-
-            return result
-        })
-    }
-    const createRemoveCallback = (index: number) =>
-        (event?: SyntheticEvent) => {
-            setValues((values: Array<T> | null): Array<T> | null => {
-                values = triggerOnChangeValue(
-                    values, event as unknown as GenericEvent, null as T, index
-                )
-                triggerOnChange(
-                    values, event as unknown as GenericEvent, undefined, index
-                )
-                return values
-            })
-        }
     // endregion
     // region render
     const addButton: ReactElement = <IconButton
@@ -506,19 +534,30 @@ export const InputsInner = function<
 
         onChange={add}
     />
-    const renderInput = (
-        inputProperties: Partial<P>, index: number
-    ): ReactNode =>
-        isFunction(properties.children) ?
-            properties.children({
-                index,
-                inputsProperties: properties,
-                properties: inputProperties
-            }) :
-            <TextInput
-                {...inputProperties as TextInputProps<T>}
-                name={`${properties.name}-${String(index + 1)}`}
-            />
+
+    let {valid} = getModelState(properties)
+    if (valid)
+        /*
+            NOTE: When no inter input constraint has been violated check each
+            input individually for a commonly marked invalid state.
+        */
+        for (const reference of references.current)
+            if (
+                reference.current &&
+                [
+                    (reference.current.properties as
+                        unknown as
+                        ModelState | undefined
+                    )?.valid,
+                    (
+                        reference.current.state as
+                            Partial<ValueState> | undefined
+                    )?.modelState?.valid
+                ].includes(false)
+            ) {
+                valid = false
+                break
+            }
 
     return <WrapConfigurations
         strict={Inputs.strict}
@@ -527,6 +566,7 @@ export const InputsInner = function<
         <div
             className={
                 [CSS_CLASS_NAMES.inputs]
+                    .concat(valid ? [] : CSS_CLASS_NAMES.inputsInvalid)
                     .concat(properties.className)
                     .join(' ')
             }

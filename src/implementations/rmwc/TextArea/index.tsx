@@ -18,6 +18,9 @@
 // region imports
 import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
 import {TextFieldHelperTextProps} from '@rmwc/textfield'
+
+import {Mapping, NOOP} from 'clientnode'
+
 import {
     ForwardedRef,
     forwardRef,
@@ -31,7 +34,6 @@ import {
 } from 'react'
 
 import {TextAreaProperties, TextAreaReference} from '../../type'
-import {Mapping, NOOP} from 'clientnode'
 
 import cssClassNames from './style.module'
 // endregion

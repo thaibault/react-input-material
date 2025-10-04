@@ -33,7 +33,6 @@ import {
     useRef,
     useState
 } from 'react'
-
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 

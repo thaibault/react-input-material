@@ -84,6 +84,14 @@ endregion */
 }
 /* endregion */
 
+.inputs {
+    border-left: 2px dashed var(--mdc-theme-surface);
+
+    &.inputs--invalid {
+        border-left: 2px dashed var(--mdc-theme-error);
+    }
+}
+
 .generic-tooltip {
     display: inline;
 }

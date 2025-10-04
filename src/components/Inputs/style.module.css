@@ -13,6 +13,14 @@ endregion */
     display: flex;
     flex-direction: column;
 
+    .inputs--invalid {
+        /*
+            NOTE: We need to apply a directive to avoid that performance
+            optimizations removes this class name.
+        */
+        visibility: visible;
+    }
+
     .inputs__add {
         display: flex;
         flex-direction: row;

@@ -18,6 +18,7 @@
 // region imports
 import {Tooltip as RMWCTooltip} from '@rmwc/tooltip'
 import {Typography} from '@rmwc/typography'
+
 import {
     ForwardedRef,
     forwardRef,
