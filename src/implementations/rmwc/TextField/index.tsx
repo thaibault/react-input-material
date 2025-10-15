@@ -96,7 +96,6 @@ export const TextField = forwardRef((
             ripple
             rootProps={useMemorizedValue(
                 {
-                    name: properties.name,
                     onClick: properties.onClick,
                     onKeyUp: properties.onKeyUp,
                     /*
