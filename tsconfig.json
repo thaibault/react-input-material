@@ -3,7 +3,7 @@
         "declaration": true,
         "declarationDir": "dist/",
         "paths": {
-          "#implementations/*": ["./src/implementations/rmwc/*"]
+            "#implementations/*": ["./src/implementations/rmwc/*"]
         }
     },
     "extends": "./node_modules/weboptimizer/tsconfig.application.json",
