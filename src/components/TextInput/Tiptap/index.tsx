@@ -20,7 +20,6 @@
 import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
-import {Mapping} from 'clientnode'
 import {
     ForwardedRef, forwardRef,
     MutableRefObject as RefObject, ReactElement, useEffect,
@@ -37,7 +36,7 @@ import {EditorReference, TiptapProps} from '../type'
 
 import MenuBar from './MenuBar'
 // endregion
-export const CSS_CLASS_NAMES = cssClassNames as Mapping
+export const CSS_CLASS_NAMES = cssClassNames
 export const VIEW_CONTENT_OFFSET_IN_PX = 8
 
 export interface Reference extends EditorReference {

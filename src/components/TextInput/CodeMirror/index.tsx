@@ -47,8 +47,6 @@ import {
     ViewUpdate
 } from '@codemirror/view'
 
-import {Mapping} from 'clientnode'
-
 import {
     FocusEvent,
     ForwardedRef,
@@ -103,7 +101,7 @@ export const BASIC_EXTENSIONS: Extension =
             keymap.of(BASIC_KEYMAPS)
         ] as const :
         []
-export const CSS_CLASS_NAMES = cssClassNames as Mapping
+export const CSS_CLASS_NAMES = cssClassNames
 
 export interface Reference extends EditorReference {
     editorView: RefObject<EditorView | null>
