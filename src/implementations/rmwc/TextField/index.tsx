@@ -37,7 +37,7 @@ import Icon from '../Icon'
 
 import cssClassNames from './style.module'
 // endregion
-export const CSS_CLASS_NAMES = cssClassNames as Mapping
+export const CSS_CLASS_NAMES = cssClassNames
 
 export interface Reference extends InputReference {
     foundation: RefObject<MDCTextFieldFoundation | null>

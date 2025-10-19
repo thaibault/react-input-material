@@ -27,8 +27,6 @@ import {
     CardPrimaryAction
 } from '@rmwc/card'
 
-import {Mapping} from 'clientnode'
-
 import {
     ForwardedRef,
     forwardRef,
@@ -47,7 +45,7 @@ import {
 import CircularProgress from '../CircularProgress'
 import cssClassNames from './style.module'
 // endregion
-export const CSS_CLASS_NAMES = cssClassNames as Mapping
+export const CSS_CLASS_NAMES = cssClassNames
 
 export const MediaCardInner = function(
     properties: MediaCardProperties,

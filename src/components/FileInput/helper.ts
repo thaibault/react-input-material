@@ -18,7 +18,6 @@
 */
 // region imports
 import {blobToBase64String} from 'blob-util'
-import {Mapping} from 'clientnode'
 import {ElementType} from 'react'
 /*
 "namedExport" version of css-loader:
@@ -46,7 +45,7 @@ import {
 } from './type'
 // endregion
 // region constants
-export const CSS_CLASS_NAMES = cssClassNames as Mapping
+export const CSS_CLASS_NAMES = cssClassNames
 /*
     NOTE: Caused by a bug transpiling regular expression which ignores needed
     escape sequences for "/" when using the nativ regular expression type.

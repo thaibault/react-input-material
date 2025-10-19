@@ -18,7 +18,6 @@ import type {EditorOptions} from '@tiptap/core'
     endregion
 */
 // region imports
-import {Mapping} from 'clientnode'
 import {KeyboardEvent} from 'react'
 import Dummy from 'react-generic-dummy'
 import UseAnimationsType from 'react-useanimations'
@@ -77,7 +76,7 @@ export const plusToXAnimation: null | typeof PlusToXAnimation | undefined =
             {default: null | typeof PlusToXAnimation} | null
         )?.default : null
 // endregion
-export const CSS_CLASS_NAMES = cssClassNames as Mapping
+export const CSS_CLASS_NAMES = cssClassNames
 // region code editor configuration
 export const CODE_EDITOR_OPTIONS = {}
 /// region rich text editor configuration
