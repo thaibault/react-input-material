@@ -1479,8 +1479,8 @@ export const TextInputInner = function<Type = unknown>(
     const textInputProperties: Partial<TextInputProperties<Type>> = {
         ref: inputReference as RefObject<InputReference>,
         /*
-            NOTE: If not set label with forbidden symbols will automatically
-            be used.
+            NOTE: If not set label with forbidden symbols will automatically be
+            used.
         */
         id,
 
