@@ -49,7 +49,7 @@ export const configuration = defineConfig({
                     stdout: 'pipe',
                     stderr: 'pipe',
                     timeout: 5 * 60 * 1000, // Wait up to 5 minutes.
-                    url: 'https://localhost:8080/'
+                    url: 'http://localhost:8080/'
                 }
             } :
             {}
