@@ -89,7 +89,7 @@ const SECTIONS = [
 const Application = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(6)
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
     const activeSection = SECTIONS[activeTabIndex]
 
     const onChange: ((properties: BaseProps) => void) =
@@ -269,7 +269,7 @@ const Application = () => {
                 }}
             >
                 {SECTIONS.map((name) =>
-                    <Tab key={name}>
+                    <Tab key={name} className={`tab-bar__tap-${name}`}>
                         {name === 'text' ?
                             <>{name} (with <sup>markup</sup>)</> :
                             name
