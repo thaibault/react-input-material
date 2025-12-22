@@ -269,7 +269,7 @@ const Application = () => {
                 }}
             >
                 {SECTIONS.map((name) =>
-                    <Tab key={name}>
+                    <Tab key={name} className={`tab-bar__tap-${name}`}>
                         {name === 'text' ?
                             <>{name} (with <sup>markup</sup>)</> :
                             name

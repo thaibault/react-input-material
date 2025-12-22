@@ -1,6 +1,6 @@
 import {defineConfig} from '@playwright/test'
 
-const RUN_SERVER = true
+const RUN_SERVER = false
 
 export const configuration = defineConfig({
     testDir: './end-to-end-tests',
