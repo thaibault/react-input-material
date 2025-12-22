@@ -1,6 +1,7 @@
 import {defineConfig} from '@playwright/test'
 
 const RUN_SERVER = false
+const BASE_URL =  'http://localhost:8080/'
 
 export const configuration = defineConfig({
     testDir: './end-to-end-tests',
@@ -23,7 +24,7 @@ export const configuration = defineConfig({
         See https://playwright.dev/docs/api/class-testoptions.
     */
     use: {
-        baseURL: 'https://localhost:8080/',
+        baseURL: BASE_URL,
 
         /*
             Collect trace when retrying the failed test.
@@ -49,7 +50,7 @@ export const configuration = defineConfig({
                     stdout: 'pipe',
                     stderr: 'pipe',
                     timeout: 5 * 60 * 1000, // Wait up to 5 minutes.
-                    url: 'http://localhost:8080/'
+                    url: BASE_URL
                 }
             } :
             {}

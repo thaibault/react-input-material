@@ -8,13 +8,15 @@ test(
     'TODO',
     async ({page}) => {
         // given
-        await page.locator('tab-bar__tap-simple').click()
-        const simpleTextInput = textInput(page.locator('[name="simpleInput1]'))
+        await page.goto('/')
+        await page.locator('.tab-bar__tap-simple').click()
+        // TODO optimize selector
+        const simpleTextInput = textInput(page.locator('.text-input').first())
 
         // when
-        simpleTextInput.fill('test-input')
+        await simpleTextInput.fill('test-input')
 
         // then
-        expect(simpleTextInput.inputValue).toBe('test-input')
+        expect(await simpleTextInput.inputValue()).toBe('test-input')
     }
 )
