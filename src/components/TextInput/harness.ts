@@ -3,9 +3,9 @@
 /** @module harness */
 'use strict'
 
-import {BaseLocator} from 'react-generic-tools/endToEndTestHelper'
+import {Locator} from 'playwright-core'
 
-export const textInput = (parent: BaseLocator) => {
+export const textInput = (parent: Locator) => {
     const input = parent.locator('input')
 
     return {
