@@ -9,6 +9,7 @@ export const textInput = (parent: BaseLocator) => {
     const input = parent.locator('input')
 
     return {
+        main: parent,
         fill: input.fill.bind(input),
         inputValue: input.inputValue.bind(input)
     }
