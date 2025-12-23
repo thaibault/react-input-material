@@ -55,6 +55,8 @@
     "dist/components/Checkbox/index.js",
     "dist/components/Checkbox/type.d.ts",
     "dist/components/Checkbox/type.js",
+    "dist/components/TextInput/harness.d.ts",
+    "dist/components/TextInput/harness.js",
     "dist/components/TextInput/helper.d.ts",
     "dist/components/TextInput/import.module.css",
     "dist/components/TextInput/index.css",
