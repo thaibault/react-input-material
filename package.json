@@ -335,8 +335,8 @@
     }
   },
   "engines": {
-    "node": ">=20",
-    "npm": ">=10",
+    "node": ">=24",
+    "npm": ">=11",
     "yarn": ">=4"
   },
   "resolutions": {
@@ -401,6 +401,7 @@
         "./components/TextInput/import.module": "./implementations/rmwc/TextField/import.module",
         "./components/TextInput/index": "./components/TextInput/index",
         "./components/TextInput/type": "./components/TextInput/type",
+        "./components/TextInput/harness": "./components/TextInput/harness",
         "./components/Inputs/import.module": "./implementations/rmwc/Inputs/import.module",
         "./components/Inputs/index": "./components/Inputs/index",
         "./components/Inputs/type": "./components/Inputs/type",
