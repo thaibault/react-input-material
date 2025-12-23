@@ -9,10 +9,10 @@ import {FileChooser, Locator, Page} from 'playwright-core'
 export const fileInput = (parent: Locator) => {
     const result = {
         main: parent,
-        openFileChooser: () => parent.locator('button').click(),
+        openFileChooser: () => result.main.locator('button').click(),
         getFileChooser: async (page: Page) => {
             const fileChooserPromise = page.waitForEvent('filechooser')
-            await result.openFileChooser()
+            void result.openFileChooser()
             return fileChooserPromise
         },
         fillFiles: async (
@@ -21,7 +21,6 @@ export const fileInput = (parent: Locator) => {
             const fileChooser = await result.getFileChooser(page)
             await fileChooser.setFiles(files)
         }
-
     }
 
     return result
