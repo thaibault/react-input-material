@@ -17,6 +17,6 @@ test(
         await checkbox.check()
 
         // then
-        expect(await checkbox.inputValue()).toStrictEqual(true)
+        expect(await checkbox.isChecked()).toStrictEqual(true)
     }
 )

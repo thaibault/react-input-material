@@ -9,7 +9,8 @@ export const checkboxInput = (parent: Locator) => {
     const result = {
         main: parent,
         check: () => result.main.locator('input').check(),
-        uncheck: () => result.main.locator('input').uncheck()
+        uncheck: () => result.main.locator('input').uncheck(),
+        isChecked: () => result.main.locator('input').isChecked()
     }
 
     return result
