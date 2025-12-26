@@ -17,6 +17,6 @@ test(
         await simpleTextInput.fill('test-input')
 
         // then
-        expect(await simpleTextInput.inputValue()).toBe('test-input')
+        expect(await simpleTextInput.inputValue()).toStrictEqual('test-input')
     }
 )
