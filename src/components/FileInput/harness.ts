@@ -20,7 +20,8 @@ export const fileInput = (parent: Locator) => {
         ) => {
             const fileChooser = await result.getFileChooser(page)
             await fileChooser.setFiles(files)
-        }
+        },
+        getFiles: async () => result.main.locator('input').inputValue()
     }
 
     return result

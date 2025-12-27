@@ -1,22 +1,22 @@
 // region imports
 import {expect, test} from '@playwright/test'
-import textInput from '../src/components/Checkbox/harness'
+import checkbox from '../src/components/Checkbox/harness'
 // endregion
 test.setTimeout(120_000)
 
 test(
-    'TODO',
+    'Checkbox can get state via harness.',
     async ({page}) => {
         // given
         await page.goto('/')
         await page.locator('.tab-bar__tap-checkbox').click()
-        // TODO optimize selector
-        const checkbox = textInput(page.locator('.checkbox').first())
+
+        const checkboxHarness = checkbox(page.locator('.checkbox').first())
 
         // when
-        await checkbox.check()
+        await checkboxHarness.check()
 
         // then
-        expect(await checkbox.isChecked()).toStrictEqual(true)
+        expect(await checkboxHarness.isChecked()).toStrictEqual(true)
     }
 )
