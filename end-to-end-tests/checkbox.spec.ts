@@ -1,7 +1,6 @@
-// region imports
 import {expect, test} from '@playwright/test'
 import checkbox from '../src/components/Checkbox/harness'
-// endregion
+
 test.setTimeout(120_000)
 
 test(
@@ -11,12 +10,16 @@ test(
         await page.goto('/')
         await page.locator('.tab-bar__tap-checkbox').click()
 
-        const checkboxHarness = checkbox(page.locator('.checkbox').first())
+        const checkboxHarness = checkbox(page.locator(
+            '.playground__inputs__checkbox .checkbox'
+        ).first())
 
         // when
         await checkboxHarness.check()
 
         // then
         expect(await checkboxHarness.isChecked()).toStrictEqual(true)
+        await checkboxHarness.uncheck()
+        expect(await checkboxHarness.isChecked()).toStrictEqual(false)
     }
 )

@@ -6,12 +6,14 @@
 import {Locator} from 'playwright-core'
 
 export const textInput = (parent: Locator) => {
-    const input = parent.locator('input')
+    const inputNode = parent.locator('input')
 
     return {
         main: parent,
-        fill: input.fill.bind(input),
-        inputValue: input.inputValue.bind(input)
+        inputNode,
+
+        fill: inputNode.fill.bind(inputNode),
+        inputValue: inputNode.inputValue.bind(inputNode)
     }
 }
 

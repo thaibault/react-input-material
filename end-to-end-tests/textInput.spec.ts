@@ -1,7 +1,7 @@
-// region imports
 import {expect, test} from '@playwright/test'
+
 import textInput from '../src/components/TextInput/harness'
-// endregion
+
 test.setTimeout(120_000)
 
 test(
@@ -11,7 +11,9 @@ test(
         await page.goto('/')
         await page.locator('.tab-bar__tap-simple').click()
 
-        const simpleTextInput = textInput(page.locator('.text-input').first())
+        const simpleTextInput = textInput(page.locator(
+            '.playground__inputs__simple-input .text-input'
+        ).first())
 
         // when
         await simpleTextInput.fill('test-input')
