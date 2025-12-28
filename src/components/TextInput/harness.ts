@@ -12,6 +12,16 @@ export const textInput = (parent: Locator) => {
         main: parent,
         inputNode,
 
+        getOptions: async () => {
+            const result = []
+            for (const listNode of await parent.locator(
+                'ul li'
+            ).elementHandles())
+                result.push(await listNode.textContent())
+
+            return result
+        },
+
         fill: inputNode.fill.bind(inputNode),
         inputValue: inputNode.inputValue.bind(inputNode)
     }
