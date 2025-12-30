@@ -402,6 +402,7 @@
     },
     "generic": {
       "entry": {
+        "./components/Checkbox/harness": "./components/Checkbox/harness",
         "./components/Checkbox/import.module": "./implementations/rmwc/Checkbox/import.module",
         "./components/Checkbox/index": "./components/Checkbox/index",
         "./components/Checkbox/type": "./components/Checkbox/type",
