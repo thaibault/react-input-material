@@ -1,7 +1,7 @@
 import {defineConfig} from '@playwright/test'
 
-const RUN_SERVER = false
-const BASE_URL =  'http://localhost:8080/'
+const RUN_SERVER = false as boolean
+const BASE_URL = 'http://localhost:8080/'
 
 export const configuration = defineConfig({
     testDir: './end-to-end-tests',
