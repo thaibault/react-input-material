@@ -12,8 +12,9 @@ export const checkboxInput = (parent: Locator) => {
         main: parent,
         inputNode,
 
-        check: () => inputNode.check(),
-        uncheck: async () => inputNode.uncheck(),
+        check: inputNode.check.bind(inputNode),
+        uncheck: inputNode.uncheck.bind(inputNode),
+        setChecked: inputNode.setChecked.bind(inputNode),
 
         isChecked: () => inputNode.isChecked()
     }
