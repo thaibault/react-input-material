@@ -6,11 +6,17 @@
 import {Locator} from 'playwright-core'
 
 export const checkboxInput = (parent: Locator) => {
-    const result = {
-        main: parent
-    }
+    const inputNode = parent.locator('input')
 
-    return result
+    return {
+        main: parent,
+        inputNode,
+
+        check: () => inputNode.check(),
+        uncheck: async () => inputNode.uncheck(),
+
+        isChecked: () => inputNode.isChecked()
+    }
 }
 
 export default checkboxInput
