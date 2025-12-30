@@ -35,8 +35,8 @@ test(
         ).first())
 
         // when
-        const lastOption = (await selectInput.getOptions()).pop()
-        await selectInput.fill(lastOption as string)
+        const lastOption: string = (await selectInput.getOptions()).pop() ?? ''
+        await selectInput.fill(lastOption)
 
         // then
         expect(await selectInput.inputValue()).toStrictEqual(lastOption)

@@ -7,23 +7,41 @@ import {Locator} from 'playwright-core'
 
 export const textInput = (parent: Locator) => {
     const inputNode = parent.locator('input')
+    const optionList = parent.locator('ul li')
+    const selectedItem = parent.locator('.mdc-select__selected-text')
 
     return {
         main: parent,
         inputNode,
 
         getOptions: async () => {
-            const result = []
-            for (const listNode of await parent.locator(
-                'ul li'
-            ).elementHandles())
-                result.push(await listNode.textContent())
+            const result: Array<string> = []
+            for (const listNode of await optionList.elementHandles())
+                result.push(await listNode.textContent() ?? '')
 
             return result
         },
 
-        fill: inputNode.fill.bind(inputNode),
-        inputValue: inputNode.inputValue.bind(inputNode)
+        fill: async (valueRepresentation: string) => {
+            if (await inputNode.count() > 0) {
+                await inputNode.fill(valueRepresentation)
+
+                return
+            }
+
+            await selectedItem.click()
+            for (const listNode of await optionList.elementHandles())
+                if (await listNode.textContent() === valueRepresentation) {
+                    await listNode.click()
+                    break
+                }
+        },
+        inputValue: async () => {
+            if (await inputNode.count() > 0)
+                return await inputNode.inputValue()
+
+            return await selectedItem.textContent()
+        }
     }
 }
 
