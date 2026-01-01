@@ -1,9 +1,8 @@
-// region imports
 import {resolve} from 'path'
 import {expect, test} from '@playwright/test'
 
 import fileInput from '../src/components/FileInput/harness'
-// endregion
+
 test.setTimeout(120_000)
 
 test(

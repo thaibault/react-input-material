@@ -6,11 +6,9 @@
 import {Locator} from 'playwright-core'
 
 export const inputsInput = (parent: Locator) => {
-    const result = {
+    return {
         main: parent
     }
-
-    return result
 }
 
 export default inputsInput
