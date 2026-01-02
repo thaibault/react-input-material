@@ -191,7 +191,7 @@
     "typescript-eslint": "^8.51.0",
     "typescript-plugin-css-modules": "^5.2.0",
     "web-component-wrapper": "^0.0.539",
-    "weboptimizer": "^2.0.1637",
+    "weboptimizer": "^2.0.1639",
     "webpack-dev-server": "^5.2.2"
   },
   "peerDependencies": {
