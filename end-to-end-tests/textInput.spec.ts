@@ -23,7 +23,7 @@ test(
     }
 )
 
-test.only(
+test(
     'Textarea TextInput can get value via harness.',
     async ({page}) => {
         // given
@@ -34,31 +34,11 @@ test.only(
             '.playground__inputs__text-input .text-input'
         ).first())
 
-        console.log('A', textareaTextInput.inputNode)
         // when
         await textareaTextInput.fill('test-input')
 
         // then
         expect(await textareaTextInput.inputValue()).toStrictEqual('test-input')
-    }
-)
-
-test(
-    'Richtext TextInput can get value via harness.',
-    async ({page}) => {
-        // given
-        await page.goto('/')
-        await page.locator('.tab-bar__tap-text').click()
-
-        const richtextTextInput = textInput(page.locator(
-            '.playground__inputs__text-input .text-input'
-        ).first())
-
-        // when
-        await richtextTextInput.fill('test-input')
-
-        // then
-        expect(await richtextTextInput.inputValue()).toStrictEqual('test-input')
     }
 )
 
@@ -70,14 +50,36 @@ test(
         await page.locator('.tab-bar__tap-text').click()
 
         const codeTextInput = textInput(page.locator(
-            '.playground__inputs__text-input .text-input'
+            '.playground__inputs__text-input .text-input--code-editor'
         ).first())
 
         // when
+        await codeTextInput.activateCodeEditor()
         await codeTextInput.fill('test-input')
 
         // then
         expect(await codeTextInput.inputValue()).toStrictEqual('test-input')
+    }
+)
+
+test(
+    'Richtext TextInput can get value via harness.',
+    async ({page}) => {
+        // given
+        await page.goto('/')
+        await page.locator('.tab-bar__tap-text').click()
+
+        const richtextTextInput = textInput(page.locator(
+            '.playground__inputs__text-input .text-input--richtext-editor'
+        ).first())
+
+        // when
+        await richtextTextInput.activateRichtextEditor()
+        await richtextTextInput.fill('test-input')
+
+        // then
+        expect(await richtextTextInput.inputValue())
+            .toStrictEqual('<p>test-input</p>')
     }
 )
 

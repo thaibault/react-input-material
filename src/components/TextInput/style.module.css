@@ -12,6 +12,35 @@ endregion */
 .text-input {
     display: block;
 
+    .text-input__code-editor-button, .text-input__richtext-editor-button {
+        /*
+            This class is needed to be imported in the component. It should
+            defined something to prevent that a minification removes it.
+        */
+        display: block;
+    }
+
+    .text-input__suggestions {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        bottom: unset !important;
+        top: 54px !important;
+        width: 100%;
+
+        &.text-input__suggestions--pending {
+            padding: 10px;
+        }
+
+        .text-input__suggestions__suggestion {
+            visibility: visible;
+            white-space: break-spaces;
+        }
+
+        .text-input__suggestions__suggestion__mark {
+            display: contents;
+        }
+    }
+
     .code-editor {
         /*
             NOTE: This is needed to let autocomplete divs for the intellisense
@@ -102,26 +131,6 @@ endregion */
         }
     }
 
-    .text-input__suggestions {
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-        bottom: unset !important;
-        top: 54px !important;
-        width: 100%;
-
-        &.text-input__suggestions--pending {
-            padding: 10px;
-        }
-
-        .text-input__suggestions__suggestion {
-            visibility: visible;
-            white-space: break-spaces;
-        }
-
-        .text-input__suggestions__suggestion__mark {
-            display: contents;
-        }
-    }
     /* Clears the 'X' from Internet Explorer */
     input[type="search"]::-ms-clear,
     input[type="search"]::-ms-reveal {

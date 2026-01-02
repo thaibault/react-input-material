@@ -6,13 +6,29 @@
 import {Locator} from 'playwright-core'
 
 export const textInput = (parent: Locator) => {
-    const inputNode = parent.locator('input, textarea, [contenteditable]')
+    const inputNode = parent.locator('input, textarea')
+    const richInputNode = parent.locator('[contenteditable]')
+
     const optionList = parent.locator('ul li')
     const selectedItem = parent.locator('.mdc-select__selected-text')
+
+    const codeEditorButton = parent.locator('.text-input__code-editor-button')
+    const richtextEditorButton =
+        parent.locator('.text-input__richtext-editor-button')
 
     return {
         main: parent,
         inputNode,
+        richInputNode,
+
+        activateCodeEditor: async () => {
+            if (await richInputNode.count() === 0)
+                await codeEditorButton.click()
+        },
+        activateRichtextEditor: async () => {
+            if (await richInputNode.count() === 0)
+                await richtextEditorButton.click()
+        },
 
         getOptions: async () => {
             const result: Array<string> = []
@@ -23,6 +39,12 @@ export const textInput = (parent: Locator) => {
         },
 
         fill: async (valueRepresentation: string) => {
+            if (await richInputNode.count() > 0) {
+                await richInputNode.fill(valueRepresentation)
+
+                return
+            }
+
             if (await inputNode.count() > 0) {
                 await inputNode.fill(valueRepresentation)
 
