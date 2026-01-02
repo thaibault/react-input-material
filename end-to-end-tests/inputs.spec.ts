@@ -1,6 +1,6 @@
 import {expect, test} from '@playwright/test'
 
-import interval from '../src/components/Interval/harness'
+import inputs from '../src/components/Inputs/harness'
 
 test.setTimeout(120_000)
 
@@ -11,13 +11,15 @@ test(
         await page.goto('/')
         await page.locator('.tab-bar__tap-inputs').click()
 
-        const intervalHarness = interval(page.locator(
+        const inputsHarness = inputs(page.locator(
             '.playground__inputs__inputs .inputs'
         ).first())
 
         // when
+        const numberOfInputs = await inputsHarness.inputs.count()
+        await inputsHarness.remove()
 
         // then
-
+        expect(await inputsHarness.inputs.count()).toEqual(numberOfInputs - 1)
     }
 )

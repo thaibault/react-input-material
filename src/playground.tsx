@@ -1273,6 +1273,13 @@ const Application = () => {
                             'none'
                     }}
                 >
+                    <Inputs
+                        name="textInputInputsControlled"
+                        onChange={onChange}
+                        onChangeValue={onChangeTextInputInputsValue}
+                        triggerInitialPropertiesConsolidation={true}
+                        value={textInputInputsValue}
+                    />
                     {/* region file */}
                     <Inputs<FileInputValue | null, FileInputProps>
                         name="fileInputs"
@@ -1389,13 +1396,6 @@ const Application = () => {
                     </Inputs>
                     {/* endregion */}
                     {/* * endregion */}
-                    <Inputs
-                        name="textInputInputsControlled"
-                        onChange={onChange}
-                        onChangeValue={onChangeTextInputInputsValue}
-                        triggerInitialPropertiesConsolidation={true}
-                        value={textInputInputsValue}
-                    />
                 </div>
                 {/* endregion */}
                 {/* region interval */}
