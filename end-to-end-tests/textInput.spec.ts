@@ -5,7 +5,7 @@ import textInput from '../src/components/TextInput/harness'
 test.setTimeout(120_000)
 
 test(
-    'TextInput can get value via harness.',
+    'Simple TextInput can get value via harness.',
     async ({page}) => {
         // given
         await page.goto('/')
@@ -20,6 +20,64 @@ test(
 
         // then
         expect(await simpleTextInput.inputValue()).toStrictEqual('test-input')
+    }
+)
+
+test.only(
+    'Textarea TextInput can get value via harness.',
+    async ({page}) => {
+        // given
+        await page.goto('/')
+        await page.locator('.tab-bar__tap-text').click()
+
+        const textareaTextInput = textInput(page.locator(
+            '.playground__inputs__text-input .text-input'
+        ).first())
+
+        console.log('A', textareaTextInput.inputNode)
+        // when
+        await textareaTextInput.fill('test-input')
+
+        // then
+        expect(await textareaTextInput.inputValue()).toStrictEqual('test-input')
+    }
+)
+
+test(
+    'Richtext TextInput can get value via harness.',
+    async ({page}) => {
+        // given
+        await page.goto('/')
+        await page.locator('.tab-bar__tap-text').click()
+
+        const richtextTextInput = textInput(page.locator(
+            '.playground__inputs__text-input .text-input'
+        ).first())
+
+        // when
+        await richtextTextInput.fill('test-input')
+
+        // then
+        expect(await richtextTextInput.inputValue()).toStrictEqual('test-input')
+    }
+)
+
+test(
+    'Code TextInput can get value via harness.',
+    async ({page}) => {
+        // given
+        await page.goto('/')
+        await page.locator('.tab-bar__tap-text').click()
+
+        const codeTextInput = textInput(page.locator(
+            '.playground__inputs__text-input .text-input'
+        ).first())
+
+        // when
+        await codeTextInput.fill('test-input')
+
+        // then
+        expect(await codeTextInput.inputValue()).toStrictEqual('test-input')
     }
 )
 

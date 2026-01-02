@@ -6,7 +6,7 @@
 import {Locator} from 'playwright-core'
 
 export const textInput = (parent: Locator) => {
-    const inputNode = parent.locator('input')
+    const inputNode = parent.locator('input, textarea, [contenteditable]')
     const optionList = parent.locator('ul li')
     const selectedItem = parent.locator('.mdc-select__selected-text')
 
