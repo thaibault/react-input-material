@@ -20,6 +20,7 @@ test(
         await inputsHarness.remove()
 
         // then
-        expect(await inputsHarness.inputs.count()).toEqual(numberOfInputs - 1)
+        await expect(inputsHarness.inputs.count()).resolves
+            .toStrictEqual(numberOfInputs - 1)
     }
 )
