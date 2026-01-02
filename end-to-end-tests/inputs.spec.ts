@@ -5,7 +5,7 @@ import inputs from '../src/components/Inputs/harness'
 test.setTimeout(120_000)
 
 test(
-    'Inputs can get nested values via harness.',
+    'Inputs can manage nested inputs via harness.',
     async ({page}) => {
         // given
         await page.goto('/')
@@ -16,6 +16,7 @@ test(
         ).first())
 
         // when
+        await inputsHarness.add()
         const numberOfInputs = await inputsHarness.inputs.count()
         await inputsHarness.remove()
 
