@@ -1,4 +1,5 @@
 import {expect, test} from '@playwright/test'
+
 import checkbox from '../src/components/Checkbox/harness'
 
 test.setTimeout(120_000)

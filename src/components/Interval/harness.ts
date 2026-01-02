@@ -5,13 +5,23 @@
 
 import {Locator} from 'playwright-core'
 
-export const intervalInput = (parent: Locator) => {
-    // TODO
-    const result = {
-        main: parent
-    }
+import {textInput} from '../TextInput/harness'
 
-    return result
+export const intervalInput = (parent: Locator) => {
+    const startInput = textInput(parent.locator('.interval__start'))
+    const endInput = textInput(parent.locator('.interval__end'))
+
+    return {
+        main: parent,
+        startInput,
+        endInput,
+
+        fillStart: startInput.fill.bind(startInput),
+        startInputValue: startInput.inputValue.bind(startInput),
+
+        fillEnd: endInput.fill.bind(endInput),
+        endInputValue: endInput.inputValue.bind(endInput)
+    }
 }
 
 export default intervalInput

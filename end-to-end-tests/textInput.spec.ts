@@ -24,6 +24,36 @@ test(
 )
 
 test(
+    'TextInput can get date time via harness.',
+    async ({page}) => {
+        // given
+        await page.goto('/')
+        await page.locator('.tab-bar__tap-time').click()
+
+        const simpleTextInput = textInput(page.locator(
+            '.playground__inputs__time-input .text-input'
+        ).first())
+
+        // when
+        const now = new Date()
+        /*
+            NOTE: Playwright does not work with the local date time string
+            representation like it is visible in browser.
+        */
+        // const formattedDate = now.toLocaleDateString()
+        const formattedDate =
+            `${String(now.getFullYear())}-` +
+            `${String(now.getMonth() + 1).padStart(2, '0')}-` +
+            String(now.getDate()).padStart(2, '0')
+        await simpleTextInput.fill(formattedDate)
+
+        // then
+        expect(await simpleTextInput.inputValue())
+            .toStrictEqual(formattedDate)
+    }
+)
+
+test(
     'TextInput can get value from selection via harness.',
     async ({page}) => {
         // given
