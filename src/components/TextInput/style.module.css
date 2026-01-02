@@ -130,7 +130,6 @@ endregion */
             outline: none;
         }
     }
-
     /* Clears the 'X' from Internet Explorer */
     input[type="search"]::-ms-clear,
     input[type="search"]::-ms-reveal {
