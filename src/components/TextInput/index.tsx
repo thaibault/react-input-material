@@ -482,6 +482,12 @@ export const TextInputInner = function<Type = unknown>(
             }
         >
             <IconButton
+                classNames={[
+                    properties.editor.startsWith('code') ?
+                        CSS_CLASS_NAMES.textInputCodeEditorButton :
+                        CSS_CLASS_NAMES.textInputRichtextEditorButton
+                ]}
+
                 domNodeProperties={{
                     'aria-label': properties.editorIsActive ?
                         'plain' :

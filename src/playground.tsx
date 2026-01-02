@@ -616,6 +616,8 @@ const Application = () => {
                         onChange={onChange}
                     />
                     <TextInput<string>
+                        className="text-input--code-editor"
+
                         editor={
                             CodeEditorIndicator as
                                 typeof CodeEditorIndicator | undefined ?
@@ -679,6 +681,8 @@ const Application = () => {
                     <hr/>
 
                     <TextInput<string>
+                        className="text-input--richtext-editor"
+
                         declaration="richtext"
                         description="textInput4Description"
                         name="textInput4"
