@@ -17,7 +17,7 @@ endregion */
             This class is needed to be imported in the component. It should
             defined something to prevent that a minification removes it.
         */
-        display: block;
+        display: inline;
     }
 
     .text-input__suggestions {
