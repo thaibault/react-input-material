@@ -3,8 +3,6 @@ import {expect, test} from '@playwright/test'
 
 import fileInput from '../src/components/FileInput/harness'
 
-test.setTimeout(120_000)
-
 test(
     'FileInput can get files via harness.',
     async ({page}) => {

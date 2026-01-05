@@ -2,8 +2,6 @@ import {expect, test} from '@playwright/test'
 
 import interval from '../src/components/Interval/harness'
 
-test.setTimeout(120_000)
-
 test(
     'Interval can get start and end values via harness.',
     async ({page}) => {
