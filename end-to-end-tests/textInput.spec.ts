@@ -2,8 +2,6 @@ import {expect, test} from '@playwright/test'
 
 import textInput from '../src/components/TextInput/harness'
 
-test.setTimeout(120_000)
-
 test(
     'Simple TextInput can get value via harness.',
     async ({page}) => {
@@ -125,10 +123,19 @@ test(
         ).first())
 
         // when
-        const lastOption: string = (await selectInput.getOptions()).pop() ?? ''
+        const options = await selectInput.getOptions()
+        const lastOption: string = options.pop() ?? ''
         await selectInput.fill(lastOption)
+        expect(await selectInput.inputValue()).toStrictEqual(lastOption)
+
+        const secondLastOption: string = options.pop() ?? ''
+        await selectInput.fill(secondLastOption)
+        expect(await selectInput.inputValue()).toStrictEqual(secondLastOption)
+
+        const thirdLastOption: string = options.pop() ?? ''
+        await selectInput.fill(thirdLastOption)
 
         // then
-        expect(await selectInput.inputValue()).toStrictEqual(lastOption)
+        expect(await selectInput.inputValue()).toStrictEqual(thirdLastOption)
     }
 )

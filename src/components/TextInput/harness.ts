@@ -9,14 +9,15 @@ export const textInput = (parent: Locator) => {
     const inputNode = parent.locator('input, textarea')
     const richInputNode = parent.locator('[contenteditable]')
 
-    const optionList = parent.locator('ul li')
-    const selectedItem = parent.locator('.mdc-select__selected-text')
+    const menuNode = parent.locator('.mdc-menu-surface')
+    const optionListNode = parent.locator('ul li')
+    const selectedItemNode = parent.locator('.mdc-select__selected-text')
 
     const codeEditorButton = parent.locator('.text-input__code-editor-button')
     const richtextEditorButton =
         parent.locator('.text-input__richtext-editor-button')
 
-    return {
+    const result = {
         main: parent,
         inputNode,
         richInputNode,
@@ -32,11 +33,16 @@ export const textInput = (parent: Locator) => {
 
         getOptions: async () => {
             const result: Array<string> = []
-            for (const listNode of await optionList.elementHandles())
+            for (const listNode of await optionListNode.elementHandles())
                 result.push(await listNode.textContent() ?? '')
 
             return result
         },
+        isMenuOpen: async () =>
+            (await menuNode
+                    .and(parent.locator('.mdc-menu-surface--open'))
+                    .count()
+            ) > 0,
 
         fill: async (valueRepresentation: string) => {
             if (await richInputNode.count() > 0) {
@@ -51,10 +57,12 @@ export const textInput = (parent: Locator) => {
                 return
             }
 
-            await selectedItem.click()
-            for (const listNode of await optionList.elementHandles())
+            while (!(await result.isMenuOpen()))
+                await selectedItemNode.click()
+            for (const listNode of await optionListNode.elementHandles())
                 if (await listNode.textContent() === valueRepresentation) {
-                    await listNode.click()
+                    if (await result.inputValue() !== valueRepresentation)
+                        await listNode.click()
                     break
                 }
         },
@@ -62,9 +70,11 @@ export const textInput = (parent: Locator) => {
             if (await inputNode.count() > 0)
                 return await inputNode.inputValue()
 
-            return await selectedItem.textContent()
+            return await selectedItemNode.textContent()
         }
     }
+
+    return result
 }
 
 export default textInput

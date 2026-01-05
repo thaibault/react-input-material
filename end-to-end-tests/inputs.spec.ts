@@ -2,8 +2,6 @@ import {expect, test} from '@playwright/test'
 
 import inputs from '../src/components/Inputs/harness'
 
-test.setTimeout(120_000)
-
 test(
     'Inputs can manage nested inputs via harness.',
     async ({page}) => {
