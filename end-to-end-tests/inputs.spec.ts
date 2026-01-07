@@ -15,11 +15,11 @@ test(
 
         // when
         await inputsHarness.add()
-        const numberOfInputs = await inputsHarness.inputs.count()
+        const numberOfInputs = await inputsHarness.items.count()
         await inputsHarness.remove()
 
         // then
-        await expect(inputsHarness.inputs.count()).resolves
+        await expect(inputsHarness.items.count()).resolves
             .toStrictEqual(numberOfInputs - 1)
     }
 )
