@@ -8,12 +8,12 @@ import {Locator} from 'playwright-core'
 export const inputsInput = (parent: Locator) => {
     const addButton = parent.locator('.inputs__add__button')
     const removeButtons = parent.locator('.inputs__item__remove')
-    const inputs = parent.locator('.inputs__item__input')
+    const items = parent.locator('.inputs__item')
 
     return {
         main: parent,
 
-        inputs,
+        items,
         removeButtons,
 
         addButton,
