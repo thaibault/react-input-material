@@ -1,3 +1,5 @@
+import {formatEndUserDate} from 'react-generic-tools'
+
 import {expect, test} from '@playwright/test'
 
 import interval from '../src/components/Interval/harness'
@@ -17,18 +19,8 @@ test(
         const now = new Date()
         const later = new Date(now)
         later.setHours(later.getHours() + 1)
-        /*
-            NOTE: Playwright does not work with the local date time string
-            representation like it is visible in browser.
-        */
-        // const formattedStartTime = now.toLocaleTimeString()
-        // const formattedEndTime = later.toLocaleTimeString()
-        const formattedStartTime =
-            `${String(now.getHours()).padStart(2, '0')}:` +
-            String(now.getMinutes()).padStart(2, '0')
-        const formattedEndTime =
-            `${String(later.getHours()).padStart(2, '0')}:` +
-            String(later.getMinutes()).padStart(2, '0')
+        const formattedStartTime = formatEndUserTime(now)
+        const formattedEndTime = formatEndUserTime(later)
 
         await intervalHarness.fillStart(formattedStartTime)
         await intervalHarness.fillEnd(formattedEndTime)
