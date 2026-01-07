@@ -1,3 +1,5 @@
+import {formatEndUserDate} from 'react-generic-tools'
+
 import {expect, test} from '@playwright/test'
 
 import textInput from '../src/components/TextInput/harness'
@@ -93,16 +95,7 @@ test(
         ).first())
 
         // when
-        const now = new Date()
-        /*
-            NOTE: Playwright does not work with the local date time string
-            representation like it is visible in browser.
-        */
-        // const formattedDate = now.toLocaleDateString()
-        const formattedDate =
-            `${String(now.getFullYear())}-` +
-            `${String(now.getMonth() + 1).padStart(2, '0')}-` +
-            String(now.getDate()).padStart(2, '0')
+        const formattedDate = formatEndUserDate(new Date())
         await simpleTextInput.fill(formattedDate)
 
         // then
