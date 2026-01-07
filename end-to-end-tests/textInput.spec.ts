@@ -1,4 +1,4 @@
-import {formatEndUserDate} from 'react-generic-tools'
+import {formatEndUserDate} from 'react-generic-tools/endToEndTestHelper'
 
 import {expect, test} from '@playwright/test'
 
