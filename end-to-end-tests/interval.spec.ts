@@ -22,8 +22,7 @@ test(
         const formattedStartTime = formatEndUserTime(now)
         const formattedEndTime = formatEndUserTime(later)
 
-        await intervalHarness.fillStart(formattedStartTime)
-        await intervalHarness.fillEnd(formattedEndTime)
+        await intervalHarness.fill(now, later)
 
         // then
         expect(await intervalHarness.startInputValue())

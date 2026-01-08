@@ -10,7 +10,7 @@ export const inputsInput = (parent: Locator) => {
     const removeButtons = parent.locator('.inputs__item__remove')
     const items = parent.locator('.inputs__item')
 
-    return {
+    const result = {
         main: parent,
 
         items,
@@ -24,8 +24,19 @@ export const inputsInput = (parent: Locator) => {
                 return removeButtons.nth(index).click()
 
             return removeButtons.last().click()
+        },
+        removeAll: async () => {
+            if (await removeButtons.count() > 0)
+                for (
+                    let index = 0;
+                    index <= await result.items.count();
+                    index++
+                )
+                    await result.remove()
         }
     }
+
+    return result
 }
 
 export default inputsInput
