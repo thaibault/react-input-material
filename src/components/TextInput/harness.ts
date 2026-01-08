@@ -41,8 +41,8 @@ export const textInput = (parent: Locator) => {
         },
         isMenuOpen: async () =>
             (await menuNode
-                    .and(parent.locator('.mdc-menu-surface--open'))
-                    .count()
+                .and(parent.locator('.mdc-menu-surface--open'))
+                .count()
             ) > 0,
 
         fill: async (valueRepresentation: string) => {
@@ -65,12 +65,18 @@ export const textInput = (parent: Locator) => {
             for (const listNode of await optionListNode.elementHandles())
                 if (await listNode.textContent() === valueRepresentation) {
                     if (await result.inputValue() !== valueRepresentation)
-                        while (await result.isMenuOpen()) {
+                        while (
+                            await result.inputValue() !== valueRepresentation
+                        ) {
                             await listNode.click()
                             await timeout(20)
                         }
                     break
                 }
+            while (await result.isMenuOpen()) {
+                await selectedItemNode.click()
+                await timeout(20)
+            }
         },
         inputValue: async () => {
             if (await inputNode.count() > 0)
