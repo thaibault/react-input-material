@@ -3,6 +3,7 @@
 /** @module harness */
 'use strict'
 
+import {timeout} from 'clientnode'
 import {Locator} from 'playwright-core'
 
 export const textInput = (parent: Locator) => {
@@ -57,12 +58,17 @@ export const textInput = (parent: Locator) => {
                 return
             }
 
-            while (!(await result.isMenuOpen()))
+            while (!(await result.isMenuOpen())) {
                 await selectedItemNode.click()
+                await timeout(20)
+            }
             for (const listNode of await optionListNode.elementHandles())
                 if (await listNode.textContent() === valueRepresentation) {
                     if (await result.inputValue() !== valueRepresentation)
-                        await listNode.click()
+                        while (await result.isMenuOpen()) {
+                            await listNode.click()
+                            await timeout(20)
+                        }
                     break
                 }
         },
