@@ -124,7 +124,7 @@
     "@codemirror/state": "^6.5.4",
     "@codemirror/view": "^6.39.12",
     "@emotion/react": "^11.14.0",
-    "@playwright/test": "^1.58.0",
+    "@playwright/test": "^1.58.1",
     "@rmwc/card": "^14.3.5",
     "@rmwc/checkbox": "^14.3.5",
     "@rmwc/circular-progress": "^14.3.5",
