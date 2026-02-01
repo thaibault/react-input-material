@@ -14397,6 +14397,7 @@ __metadata:
     "@stylistic/eslint-plugin": "npm:^5.7.1"
     "@teamsupercell/typings-for-css-modules-loader": "npm:^2.5.2"
     "@tiptap/core": "npm:^3.18.0"
+    "@tiptap/extensions": "npm:^3.18.0"
     "@tiptap/react": "npm:^3.18.0"
     "@tiptap/starter-kit": "npm:^3.18.0"
     "@types/ejs": "npm:^3.1.5"

@@ -17,13 +17,18 @@
     endregion
 */
 // region imports
+import {CharacterCount} from '@tiptap/extensions'
 import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 import {
-    ForwardedRef, forwardRef,
-    MutableRefObject as RefObject, ReactElement, useEffect,
-    useImperativeHandle, useRef
+    ForwardedRef,
+    forwardRef,
+    MutableRefObject as RefObject,
+    ReactElement,
+    useEffect,
+    useImperativeHandle,
+    useRef
 } from 'react'
 import Dummy from 'react-generic-dummy'
 
@@ -68,7 +73,13 @@ export const Index = forwardRef((
 
     const extensions =
         properties.editor?.extensions ||
-        [StarterKit.configure(properties.editor?.starterKitOptions || {})]
+        [
+            ...(properties.maximumLength === undefined ?
+                [] :
+                [CharacterCount.configure({limit: properties.maximumLength})]
+            ),
+            StarterKit.configure(properties.editor?.starterKitOptions || {})
+        ]
 
     const editor = useEditor({
         extensions,
