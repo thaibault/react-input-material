@@ -30,8 +30,8 @@ TextInput.locales = ['en-US']
 
 const TRANSFORMER = TextInput.transformer
 const TIMESTAMP_TRANSFORMER = {
-    ...TextInput.transformer,
-    date: {...TextInput.transformer.date, useISOString: false}
+    ...TRANSFORMER,
+    date: {...TRANSFORMER.date, useISOString: false}
 }
 const TIMEZONE_OFFSET_IN_SECONDS =
     -1 * new Date(1970, 0, 1).getTimezoneOffset() * 60
@@ -66,7 +66,6 @@ describe('TextInput', () => {
         [true, null]
     )
 
-    // TODO add missing transformer
     testEach<AnyFunction>(
         'transformer.currency.format.final.transform',
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -82,7 +81,7 @@ describe('TextInput', () => {
             ['- Infinity USD', -Infinity],
             ['unknown', NaN]
         ].map((item: Array<unknown>): Array<unknown> =>
-            item.concat(TextInput.transformer)
+            item.concat(TRANSFORMER)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
@@ -116,7 +115,7 @@ describe('TextInput', () => {
             ['Infinitely early in the past', -Infinity],
             ['', NaN]
         ].map((item: Array<unknown>): Array<unknown> =>
-            item.concat(TextInput.transformer)
+            item.concat(TRANSFORMER)
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 
@@ -172,48 +171,91 @@ describe('TextInput', () => {
     )
 
     testEach<AnyFunction>(
+        'transformer.date.format.final.transform',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        TRANSFORMER['datetime-local'].format!.final.transform!,
+
+        ['1970-01-01T00:00:00', -1 * TIMEZONE_OFFSET_IN_SECONDS],
+        ['1970-01-01T00:00:10', 10 - TIMEZONE_OFFSET_IN_SECONDS],
+        ['1970-01-02T00:00:00', 60 ** 2 * 24 - TIMEZONE_OFFSET_IN_SECONDS],
+        ['Infinitely far in the future', Infinity],
+        ['Infinitely early in the past', -Infinity],
+        ['', NaN]
+    )
+    testEach<AnyFunction>(
+        'transformer.date.parse',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        TIMESTAMP_TRANSFORMER['datetime-local'].parse!,
+
+        ...([
+            [1, 1],
+            [0, 0],
+            [1, '1 f'],
+            [0, '0 f'],
+            [1, '1 f'],
+            [1.1, '1.1 f'],
+            [0, '1970-01-01']
+        ].map((item: Array<unknown>): Array<unknown> =>
+            item.concat(TIMESTAMP_TRANSFORMER)
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
+    )
+
+    testEach<AnyFunction>(
+        'transformer.date-local.format.final.transform',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        TRANSFORMER['datetime-local'].format!.final.transform!,
+
+        ['1970-01-01T00:00:00', -1 * TIMEZONE_OFFSET_IN_SECONDS],
+        ['1970-01-01T00:00:10', 10 + -1 * TIMEZONE_OFFSET_IN_SECONDS],
+        ['1970-01-02T00:00:00', 60 ** 2 * 24 - TIMEZONE_OFFSET_IN_SECONDS],
+        ['Infinitely far in the future', Infinity],
+        ['Infinitely early in the past', -Infinity],
+        ['', NaN]
+    )
+    testEach<AnyFunction>(
+        'transformer.date-local.parse',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        TIMESTAMP_TRANSFORMER['datetime-local'].parse!,
+
+        ...([
+            [1, 1],
+            [0, 0],
+            [1, '1 f'],
+            [0, '0 f'],
+            [1, '1 f'],
+            [1.1, '1.1 f'],
+            [0, '1970-01-01']
+        ].map((item: Array<unknown>): Array<unknown> =>
+            item.concat(TIMESTAMP_TRANSFORMER)
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
+    )
+
+    testEach<AnyFunction>(
         'transformer.time.format.final.transform',
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        TextInput.transformer.time.format!.final.transform!,
+        TRANSFORMER.time.format!.final.transform!,
 
-        ['00:00:00.000', 0, TextInput.transformer, {}],
-        ['00:00', 0, TextInput.transformer, {step: 60}],
-        ['00:00:10.000', 10, TextInput.transformer, {}],
-        ['00:00', 10, TextInput.transformer, {step: 120}],
-        ['00:00:00.000', 60 ** 2 * 24, TextInput.transformer, {}],
-        ['00:00:00.000', 60 ** 2 * 24, TextInput.transformer, {step: 61}],
-        ['00:00', 60 ** 2 * 24, TextInput.transformer, {step: 60}],
-        ['00:00:20.000', 60 ** 2 * 24 + 20, TextInput.transformer, {}],
-        ['00:10:00.000', 10 * 60, TextInput.transformer, {}],
-        ['10:10:00.000', 10 * 60 ** 2 + 10 * 60, TextInput.transformer, {}],
-        [
-            '10:10:00.100',
-            10 * 60 ** 2 + 10 * 60 + 0.1,
-            TextInput.transformer,
-            {}
-        ],
-        [
-            '10:10',
-            10 * 60 ** 2 + 10 * 60 + 0.1,
-            TextInput.transformer,
-            {step: 60}
-        ],
+        ['00:00:00.000', 0, TRANSFORMER, {}],
+        ['00:00', 0, TRANSFORMER, {step: 60}],
+        ['00:00:10.000', 10, TRANSFORMER, {}],
+        ['00:00', 10, TRANSFORMER, {step: 120}],
+        ['00:00:00.000', 60 ** 2 * 24, TRANSFORMER, {}],
+        ['00:00:00.000', 60 ** 2 * 24, TRANSFORMER, {step: 61}],
+        ['00:00', 60 ** 2 * 24, TRANSFORMER, {step: 60}],
+        ['00:00:20.000', 60 ** 2 * 24 + 20, TRANSFORMER, {}],
+        ['00:10:00.000', 10 * 60, TRANSFORMER, {}],
+        ['10:10:00.000', 10 * 60 ** 2 + 10 * 60, TRANSFORMER, {}],
+        ['10:10:00.100', 10 * 60 ** 2 + 10 * 60 + 0.1, TRANSFORMER, {}],
+        ['10:10', 10 * 60 ** 2 + 10 * 60 + 0.1, TRANSFORMER, {step: 60}],
         [
             '08:00',
             Date.parse('1970-01-01T08:00:00.000Z') / 1000,
-            TextInput.transformer,
+            TRANSFORMER,
             {step: 60}
         ],
-        [
-            'Infinitely far in the future', Infinity, TextInput.transformer, {}
-        ],
-        [
-            'Infinitely early in the past',
-            -Infinity,
-            TextInput.transformer,
-            {}
-        ],
-        ['', NaN, TextInput.transformer, {}]
+        ['Infinitely far in the future', Infinity, TRANSFORMER, {}],
+        ['Infinitely early in the past', -Infinity, TRANSFORMER, {}],
+        ['', NaN, TRANSFORMER, {}]
     )
     testEach<AnyFunction>(
         'transformer.time.parse',
@@ -272,6 +314,83 @@ describe('TextInput', () => {
             ]
         ].map((item: Array<unknown>): Array<unknown> =>
             item.concat(TIMESTAMP_TRANSFORMER)
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
+    )
+
+    testEach<AnyFunction>(
+        'transformer.float.format.final.transform',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        TRANSFORMER.float.format!.final.transform!,
+
+        ...([
+            ['0', 0],
+            ['1', 1],
+            ['1.3', 1.3],
+            ['2.34', 2.34],
+            ['Infinity', Infinity],
+            ['- Infinity', -Infinity]
+        ].map((item: Array<unknown>): Array<unknown> =>
+            item.concat(TRANSFORMER)
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
+    )
+    testEach<AnyFunction>(
+        'transformer.float.parse',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        TRANSFORMER.float.parse!,
+
+        ...([
+            [0, '0'],
+            [1, '1'],
+            [1.3, '1.3'],
+            [2.34, '2.34']
+        ].map((item: Array<unknown>): Array<unknown> =>
+            item.concat(TRANSFORMER, {minimum: -2, maximum: 10})
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
+    )
+
+    testEach<AnyFunction>(
+        'transformer.integer.format.final.transform',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        TRANSFORMER.integer.format!.final.transform!,
+
+        ...([
+            ['0', 0],
+            ['1', 1],
+            ['1', 1.3],
+            ['2', 2.34],
+            ['Infinity', Infinity],
+            ['- Infinity', -Infinity]
+        ].map((item: Array<unknown>): Array<unknown> =>
+            item.concat(TRANSFORMER)
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
+    )
+    testEach<AnyFunction>(
+        'transformer.integer.parse',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        TRANSFORMER.integer.parse!,
+
+        ...([
+            [0, '0'],
+            [1, '1'],
+            [1, '1.3'],
+            [2, '2.34']
+        ].map((item: Array<unknown>): Array<unknown> =>
+            item.concat(TRANSFORMER, {minimum: -2, maximum: 10})
+        ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
+    )
+
+    testEach<AnyFunction>(
+        'transformer.number.parse',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        TRANSFORMER.number.parse!,
+
+        ...([
+            [0, '0'],
+            [1, '1'],
+            [1, '1.3'],
+            [2, '2.34']
+        ].map((item: Array<unknown>): Array<unknown> =>
+            item.concat(TRANSFORMER, {minimum: -2, maximum: 10})
         ) as Array<[ReturnType<AnyFunction>, ...Parameters<AnyFunction>]>)
     )
 

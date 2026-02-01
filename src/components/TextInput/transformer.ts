@@ -611,13 +611,20 @@ export const TRANSFORMER: DataTransformation = {
     integer: {
         format: {final: {transform: (
             value: number, {integer: {format}}: DataTransformation
-        ): string => (
-            new Intl.NumberFormat(
-                TextInput.locales,
-                {
-                    maximumFractionDigits: 0, ...(format?.final.options ?? {})
-                }
-            )).format(value)
+        ): string =>
+            format ?
+                value === Infinity ?
+                    'Infinity' :
+                    value === -Infinity ?
+                        '- Infinity' :
+                        (new Intl.NumberFormat(
+                            TextInput.locales,
+                            {
+                                maximumFractionDigits: 0,
+                                ...(format.final.options ?? {})
+                            }
+                        )).format(value) :
+                String(value)
         }},
         parse: (
             value: number | string,
