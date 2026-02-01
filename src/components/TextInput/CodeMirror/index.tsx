@@ -31,7 +31,7 @@ import {
 } from '@codemirror/language'
 import {lintKeymap} from '@codemirror/lint'
 import {searchKeymap, highlightSelectionMatches} from '@codemirror/search'
-import {EditorState, Extension, Text} from '@codemirror/state'
+import {EditorState, Extension, Text, Transaction} from '@codemirror/state'
 import {
     crosshairCursor,
     drawSelection,
@@ -43,8 +43,7 @@ import {
     KeyBinding,
     keymap,
     lineNumbers,
-    rectangularSelection,
-    ViewUpdate
+    rectangularSelection
 } from '@codemirror/view'
 
 import {
@@ -138,14 +137,14 @@ export const Index = forwardRef((
         })
     )
 
-    const onChange = (viewUpdate: ViewUpdate) => {
+    const onChange = (transaction: Transaction) => {
         if (properties.disabled)
             return
 
-        const newValue = viewUpdate.state.doc.toString()
+        const newValue = transaction.state.doc.toString()
 
         inputEventMapperReference.current?.eventMapper
-            .input(newValue, viewUpdate)
+            .input(newValue, transaction)
 
         if (properties.onChange)
             properties.onChange(newValue)
@@ -160,14 +159,21 @@ export const Index = forwardRef((
                 doc: String(value),
                 extensions: [
                     BASIC_EXTENSIONS,
-                    EditorView.updateListener.of((viewUpdate: ViewUpdate) => {
-                        // TODO prevent update if given string is longer than
-                        // "properties.maximumLength"
+                    EditorState.changeFilter.of((transaction: Transaction) => {
+                        const newValue = transaction.state.doc.toString()
                         if (
-                            viewUpdate.startState.doc.toString() !==
-                            viewUpdate.state.doc.toString()
-                        )
-                            onChange(viewUpdate)
+                            transaction.startState.doc.toString() !== newValue
+                        ) {
+                            if (
+                                properties.maximumLength !== undefined &&
+                                newValue.length > properties.maximumLength
+                            )
+                                return false
+
+                            onChange(transaction)
+                        }
+
+                        return true
                     }),
                     properties.editor?.mode ? properties.editor.mode : []
                 ]

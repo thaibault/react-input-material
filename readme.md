@@ -40,14 +40,15 @@ selections, numbers, dates and so on.
 
 - Tooltip
 
+#### Checkbox
+
+- Checkbox
+- Error
+
 #### FileInput
 
-- Index
 - CircularProgress
-
-#### Index
-
-- Index
+- MediaCard
 
 #### Inputs
 
@@ -59,8 +60,11 @@ selections, numbers, dates and so on.
 
 #### TextInput
 
-- Index
-- Index (with advanced editor integration interface)
-- Index
+- CircularProgress
+- Error
+- Icon
+- IconButton
 - Menu
-  - TODO
+- Select
+- TextArea
+- TextField
