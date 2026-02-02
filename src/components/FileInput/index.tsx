@@ -141,14 +141,15 @@ export const FileInputInner = function<Type extends Value = Value>(
 
         determineValidationState<Type>(
             result,
-            // TODO not available
-            false
-            /*
-            nameInputReference.current?.properties.invalid ??
-                result.fileNameInputProperties.invalid ??
-                result.model.fileName.invalid ??
-                result.model!.state.invalidName
-            */,
+            Boolean(
+                (
+                    nameInputReference.current?.properties?.invalid as
+                        unknown as
+                        boolean | undefined
+                ) ??
+                result.model.fileName.state?.invalid ??
+                result.model.state?.invalidName
+            ),
             result.model.state as ModelState
         )
 
@@ -261,7 +262,7 @@ export const FileInputInner = function<Type extends Value = Value>(
      * through post processed data properties.
      */
     const onChangeValue = (
-        eventSourceOrName?: Partial<Type> | string | SyntheticEvent,
+        eventSourceOrName?: null | Partial<Type> | string | SyntheticEvent,
         event?: SyntheticEvent,
         inputProperties?: TextInputProperties<string>,
         attachBlobProperty = false
@@ -318,8 +319,11 @@ export const FileInputInner = function<Type extends Value = Value>(
                     ...oldValueState.value, name: eventSourceOrName
                 } as Type
             else if (
-                typeof (eventSourceOrName as Type).source === 'string' ||
-                typeof (eventSourceOrName as Type).url === 'string'
+                eventSourceOrName &&
+                (
+                    typeof (eventSourceOrName as Type).source === 'string' ||
+                    typeof (eventSourceOrName as Type).url === 'string'
+                )
             )
                 if (attachBlobProperty)
                     properties.value = {
@@ -766,7 +770,7 @@ export const FileInputInner = function<Type extends Value = Value>(
             onFocus={onFocus}
         >
             <input
-                accept={[].concat(
+                accept={([] as Array<string>).concat(
                     properties.acceptedContentTypes ?? []
                 ).join(', ')}
 
