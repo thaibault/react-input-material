@@ -765,8 +765,11 @@ export const FileInputInner = function<Type extends Value = Value>(
             onChange={onChangeValue}
             onFocus={onFocus}
         >
-            {/* TODO use "accept" attribute for better validation. */}
             <input
+                accept={[].concat(
+                    properties.acceptedContentTypes ?? []
+                ).join(', ')}
+
                 disabled={properties.disabled}
 
                 className={

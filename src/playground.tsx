@@ -1170,6 +1170,7 @@ const Application = () => {
                             } as FileInputValue
                         })}
 
+                        acceptedContentTypes="text/*"
                         contentTypePattern="^text/(?:plain|(?:x-)?csv|xml)$"
                         model={{fileName: {
                             pattern: '^[a-zA-Z0-9]\\.(?:csv|txt|xml)$'

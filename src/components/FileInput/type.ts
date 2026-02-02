@@ -131,6 +131,7 @@ export interface Properties<
     fileInputClassNames?: Array<string>
     imageClassNames?: Array<string>
 
+    acceptedContentTypes?: Array<string> | string
     contentTypePattern: Array<RegExp | string> | null | RegExp | string
     invertedContentTypePattern: Array<RegExp | string> | null | RegExp | string
 
