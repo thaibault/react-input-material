@@ -218,6 +218,7 @@
     "@rmwc/touch-target": "*",
     "@rmwc/typography": "*",
     "@tiptap/core": "*",
+    "@tiptap/extensions": "*",
     "@tiptap/react": "*",
     "@tiptap/starter-kit": "*",
     "@types/react": "*",
@@ -297,6 +298,9 @@
       "optional": true
     },
     "@tiptap/core": {
+      "optional": true
+    },
+    "@tiptap/extensions": {
       "optional": true
     },
     "@tiptap/react": {
@@ -537,7 +541,8 @@
           "@codemirror/view": "react-generic-dummy",
           "@rmwc/tooltip": "react-generic-dummy",
           "@tiptap/core$": "react-generic-dummy",
-          "@tiptap/react": "react-generic-dummy",
+          "@tiptap/extensions$": "react-generic-dummy",
+          "@tiptap/react$": "react-generic-dummy",
           "@tiptap/starter-kit$": "react-generic-dummy",
           "react-useanimations$": "react-generic-dummy",
           "react-useanimations/lib/lock$": "react-generic-dummy",
