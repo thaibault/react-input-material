@@ -14481,6 +14481,7 @@ __metadata:
     "@rmwc/touch-target": "*"
     "@rmwc/typography": "*"
     "@tiptap/core": "*"
+    "@tiptap/extensions": "*"
     "@tiptap/react": "*"
     "@tiptap/starter-kit": "*"
     "@types/react": "*"
@@ -14538,6 +14539,8 @@ __metadata:
     "@rmwc/typography":
       optional: true
     "@tiptap/core":
+      optional: true
+    "@tiptap/extensions":
       optional: true
     "@tiptap/react":
       optional: true
