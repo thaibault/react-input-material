@@ -84,7 +84,7 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState, EditorState, Selection, TypeSpecification, NormalizedSelection
+    CursorState, EditorState, Selection, TypeDefinition, NormalizedSelection
 } from '../../type'
 import {
     IconProperties,
@@ -1326,7 +1326,7 @@ export const TextInputInner = function<Type = unknown>(
         givenProps
     )
 
-    const type: TypeSpecification =
+    const type: TypeDefinition =
         givenProperties.type as keyof DataTransformation | null ||
         givenProperties.model?.type ||
         'string'
