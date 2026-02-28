@@ -66,8 +66,12 @@ export const PrimitiveTypes = [
     'string'
 ] as const
 export type PrimitiveType = typeof PrimitiveTypes[number]
-export type Type = boolean | number | string // | 'any' | PrimitiveType
-export type TypeSpecification = Array<TypeSpecification> | Type
+export type Type =
+    boolean |
+    number |
+    string
+    // | 'any' | PrimitiveType
+export type TypeDefinition = Array<TypeDefinition> | Type
 //// region model
 export interface SelectionOption {
     label: string
@@ -89,7 +93,7 @@ export interface CommonBaseModel<Type = unknown> {
     maximumLength: number
     minimumLength: number
 
-    type: TypeSpecification
+    type: TypeDefinition
 
     trim: boolean
 

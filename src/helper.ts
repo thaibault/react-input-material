@@ -45,7 +45,7 @@ import {
     ModelState,
     NormalizedSelection,
     Selection,
-    TypeSpecification,
+    TypeDefinition,
     ValueState
 } from './type'
 import {DateTimeRepresentation} from './components/Interval/type'
@@ -294,7 +294,7 @@ export function determineInitialRepresentation<
         if (typeof candidate === 'string')
             return candidate
 
-        return formatValue<T, DP & {type: TypeSpecification}>(
+        return formatValue<T, DP & {type: TypeDefinition}>(
             {
                 ...properties,
                 type: (
@@ -302,7 +302,7 @@ export function determineInitialRepresentation<
                     properties.model?.type ||
                     defaultProperties.model.type
                 )
-            } as unknown as DP & {type: TypeSpecification},
+            } as unknown as DP & {type: TypeDefinition},
             value,
             transformer
         )
