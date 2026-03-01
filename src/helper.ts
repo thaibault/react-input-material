@@ -44,7 +44,7 @@ import {
     DefaultProperties,
     ModelState,
     NormalizedSelection,
-    Selection,
+    SelectionDefinition,
     TypeDefinition,
     ValueState
 } from './type'
@@ -605,7 +605,7 @@ export function getValueFromSelection<T>(
  * @returns Determined normalized sorted selection configuration.
  */
 export function normalizeSelection(
-    selection?: Selection | null, labels?: Selection | null
+    selection?: SelectionDefinition | null, labels?: SelectionDefinition | null
 ): NormalizedSelection | null | undefined {
     if (!selection) {
         selection = labels

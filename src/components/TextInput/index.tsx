@@ -84,7 +84,7 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState, EditorState, Selection, TypeDefinition, NormalizedSelection
+    CursorState, EditorState, SelectionDefinition, TypeDefinition, NormalizedSelection
 } from '../../type'
 import {
     IconProperties,
@@ -1047,7 +1047,7 @@ export const TextInputInner = function<Type = unknown>(
             const abortController = new AbortController()
 
             const onResultsRetrieved = (
-                results?: Selection
+                results?: SelectionDefinition
             ): void => {
                 if (abortController.signal.aborted)
                     return
@@ -1354,7 +1354,7 @@ export const TextInputInner = function<Type = unknown>(
         selection =
             givenProperties.selection ||
             givenProperties.model?.selection as
-                Selection
+                SelectionDefinition
     if (
         !selection &&
         (givenProperties.type || givenProperties.model?.type) === 'boolean'

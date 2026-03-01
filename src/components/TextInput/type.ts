@@ -67,7 +67,7 @@ import {
     modelStatePropertyTypes as baseModelStatePropertyTypes,
     Properties as BaseProperties,
     propertyTypes as basePropertyTypes,
-    Selection,
+    SelectionDefinition,
     State as BaseState,
     StaticWebComponent,
     ValueState as BaseValueState
@@ -322,7 +322,7 @@ export interface Properties<Type = unknown> extends
     invertedPattern: Array<RegExp | string> | null | RegExp | string
     invertedPatternText: string
 
-    labels: Selection
+    labels: SelectionDefinition
 
     maximumLengthText: string
     minimumLengthText: string
