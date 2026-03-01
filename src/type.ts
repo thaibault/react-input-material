@@ -69,8 +69,9 @@ export type PrimitiveType = typeof PrimitiveTypes[number]
 export type Type =
     boolean |
     number |
-    string
-    // | 'any' | PrimitiveType
+    string |
+    object
+    // | PrimitiveType
 export type TypeDefinition = Array<TypeDefinition> | Type
 //// region model
 export interface SelectionOption {
@@ -78,8 +79,10 @@ export interface SelectionOption {
     value: Primitive
 }
 export type NormalizedSelection = Array<SelectionOption>
-export type ModelSelection = Array<Primitive> | Mapping | NormalizedSelection
-export type Selection = Array<[Primitive, string]> | ModelSelection
+export type BaseSelectionDefinition =
+    Array<Primitive> | Mapping | NormalizedSelection
+export type SelectionDefinition =
+    Array<[Primitive, string]> | BaseSelectionDefinition
 export interface CommonBaseModel<Type = unknown> {
     declaration: string
     description: string
@@ -119,7 +122,7 @@ export interface BaseModel<T = unknown> extends CommonBaseModel<T> {
     pattern?: Pattern
     invertedPattern?: Pattern
 
-    selection?: ModelSelection
+    selection?: BaseSelectionDefinition
 
     mutable: boolean
     writable: boolean
@@ -158,7 +161,7 @@ CommonBaseModel<T>, ModelState {
         NOTE: selection allows more options than when configuring via "model"
         to be aligned to backend view of selections.
      */
-    selection?: Selection
+    selection?: SelectionDefinition
 
     showDeclaration: boolean
 
@@ -203,7 +206,8 @@ export interface TypedProperties<T = unknown> extends BaseProperties<T> {
     onFocus: (event: FocusEvent, properties: this) => void
     onTouch: (event: GenericEvent, properties: this) => void
 }
-export type Properties<T = unknown> = TypedProperties<T> & CommonBaseModel<T>
+export type Properties<T = unknown> =
+    TypedProperties<T> & CommonBaseModel<T>
 export type Props<T = unknown> =
     Partial<Omit<Properties<T>, 'model'>> &
     {
@@ -266,7 +270,7 @@ export const baseModelPropertyTypes: ValidationMapping = {
 
     default: any,
 
-    // NOTE: Corresponds to type "ModelSelection".
+    // NOTE: Corresponds to type "SelectionDefinition".
     selection: oneOfType([
         arrayOf(oneOfType([boolean, number, string])),
         arrayOf(shape({
