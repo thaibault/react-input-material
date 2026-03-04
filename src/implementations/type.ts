@@ -97,7 +97,7 @@ export interface IconButtonProperties extends IconProperties {
 export type InputDomNodes =
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 export interface InputReference {
-    input: RefObject<InputDomNodes | null>
+    input: InputDomNodes | null
 }
 
 export interface InputProperties<Type>
@@ -126,11 +126,13 @@ export enum MediaCardRepresentationType {
     PENDING = 'pending'
 }
 export interface MediaCardReference {
-    card?: RefObject<HTMLDivElement | null>
-    iFrame?: RefObject<HTMLIFrameElement | null>
+    card?: HTMLDivElement | null
+    iFrame?: HTMLIFrameElement | null
 
-    uploadButton?: RefObject<HTMLDivElement | null>
-    downloadLink?: RefObject<HTMLAnchorElement | null>
+    downloadLink?: HTMLAnchorElement | null
+
+    deleteButton: HTMLElement | null
+    uploadButton?: HTMLElement | null
 }
 
 export interface MediaCardProperties extends LowLevelBaseComponentProperties {
@@ -246,8 +248,8 @@ export interface EventMapperWrapperReference<Type = unknown> {
 }
 
 export interface TextAreaReference extends InputReference {
-    input: RefObject<HTMLTextAreaElement | null>
-    label: RefObject<HTMLLabelElement | null>
+    input: HTMLTextAreaElement | null
+    label: HTMLLabelElement | null
 }
 
 export interface TextAreaProperties extends TypeTextInputProperties<string> {

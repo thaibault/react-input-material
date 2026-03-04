@@ -23,13 +23,7 @@ import {
 import {IconSizeT} from '@rmwc/types'
 
 import {
-    ForwardedRef,
-    forwardRef,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
-    ReactElement,
-    useImperativeHandle,
-    useRef
+    ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useState
 } from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
 
@@ -38,17 +32,18 @@ import {IconButtonProperties} from '../type'
 export const IconButton = forwardRef((
     properties: IconButtonProperties, reference?: ForwardedRef<unknown>
 ): ReactElement => {
-    const baseReference: RefObject<HTMLInputElement | null> =
-        useRef<HTMLInputElement>(null)
-    const foundationReference: RefObject<MDCIconButtonToggleFoundation | null> =
-        useRef<MDCIconButtonToggleFoundation>(null)
+    const [baseReference, setBaseReference] =
+        useState<HTMLInputElement | null>(null)
+    const [foundationReference, setFoundationReference] =
+        useState<MDCIconButtonToggleFoundation | null>(null)
 
     useImperativeHandle(
         reference,
         () => ({
             base: baseReference,
             foundation: foundationReference
-        })
+        }),
+        [baseReference, foundationReference]
     )
 
     const size = properties.size?.replace('extra-small', 'xsmall')
@@ -93,8 +88,8 @@ export const IconButton = forwardRef((
                 ((event: IconButtonOnChangeEventT) => void)
         }
 
-        ref={baseReference}
-        foundationRef={foundationReference}
+        ref={setBaseReference}
+        foundationRef={setFoundationReference}
 
         {...properties.componentProperties ?? fallbackComponentProperties}
     />

@@ -35,7 +35,7 @@ import {
     ReactNode,
     useId,
     useImperativeHandle,
-    useRef
+    useState
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
 
@@ -54,12 +54,17 @@ export const MediaCardInner = function(
     const defaultID = useId()
     const id = properties.id ?? defaultID
     // region references
-    const cardReference = useRef<HTMLDivElement | null>(null)
-    const iFrameReference = useRef<HTMLIFrameElement | null>(null)
+    const [cardReference, setCardReference] =
+        useState<HTMLDivElement | null>(null)
+    const [iFrameReference, setIFrameReference] =
+        useState<HTMLIFrameElement | null>(null)
 
-    const deleteButtonReference = useRef<HTMLButtonElement>(null)
-    const downloadLinkReference = useRef<HTMLAnchorElement>(null)
-    const uploadButtonReference = useRef<HTMLDivElement>(null)
+    const [deleteButtonReference, setDeleteButtonReference] =
+        useState<HTMLElement | null>(null)
+    const [downloadLinkReference, setDownloadLinkReference] =
+        useState<HTMLAnchorElement | null>(null)
+    const [uploadButtonReference, setUploadButtonReference] =
+        useState<HTMLElement | null>(null)
 
     useImperativeHandle(
         reference,
@@ -67,10 +72,18 @@ export const MediaCardInner = function(
             card: cardReference,
             iFrame: iFrameReference,
 
-            deleteButton: deleteButtonReference,
             downloadLink: downloadLinkReference,
+
+            deleteButton: deleteButtonReference,
             uploadButton: uploadButtonReference
-        })
+        }),
+        [
+            cardReference,
+            iFrameReference,
+            downloadLinkReference,
+            deleteButtonReference,
+            uploadButtonReference
+        ]
     )
     // endregion
     const determineMediaContent = (): ReactNode => {
@@ -106,7 +119,7 @@ export const MediaCardInner = function(
                     .join(' ')
             }>
                 <iframe
-                    ref={iFrameReference}
+                    ref={setIFrameReference}
                     style={{border: 0, overflow: 'hidden'}}
                     src={properties.url}
                 />
@@ -127,7 +140,7 @@ export const MediaCardInner = function(
         properties.name
 
     return <Card
-        ref={cardReference}
+        ref={setCardReference}
 
         className={properties.classNames?.join(' ')}
         style={properties.styles}
@@ -214,7 +227,7 @@ export const MediaCardInner = function(
                     ) ?
                         <CardActionButton
                             onClick={properties.onClickAddOrEdit}
-                            ref={uploadButtonReference}
+                            ref={setUploadButtonReference}
                         >
                             {properties.empty ?
                                 properties.newButton :
@@ -235,7 +248,7 @@ export const MediaCardInner = function(
                                         if (properties.onChange)
                                             properties.onChange()
                                     }}
-                                    ref={deleteButtonReference}
+                                    ref={setDeleteButtonReference}
                                 >
                                     {properties.deleteButton}
                                 </CardActionButton> :
@@ -247,8 +260,7 @@ export const MediaCardInner = function(
                             ) ?
                                 <CardActionButton
                                     onClick={() => {
-                                        downloadLinkReference
-                                            .current?.click()
+                                        downloadLinkReference?.click()
                                     }}
                                 >
                                     <a
@@ -262,7 +274,7 @@ export const MediaCardInner = function(
                                         download={properties.fileName}
 
                                         href={properties.url}
-                                        ref={downloadLinkReference}
+                                        ref={setDownloadLinkReference}
 
                                         target="_blank"
 

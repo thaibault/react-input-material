@@ -24,13 +24,11 @@ import {Mapping, NOOP} from 'clientnode'
 import {
     ForwardedRef,
     forwardRef,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
     ReactElement,
     useEffect,
     useId,
     useImperativeHandle,
-    useRef
+    useState
 } from 'react'
 
 import {TextAreaProperties, TextAreaReference} from '../../type'
@@ -40,8 +38,8 @@ import cssClassNames from './style.module'
 export const CSS_CLASS_NAMES = cssClassNames
 
 export interface Reference extends TextAreaReference {
-    materialTextField: RefObject<MDCTextField | null>
-    foundation: RefObject<MDCTextFieldFoundation | null>
+    materialTextField: MDCTextField | null
+    foundation: MDCTextFieldFoundation | null
 }
 
 export const OUTLINED = false
@@ -53,13 +51,14 @@ export const TextArea = forwardRef((
     const id = properties.id ?? defaultID
     const classNamePrefix = properties.classNamePrefix ?? 'text-area'
 
-    const inputReference: RefObject<HTMLTextAreaElement | null> =
-        useRef<HTMLTextAreaElement>(null)
-    const materialTextFieldReference = useRef<MDCTextField | null>(null)
-    const labelReference: RefObject<HTMLLabelElement | null> =
-        useRef<HTMLLabelElement>(null)
-    const foundationReference: RefObject<MDCTextFieldFoundation | null> =
-        useRef<MDCTextFieldFoundation>(null)
+    const [inputReference, setInputReference] =
+        useState<HTMLTextAreaElement | null>(null)
+    const [materialTextFieldReference, setMaterialTextFieldReference] =
+        useState<MDCTextField | null>(null)
+    const [labelReference, setLabelReference] =
+        useState<HTMLLabelElement | null>(null)
+    const [foundationReference, setFoundationReference] =
+        useState<MDCTextFieldFoundation | null>(null)
 
     useImperativeHandle(
         reference,
@@ -68,51 +67,60 @@ export const TextArea = forwardRef((
             input: inputReference,
             label: labelReference,
             materialTextField: materialTextFieldReference
-        })
+        }),
+        [
+            foundationReference,
+            inputReference,
+            labelReference,
+            materialTextFieldReference
+        ]
     )
 
     useEffect(
         () => {
-            if (labelReference.current) {
-                materialTextFieldReference.current =
-                    new MDCTextField(labelReference.current)
+            if (labelReference) {
+                setMaterialTextFieldReference(new MDCTextField(labelReference))
 
-                foundationReference.current =
-                    materialTextFieldReference.current.getDefaultFoundation()
+                if (materialTextFieldReference)
+                    setFoundationReference(
+                        materialTextFieldReference.getDefaultFoundation()
+                    )
 
                 if (typeof properties.value === 'string') {
-                    foundationReference.current.setValue(properties.value)
-                    materialTextFieldReference.current.value = properties.value
+                    foundationReference?.setValue(properties.value)
+                    if (materialTextFieldReference)
+                        materialTextFieldReference.value = properties.value
                 }
 
                 if (typeof properties.disabled === 'boolean') {
-                    foundationReference.current.setDisabled(
-                        properties.disabled
-                    )
-                    materialTextFieldReference.current.disabled =
-                        properties.disabled
+                    foundationReference?.setDisabled(properties.disabled)
+                    if (materialTextFieldReference)
+                        materialTextFieldReference.disabled =
+                            properties.disabled
                 }
 
                 if (typeof properties.invalid === 'boolean') {
-                    foundationReference.current.setValid(!properties.invalid)
-                    materialTextFieldReference.current.valid =
-                        !properties.invalid
+                    foundationReference?.setValid(!properties.invalid)
+                    if (materialTextFieldReference)
+                        materialTextFieldReference.valid = !properties.invalid
                 }
 
-                if (typeof properties.required === 'boolean')
-                    materialTextFieldReference.current.required =
-                        properties.required
+                if (
+                    typeof properties.required === 'boolean' &&
+                    materialTextFieldReference
+                )
+                    materialTextFieldReference.required = properties.required
 
-                foundationReference.current.setUseNativeValidation(false)
+                foundationReference?.setUseNativeValidation(false)
 
                 return () => {
-                    materialTextFieldReference.current?.destroy()
+                    materialTextFieldReference?.destroy()
                 }
             }
         },
         [
-            labelReference.current,
-            materialTextFieldReference.current,
+            labelReference,
+            materialTextFieldReference,
 
             properties.value,
             properties.disabled,
@@ -137,11 +145,11 @@ export const TextArea = forwardRef((
                         do clearing the textarea's input value.
                     */
                     setTimeout(() => {
-                        foundationReference.current?.autoCompleteFocus()
+                        foundationReference?.autoCompleteFocus()
                     })
                 } :
                 NOOP
-            inputReference.current?.addEventListener('input', onInput)
+            inputReference?.addEventListener('input', onInput)
 
             const onFocus = properties.children ?
                 () => {
@@ -151,20 +159,20 @@ export const TextArea = forwardRef((
                         focusing the advanced editor.
                     */
                     setTimeout(() => {
-                        foundationReference.current?.activateFocus()
+                        foundationReference?.activateFocus()
                     })
                 } :
                 NOOP
-            inputReference.current?.addEventListener('focus', onFocus)
+            inputReference?.addEventListener('focus', onFocus)
 
             return () => {
-                inputReference.current?.removeEventListener('input', onInput)
-                inputReference.current?.removeEventListener('focus', onFocus)
+                inputReference?.removeEventListener('input', onInput)
+                inputReference?.removeEventListener('focus', onFocus)
             }
         },
         [
-            foundationReference.current,
-            inputReference.current,
+            foundationReference,
+            inputReference,
             properties.children
         ]
     )
@@ -178,7 +186,7 @@ export const TextArea = forwardRef((
 
     const editorContent = <>
         <textarea
-            ref={inputReference}
+            ref={setInputReference}
 
             id={id}
             name={properties.name}
@@ -244,7 +252,7 @@ export const TextArea = forwardRef((
 
     return <>
         <label
-            ref={labelReference}
+            ref={setLabelReference}
             onClick={(event) => {
                 if (properties.onLabelClick)
                     properties.onLabelClick(event)

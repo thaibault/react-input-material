@@ -41,13 +41,15 @@ import {
     MouseEvent as ReactMouseEvent,
     ReactElement,
     ReactNode,
+    SyntheticEvent,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
+    useCallback,
     useEffect,
     useId,
     useImperativeHandle,
     useRef,
-    useState, SyntheticEvent
+    useState
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
 import {GenericEvent} from 'react-generic-tools/type'
@@ -84,7 +86,11 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState, EditorState, SelectionDefinition, TypeDefinition, NormalizedSelection
+    CursorState,
+    EditorState,
+    NormalizedSelection,
+    SelectionDefinition,
+    TypeDefinition
 } from '../../type'
 import {
     IconProperties,
@@ -184,8 +190,8 @@ export const TextInputInner = function<Type = unknown>(
      * with input element.
      */
     useEffect(() => {
-        if (inputReference.current?.input?.current) {
-            let input = inputReference.current.input.current as
+        if (inputReference?.input?.current) {
+            let input = inputReference.input.current as
                 HTMLElement |
                 TextAreaReference |
                 EditorReference |
@@ -1199,7 +1205,7 @@ export const TextInputInner = function<Type = unknown>(
             !properties.disabled &&
             useSuggestions &&
             'ArrowDown' === event.code &&
-            event.target === inputReference.current?.input?.current
+            event.target === inputReference?.input?.current
         )
             menuReference.current?.focusItem(0)
 
@@ -1292,8 +1298,10 @@ export const TextInputInner = function<Type = unknown>(
     // endregion
     // region properties
     /// region references
+    /* TODO
     const inputReference =
         useRef<InputReference | InputEventMapperReference>(null)
+     */
     const wrapperReference = useRef<HTMLDivElement>(null)
     const menuReference: RefObject<MenuReference | null> =
         useRef<MenuReference>(null)
@@ -1450,6 +1458,18 @@ export const TextInputInner = function<Type = unknown>(
     /// endregion
     // endregion
     // region export references
+    const [inputReference, setInputReference] = useState<
+        InputReference | InputEventMapperReference | null
+    >(null)
+    const setInputReferenceCallback = useCallback(
+        (reference: InputReference | InputEventMapperReference | null) => {
+            if (reference !== null && reference !== inputReference) {
+                console.log('SET input reference', reference)
+                setInputReference(reference)
+            }
+        },
+        []
+    )
     useImperativeHandle(
         reference,
         (): AdapterWithReferences<Type> => {
@@ -1471,7 +1491,7 @@ export const TextInputInner = function<Type = unknown>(
             return {
                 properties,
                 references: {
-                    input: inputReference,
+                    input: {current: inputReference},
                     menu: menuReference,
                     wrapper: wrapperReference
                 },
@@ -1483,7 +1503,8 @@ export const TextInputInner = function<Type = unknown>(
     // region render
     /// region intermediate render properties
     const textInputProperties: Partial<TextInputProperties<Type>> = {
-        ref: inputReference as RefObject<InputReference>,
+        ref: setInputReferenceCallback as unknown as RefObject<InputReference>,
+        // inputReference as RefObject<InputReference>,
         /*
             NOTE: If not set label with forbidden symbols will automatically be
             used.
@@ -1776,8 +1797,10 @@ export const TextInputInner = function<Type = unknown>(
                                 Partial<CodeEditorProperties>
                             }
 
-                            ref={inputReference as
-                                RefObject<CodeMirrorReference>
+                            ref={
+                                setInputReferenceCallback as
+                                    unknown as
+                                    RefObject<CodeMirrorReference>
                             }
                         />,
                         isAdvancedEditor
@@ -1799,7 +1822,11 @@ export const TextInputInner = function<Type = unknown>(
                             Partial<RichTextEditorProperties>
                         }
 
-                        ref={inputReference as RefObject<TipTapReference>}
+                        ref={
+                            setInputReferenceCallback as
+                                unknown as
+                                RefObject<TipTapReference>
+                        }
                     /> :
                 ''
             }
@@ -1869,7 +1896,8 @@ export const TextInputInner = function<Type = unknown>(
                                     Partial<TypeTextInputProperties<string>>
                                 }
 
-                                ref={inputReference as
+                                ref={setInputReference as
+                                    unknown as
                                     RefObject<TextAreaReference>
                                 }
 

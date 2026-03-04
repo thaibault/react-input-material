@@ -19,7 +19,7 @@
 import {MDCCheckboxFoundation} from '@material/checkbox'
 import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox'
 import {
-    ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useRef
+    ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useState
 } from 'react'
 
 import {CheckboxProperties, InputReference} from '../../type'
@@ -30,9 +30,12 @@ const CSS_CLASS_NAMES = cssClassNames
 export const Checkbox = forwardRef((
     properties: CheckboxProperties, reference?: ForwardedRef<InputReference>
 ): ReactElement => {
-    const baseReference = useRef<HTMLInputElement>(null)
-    const foundationReference = useRef<MDCCheckboxFoundation>(null)
-    const inputReference = useRef<HTMLInputElement>(null)
+    const [baseReference, setBaseReference] =
+        useState<HTMLInputElement | null>(null)
+    const [foundationReference, setFoundationReference] =
+        useState<MDCCheckboxFoundation | null>(null)
+    const [inputReference, setInputReference] =
+        useState<HTMLInputElement | null>(null)
 
     useImperativeHandle(
         reference,
@@ -40,7 +43,8 @@ export const Checkbox = forwardRef((
             base: baseReference,
             foundation: foundationReference,
             input: inputReference
-        })
+        }),
+        [baseReference, foundationReference, inputReference]
     )
 
     return <div
@@ -72,9 +76,9 @@ export const Checkbox = forwardRef((
 
             value={String(properties.value as unknown)}
 
-            ref={baseReference}
-            inputRef={inputReference}
-            foundationRef={foundationReference}
+            ref={setBaseReference}
+            foundationRef={setFoundationReference}
+            inputRef={setInputReference}
 
             {...properties.componentProperties}
         >{properties.children}</RMWCCheckbox>

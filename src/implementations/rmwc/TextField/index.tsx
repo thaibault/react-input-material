@@ -22,13 +22,7 @@ import {TextField as RMWCTextField} from '@rmwc/textfield'
 import {Mapping} from 'clientnode'
 
 import {
-    ForwardedRef,
-    forwardRef,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
-    ReactElement,
-    useImperativeHandle,
-    useRef
+    ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useState
 } from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
 
@@ -40,19 +34,19 @@ import cssClassNames from './style.module'
 export const CSS_CLASS_NAMES = cssClassNames
 
 export interface Reference extends InputReference {
-    foundation: RefObject<MDCTextFieldFoundation | null>
-    input: RefObject<HTMLInputElement | null>
+    foundation: MDCTextFieldFoundation | null
+    input: HTMLInputElement | null
 }
 
 export const TextField = forwardRef((
     properties: TextFieldProperties, reference?: ForwardedRef<InputReference>
 ): ReactElement => {
-    const baseReference: RefObject<HTMLInputElement | null> =
-        useRef<HTMLInputElement>(null)
-    const foundationReference: RefObject<MDCTextFieldFoundation | null> =
-        useRef<MDCTextFieldFoundation>(null)
-    const inputReference: RefObject<HTMLInputElement | null> =
-        useRef<HTMLInputElement>(null)
+    const [baseReference, setBaseReference] =
+        useState<HTMLInputElement | null>(null)
+    const [foundationReference, setFoundationReference] =
+        useState<MDCTextFieldFoundation | null>(null)
+    const [inputReference, setInputReference] =
+        useState<HTMLInputElement | HTMLTextAreaElement | null>(null)
 
     useImperativeHandle(
         reference,
@@ -60,7 +54,8 @@ export const TextField = forwardRef((
             base: baseReference,
             foundation: foundationReference,
             input: inputReference
-        })
+        }),
+        [baseReference, foundationReference, inputReference]
     )
 
     // NOTE: Character count is only supported if maximum length is given.
@@ -88,9 +83,9 @@ export const TextField = forwardRef((
 
             maxLength={isMaximumLength ? properties.maximumLength : undefined}
 
-            ref={baseReference}
-            foundationRef={foundationReference}
-            inputRef={inputReference}
+            ref={setBaseReference}
+            foundationRef={setFoundationReference}
+            inputRef={setInputReference}
 
             onChange={properties.onChange}
             ripple

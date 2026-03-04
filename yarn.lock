@@ -1519,7 +1519,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/autocomplete@npm:^6.0.0, @codemirror/autocomplete@npm:^6.20.0":
+"@codemirror/autocomplete@npm:^6.0.0":
   version: 6.20.0
   resolution: "@codemirror/autocomplete@npm:6.20.0"
   dependencies:
@@ -1528,6 +1528,18 @@ __metadata:
     "@codemirror/view": "npm:^6.17.0"
     "@lezer/common": "npm:^1.0.0"
   checksum: 10c0/d0d1cf3eca6269811eb66edcf742ffa0a5423d7d115ab82b0d62a24d6cfcfb2a4c3779333b2cb68e3004af46556ac6203049f581d35785c46ffd1b852f6e8076
+  languageName: node
+  linkType: hard
+
+"@codemirror/autocomplete@npm:^6.20.1":
+  version: 6.20.1
+  resolution: "@codemirror/autocomplete@npm:6.20.1"
+  dependencies:
+    "@codemirror/language": "npm:^6.0.0"
+    "@codemirror/state": "npm:^6.0.0"
+    "@codemirror/view": "npm:^6.17.0"
+    "@lezer/common": "npm:^1.0.0"
+  checksum: 10c0/ec3ecdd8098778c0764827ffcb6252edc763de3500314ad6b36d77bd09f73c03cb9a95b952b2b928354e1c83f2ae1bfef92b406eae40f94b47104b51bd508b35
   languageName: node
   linkType: hard
 
@@ -1556,9 +1568,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-javascript@npm:^6.2.4":
-  version: 6.2.4
-  resolution: "@codemirror/lang-javascript@npm:6.2.4"
+"@codemirror/lang-javascript@npm:^6.2.5":
+  version: 6.2.5
+  resolution: "@codemirror/lang-javascript@npm:6.2.5"
   dependencies:
     "@codemirror/autocomplete": "npm:^6.0.0"
     "@codemirror/language": "npm:^6.6.0"
@@ -1567,7 +1579,7 @@ __metadata:
     "@codemirror/view": "npm:^6.17.0"
     "@lezer/common": "npm:^1.0.0"
     "@lezer/javascript": "npm:^1.0.0"
-  checksum: 10c0/af6faaa9566c57e233459d48e8afbdbf99b6d666695fa49b2d352cda15b6022edbe319e1b296f76526f48c313627bbcd2a340872e6627a17358edabc08e8e129
+  checksum: 10c0/a9b10c58ad9dbcc54e17a641a114fc7718e362281dc9533828ed2a3a09270eb5677febb4ddad6d0cc2c439496f0ba0b7aa893d08de0b1ddc44df5c9ab0d7d299
   languageName: node
   linkType: hard
 
@@ -1585,7 +1597,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lint@npm:^6.0.0, @codemirror/lint@npm:^6.9.4":
+"@codemirror/lint@npm:^6.0.0":
   version: 6.9.4
   resolution: "@codemirror/lint@npm:6.9.4"
   dependencies:
@@ -1593,6 +1605,17 @@ __metadata:
     "@codemirror/view": "npm:^6.35.0"
     crelt: "npm:^1.0.5"
   checksum: 10c0/ae11d4d61250010732b10e4d392bd987c78afbc06ea4ccc351b57050bb5ffc74a866e5efdd7b05684d899330d4913c81b88fb7b4a0ff9762f689722ec889c7aa
+  languageName: node
+  linkType: hard
+
+"@codemirror/lint@npm:^6.9.5":
+  version: 6.9.5
+  resolution: "@codemirror/lint@npm:6.9.5"
+  dependencies:
+    "@codemirror/state": "npm:^6.0.0"
+    "@codemirror/view": "npm:^6.35.0"
+    crelt: "npm:^1.0.5"
+  checksum: 10c0/74fb810ffe491cfb4f1d30cd97560f4d4c5e598e34d4e3814989750ba82de9c921df6afb2b25a9972364e9beb38512a80db940d98d648cd136e991ffa21b85fd
   languageName: node
   linkType: hard
 
@@ -1616,7 +1639,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/view@npm:^6.17.0, @codemirror/view@npm:^6.23.0, @codemirror/view@npm:^6.27.0, @codemirror/view@npm:^6.35.0, @codemirror/view@npm:^6.37.0, @codemirror/view@npm:^6.39.15":
+"@codemirror/view@npm:^6.17.0, @codemirror/view@npm:^6.23.0, @codemirror/view@npm:^6.27.0, @codemirror/view@npm:^6.35.0, @codemirror/view@npm:^6.37.0":
   version: 6.39.15
   resolution: "@codemirror/view@npm:6.39.15"
   dependencies:
@@ -1625,6 +1648,18 @@ __metadata:
     style-mod: "npm:^4.1.0"
     w3c-keyname: "npm:^2.2.4"
   checksum: 10c0/bdcae5b2c6b86cd20c4aad6dbacb8876c83c3e4976414596477fbd185714ee3649c06b4549804495635d9427aa02316fee7eb085ee188b8a60e0aa67d09b3553
+  languageName: node
+  linkType: hard
+
+"@codemirror/view@npm:^6.39.16":
+  version: 6.39.16
+  resolution: "@codemirror/view@npm:6.39.16"
+  dependencies:
+    "@codemirror/state": "npm:^6.5.0"
+    crelt: "npm:^1.0.6"
+    style-mod: "npm:^4.1.0"
+    w3c-keyname: "npm:^2.2.4"
+  checksum: 10c0/93de1ad645649030968d7dae2ce9a599ec3e96651a1b8a43445137e69b879073e08f031299684f6df77889fa3743e8275166fd12a2b591b3fb7494c6a0d427d5
   languageName: node
   linkType: hard
 
@@ -8096,6 +8131,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"clientnode@npm:4.0.1354":
+  version: 4.0.1354
+  resolution: "clientnode@npm:4.0.1354"
+  peerDependencies:
+    "@babel/runtime": "*"
+    "@types/prop-types": "*"
+    jquery: "*"
+    node-fetch: "*"
+    prop-types: "*"
+  peerDependenciesMeta:
+    "@babel/runtime":
+      optional: true
+    "@types/prop-types":
+      optional: true
+    jquery:
+      optional: true
+    node-fetch:
+      optional: true
+    prop-types:
+      optional: true
+  checksum: 10c0/474d1c8f47e3dbef99f53969df0da2c0886e1c888b7bed09234c1af3447fb05468b5feff6d0d8f4e6dc822a92af719da56669c0983322b0c186fbdc1fde8862b
+  languageName: node
+  linkType: hard
+
 "cliui@npm:^4.0.0":
   version: 4.1.0
   resolution: "cliui@npm:4.1.0"
@@ -13825,7 +13884,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.5.6, postcss@npm:^8.0.0, postcss@npm:^8.4.35, postcss@npm:^8.4.40, postcss@npm:^8.5.6":
+"postcss@npm:8.5.8":
+  version: 8.5.8
+  resolution: "postcss@npm:8.5.8"
+  dependencies:
+    nanoid: "npm:^3.3.11"
+    picocolors: "npm:^1.1.1"
+    source-map-js: "npm:^1.2.1"
+  checksum: 10c0/dd918f7127ee7c60a0295bae2e72b3787892296e1d1c3c564d7a2a00c68d8df83cadc3178491259daa19ccc54804fb71ed8c937c6787e08d8bd4bedf8d17044c
+  languageName: node
+  linkType: hard
+
+"postcss@npm:^8.0.0, postcss@npm:^8.4.35, postcss@npm:^8.4.40, postcss@npm:^8.5.6":
   version: 8.5.6
   resolution: "postcss@npm:8.5.6"
   dependencies:
@@ -14297,9 +14367,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-generic-tools@npm:^0.0.95":
-  version: 0.0.95
-  resolution: "react-generic-tools@npm:0.0.95"
+"react-generic-tools@npm:^0.0.100":
+  version: 0.0.100
+  resolution: "react-generic-tools@npm:0.0.100"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/prop-types": "*"
@@ -14322,7 +14392,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/a492828db4a2bf70da72c222ff3d77395ebf48ee64b1781602742942cd30386e92d9dd36e7ec33a6e5fa3e6d8130131c0549534e346347f211630e7410a290b7
+  checksum: 10c0/f898abc4171ffdc01876c92bbe11dfaf1b0463483c3f7eed55c08f4ce159b184f369760921b83988175ee4cbd3e3accac4929668cad306cebe517761708c347f
   languageName: node
   linkType: hard
 
@@ -14334,15 +14404,15 @@ __metadata:
     "@babel/plugin-transform-proto-to-assign": "npm:^7.27.1"
     "@babel/preset-react": "npm:^7.28.5"
     "@babel/runtime": "npm:^7.28.6"
-    "@codemirror/autocomplete": "npm:^6.20.0"
+    "@codemirror/autocomplete": "npm:^6.20.1"
     "@codemirror/commands": "npm:^6.10.2"
     "@codemirror/lang-css": "npm:^6.3.1"
-    "@codemirror/lang-javascript": "npm:^6.2.4"
+    "@codemirror/lang-javascript": "npm:^6.2.5"
     "@codemirror/language": "npm:^6.12.2"
-    "@codemirror/lint": "npm:^6.9.4"
+    "@codemirror/lint": "npm:^6.9.5"
     "@codemirror/search": "npm:^6.6.0"
     "@codemirror/state": "npm:^6.5.4"
-    "@codemirror/view": "npm:^6.39.15"
+    "@codemirror/view": "npm:^6.39.16"
     "@emotion/react": "npm:^11.14.0"
     "@eslint/js": "npm:^10.0.1"
     "@playwright/test": "npm:^1.58.2"
@@ -14379,7 +14449,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.56.1"
     "@typescript-eslint/parser": "npm:^8.56.1"
     blob-util: "npm:^2.0.2"
-    clientnode: "npm:4.0.1349"
+    clientnode: "npm:4.0.1354"
     css-loader: "npm:^7.1.4"
     cssnano: "npm:^7.1.2"
     documentation-website: "npm:^1.0.398"
@@ -14392,7 +14462,7 @@ __metadata:
     material-components-web: "npm:^14.0.0"
     material-icons: "npm:^1.13.14"
     mini-css-extract-plugin: "npm:^2.10.0"
-    postcss: "npm:8.5.6"
+    postcss: "npm:8.5.8"
     postcss-import: "npm:^16.1.1"
     postcss-loader: "npm:^8.2.1"
     postcss-nested: "npm:^7.0.2"
@@ -14403,7 +14473,7 @@ __metadata:
     react-dom: "npm:^18.3.1"
     react-generic-animate: "npm:^0.0.108"
     react-generic-dummy: "npm:^0.0.119"
-    react-generic-tools: "npm:^0.0.95"
+    react-generic-tools: "npm:^0.0.100"
     react-transition-group: "npm:^4.4.5"
     react-useanimations: "npm:^2.10.0"
     spark-md5: "npm:^3.0.2"

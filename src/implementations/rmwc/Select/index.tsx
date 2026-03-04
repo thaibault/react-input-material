@@ -25,7 +25,7 @@ import {
     memo as memorize,
     ReactElement,
     useImperativeHandle,
-    useRef
+    useState
 } from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
 
@@ -35,9 +35,12 @@ export const SelectInner = function<Type = unknown>(
     properties: SelectProperties<Type>,
     reference?: ForwardedRef<InputReference>
 ): ReactElement {
-    const baseReference = useRef<HTMLSelectElement>(null)
-    const foundationReference = useRef<MDCSelectFoundation>(null)
-    const inputReference = useRef<HTMLSelectElement>(null)
+    const [baseReference, setBaseReference] =
+        useState<HTMLSelectElement | null>(null)
+    const [foundationReference, setFoundationReference] =
+        useState<MDCSelectFoundation | null>(null)
+    const [inputReference, setInputReference] =
+        useState<HTMLSelectElement | null>(null)
 
     useImperativeHandle(
         reference,
@@ -45,7 +48,8 @@ export const SelectInner = function<Type = unknown>(
             base: baseReference,
             foundation: foundationReference,
             input: inputReference
-        })
+        }),
+        [baseReference, foundationReference, inputReference]
     )
 
     return <RMWCSelect
@@ -65,12 +69,9 @@ export const SelectInner = function<Type = unknown>(
 
         enhanced
 
-        ref={baseReference}
-        foundationRef={foundationReference}
-        inputRef={inputReference as
-            unknown as
-            (reference: HTMLSelectElement | null) => void
-        }
+        ref={setBaseReference}
+        foundationRef={setFoundationReference}
+        inputRef={setInputReference}
 
         onChange={properties.onChange}
         onKeyDown={properties.onKeyDown}
