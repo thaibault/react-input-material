@@ -623,11 +623,6 @@ export const FileInputInner = function<Type extends Value = Value>(
                         resolve, reject
                     ) => {
                         fileReader.onload = (event) => {
-                            console.debug(
-                                `Read chunk ${String(currentChunk + 1)} of ` +
-                                `${String(chunks)}.`
-                            )
-
                             buffer.append(event.target?.result as ArrayBuffer)
                             currentChunk++
 

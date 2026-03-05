@@ -73,7 +73,8 @@ export const Index = forwardRef((
                     }
                 }
             }
-        })
+        }),
+        [inputReference?.input]
     )
 
     return <TextArea ref={setInputReference} {...properties}>

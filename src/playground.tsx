@@ -257,6 +257,7 @@ const Application = () => {
     // endregion
     const fileInputUnControlledHeadlessReference =
         createRef<AdapterWithReferences>()
+
     return (<>
         {/* region navigation */}
         <div className="tab-bar">
@@ -616,6 +617,7 @@ const Application = () => {
                         initialValue="const value = 2"
                         onChange={onChange}
                     />
+
                     <TextInput<string>
                         className="text-input--code-editor"
 

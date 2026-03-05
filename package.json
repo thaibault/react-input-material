@@ -159,7 +159,7 @@
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
     "blob-util": "^2.0.2",
-    "clientnode": "4.0.1354",
+    "clientnode": "4.0.1355",
     "css-loader": "^7.1.4",
     "cssnano": "^7.1.2",
     "documentation-website": "^1.0.398",
@@ -194,7 +194,7 @@
     "typescript-eslint": "^8.56.1",
     "typescript-plugin-css-modules": "^5.2.0",
     "web-component-wrapper": "^0.0.544",
-    "weboptimizer": "^3.0.2",
+    "weboptimizer": "^3.0.3",
     "webpack-dev-server": "^5.2.3"
   },
   "peerDependencies": {

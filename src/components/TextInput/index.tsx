@@ -178,152 +178,6 @@ export const TextInputInner = function<Type = unknown>(
 ): ReactElement {
     const defaultID = useId()
     const id = props.id ?? defaultID
-    // region live-cycle
-    /// region input element property synchronisation
-    /**
-     * Is triggered immediate after a re-rendering. Connects error message
-     * with input element.
-     */
-    useEffect(() => {
-        if (inputReference?.input) {
-            let input = inputReference.input as
-                HTMLElement |
-                TextAreaReference |
-                EditorReference |
-                undefined
-            if ((input as Partial<TextAreaReference>).input) {
-                input =
-                    (input as Partial<TextAreaReference | EditorReference>)
-                        .input as
-                            HTMLElement | TextAreaReference
-                if ((input as Partial<TextAreaReference>).input)
-                    input = (input as Partial<TextAreaReference>).input as
-                        HTMLElement
-            }
-
-            if (!input)
-                return
-
-            const inputDomNode = input as HTMLElement
-
-            const determinedAttributes: Mapping<boolean | number | string> = {}
-            const attributesToRemove: Array<string> = []
-
-            // Apply aria attributes regarding validation state.
-            if (properties.valid) {
-                attributesToRemove.push('ariaErrormessage')
-                attributesToRemove.push('ariaInvalid')
-            } else {
-                determinedAttributes.ariaErrormessage =
-                    `${id}-error-message`
-                determinedAttributes.ariaInvalid = 'true'
-            }
-
-            // Apply aria attributes regarding searching.
-            if (useSuggestions) {
-                if (inputDomNode.getAttribute('type') !== 'search')
-                    determinedAttributes.role = 'searchbox'
-
-                determinedAttributes.ariaAutocomplete =
-                    properties.searchSelection ? 'inline' : 'list'
-            } else {
-                attributesToRemove.push('searchbox')
-                attributesToRemove.push('ariaAutocomplete')
-            }
-
-            if (properties.showDeclaration)
-                determinedAttributes.ariaDescribedby = `${id}-declaration`
-            else
-                attributesToRemove.push('ariaDescribedby')
-
-            const attributes = {
-                ...determinedAttributes, ...properties.attributes || {}
-            }
-
-            // Apply configured native input properties.
-            for (const [name, value] of Object.entries(attributes)) {
-                const attributeName: string = camelCaseToDelimited(name)
-
-                if (typeof value === 'boolean')
-                    if (value)
-                        inputDomNode.setAttribute(attributeName, '')
-                    else
-                        inputDomNode.removeAttribute(attributeName)
-                else
-                    inputDomNode.setAttribute(attributeName, String(value))
-            }
-
-            for (const name of attributesToRemove) {
-                const attributeName: string = camelCaseToDelimited(name)
-                if (inputDomNode.hasAttribute(attributeName))
-                    inputDomNode.removeAttribute(attributeName)
-            }
-        }
-    })
-    /// endregion
-    /// region apply missing initial aria attribute regarding menu popup state.
-    /**
-     * Is triggered immediate after a re-rendering. Sets initial aria list box
-     * opening and hidden state.
-     */
-    useEffect(() => {
-        if (isSelection) {
-            const selectionWrapper: HTMLElement | null | undefined =
-                wrapperReference?.querySelector('[aria-haspopup="listbox"]')
-            if (selectionWrapper) {
-                if (!selectionWrapper.hasAttribute('aria-expanded'))
-                    selectionWrapper.setAttribute('aria-expanded', 'false')
-
-                const activeIcon: HTMLElement | null = selectionWrapper
-                    .querySelector('.mdc-select__dropdown-icon-active')
-                if (activeIcon && !activeIcon.hasAttribute('aria-hidden'))
-                    activeIcon.setAttribute('aria-hidden', 'true')
-
-                const inactiveIcon: HTMLElement | null = selectionWrapper
-                    .querySelector('.mdc-select__dropdown-icon-inactive')
-                if (inactiveIcon && !inactiveIcon.hasAttribute('aria-hidden'))
-                    inactiveIcon.setAttribute('aria-hidden', 'true')
-            }
-        }
-    })
-    /// endregion
-    /// region avoid accidentally opening select menu.
-    /**
-     * Is triggered immediate after a re-rendering. Captures key down events
-     * on disabled select fields.
-     * @returns Nothing.
-     */
-    useEffect((): undefined | (() => void) => {
-        if (isSelection) {
-            const selectionWrapper: HTMLElement | null | undefined =
-                wrapperReference?.querySelector('[aria-haspopup="listbox"]')
-            if (selectionWrapper) {
-                const handler = (event: KeyboardEvent) => {
-                    if (properties.disabled)
-                        event.stopPropagation()
-                }
-
-                selectionWrapper.addEventListener('keydown', handler, true)
-
-                return () => {
-                    selectionWrapper.removeEventListener(
-                        'keydown', handler, true
-                    )
-                }
-            }
-        }
-    })
-    /// endregion
-    useEffect(
-        () => {
-            if (properties.triggerInitialPropertiesConsolidation)
-                onChange(new Event(
-                    'genericInitialPropertiesConsolidation'
-                ) as unknown as GenericEvent)
-        },
-        []
-    )
-    // endregion
     // region context helper
     /// region render helper
     /**
@@ -1491,8 +1345,7 @@ export const TextInputInner = function<Type = unknown>(
         ]
     )
     // endregion
-    // region render
-    /// region intermediate render properties
+    // region intermediate render properties
     const textInputProperties: Partial<TextInputProperties<Type>> = {
         ref: setInputReference as unknown as RefObject<InputReference | null>,
         /*
@@ -1640,8 +1493,8 @@ export const TextInputInner = function<Type = unknown>(
     const isSelection: boolean =
         (Boolean(normalizedSelection) || Boolean(properties.labels)) &&
         !useSuggestions
-    /// endregion
-    /// region determine type specific constraints
+    // endregion
+    // region determine type specific constraints
     const typeTextConstraints: Mapping<unknown> = {}
     if (properties.type === 'number') {
         typeTextConstraints.step = properties.step
@@ -1686,7 +1539,169 @@ export const TextInputInner = function<Type = unknown>(
                 transformer
             )
     }
+    // endregion
+    // region live-cycle
+    /// region input element property synchronization
+    /**
+     * Is triggered immediate after a re-rendering. Connects error message
+     * with input element.
+     */
+    useEffect(
+        () => {
+            if (inputReference?.input) {
+                let input = inputReference.input as
+                    HTMLElement |
+                    TextAreaReference |
+                    EditorReference |
+                    undefined
+
+                if (Object.prototype.hasOwnProperty.call(input, 'input')) {
+                    input =
+                        (input as Partial<TextAreaReference | EditorReference>)
+                            .input as
+                            HTMLElement | TextAreaReference | undefined
+                    if (
+                        input &&
+                        Object.prototype.hasOwnProperty.call(input, 'input')
+                    )
+                        input = (input as Partial<TextAreaReference>).input as
+                            HTMLElement
+                }
+
+                if (!input)
+                    return
+
+                const inputDomNode = input as HTMLElement
+
+                const determinedAttributes: Mapping<
+                    boolean | number | string
+                > = {}
+                const attributesToRemove: Array<string> = []
+
+                // Apply aria attributes regarding validation state.
+                if (properties.valid) {
+                    attributesToRemove.push('ariaErrormessage')
+                    attributesToRemove.push('ariaInvalid')
+                } else {
+                    determinedAttributes.ariaErrormessage =
+                        `${id}-error-message`
+                    determinedAttributes.ariaInvalid = 'true'
+                }
+
+                // Apply aria attributes regarding searching.
+                if (useSuggestions) {
+                    if (inputDomNode.getAttribute('type') !== 'search')
+                        determinedAttributes.role = 'searchbox'
+
+                    determinedAttributes.ariaAutocomplete =
+                        properties.searchSelection ? 'inline' : 'list'
+                } else {
+                    attributesToRemove.push('searchbox')
+                    attributesToRemove.push('ariaAutocomplete')
+                }
+
+                if (properties.showDeclaration)
+                    determinedAttributes.ariaDescribedby = `${id}-declaration`
+                else
+                    attributesToRemove.push('ariaDescribedby')
+
+                const attributes = {
+                    ...determinedAttributes, ...properties.attributes || {}
+                }
+
+                // Apply configured native input properties.
+                for (const [name, value] of Object.entries(attributes)) {
+                    const attributeName: string = camelCaseToDelimited(name)
+
+                    if (typeof value === 'boolean')
+                        if (value)
+                            inputDomNode.setAttribute(attributeName, '')
+                        else
+                            inputDomNode.removeAttribute(attributeName)
+                    else
+                        inputDomNode.setAttribute(attributeName, String(value))
+                }
+
+                for (const name of attributesToRemove) {
+                    const attributeName: string = camelCaseToDelimited(name)
+                    if (inputDomNode.hasAttribute(attributeName))
+                        inputDomNode.removeAttribute(attributeName)
+                }
+            }
+        },
+        [
+            inputReference?.input,
+            useSuggestions,
+            properties.searchSelection,
+            properties.showDeclaration,
+            properties.attributes
+        ]
+    )
     /// endregion
+    /// region apply missing initial aria attribute regarding menu popup state.
+    /**
+     * Is triggered immediate after a re-rendering. Sets initial aria list box
+     * opening and hidden state.
+     */
+    useEffect(() => {
+        if (isSelection) {
+            const selectionWrapper: HTMLElement | null | undefined =
+                wrapperReference?.querySelector('[aria-haspopup="listbox"]')
+            if (selectionWrapper) {
+                if (!selectionWrapper.hasAttribute('aria-expanded'))
+                    selectionWrapper.setAttribute('aria-expanded', 'false')
+
+                const activeIcon: HTMLElement | null = selectionWrapper
+                    .querySelector('.mdc-select__dropdown-icon-active')
+                if (activeIcon && !activeIcon.hasAttribute('aria-hidden'))
+                    activeIcon.setAttribute('aria-hidden', 'true')
+
+                const inactiveIcon: HTMLElement | null = selectionWrapper
+                    .querySelector('.mdc-select__dropdown-icon-inactive')
+                if (inactiveIcon && !inactiveIcon.hasAttribute('aria-hidden'))
+                    inactiveIcon.setAttribute('aria-hidden', 'true')
+            }
+        }
+    })
+    /// endregion
+    /// region avoid accidentally opening select menu.
+    /**
+     * Is triggered immediate after a re-rendering. Captures key down events
+     * on disabled select fields.
+     * @returns Nothing.
+     */
+    useEffect((): undefined | (() => void) => {
+        if (isSelection) {
+            const selectionWrapper: HTMLElement | null | undefined =
+                wrapperReference?.querySelector('[aria-haspopup="listbox"]')
+            if (selectionWrapper) {
+                const handler = (event: KeyboardEvent) => {
+                    if (properties.disabled)
+                        event.stopPropagation()
+                }
+
+                selectionWrapper.addEventListener('keydown', handler, true)
+
+                return () => {
+                    selectionWrapper.removeEventListener(
+                        'keydown', handler, true
+                    )
+                }
+            }
+        }
+    })
+    /// endregion
+    // TODO maybe not needed anymore!
+    useEffect(
+        () => {
+            if (properties.triggerInitialPropertiesConsolidation)
+                onChange(new Event(
+                    'genericInitialPropertiesConsolidation'
+                ) as unknown as GenericEvent)
+        },
+        []
+    )
+    // endregion
     const editorProperties = {} as
         CodeEditorProperties | RichTextEditorProperties
     if (isAdvancedEditor)
@@ -1726,7 +1741,7 @@ export const TextInputInner = function<Type = unknown>(
             }
         } else
             editorProperties.editor = TIPTAP_DEFAULT_OPTIONS
-    /// region main markup
+    // region main markup
     return <WrapConfigurations
         strict={TextInput.strict}
         themeConfiguration={properties.themeConfiguration}
@@ -1928,7 +1943,6 @@ export const TextInputInner = function<Type = unknown>(
         </div>
     </WrapConfigurations>
     /// endregion
-    // endregion
 }
 // NOTE: This is useful in react dev tools.
 TextInputInner.displayName = 'TextInput'

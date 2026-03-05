@@ -18,6 +18,17 @@
 */
 // region imports
 import {
+    FocusEvent,
+    ForwardedRef,
+    forwardRef,
+    ReactElement,
+    useEffect,
+    useImperativeHandle,
+    useState
+} from 'react'
+import {useMemorizedValue} from 'react-generic-tools'
+
+import {
     autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap
 } from '@codemirror/autocomplete'
 import {defaultKeymap, history, historyKeymap} from '@codemirror/commands'
@@ -45,16 +56,6 @@ import {
     lineNumbers,
     rectangularSelection
 } from '@codemirror/view'
-
-import {
-    FocusEvent,
-    ForwardedRef,
-    forwardRef,
-    ReactElement,
-    useEffect,
-    useImperativeHandle,
-    useState
-} from 'react'
 
 import {TextAreaProperties} from '../../../implementations/type'
 import InputEventMapper, {
@@ -246,25 +247,36 @@ export const Index = forwardRef((
 
         classNamePrefix={CSS_CLASS_NAMES.codeEditor}
 
-        onLabelClick={() => {
-            editorViewReference?.focus()
-        }}
+        onLabelClick={useMemorizedValue(
+            () => {
+                editorViewReference?.focus()
+            },
+            editorViewReference
+        )}
     >
         <div
             ref={setEditorViewReference}
 
-            onBlur={(event: FocusEvent<HTMLDivElement>) => {
-                inputEventMapperReference?.eventMapper.blur(event)
+            onBlur={useMemorizedValue(
+                (event: FocusEvent<HTMLDivElement>) => {
+                    inputEventMapperReference?.eventMapper.blur(event)
 
-                if (properties.onBlur)
-                    properties.onBlur(event)
-            }}
-            onFocus={(event: FocusEvent<HTMLDivElement>) => {
-                inputEventMapperReference?.eventMapper.focus(event)
+                    if (properties.onBlur)
+                        properties.onBlur(event)
+                },
+                inputEventMapperReference?.eventMapper,
+                properties.onBlur
+            )}
+            onFocus={useMemorizedValue(
+                (event: FocusEvent<HTMLDivElement>) => {
+                    inputEventMapperReference?.eventMapper.focus(event)
 
-                if (properties.onFocus)
-                    properties.onFocus(event)
-            }}
+                    if (properties.onFocus)
+                        properties.onFocus(event)
+                },
+                inputEventMapperReference?.eventMapper,
+                properties.onFocus
+            )}
 
             className={
                 `${CSS_CLASS_NAMES.codeEditorView} mdc-text-field__input`

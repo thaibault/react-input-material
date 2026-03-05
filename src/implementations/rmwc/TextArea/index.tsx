@@ -79,48 +79,42 @@ export const TextArea = forwardRef((
     useEffect(
         () => {
             if (labelReference) {
-                setMaterialTextFieldReference(new MDCTextField(labelReference))
+                const materialTextFieldReference =
+                    new MDCTextField(labelReference)
 
-                if (materialTextFieldReference)
-                    setFoundationReference(
-                        materialTextFieldReference.getDefaultFoundation()
-                    )
+                setMaterialTextFieldReference(materialTextFieldReference)
+
+                setFoundationReference(
+                    materialTextFieldReference.getDefaultFoundation()
+                )
 
                 if (typeof properties.value === 'string') {
                     foundationReference?.setValue(properties.value)
-                    if (materialTextFieldReference)
-                        materialTextFieldReference.value = properties.value
+                    materialTextFieldReference.value = properties.value
                 }
 
                 if (typeof properties.disabled === 'boolean') {
                     foundationReference?.setDisabled(properties.disabled)
-                    if (materialTextFieldReference)
-                        materialTextFieldReference.disabled =
-                            properties.disabled
+                    materialTextFieldReference.disabled = properties.disabled
                 }
 
                 if (typeof properties.invalid === 'boolean') {
                     foundationReference?.setValid(!properties.invalid)
-                    if (materialTextFieldReference)
-                        materialTextFieldReference.valid = !properties.invalid
+                    materialTextFieldReference.valid = !properties.invalid
                 }
 
-                if (
-                    typeof properties.required === 'boolean' &&
-                    materialTextFieldReference
-                )
+                if (typeof properties.required === 'boolean')
                     materialTextFieldReference.required = properties.required
 
                 foundationReference?.setUseNativeValidation(false)
 
                 return () => {
-                    materialTextFieldReference?.destroy()
+                    materialTextFieldReference.destroy()
                 }
             }
         },
         [
             labelReference,
-            materialTextFieldReference,
 
             properties.value,
             properties.disabled,
