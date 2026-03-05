@@ -243,7 +243,7 @@ export interface InputEventWrapper {
     input: (value: number | string, event: object) => void
 }
 export interface EventMapperWrapperReference<Type = unknown> {
-    input: RefObject<Type | null> | null
+    input: Type | null
     eventMapper: InputEventWrapper
 }
 

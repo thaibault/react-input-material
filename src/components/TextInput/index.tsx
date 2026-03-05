@@ -44,11 +44,9 @@ import {
     SyntheticEvent,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
-    useCallback,
     useEffect,
     useId,
     useImperativeHandle,
-    useRef,
     useState
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
@@ -66,6 +64,7 @@ import IconButton from '#implementations/IconButton'
 import Menu from '#implementations/Menu'
 import Select from '#implementations/Select'
 import TextField from '#implementations/TextField'
+import Textarea from '#implementations/TextArea'
 
 import WrapConfigurations from '../Wrapper/WrapConfigurations'
 import WrapTooltip from '../Wrapper/WrapTooltip'
@@ -140,11 +139,7 @@ import {
     ValueState
 } from './type'
 import TRANSFORMER from './transformer'
-import Index from '#implementations/TextArea'
-import {
-    Reference as InputEventMapperReference
-} from './InputEventMapperWrapper'
-
+// endregion
 export {
     CODE_EDITOR_OPTIONS,
 
@@ -157,7 +152,7 @@ export {
     TIPTAP_DEFAULT_OPTIONS
 } from './helper'
 export const INPUT_TRANSFORMER = TRANSFORMER
-// endregion
+
 /**
  * Generic text input wrapper component which automatically determines a useful
  * input field depending on given model specification.
@@ -190,21 +185,20 @@ export const TextInputInner = function<Type = unknown>(
      * with input element.
      */
     useEffect(() => {
-        if (inputReference?.input?.current) {
-            let input = inputReference.input.current as
+        if (inputReference?.input) {
+            let input = inputReference.input as
                 HTMLElement |
                 TextAreaReference |
                 EditorReference |
                 undefined
-            if ((input as Partial<TextAreaReference>).input?.current) {
+            if ((input as Partial<TextAreaReference>).input) {
                 input =
                     (input as Partial<TextAreaReference | EditorReference>)
-                    .input?.current as
-                        HTMLElement | TextAreaReference
-                if ((input as Partial<TextAreaReference>).input?.current)
-                    input =
-                        (input as Partial<TextAreaReference>).input?.current as
-                            HTMLElement
+                        .input as
+                            HTMLElement | TextAreaReference
+                if ((input as Partial<TextAreaReference>).input)
+                    input = (input as Partial<TextAreaReference>).input as
+                        HTMLElement
             }
 
             if (!input)
@@ -275,9 +269,7 @@ export const TextInputInner = function<Type = unknown>(
     useEffect(() => {
         if (isSelection) {
             const selectionWrapper: HTMLElement | null | undefined =
-                wrapperReference.current?.querySelector(
-                    '[aria-haspopup="listbox"]'
-                )
+                wrapperReference?.querySelector('[aria-haspopup="listbox"]')
             if (selectionWrapper) {
                 if (!selectionWrapper.hasAttribute('aria-expanded'))
                     selectionWrapper.setAttribute('aria-expanded', 'false')
@@ -304,9 +296,7 @@ export const TextInputInner = function<Type = unknown>(
     useEffect((): undefined | (() => void) => {
         if (isSelection) {
             const selectionWrapper: HTMLElement | null | undefined =
-                wrapperReference.current?.querySelector(
-                    '[aria-haspopup="listbox"]'
-                )
+                wrapperReference?.querySelector('[aria-haspopup="listbox"]')
             if (selectionWrapper) {
                 const handler = (event: KeyboardEvent) => {
                     if (properties.disabled)
@@ -753,7 +743,7 @@ export const TextInputInner = function<Type = unknown>(
         ): ValueState<Type, ModelState> => {
             if (
                 event.relatedTarget &&
-                wrapperReference.current?.contains(
+                wrapperReference?.contains(
                     event.relatedTarget as unknown as Node
                 )
             )
@@ -1205,9 +1195,9 @@ export const TextInputInner = function<Type = unknown>(
             !properties.disabled &&
             useSuggestions &&
             'ArrowDown' === event.code &&
-            event.target === inputReference?.input?.current
+            event.target === inputReference?.input
         )
-            menuReference.current?.focusItem(0)
+            menuReference?.focusItem(0)
 
         /*
             NOTE: We do not want to forward keydown enter events coming from
@@ -1297,15 +1287,6 @@ export const TextInputInner = function<Type = unknown>(
     }
     // endregion
     // region properties
-    /// region references
-    /* TODO
-    const inputReference =
-        useRef<InputReference | InputEventMapperReference>(null)
-     */
-    const wrapperReference = useRef<HTMLDivElement>(null)
-    const menuReference: RefObject<MenuReference | null> =
-        useRef<MenuReference>(null)
-    /// endregion
     const givenProps: Props<Type> = translateKnownSymbols(props)
 
     const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
@@ -1318,8 +1299,7 @@ export const TextInputInner = function<Type = unknown>(
     const [showDeclaration, setShowDeclaration] = useState<boolean>(false)
 
     let initialValue: null | Type = determineInitialValue<Type>(
-        givenProps,
-        TextInput.defaultProperties.model.default as Type
+        givenProps, TextInput.defaultProperties.model.default as Type
     )
     if (initialValue instanceof Date)
         initialValue = (initialValue.getTime() / 1000) as unknown as Type
@@ -1459,17 +1439,13 @@ export const TextInputInner = function<Type = unknown>(
     // endregion
     // region export references
     const [inputReference, setInputReference] = useState<
-        InputReference | InputEventMapperReference | null
+        CodeMirrorReference | InputReference | TipTapReference | null
     >(null)
-    const setInputReferenceCallback = useCallback(
-        (reference: InputReference | InputEventMapperReference | null) => {
-            if (reference !== null && reference !== inputReference) {
-                console.log('SET input reference', reference)
-                setInputReference(reference)
-            }
-        },
-        []
-    )
+    const [menuReference, setMenuReference] =
+        useState<MenuReference | null>(null)
+    const [wrapperReference, setWrapperReference] =
+        useState<HTMLDivElement | null>(null)
+
     useImperativeHandle(
         reference,
         (): AdapterWithReferences<Type> => {
@@ -1491,20 +1467,34 @@ export const TextInputInner = function<Type = unknown>(
             return {
                 properties,
                 references: {
-                    input: {current: inputReference},
+                    input: inputReference,
                     menu: menuReference,
                     wrapper: wrapperReference
                 },
                 state
             }
-        }
+        },
+        [
+            properties.model.state,
+
+            properties.cursor,
+            properties.editorIsActive,
+            properties.hidden,
+            properties.showDeclaration,
+
+            representationControlled,
+            controlled,
+
+            inputReference,
+            menuReference,
+            wrapperReference
+        ]
     )
     // endregion
     // region render
     /// region intermediate render properties
     const textInputProperties: Partial<TextInputProperties<Type>> = {
-        ref: setInputReferenceCallback as unknown as RefObject<InputReference>,
-        // inputReference as RefObject<InputReference>,
+        ref: setInputReference as unknown as RefObject<InputReference | null>,
         /*
             NOTE: If not set label with forbidden symbols will automatically be
             used.
@@ -1743,7 +1733,7 @@ export const TextInputInner = function<Type = unknown>(
         tooltip={properties.tooltip}
     >
         <div
-            ref={wrapperReference}
+            ref={setWrapperReference}
 
             className={[CSS_CLASS_NAMES.textInput]
                 .concat(properties.className)
@@ -1798,7 +1788,7 @@ export const TextInputInner = function<Type = unknown>(
                             }
 
                             ref={
-                                setInputReferenceCallback as
+                                setInputReference as
                                     unknown as
                                     RefObject<CodeMirrorReference>
                             }
@@ -1823,7 +1813,7 @@ export const TextInputInner = function<Type = unknown>(
                         }
 
                         ref={
-                            setInputReferenceCallback as
+                            setInputReference as
                                 unknown as
                                 RefObject<TipTapReference>
                         }
@@ -1834,7 +1824,11 @@ export const TextInputInner = function<Type = unknown>(
                 <div>
                     {useSuggestions ?
                         <Menu
-                            ref={menuReference}
+                            ref={
+                                setMenuReference as
+                                    unknown as
+                                    RefObject<MenuReference>
+                            }
 
                             onKeyDown={preventEnterKeyPropagation}
                             pending={selection instanceof AbortController}
@@ -1885,7 +1879,7 @@ export const TextInputInner = function<Type = unknown>(
                     {
                         properties.type === 'string' &&
                         properties.editor !== 'plain' ?
-                            <Index
+                            <Textarea
                                 {...textInputProperties as
                                     Partial<TextInputProperties<string>>
                                 }

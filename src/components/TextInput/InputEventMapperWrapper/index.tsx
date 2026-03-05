@@ -18,7 +18,7 @@
 */
 // region imports
 import {
-    ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useRef
+    ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useState
 } from 'react'
 
 import TextArea from '#implementations/TextArea'
@@ -32,7 +32,8 @@ export type Reference = EventMapperWrapperReference<Partial<TextAreaReference>>
 export const Index = forwardRef((
     properties: TextAreaProperties, reference?: ForwardedRef<Reference>
 ): ReactElement => {
-    const inputReference = useRef<TextAreaReference | null>(null)
+    const [inputReference, setInputReference] =
+        useState<TextAreaReference | null>(null)
     useImperativeHandle(
         reference,
         () => ({
@@ -44,42 +45,38 @@ export const Index = forwardRef((
             */
             eventMapper: {
                 blur: (event: object) => {
-                    if (inputReference.current?.input.current) {
+                    if (inputReference?.input) {
                         const syntheticEvent = new Event('blur') as
                             Event & { detail: object }
                         syntheticEvent.detail = event
-                        inputReference.current.input.current
-                            .dispatchEvent(syntheticEvent)
+                        inputReference.input.dispatchEvent(syntheticEvent)
                     }
                 },
                 focus: (event: object) => {
-                    if (inputReference.current?.input.current) {
+                    if (inputReference?.input) {
                         const syntheticEvent = new Event('focus') as
                             Event & { detail: object }
                         syntheticEvent.detail = event
 
-                        inputReference.current.input.current
-                            .dispatchEvent(syntheticEvent)
+                        inputReference.input.dispatchEvent(syntheticEvent)
                     }
                 },
                 input: (value: number | string, event: object) => {
-                    if (inputReference.current?.input.current) {
+                    if (inputReference?.input) {
                         const syntheticEvent = new Event('input') as
                             Event & { detail: object }
                         syntheticEvent.detail = event
 
-                        inputReference.current.input.current.value =
-                            String(value)
+                        inputReference.input.value = String(value)
 
-                        inputReference.current.input.current
-                            .dispatchEvent(syntheticEvent)
+                        inputReference.input.dispatchEvent(syntheticEvent)
                     }
                 }
             }
         })
     )
 
-    return <TextArea ref={inputReference} {...properties}>
+    return <TextArea ref={setInputReference} {...properties}>
         {properties.children}
     </TextArea>
 })

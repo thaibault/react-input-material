@@ -40,9 +40,7 @@ import {
     MouseEvent,
     ReactElement,
     ReactNode,
-    RefAttributes,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject
+    RefAttributes
 } from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
@@ -72,9 +70,12 @@ import {
     StaticWebComponent,
     ValueState as BaseValueState
 } from '../../type'
+
 import {
     Reference as InputEventMapperReference
 } from './InputEventMapperWrapper'
+import {Reference as CodeMirrorReference} from './CodeMirror'
+import {Reference as TipTapReference} from './Tiptap'
 // endregion
 // region data transformation
 export type Transformer<T = unknown> = (
@@ -152,7 +153,7 @@ export type DataTransformation =
     /* eslint-enable @typescript-eslint/consistent-indexed-object-style */
 // endregion
 export interface EditorReference {
-    input: RefObject<InputEventMapperReference | null>
+    input: InputEventMapperReference | null
 }
 
 export interface EditorProperties
@@ -393,9 +394,9 @@ export type Adapter<T = unknown> = ComponentAdapter<
 >
 export interface AdapterWithReferences<T = unknown> extends Adapter<T> {
     references: {
-        input: RefObject<InputReference | InputEventMapperReference | null>
-        menu: RefObject<unknown>
-        wrapper: RefObject<HTMLDivElement | null>
+        input: CodeMirrorReference | InputReference | TipTapReference | null
+        menu: unknown
+        wrapper: HTMLDivElement | null
     }
 }
 

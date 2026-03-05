@@ -17,10 +17,9 @@
     endregion
 */
 // region imports
-import {EditorView, EditorView as CodeEditorIndicator} from '@codemirror/view'
+import {EditorView as CodeEditorIndicator} from '@codemirror/view'
 import {EditorContent as RichTextEditorIndicator} from '@tiptap/react'
 import {Tab, TabBar} from '@rmwc/tabs'
-import {TextField as RMWCTextField} from '@rmwc/textfield'
 
 import {
     dateTimeFormat,
@@ -32,14 +31,7 @@ import {
     timeout
 } from 'clientnode'
 
-import {
-    createRef,
-    forwardRef,
-    ReactNode,
-    useImperativeHandle, useMemo,
-    useRef,
-    useState
-} from 'react'
+import {createRef, ReactNode, useState} from 'react'
 import {createRoot} from 'react-dom/client'
 import {useMemorizedValue} from 'react-generic-tools'
 
@@ -73,8 +65,6 @@ import {
 import {Checkbox, FileInput, TextInput, Inputs, Interval} from './index'
 import {BaseProps} from './type'
 import {slicePropertiesForStateRecursively} from './helper'
-
-import TextField from './implementations/rmwc/TextField'
 // endregion
 // region configuration
 LOCALES.push('de-DE')
@@ -97,43 +87,7 @@ const SECTIONS = [
 ] as const
 // endregion
 
-const Test = forwardRef((props, ref) => {
-    const [nestedRef, setNestedRef] = useState()
-
-    useImperativeHandle(
-        ref,
-        () => {
-            return {
-                reference: nestedRef
-            }
-        },
-        [nestedRef]
-    )
-
-    return props.input ?
-        <TextField
-            ref={setNestedRef}
-        /> :
-        <div ref={setNestedRef}>no input</div>
-})
-
 const Application = () => {
-    const [inputEnabled, setInputEnabled] = useState(true)
-    const [nestedRef, setNestedRef] = useState()
-
-    console.log('render with nested ref', nestedRef)
-
-    return <>
-        <button
-            onClick={() =>
-                setInputEnabled((inputEnabled) =>
-                    !inputEnabled
-                )
-            }
-        >toggle input</button>
-        <Test input={inputEnabled} ref={setNestedRef} />
-    </>
-
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0)

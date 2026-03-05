@@ -24,11 +24,10 @@ import StarterKit from '@tiptap/starter-kit'
 import {
     ForwardedRef,
     forwardRef,
-    MutableRefObject as RefObject,
     ReactElement,
     useEffect,
     useImperativeHandle,
-    useRef
+    useState
 } from 'react'
 import Dummy from 'react-generic-dummy'
 
@@ -45,7 +44,7 @@ export const CSS_CLASS_NAMES = cssClassNames
 export const VIEW_CONTENT_OFFSET_IN_PX = 8
 
 export interface Reference extends EditorReference {
-    editorViewReference: RefObject<HTMLDivElement | null>
+    editorViewReference: HTMLDivElement | null
 }
 
 export const Index = forwardRef((
@@ -59,16 +58,18 @@ export const Index = forwardRef((
 
     const value = properties.value ?? ''
 
-    const inputEventMapperReference =
-        useRef<InputEventMapperReference | null>(null)
-    const editorViewReference = useRef<HTMLDivElement | null>(null)
+    const [inputEventMapperReference, setInputEventMapperReference] =
+        useState<InputEventMapperReference | null>(null)
+    const [editorViewReference, setEditorViewReference] =
+        useState<HTMLDivElement | null>(null)
 
     useImperativeHandle(
         reference,
         () => ({
             input: inputEventMapperReference,
             editorViewReference
-        })
+        }),
+        [inputEventMapperReference, editorViewReference]
     )
 
     const extensions =
@@ -87,13 +88,13 @@ export const Index = forwardRef((
         editable: !properties.disabled,
         content: String(value),
         onBlur: (editorEvent: EditorEvents['focus']) => {
-            inputEventMapperReference.current?.eventMapper.blur(editorEvent)
+            inputEventMapperReference?.eventMapper.blur(editorEvent)
 
             if (properties.onBlur)
                 properties.onBlur(editorEvent)
         },
         onFocus: (editorEvent: EditorEvents['focus']) => {
-            inputEventMapperReference.current?.eventMapper.focus(editorEvent)
+            inputEventMapperReference?.eventMapper.focus(editorEvent)
 
             if (properties.onFocus)
                 properties.onFocus(editorEvent)
@@ -101,7 +102,7 @@ export const Index = forwardRef((
         onUpdate: (editorEvent) => {
             const html = editorEvent.editor.getHTML()
 
-            inputEventMapperReference.current?.eventMapper.input(
+            inputEventMapperReference?.eventMapper.input(
                 html === '<p></p>' ? '' : html, editorEvent
             )
 
@@ -114,22 +115,20 @@ export const Index = forwardRef((
     })
     const htmlContent = editor.getHTML()
 
-    const clientHeight =
-        inputEventMapperReference
-            .current?.input?.current?.input?.current?.clientHeight
+    const clientHeight = inputEventMapperReference?.input?.input?.clientHeight
     useEffect(
         () => {
-            if (editorViewReference.current && clientHeight)
-                editorViewReference.current.style.height =
+            if (editorViewReference && clientHeight)
+                editorViewReference.style.height =
                     String(clientHeight + VIEW_CONTENT_OFFSET_IN_PX) + 'px'
         },
-        [editorViewReference.current, clientHeight]
+        [editorViewReference, clientHeight]
     )
 
     return <InputEventMapper
         {...(properties as TextAreaProperties)}
 
-        ref={inputEventMapperReference}
+        ref={setInputEventMapperReference}
 
         barContentSlot={<MenuBar editor={editor}/>}
 
@@ -146,7 +145,7 @@ export const Index = forwardRef((
                 `${CSS_CLASS_NAMES.richtextEditorView} mdc-text-field__input`
             }
             editor={editor}
-            innerRef={editorViewReference}
+            innerRef={setEditorViewReference}
         />
     </InputEventMapper>
 })
