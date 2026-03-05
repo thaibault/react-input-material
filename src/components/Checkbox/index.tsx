@@ -23,7 +23,7 @@ import {
     FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardRefRenderFunction,
-    memo as memorize,
+    memo as memoize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
     // NOTE: can be "RefObject" directly when migrated to react19.
@@ -31,7 +31,6 @@ import {
     SyntheticEvent,
     useEffect,
     useImperativeHandle,
-    useRef,
     useState
 } from 'react'
 
@@ -347,10 +346,6 @@ export const CheckboxInner = function(
     }
     // endregion
     // region properties
-    /// region references
-    const inputReference: RefObject<InputReference | null> =
-        useRef<InputReference>(null)
-    /// endregion
     const givenProps: Props = translateKnownSymbols(props)
 
     const initialValue: boolean | null = determineInitialValue<boolean | null>(
@@ -407,6 +402,9 @@ export const CheckboxInner = function(
             wrapStateSetter<ValueState>(setValueState, currentValueState)
     // endregion
     // region export references
+    const [inputReference, setInputReference] =
+        useState<InputReference | null>(null)
+
     useImperativeHandle(
         reference,
         (): Adapter & {reference: unknown} => ({
@@ -419,7 +417,14 @@ export const CheckboxInner = function(
                     {value: properties.value as boolean | null}
                 )
             }
-        })
+        }),
+        [
+            properties,
+            inputReference,
+            properties.model.state,
+            controlled,
+            properties.value
+        ]
     )
     // endregion
     // region render
@@ -441,7 +446,7 @@ export const CheckboxInner = function(
             id={properties.id || properties.name}
             name={properties.name}
 
-            ref={inputReference}
+            ref={setInputReference}
 
             classNames={
                 [CSS_CLASS_NAMES.checkbox].concat(properties.className)
@@ -487,7 +492,7 @@ CheckboxInner.displayName = 'Checkbox'
  */
 export const Checkbox: Component<
     typeof CheckboxInner
-> = memorize(forwardRef(CheckboxInner)) as
+> = memoize(forwardRef(CheckboxInner)) as
     unknown as
     Component<typeof CheckboxInner>
 // region static properties

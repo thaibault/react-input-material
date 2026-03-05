@@ -30,14 +30,15 @@ import {
 import {
     ForwardedRef,
     forwardRef,
-    memo as memorize,
+    memo as memoize,
     ReactElement,
     ReactNode,
     useId,
-    useImperativeHandle,
-    useState
+    useImperativeHandle
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
+
+import {useReferenceState} from '../../../helper'
 
 import {
     MediaCardProperties, MediaCardReference, MediaCardRepresentationType
@@ -55,16 +56,16 @@ export const MediaCardInner = function(
     const id = properties.id ?? defaultID
     // region references
     const [cardReference, setCardReference] =
-        useState<HTMLDivElement | null>(null)
+        useReferenceState<HTMLDivElement | null>(null)
     const [iFrameReference, setIFrameReference] =
-        useState<HTMLIFrameElement | null>(null)
+        useReferenceState<HTMLIFrameElement | null>(null)
 
     const [deleteButtonReference, setDeleteButtonReference] =
-        useState<HTMLElement | null>(null)
+        useReferenceState<HTMLElement | null>(null)
     const [downloadLinkReference, setDownloadLinkReference] =
-        useState<HTMLAnchorElement | null>(null)
+        useReferenceState<HTMLAnchorElement | null>(null)
     const [uploadButtonReference, setUploadButtonReference] =
-        useState<HTMLElement | null>(null)
+        useReferenceState<HTMLElement | null>(null)
 
     useImperativeHandle(
         reference,
@@ -294,7 +295,7 @@ export const MediaCardInner = function(
         }
     </Card>
 }
-export const MediaCard = memorize(forwardRef(MediaCardInner)) as
+export const MediaCard = memoize(forwardRef(MediaCardInner)) as
     typeof MediaCardInner
 
 export default MediaCard

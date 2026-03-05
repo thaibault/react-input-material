@@ -23,7 +23,7 @@ import {
     createRef,
     ForwardedRef,
     forwardRef,
-    memo as memorize,
+    memo as memoize,
     ReactElement,
     ReactNode,
     // NOTE: can be "RefObject" directly when migrated to react19.
@@ -647,7 +647,7 @@ InputsInner.displayName = 'Inputs'
  * @returns React elements.
  */
 export const Inputs: Component<typeof InputsInner> =
-    memorize(forwardRef(InputsInner)) as
+    memoize(forwardRef(InputsInner)) as
         unknown as
         Component<typeof InputsInner>
 // region static properties

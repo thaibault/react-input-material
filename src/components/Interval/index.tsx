@@ -22,7 +22,7 @@ import {GenericEvent} from 'react-generic-tools/type'
 import {
     ForwardedRef,
     forwardRef,
-    memo as memorize,
+    memo as memoize,
     ReactElement,
     useImperativeHandle,
     useRef,
@@ -492,7 +492,7 @@ IntervalInner.displayName = 'Interval'
  * @returns React elements.
  */
 export const Interval: Component<typeof IntervalInner> =
-    memorize(forwardRef(IntervalInner)) as
+    memoize(forwardRef(IntervalInner)) as
         unknown as
         Component<typeof IntervalInner>
 // region static properties

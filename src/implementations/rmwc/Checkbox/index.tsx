@@ -19,9 +19,10 @@
 import {MDCCheckboxFoundation} from '@material/checkbox'
 import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox'
 import {
-    ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useState
+    ForwardedRef, forwardRef, ReactElement, useImperativeHandle
 } from 'react'
 
+import {useReferenceState} from '../../../helper'
 import {CheckboxProperties, InputReference} from '../../type'
 import cssClassNames from './style.module'
 // endregion
@@ -31,11 +32,11 @@ export const Checkbox = forwardRef((
     properties: CheckboxProperties, reference?: ForwardedRef<InputReference>
 ): ReactElement => {
     const [baseReference, setBaseReference] =
-        useState<HTMLInputElement | null>(null)
+        useReferenceState<HTMLInputElement | null>(null)
     const [foundationReference, setFoundationReference] =
-        useState<MDCCheckboxFoundation | null>(null)
+        useReferenceState<MDCCheckboxFoundation | null>(null)
     const [inputReference, setInputReference] =
-        useState<HTMLInputElement | null>(null)
+        useReferenceState<HTMLInputElement | null>(null)
 
     useImperativeHandle(
         reference,

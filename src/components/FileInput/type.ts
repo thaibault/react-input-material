@@ -201,9 +201,9 @@ export interface AdapterWithReferences<
     Type extends Value = Value
 > extends Adapter<Type> {
     references: {
-        fileInput: RefObject<HTMLInputElement | null>
-        mediaCard: RefObject<MediaCardReference | null>
-        nameInput: RefObject<TextInputAdapter<string> | null>
+        fileInput: HTMLInputElement | null
+        mediaCard: MediaCardReference | null
+        nameInput: TextInputAdapter<string> | null
     }
 }
 

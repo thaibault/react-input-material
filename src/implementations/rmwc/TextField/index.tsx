@@ -22,9 +22,11 @@ import {TextField as RMWCTextField} from '@rmwc/textfield'
 import {Mapping} from 'clientnode'
 
 import {
-    ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useState
+    ForwardedRef, forwardRef, ReactElement, useImperativeHandle
 } from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
+
+import {useReferenceState} from '../../../helper'
 
 import {InputReference, TextFieldProperties} from '../../type'
 import Icon from '../Icon'
@@ -42,11 +44,11 @@ export const TextField = forwardRef((
     properties: TextFieldProperties, reference?: ForwardedRef<InputReference>
 ): ReactElement => {
     const [baseReference, setBaseReference] =
-        useState<HTMLInputElement | null>(null)
+        useReferenceState<HTMLInputElement | null>(null)
     const [foundationReference, setFoundationReference] =
-        useState<MDCTextFieldFoundation | null>(null)
+        useReferenceState<MDCTextFieldFoundation | null>(null)
     const [inputReference, setInputReference] =
-        useState<HTMLInputElement | HTMLTextAreaElement | null>(null)
+        useReferenceState<HTMLInputElement | HTMLTextAreaElement | null>(null)
 
     useImperativeHandle(
         reference,

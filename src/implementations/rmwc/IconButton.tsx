@@ -23,9 +23,11 @@ import {
 import {IconSizeT} from '@rmwc/types'
 
 import {
-    ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useState
+    ForwardedRef, forwardRef, ReactElement, useImperativeHandle
 } from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
+
+import {useReferenceState} from '../../helper'
 
 import {IconButtonProperties} from '../type'
 // endregion
@@ -33,9 +35,9 @@ export const IconButton = forwardRef((
     properties: IconButtonProperties, reference?: ForwardedRef<unknown>
 ): ReactElement => {
     const [baseReference, setBaseReference] =
-        useState<HTMLInputElement | null>(null)
+        useReferenceState<HTMLInputElement | null>(null)
     const [foundationReference, setFoundationReference] =
-        useState<MDCIconButtonToggleFoundation | null>(null)
+        useReferenceState<MDCIconButtonToggleFoundation | null>(null)
 
     useImperativeHandle(
         reference,

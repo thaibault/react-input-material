@@ -37,7 +37,7 @@ import {
     forwardRef,
     ForwardedRef,
     KeyboardEvent as ReactKeyboardEvent,
-    memo as memorize,
+    memo as memoize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
     ReactNode,
@@ -52,6 +52,7 @@ import {
 import GenericAnimate from 'react-generic-animate'
 import {GenericEvent} from 'react-generic-tools/type'
 import Dummy from 'react-generic-dummy'
+import {useMemorizedValue} from 'react-generic-tools'
 import {
     TransitionChildren, TransitionProps
 } from 'react-transition-group/Transition'
@@ -82,6 +83,7 @@ import {
     renderMessage,
     translateKnownSymbols,
     triggerCallbackIfExists,
+    useReferenceState,
     wrapStateSetter
 } from '../../helper'
 import {
@@ -589,9 +591,7 @@ export const TextInputInner = function<Type = unknown>(
      * Triggered on blur events.
      * @param event - Event object.
      */
-    const onBlur = (
-        event: ReactFocusEvent<HTMLDivElement>
-    ): void => {
+    const onBlur = (event: ReactFocusEvent<HTMLDivElement>): void => {
         setValueState((
             oldValueState: ValueState<Type, ModelState>
         ): ValueState<Type, ModelState> => {
@@ -706,7 +706,7 @@ export const TextInputInner = function<Type = unknown>(
      * Triggered when editor is active indicator should be changed.
      * @param event - Mouse event object.
      */
-    const onChangeEditorIsActive = (event: ReactMouseEvent): void => {
+    const onChangeEditorIsActive = (event: ReactMouseEvent) => {
         event.preventDefault()
         event.stopPropagation()
 
@@ -1233,7 +1233,6 @@ export const TextInputInner = function<Type = unknown>(
             value: initialValue
         })
     )
-
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
@@ -1292,13 +1291,13 @@ export const TextInputInner = function<Type = unknown>(
     /// endregion
     // endregion
     // region export references
-    const [inputReference, setInputReference] = useState<
+    const [inputReference, setInputReference] = useReferenceState<
         CodeMirrorReference | InputReference | TipTapReference | null
     >(null)
     const [menuReference, setMenuReference] =
-        useState<MenuReference | null>(null)
+        useReferenceState<MenuReference | null>(null)
     const [wrapperReference, setWrapperReference] =
-        useState<HTMLDivElement | null>(null)
+        useReferenceState<HTMLDivElement | null>(null)
 
     useImperativeHandle(
         reference,
@@ -1691,7 +1690,6 @@ export const TextInputInner = function<Type = unknown>(
         }
     })
     /// endregion
-    // TODO maybe not needed anymore!
     useEffect(
         () => {
             if (properties.triggerInitialPropertiesConsolidation)
@@ -1770,14 +1768,16 @@ export const TextInputInner = function<Type = unknown>(
 
                     onChange={onChangeValue}
                     onClick={onClick}
-                    onKeyDown={(event: ReactKeyboardEvent): void => {
-                        /*
-                            Avoid scrolling page interactions when navigating
-                            through option.
-                        */
-                        if (!(properties.disabled || event.code === 'Tab'))
-                            event.preventDefault()
-                    }}
+                    onKeyDown={useMemorizedValue(
+                        (event: ReactKeyboardEvent) => {
+                            /*
+                                Avoid scrolling page interactions when
+                                navigating through option.
+                            */
+                            if (!(properties.disabled || event.code === 'Tab'))
+                                event.preventDefault()
+                        }
+                    )}
 
                     options={normalizedSelection as NormalizedSelection}
                     value={properties.value as Type}
@@ -1960,7 +1960,7 @@ TextInputInner.displayName = 'TextInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const TextInput = memorize(forwardRef(TextInputInner)) as
+export const TextInput = memoize(forwardRef(TextInputInner)) as
     unknown as
     Component<typeof TextInputInner>
 // region static properties

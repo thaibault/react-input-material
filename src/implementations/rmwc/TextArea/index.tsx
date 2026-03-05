@@ -27,13 +27,15 @@ import {
     ReactElement,
     useEffect,
     useId,
-    useImperativeHandle,
-    useState
+    useImperativeHandle
 } from 'react'
+
+import {useReferenceState} from '../../../helper'
 
 import {TextAreaProperties, TextAreaReference} from '../../type'
 
 import cssClassNames from './style.module'
+import {useMemorizedValue} from 'react-generic-tools'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames
 
@@ -52,13 +54,13 @@ export const TextArea = forwardRef((
     const classNamePrefix = properties.classNamePrefix ?? 'text-area'
 
     const [inputReference, setInputReference] =
-        useState<HTMLTextAreaElement | null>(null)
+        useReferenceState<HTMLTextAreaElement | null>(null)
     const [materialTextFieldReference, setMaterialTextFieldReference] =
-        useState<MDCTextField | null>(null)
+        useReferenceState<MDCTextField | null>(null)
     const [labelReference, setLabelReference] =
-        useState<HTMLLabelElement | null>(null)
+        useReferenceState<HTMLLabelElement | null>(null)
     const [foundationReference, setFoundationReference] =
-        useState<MDCTextFieldFoundation | null>(null)
+        useReferenceState<MDCTextFieldFoundation | null>(null)
 
     useImperativeHandle(
         reference,
@@ -164,11 +166,7 @@ export const TextArea = forwardRef((
                 inputReference?.removeEventListener('focus', onFocus)
             }
         },
-        [
-            foundationReference,
-            inputReference,
-            properties.children
-        ]
+        [foundationReference, inputReference, properties.children]
     )
 
     // NOTE: Character count is only supported if maximum length is given.
@@ -188,14 +186,16 @@ export const TextArea = forwardRef((
             disabled={properties.disabled}
 
             className="mdc-text-field__input"
-            style={properties.children ?
-                {
-                    visibility: 'hidden',
-                    position: 'absolute',
-                    ...properties.styles
-                } :
+            style={useMemorizedValue(
+                properties.children ?
+                    {
+                        visibility: 'hidden',
+                        position: 'absolute',
+                        ...properties.styles
+                    } :
+                    properties.styles,
                 properties.styles
-            }
+            )}
             rows={properties.rows}
 
             aria-labelledby={`${id}-label`}
@@ -239,18 +239,23 @@ export const TextArea = forwardRef((
         }
     </>
 
-    const helpText: TextFieldHelperTextProps =
+    const helpText: TextFieldHelperTextProps = useMemorizedValue(
         typeof properties.helpText === 'object' ?
             properties.helpText as TextFieldHelperTextProps :
-            {children: properties.helpText}
+            {children: properties.helpText},
+        properties.helpText
+    )
 
     return <>
         <label
             ref={setLabelReference}
-            onClick={(event) => {
-                if (properties.onLabelClick)
-                    properties.onLabelClick(event)
-            }}
+            onClick={useMemorizedValue(
+                (event) => {
+                    if (properties.onLabelClick)
+                        properties.onLabelClick(event)
+                },
+                properties.onLabelClick
+            )}
             className={[
                 classNamePrefix,
                 'mdc-text-field',

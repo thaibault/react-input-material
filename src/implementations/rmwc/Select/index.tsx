@@ -22,12 +22,13 @@ import {OptionsType, Select as RMWCSelect} from '@rmwc/select'
 import {
     ForwardedRef,
     forwardRef,
-    memo as memorize,
+    memo as memoize,
     ReactElement,
-    useImperativeHandle,
-    useState
+    useImperativeHandle
 } from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
+
+import {useReferenceState} from '../../../helper'
 
 import {InputReference, SelectProperties} from '../../type'
 // endregion
@@ -36,11 +37,11 @@ export const SelectInner = function<Type = unknown>(
     reference?: ForwardedRef<InputReference>
 ): ReactElement {
     const [baseReference, setBaseReference] =
-        useState<HTMLSelectElement | null>(null)
+        useReferenceState<HTMLSelectElement | null>(null)
     const [foundationReference, setFoundationReference] =
-        useState<MDCSelectFoundation | null>(null)
+        useReferenceState<MDCSelectFoundation | null>(null)
     const [inputReference, setInputReference] =
-        useState<HTMLSelectElement | null>(null)
+        useReferenceState<HTMLSelectElement | null>(null)
 
     useImperativeHandle(
         reference,
@@ -85,6 +86,6 @@ export const SelectInner = function<Type = unknown>(
         {...properties.componentProperties}
     />
 }
-export const Select = memorize(forwardRef(SelectInner)) as typeof SelectInner
+export const Select = memoize(forwardRef(SelectInner)) as typeof SelectInner
 
 export default Select

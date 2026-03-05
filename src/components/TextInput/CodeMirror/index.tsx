@@ -23,8 +23,7 @@ import {
     forwardRef,
     ReactElement,
     useEffect,
-    useImperativeHandle,
-    useState
+    useImperativeHandle, useRef
 } from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
 
@@ -57,6 +56,7 @@ import {
     rectangularSelection
 } from '@codemirror/view'
 
+import {useReferenceState} from '../../../helper'
 import {TextAreaProperties} from '../../../implementations/type'
 import InputEventMapper, {
     Reference as InputEventMapperReference
@@ -123,11 +123,11 @@ export const Index = forwardRef((
     const value = properties.value ?? ''
 
     const [inputEventMapperReference, setInputEventMapperReference] =
-        useState<InputEventMapperReference | null>(null)
+        useReferenceState<InputEventMapperReference | null>(null)
     const [editorView, setEditorView] =
-        useState<EditorView | null>(null)
+        useReferenceState<EditorView | null>(null)
     const [editorViewReference, setEditorViewReference] =
-        useState<HTMLDivElement | null>(null)
+        useReferenceState<HTMLDivElement | null>(null)
 
     useImperativeHandle(
         reference,
@@ -139,18 +139,16 @@ export const Index = forwardRef((
         [inputEventMapperReference, editorView, editorViewReference]
     )
 
-    const onChange = (transaction: Transaction) => {
-        if (properties.disabled)
-            return
-
-        const newValue = transaction.state.doc.toString()
-
-        inputEventMapperReference?.eventMapper.input(newValue, transaction)
-
-        if (properties.onChange)
-            properties.onChange(newValue)
-    }
-
+    /*
+        NOTE: We do need to store the input event mapper reference in a ref
+        here, because otherwise we would need to re-initialize the editor on
+        every change of the input event mapper reference, which would cause a
+        lot of performance issues and also cause the editor to lose focus on
+        every change of the input event mapper reference.
+     */
+    const internalInputEventMapperReference =
+        useRef(inputEventMapperReference)
+    internalInputEventMapperReference.current = inputEventMapperReference
     useEffect(
         () => {
             if (!editorViewReference)
@@ -171,7 +169,15 @@ export const Index = forwardRef((
                             )
                                 return false
 
-                            onChange(transaction)
+                            if (properties.disabled)
+                                return true
+
+                            internalInputEventMapperReference
+                                .current?.eventMapper
+                                .input(newValue, {transaction})
+
+                            if (properties.onChange)
+                                properties.onChange(newValue)
                         }
 
                         return true
@@ -264,7 +270,7 @@ export const Index = forwardRef((
                     if (properties.onBlur)
                         properties.onBlur(event)
                 },
-                inputEventMapperReference?.eventMapper,
+                inputEventMapperReference?.eventMapper.blur,
                 properties.onBlur
             )}
             onFocus={useMemorizedValue(
@@ -274,7 +280,7 @@ export const Index = forwardRef((
                     if (properties.onFocus)
                         properties.onFocus(event)
                 },
-                inputEventMapperReference?.eventMapper,
+                inputEventMapperReference?.eventMapper.focus,
                 properties.onFocus
             )}
 

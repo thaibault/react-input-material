@@ -23,15 +23,15 @@ import {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
     forwardRef,
-    memo as memorize,
+    memo as memoize,
     MouseEvent as ReactMouseEvent,
-    // NOTE: can be "RefObject" directly when migrated to react19.
     ReactElement,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject,
     SyntheticEvent,
     useEffect,
     useId,
     useImperativeHandle,
-    useRef,
     useState
 } from 'react'
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
@@ -86,6 +86,7 @@ import {
     MediaCardReference,
     MediaCardRepresentationType
 } from '../../implementations/type'
+import {useMemorizedValue} from 'react-generic-tools'
 
 export {
     CSS_CLASS_NAMES,
@@ -143,7 +144,7 @@ export const FileInputInner = function<Type extends Value = Value>(
             result,
             Boolean(
                 (
-                    nameInputReference.current?.properties?.invalid as
+                    nameInputReference?.properties?.invalid as
                         unknown as
                         boolean | undefined
                 ) ??
@@ -157,26 +158,6 @@ export const FileInputInner = function<Type extends Value = Value>(
             result
         )
     }
-    // endregion
-    // region references
-    const fileInputReference = useRef<HTMLInputElement | null>(null)
-    const mediaCardReference = useRef<MediaCardReference>(null)
-    const nameInputReference = useRef<TextInputAdapter<string>>(null)
-    useImperativeHandle(
-        reference,
-        (): AdapterWithReferences<Type> => ({
-            properties,
-            references: {
-                fileInput: fileInputReference,
-                mediaCard: mediaCardReference,
-                nameInput: nameInputReference
-            },
-            state: {
-                modelState: properties.model.state as ModelState,
-                ...(controlled ? {} : {value: properties.value})
-            }
-        })
-    )
     // endregion
     // region event handler
     /**
@@ -228,9 +209,8 @@ export const FileInputInner = function<Type extends Value = Value>(
      * @param event - Potential event object.
      */
     const onChange = (event?: SyntheticEvent) => {
-        if (nameInputReference.current?.properties)
-            properties.model.fileName =
-                nameInputReference.current.properties.model
+        if (nameInputReference?.properties)
+            properties.model.fileName = nameInputReference.properties.model
 
         const consolidatedProperties: Properties<Type> =
             getConsolidatedProperties(
@@ -257,14 +237,14 @@ export const FileInputInner = function<Type extends Value = Value>(
      * @param eventSourceOrName - Event object or new value.
      * @param event - Optional event object (if not provided as first
      * argument).
-     * @param inputProperties - Current properties state.
+     * @param _inputProperties - Current properties state.
      * @param attachBlobProperty - Indicates whether additional data is added
      * through post processed data properties.
      */
     const onChangeValue = (
         eventSourceOrName?: null | Partial<Type> | string | SyntheticEvent,
         event?: SyntheticEvent,
-        inputProperties?: TextInputProperties<string>,
+        _inputProperties?: TextInputProperties<string>,
         attachBlobProperty = false
     ): void => {
         if (!(properties.model.mutable && properties.model.writable))
@@ -272,9 +252,8 @@ export const FileInputInner = function<Type extends Value = Value>(
 
         if (
             eventSourceOrName &&
-            fileInputReference.current &&
-            (eventSourceOrName as SyntheticEvent).target ===
-                fileInputReference.current
+            fileInputReference &&
+            (eventSourceOrName as SyntheticEvent).target === fileInputReference
         ) {
             event = eventSourceOrName as SyntheticEvent
 
@@ -353,7 +332,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                 Type, DefaultProperties<Type>
             >(
                 properties as DefaultProperties<Type>,
-                nameInputReference.current?.properties?.invalid || false,
+                nameInputReference?.properties?.invalid || false,
                 oldValueState.modelState
             ))
                 stateChanged = true
@@ -548,6 +527,39 @@ export const FileInputInner = function<Type extends Value = Value>(
             wrapStateSetter<ValueState<Type>>(setValueState, currentValueState)
     /// endregion
     // endregion
+    // region references
+    const [fileInputReference, setFileInputReference] =
+        useState<HTMLInputElement | null>(null)
+    const [mediaCardReference, setMediaCardReference] =
+        useState<MediaCardReference | null>(null)
+    const [nameInputReference, setNameInputReference] =
+        useState<TextInputAdapter<string> | null>(null)
+
+    useImperativeHandle(
+        reference,
+        (): AdapterWithReferences<Type> => ({
+            properties,
+            references: {
+                fileInput: fileInputReference,
+                mediaCard: mediaCardReference,
+                nameInput: nameInputReference
+            },
+            state: {
+                modelState: properties.model.state as ModelState,
+                ...(controlled ? {} : {value: properties.value})
+            }
+        }),
+        [
+            properties,
+            fileInputReference,
+            mediaCardReference,
+            nameInputReference,
+            properties.model.state,
+            controlled,
+            properties.value
+        ]
+    )
+    // endregion
     const defaultID = useId()
     const id = properties.id ?? defaultID
 
@@ -691,13 +703,18 @@ export const FileInputInner = function<Type extends Value = Value>(
         tooltip={properties.tooltip}
     >
         <MediaCard
-            ref={mediaCardReference}
+            ref={
+                setMediaCardReference as
+                    unknown as
+                    RefObject<MediaCardReference>
+            }
 
             id={props.id}
 
-            classNames={
-                [CSS_CLASS_NAMES.fileInput].concat(properties.className)
-            }
+            classNames={useMemorizedValue(
+                [CSS_CLASS_NAMES.fileInput].concat(properties.className),
+                properties.className
+            )}
             imageClassNames={properties.imageClassNames}
 
             styles={properties.styles}
@@ -758,52 +775,62 @@ export const FileInputInner = function<Type extends Value = Value>(
 
             onBlur={onBlur}
             onClick={onClick}
-            onClickAddOrEdit={() => {
-                fileInputReference.current?.click()
-            }}
+            onClickAddOrEdit={useMemorizedValue(
+                () => {
+                    fileInputReference?.click()
+                },
+                fileInputReference
+            )}
             onChange={onChangeValue}
             onFocus={onFocus}
         >
             <input
-                accept={([] as Array<string>).concat(
-                    properties.acceptedContentTypes ?? []
-                ).join(', ')}
+                accept={useMemorizedValue(
+                    ([] as Array<string>)
+                        .concat(properties.acceptedContentTypes ?? [])
+                        .join(', '),
+                    properties.acceptedContentTypes
+                )}
 
                 disabled={properties.disabled}
 
-                className={
+                className={useMemorizedValue(
                     [CSS_CLASS_NAMES.fileInputNative]
                         .concat(properties.fileInputClassNames ?? [])
-                        .join(' ')
-                }
+                        .join(' '),
+                    properties.fileInputClassNames
+                )}
                 id={id}
 
                 name={properties.name}
 
                 onChange={onChangeValue}
 
-                ref={fileInputReference}
+                ref={setFileInputReference}
 
                 type="file"
             />
 
             {properties.value ?
                 <TextInput
-                    ref={nameInputReference}
+                    ref={setNameInputReference}
 
                     {...properties.generateFileNameInputProperties(
                         {
                             disabled: properties.disabled,
                             value: (properties.value as Value | null)?.name,
 
-                            ...mask(
-                                defaultFileNameInputProperties,
-                                {
-                                    exclude: Object.keys(
-                                        properties.model.fileName
-                                    )
-                                }
-                            ) as TextInputProps<string>,
+                            ...useMemorizedValue(
+                                mask(
+                                    defaultFileNameInputProperties,
+                                    {
+                                        exclude: Object.keys(
+                                            properties.model.fileName
+                                        )
+                                    }
+                                ) as TextInputProps<string>,
+                                properties.model.fileName
+                            ),
 
                             default: properties.value.name,
                             model: properties.model.fileName,
@@ -844,7 +871,7 @@ FileInputInner.displayName = 'FileInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const FileInput = memorize(forwardRef(FileInputInner)) as
+export const FileInput = memoize(forwardRef(FileInputInner)) as
     unknown as
     Component<typeof FileInputInner>
 // region static properties

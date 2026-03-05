@@ -22,15 +22,11 @@ import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 import {
-    ForwardedRef,
-    forwardRef,
-    ReactElement,
-    useEffect,
-    useImperativeHandle,
-    useState
+    ForwardedRef, forwardRef, ReactElement, useEffect, useImperativeHandle
 } from 'react'
 import Dummy from 'react-generic-dummy'
 
+import {useReferenceState} from '../../../helper'
 import {TextAreaProperties} from '../../../implementations/type'
 import InputEventMapper, {
     Reference as InputEventMapperReference
@@ -39,6 +35,7 @@ import cssClassNames from '../style.module'
 import {EditorReference, TiptapProps} from '../type'
 
 import MenuBar from './MenuBar'
+import {useMemorizedValue} from 'react-generic-tools'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames
 export const VIEW_CONTENT_OFFSET_IN_PX = 8
@@ -59,9 +56,9 @@ export const Index = forwardRef((
     const value = properties.value ?? ''
 
     const [inputEventMapperReference, setInputEventMapperReference] =
-        useState<InputEventMapperReference | null>(null)
+        useReferenceState<InputEventMapperReference | null>(null)
     const [editorViewReference, setEditorViewReference] =
-        useState<HTMLDivElement | null>(null)
+        useReferenceState<HTMLDivElement | null>(null)
 
     useImperativeHandle(
         reference,
@@ -136,9 +133,12 @@ export const Index = forwardRef((
 
         classNamePrefix={CSS_CLASS_NAMES.richtextEditor}
 
-        onLabelClick={() => {
-            editor.chain().focus().run()
-        }}
+        onLabelClick={useMemorizedValue(
+            () => {
+                editor.chain().focus().run()
+            },
+            editor
+        )}
     >
         <EditorContent
             className={

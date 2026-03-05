@@ -18,11 +18,12 @@
 */
 // region imports
 import {
-    ForwardedRef, forwardRef, ReactElement, useImperativeHandle, useState
+    ForwardedRef, forwardRef, ReactElement, useImperativeHandle
 } from 'react'
 
 import TextArea from '#implementations/TextArea'
 
+import {useReferenceState} from '../../../helper'
 import {
     EventMapperWrapperReference, TextAreaProperties, TextAreaReference
 } from '../../../implementations/type'
@@ -33,7 +34,8 @@ export const Index = forwardRef((
     properties: TextAreaProperties, reference?: ForwardedRef<Reference>
 ): ReactElement => {
     const [inputReference, setInputReference] =
-        useState<TextAreaReference | null>(null)
+        useReferenceState<TextAreaReference | null>(null)
+
     useImperativeHandle(
         reference,
         () => ({
@@ -74,7 +76,7 @@ export const Index = forwardRef((
                 }
             }
         }),
-        [inputReference?.input]
+        [inputReference, inputReference?.input]
     )
 
     return <TextArea ref={setInputReference} {...properties}>
