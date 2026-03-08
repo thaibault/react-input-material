@@ -18,16 +18,16 @@
 */
 // region imports
 import {copy, extend, mask} from 'clientnode'
-import {GenericEvent} from 'react-generic-tools/type'
 import {
     ForwardedRef,
     forwardRef,
     memo as memoize,
-    ReactElement,
+    ReactElement, RefObject,
     useImperativeHandle,
-    useRef,
     useState
 } from 'react'
+import {GenericEvent} from 'react-generic-tools/type'
+import {useMemorizedValue} from 'react-generic-tools'
 
 import Icon from '#implementations/Icon'
 
@@ -65,6 +65,7 @@ import {
     Props,
     Value
 } from './type'
+import {useLogChanges} from 'react-generic-tools/debugHelper'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
@@ -167,15 +168,22 @@ export const IntervalInner = function(
             givenProps as StrictProps
         )
 
-    let endProperties =
-        properties.value?.end as IntervalTextInputProps | null ||
-        {} as IntervalTextInputProps
-    const iconProperties: IconProperties = typeof properties.icon === 'string' ?
-        {icon: properties.icon} :
-        properties.icon as IconProperties
-    let startProperties =
+    let startProperties = useMemorizedValue(
         properties.value?.start as IntervalTextInputProps | null ||
-        {} as IntervalTextInputProps
+        {} as IntervalTextInputProps,
+        properties.value?.start
+    )
+    const iconProperties: IconProperties = useMemorizedValue(
+        typeof properties.icon === 'string' ?
+            {icon: properties.icon} :
+            properties.icon as IconProperties,
+        properties.icon
+    )
+    let endProperties = useMemorizedValue(
+        properties.value?.end as IntervalTextInputProps | null ||
+        {} as IntervalTextInputProps,
+        properties.value?.end
+    )
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
@@ -198,9 +206,13 @@ export const IntervalInner = function(
             properties.model?.value?.start?.default ??
             null
     })
-    if (!controlled)
-        properties.value =
-            {end: {value: value.end}, start: {value: value.start}}
+    properties.value = useMemorizedValue(
+        controlled ?
+            properties.value :
+            {end: {value: value.end}, start: {value: value.start}},
+        controlled,
+        properties.value
+    )
     const propertiesToForward =
         mask<IntervalTextInputProps>(
             properties as unknown as IntervalTextInputProps,
@@ -237,9 +249,11 @@ export const IntervalInner = function(
     )
 
     if (!startProperties.className)
-        startProperties.className = [`${CSS_CLASS_NAMES.interval}__start`]
-    if (!iconProperties.classNames)
-        iconProperties.classNames = [`${CSS_CLASS_NAMES.interval}__icon`]
+        startProperties.className = `${CSS_CLASS_NAMES.interval}__start`
+    iconProperties.classNames = useMemorizedValue(
+        iconProperties.classNames ?? [`${CSS_CLASS_NAMES.interval}__icon`],
+        iconProperties.classNames
+    )
     if (!endProperties.className)
         endProperties.className = `${CSS_CLASS_NAMES.interval}__end`
 
@@ -248,41 +262,51 @@ export const IntervalInner = function(
 
     // NOTE: Consolidates only internal boundaries for better user experience.
     const consolidateBoundaries = ({start, end}: Value) => {
-        startProperties.maximum = formatDateTimeAsConfigured(Math.min(
-            normalizeDateTimeToNumber(startConfiguration.maximum, Infinity),
-            normalizeDateTimeToNumber(end, Infinity),
-            normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
-        )) ?? Infinity
+        startProperties.maximum =
+            formatDateTimeAsConfigured(Math.min(
+                normalizeDateTimeToNumber(startConfiguration.maximum, Infinity),
+                normalizeDateTimeToNumber(end, Infinity),
+                normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
+            )) ??
+            Infinity
 
-        startProperties.minimum = formatDateTimeAsConfigured(
-            normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
-        ) ?? -Infinity
+        startProperties.minimum =
+            formatDateTimeAsConfigured(
+                normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
+            ) ??
+            -Infinity
         startProperties.value = formatDateTimeAsConfigured(start)
 
-        endProperties.maximum = formatDateTimeAsConfigured(
-            normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
-        ) ?? Infinity
+        endProperties.maximum =
+            formatDateTimeAsConfigured(
+                normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
+            ) ??
+            Infinity
 
-        endProperties.minimum = formatDateTimeAsConfigured(Math.max(
-            normalizeDateTimeToNumber(endConfiguration.minimum, -Infinity),
-            normalizeDateTimeToNumber(start, -Infinity),
-            normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
-        )) ?? -Infinity
+        endProperties.minimum =
+            formatDateTimeAsConfigured(Math.max(
+                normalizeDateTimeToNumber(endConfiguration.minimum, -Infinity),
+                normalizeDateTimeToNumber(start, -Infinity),
+                normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
+            )) ??
+            -Infinity
         endProperties.value = end
     }
 
-    const valueState: Value = {
-        start:
-            (properties.value?.start as IntervalTextInputProps | null)?.value,
-        end: (properties.value?.end as IntervalTextInputProps | null)?.value
-    }
+    const valueState: Value = useMemorizedValue(
+        {
+            start: (
+                properties.value?.start as IntervalTextInputProps | null
+            )?.value,
+            end: (
+                properties.value?.end as IntervalTextInputProps | null
+            )?.value
+        },
+        (properties.value?.start as IntervalTextInputProps | null)?.value,
+        (properties.value?.end as IntervalTextInputProps | null)?.value
+    )
 
     consolidateBoundaries(valueState)
-
-    const endInputReference =
-        useRef<TextInputAdapterWithReferences<null | number | string>>(null)
-    const startInputReference=
-        useRef<TextInputAdapterWithReferences<null | number | string>>(null)
 
     if (controlled)
         /*
@@ -291,23 +315,47 @@ export const IntervalInner = function(
         */
         setValue = createDummyStateSetter<Value>(valueState)
     // endregion
+    // region export references
+    const [startInputReference, setStartInputReference] = useState<
+        TextInputAdapterWithReferences<null | number | string> | null
+    >(null)
+    const [endInputReference, setEndInputReference] = useState<
+        TextInputAdapterWithReferences<null | number | string> | null
+    >(null)
+
+    useLogChanges(iconProperties, 'iconProperties')
+
     useImperativeHandle(
         reference,
         (): AdapterWithReferences => ({
             properties: getExternalProperties(
                 properties as Properties,
                 iconProperties,
-                startInputReference.current?.properties ||
+                startInputReference?.properties ||
                 properties.value?.start as
                     TextInputProperties<null | number | string>,
-                endInputReference.current?.properties ||
+                endInputReference?.properties ||
                 properties.value?.end as
                     TextInputProperties<null | number | string>
             ),
-            references: {end: endInputReference, start: startInputReference},
+            references: {start: startInputReference, end: endInputReference},
             state: controlled ? {} : {value: valueState}
-        })
+        }),
+        [
+            iconProperties.icon,
+            // NOTE: Represents the need to republish derived states.
+            (
+                startInputReference?.properties?.value ||
+                properties.value?.start
+            ),
+            (endInputReference?.properties?.value || properties.value?.end),
+            startInputReference,
+            endInputReference,
+            controlled,
+            valueState
+        ]
     )
+    // endregion
     // region attach event handler
     if (properties.onChange) {
         startProperties.onChange = (
@@ -315,12 +363,12 @@ export const IntervalInner = function(
             event?: GenericEvent
         ): void => {
             const end: TextInputProperties<null | number | string> =
-                endInputReference.current?.properties ||
+                endInputReference?.properties ||
                 endProperties as
                     unknown as
                     TextInputProperties<null | number | string>
             end.value = end.model.value = normalizeDateTimeToNumber(
-                endInputReference.current?.properties?.value, -Infinity
+                endInputReference?.properties?.value, -Infinity
             )
             if (!controlled)
                 end.value = end.model.value = formatDateTimeAsConfigured(
@@ -359,12 +407,12 @@ export const IntervalInner = function(
             event?: GenericEvent
         ): void => {
             const start: TextInputProperties<null | number | string> =
-                startInputReference.current?.properties ||
+                startInputReference?.properties ||
                 startProperties as
                     unknown as
                     TextInputProperties<null | number | string>
             start.value = start.model.value = normalizeDateTimeToNumber(
-                startInputReference.current?.properties?.value, Infinity
+                startInputReference?.properties?.value, Infinity
             )
             if (!controlled)
                 start.value = start.model.value = formatDateTimeAsConfigured(
@@ -404,7 +452,7 @@ export const IntervalInner = function(
         value: null | number | string, event?: GenericEvent
     ) => {
         let endValue = normalizeDateTimeToNumber(
-            endInputReference.current?.properties?.value, -Infinity
+            endInputReference?.properties?.value, -Infinity
         )
         if (!controlled)
             endValue = Math.max(
@@ -431,7 +479,7 @@ export const IntervalInner = function(
         value: null | number | string, event?: GenericEvent
     ) => {
         let startValue = normalizeDateTimeToNumber(
-            startInputReference.current?.properties?.value, Infinity
+            startInputReference?.properties?.value, Infinity
         )
         if (!controlled)
             startValue = Math.min(
@@ -472,9 +520,27 @@ export const IntervalInner = function(
             data-name={properties.name}
             style={properties.styles}
         >
-            <TextInput {...startProperties} ref={startInputReference} />
+            <TextInput
+                {...startProperties}
+                ref={
+                    setStartInputReference as
+                        unknown as
+                        RefObject<TextInputAdapterWithReferences<
+                            null | number | string
+                        >>
+                }
+            />
             <Icon {...properties.icon as IconProperties} />
-            <TextInput {...endProperties} ref={endInputReference} />
+            <TextInput
+                {...endProperties}
+                ref={
+                    setEndInputReference as
+                        unknown as
+                        RefObject<TextInputAdapterWithReferences<
+                            null | number | string
+                        >>
+                }
+            />
         </div>
     </WrapConfigurations>
 }

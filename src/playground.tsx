@@ -65,6 +65,7 @@ import {
 import {Checkbox, FileInput, TextInput, Inputs, Interval} from './index'
 import {BaseProps} from './type'
 import {slicePropertiesForStateRecursively} from './helper'
+import {useLogChanges} from 'react-generic-tools/debugHelper'
 // endregion
 // region configuration
 LOCALES.push('de-DE')
@@ -88,9 +89,25 @@ const SECTIONS = [
 // endregion
 
 const Application = () => {
+    const [ref, setRef] = useState(null)
+
+    const onChange = ({model}) => {
+        console.log(model)
+    }
+
+    console.log('Outer ref', ref)
+
+    return <FileInput
+        name="fileInput1"
+        ref={setRef}
+        onChange={onChange}
+    />
+}
+
+const ApplicationBACKUP = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(7)
     const activeSection = SECTIONS[activeTabIndex]
 
     const onChange: ((properties: BaseProps) => void) =
@@ -1164,7 +1181,6 @@ const Application = () => {
                     }}
                 >
                     <FileInput name="fileInput1" onChange={onChange} />
-
                     <FileInput
                         default={useMemorizedValue({
                             placeholder: {
@@ -1175,9 +1191,9 @@ const Application = () => {
 
                         acceptedContentTypes="text/*"
                         contentTypePattern="^text/(?:plain|(?:x-)?csv|xml)$"
-                        model={{fileName: {
+                        model={useMemorizedValue({fileName: {
                             pattern: '^[a-zA-Z0-9]\\.(?:csv|txt|xml)$'
-                        }}}
+                        }})}
 
                         encoding="latin1"
 
@@ -1254,7 +1270,7 @@ const Application = () => {
                     <button
                         onClick={() => {
                             fileInputUnControlledHeadlessReference
-                                .current?.references.fileInput.current?.click()
+                                .current?.references.fileInput?.click()
                         }}
                     >Add medium</button>
                     <FileInput

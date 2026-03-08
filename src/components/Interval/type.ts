@@ -156,14 +156,14 @@ export type PropertyTypes = {
 export type Adapter = ComponentAdapter<Properties, {value?: Value | null}>
 export interface AdapterWithReferences extends Adapter {
     references: {
-        end: RefObject<
+        end: (
             TextInputAdapterWithReferences<DateTimeRepresentation | null> |
             null
-        >
-        start: RefObject<
+        )
+        start: (
             TextInputAdapterWithReferences<DateTimeRepresentation | null> |
             null
-        >
+            )
     }
 }
 

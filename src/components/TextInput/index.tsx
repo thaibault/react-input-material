@@ -87,11 +87,7 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState,
-    EditorState,
-    NormalizedSelection,
-    SelectionDefinition,
-    TypeDefinition
+    NormalizedSelection, SelectionDefinition, TypeDefinition
 } from '../../type'
 import {
     IconProperties,
@@ -470,18 +466,8 @@ export const TextInputInner = function<Type = unknown>(
     /// endregion
     /// region property aggregation
     const deriveMissingPropertiesFromState = () => {
-        if (
-            givenProperties.cursor === null ||
-            typeof givenProperties.cursor !== 'object'
-        )
-            givenProperties.cursor = {} as CursorState
-        if (givenProperties.cursor.end === undefined)
-            givenProperties.cursor.end = cursor.end
-        if (givenProperties.cursor.start === undefined)
-            givenProperties.cursor.start = cursor.start
-
         if (givenProperties.editorIsActive === undefined)
-            givenProperties.editorIsActive = editorState.editorIsActive
+            givenProperties.editorIsActive = editorIsActive
 
         if (givenProperties.hidden === undefined)
             givenProperties.hidden = hidden
@@ -710,7 +696,7 @@ export const TextInputInner = function<Type = unknown>(
         event.preventDefault()
         event.stopPropagation()
 
-        setEditorState(({editorIsActive}): EditorState => {
+        setEditorIsActive((editorIsActive) => {
             properties.editorIsActive = !editorIsActive
 
             onChange(event)
@@ -724,10 +710,7 @@ export const TextInputInner = function<Type = unknown>(
                 properties
             )
 
-            return {
-                editorIsActive: properties.editorIsActive,
-                selectionIsUnstable: true
-            }
+            return properties.editorIsActive
         })
     }
     /**
@@ -1143,11 +1126,9 @@ export const TextInputInner = function<Type = unknown>(
     // region properties
     const givenProps: Props<Type> = translateKnownSymbols(props)
 
-    const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
-    const [editorState, setEditorState] = useState<EditorState>({
-        editorIsActive: givenProps.editorIsInitiallyActive || false,
-        selectionIsUnstable: false
-    })
+    const [editorIsActive, setEditorIsActive] = useState(
+        givenProps.editorIsInitiallyActive || false
+    )
     const [hidden, setHidden] = useState<boolean | undefined>()
     const [isSuggestionOpen, setIsSuggestionOpen] = useState<boolean>(false)
     const [showDeclaration, setShowDeclaration] = useState<boolean>(false)
@@ -1255,12 +1236,8 @@ export const TextInputInner = function<Type = unknown>(
     if (properties.hidden === undefined)
         properties.hidden = properties.name.startsWith('password')
     /// region synchronize properties into state where values are not controlled
-    if (properties.cursor && !equals(properties.cursor, cursor))
-        setCursor(properties.cursor as CursorState)
-    if (properties.editorIsActive !== editorState.editorIsActive)
-        setEditorState({
-            ...editorState, editorIsActive: properties.editorIsActive
-        })
+    if (properties.editorIsActive !== editorIsActive)
+        setEditorIsActive(properties.editorIsActive)
     if (properties.hidden !== hidden)
         setHidden(properties.hidden)
     if (properties.showDeclaration !== showDeclaration)
@@ -1306,11 +1283,10 @@ export const TextInputInner = function<Type = unknown>(
                 {modelState: properties.model.state} as State<Type>
 
             for (const name of [
-                'cursor', 'editorIsActive', 'hidden', 'showDeclaration'
+                'editorIsActive', 'hidden', 'showDeclaration'
             ] as const)
                 if (!Object.prototype.hasOwnProperty.call(givenProps, name))
-                    (state[name] as boolean | Partial<CursorState>) =
-                        properties[name] ?? false
+                    state[name] = properties[name] ?? false
 
             if (!representationControlled)
                 state.representation = properties.representation
@@ -1328,12 +1304,13 @@ export const TextInputInner = function<Type = unknown>(
             }
         },
         [
-            properties.model.state,
+            // NOTE: Represents the need to republish derived states.
+            properties.value,
+            properties.representation,
 
-            properties.cursor,
-            properties.editorIsActive,
-            properties.hidden,
-            properties.showDeclaration,
+            givenProps.editorIsActive,
+            givenProps.hidden,
+            givenProps.showDeclaration,
 
             representationControlled,
             controlled,
@@ -1757,7 +1734,6 @@ export const TextInputInner = function<Type = unknown>(
             onBlur={onBlur}
             onKeyDown={onKeyDown}
 
-
             {...(useSuggestions ? {role: 'search'} : {})}
         >
             {wrapAnimationConditionally(
@@ -1975,7 +1951,6 @@ TextInput.defaultModelState = defaultModelState
 */
 TextInput.defaultProperties = {
     ...defaultProperties,
-    cursor: undefined,
     model: {
         ...defaultProperties.model,
         // Trigger initial determination.

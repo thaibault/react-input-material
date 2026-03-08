@@ -32,8 +32,10 @@ import {
     useEffect,
     useId,
     useImperativeHandle,
-    useState
+    useState,
+    useRef
 } from 'react'
+import {useMemorizedValue} from 'react-generic-tools'
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
@@ -86,7 +88,6 @@ import {
     MediaCardReference,
     MediaCardRepresentationType
 } from '../../implementations/type'
-import {useMemorizedValue} from 'react-generic-tools'
 
 export {
     CSS_CLASS_NAMES,
@@ -125,6 +126,18 @@ export {
 export const FileInputInner = function<Type extends Value = Value>(
     props: Props<Type>, reference?: ForwardedRef<AdapterWithReferences<Type>>
 ): ReactElement {
+    // TODO
+    /*
+        NOTE: We currently end up in and endless loop if we store the input
+        reference in state like:
+
+        const [nameInputReference, setNameInputReference] =
+            useState<TextInputAdapter<string> | null>(null)
+    */
+    const nameInputReferenceAsRef =
+        useRef<TextInputAdapter<string> | null>(null)
+    const setNameInputReference = nameInputReferenceAsRef
+    const nameInputReference = nameInputReferenceAsRef.current
     // region property aggregation
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -532,8 +545,6 @@ export const FileInputInner = function<Type extends Value = Value>(
         useState<HTMLInputElement | null>(null)
     const [mediaCardReference, setMediaCardReference] =
         useState<MediaCardReference | null>(null)
-    const [nameInputReference, setNameInputReference] =
-        useState<TextInputAdapter<string> | null>(null)
 
     useImperativeHandle(
         reference,
@@ -550,12 +561,11 @@ export const FileInputInner = function<Type extends Value = Value>(
             }
         }),
         [
-            properties,
             fileInputReference,
             mediaCardReference,
             nameInputReference,
-            properties.model.state,
             controlled,
+            // NOTE: State can be derived out of changes to the given value.
             properties.value
         ]
     )
@@ -785,21 +795,18 @@ export const FileInputInner = function<Type extends Value = Value>(
             onFocus={onFocus}
         >
             <input
-                accept={useMemorizedValue(
+                accept={
                     ([] as Array<string>)
                         .concat(properties.acceptedContentTypes ?? [])
-                        .join(', '),
-                    properties.acceptedContentTypes
-                )}
+                        .join(', ')
+                }
 
                 disabled={properties.disabled}
 
-                className={useMemorizedValue(
+                className={
                     [CSS_CLASS_NAMES.fileInputNative]
                         .concat(properties.fileInputClassNames ?? [])
-                        .join(' '),
-                    properties.fileInputClassNames
-                )}
+                        .join(' ')}
                 id={id}
 
                 name={properties.name}
@@ -820,21 +827,19 @@ export const FileInputInner = function<Type extends Value = Value>(
                             disabled: properties.disabled,
                             value: (properties.value as Value | null)?.name,
 
-                            ...useMemorizedValue(
-                                mask(
-                                    defaultFileNameInputProperties,
-                                    {
-                                        exclude: Object.keys(
-                                            properties.model.fileName
-                                        )
-                                    }
-                                ) as TextInputProps<string>,
-                                properties.model.fileName
-                            ),
+                            ...mask(
+                                defaultFileNameInputProperties,
+                                {
+                                    exclude: Object.keys(
+                                        properties.model.fileName
+                                    )
+                                }
+                            ) as TextInputProps<string>,
 
                             default: properties.value.name,
                             model: properties.model.fileName,
-                            onChangeValue: onChangeValue,
+                            onChangeValue,
+
                             triggerInitialPropertiesConsolidation
                         },
                         properties as
