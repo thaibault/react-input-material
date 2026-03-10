@@ -35,21 +35,12 @@ import {
     ForwardRefExoticComponent,
     ReactElement,
     ReactNode,
-    RefAttributes,
-    RefObject
+    RefAttributes
 } from 'react'
 
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 
-import {
-    defaultInputModel as defaultTextInputModel,
-    defaultProperties as defaultTextInputProperties,
-    Adapter as TextInputAdapter,
-    Model as TextInputModel,
-    propertyTypes as textInputPropertyTypes,
-    Props as TextInputProps,
-    PartialModel as PartialTextInputModel
-} from '../TextInput/type'
+import {MediaCardReference} from '../../implementations/type'
 import {
     BaseModel,
     defaultModel as baseDefaultModel,
@@ -65,7 +56,16 @@ import {
     StaticWebComponent,
     ValueState as BaseValueState
 } from '../../type'
-import {MediaCardReference} from '../../implementations/type'
+
+import {
+    defaultInputModel as defaultTextInputModel,
+    defaultProperties as defaultTextInputProperties,
+    Adapter as TextInputAdapter,
+    Model as TextInputModel,
+    propertyTypes as textInputPropertyTypes,
+    Props as TextInputProps,
+    PartialModel as PartialTextInputModel
+} from '../TextInput/type'
 // endregion
 export enum RepresentationType {
     BINARY = 'binary',
