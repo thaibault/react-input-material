@@ -390,9 +390,8 @@ export const TRANSFORMER: DataTransformation = {
                 ) as number
             }
 
-            const edgeValueDescription = convertEdgeValueToString(value)
-            if (typeof edgeValueDescription === 'string')
-                return edgeValueDescription
+            if (value === Infinity)
+                value = 24 * 60 * 60
 
             let formattedValue = utcSecondsToISOString(value)
 
@@ -495,9 +494,8 @@ export const TRANSFORMER: DataTransformation = {
                 ) as number
             }
 
-            const edgeValueDescription = convertEdgeValueToString(value)
-            if (typeof edgeValueDescription === 'string')
-                return edgeValueDescription
+            if (value === Infinity)
+                value = 24 * 60 * 60
 
             /*
                 NOTE: For time without any date information we cannot determine

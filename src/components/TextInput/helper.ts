@@ -2,7 +2,6 @@
 // -*- coding: utf-8 -*-
 /** @module helper */
 'use strict'
-import type {EditorOptions} from '@tiptap/core'
 /* !
     region header
     [Project page](https://torben.website/react-material-input)
@@ -24,13 +23,14 @@ import UseAnimationsType from 'react-useanimations'
 import LockAnimation from 'react-useanimations/lib/lock'
 import PlusToXAnimation from 'react-useanimations/lib/plusToX'
 
+import type {EditorOptions} from '@tiptap/core'
+
 import {
     determineValidationState as determineBaseValidationState
 } from '../../helper'
 import {DefaultProperties as DefaultBaseProperties} from '../../type'
 import {
-    DefaultProperties as DefaultProperties,
-    ModelState as ModelState
+    DefaultProperties as DefaultProperties, ModelState as ModelState,
 } from './type'
 
 /*
@@ -190,3 +190,4 @@ export function suggestionMatches(
 
     return false
 }
+// endregion

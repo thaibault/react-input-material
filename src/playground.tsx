@@ -31,7 +31,7 @@ import {
     timeout
 } from 'clientnode'
 
-import {createRef, ReactNode, useState} from 'react'
+import {createRef, ReactNode, useRef, useState} from 'react'
 import {createRoot} from 'react-dom/client'
 import {useMemorizedValue} from 'react-generic-tools'
 
@@ -65,7 +65,6 @@ import {
 import {Checkbox, FileInput, TextInput, Inputs, Interval} from './index'
 import {BaseProps} from './type'
 import {slicePropertiesForStateRecursively} from './helper'
-import {useLogChanges} from 'react-generic-tools/debugHelper'
 // endregion
 // region configuration
 LOCALES.push('de-DE')
@@ -89,22 +88,28 @@ const SECTIONS = [
 // endregion
 
 const Application = () => {
+    /*
+    const ref = useRef(null)
+    const setRef = ref
+    */
     const [ref, setRef] = useState(null)
 
-    const onChange = ({model}) => {
+    const onChange = useMemorizedValue(({model}) => {
         console.log(model)
-    }
+    })
 
     console.log('Outer ref', ref)
 
     return <FileInput
-        name="fileInput1"
         ref={setRef}
+
         onChange={onChange}
+
+        name="fileInput1"
     />
 }
 
-const ApplicationBACKUP = () => {
+const ApplicationBackup = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
     const [activeTabIndex, setActiveTabIndex] = useState<number>(7)

@@ -44,6 +44,7 @@ import {
     DefaultProperties,
     ModelState,
     NormalizedSelection,
+    Props,
     SelectionDefinition,
     TypeDefinition,
     ValueState
@@ -465,20 +466,6 @@ export const mapPropertiesIntoModel = <
         result.model.mutable = false
         delete result.disabled
     }
-    if ((result as unknown as TextInputDefaultProperties).invertedPattern) {
-        result.model.invertedPattern =
-            /* eslint-disable @typescript-eslint/no-non-null-assertion */
-            (result as unknown as TextInputDefaultProperties).invertedPattern!
-            /* eslint-enable @typescript-eslint/no-non-null-assertion */
-        delete (result as unknown as TextInputDefaultProperties).invertedPattern
-    }
-    if ((result as unknown as TextInputDefaultProperties).pattern) {
-        result.model.pattern =
-            /* eslint-disable @typescript-eslint/no-non-null-assertion */
-            (result as unknown as TextInputDefaultProperties).pattern!
-            /* eslint-enable @typescript-eslint/no-non-null-assertion */
-        delete (result as unknown as TextInputDefaultProperties).pattern
-    }
     if (result.required) {
         result.model.nullable = false
         delete result.required
@@ -487,6 +474,20 @@ export const mapPropertiesIntoModel = <
         result.type = 'string'
     // endregion
     // region map properties into model
+    if ((result as unknown as TextInputDefaultProperties).invertedPattern) {
+        result.model.invertedPattern =
+            /* eslint-disable @typescript-eslint/no-non-null-assertion */
+            (result as unknown as TextInputDefaultProperties).invertedPattern!
+        /* eslint-enable @typescript-eslint/no-non-null-assertion */
+        delete (result as unknown as TextInputDefaultProperties).invertedPattern
+    }
+    if ((result as unknown as TextInputDefaultProperties).pattern) {
+        result.model.pattern =
+            /* eslint-disable @typescript-eslint/no-non-null-assertion */
+            (result as unknown as TextInputDefaultProperties).pattern!
+        /* eslint-enable @typescript-eslint/no-non-null-assertion */
+        delete (result as unknown as TextInputDefaultProperties).pattern
+    }
     // Map first level properties
     for (const name of Object.keys(result.model).concat('value'))
         if (
@@ -535,6 +536,36 @@ export const getConsolidatedProperties = <
     delete result.nullable
     // endregion
     return result
+}
+export const usePropertiesChangedIndicator = <Type = unknown>(
+    properties: Props<Type>
+) => {
+    const keys = Object.keys(properties).sort()
+    const valuesWhichEnforcesNewFunctionCreations: Array<unknown> =
+        keys.flatMap((key) => {
+            const value = properties[key as keyof typeof properties]
+
+            if (Array.isArray(value))
+                return value as Array<unknown>
+
+            if (value !== null && typeof value === 'object') {
+                if (key === 'model' && (value as BaseModel).state) {
+                    const modelState = (value as BaseModel).state
+                    delete (value as BaseModel).state
+                    const result: Array<unknown> = Object
+                        .values(value)
+                        .concat(modelState ? Object.values(modelState) : [])
+                    ;(value as BaseModel).state = modelState
+
+                    return result
+                }
+
+                return Object.values(value) as Array<unknown>
+            }
+
+            return value
+        })
+    return useMemorizedValue({}, ...valuesWhichEnforcesNewFunctionCreations)
 }
 // endregion
 // region value transformer
