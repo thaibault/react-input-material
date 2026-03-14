@@ -181,7 +181,7 @@
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-generic-animate": "^0.0.113",
+    "react-generic-animate": "^0.0.114",
     "react-generic-dummy": "^0.0.122",
     "react-generic-tools": "^0.0.104",
     "react-transition-group": "^4.4.5",
