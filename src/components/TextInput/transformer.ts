@@ -391,7 +391,11 @@ export const TRANSFORMER: DataTransformation = {
             }
 
             if (value === Infinity)
-                value = 24 * 60 * 60
+                value = 24 * 60 * 60 + 0.999 - 1
+            else if (value === -Infinity)
+                value = 0
+            else if (!isFinite(value))
+                return ''
 
             let formattedValue = utcSecondsToISOString(value)
 
@@ -496,6 +500,10 @@ export const TRANSFORMER: DataTransformation = {
 
             if (value === Infinity)
                 value = 24 * 60 * 60
+            else if (value === -Infinity)
+                value = 0
+            else if (!isFinite(value))
+                return ''
 
             /*
                 NOTE: For time without any date information we cannot determine

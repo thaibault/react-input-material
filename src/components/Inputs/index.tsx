@@ -514,7 +514,7 @@ export const InputsInner = function<
     properties.invalidMinimumNumber =
         properties.model.state.invalidMinimumNumber =
             properties.minimumNumber > (properties.value?.length || 0)
-
+    // endregion
     useImperativeHandle(
         reference,
         (): AdapterWithReferences<T, P> => ({
@@ -525,7 +525,6 @@ export const InputsInner = function<
                 {value: inputPropertiesToValues(properties.value)}
         })
     )
-    // endregion
     // region render
     const addButton: ReactElement = <IconButton
         classNames={[CSS_CLASS_NAMES.inputsAddButton]}

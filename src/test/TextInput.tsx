@@ -253,8 +253,8 @@ describe('TextInput', () => {
             TRANSFORMER,
             {step: 60}
         ],
-        ['Infinitely far in the future', Infinity, TRANSFORMER, {}],
-        ['Infinitely early in the past', -Infinity, TRANSFORMER, {}],
+        ['23:59:59.999', Infinity, TRANSFORMER, {}],
+        ['00:00:00.000', -Infinity, TRANSFORMER, {}],
         ['', NaN, TRANSFORMER, {}]
     )
     testEach<AnyFunction>(

@@ -86,33 +86,7 @@ const SECTIONS = [
     'checkbox'
 ] as const
 // endregion
-
 const Application = () => {
-    /*
-    const ref = useRef(null)
-    const setRef = ref
-    */
-    const [ref, setRef] = useState(null)
-
-    const onChange = useMemorizedValue(({model}) => {
-        console.log(model)
-    })
-
-    console.log('Outer ref', ref)
-
-    return <Interval
-        name="intervalInput1"
-        onChange={onChange}
-        required
-        step={60}
-        value={useMemorizedValue({
-            start: {default: 120, maximum: 3600},
-            end: {default: 240, minimum: 120}
-        })}
-    />
-}
-
-const ApplicationBackup = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
     const [activeTabIndex, setActiveTabIndex] = useState<number>(7)

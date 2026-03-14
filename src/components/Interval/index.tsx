@@ -303,19 +303,23 @@ export const IntervalInner = function(
 
     const startPropertiesChangedIndicator =
         usePropertiesChangedIndicator<DateTimeRepresentation | null>(
-            startProperties
+            startProperties as
+                TextInputProperties<DateTimeRepresentation | null>
         )
     const endPropertiesChangedIndicator =
         usePropertiesChangedIndicator<DateTimeRepresentation | null>(
-            endProperties
+            endProperties as
+                TextInputProperties<DateTimeRepresentation | null>
         )
     const propertiesChangedIndicator = useMemorizedValue(
         {},
         startPropertiesChangedIndicator,
         endPropertiesChangedIndicator,
+
+        JSON.stringify(iconProperties),
+
         properties.onChange,
-        properties.onChangeValue,
-        ...Object.values(iconProperties) as Array<unknown>
+        properties.onChangeValue
     )
     // endregion
     if (controlled)
