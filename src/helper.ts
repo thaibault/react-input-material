@@ -33,22 +33,9 @@ import {
     ValueOf
 } from 'clientnode'
 import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
-
 import {ReactNode, useState} from 'react'
+import {useMemorizedValue} from 'react-generic-tools'
 
-import {
-    BaseModel,
-    BaseProperties,
-    BaseProps,
-    DefaultBaseProperties,
-    DefaultProperties,
-    ModelState,
-    NormalizedSelection,
-    Props,
-    SelectionDefinition,
-    TypeDefinition,
-    ValueState
-} from './type'
 import {DateTimeRepresentation} from './components/Interval/type'
 import TextInput from './components/TextInput'
 import {
@@ -59,7 +46,19 @@ import {
     Props as TextInputProps,
     Transformer as TextInputTransformer
 } from './components/TextInput/type'
-import {useMemorizedValue} from 'react-generic-tools'
+import {
+    BaseModel,
+    BaseProperties,
+    BaseProps,
+    DefaultBaseProperties,
+    DefaultProperties,
+    ModelState,
+    NormalizedSelection,
+    Properties,
+    SelectionDefinition,
+    TypeDefinition,
+    ValueState
+} from './type'
 // endregion
 // region state
 /**
@@ -537,36 +536,6 @@ export const getConsolidatedProperties = <
     // endregion
     return result
 }
-export const usePropertiesChangedIndicator = <Type = unknown>(
-    properties: Props<Type>
-) => {
-    const keys = Object.keys(properties).sort()
-    const valuesWhichEnforcesNewFunctionCreations: Array<unknown> =
-        keys.flatMap((key) => {
-            const value = properties[key as keyof typeof properties]
-
-            if (Array.isArray(value))
-                return value as Array<unknown>
-
-            if (value !== null && typeof value === 'object') {
-                if (key === 'model' && (value as BaseModel).state) {
-                    const modelState = (value as BaseModel).state
-                    delete (value as BaseModel).state
-                    const result: Array<unknown> = Object
-                        .values(value)
-                        .concat(modelState ? Object.values(modelState) : [])
-                    ;(value as BaseModel).state = modelState
-
-                    return result
-                }
-
-                return Object.values(value) as Array<unknown>
-            }
-
-            return value
-        })
-    return useMemorizedValue({}, ...valuesWhichEnforcesNewFunctionCreations)
-}
 // endregion
 // region value transformer
 /// region selection
@@ -895,3 +864,26 @@ export const formatDateTimeAsConfigured = (
     return value
 }
 // endregion
+export const hashRegularExpression = (expression: RegExp) => (
+    expression.source +
+    '||' +
+    expression.flags.split('').sort().join('')
+)
+export const usePropertiesChangedIndicator = <Type = unknown>(
+    properties: Properties<Type>
+) =>
+    useMemorizedValue(
+        {},
+
+        JSON.stringify(properties),
+
+        properties.onChange,
+        properties.onChangeShowDeclaration,
+        properties.onChangeState,
+        properties.onChangeValue,
+
+        properties.onBlur,
+        properties.onClick,
+        properties.onFocus,
+        properties.onTouch
+    )

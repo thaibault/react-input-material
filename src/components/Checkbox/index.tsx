@@ -51,14 +51,14 @@ import {
     mapPropertiesIntoModel,
     translateKnownSymbols,
     triggerCallbackIfExists,
-    wrapStateSetter,
-    usePropertiesChangedIndicator
+    usePropertiesChangedIndicator,
+    wrapStateSetter
 } from '../../helper'
 import {InputReference} from '../../implementations/type'
 import {
-    BaseProps,
     defaultModelState as baseDefaultModelState,
-    DefaultProperties as BaseDefaultProperties
+    DefaultProperties as BaseDefaultProperties,
+    Properties as BaseProperties
 } from '../../type'
 
 import cssClassNames from './style.module'
@@ -180,10 +180,9 @@ export const CheckboxInner = function(
 
     const properties: Properties = getConsolidatedProperties(givenProperties)
 
-    const propertiesChangedIndicator =
-        usePropertiesChangedIndicator<boolean | null>(
-            properties as BaseProps<boolean | null>
-        )
+    const propertiesChangedIndicator = usePropertiesChangedIndicator(
+        properties as unknown as BaseProperties<boolean>
+    )
 
     const currentValueState: ValueState = {
         modelState: properties.model.state as ModelState,

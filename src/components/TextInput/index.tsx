@@ -44,10 +44,11 @@ import {
     SyntheticEvent,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
+    useCallback,
     useEffect,
     useId,
     useImperativeHandle,
-    useState, useCallback
+    useState
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
 import {GenericEvent} from 'react-generic-tools/type'
@@ -67,8 +68,6 @@ import Select from '#implementations/Select'
 import TextField from '#implementations/TextField'
 import Textarea from '#implementations/TextArea'
 
-import WrapConfigurations from '../Wrapper/WrapConfigurations'
-import WrapTooltip from '../Wrapper/WrapTooltip'
 import {
     deriveMissingPropertiesFromState as deriveMissingBasePropertiesFromState,
     determineInitialValue,
@@ -83,12 +82,10 @@ import {
     renderMessage,
     translateKnownSymbols,
     triggerCallbackIfExists,
-    usePropertiesChangedIndicator,
     useReferenceState,
     wrapStateSetter
 } from '../../helper'
 import {
-    BaseProps,
     NormalizedSelection, SelectionDefinition, TypeDefinition
 } from '../../type'
 import {
@@ -103,6 +100,9 @@ import {
     TypeTextInputProperties
 } from '../../implementations/type'
 
+import WrapConfigurations from '../Wrapper/WrapConfigurations'
+import WrapTooltip from '../Wrapper/WrapTooltip'
+
 import CodeEditorComponent, {
     Reference as CodeMirrorReference
 } from './CodeMirror'
@@ -115,7 +115,8 @@ import {
     preventEnterKeyPropagation,
     suggestionMatches,
     TIPTAP_DEFAULT_OPTIONS,
-    UseAnimations
+    UseAnimations,
+    usePropertiesChangedIndicator
 } from './helper'
 import {
     AdapterWithReferences,
@@ -717,9 +718,8 @@ export const TextInputInner = function<Type = unknown>(
             setValueState, currentValueState
         )
     /// endregion
-    const propertiesChangedIndicator = usePropertiesChangedIndicator<Type>(
-        properties as BaseProps<Type>
-    )
+    const propertiesChangedIndicator =
+        usePropertiesChangedIndicator<Type>(properties)
     // endregion
     // region event handler
     /**

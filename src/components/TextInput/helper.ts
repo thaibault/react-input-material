@@ -26,13 +26,18 @@ import PlusToXAnimation from 'react-useanimations/lib/plusToX'
 import type {EditorOptions} from '@tiptap/core'
 
 import {
-    determineValidationState as determineBaseValidationState
+    determineValidationState as determineBaseValidationState,
+    hashRegularExpression,
+    usePropertiesChangedIndicator as useBasePropertiesChangedIndicator
 } from '../../helper'
-import {DefaultProperties as DefaultBaseProperties} from '../../type'
+import {
+    DefaultProperties as DefaultBaseProperties, Properties as BaseProperties
+} from '../../type'
+
 import {
     DefaultProperties as DefaultProperties, ModelState as ModelState,
+    Properties
 } from './type'
-
 /*
 "namedExport" version of css-loader:
 
@@ -47,6 +52,7 @@ import {
 } from './style.module'
  */
 import cssClassNames from './style.module'
+import {useMemorizedValue} from 'react-generic-tools'
 // endregion
 // region constants
 declare const TARGET_TECHNOLOGY: string
@@ -190,4 +196,28 @@ export function suggestionMatches(
 
     return false
 }
+export const usePropertiesChangedIndicator = <Type = unknown>(
+    properties: Properties<Type>
+) =>
+    useMemorizedValue(
+        {},
+
+        useBasePropertiesChangedIndicator<Type>(
+            properties as unknown as BaseProperties<Type>
+        ),
+
+        properties.pattern instanceof RegExp ?
+            hashRegularExpression(properties.pattern) :
+            properties.pattern,
+        properties.invertedPattern instanceof RegExp ?
+            hashRegularExpression(properties.invertedPattern) :
+            properties.invertedPattern,
+
+        properties.onChangeEditorIsActive,
+        properties.onKeyDown,
+        properties.onKeyUp,
+        properties.onSelect,
+        properties.onSelectionChange,
+        properties.suggestionCreator
+    )
 // endregion

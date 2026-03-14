@@ -31,7 +31,7 @@ import {
     timeout
 } from 'clientnode'
 
-import {createRef, ReactNode, useRef, useState} from 'react'
+import {createRef, ReactNode, useState} from 'react'
 import {createRoot} from 'react-dom/client'
 import {useMemorizedValue} from 'react-generic-tools'
 
@@ -100,12 +100,15 @@ const Application = () => {
 
     console.log('Outer ref', ref)
 
-    return <FileInput
-        ref={setRef}
-
+    return <Interval
+        name="intervalInput1"
         onChange={onChange}
-
-        name="fileInput1"
+        required
+        step={60}
+        value={useMemorizedValue({
+            start: {default: 120, maximum: 3600},
+            end: {default: 240, minimum: 120}
+        })}
     />
 }
 
