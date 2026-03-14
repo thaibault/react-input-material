@@ -37,21 +37,23 @@ import {
     forwardRef,
     ForwardedRef,
     KeyboardEvent as ReactKeyboardEvent,
-    memo as memorize,
+    memo as memoize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
     ReactNode,
+    SyntheticEvent,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
+    useCallback,
     useEffect,
     useId,
     useImperativeHandle,
-    useRef,
-    useState, SyntheticEvent
+    useState
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
 import {GenericEvent} from 'react-generic-tools/type'
 import Dummy from 'react-generic-dummy'
+import {useMemorizedValue} from 'react-generic-tools'
 import {
     TransitionChildren, TransitionProps
 } from 'react-transition-group/Transition'
@@ -64,9 +66,8 @@ import IconButton from '#implementations/IconButton'
 import Menu from '#implementations/Menu'
 import Select from '#implementations/Select'
 import TextField from '#implementations/TextField'
+import Textarea from '#implementations/TextArea'
 
-import WrapConfigurations from '../Wrapper/WrapConfigurations'
-import WrapTooltip from '../Wrapper/WrapTooltip'
 import {
     deriveMissingPropertiesFromState as deriveMissingBasePropertiesFromState,
     determineInitialValue,
@@ -81,10 +82,11 @@ import {
     renderMessage,
     translateKnownSymbols,
     triggerCallbackIfExists,
+    useReferenceState,
     wrapStateSetter
 } from '../../helper'
 import {
-    CursorState, EditorState, SelectionDefinition, TypeDefinition, NormalizedSelection
+    NormalizedSelection, SelectionDefinition, TypeDefinition
 } from '../../type'
 import {
     IconProperties,
@@ -98,6 +100,9 @@ import {
     TypeTextInputProperties
 } from '../../implementations/type'
 
+import WrapConfigurations from '../Wrapper/WrapConfigurations'
+import WrapTooltip from '../Wrapper/WrapTooltip'
+
 import CodeEditorComponent, {
     Reference as CodeMirrorReference
 } from './CodeMirror'
@@ -110,7 +115,8 @@ import {
     preventEnterKeyPropagation,
     suggestionMatches,
     TIPTAP_DEFAULT_OPTIONS,
-    UseAnimations
+    UseAnimations,
+    usePropertiesChangedIndicator
 } from './helper'
 import {
     AdapterWithReferences,
@@ -134,11 +140,7 @@ import {
     ValueState
 } from './type'
 import TRANSFORMER from './transformer'
-import Index from '#implementations/TextArea'
-import {
-    Reference as InputEventMapperReference
-} from './InputEventMapperWrapper'
-
+// endregion
 export {
     CODE_EDITOR_OPTIONS,
 
@@ -151,7 +153,7 @@ export {
     TIPTAP_DEFAULT_OPTIONS
 } from './helper'
 export const INPUT_TRANSFORMER = TRANSFORMER
-// endregion
+
 /**
  * Generic text input wrapper component which automatically determines a useful
  * input field depending on given model specification.
@@ -177,157 +179,6 @@ export const TextInputInner = function<Type = unknown>(
 ): ReactElement {
     const defaultID = useId()
     const id = props.id ?? defaultID
-    // region live-cycle
-    /// region input element property synchronisation
-    /**
-     * Is triggered immediate after a re-rendering. Connects error message
-     * with input element.
-     */
-    useEffect(() => {
-        if (inputReference.current?.input?.current) {
-            let input = inputReference.current.input.current as
-                HTMLElement |
-                TextAreaReference |
-                EditorReference |
-                undefined
-            if ((input as Partial<TextAreaReference>).input?.current) {
-                input =
-                    (input as Partial<TextAreaReference | EditorReference>)
-                    .input?.current as
-                        HTMLElement | TextAreaReference
-                if ((input as Partial<TextAreaReference>).input?.current)
-                    input =
-                        (input as Partial<TextAreaReference>).input?.current as
-                            HTMLElement
-            }
-
-            if (!input)
-                return
-
-            const inputDomNode = input as HTMLElement
-
-            const determinedAttributes: Mapping<boolean | number | string> = {}
-            const attributesToRemove: Array<string> = []
-
-            // Apply aria attributes regarding validation state.
-            if (properties.valid) {
-                attributesToRemove.push('ariaErrormessage')
-                attributesToRemove.push('ariaInvalid')
-            } else {
-                determinedAttributes.ariaErrormessage =
-                    `${id}-error-message`
-                determinedAttributes.ariaInvalid = 'true'
-            }
-
-            // Apply aria attributes regarding searching.
-            if (useSuggestions) {
-                if (inputDomNode.getAttribute('type') !== 'search')
-                    determinedAttributes.role = 'searchbox'
-
-                determinedAttributes.ariaAutocomplete =
-                    properties.searchSelection ? 'inline' : 'list'
-            } else {
-                attributesToRemove.push('searchbox')
-                attributesToRemove.push('ariaAutocomplete')
-            }
-
-            if (properties.showDeclaration)
-                determinedAttributes.ariaDescribedby = `${id}-declaration`
-            else
-                attributesToRemove.push('ariaDescribedby')
-
-            const attributes = {
-                ...determinedAttributes, ...properties.attributes || {}
-            }
-
-            // Apply configured native input properties.
-            for (const [name, value] of Object.entries(attributes)) {
-                const attributeName: string = camelCaseToDelimited(name)
-
-                if (typeof value === 'boolean')
-                    if (value)
-                        inputDomNode.setAttribute(attributeName, '')
-                    else
-                        inputDomNode.removeAttribute(attributeName)
-                else
-                    inputDomNode.setAttribute(attributeName, String(value))
-            }
-
-            for (const name of attributesToRemove) {
-                const attributeName: string = camelCaseToDelimited(name)
-                if (inputDomNode.hasAttribute(attributeName))
-                    inputDomNode.removeAttribute(attributeName)
-            }
-        }
-    })
-    /// endregion
-    /// region apply missing initial aria attribute regarding menu popup state.
-    /**
-     * Is triggered immediate after a re-rendering. Sets initial aria list box
-     * opening and hidden state.
-     */
-    useEffect(() => {
-        if (isSelection) {
-            const selectionWrapper: HTMLElement | null | undefined =
-                wrapperReference.current?.querySelector(
-                    '[aria-haspopup="listbox"]'
-                )
-            if (selectionWrapper) {
-                if (!selectionWrapper.hasAttribute('aria-expanded'))
-                    selectionWrapper.setAttribute('aria-expanded', 'false')
-
-                const activeIcon: HTMLElement | null = selectionWrapper
-                    .querySelector('.mdc-select__dropdown-icon-active')
-                if (activeIcon && !activeIcon.hasAttribute('aria-hidden'))
-                    activeIcon.setAttribute('aria-hidden', 'true')
-
-                const inactiveIcon: HTMLElement | null = selectionWrapper
-                    .querySelector('.mdc-select__dropdown-icon-inactive')
-                if (inactiveIcon && !inactiveIcon.hasAttribute('aria-hidden'))
-                    inactiveIcon.setAttribute('aria-hidden', 'true')
-            }
-        }
-    })
-    /// endregion
-    /// region avoid accidentally opening select menu.
-    /**
-     * Is triggered immediate after a re-rendering. Captures key down events
-     * on disabled select fields.
-     * @returns Nothing.
-     */
-    useEffect((): undefined | (() => void) => {
-        if (isSelection) {
-            const selectionWrapper: HTMLElement | null | undefined =
-                wrapperReference.current?.querySelector(
-                    '[aria-haspopup="listbox"]'
-                )
-            if (selectionWrapper) {
-                const handler = (event: KeyboardEvent) => {
-                    if (properties.disabled)
-                        event.stopPropagation()
-                }
-
-                selectionWrapper.addEventListener('keydown', handler, true)
-
-                return () => {
-                    selectionWrapper.removeEventListener(
-                        'keydown', handler, true
-                    )
-                }
-            }
-        }
-    })
-    /// endregion
-    useEffect(
-        () => {
-            if (properties.triggerInitialPropertiesConsolidation)
-                onChange(new Event(
-                    'genericInitialPropertiesConsolidation'
-                ) as unknown as GenericEvent)
-        },
-        []
-    )
-    // endregion
     // region context helper
     /// region render helper
     /**
@@ -618,18 +469,8 @@ export const TextInputInner = function<Type = unknown>(
     /// endregion
     /// region property aggregation
     const deriveMissingPropertiesFromState = () => {
-        if (
-            givenProperties.cursor === null ||
-            typeof givenProperties.cursor !== 'object'
-        )
-            givenProperties.cursor = {} as CursorState
-        if (givenProperties.cursor.end === undefined)
-            givenProperties.cursor.end = cursor.end
-        if (givenProperties.cursor.start === undefined)
-            givenProperties.cursor.start = cursor.start
-
         if (givenProperties.editorIsActive === undefined)
-            givenProperties.editorIsActive = editorState.editorIsActive
+            givenProperties.editorIsActive = editorIsActive
 
         if (givenProperties.hidden === undefined)
             givenProperties.hidden = hidden
@@ -734,584 +575,18 @@ export const TextInputInner = function<Type = unknown>(
     }
     /// endregion
     // endregion
-    // region event handler
-    /**
-     * Triggered on blur events.
-     * @param event - Event object.
-     */
-    const onBlur = (
-        event: ReactFocusEvent<HTMLDivElement>
-    ): void => {
-        setValueState((
-            oldValueState: ValueState<Type, ModelState>
-        ): ValueState<Type, ModelState> => {
-            if (
-                event.relatedTarget &&
-                wrapperReference.current?.contains(
-                    event.relatedTarget as unknown as Node
-                )
-            )
-                return oldValueState
-
-            setIsSuggestionOpen(false)
-
-            let changed = false
-            let stateChanged = false
-
-            if (oldValueState.modelState.focused) {
-                properties.focused = false
-                changed = true
-                stateChanged = true
-            }
-
-            if (!oldValueState.modelState.visited) {
-                properties.visited = true
-                changed = true
-                stateChanged = true
-            }
-
-            if (!useSuggestions || properties.suggestSelection) {
-                const candidate: null | Type = getValueFromSelection<Type>(
-                    properties.representation, normalizedSelection
-                )
-                if (candidate === null) {
-                    properties.value = parseValue<Type>(
-                        properties,
-                        properties.value,
-                        transformer,
-                        properties.model.trim
-                    )
-                    properties.representation = formatValue<Type>(
-                        properties, properties.value, transformer
-                    )
-                } else
-                    properties.value = candidate
-            }
-
-            if (
-                !equals(oldValueState.value, properties.value) ||
-                oldValueState.representation !== properties.representation
-            )
-                changed = true
-
-            if (changed)
-                onChange(event)
-
-            if (!equals(oldValueState.value, properties.value))
-                triggerCallbackIfExists<Properties<Type>>(
-                    properties,
-                    'changeValue',
-                    controlled,
-                    properties.value,
-                    event,
-                    properties
-                )
-
-            if (stateChanged)
-                triggerCallbackIfExists<Properties<Type>>(
-                    properties,
-                    'changeState',
-                    controlled,
-                    properties.model.state,
-                    event,
-                    properties
-                )
-
-            triggerCallbackIfExists<Properties<Type>>(
-                properties, 'blur', controlled, event, properties
-            )
-
-            return changed ?
-                {
-                    modelState: properties.model.state,
-                    representation: properties.representation,
-                    value: properties.value as null | Type
-                } as ValueState<Type, ModelState> :
-                oldValueState
-        })
-    }
-    /**
-     * Triggered on any change events. Consolidates properties object and
-     * triggers given on change callbacks.
-     * @param event - Potential event object.
-     */
-    const onChange = (event: GenericEvent): void => {
-        extend(
-            true,
-            properties,
-            getConsolidatedProperties(
-                /*
-                    Workaround since "Type" isn't identified as subset of
-                    "RecursivePartial<Type>" yet.
-                */
-                properties as unknown as Props<Type>
-            )
-        )
-
-        triggerCallbackIfExists<Properties<Type>>(
-            properties, 'change', controlled, properties, event
-        )
-    }
-    /**
-     * Triggered when editor is active indicator should be changed.
-     * @param event - Mouse event object.
-     */
-    const onChangeEditorIsActive = (event: ReactMouseEvent): void => {
-        event.preventDefault()
-        event.stopPropagation()
-
-        setEditorState(({editorIsActive}): EditorState => {
-            properties.editorIsActive = !editorIsActive
-
-            onChange(event)
-
-            triggerCallbackIfExists<Properties<Type>>(
-                properties,
-                'changeEditorIsActive',
-                controlled,
-                properties.editorIsActive,
-                event,
-                properties
-            )
-
-            return {
-                editorIsActive: properties.editorIsActive,
-                selectionIsUnstable: true
-            }
-        })
-    }
-    /**
-     * Triggered when show declaration indicator should be changed.
-     * @param event - Potential event object.
-     */
-    const onChangeShowDeclaration = (event?: SyntheticEvent) => {
-        setShowDeclaration((value: boolean): boolean => {
-            properties.showDeclaration = !value
-
-            onChange(event as unknown as GenericEvent)
-
-            triggerCallbackIfExists<Properties<Type>>(
-                properties,
-                'changeShowDeclaration',
-                controlled,
-                properties.showDeclaration,
-                event,
-                properties
-            )
-
-            return properties.showDeclaration
-        })
-    }
-    /**
-     * Triggered when ever the value changes.
-     * Takes a given value or determines it from given event object and
-     * generates new value state (internal value, representation and validation
-     * states). Derived event handler will be triggered when internal state has
-     * been consolidated.
-     * @param eventOrValue - Event object or new value.
-     * @param selectedIndex - Indicates whether given event was triggered by a
-     * selection.
-     */
-    const onChangeValue = (
-        eventOrValue: GenericEvent<Type> | Type, selectedIndex = -1
-    ): void => {
-        setIsSuggestionOpen(true)
-
-        let event: GenericEvent
-        if (isObject(eventOrValue)) {
-            event = eventOrValue as unknown as GenericEvent
-            const target: HTMLInputElement | null | undefined =
-                event.target as HTMLInputElement | null ||
-                event.detail as HTMLInputElement | null
-            if (target)
-                properties.value = typeof target.value === 'undefined' ?
-                    null as Type :
-                    target.value as Type
-            else
-                properties.value = eventOrValue as Type
-        } else
-            properties.value = eventOrValue as Type
-
-        const setHelper = (): void => {
-            setValueState((
-                oldValueState: ValueState<Type, ModelState>
-            ): ValueState<Type, ModelState> => {
-                if (
-                    !representationControlled &&
-                    oldValueState.representation ===
-                        properties.representation &&
-                    /*
-                        NOTE: Unstable intermediate states have to be synced of
-                        a suggestion creator was pending.
-                    */
-                    !properties.suggestionCreator &&
-                    selectedIndex === -1
-                )
-                    /*
-                        NOTE: No representation update and no controlled value
-                        or representation:
-
-                            -> No value update
-                            -> No state update
-                            -> Nothing to trigger
-                    */
-                    return oldValueState
-
-                const valueState: ValueState<Type, ModelState> = {
-                    ...oldValueState, representation: properties.representation
-                }
-
-                if (
-                    !controlled &&
-                    equals(oldValueState.value, properties.value)
-                )
-                    /*
-                        NOTE: No value update and no controlled value:
-
-                            -> No state update
-                            -> Nothing to trigger
-                    */
-                    return valueState
-
-                valueState.value = properties.value as null | Type
-
-                let stateChanged = false
-
-                if (oldValueState.modelState.pristine) {
-                    properties.dirty = true
-                    properties.pristine = false
-                    stateChanged = true
-                }
-
-                onChange(event)
-
-                if (determineValidationState<Type>(
-                    properties as DefaultProperties<Type>,
-                    oldValueState.modelState
-                ))
-                    stateChanged = true
-
-                triggerCallbackIfExists<Properties<Type>>(
-                    properties,
-                    'changeValue',
-                    controlled,
-                    properties.value,
-                    event,
-                    properties
-                )
-
-                if (stateChanged && properties.model.state) {
-                    valueState.modelState = properties.model.state
-
-                    triggerCallbackIfExists<Properties<Type>>(
-                        properties,
-                        'changeState',
-                        controlled,
-                        properties.model.state,
-                        event,
-                        properties
-                    )
-                }
-
-                if (isSelection || selectedIndex !== -1)
-                    triggerCallbackIfExists<Properties<Type>>(
-                        properties,
-                        'select',
-                        controlled,
-                        event,
-                        properties
-                    )
-
-                return valueState
-            })
-        }
-
-        const trim = !controlled && properties.model.trim
-
-        properties.representation = selectedIndex !== -1 ?
-            currentSuggestionLabels[selectedIndex] :
-            typeof properties.value === 'string' ?
-                properties.value :
-                formatValue<Type>(properties, properties.value, transformer)
-
-        if (!useSuggestions) {
-            properties.value = parseValue<Type>(
-                properties,
-                properties.value,
-                transformer,
-                trim
-            )
-
-            setHelper()
-        } else if (properties.suggestionCreator) {
-            const abortController = new AbortController()
-
-            const onResultsRetrieved = (
-                results?: SelectionDefinition
-            ): void => {
-                if (abortController.signal.aborted)
-                    return
-
-                /*
-                    NOTE: A synchronous retrieved selection may have to stop a
-                    pending (slower) asynchronous request.
-                */
-                setSelection((
-                    oldSelection?: AbortController | Properties['selection']
-                ): Properties['selection'] | undefined => {
-                    if (
-                        oldSelection instanceof AbortController &&
-                        !oldSelection.signal.aborted
-                    )
-                        oldSelection.abort()
-
-                    return results
-                })
-
-                if (selectedIndex === -1) {
-                    const result: Type = getValueFromSelection<Type>(
-                        properties.representation, normalizeSelection(results)
-                    )
-
-                    if (result !== null || properties.searchSelection)
-                        properties.value = result
-                    else
-                        properties.value = parseValue<Type>(
-                            properties,
-                            properties.representation as unknown as Type,
-                            transformer,
-                            trim
-                        )
-                }
-
-                setHelper()
-            }
-
-            /*
-                Trigger asynchronous suggestions retrieving and delayed state
-                consolidation.
-            */
-            const result: (
-                Properties['selection'] | Promise<Properties['selection']>
-            ) = properties.suggestionCreator({
-                abortController,
-                properties,
-                query: properties.representation as string
-            })
-
-            if ((result as Promise<Properties['selection']> | null)?.then) {
-                setSelection((
-                    oldSelection?: AbortController | Properties['selection']
-                ): AbortController => {
-                    if (
-                        oldSelection instanceof AbortController &&
-                        !oldSelection.signal.aborted
-                    )
-                        oldSelection.abort()
-
-                    return abortController
-                })
-                /*
-                    NOTE: Immediate sync current representation to maintain
-                    cursor state.
-                */
-                setValueState((
-                    oldValueState: ValueState<Type, ModelState>
-                ): ValueState<Type, ModelState> => ({
-                    ...oldValueState, representation: properties.representation
-                }))
-
-                ;(result as Promise<Properties['selection']>).then(
-                    onResultsRetrieved,
-                    /*
-                        NOTE: Avoid to through an exception when aborting the
-                        request intentionally.
-                    */
-                    () => {
-                        // Do nothing regardless of an error.
-                    }
-                )
-            } else
-                onResultsRetrieved(result as Properties['selection'])
-        } else {
-            if (selectedIndex === -1) {
-                /*
-                    Map value from given selections and trigger state
-                    consolidation.
-                */
-                const result: null | Type = getValueFromSelection<Type>(
-                    properties.representation, normalizedSelection
-                )
-
-                if (result !== null || properties.searchSelection)
-                    properties.value = result
-                else
-                    properties.value = parseValue<Type>(
-                        properties,
-                        properties.representation as unknown as Type,
-                        transformer,
-                        trim
-                    )
-            }
-
-            setHelper()
-        }
-    }
-    /**
-     * Triggered on click events.
-     * @param event - Mouse event object.
-     */
-    const onClick = (event: ReactMouseEvent) => {
-        onSelectionChange(event)
-
-        triggerCallbackIfExists<Properties<Type>>(
-            properties, 'click', controlled, event, properties
-        )
-
-        onTouch(event)
-    }
-    /**
-     * Triggered on focus events and opens suggestions.
-     * @param event - Focus event object.
-     */
-    const triggerOnFocusAndOpenSuggestions = (event: ReactFocusEvent) => {
-        setIsSuggestionOpen(true)
-
-        onFocus(event)
-    }
-    /**
-     * Triggered on focus events.
-     * @param event - Focus event object.
-     */
-    const onFocus = (event: ReactFocusEvent) => {
-        triggerCallbackIfExists<Properties<Type>>(
-            properties, 'focus', controlled, event, properties
-        )
-
-        onTouch(event)
-    }
-    /**
-     * Triggered on key down events.
-     * @param event - Key up event object.
-     */
-    const onKeyDown = (event: ReactKeyboardEvent): void => {
-        if (
-            !properties.disabled &&
-            useSuggestions &&
-            'ArrowDown' === event.code &&
-            event.target === inputReference.current?.input?.current
-        )
-            menuReference.current?.focusItem(0)
-
-        /*
-            NOTE: We do not want to forward keydown enter events coming from
-            textareas.
-        */
-        if (
-            isSelection ||
-            properties.type === 'string' &&
-            properties.editor !== 'plain'
-        )
-            preventEnterKeyPropagation(event)
-
-        triggerCallbackIfExists<Properties<Type>>(
-            properties, 'keyDown', controlled, event, properties
-        )
-    }
-    /**
-     * Triggered on key up events.
-     * @param event - Key up event object.
-     */
-    const onKeyUp = (event: ReactKeyboardEvent) => {
-        // NOTE: Avoid breaking password-filler on non textarea fields!
-        if (event.code) {
-            onSelectionChange(event)
-
-            triggerCallbackIfExists<Properties<Type>>(
-                properties, 'keyUp', controlled, event, properties
-            )
-        }
-    }
-    /**
-     * Triggered on selection change events.
-     * @param event - Event which triggered selection change.
-     */
-    const onSelectionChange = (event: GenericEvent) => {
-        triggerCallbackIfExists<Properties<Type>>(
-            properties, 'selectionChange', controlled, event, properties
-        )
-    }
-    /**
-     * Triggers on start interacting with the input.
-     * @param event - Event object which triggered interaction.
-     */
-    const onTouch = (event: ReactFocusEvent | ReactMouseEvent): void => {
-        setValueState((
-            oldValueState: ValueState<Type, ModelState>
-        ): ValueState<Type, ModelState> => {
-            let changedState = false
-
-            if (!oldValueState.modelState.focused) {
-                properties.focused = true
-                changedState = true
-            }
-
-            if (oldValueState.modelState.untouched) {
-                properties.touched = true
-                properties.untouched = false
-                changedState = true
-            }
-
-            let result: ValueState<Type, ModelState> = oldValueState
-
-            if (changedState) {
-                onChange(event)
-
-                result = {
-                    ...oldValueState,
-                    modelState: properties.model.state as ModelState
-                }
-
-                triggerCallbackIfExists<Properties<Type>>(
-                    properties,
-                    'changeState',
-                    controlled,
-                    properties.model.state,
-                    event,
-                    properties
-                )
-            }
-
-            triggerCallbackIfExists<Properties<Type>>(
-                properties, 'touch', controlled, event, properties
-            )
-
-            return result
-        })
-    }
-    // endregion
     // region properties
-    /// region references
-    const inputReference =
-        useRef<InputReference | InputEventMapperReference>(null)
-    const wrapperReference = useRef<HTMLDivElement>(null)
-    const menuReference: RefObject<MenuReference | null> =
-        useRef<MenuReference>(null)
-    /// endregion
     const givenProps: Props<Type> = translateKnownSymbols(props)
 
-    const [cursor, setCursor] = useState<CursorState>({end: 0, start: 0})
-    const [editorState, setEditorState] = useState<EditorState>({
-        editorIsActive: givenProps.editorIsInitiallyActive || false,
-        selectionIsUnstable: false
-    })
+    const [editorIsActive, setEditorIsActive] = useState(
+        givenProps.editorIsInitiallyActive || false
+    )
     const [hidden, setHidden] = useState<boolean | undefined>()
     const [isSuggestionOpen, setIsSuggestionOpen] = useState<boolean>(false)
     const [showDeclaration, setShowDeclaration] = useState<boolean>(false)
 
     let initialValue: null | Type = determineInitialValue<Type>(
-        givenProps,
-        TextInput.defaultProperties.model.default as Type
+        givenProps, TextInput.defaultProperties.model.default as Type
     )
     if (initialValue instanceof Date)
         initialValue = (initialValue.getTime() / 1000) as unknown as Type
@@ -1391,7 +666,6 @@ export const TextInputInner = function<Type = unknown>(
             value: initialValue
         })
     )
-
     /*
         NOTE: Sometimes we need real given properties or derived (default
         extended) "given" properties.
@@ -1414,12 +688,8 @@ export const TextInputInner = function<Type = unknown>(
     if (properties.hidden === undefined)
         properties.hidden = properties.name.startsWith('password')
     /// region synchronize properties into state where values are not controlled
-    if (properties.cursor && !equals(properties.cursor, cursor))
-        setCursor(properties.cursor as CursorState)
-    if (properties.editorIsActive !== editorState.editorIsActive)
-        setEditorState({
-            ...editorState, editorIsActive: properties.editorIsActive
-        })
+    if (properties.editorIsActive !== editorIsActive)
+        setEditorIsActive(properties.editorIsActive)
     if (properties.hidden !== hidden)
         setHidden(properties.hidden)
     if (properties.showDeclaration !== showDeclaration)
@@ -1448,8 +718,608 @@ export const TextInputInner = function<Type = unknown>(
             setValueState, currentValueState
         )
     /// endregion
+    const propertiesChangedIndicator =
+        usePropertiesChangedIndicator<Type>(properties)
+    // endregion
+    // region event handler
+    /**
+     * Triggered on blur events.
+     * @param event - Event object.
+     */
+    const onBlur = useCallback(
+        (event: ReactFocusEvent<HTMLDivElement>): void => {
+            setValueState((
+                oldValueState: ValueState<Type, ModelState>
+            ): ValueState<Type, ModelState> => {
+                if (
+                    event.relatedTarget &&
+                    wrapperReference?.contains(
+                        event.relatedTarget as unknown as Node
+                    )
+                )
+                    return oldValueState
+
+                setIsSuggestionOpen(false)
+
+                let changed = false
+                let stateChanged = false
+
+                if (oldValueState.modelState.focused) {
+                    properties.focused = false
+                    changed = true
+                    stateChanged = true
+                }
+
+                if (!oldValueState.modelState.visited) {
+                    properties.visited = true
+                    changed = true
+                    stateChanged = true
+                }
+
+                if (!useSuggestions || properties.suggestSelection) {
+                    const candidate: null | Type = getValueFromSelection<Type>(
+                        properties.representation, normalizedSelection
+                    )
+                    if (candidate === null) {
+                        properties.value = parseValue<Type>(
+                            properties,
+                            properties.value,
+                            transformer,
+                            properties.model.trim
+                        )
+                        properties.representation = formatValue<Type>(
+                            properties, properties.value, transformer
+                        )
+                    } else
+                        properties.value = candidate
+                }
+
+                if (
+                    !equals(oldValueState.value, properties.value) ||
+                    oldValueState.representation !== properties.representation
+                )
+                    changed = true
+
+                if (changed)
+                    onChange(event)
+
+                if (!equals(oldValueState.value, properties.value))
+                    triggerCallbackIfExists<Properties<Type>>(
+                        properties,
+                        'changeValue',
+                        controlled,
+                        properties.value,
+                        event,
+                        properties
+                    )
+
+                if (stateChanged)
+                    triggerCallbackIfExists<Properties<Type>>(
+                        properties,
+                        'changeState',
+                        controlled,
+                        properties.model.state,
+                        event,
+                        properties
+                    )
+
+                triggerCallbackIfExists<Properties<Type>>(
+                    properties, 'blur', controlled, event, properties
+                )
+
+                return changed ?
+                    {
+                        modelState: properties.model.state,
+                        representation: properties.representation,
+                        value: properties.value as null | Type
+                    } as ValueState<Type, ModelState> :
+                    oldValueState
+            })
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on any change events. Consolidates properties object and
+     * triggers given on change callbacks.
+     * @param event - Potential event object.
+     */
+    const onChange = useCallback(
+        (event: GenericEvent): void => {
+            extend(
+                true,
+                properties,
+                getConsolidatedProperties(
+                    /*
+                        Workaround since "Type" isn't identified as subset of
+                        "RecursivePartial<Type>" yet.
+                    */
+                    properties as unknown as Props<Type>
+                )
+            )
+
+            triggerCallbackIfExists<Properties<Type>>(
+                properties, 'change', controlled, properties, event
+            )
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered when editor is active indicator should be changed.
+     * @param event - Mouse event object.
+     */
+    const onChangeEditorIsActive = useCallback(
+        (event: ReactMouseEvent) => {
+            event.preventDefault()
+            event.stopPropagation()
+
+            setEditorIsActive((editorIsActive) => {
+                properties.editorIsActive = !editorIsActive
+
+                onChange(event)
+
+                triggerCallbackIfExists<Properties<Type>>(
+                    properties,
+                    'changeEditorIsActive',
+                    controlled,
+                    properties.editorIsActive,
+                    event,
+                    properties
+                )
+
+                return properties.editorIsActive
+            })
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered when show declaration indicator should be changed.
+     * @param event - Potential event object.
+     */
+    const onChangeShowDeclaration = useCallback(
+        (event?: SyntheticEvent) => {
+            setShowDeclaration((value: boolean): boolean => {
+                properties.showDeclaration = !value
+
+                onChange(event as unknown as GenericEvent)
+
+                triggerCallbackIfExists<Properties<Type>>(
+                    properties,
+                    'changeShowDeclaration',
+                    controlled,
+                    properties.showDeclaration,
+                    event,
+                    properties
+                )
+
+                return properties.showDeclaration
+            })
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered when ever the value changes.
+     * Takes a given value or determines it from given event object and
+     * generates new value state (internal value, representation and validation
+     * states). Derived event handler will be triggered when internal state has
+     * been consolidated.
+     * @param eventOrValue - Event object or new value.
+     * @param selectedIndex - Indicates whether given event was triggered by a
+     * selection.
+     */
+    const onChangeValue = useCallback(
+        (
+            eventOrValue: GenericEvent<Type> | Type, selectedIndex = -1
+        ): void => {
+            setIsSuggestionOpen(true)
+
+            let event: GenericEvent
+            if (isObject(eventOrValue)) {
+                event = eventOrValue as unknown as GenericEvent
+                const target: HTMLInputElement | null | undefined =
+                    event.target as HTMLInputElement | null ||
+                    event.detail as HTMLInputElement | null
+                if (target)
+                    properties.value = typeof target.value === 'undefined' ?
+                        null as Type :
+                        target.value as Type
+                else
+                    properties.value = eventOrValue as Type
+            } else
+                properties.value = eventOrValue as Type
+
+            const setHelper = (): void => {
+                setValueState((
+                    oldValueState: ValueState<Type, ModelState>
+                ): ValueState<Type, ModelState> => {
+                    if (
+                        !representationControlled &&
+                        oldValueState.representation ===
+                        properties.representation &&
+                        /*
+                            NOTE: Unstable intermediate states have to be
+                            synced of a suggestion creator was pending.
+                        */
+                        !properties.suggestionCreator &&
+                        selectedIndex === -1
+                    )
+                        /*
+                            NOTE: No representation update and no controlled
+                            value or representation:
+
+                                -> No value update
+                                -> No state update
+                                -> Nothing to trigger
+                        */
+                        return oldValueState
+
+                    const valueState: ValueState<Type, ModelState> = {
+                        ...oldValueState,
+                        representation: properties.representation
+                    }
+
+                    if (
+                        !controlled &&
+                        equals(oldValueState.value, properties.value)
+                    )
+                        /*
+                            NOTE: No value update and no controlled value:
+
+                                -> No state update
+                                -> Nothing to trigger
+                        */
+                        return valueState
+
+                    valueState.value = properties.value as null | Type
+
+                    let stateChanged = false
+
+                    if (oldValueState.modelState.pristine) {
+                        properties.dirty = true
+                        properties.pristine = false
+                        stateChanged = true
+                    }
+
+                    onChange(event)
+
+                    if (determineValidationState<Type>(
+                        properties as DefaultProperties<Type>,
+                        oldValueState.modelState
+                    ))
+                        stateChanged = true
+
+                    triggerCallbackIfExists<Properties<Type>>(
+                        properties,
+                        'changeValue',
+                        controlled,
+                        properties.value,
+                        event,
+                        properties
+                    )
+
+                    if (stateChanged && properties.model.state) {
+                        valueState.modelState = properties.model.state
+
+                        triggerCallbackIfExists<Properties<Type>>(
+                            properties,
+                            'changeState',
+                            controlled,
+                            properties.model.state,
+                            event,
+                            properties
+                        )
+                    }
+
+                    if (isSelection || selectedIndex !== -1)
+                        triggerCallbackIfExists<Properties<Type>>(
+                            properties,
+                            'select',
+                            controlled,
+                            event,
+                            properties
+                        )
+
+                    return valueState
+                })
+            }
+
+            const trim = !controlled && properties.model.trim
+
+            properties.representation = selectedIndex !== -1 ?
+                currentSuggestionLabels[selectedIndex] :
+                typeof properties.value === 'string' ?
+                    properties.value :
+                    formatValue<Type>(properties, properties.value, transformer)
+
+            if (!useSuggestions) {
+                properties.value = parseValue<Type>(
+                    properties,
+                    properties.value,
+                    transformer,
+                    trim
+                )
+
+                setHelper()
+            } else if (properties.suggestionCreator) {
+                const abortController = new AbortController()
+
+                const onResultsRetrieved = (
+                    results?: SelectionDefinition
+                ): void => {
+                    if (abortController.signal.aborted)
+                        return
+
+                    /*
+                        NOTE: A synchronous retrieved selection may have to
+                        stop a pending (slower) asynchronous request.
+                    */
+                    setSelection((
+                        oldSelection?: AbortController | Properties['selection']
+                    ): Properties['selection'] | undefined => {
+                        if (
+                            oldSelection instanceof AbortController &&
+                            !oldSelection.signal.aborted
+                        )
+                            oldSelection.abort()
+
+                        return results
+                    })
+
+                    if (selectedIndex === -1) {
+                        const result: Type = getValueFromSelection<Type>(
+                            properties.representation,
+                            normalizeSelection(results)
+                        )
+
+                        if (result !== null || properties.searchSelection)
+                            properties.value = result
+                        else
+                            properties.value = parseValue<Type>(
+                                properties,
+                                properties.representation as unknown as Type,
+                                transformer,
+                                trim
+                            )
+                    }
+
+                    setHelper()
+                }
+
+                /*
+                    Trigger asynchronous suggestions retrieving and delayed
+                    state consolidation.
+                */
+                const result: (
+                    Properties['selection'] | Promise<Properties['selection']>
+                    ) = properties.suggestionCreator({
+                    abortController,
+                    properties,
+                    query: properties.representation as string
+                })
+
+                if ((result as Promise<Properties['selection']> | null)?.then) {
+                    setSelection((
+                        oldSelection?: AbortController | Properties['selection']
+                    ): AbortController => {
+                        if (
+                            oldSelection instanceof AbortController &&
+                            !oldSelection.signal.aborted
+                        )
+                            oldSelection.abort()
+
+                        return abortController
+                    })
+                    /*
+                        NOTE: Immediate sync current representation to maintain
+                        cursor state.
+                    */
+                    setValueState((
+                        oldValueState: ValueState<Type, ModelState>
+                    ): ValueState<Type, ModelState> => ({
+                        ...oldValueState,
+                        representation: properties.representation
+                    }))
+
+                    ;(result as Promise<Properties['selection']>).then(
+                        onResultsRetrieved,
+                        /*
+                            NOTE: Avoid to through an exception when aborting
+                            the request intentionally.
+                        */
+                        () => {
+                            // Do nothing regardless of an error.
+                        }
+                    )
+                } else
+                    onResultsRetrieved(result as Properties['selection'])
+            } else {
+                if (selectedIndex === -1) {
+                    /*
+                        Map value from given selections and trigger state
+                        consolidation.
+                    */
+                    const result: null | Type = getValueFromSelection<Type>(
+                        properties.representation, normalizedSelection
+                    )
+
+                    if (result !== null || properties.searchSelection)
+                        properties.value = result
+                    else
+                        properties.value = parseValue<Type>(
+                            properties,
+                            properties.representation as unknown as Type,
+                            transformer,
+                            trim
+                        )
+                }
+
+                setHelper()
+            }
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on click events.
+     * @param event - Mouse event object.
+     */
+    const onClick = useCallback(
+        (event: ReactMouseEvent) => {
+            onSelectionChange(event)
+
+            triggerCallbackIfExists<Properties<Type>>(
+                properties, 'click', controlled, event, properties
+            )
+
+            onTouch(event)
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on focus events and opens suggestions.
+     * @param event - Focus event object.
+     */
+    const triggerOnFocusAndOpenSuggestions = useCallback(
+        (event: ReactFocusEvent) => {
+            setIsSuggestionOpen(true)
+
+            onFocus(event)
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on focus events.
+     * @param event - Focus event object.
+     */
+    const onFocus = useCallback(
+        (event: ReactFocusEvent) => {
+            triggerCallbackIfExists<Properties<Type>>(
+                properties, 'focus', controlled, event, properties
+            )
+
+            onTouch(event)
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on key down events.
+     * @param event - Key up event object.
+     */
+    const onKeyDown = useCallback(
+        (event: ReactKeyboardEvent): void => {
+            if (
+                !properties.disabled &&
+                useSuggestions &&
+                'ArrowDown' === event.code &&
+                event.target === inputReference?.input
+            )
+                menuReference?.focusItem(0)
+
+            /*
+                NOTE: We do not want to forward keydown enter events coming
+                from textareas.
+            */
+            if (
+                isSelection ||
+                properties.type === 'string' &&
+                properties.editor !== 'plain'
+            )
+                preventEnterKeyPropagation(event)
+
+            triggerCallbackIfExists<Properties<Type>>(
+                properties, 'keyDown', controlled, event, properties
+            )
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on key up events.
+     * @param event - Key up event object.
+     */
+    const onKeyUp = useCallback(
+        (event: ReactKeyboardEvent) => {
+            // NOTE: Avoid breaking password-filler on non textarea fields!
+            if (event.code) {
+                onSelectionChange(event)
+
+                triggerCallbackIfExists<Properties<Type>>(
+                    properties, 'keyUp', controlled, event, properties
+                )
+            }
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on selection change events.
+     * @param event - Event which triggered selection change.
+     */
+    const onSelectionChange = useCallback(
+        (event: GenericEvent) => {
+            triggerCallbackIfExists<Properties<Type>>(
+                properties, 'selectionChange', controlled, event, properties
+            )
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggers on start interacting with the input.
+     * @param event - Event object which triggered interaction.
+     */
+    const onTouch = useCallback(
+        (event: ReactFocusEvent | ReactMouseEvent): void => {
+            setValueState((
+                oldValueState: ValueState<Type, ModelState>
+            ): ValueState<Type, ModelState> => {
+                let changedState = false
+
+                if (!oldValueState.modelState.focused) {
+                    properties.focused = true
+                    changedState = true
+                }
+
+                if (oldValueState.modelState.untouched) {
+                    properties.touched = true
+                    properties.untouched = false
+                    changedState = true
+                }
+
+                let result: ValueState<Type, ModelState> = oldValueState
+
+                if (changedState) {
+                    onChange(event)
+
+                    result = {
+                        ...oldValueState,
+                        modelState: properties.model.state as ModelState
+                    }
+
+                    triggerCallbackIfExists<Properties<Type>>(
+                        properties,
+                        'changeState',
+                        controlled,
+                        properties.model.state,
+                        event,
+                        properties
+                    )
+                }
+
+                triggerCallbackIfExists<Properties<Type>>(
+                    properties, 'touch', controlled, event, properties
+                )
+
+                return result
+            })
+        },
+        [propertiesChangedIndicator]
+    )
     // endregion
     // region export references
+    const [inputReference, setInputReference] = useReferenceState<
+        CodeMirrorReference | InputReference | TipTapReference | null
+    >(null)
+    const [menuReference, setMenuReference] =
+        useReferenceState<MenuReference | null>(null)
+    const [wrapperReference, setWrapperReference] =
+        useReferenceState<HTMLDivElement | null>(null)
+
     useImperativeHandle(
         reference,
         (): AdapterWithReferences<Type> => {
@@ -1457,11 +1327,10 @@ export const TextInputInner = function<Type = unknown>(
                 {modelState: properties.model.state} as State<Type>
 
             for (const name of [
-                'cursor', 'editorIsActive', 'hidden', 'showDeclaration'
+                'editorIsActive', 'hidden', 'showDeclaration'
             ] as const)
                 if (!Object.prototype.hasOwnProperty.call(givenProps, name))
-                    (state[name] as boolean | Partial<CursorState>) =
-                        properties[name] ?? false
+                    state[name] = properties[name] ?? false
 
             if (!representationControlled)
                 state.representation = properties.representation
@@ -1477,13 +1346,19 @@ export const TextInputInner = function<Type = unknown>(
                 },
                 state
             }
-        }
+        },
+        [
+            propertiesChangedIndicator,
+
+            inputReference,
+            menuReference,
+            wrapperReference
+        ]
     )
     // endregion
-    // region render
-    /// region intermediate render properties
+    // region intermediate render properties
     const textInputProperties: Partial<TextInputProperties<Type>> = {
-        ref: inputReference as RefObject<InputReference>,
+        ref: setInputReference as unknown as RefObject<InputReference | null>,
         /*
             NOTE: If not set label with forbidden symbols will automatically be
             used.
@@ -1629,8 +1504,8 @@ export const TextInputInner = function<Type = unknown>(
     const isSelection: boolean =
         (Boolean(normalizedSelection) || Boolean(properties.labels)) &&
         !useSuggestions
-    /// endregion
-    /// region determine type specific constraints
+    // endregion
+    // region determine type specific constraints
     const typeTextConstraints: Mapping<unknown> = {}
     if (properties.type === 'number') {
         typeTextConstraints.step = properties.step
@@ -1675,7 +1550,168 @@ export const TextInputInner = function<Type = unknown>(
                 transformer
             )
     }
+    // endregion
+    // region live-cycle
+    /// region input element property synchronization
+    /**
+     * Is triggered immediate after a re-rendering. Connects error message
+     * with input element.
+     */
+    useEffect(
+        () => {
+            if (inputReference?.input) {
+                let input = inputReference.input as
+                    HTMLElement |
+                    TextAreaReference |
+                    EditorReference |
+                    undefined
+
+                if (Object.prototype.hasOwnProperty.call(input, 'input')) {
+                    input =
+                        (input as Partial<TextAreaReference | EditorReference>)
+                            .input as
+                            HTMLElement | TextAreaReference | undefined
+                    if (
+                        input &&
+                        Object.prototype.hasOwnProperty.call(input, 'input')
+                    )
+                        input = (input as Partial<TextAreaReference>).input as
+                            HTMLElement
+                }
+
+                if (!input)
+                    return
+
+                const inputDomNode = input as HTMLElement
+
+                const determinedAttributes: Mapping<
+                    boolean | number | string
+                > = {}
+                const attributesToRemove: Array<string> = []
+
+                // Apply aria attributes regarding validation state.
+                if (properties.valid) {
+                    attributesToRemove.push('ariaErrormessage')
+                    attributesToRemove.push('ariaInvalid')
+                } else {
+                    determinedAttributes.ariaErrormessage =
+                        `${id}-error-message`
+                    determinedAttributes.ariaInvalid = 'true'
+                }
+
+                // Apply aria attributes regarding searching.
+                if (useSuggestions) {
+                    if (inputDomNode.getAttribute('type') !== 'search')
+                        determinedAttributes.role = 'searchbox'
+
+                    determinedAttributes.ariaAutocomplete =
+                        properties.searchSelection ? 'inline' : 'list'
+                } else {
+                    attributesToRemove.push('searchbox')
+                    attributesToRemove.push('ariaAutocomplete')
+                }
+
+                if (properties.showDeclaration)
+                    determinedAttributes.ariaDescribedby = `${id}-declaration`
+                else
+                    attributesToRemove.push('ariaDescribedby')
+
+                const attributes = {
+                    ...determinedAttributes, ...properties.attributes || {}
+                }
+
+                // Apply configured native input properties.
+                for (const [name, value] of Object.entries(attributes)) {
+                    const attributeName: string = camelCaseToDelimited(name)
+
+                    if (typeof value === 'boolean')
+                        if (value)
+                            inputDomNode.setAttribute(attributeName, '')
+                        else
+                            inputDomNode.removeAttribute(attributeName)
+                    else
+                        inputDomNode.setAttribute(attributeName, String(value))
+                }
+
+                for (const name of attributesToRemove) {
+                    const attributeName: string = camelCaseToDelimited(name)
+                    if (inputDomNode.hasAttribute(attributeName))
+                        inputDomNode.removeAttribute(attributeName)
+                }
+            }
+        },
+        [
+            inputReference?.input,
+            useSuggestions,
+            properties.searchSelection,
+            properties.showDeclaration,
+            properties.attributes
+        ]
+    )
     /// endregion
+    /// region apply missing initial aria attribute regarding menu popup state.
+    /**
+     * Is triggered immediate after a re-rendering. Sets initial aria list box
+     * opening and hidden state.
+     */
+    useEffect(() => {
+        if (isSelection) {
+            const selectionWrapper: HTMLElement | null | undefined =
+                wrapperReference?.querySelector('[aria-haspopup="listbox"]')
+            if (selectionWrapper) {
+                if (!selectionWrapper.hasAttribute('aria-expanded'))
+                    selectionWrapper.setAttribute('aria-expanded', 'false')
+
+                const activeIcon: HTMLElement | null = selectionWrapper
+                    .querySelector('.mdc-select__dropdown-icon-active')
+                if (activeIcon && !activeIcon.hasAttribute('aria-hidden'))
+                    activeIcon.setAttribute('aria-hidden', 'true')
+
+                const inactiveIcon: HTMLElement | null = selectionWrapper
+                    .querySelector('.mdc-select__dropdown-icon-inactive')
+                if (inactiveIcon && !inactiveIcon.hasAttribute('aria-hidden'))
+                    inactiveIcon.setAttribute('aria-hidden', 'true')
+            }
+        }
+    })
+    /// endregion
+    /// region avoid accidentally opening select menu.
+    /**
+     * Is triggered immediate after a re-rendering. Captures key down events
+     * on disabled select fields.
+     * @returns Nothing.
+     */
+    useEffect((): undefined | (() => void) => {
+        if (isSelection) {
+            const selectionWrapper: HTMLElement | null | undefined =
+                wrapperReference?.querySelector('[aria-haspopup="listbox"]')
+            if (selectionWrapper) {
+                const handler = (event: KeyboardEvent) => {
+                    if (properties.disabled)
+                        event.stopPropagation()
+                }
+
+                selectionWrapper.addEventListener('keydown', handler, true)
+
+                return () => {
+                    selectionWrapper.removeEventListener(
+                        'keydown', handler, true
+                    )
+                }
+            }
+        }
+    })
+    /// endregion
+    useEffect(
+        () => {
+            if (properties.triggerInitialPropertiesConsolidation)
+                onChange(new Event(
+                    'genericInitialPropertiesConsolidation'
+                ) as unknown as GenericEvent)
+        },
+        []
+    )
+    // endregion
     const editorProperties = {} as
         CodeEditorProperties | RichTextEditorProperties
     if (isAdvancedEditor)
@@ -1715,14 +1751,14 @@ export const TextInputInner = function<Type = unknown>(
             }
         } else
             editorProperties.editor = TIPTAP_DEFAULT_OPTIONS
-    /// region main markup
+    // region main markup
     return <WrapConfigurations
         strict={TextInput.strict}
         themeConfiguration={properties.themeConfiguration}
         tooltip={properties.tooltip}
     >
         <div
-            ref={wrapperReference}
+            ref={setWrapperReference}
 
             className={[CSS_CLASS_NAMES.textInput]
                 .concat(properties.className)
@@ -1732,7 +1768,6 @@ export const TextInputInner = function<Type = unknown>(
 
             onBlur={onBlur}
             onKeyDown={onKeyDown}
-
 
             {...(useSuggestions ? {role: 'search'} : {})}
         >
@@ -1744,14 +1779,16 @@ export const TextInputInner = function<Type = unknown>(
 
                     onChange={onChangeValue}
                     onClick={onClick}
-                    onKeyDown={(event: ReactKeyboardEvent): void => {
-                        /*
-                            Avoid scrolling page interactions when navigating
-                            through option.
-                        */
-                        if (!(properties.disabled || event.code === 'Tab'))
-                            event.preventDefault()
-                    }}
+                    onKeyDown={useMemorizedValue(
+                        (event: ReactKeyboardEvent) => {
+                            /*
+                                Avoid scrolling page interactions when
+                                navigating through option.
+                            */
+                            if (!(properties.disabled || event.code === 'Tab'))
+                                event.preventDefault()
+                        }
+                    )}
 
                     options={normalizedSelection as NormalizedSelection}
                     value={properties.value as Type}
@@ -1776,8 +1813,10 @@ export const TextInputInner = function<Type = unknown>(
                                 Partial<CodeEditorProperties>
                             }
 
-                            ref={inputReference as
-                                RefObject<CodeMirrorReference>
+                            ref={
+                                setInputReference as
+                                    unknown as
+                                    RefObject<CodeMirrorReference>
                             }
                         />,
                         isAdvancedEditor
@@ -1799,7 +1838,11 @@ export const TextInputInner = function<Type = unknown>(
                             Partial<RichTextEditorProperties>
                         }
 
-                        ref={inputReference as RefObject<TipTapReference>}
+                        ref={
+                            setInputReference as
+                                unknown as
+                                RefObject<TipTapReference>
+                        }
                     /> :
                 ''
             }
@@ -1807,7 +1850,11 @@ export const TextInputInner = function<Type = unknown>(
                 <div>
                     {useSuggestions ?
                         <Menu
-                            ref={menuReference}
+                            ref={
+                                setMenuReference as
+                                    unknown as
+                                    RefObject<MenuReference>
+                            }
 
                             onKeyDown={preventEnterKeyPropagation}
                             pending={selection instanceof AbortController}
@@ -1858,7 +1905,7 @@ export const TextInputInner = function<Type = unknown>(
                     {
                         properties.type === 'string' &&
                         properties.editor !== 'plain' ?
-                            <Index
+                            <Textarea
                                 {...textInputProperties as
                                     Partial<TextInputProperties<string>>
                                 }
@@ -1869,7 +1916,8 @@ export const TextInputInner = function<Type = unknown>(
                                     Partial<TypeTextInputProperties<string>>
                                 }
 
-                                ref={inputReference as
+                                ref={setInputReference as
+                                    unknown as
                                     RefObject<TextAreaReference>
                                 }
 
@@ -1906,7 +1954,6 @@ export const TextInputInner = function<Type = unknown>(
         </div>
     </WrapConfigurations>
     /// endregion
-    // endregion
 }
 // NOTE: This is useful in react dev tools.
 TextInputInner.displayName = 'TextInput'
@@ -1924,7 +1971,7 @@ TextInputInner.displayName = 'TextInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const TextInput = memorize(forwardRef(TextInputInner)) as
+export const TextInput = memoize(forwardRef(TextInputInner)) as
     unknown as
     Component<typeof TextInputInner>
 // region static properties
@@ -1939,7 +1986,6 @@ TextInput.defaultModelState = defaultModelState
 */
 TextInput.defaultProperties = {
     ...defaultProperties,
-    cursor: undefined,
     model: {
         ...defaultProperties.model,
         // Trigger initial determination.

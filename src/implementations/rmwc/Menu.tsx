@@ -29,30 +29,34 @@ import {
 import {
     ForwardedRef,
     forwardRef,
-    memo as memorize,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
+    memo as memoize,
     ReactElement,
-    useImperativeHandle,
-    useRef
+    useImperativeHandle
 } from 'react'
+
+import {useReferenceState} from '../../helper'
+
+import {MenuProperties, MenuReference} from '../type'
 
 import CircularProgress from './CircularProgress'
 
-import {MenuProperties, MenuReference} from '../type'
 // endregion
 export interface Reference extends MenuReference {
-    surfaceAnchor: RefObject<HTMLDivElement | null>
-    suggestionMenuAPI: RefObject<MenuApi | null>
-    suggestionMenuFoundation: RefObject<MDCMenuFoundation | null>
+    surfaceAnchor: HTMLDivElement | null
+    suggestionMenuAPI: MenuApi | null
+    suggestionMenuFoundation: MDCMenuFoundation | null
 }
 
 export const MenuInner = function(
     properties: MenuProperties, reference?: ForwardedRef<MenuReference | null>
 ): ReactElement {
-    const surfaceAnchorReference = useRef<HTMLDivElement | null>(null)
-    const suggestionMenuAPIReference = useRef<MenuApi>(null)
-    const suggestionMenuFoundationReference = useRef<MDCMenuFoundation>(null)
+    const [surfaceAnchorReference, setSurfaceAnchorReference] =
+        useReferenceState<HTMLDivElement | null>(null)
+    const [suggestionMenuAPIReference, setSuggestionMenuAPIReference] =
+        useReferenceState<MenuApi | null>(null)
+    const [
+        suggestionMenuFoundationReference, setSuggestionMenuFoundationReference
+    ] = useReferenceState<MDCMenuFoundation | null>(null)
 
     useImperativeHandle(
         reference,
@@ -61,13 +65,18 @@ export const MenuInner = function(
             suggestionMenuAPI: suggestionMenuAPIReference,
             suggestionMenuFoundation: suggestionMenuFoundationReference,
             focusItem: (index: number) => {
-                suggestionMenuAPIReference.current?.focusItemAtIndex(index)
+                suggestionMenuAPIReference?.focusItemAtIndex(index)
             }
-        })
+        }),
+        [
+            surfaceAnchorReference,
+            suggestionMenuAPIReference,
+            suggestionMenuFoundationReference
+        ]
     )
 
     return <MenuSurfaceAnchor
-        ref={surfaceAnchorReference}
+        ref={setSurfaceAnchorReference}
         onKeyDown={properties.onKeyDown}
     >
         {properties.pending ?
@@ -85,14 +94,11 @@ export const MenuInner = function(
             <RMWCMenu
                 anchorCorner="bottomLeft"
 
-                apiRef={(instance: MenuApi | null) => {
-                    (suggestionMenuAPIReference as {current: MenuApi | null})
-                        .current = instance
-                }}
+                apiRef={setSuggestionMenuAPIReference}
                 className={properties.classNames?.join(' ')}
 
                 focusOnOpen={false}
-                foundationRef={suggestionMenuFoundationReference}
+                foundationRef={setSuggestionMenuFoundationReference}
                 onFocus={properties.onFocus}
                 onSelect={properties.onSelect as RMWCMenuProps['onSelect']}
                 open={properties.open}
@@ -105,6 +111,6 @@ export const MenuInner = function(
         }
     </MenuSurfaceAnchor>
 }
-export const Menu = memorize(forwardRef(MenuInner)) as typeof MenuInner
+export const Menu = memoize(forwardRef(MenuInner)) as typeof MenuInner
 
 export default Menu

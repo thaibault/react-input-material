@@ -19,6 +19,20 @@
 // region imports
 import {blobToBase64String} from 'blob-util'
 import {ElementType} from 'react'
+import {useMemorizedValue} from 'react-generic-tools'
+
+import {
+    determineValidationState as determineBaseValidationState,
+    hashRegularExpression,
+    usePropertiesChangedIndicator as useBasePropertiesChangedIndicator,
+    usePropertiesChangedIndicator as useTextPropertiesChangedIndicator
+} from '../../helper'
+import {
+    DefaultProperties as DefaultBaseProperties, Properties as BaseProperties
+} from '../../type'
+
+import {Props} from '../TextInput/type'
+
 /*
 "namedExport" version of css-loader:
 
@@ -31,11 +45,7 @@ import {
 } from './style.module'
 */
 import cssClassNames from './style.module'
-import {
-    determineValidationState as determineBaseValidationState
-} from '../../helper'
-import {DefaultProperties as DefaultBaseProperties} from '../../type'
-import {Props} from '../TextInput/type'
+
 import {
     DefaultProperties as DefaultProperties,
     ModelState as ModelState,
@@ -281,4 +291,38 @@ export const readBinaryDataIntoText = (
         )
     })
 /// endregion
+export const usePropertiesChangedIndicator = <Type extends Value = Value>(
+    properties: Properties<Type>
+) =>
+    useMemorizedValue(
+        {},
+
+        useBasePropertiesChangedIndicator<Type>(
+            properties as unknown as BaseProperties<Type>
+        ),
+
+        JSON.stringify(properties.model.fileName),
+        properties.model.fileName.pattern instanceof RegExp ?
+            hashRegularExpression(properties.model.fileName.pattern) :
+            properties.model.fileName.pattern,
+        properties.model.fileName.invertedPattern instanceof RegExp ?
+            hashRegularExpression(properties.model.fileName.invertedPattern) :
+            properties.model.fileName.invertedPattern,
+
+        properties.children,
+
+        properties.contentTypePattern instanceof RegExp ?
+            hashRegularExpression(properties.contentTypePattern) :
+            properties.contentTypePattern,
+        properties.invertedContentTypePattern instanceof RegExp ?
+            hashRegularExpression(properties.invertedContentTypePattern) :
+            properties.invertedContentTypePattern,
+
+        properties.deleteButton,
+        properties.downloadButton,
+        properties.editButton,
+        properties.newButton,
+
+        properties.generateFileNameInputProperties
+    )
 // endregion

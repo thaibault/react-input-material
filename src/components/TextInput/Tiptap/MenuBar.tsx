@@ -17,6 +17,8 @@
     endregion
 */
 // region imports
+import {useMemorizedValue} from 'react-generic-tools'
+
 import {ChainedCommands, Editor} from '@tiptap/core'
 
 import {createContext, useContext} from 'react'
@@ -55,10 +57,14 @@ const Button = ({
 
             classNames={checked ? ['mdc-icon-button--checked'] : []}
 
-            onClick={(event) => {
-                event.stopPropagation()
-                action(editor.chain().focus()).run()
-            }}
+            onClick={useMemorizedValue(
+                (event) => {
+                    event.stopPropagation()
+                    action(editor.chain().focus()).run()
+                },
+                action,
+                editor
+            )}
 
             size="extra-small"
 

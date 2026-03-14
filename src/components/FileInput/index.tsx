@@ -23,24 +23,24 @@ import {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
     forwardRef,
-    memo as memorize,
+    memo as memoize,
     MouseEvent as ReactMouseEvent,
-    // NOTE: can be "RefObject" directly when migrated to react19.
     ReactElement,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject,
     SyntheticEvent,
     useEffect,
     useId,
     useImperativeHandle,
-    useRef,
-    useState
+    useState,
+    useRef, useCallback
 } from 'react'
+import {useMemorizedValue} from 'react-generic-tools'
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
 import MediaCard from '#implementations/MediaCard'
 
-import TextInput from '../TextInput'
-import {WrapConfigurations} from '../Wrapper/WrapConfigurations'
 import {
     deriveMissingPropertiesFromState,
     determineInitialValue,
@@ -52,11 +52,27 @@ import {
     wrapStateSetter
 } from '../../helper'
 import {
+    MediaCardReference,
+    MediaCardRepresentationType
+} from '../../implementations/type'
+
+import TextInput from '../TextInput'
+import {
     Adapter as TextInputAdapter,
     Properties as TextInputProperties,
     Props as TextInputProps
 } from '../TextInput/type'
+import {WrapConfigurations} from '../Wrapper/WrapConfigurations'
 
+import {
+    CSS_CLASS_NAMES,
+    deriveBase64String,
+    determineContentType,
+    determineRepresentationType,
+    determineValidationState,
+    readBinaryDataIntoText,
+    usePropertiesChangedIndicator
+} from './helper'
 import {
     AdapterWithReferences,
     Component,
@@ -74,18 +90,6 @@ import {
     Value,
     ValueState
 } from './type'
-import {
-    CSS_CLASS_NAMES,
-    deriveBase64String,
-    determineContentType,
-    determineRepresentationType,
-    determineValidationState,
-    readBinaryDataIntoText
-} from './helper'
-import {
-    MediaCardReference,
-    MediaCardRepresentationType
-} from '../../implementations/type'
 
 export {
     CSS_CLASS_NAMES,
@@ -124,6 +128,18 @@ export {
 export const FileInputInner = function<Type extends Value = Value>(
     props: Props<Type>, reference?: ForwardedRef<AdapterWithReferences<Type>>
 ): ReactElement {
+    // TODO
+    /*
+        NOTE: We currently end up in and endless loop if we store the input
+        reference in state like:
+
+        const [nameInputReference, setNameInputReference] =
+            useState<TextInputAdapter<string> | null>(null)
+    */
+    const nameInputReferenceAsRef =
+        useRef<TextInputAdapter<string> | null>(null)
+    const setNameInputReference = nameInputReferenceAsRef
+    const nameInputReference = nameInputReferenceAsRef.current
     // region property aggregation
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -143,7 +159,7 @@ export const FileInputInner = function<Type extends Value = Value>(
             result,
             Boolean(
                 (
-                    nameInputReference.current?.properties?.invalid as
+                    nameInputReference?.properties?.invalid as
                         unknown as
                         boolean | undefined
                 ) ??
@@ -156,304 +172,6 @@ export const FileInputInner = function<Type extends Value = Value>(
         return getBaseConsolidatedProperties<Props<Type>, Properties<Type>>(
             result
         )
-    }
-    // endregion
-    // region references
-    const fileInputReference = useRef<HTMLInputElement | null>(null)
-    const mediaCardReference = useRef<MediaCardReference>(null)
-    const nameInputReference = useRef<TextInputAdapter<string>>(null)
-    useImperativeHandle(
-        reference,
-        (): AdapterWithReferences<Type> => ({
-            properties,
-            references: {
-                fileInput: fileInputReference,
-                mediaCard: mediaCardReference,
-                nameInput: nameInputReference
-            },
-            state: {
-                modelState: properties.model.state as ModelState,
-                ...(controlled ? {} : {value: properties.value})
-            }
-        })
-    )
-    // endregion
-    // region event handler
-    /**
-     * Triggered on blur events.
-     * @param event - Event object.
-     */
-    const onBlur = (event: SyntheticEvent): void => {
-        setValueState((
-            oldValueState: ValueState<Type>
-        ): ValueState<Type> => {
-            let changed = false
-
-            if (oldValueState.modelState.focused) {
-                properties.focused = false
-                changed = true
-            }
-
-            if (!oldValueState.modelState.visited) {
-                properties.visited = true
-                changed = true
-            }
-
-            if (changed) {
-                onChange(event)
-
-                triggerCallbackIfExists<Properties<Type>>(
-                    properties,
-                    'changeState',
-                    controlled,
-                    properties.model.state,
-                    event,
-                    properties
-                )
-            }
-
-            triggerCallbackIfExists<Properties<Type>>(
-                properties, 'blur', controlled, event, properties
-            )
-
-            return changed ?
-                {...oldValueState, modelState: properties.model.state} as
-                    ValueState<Type> :
-                oldValueState
-        })
-    }
-    /**
-     * Triggered on any change events. Consolidates properties object and
-     * triggers given on change callbacks.
-     * @param event - Potential event object.
-     */
-    const onChange = (event?: SyntheticEvent) => {
-        if (nameInputReference.current?.properties)
-            properties.model.fileName =
-                nameInputReference.current.properties.model
-
-        const consolidatedProperties: Properties<Type> =
-            getConsolidatedProperties(
-                /*
-                    Workaround since "Type" isn't identified as subset of
-                    "RecursivePartial<Type>" yet.
-                */
-                properties as unknown as Props<Type>
-            )
-        // NOTE: Avoid recursive merging of deprecated value properties.
-        delete properties.model.value
-        delete properties.value
-        // NOTE: Avoid trying to write into a readonly object.
-        properties.styles = copy(properties.styles)
-
-        extend(true, properties, consolidatedProperties)
-
-        triggerCallbackIfExists<Properties<Type>>(
-            properties, 'change', controlled, properties, event
-        )
-    }
-    /**
-     * Triggered when ever the value changes.
-     * @param eventSourceOrName - Event object or new value.
-     * @param event - Optional event object (if not provided as first
-     * argument).
-     * @param inputProperties - Current properties state.
-     * @param attachBlobProperty - Indicates whether additional data is added
-     * through post processed data properties.
-     */
-    const onChangeValue = (
-        eventSourceOrName?: null | Partial<Type> | string | SyntheticEvent,
-        event?: SyntheticEvent,
-        inputProperties?: TextInputProperties<string>,
-        attachBlobProperty = false
-    ): void => {
-        if (!(properties.model.mutable && properties.model.writable))
-            return
-
-        if (
-            eventSourceOrName &&
-            fileInputReference.current &&
-            (eventSourceOrName as SyntheticEvent).target ===
-                fileInputReference.current
-        ) {
-            event = eventSourceOrName as SyntheticEvent
-
-            if (
-                (event.target as unknown as {files: FileList | null})
-                    .files?.length
-            ) {
-                const blob: File =
-                    (event.target as unknown as {files: FileList}).files[0]
-
-                properties.value = {blob, name: blob.name} as unknown as Type
-
-                properties.value.name =
-                    properties.generateFileNameInputProperties(
-                        {
-                            disabled: properties.disabled,
-                            value: blob.name,
-                            ...defaultFileNameInputProperties,
-                            model: properties.model.fileName,
-                            onChangeValue,
-                            default: properties.value.name
-                        },
-                        properties as
-                            Omit<Properties<Type>, 'value'> &
-                            {value: Type & {name: string}}
-                    )?.value ||
-                    blob.name
-            } else
-                return
-        }
-
-        setValueState((oldValueState: ValueState<Type>): ValueState<Type> => {
-            if (typeof eventSourceOrName === 'undefined')
-                // NOTE: Mark file as deleted.
-                properties.value = null
-            else if (typeof eventSourceOrName === 'string')
-                /*
-                    NOTE: A name can only be changed if a blob is available
-                    beforehand.
-                */
-                properties.value = {
-                    ...oldValueState.value, name: eventSourceOrName
-                } as Type
-            else if (
-                eventSourceOrName &&
-                (
-                    typeof (eventSourceOrName as Type).source === 'string' ||
-                    typeof (eventSourceOrName as Type).url === 'string'
-                )
-            )
-                if (attachBlobProperty)
-                    properties.value = {
-                        ...oldValueState.value, ...eventSourceOrName
-                    } as Type
-                else
-                    properties.value = eventSourceOrName as Type
-
-            if (equals(oldValueState.value, properties.value))
-                return oldValueState
-
-            let stateChanged = false
-
-            const result: ValueState<Type> = {
-                ...oldValueState, value: properties.value as null | Type
-            }
-
-            if (oldValueState.modelState.pristine) {
-                properties.dirty = true
-                properties.pristine = false
-                stateChanged = true
-            }
-
-            onChange(event)
-
-            if (determineValidationState<
-                Type, DefaultProperties<Type>
-            >(
-                properties as DefaultProperties<Type>,
-                nameInputReference.current?.properties?.invalid || false,
-                oldValueState.modelState
-            ))
-                stateChanged = true
-
-            triggerCallbackIfExists<Properties<Type>>(
-                properties,
-                'changeValue',
-                controlled,
-                properties.value,
-                event,
-                properties
-            )
-
-            if (stateChanged) {
-                result.modelState =
-                    properties.model.state as ModelState
-
-                triggerCallbackIfExists<Properties<Type>>(
-                    properties,
-                    'changeState',
-                    controlled,
-                    properties.model.state,
-                    event,
-                    properties
-                )
-            }
-
-            if (attachBlobProperty)
-                result.attachBlobProperty = true
-
-            return result
-        })
-    }
-    /**
-     * Triggered on click events.
-     * @param event - Mouse event object.
-     */
-    const onClick = (event: ReactMouseEvent) => {
-        triggerCallbackIfExists<Properties<Type>>(
-            properties, 'click', controlled, event, properties
-        )
-
-        onTouch(event)
-    }
-    /**
-     * Triggered on focus events.
-     * @param event - Focus event object.
-     */
-    const onFocus = (event: ReactFocusEvent) => {
-        triggerCallbackIfExists<Properties<Type>>(
-            properties, 'focus', controlled, event, properties
-        )
-
-        onTouch(event)
-    }
-    /**
-     * Triggers on start interacting with the input.
-     * @param event - Event object which triggered interaction.
-     */
-    const onTouch = (event: ReactFocusEvent | ReactMouseEvent): void => {
-        setValueState((oldValueState: ValueState<Type>): ValueState<Type> => {
-            let changedState = false
-
-            if (!oldValueState.modelState.focused) {
-                properties.focused = true
-                changedState = true
-            }
-
-            if (oldValueState.modelState.untouched) {
-                properties.touched = true
-                properties.untouched = false
-                changedState = true
-            }
-
-            let result: ValueState<Type> = oldValueState
-
-            if (changedState) {
-                onChange(event)
-
-                result = {
-                    ...oldValueState,
-                    modelState: properties.model.state as ModelState
-                }
-
-                triggerCallbackIfExists<Properties<Type>>(
-                    properties,
-                    'changeState',
-                    controlled,
-                    properties.model.state,
-                    event,
-                    properties
-                )
-            }
-
-            triggerCallbackIfExists<Properties<Type>>(
-                properties, 'touch', controlled, event, properties
-            )
-
-            return result
-        })
     }
     // endregion
     // region properties
@@ -518,6 +236,9 @@ export const FileInputInner = function<Type extends Value = Value>(
     const properties: Properties<Type> =
         getConsolidatedProperties(givenProperties)
 
+    const propertiesChangedIndicator =
+        usePropertiesChangedIndicator(properties)
+
     /*
         NOTE: We have to merge asynchronous determined missing value properties
         to avoid endless rendering loops when a value is provided via
@@ -547,6 +268,337 @@ export const FileInputInner = function<Type extends Value = Value>(
         setValueState =
             wrapStateSetter<ValueState<Type>>(setValueState, currentValueState)
     /// endregion
+    // endregion
+    // region event handler
+    /**
+     * Triggered on blur events.
+     * @param event - Event object.
+     */
+    const onBlur = useCallback(
+        (event: SyntheticEvent): void => {
+            setValueState((
+                oldValueState: ValueState<Type>
+            ): ValueState<Type> => {
+                let changed = false
+
+                if (oldValueState.modelState.focused) {
+                    properties.focused = false
+                    changed = true
+                }
+
+                if (!oldValueState.modelState.visited) {
+                    properties.visited = true
+                    changed = true
+                }
+
+                if (changed) {
+                    onChange(event)
+
+                    triggerCallbackIfExists<Properties<Type>>(
+                        properties,
+                        'changeState',
+                        controlled,
+                        properties.model.state,
+                        event,
+                        properties
+                    )
+                }
+
+                triggerCallbackIfExists<Properties<Type>>(
+                    properties, 'blur', controlled, event, properties
+                )
+
+                return changed ?
+                    {...oldValueState, modelState: properties.model.state} as
+                        ValueState<Type> :
+                    oldValueState
+            })
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on any change events. Consolidates properties object and
+     * triggers given on change callbacks.
+     * @param event - Potential event object.
+     */
+    const onChange = useCallback(
+        (event?: SyntheticEvent) => {
+            if (nameInputReference?.properties)
+                properties.model.fileName = nameInputReference.properties.model
+
+            const consolidatedProperties: Properties<Type> =
+                getConsolidatedProperties(
+                    /*
+                        Workaround since "Type" isn't identified as subset of
+                        "RecursivePartial<Type>" yet.
+                    */
+                    properties as unknown as Props<Type>
+                )
+            // NOTE: Avoid recursive merging of deprecated value properties.
+            delete properties.model.value
+            delete properties.value
+            // NOTE: Avoid trying to write into a readonly object.
+            properties.styles = copy(properties.styles)
+
+            extend(true, properties, consolidatedProperties)
+
+            triggerCallbackIfExists<Properties<Type>>(
+                properties, 'change', controlled, properties, event
+            )
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered when ever the value changes.
+     * @param eventSourceOrName - Event object or new value.
+     * @param event - Optional event object (if not provided as first
+     * argument).
+     * @param _inputProperties - Current properties state.
+     * @param attachBlobProperty - Indicates whether additional data is added
+     * through post processed data properties.
+     */
+    const onChangeValue = useCallback(
+        (
+            eventSourceOrName?: null | Partial<Type> | string | SyntheticEvent,
+            event?: SyntheticEvent,
+            _inputProperties?: TextInputProperties<string>,
+            attachBlobProperty = false
+        ): void => {
+            if (!(properties.model.mutable && properties.model.writable))
+                return
+
+            if (
+                eventSourceOrName &&
+                fileInputReference &&
+                (eventSourceOrName as SyntheticEvent).target ===
+                    fileInputReference
+            ) {
+                event = eventSourceOrName as SyntheticEvent
+
+                if (
+                    (event.target as unknown as {files: FileList | null})
+                        .files?.length
+                ) {
+                    const blob: File =
+                        (event.target as unknown as {files: FileList}).files[0]
+
+                    properties.value =
+                        {blob, name: blob.name} as unknown as Type
+
+                    properties.value.name =
+                        properties.generateFileNameInputProperties(
+                            {
+                                disabled: properties.disabled,
+                                value: blob.name,
+                                ...defaultFileNameInputProperties,
+                                model: properties.model.fileName,
+                                onChangeValue,
+                                default: properties.value.name
+                            },
+                            properties as
+                                Omit<Properties<Type>, 'value'> &
+                                {value: Type & {name: string}}
+                        )?.value ||
+                        blob.name
+                } else
+                    return
+            }
+
+            setValueState((
+                oldValueState: ValueState<Type>
+            ): ValueState<Type> => {
+                if (typeof eventSourceOrName === 'undefined')
+                    // NOTE: Mark file as deleted.
+                    properties.value = null
+                else if (typeof eventSourceOrName === 'string')
+                    /*
+                        NOTE: A name can only be changed if a blob is available
+                        beforehand.
+                    */
+                    properties.value = {
+                        ...oldValueState.value, name: eventSourceOrName
+                    } as Type
+                else if (
+                    eventSourceOrName &&
+                    (
+                        typeof (eventSourceOrName as Type).source ===
+                            'string' ||
+                        typeof (eventSourceOrName as Type).url === 'string'
+                    )
+                )
+                    if (attachBlobProperty)
+                        properties.value = {
+                            ...oldValueState.value, ...eventSourceOrName
+                        } as Type
+                    else
+                        properties.value = eventSourceOrName as Type
+
+                if (equals(oldValueState.value, properties.value))
+                    return oldValueState
+
+                let stateChanged = false
+
+                const result: ValueState<Type> = {
+                    ...oldValueState, value: properties.value as null | Type
+                }
+
+                if (oldValueState.modelState.pristine) {
+                    properties.dirty = true
+                    properties.pristine = false
+                    stateChanged = true
+                }
+
+                onChange(event)
+
+                if (determineValidationState<
+                    Type, DefaultProperties<Type>
+                >(
+                    properties as DefaultProperties<Type>,
+                    nameInputReference?.properties?.invalid || false,
+                    oldValueState.modelState
+                ))
+                    stateChanged = true
+
+                triggerCallbackIfExists<Properties<Type>>(
+                    properties,
+                    'changeValue',
+                    controlled,
+                    properties.value,
+                    event,
+                    properties
+                )
+
+                if (stateChanged) {
+                    result.modelState =
+                        properties.model.state as ModelState
+
+                    triggerCallbackIfExists<Properties<Type>>(
+                        properties,
+                        'changeState',
+                        controlled,
+                        properties.model.state,
+                        event,
+                        properties
+                    )
+                }
+
+                if (attachBlobProperty)
+                    result.attachBlobProperty = true
+
+                return result
+            })
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on click events.
+     * @param event - Mouse event object.
+     */
+    const onClick = useCallback(
+        (event: ReactMouseEvent) => {
+            triggerCallbackIfExists<Properties<Type>>(
+                properties, 'click', controlled, event, properties
+            )
+
+            onTouch(event)
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on focus events.
+     * @param event - Focus event object.
+     */
+    const onFocus = useCallback(
+        (event: ReactFocusEvent) => {
+            triggerCallbackIfExists<Properties<Type>>(
+                properties, 'focus', controlled, event, properties
+            )
+
+            onTouch(event)
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggers on start interacting with the input.
+     * @param event - Event object which triggered interaction.
+     */
+    const onTouch = useCallback(
+        (event: ReactFocusEvent | ReactMouseEvent): void => {
+            setValueState((
+                oldValueState: ValueState<Type>
+            ): ValueState<Type> => {
+                let changedState = false
+
+                if (!oldValueState.modelState.focused) {
+                    properties.focused = true
+                    changedState = true
+                }
+
+                if (oldValueState.modelState.untouched) {
+                    properties.touched = true
+                    properties.untouched = false
+                    changedState = true
+                }
+
+                let result: ValueState<Type> = oldValueState
+
+                if (changedState) {
+                    onChange(event)
+
+                    result = {
+                        ...oldValueState,
+                        modelState: properties.model.state as ModelState
+                    }
+
+                    triggerCallbackIfExists<Properties<Type>>(
+                        properties,
+                        'changeState',
+                        controlled,
+                        properties.model.state,
+                        event,
+                        properties
+                    )
+                }
+
+                triggerCallbackIfExists<Properties<Type>>(
+                    properties, 'touch', controlled, event, properties
+                )
+
+                return result
+            })
+        },
+        [propertiesChangedIndicator]
+    )
+    // endregion
+    // region references
+    const [fileInputReference, setFileInputReference] =
+        useState<HTMLInputElement | null>(null)
+    const [mediaCardReference, setMediaCardReference] =
+        useState<MediaCardReference | null>(null)
+
+    useImperativeHandle(
+        reference,
+        (): AdapterWithReferences<Type> => ({
+            properties,
+            references: {
+                fileInput: fileInputReference,
+                mediaCard: mediaCardReference,
+                nameInput: nameInputReference
+            },
+            state: {
+                modelState: properties.model.state as ModelState,
+                ...(controlled ? {} : {value: properties.value})
+            }
+        }),
+        [
+            fileInputReference,
+            mediaCardReference,
+            nameInputReference,
+            controlled,
+            // NOTE: State can be derived out of changes to the given value.
+            properties.value
+        ]
+    )
     // endregion
     const defaultID = useId()
     const id = properties.id ?? defaultID
@@ -623,11 +675,6 @@ export const FileInputInner = function<Type extends Value = Value>(
                         resolve, reject
                     ) => {
                         fileReader.onload = (event) => {
-                            console.debug(
-                                `Read chunk ${String(currentChunk + 1)} of ` +
-                                `${String(chunks)}.`
-                            )
-
                             buffer.append(event.target?.result as ArrayBuffer)
                             currentChunk++
 
@@ -696,13 +743,18 @@ export const FileInputInner = function<Type extends Value = Value>(
         tooltip={properties.tooltip}
     >
         <MediaCard
-            ref={mediaCardReference}
+            ref={
+                setMediaCardReference as
+                    unknown as
+                    RefObject<MediaCardReference>
+            }
 
             id={props.id}
 
-            classNames={
-                [CSS_CLASS_NAMES.fileInput].concat(properties.className)
-            }
+            classNames={useMemorizedValue(
+                [CSS_CLASS_NAMES.fileInput].concat(properties.className),
+                properties.className
+            )}
             imageClassNames={properties.imageClassNames}
 
             styles={properties.styles}
@@ -763,38 +815,42 @@ export const FileInputInner = function<Type extends Value = Value>(
 
             onBlur={onBlur}
             onClick={onClick}
-            onClickAddOrEdit={() => {
-                fileInputReference.current?.click()
-            }}
+            onClickAddOrEdit={useMemorizedValue(
+                () => {
+                    fileInputReference?.click()
+                },
+                fileInputReference
+            )}
             onChange={onChangeValue}
             onFocus={onFocus}
         >
             <input
-                accept={([] as Array<string>).concat(
-                    properties.acceptedContentTypes ?? []
-                ).join(', ')}
+                accept={
+                    ([] as Array<string>)
+                        .concat(properties.acceptedContentTypes ?? [])
+                        .join(', ')
+                }
 
                 disabled={properties.disabled}
 
                 className={
                     [CSS_CLASS_NAMES.fileInputNative]
                         .concat(properties.fileInputClassNames ?? [])
-                        .join(' ')
-                }
+                        .join(' ')}
                 id={id}
 
                 name={properties.name}
 
                 onChange={onChangeValue}
 
-                ref={fileInputReference}
+                ref={setFileInputReference}
 
                 type="file"
             />
 
             {properties.value ?
                 <TextInput
-                    ref={nameInputReference}
+                    ref={setNameInputReference}
 
                     {...properties.generateFileNameInputProperties(
                         {
@@ -812,7 +868,8 @@ export const FileInputInner = function<Type extends Value = Value>(
 
                             default: properties.value.name,
                             model: properties.model.fileName,
-                            onChangeValue: onChangeValue,
+                            onChangeValue,
+
                             triggerInitialPropertiesConsolidation
                         },
                         properties as
@@ -849,7 +906,7 @@ FileInputInner.displayName = 'FileInput'
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
  */
-export const FileInput = memorize(forwardRef(FileInputInner)) as
+export const FileInput = memoize(forwardRef(FileInputInner)) as
     unknown as
     Component<typeof FileInputInner>
 // region static properties

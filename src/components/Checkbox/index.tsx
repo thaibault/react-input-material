@@ -23,7 +23,7 @@ import {
     FocusEvent as ReactFocusEvent,
     forwardRef,
     ForwardRefRenderFunction,
-    memo as memorize,
+    memo as memoize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
     // NOTE: can be "RefObject" directly when migrated to react19.
@@ -31,20 +31,18 @@ import {
     SyntheticEvent,
     useEffect,
     useImperativeHandle,
-    useRef,
-    useState
+    useState,
+    useCallback
 } from 'react'
+import {GenericEvent} from 'react-generic-tools/type'
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
 import LowLevelCheckbox from '#implementations/Checkbox'
 import Error from '#implementations/Error'
-/*
-"namedExport" version of css-loader:
 
-import {checkboxClassName} from './style.module'
-*/
 import {WrapConfigurations} from '../Wrapper/WrapConfigurations'
+
 import {
     deriveMissingPropertiesFromState,
     determineInitialValue,
@@ -53,11 +51,14 @@ import {
     mapPropertiesIntoModel,
     translateKnownSymbols,
     triggerCallbackIfExists,
+    usePropertiesChangedIndicator,
     wrapStateSetter
 } from '../../helper'
+import {InputReference} from '../../implementations/type'
 import {
     defaultModelState as baseDefaultModelState,
-    DefaultProperties as BaseDefaultProperties
+    DefaultProperties as BaseDefaultProperties,
+    Properties as BaseProperties
 } from '../../type'
 
 import cssClassNames from './style.module'
@@ -72,8 +73,6 @@ import {
     propertyTypes,
     ValueState
 } from './type'
-import {InputReference} from '../../implementations/type'
-import {GenericEvent} from 'react-generic-tools/type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
@@ -142,215 +141,7 @@ export const CheckboxInner = function(
         return result as Properties
     }
     // endregion
-    useEffect(
-        () => {
-            if (properties.triggerInitialPropertiesConsolidation)
-                onChange()
-        },
-        []
-    )
-    // region event handler
-    /**
-     * Triggered on blur events.
-     * @param event - Event object.
-     */
-    const onBlur = (event: SyntheticEvent): void => {
-        setValueState((oldValueState: ValueState): ValueState => {
-            let changed = false
-
-            if (oldValueState.modelState.focused) {
-                properties.focused = false
-                changed = true
-            }
-
-            if (!oldValueState.modelState.visited) {
-                properties.visited = true
-                changed = true
-            }
-
-            if (changed) {
-                onChange(event)
-
-                triggerCallbackIfExists<Properties>(
-                    properties,
-                    'changeState',
-                    controlled,
-                    properties.model.state,
-                    event,
-                    properties
-                )
-            }
-
-            triggerCallbackIfExists<Properties>(
-                properties, 'blur', controlled, event, properties
-            )
-
-            return changed ?
-                {...oldValueState, modelState: properties.model.state} as
-                    ValueState :
-                oldValueState
-        })
-    }
-    /**
-     * Triggered on any change events. Consolidates properties object and
-     * triggers given on change callbacks.
-     * @param event - Potential event object.
-     */
-    const onChange = (event?: SyntheticEvent): void => {
-        extend(
-            true,
-            properties,
-            getConsolidatedProperties(
-                /*
-                    Workaround since "Type" isn't identified as subset of
-                    "RecursivePartial<Type>" yet.
-                */
-                properties as unknown as Props
-            )
-        )
-
-        triggerCallbackIfExists<Properties>(
-            properties, 'change', controlled, properties, event
-        )
-    }
-    /**
-     * Triggered when ever the value changes.
-     * @param event - Event object.
-     */
-    const onChangeValue = (
-        event: GenericEvent<boolean> | boolean
-    ): void => {
-        if (!(properties.model.mutable && properties.model.writable))
-            return
-
-        if (typeof event === 'boolean')
-            event = {target: {checked: event}} as
-                unknown as
-                GenericEvent<boolean>
-
-        properties.value = Boolean(
-            (event.target as unknown as {checked: boolean | null}).checked
-        )
-
-        setValueState((oldValueState: ValueState): ValueState => {
-            if (oldValueState.value === properties.value)
-                return oldValueState
-
-            let stateChanged = false
-
-            const result: ValueState =
-                {...oldValueState, value: properties.value as boolean | null}
-
-            if (oldValueState.modelState.pristine) {
-                properties.dirty = true
-                properties.pristine = false
-                stateChanged = true
-            }
-
-            onChange(event)
-
-            if (determineValidationState(properties, oldValueState.modelState))
-                stateChanged = true
-
-            triggerCallbackIfExists<Properties>(
-                properties,
-                'changeValue',
-                controlled,
-                properties.value,
-                event,
-                properties
-            )
-
-            if (stateChanged && properties.model.state) {
-                result.modelState = properties.model.state
-
-                triggerCallbackIfExists<Properties>(
-                    properties,
-                    'changeState',
-                    controlled,
-                    properties.model.state,
-                    event,
-                    properties
-                )
-            }
-
-            return result
-        })
-    }
-    /**
-     * Triggered on click events.
-     * @param event - Mouse event object.
-     */
-    const onClick = (event: ReactMouseEvent) => {
-        triggerCallbackIfExists<Properties>(
-            properties, 'click', controlled, event, properties
-        )
-
-        onTouch(event)
-    }
-    /**
-     * Triggered on focus events.
-     * @param event - Focus event object.
-     */
-    const onFocus = (event: ReactFocusEvent) => {
-        triggerCallbackIfExists<Properties>(
-            properties, 'focus', controlled, event, properties
-        )
-
-        onTouch(event)
-    }
-    /**
-     * Triggers on start interacting with the input.
-     * @param event - Event object which triggered interaction.
-     */
-    const onTouch = (event: ReactFocusEvent | ReactMouseEvent): void => {
-        setValueState((oldValueState: ValueState): ValueState => {
-            let changedState = false
-
-            if (!oldValueState.modelState.focused) {
-                properties.focused = true
-                changedState = true
-            }
-
-            if (oldValueState.modelState.untouched) {
-                properties.touched = true
-                properties.untouched = false
-                changedState = true
-            }
-
-            let result: ValueState = oldValueState
-
-            if (changedState) {
-                onChange(event)
-
-                result = {
-                    ...oldValueState,
-                    modelState: properties.model.state as ModelState
-                }
-
-                triggerCallbackIfExists<Properties>(
-                    properties,
-                    'changeState',
-                    controlled,
-                    properties.model.state,
-                    event,
-                    properties
-                )
-            }
-
-            triggerCallbackIfExists<Properties>(
-                properties, 'touch', controlled, event, properties
-            )
-
-            return result
-        })
-    }
-    // endregion
     // region properties
-    /// region references
-    const inputReference: RefObject<InputReference | null> =
-        useRef<InputReference>(null)
-    /// endregion
     const givenProps: Props = translateKnownSymbols(props)
 
     const initialValue: boolean | null = determineInitialValue<boolean | null>(
@@ -389,6 +180,10 @@ export const CheckboxInner = function(
 
     const properties: Properties = getConsolidatedProperties(givenProperties)
 
+    const propertiesChangedIndicator = usePropertiesChangedIndicator(
+        properties as unknown as BaseProperties<boolean>
+    )
+
     const currentValueState: ValueState = {
         modelState: properties.model.state as ModelState,
         value: properties.value as boolean | null
@@ -406,7 +201,226 @@ export const CheckboxInner = function(
         setValueState =
             wrapStateSetter<ValueState>(setValueState, currentValueState)
     // endregion
+    // region event handler
+    /**
+     * Triggered on blur events.
+     * @param event - Event object.
+     */
+    const onBlur = useCallback(
+        (event: SyntheticEvent): void => {
+            setValueState((oldValueState: ValueState): ValueState => {
+                let changed = false
+
+                if (oldValueState.modelState.focused) {
+                    properties.focused = false
+                    changed = true
+                }
+
+                if (!oldValueState.modelState.visited) {
+                    properties.visited = true
+                    changed = true
+                }
+
+                if (changed) {
+                    onChange(event)
+
+                    triggerCallbackIfExists<Properties>(
+                        properties,
+                        'changeState',
+                        controlled,
+                        properties.model.state,
+                        event,
+                        properties
+                    )
+                }
+
+                triggerCallbackIfExists<Properties>(
+                    properties, 'blur', controlled, event, properties
+                )
+
+                return changed ?
+                    {...oldValueState, modelState: properties.model.state} as
+                        ValueState :
+                    oldValueState
+            })
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on any change events. Consolidates properties object and
+     * triggers given on change callbacks.
+     * @param event - Potential event object.
+     */
+    const onChange = useCallback(
+        (event?: SyntheticEvent): void => {
+            extend(
+                true,
+                properties,
+                getConsolidatedProperties(
+                    /*
+                        Workaround since "Type" isn't identified as subset of
+                        "RecursivePartial<Type>" yet.
+                    */
+                    properties as unknown as Props
+                )
+            )
+
+            triggerCallbackIfExists<Properties>(
+                properties, 'change', controlled, properties, event
+            )
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered when ever the value changes.
+     * @param event - Event object.
+     */
+    const onChangeValue = useCallback(
+        (event: GenericEvent<boolean> | boolean): void => {
+            if (!(properties.model.mutable && properties.model.writable))
+                return
+
+            if (typeof event === 'boolean')
+                event = {target: {checked: event}} as
+                    unknown as
+                    GenericEvent<boolean>
+
+            properties.value = Boolean(
+                (event.target as unknown as {checked: boolean | null}).checked
+            )
+
+            setValueState((oldValueState: ValueState): ValueState => {
+                if (oldValueState.value === properties.value)
+                    return oldValueState
+
+                let stateChanged = false
+
+                const result: ValueState = {
+                    ...oldValueState, value: properties.value as boolean | null
+                }
+
+                if (oldValueState.modelState.pristine) {
+                    properties.dirty = true
+                    properties.pristine = false
+                    stateChanged = true
+                }
+
+                onChange(event)
+
+                if (determineValidationState(
+                    properties, oldValueState.modelState
+                ))
+                    stateChanged = true
+
+                triggerCallbackIfExists<Properties>(
+                    properties,
+                    'changeValue',
+                    controlled,
+                    properties.value,
+                    event,
+                    properties
+                )
+
+                if (stateChanged && properties.model.state) {
+                    result.modelState = properties.model.state
+
+                    triggerCallbackIfExists<Properties>(
+                        properties,
+                        'changeState',
+                        controlled,
+                        properties.model.state,
+                        event,
+                        properties
+                    )
+                }
+
+                return result
+            })
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on click events.
+     * @param event - Mouse event object.
+     */
+    const onClick = useCallback(
+        (event: ReactMouseEvent) => {
+            triggerCallbackIfExists<Properties>(
+                properties, 'click', controlled, event, properties
+            )
+
+            onTouch(event)
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggered on focus events.
+     * @param event - Focus event object.
+     */
+    const onFocus = useCallback(
+        (event: ReactFocusEvent) => {
+            triggerCallbackIfExists<Properties>(
+                properties, 'focus', controlled, event, properties
+            )
+
+            onTouch(event)
+        },
+        [propertiesChangedIndicator]
+    )
+    /**
+     * Triggers on start interacting with the input.
+     * @param event - Event object which triggered interaction.
+     */
+    const onTouch = useCallback(
+        (event: ReactFocusEvent | ReactMouseEvent): void => {
+            setValueState((oldValueState: ValueState): ValueState => {
+                let changedState = false
+
+                if (!oldValueState.modelState.focused) {
+                    properties.focused = true
+                    changedState = true
+                }
+
+                if (oldValueState.modelState.untouched) {
+                    properties.touched = true
+                    properties.untouched = false
+                    changedState = true
+                }
+
+                let result: ValueState = oldValueState
+
+                if (changedState) {
+                    onChange(event)
+
+                    result = {
+                        ...oldValueState,
+                        modelState: properties.model.state as ModelState
+                    }
+
+                    triggerCallbackIfExists<Properties>(
+                        properties,
+                        'changeState',
+                        controlled,
+                        properties.model.state,
+                        event,
+                        properties
+                    )
+                }
+
+                triggerCallbackIfExists<Properties>(
+                    properties, 'touch', controlled, event, properties
+                )
+
+                return result
+            })
+        },
+        [propertiesChangedIndicator]
+    )
+    // endregion
     // region export references
+    const [inputReference, setInputReference] =
+        useState<InputReference | null>(null)
+
     useImperativeHandle(
         reference,
         (): Adapter & {reference: unknown} => ({
@@ -419,9 +433,17 @@ export const CheckboxInner = function(
                     {value: properties.value as boolean | null}
                 )
             }
-        })
+        }),
+        [propertiesChangedIndicator, inputReference]
     )
     // endregion
+    useEffect(
+        () => {
+            if (properties.triggerInitialPropertiesConsolidation)
+                onChange()
+        },
+        []
+    )
     // region render
     return <WrapConfigurations
         strict={Checkbox.strict}
@@ -441,7 +463,7 @@ export const CheckboxInner = function(
             id={properties.id || properties.name}
             name={properties.name}
 
-            ref={inputReference}
+            ref={setInputReference}
 
             classNames={
                 [CSS_CLASS_NAMES.checkbox].concat(properties.className)
@@ -487,7 +509,7 @@ CheckboxInner.displayName = 'Checkbox'
  */
 export const Checkbox: Component<
     typeof CheckboxInner
-> = memorize(forwardRef(CheckboxInner)) as
+> = memoize(forwardRef(CheckboxInner)) as
     unknown as
     Component<typeof CheckboxInner>
 // region static properties

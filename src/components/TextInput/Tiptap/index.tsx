@@ -22,16 +22,11 @@ import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 import {
-    ForwardedRef,
-    forwardRef,
-    MutableRefObject as RefObject,
-    ReactElement,
-    useEffect,
-    useImperativeHandle,
-    useRef
+    ForwardedRef, forwardRef, ReactElement, useEffect, useImperativeHandle
 } from 'react'
 import Dummy from 'react-generic-dummy'
 
+import {useReferenceState} from '../../../helper'
 import {TextAreaProperties} from '../../../implementations/type'
 import InputEventMapper, {
     Reference as InputEventMapperReference
@@ -40,12 +35,13 @@ import cssClassNames from '../style.module'
 import {EditorReference, TiptapProps} from '../type'
 
 import MenuBar from './MenuBar'
+import {useMemorizedValue} from 'react-generic-tools'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames
 export const VIEW_CONTENT_OFFSET_IN_PX = 8
 
 export interface Reference extends EditorReference {
-    editorViewReference: RefObject<HTMLDivElement | null>
+    editorViewReference: HTMLDivElement | null
 }
 
 export const Index = forwardRef((
@@ -59,16 +55,18 @@ export const Index = forwardRef((
 
     const value = properties.value ?? ''
 
-    const inputEventMapperReference =
-        useRef<InputEventMapperReference | null>(null)
-    const editorViewReference = useRef<HTMLDivElement | null>(null)
+    const [inputEventMapperReference, setInputEventMapperReference] =
+        useReferenceState<InputEventMapperReference | null>(null)
+    const [editorViewReference, setEditorViewReference] =
+        useReferenceState<HTMLDivElement | null>(null)
 
     useImperativeHandle(
         reference,
         () => ({
             input: inputEventMapperReference,
             editorViewReference
-        })
+        }),
+        [inputEventMapperReference, editorViewReference]
     )
 
     const extensions =
@@ -87,13 +85,13 @@ export const Index = forwardRef((
         editable: !properties.disabled,
         content: String(value),
         onBlur: (editorEvent: EditorEvents['focus']) => {
-            inputEventMapperReference.current?.eventMapper.blur(editorEvent)
+            inputEventMapperReference?.eventMapper.blur(editorEvent)
 
             if (properties.onBlur)
                 properties.onBlur(editorEvent)
         },
         onFocus: (editorEvent: EditorEvents['focus']) => {
-            inputEventMapperReference.current?.eventMapper.focus(editorEvent)
+            inputEventMapperReference?.eventMapper.focus(editorEvent)
 
             if (properties.onFocus)
                 properties.onFocus(editorEvent)
@@ -101,7 +99,7 @@ export const Index = forwardRef((
         onUpdate: (editorEvent) => {
             const html = editorEvent.editor.getHTML()
 
-            inputEventMapperReference.current?.eventMapper.input(
+            inputEventMapperReference?.eventMapper.input(
                 html === '<p></p>' ? '' : html, editorEvent
             )
 
@@ -114,22 +112,20 @@ export const Index = forwardRef((
     })
     const htmlContent = editor.getHTML()
 
-    const clientHeight =
-        inputEventMapperReference
-            .current?.input?.current?.input?.current?.clientHeight
+    const clientHeight = inputEventMapperReference?.input?.input?.clientHeight
     useEffect(
         () => {
-            if (editorViewReference.current && clientHeight)
-                editorViewReference.current.style.height =
+            if (editorViewReference && clientHeight)
+                editorViewReference.style.height =
                     String(clientHeight + VIEW_CONTENT_OFFSET_IN_PX) + 'px'
         },
-        [editorViewReference.current, clientHeight]
+        [editorViewReference, clientHeight]
     )
 
     return <InputEventMapper
         {...(properties as TextAreaProperties)}
 
-        ref={inputEventMapperReference}
+        ref={setInputEventMapperReference}
 
         barContentSlot={<MenuBar editor={editor}/>}
 
@@ -137,16 +133,19 @@ export const Index = forwardRef((
 
         classNamePrefix={CSS_CLASS_NAMES.richtextEditor}
 
-        onLabelClick={() => {
-            editor.chain().focus().run()
-        }}
+        onLabelClick={useMemorizedValue(
+            () => {
+                editor.chain().focus().run()
+            },
+            editor
+        )}
     >
         <EditorContent
             className={
                 `${CSS_CLASS_NAMES.richtextEditorView} mdc-text-field__input`
             }
             editor={editor}
-            innerRef={editorViewReference}
+            innerRef={setEditorViewReference}
         />
     </InputEventMapper>
 })

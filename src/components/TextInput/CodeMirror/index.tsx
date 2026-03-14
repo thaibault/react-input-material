@@ -18,6 +18,16 @@
 */
 // region imports
 import {
+    FocusEvent,
+    ForwardedRef,
+    forwardRef,
+    ReactElement,
+    useEffect,
+    useImperativeHandle, useRef
+} from 'react'
+import {useMemorizedValue} from 'react-generic-tools'
+
+import {
     autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap
 } from '@codemirror/autocomplete'
 import {defaultKeymap, history, historyKeymap} from '@codemirror/commands'
@@ -46,18 +56,7 @@ import {
     rectangularSelection
 } from '@codemirror/view'
 
-import {
-    FocusEvent,
-    ForwardedRef,
-    forwardRef,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
-    ReactElement,
-    useEffect,
-    useImperativeHandle,
-    useRef
-} from 'react'
-
+import {useReferenceState} from '../../../helper'
 import {TextAreaProperties} from '../../../implementations/type'
 import InputEventMapper, {
     Reference as InputEventMapperReference
@@ -103,8 +102,8 @@ export const BASIC_EXTENSIONS: Extension =
 export const CSS_CLASS_NAMES = cssClassNames
 
 export interface Reference extends EditorReference {
-    editorView: RefObject<EditorView | null>
-    editorViewReference: RefObject<HTMLDivElement | null>
+    editorView: EditorView | null
+    editorViewReference: HTMLDivElement | null
 }
 
 export const Index = forwardRef((
@@ -123,10 +122,12 @@ export const Index = forwardRef((
 
     const value = properties.value ?? ''
 
-    const inputEventMapperReference =
-        useRef<InputEventMapperReference | null>(null)
-    const editorView = useRef<EditorView | null>(null)
-    const editorViewReference = useRef<HTMLDivElement | null>(null)
+    const [inputEventMapperReference, setInputEventMapperReference] =
+        useReferenceState<InputEventMapperReference | null>(null)
+    const [editorView, setEditorView] =
+        useReferenceState<EditorView | null>(null)
+    const [editorViewReference, setEditorViewReference] =
+        useReferenceState<HTMLDivElement | null>(null)
 
     useImperativeHandle(
         reference,
@@ -134,25 +135,23 @@ export const Index = forwardRef((
             input: inputEventMapperReference,
             editorView,
             editorViewReference
-        })
+        }),
+        [inputEventMapperReference, editorView, editorViewReference]
     )
 
-    const onChange = (transaction: Transaction) => {
-        if (properties.disabled)
-            return
-
-        const newValue = transaction.state.doc.toString()
-
-        inputEventMapperReference.current?.eventMapper
-            .input(newValue, transaction)
-
-        if (properties.onChange)
-            properties.onChange(newValue)
-    }
-
+    /*
+        NOTE: We do need to store the input event mapper reference in a ref
+        here, because otherwise we would need to re-initialize the editor on
+        every change of the input event mapper reference, which would cause a
+        lot of performance issues and also cause the editor to lose focus on
+        every change of the input event mapper reference.
+     */
+    const internalInputEventMapperReference =
+        useRef(inputEventMapperReference)
+    internalInputEventMapperReference.current = inputEventMapperReference
     useEffect(
         () => {
-            if (!editorViewReference.current)
+            if (!editorViewReference)
                 return
 
             const state = EditorState.create({
@@ -170,7 +169,15 @@ export const Index = forwardRef((
                             )
                                 return false
 
-                            onChange(transaction)
+                            if (properties.disabled)
+                                return true
+
+                            internalInputEventMapperReference
+                                .current?.eventMapper
+                                .input(newValue, {transaction})
+
+                            if (properties.onChange)
+                                properties.onChange(newValue)
                         }
 
                         return true
@@ -179,50 +186,48 @@ export const Index = forwardRef((
                 ]
             })
 
-            editorView.current = new EditorView({
+            setEditorView(new EditorView({
                 state,
-                parent: editorViewReference.current
-            })
+                parent: editorViewReference
+            }))
 
             return () => {
-                if (editorView.current) {
-                    editorView.current.destroy()
-                    editorView.current = null
+                if (editorView) {
+                    editorView.destroy()
+                    setEditorView(null)
                 }
             }
         },
-        [editorViewReference.current, properties.editor?.mode?.language.name]
+        [editorViewReference, properties.editor?.mode?.language.name]
     )
 
     useEffect(
         () => {
             if (
-                editorView.current &&
-                properties.value !== editorView.current.state.doc.toString()
+                editorView &&
+                properties.value !== editorView.state.doc.toString()
             )
-                editorView.current.state.update(
+                editorView.state.update(
                     {changes: {from: 0, insert: Text.empty}},
                     {changes: {from: 0, insert: String(properties.value)}}
                 )
         },
-        [editorView.current, properties.value]
+        [editorView, properties.value]
     )
 
     const textAreaDomNode =
-        inputEventMapperReference.current?.input?.current?.input?.current
+        inputEventMapperReference?.input?.input
     useEffect(
         () => {
             const resizeObserver = new ResizeObserver(() => {
                 const clientHeight = textAreaDomNode?.clientHeight
 
-                if (editorViewReference.current && clientHeight) {
+                if (editorViewReference && clientHeight) {
                     const scrollableViewNode: HTMLDivElement | null =
-                        editorViewReference.current
-                            .querySelector('.cm-scroller')
+                        editorViewReference.querySelector('.cm-scroller')
                     if (scrollableViewNode) {
                         const newHeightValue = String(clientHeight) + 'px'
-                        editorViewReference.current.style.height =
-                            newHeightValue
+                        editorViewReference.style.height = newHeightValue
                         scrollableViewNode.style.height = newHeightValue
 
                         return
@@ -236,37 +241,48 @@ export const Index = forwardRef((
                 resizeObserver.disconnect()
             }
         },
-        [editorViewReference.current, textAreaDomNode]
+        [editorViewReference, textAreaDomNode]
     )
 
     return <InputEventMapper
         {...(properties as TextAreaProperties)}
 
-        ref={inputEventMapperReference}
+        ref={setInputEventMapperReference}
 
         value={value as string | undefined}
 
         classNamePrefix={CSS_CLASS_NAMES.codeEditor}
 
-        onLabelClick={() => {
-            editorViewReference.current?.focus()
-        }}
+        onLabelClick={useMemorizedValue(
+            () => {
+                editorViewReference?.focus()
+            },
+            editorViewReference
+        )}
     >
         <div
-            ref={editorViewReference}
+            ref={setEditorViewReference}
 
-            onBlur={(event: FocusEvent<HTMLDivElement>) => {
-                inputEventMapperReference.current?.eventMapper.blur(event)
+            onBlur={useMemorizedValue(
+                (event: FocusEvent<HTMLDivElement>) => {
+                    inputEventMapperReference?.eventMapper.blur(event)
 
-                if (properties.onBlur)
-                    properties.onBlur(event)
-            }}
-            onFocus={(event: FocusEvent<HTMLDivElement>) => {
-                inputEventMapperReference.current?.eventMapper.focus(event)
+                    if (properties.onBlur)
+                        properties.onBlur(event)
+                },
+                inputEventMapperReference?.eventMapper.blur,
+                properties.onBlur
+            )}
+            onFocus={useMemorizedValue(
+                (event: FocusEvent<HTMLDivElement>) => {
+                    inputEventMapperReference?.eventMapper.focus(event)
 
-                if (properties.onFocus)
-                    properties.onFocus(event)
-            }}
+                    if (properties.onFocus)
+                        properties.onFocus(event)
+                },
+                inputEventMapperReference?.eventMapper.focus,
+                properties.onFocus
+            )}
 
             className={
                 `${CSS_CLASS_NAMES.codeEditorView} mdc-text-field__input`

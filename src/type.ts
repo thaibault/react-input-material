@@ -51,10 +51,6 @@ import {ThemeProviderProps} from '@rmwc/theme'
 // endregion
 // region exports
 /// region generic
-export interface CursorState {
-    end: number
-    start: number
-}
 export const PrimitiveTypes = [
     'boolean',
 
@@ -227,10 +223,6 @@ export interface State<T = unknown> {
 export interface ValueState<T = unknown, MS = ModelState> {
     modelState: MS
     value: null | T
-}
-export interface EditorState {
-    editorIsActive: boolean
-    selectionIsUnstable: boolean
 }
 //// endregion
 export interface StaticWebComponent<

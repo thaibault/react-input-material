@@ -89,7 +89,7 @@ const SECTIONS = [
 const Application = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(7)
     const activeSection = SECTIONS[activeTabIndex]
 
     const onChange: ((properties: BaseProps) => void) =
@@ -256,6 +256,7 @@ const Application = () => {
     // endregion
     const fileInputUnControlledHeadlessReference =
         createRef<AdapterWithReferences>()
+
     return (<>
         {/* region navigation */}
         <div className="tab-bar">
@@ -615,6 +616,7 @@ const Application = () => {
                         initialValue="const value = 2"
                         onChange={onChange}
                     />
+
                     <TextInput<string>
                         className="text-input--code-editor"
 
@@ -1161,7 +1163,6 @@ const Application = () => {
                     }}
                 >
                     <FileInput name="fileInput1" onChange={onChange} />
-
                     <FileInput
                         default={useMemorizedValue({
                             placeholder: {
@@ -1172,9 +1173,9 @@ const Application = () => {
 
                         acceptedContentTypes="text/*"
                         contentTypePattern="^text/(?:plain|(?:x-)?csv|xml)$"
-                        model={{fileName: {
+                        model={useMemorizedValue({fileName: {
                             pattern: '^[a-zA-Z0-9]\\.(?:csv|txt|xml)$'
-                        }}}
+                        }})}
 
                         encoding="latin1"
 
@@ -1251,7 +1252,7 @@ const Application = () => {
                     <button
                         onClick={() => {
                             fileInputUnControlledHeadlessReference
-                                .current?.references.fileInput.current?.click()
+                                .current?.references.fileInput?.click()
                         }}
                     >Add medium</button>
                     <FileInput

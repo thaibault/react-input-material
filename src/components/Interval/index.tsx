@@ -18,16 +18,18 @@
 */
 // region imports
 import {copy, extend, mask} from 'clientnode'
-import {GenericEvent} from 'react-generic-tools/type'
 import {
     ForwardedRef,
     forwardRef,
-    memo as memorize,
+    memo as memoize,
     ReactElement,
+    RefObject,
+    useCallback,
     useImperativeHandle,
-    useRef,
     useState
 } from 'react'
+import {GenericEvent} from 'react-generic-tools/type'
+import {useMemorizedValue} from 'react-generic-tools'
 
 import Icon from '#implementations/Icon'
 
@@ -37,7 +39,10 @@ import {
     translateKnownSymbols,
     triggerCallbackIfExists
 } from '../../helper'
+import {IconProperties} from '../../implementations/type'
+
 import TextInput from '../TextInput'
+import {usePropertiesChangedIndicator} from '../TextInput/helper'
 import {
     Properties as TextInputProperties,
     AdapterWithReferences as TextInputAdapterWithReferences
@@ -51,12 +56,11 @@ import {intervalClassName, intervalDisabledClassName} from './style.module'
 */
 import cssClassNames from './style.module'
 
-import {IconProperties} from '../../implementations/type'
-
 import {
     Adapter,
     AdapterWithReferences,
     Component,
+    DateTimeRepresentation,
     defaultProperties,
     IntervalTextInputProps,
     ModelState,
@@ -167,14 +171,15 @@ export const IntervalInner = function(
             givenProps as StrictProps
         )
 
-    let endProperties =
-        properties.value?.end as IntervalTextInputProps | null ||
-        {} as IntervalTextInputProps
-    const iconProperties: IconProperties = typeof properties.icon === 'string' ?
-        {icon: properties.icon} :
-        properties.icon as IconProperties
     let startProperties =
         properties.value?.start as IntervalTextInputProps | null ||
+        {} as IntervalTextInputProps
+    const iconProperties: IconProperties =
+        typeof properties.icon === 'string' ?
+            {icon: properties.icon} :
+            properties.icon as IconProperties
+    let endProperties =
+        properties.value?.end as IntervalTextInputProps | null ||
         {} as IntervalTextInputProps
     /*
         NOTE: Sometimes we need real given properties or derived (default
@@ -198,9 +203,9 @@ export const IntervalInner = function(
             properties.model?.value?.start?.default ??
             null
     })
-    if (!controlled)
-        properties.value =
-            {end: {value: value.end}, start: {value: value.start}}
+    properties.value = controlled ?
+        properties.value :
+        {end: {value: value.end}, start: {value: value.start}}
     const propertiesToForward =
         mask<IntervalTextInputProps>(
             properties as unknown as IntervalTextInputProps,
@@ -237,9 +242,11 @@ export const IntervalInner = function(
     )
 
     if (!startProperties.className)
-        startProperties.className = [`${CSS_CLASS_NAMES.interval}__start`]
-    if (!iconProperties.classNames)
-        iconProperties.classNames = [`${CSS_CLASS_NAMES.interval}__icon`]
+        startProperties.className = `${CSS_CLASS_NAMES.interval}__start`
+    iconProperties.classNames = useMemorizedValue(
+        iconProperties.classNames ?? [`${CSS_CLASS_NAMES.interval}__icon`],
+        iconProperties.classNames
+    )
     if (!endProperties.className)
         endProperties.className = `${CSS_CLASS_NAMES.interval}__end`
 
@@ -248,212 +255,280 @@ export const IntervalInner = function(
 
     // NOTE: Consolidates only internal boundaries for better user experience.
     const consolidateBoundaries = ({start, end}: Value) => {
-        startProperties.maximum = formatDateTimeAsConfigured(Math.min(
-            normalizeDateTimeToNumber(startConfiguration.maximum, Infinity),
-            normalizeDateTimeToNumber(end, Infinity),
-            normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
-        )) ?? Infinity
+        startProperties.maximum =
+            formatDateTimeAsConfigured(Math.min(
+                normalizeDateTimeToNumber(startConfiguration.maximum, Infinity),
+                normalizeDateTimeToNumber(end, Infinity),
+                normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
+            )) ??
+            Infinity
 
-        startProperties.minimum = formatDateTimeAsConfigured(
-            normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
-        ) ?? -Infinity
+        startProperties.minimum =
+            formatDateTimeAsConfigured(
+                normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
+            ) ??
+            -Infinity
         startProperties.value = formatDateTimeAsConfigured(start)
 
-        endProperties.maximum = formatDateTimeAsConfigured(
-            normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
-        ) ?? Infinity
+        endProperties.maximum =
+            formatDateTimeAsConfigured(
+                normalizeDateTimeToNumber(endConfiguration.maximum, Infinity)
+            ) ??
+            Infinity
 
-        endProperties.minimum = formatDateTimeAsConfigured(Math.max(
-            normalizeDateTimeToNumber(endConfiguration.minimum, -Infinity),
-            normalizeDateTimeToNumber(start, -Infinity),
-            normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
-        )) ?? -Infinity
-        endProperties.value = end
+        endProperties.minimum =
+            formatDateTimeAsConfigured(Math.max(
+                normalizeDateTimeToNumber(endConfiguration.minimum, -Infinity),
+                normalizeDateTimeToNumber(start, -Infinity),
+                normalizeDateTimeToNumber(startConfiguration.minimum, -Infinity)
+            )) ??
+            -Infinity
+        endProperties.value = formatDateTimeAsConfigured(end)
     }
 
-    const valueState: Value = {
-        start:
-            (properties.value?.start as IntervalTextInputProps | null)?.value,
-        end: (properties.value?.end as IntervalTextInputProps | null)?.value
-    }
+    const valueState: Value = useMemorizedValue(
+        {
+            start: (
+                properties.value?.start as IntervalTextInputProps | null
+            )?.value,
+            end: (
+                properties.value?.end as IntervalTextInputProps | null
+            )?.value
+        },
+        (properties.value?.start as IntervalTextInputProps | null)?.value,
+        (properties.value?.end as IntervalTextInputProps | null)?.value
+    )
 
     consolidateBoundaries(valueState)
 
-    const endInputReference =
-        useRef<TextInputAdapterWithReferences<null | number | string>>(null)
-    const startInputReference=
-        useRef<TextInputAdapterWithReferences<null | number | string>>(null)
+    const startPropertiesChangedIndicator =
+        usePropertiesChangedIndicator<DateTimeRepresentation | null>(
+            startProperties as
+                TextInputProperties<DateTimeRepresentation | null>
+        )
+    const endPropertiesChangedIndicator =
+        usePropertiesChangedIndicator<DateTimeRepresentation | null>(
+            endProperties as
+                TextInputProperties<DateTimeRepresentation | null>
+        )
+    const propertiesChangedIndicator = useMemorizedValue(
+        {},
+        startPropertiesChangedIndicator,
+        endPropertiesChangedIndicator,
 
+        JSON.stringify(iconProperties),
+
+        properties.onChange,
+        properties.onChangeValue
+    )
+    // endregion
     if (controlled)
         /*
             NOTE: We act as a controlled component by overwriting internal
             state setter.
         */
         setValue = createDummyStateSetter<Value>(valueState)
-    // endregion
+    // region export references
+    const [startInputReference, setStartInputReference] = useState<
+        TextInputAdapterWithReferences<null | number | string> | null
+    >(null)
+    const [endInputReference, setEndInputReference] = useState<
+        TextInputAdapterWithReferences<null | number | string> | null
+    >(null)
+
     useImperativeHandle(
         reference,
         (): AdapterWithReferences => ({
             properties: getExternalProperties(
                 properties as Properties,
                 iconProperties,
-                startInputReference.current?.properties ||
+                startInputReference?.properties ||
                 properties.value?.start as
                     TextInputProperties<null | number | string>,
-                endInputReference.current?.properties ||
+                endInputReference?.properties ||
                 properties.value?.end as
                     TextInputProperties<null | number | string>
             ),
-            references: {end: endInputReference, start: startInputReference},
+            references: {start: startInputReference, end: endInputReference},
             state: controlled ? {} : {value: valueState}
-        })
+        }),
+        [
+            propertiesChangedIndicator,
+
+            startInputReference,
+            endInputReference
+        ]
     )
+    // endregion
     // region attach event handler
     if (properties.onChange) {
-        startProperties.onChange = (
-            textInputProperties: TextInputProperties<null | number | string>,
-            event?: GenericEvent
-        ): void => {
-            const end: TextInputProperties<null | number | string> =
-                endInputReference.current?.properties ||
-                endProperties as
-                    unknown as
-                    TextInputProperties<null | number | string>
-            end.value = end.model.value = normalizeDateTimeToNumber(
-                endInputReference.current?.properties?.value, -Infinity
-            )
-            if (!controlled)
-                end.value = end.model.value = formatDateTimeAsConfigured(
-                    Math.max(
-                        end.value,
-                        normalizeDateTimeToNumber(
-                            textInputProperties.value, -Infinity
+        startProperties.onChange = useCallback(
+            (
+                textInputProperties: TextInputProperties<
+                    null | number | string
+                >,
+                event?: GenericEvent
+            ): void => {
+                const end: TextInputProperties<null | number | string> =
+                    endProperties as
+                        unknown as
+                        TextInputProperties<null | number | string>
+                end.value = end.model.value = normalizeDateTimeToNumber(
+                    endInputReference?.properties?.value, -Infinity
+                )
+                if (!controlled)
+                    end.value = end.model.value = formatDateTimeAsConfigured(
+                        Math.max(
+                            end.value,
+                            normalizeDateTimeToNumber(
+                                textInputProperties.value, -Infinity
+                            )
                         )
                     )
+
+                // NOTE: We need to reset internal temporary set boundaries.
+                end.maximum = end.model.maximum = endConfiguration.maximum
+                end.minimum = end.model.minimum = endConfiguration.minimum
+                textInputProperties.maximum =
+                    textInputProperties.model.maximum =
+                    startConfiguration.maximum
+                textInputProperties.minimum =
+                    textInputProperties.model.minimum =
+                    startConfiguration.minimum
+
+                triggerCallbackIfExists<Properties>(
+                    properties as Properties,
+                    'change',
+                    controlled,
+                    getExternalProperties(
+                        properties as Properties,
+                        iconProperties,
+                        textInputProperties,
+                        end
+                    ),
+                    event || new Event('genericIntervalStartChange'),
+                    properties
+                )
+            },
+            [propertiesChangedIndicator, endInputReference?.properties?.value]
+        )
+        endProperties.onChange = useCallback(
+            (
+                textInputProperties: TextInputProperties<
+                    null | number | string
+                >,
+                event?: GenericEvent
+            ): void => {
+                const start: TextInputProperties<null | number | string> =
+                    startProperties as
+                        unknown as
+                        TextInputProperties<null | number | string>
+                start.value = start.model.value = normalizeDateTimeToNumber(
+                    startInputReference?.properties?.value, Infinity
+                )
+                if (!controlled)
+                    start.value =
+                    start.model.value =
+                        formatDateTimeAsConfigured(
+                            Math.min(
+                                start.value,
+                                normalizeDateTimeToNumber(
+                                    textInputProperties.value, Infinity
+                                )
+                            )
+                        )
+
+                // NOTE: We need to reset internal temporary set boundaries.
+                start.maximum =
+                    start.model.maximum =
+                    startConfiguration.maximum
+                start.minimum =
+                    start.model.minimum =
+                    startConfiguration.minimum
+                textInputProperties.maximum =
+                    textInputProperties.model.maximum =
+                    endConfiguration.maximum
+                textInputProperties.minimum =
+                    textInputProperties.model.minimum =
+                    endConfiguration.minimum
+
+                triggerCallbackIfExists<Properties>(
+                    properties as Properties,
+                    'change',
+                    controlled,
+                    getExternalProperties(
+                        properties as Properties,
+                        iconProperties,
+                        start,
+                        textInputProperties
+                    ),
+                    event || new Event('genericIntervalEndChange'),
+                    properties
+                )
+            },
+            [
+                propertiesChangedIndicator,
+                startInputReference?.properties?.value
+            ]
+        )
+    }
+
+    startProperties.onChangeValue = useCallback(
+        (value: null | number | string, event?: GenericEvent) => {
+            let endValue = normalizeDateTimeToNumber(
+                endInputReference?.properties?.value, -Infinity
+            )
+            if (!controlled)
+                endValue = Math.max(
+                    endValue, normalizeDateTimeToNumber(value, -Infinity)
                 )
 
-            // NOTE: We need to reset internal temporary set boundaries.
-            end.maximum = end.model.maximum = endConfiguration.maximum
-            end.minimum = end.model.minimum = endConfiguration.minimum
-            textInputProperties.maximum = textInputProperties.model.maximum =
-                startConfiguration.maximum
-            textInputProperties.minimum = textInputProperties.model.minimum =
-                startConfiguration.minimum
+            const newValue: Value = {
+                start: value,
+                end: isFinite(endValue) ? endValue : value
+            }
 
             triggerCallbackIfExists<Properties>(
                 properties as Properties,
-                'change',
+                'changeValue',
                 controlled,
-                getExternalProperties(
-                    properties as Properties,
-                    iconProperties,
-                    textInputProperties,
-                    end
-                ),
-                event || new Event('genericIntervalStartChange'),
+                newValue,
+                event,
                 properties
             )
-        }
-        endProperties.onChange = (
-            textInputProperties: TextInputProperties<null | number | string>,
-            event?: GenericEvent
-        ): void => {
-            const start: TextInputProperties<null | number | string> =
-                startInputReference.current?.properties ||
-                startProperties as
-                    unknown as
-                    TextInputProperties<null | number | string>
-            start.value = start.model.value = normalizeDateTimeToNumber(
-                startInputReference.current?.properties?.value, Infinity
+
+            setValue(newValue)
+        },
+        [propertiesChangedIndicator, endInputReference?.properties?.value]
+    )
+    endProperties.onChangeValue = useCallback(
+        (value: null | number | string, event?: GenericEvent) => {
+            let startValue = normalizeDateTimeToNumber(
+                startInputReference?.properties?.value, Infinity
             )
             if (!controlled)
-                start.value = start.model.value = formatDateTimeAsConfigured(
-                    Math.min(
-                        start.value,
-                        normalizeDateTimeToNumber(
-                            textInputProperties.value, Infinity
-                        )
-                    )
+                startValue = Math.min(
+                    startValue, normalizeDateTimeToNumber(value, Infinity)
                 )
 
-            // NOTE: We need to reset internal temporary set boundaries.
-            start.maximum = start.model.maximum = startConfiguration.maximum
-            start.minimum = start.model.minimum = startConfiguration.minimum
-            textInputProperties.maximum = textInputProperties.model.maximum =
-                endConfiguration.maximum
-            textInputProperties.minimum = textInputProperties.model.minimum =
-                endConfiguration.minimum
+            const newValue: Value = {
+                start: isFinite(startValue) ? startValue : value,
+                end: value
+            }
 
             triggerCallbackIfExists<Properties>(
                 properties as Properties,
-                'change',
+                'changeValue',
                 controlled,
-                getExternalProperties(
-                    properties as Properties,
-                    iconProperties,
-                    start,
-                    textInputProperties
-                ),
-                event || new Event('genericIntervalEndChange'),
+                newValue,
+                event,
                 properties
             )
-        }
-    }
 
-    startProperties.onChangeValue = (
-        value: null | number | string, event?: GenericEvent
-    ) => {
-        let endValue = normalizeDateTimeToNumber(
-            endInputReference.current?.properties?.value, -Infinity
-        )
-        if (!controlled)
-            endValue = Math.max(
-                endValue, normalizeDateTimeToNumber(value, -Infinity)
-            )
-
-        const newValue: Value = {
-            start: value,
-            end: isFinite(endValue) ? endValue : value
-        }
-
-        triggerCallbackIfExists<Properties>(
-            properties as Properties,
-            'changeValue',
-            controlled,
-            newValue,
-            event,
-            properties
-        )
-
-        setValue(newValue)
-    }
-    endProperties.onChangeValue = (
-        value: null | number | string, event?: GenericEvent
-    ) => {
-        let startValue = normalizeDateTimeToNumber(
-            startInputReference.current?.properties?.value, Infinity
-        )
-        if (!controlled)
-            startValue = Math.min(
-                startValue, normalizeDateTimeToNumber(value, Infinity)
-            )
-
-        const newValue: Value = {
-            start: isFinite(startValue) ? startValue : value,
-            end: value
-        }
-
-        triggerCallbackIfExists<Properties>(
-            properties as Properties,
-            'changeValue',
-            controlled,
-            newValue,
-            event,
-            properties
-        )
-
-        setValue(newValue)
-    }
+            setValue(newValue)
+        },
+        [propertiesChangedIndicator, startInputReference?.properties?.value]
+    )
     // endregion
     return <WrapConfigurations
         strict={Interval.strict}
@@ -472,9 +547,27 @@ export const IntervalInner = function(
             data-name={properties.name}
             style={properties.styles}
         >
-            <TextInput {...startProperties} ref={startInputReference} />
+            <TextInput
+                {...startProperties}
+                ref={
+                    setStartInputReference as
+                        unknown as
+                        RefObject<TextInputAdapterWithReferences<
+                            null | number | string
+                        >>
+                }
+            />
             <Icon {...properties.icon as IconProperties} />
-            <TextInput {...endProperties} ref={endInputReference} />
+            <TextInput
+                {...endProperties}
+                ref={
+                    setEndInputReference as
+                        unknown as
+                        RefObject<TextInputAdapterWithReferences<
+                            null | number | string
+                        >>
+                }
+            />
         </div>
     </WrapConfigurations>
 }
@@ -492,7 +585,7 @@ IntervalInner.displayName = 'Interval'
  * @returns React elements.
  */
 export const Interval: Component<typeof IntervalInner> =
-    memorize(forwardRef(IntervalInner)) as
+    memoize(forwardRef(IntervalInner)) as
         unknown as
         Component<typeof IntervalInner>
 // region static properties

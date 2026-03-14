@@ -158,6 +158,9 @@ export const TRANSFORMER: DataTransformation = {
             if (isNaN(value as number))
                 value = 0
 
+            if (typeof value === 'number' && !isFinite(value))
+                return value
+
             return useISOString ?
                 utcSecondsToISOString(value as number) :
                 value
@@ -230,6 +233,9 @@ export const TRANSFORMER: DataTransformation = {
 
             if (isNaN(value as number))
                 value = 0
+
+            if (typeof value === 'number' && !isFinite(value))
+                return value
 
             return useISOString ?
                 utcSecondsToISOString(value as number) :
@@ -347,6 +353,9 @@ export const TRANSFORMER: DataTransformation = {
             if (isRoundedToDay)
                 value += new Date(value * 1000).getTimezoneOffset() * 60
 
+            if (typeof value === 'number' && !isFinite(value))
+                return value
+
             return transformation.date.useISOString ?
                 utcSecondsToISOString(value) :
                 value
@@ -381,9 +390,12 @@ export const TRANSFORMER: DataTransformation = {
                 ) as number
             }
 
-            const edgeValueDescription = convertEdgeValueToString(value)
-            if (typeof edgeValueDescription === 'string')
-                return edgeValueDescription
+            if (value === Infinity)
+                value = 24 * 60 * 60 + 0.999 - 1
+            else if (value === -Infinity)
+                value = 0
+            else if (!isFinite(value))
+                return ''
 
             let formattedValue = utcSecondsToISOString(value)
 
@@ -406,7 +418,7 @@ export const TRANSFORMER: DataTransformation = {
 
             return formattedValue
         }}},
-        // Converts given date representation into unix time stamp.
+        // Converts given date representation normalized parseable format.
         parse: (
             value: Date | number | string,
             {date: {useISOString}}: DataTransformation
@@ -448,6 +460,9 @@ export const TRANSFORMER: DataTransformation = {
             if (isNaN(value))
                 value = 0
 
+            if (typeof value === 'number' && !isFinite(value))
+                return value
+
             return useISOString ? utcSecondsToISOString(value) : value
         }
     },
@@ -483,9 +498,12 @@ export const TRANSFORMER: DataTransformation = {
                 ) as number
             }
 
-            const edgeValueDescription = convertEdgeValueToString(value)
-            if (typeof edgeValueDescription === 'string')
-                return edgeValueDescription
+            if (value === Infinity)
+                value = 24 * 60 * 60
+            else if (value === -Infinity)
+                value = 0
+            else if (!isFinite(value))
+                return ''
 
             /*
                 NOTE: For time without any date information we cannot determine
@@ -565,6 +583,9 @@ export const TRANSFORMER: DataTransformation = {
 
             if (isNaN(value))
                 value = 0
+
+            if (typeof value === 'number' && !isFinite(value))
+                return value
 
             return useISOString ? utcSecondsToISOString(value) : value
         },

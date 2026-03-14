@@ -29,7 +29,6 @@ import BasePropertyTypes, {
     object,
     oneOfType,
     Requireable,
-    shape,
     string,
     symbol
 } from 'clientnode/property-types'
@@ -40,9 +39,7 @@ import {
     MouseEvent,
     ReactElement,
     ReactNode,
-    RefAttributes,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject
+    RefAttributes
 } from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
 import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
@@ -58,7 +55,6 @@ import {
 } from '../../implementations/type'
 import {
     BaseModel,
-    CursorState,
     defaultModel as baseDefaultModel,
     defaultModelState as baseDefaultModelState,
     defaultProperties as baseDefaultProperties,
@@ -72,9 +68,12 @@ import {
     StaticWebComponent,
     ValueState as BaseValueState
 } from '../../type'
+
 import {
     Reference as InputEventMapperReference
 } from './InputEventMapperWrapper'
+import {Reference as CodeMirrorReference} from './CodeMirror'
+import {Reference as TipTapReference} from './Tiptap'
 // endregion
 // region data transformation
 export type Transformer<T = unknown> = (
@@ -152,7 +151,7 @@ export type DataTransformation =
     /* eslint-enable @typescript-eslint/consistent-indexed-object-style */
 // endregion
 export interface EditorReference {
-    input: RefObject<InputEventMapperReference | null>
+    input: InputEventMapperReference | null
 }
 
 export interface EditorProperties
@@ -298,7 +297,6 @@ export interface Properties<Type = unknown> extends
 
     align: 'end' | 'start'
     children: (options: ChildrenOptions<this, Type>) => null | ReactElement
-    cursor: Partial<CursorState> | null
 
     editor: EditorType
     editorIsActive: boolean
@@ -373,19 +371,16 @@ export type PropertyTypes<T = unknown> = {
 }
 
 export interface State<T = unknown> extends BaseState<T> {
-    cursor: CursorState
     editorIsActive: boolean
     hidden?: boolean
     modelState: ModelState
     representation?: ReactNode | string
-    selectionIsUnstable: boolean
     showDeclaration: boolean
 }
 
-// NOTE: We hold "selectionIsUnstable" state value as internal private one.
 export type Adapter<T = unknown> = ComponentAdapter<
     Properties<T>,
-    Omit<State<T>, 'representation' | 'selectionIsUnstable' | 'value'> &
+    Omit<State<T>, 'editorIsActive' | 'representation' | 'value'> &
     {
         representation?: ReactNode | string
         value?: null | T
@@ -393,9 +388,9 @@ export type Adapter<T = unknown> = ComponentAdapter<
 >
 export interface AdapterWithReferences<T = unknown> extends Adapter<T> {
     references: {
-        input: RefObject<InputReference | InputEventMapperReference | null>
-        menu: RefObject<unknown>
-        wrapper: RefObject<HTMLDivElement | null>
+        input: CodeMirrorReference | InputReference | TipTapReference | null
+        menu: unknown
+        wrapper: HTMLDivElement | null
     }
 }
 
@@ -432,13 +427,6 @@ export const propertyTypes: ValidationMapping = {
     */
     align: string,
     children: func,
-    cursor: oneOfType([
-        shape({
-            end: number.isRequired,
-            start: number.isRequired
-        }),
-        symbol
-    ]),
 
     /*
         NOTE: Not yet working:
@@ -548,11 +536,6 @@ export const defaultInputModel: Model<string> = {
 */
 export const defaultProperties: DefaultProperties = {
     ...baseDefaultProperties as DefaultProperties,
-
-    cursor: {
-        end: 0,
-        start: 0
-    },
 
     editor: 'plain',
     selectableEditor: false,

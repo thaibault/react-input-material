@@ -22,12 +22,13 @@ import {OptionsType, Select as RMWCSelect} from '@rmwc/select'
 import {
     ForwardedRef,
     forwardRef,
-    memo as memorize,
+    memo as memoize,
     ReactElement,
-    useImperativeHandle,
-    useRef
+    useImperativeHandle
 } from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
+
+import {useReferenceState} from '../../../helper'
 
 import {InputReference, SelectProperties} from '../../type'
 // endregion
@@ -35,9 +36,12 @@ export const SelectInner = function<Type = unknown>(
     properties: SelectProperties<Type>,
     reference?: ForwardedRef<InputReference>
 ): ReactElement {
-    const baseReference = useRef<HTMLSelectElement>(null)
-    const foundationReference = useRef<MDCSelectFoundation>(null)
-    const inputReference = useRef<HTMLSelectElement>(null)
+    const [baseReference, setBaseReference] =
+        useReferenceState<HTMLSelectElement | null>(null)
+    const [foundationReference, setFoundationReference] =
+        useReferenceState<MDCSelectFoundation | null>(null)
+    const [inputReference, setInputReference] =
+        useReferenceState<HTMLSelectElement | null>(null)
 
     useImperativeHandle(
         reference,
@@ -45,7 +49,8 @@ export const SelectInner = function<Type = unknown>(
             base: baseReference,
             foundation: foundationReference,
             input: inputReference
-        })
+        }),
+        [baseReference, foundationReference, inputReference]
     )
 
     return <RMWCSelect
@@ -65,12 +70,9 @@ export const SelectInner = function<Type = unknown>(
 
         enhanced
 
-        ref={baseReference}
-        foundationRef={foundationReference}
-        inputRef={inputReference as
-            unknown as
-            (reference: HTMLSelectElement | null) => void
-        }
+        ref={setBaseReference}
+        foundationRef={setFoundationReference}
+        inputRef={setInputReference}
 
         onChange={properties.onChange}
         onKeyDown={properties.onKeyDown}
@@ -84,6 +86,6 @@ export const SelectInner = function<Type = unknown>(
         {...properties.componentProperties}
     />
 }
-export const Select = memorize(forwardRef(SelectInner)) as typeof SelectInner
+export const Select = memoize(forwardRef(SelectInner)) as typeof SelectInner
 
 export default Select

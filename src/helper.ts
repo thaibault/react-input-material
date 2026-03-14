@@ -33,21 +33,9 @@ import {
     ValueOf
 } from 'clientnode'
 import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
-
 import {ReactNode, useState} from 'react'
+import {useMemorizedValue} from 'react-generic-tools'
 
-import {
-    BaseModel,
-    BaseProperties,
-    BaseProps,
-    DefaultBaseProperties,
-    DefaultProperties,
-    ModelState,
-    NormalizedSelection,
-    SelectionDefinition,
-    TypeDefinition,
-    ValueState
-} from './type'
 import {DateTimeRepresentation} from './components/Interval/type'
 import TextInput from './components/TextInput'
 import {
@@ -58,8 +46,38 @@ import {
     Props as TextInputProps,
     Transformer as TextInputTransformer
 } from './components/TextInput/type'
+import {
+    BaseModel,
+    BaseProperties,
+    BaseProps,
+    DefaultBaseProperties,
+    DefaultProperties,
+    ModelState,
+    NormalizedSelection,
+    Properties,
+    SelectionDefinition,
+    TypeDefinition,
+    ValueState
+} from './type'
 // endregion
 // region state
+/**
+ * Use state wrapper to deal with references. It only sets a new state if the
+ * given reference isn't null.
+ * @param initialValue - To set state to.
+ * @returns Whatever "useState" would return.
+ */
+export const useReferenceState = (<T>(initialValue: T) => {
+    const [value, setValue] = useState<T>(initialValue)
+
+    return [
+        value,
+        useMemorizedValue((reference: T | null) => {
+            if (reference !== null)
+                setValue(reference)
+        })
+    ]
+}) as (typeof useState)
 /**
  * Removes all none serializable values from given data structure.
  * @param object - Mapping of values to slice.
@@ -447,20 +465,6 @@ export const mapPropertiesIntoModel = <
         result.model.mutable = false
         delete result.disabled
     }
-    if ((result as unknown as TextInputDefaultProperties).invertedPattern) {
-        result.model.invertedPattern =
-            /* eslint-disable @typescript-eslint/no-non-null-assertion */
-            (result as unknown as TextInputDefaultProperties).invertedPattern!
-            /* eslint-enable @typescript-eslint/no-non-null-assertion */
-        delete (result as unknown as TextInputDefaultProperties).invertedPattern
-    }
-    if ((result as unknown as TextInputDefaultProperties).pattern) {
-        result.model.pattern =
-            /* eslint-disable @typescript-eslint/no-non-null-assertion */
-            (result as unknown as TextInputDefaultProperties).pattern!
-            /* eslint-enable @typescript-eslint/no-non-null-assertion */
-        delete (result as unknown as TextInputDefaultProperties).pattern
-    }
     if (result.required) {
         result.model.nullable = false
         delete result.required
@@ -469,6 +473,20 @@ export const mapPropertiesIntoModel = <
         result.type = 'string'
     // endregion
     // region map properties into model
+    if ((result as unknown as TextInputDefaultProperties).invertedPattern) {
+        result.model.invertedPattern =
+            /* eslint-disable @typescript-eslint/no-non-null-assertion */
+            (result as unknown as TextInputDefaultProperties).invertedPattern!
+        /* eslint-enable @typescript-eslint/no-non-null-assertion */
+        delete (result as unknown as TextInputDefaultProperties).invertedPattern
+    }
+    if ((result as unknown as TextInputDefaultProperties).pattern) {
+        result.model.pattern =
+            /* eslint-disable @typescript-eslint/no-non-null-assertion */
+            (result as unknown as TextInputDefaultProperties).pattern!
+        /* eslint-enable @typescript-eslint/no-non-null-assertion */
+        delete (result as unknown as TextInputDefaultProperties).pattern
+    }
     // Map first level properties
     for (const name of Object.keys(result.model).concat('value'))
         if (
@@ -846,3 +864,26 @@ export const formatDateTimeAsConfigured = (
     return value
 }
 // endregion
+export const hashRegularExpression = (expression: RegExp) => (
+    expression.source +
+    '||' +
+    expression.flags.split('').sort().join('')
+)
+export const usePropertiesChangedIndicator = <Type = unknown>(
+    properties: Properties<Type>
+) =>
+    useMemorizedValue(
+        {},
+
+        JSON.stringify(properties),
+
+        properties.onChange,
+        properties.onChangeShowDeclaration,
+        properties.onChangeState,
+        properties.onChangeValue,
+
+        properties.onBlur,
+        properties.onClick,
+        properties.onFocus,
+        properties.onTouch
+    )

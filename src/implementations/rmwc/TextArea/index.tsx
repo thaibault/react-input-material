@@ -24,24 +24,24 @@ import {Mapping, NOOP} from 'clientnode'
 import {
     ForwardedRef,
     forwardRef,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
     ReactElement,
     useEffect,
     useId,
-    useImperativeHandle,
-    useRef
+    useImperativeHandle
 } from 'react'
+
+import {useReferenceState} from '../../../helper'
 
 import {TextAreaProperties, TextAreaReference} from '../../type'
 
 import cssClassNames from './style.module'
+import {useMemorizedValue} from 'react-generic-tools'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames
 
 export interface Reference extends TextAreaReference {
-    materialTextField: RefObject<MDCTextField | null>
-    foundation: RefObject<MDCTextFieldFoundation | null>
+    materialTextField: MDCTextField | null
+    foundation: MDCTextFieldFoundation | null
 }
 
 export const OUTLINED = false
@@ -53,13 +53,14 @@ export const TextArea = forwardRef((
     const id = properties.id ?? defaultID
     const classNamePrefix = properties.classNamePrefix ?? 'text-area'
 
-    const inputReference: RefObject<HTMLTextAreaElement | null> =
-        useRef<HTMLTextAreaElement>(null)
-    const materialTextFieldReference = useRef<MDCTextField | null>(null)
-    const labelReference: RefObject<HTMLLabelElement | null> =
-        useRef<HTMLLabelElement>(null)
-    const foundationReference: RefObject<MDCTextFieldFoundation | null> =
-        useRef<MDCTextFieldFoundation>(null)
+    const [inputReference, setInputReference] =
+        useReferenceState<HTMLTextAreaElement | null>(null)
+    const [materialTextFieldReference, setMaterialTextFieldReference] =
+        useReferenceState<MDCTextField | null>(null)
+    const [labelReference, setLabelReference] =
+        useReferenceState<HTMLLabelElement | null>(null)
+    const [foundationReference, setFoundationReference] =
+        useReferenceState<MDCTextFieldFoundation | null>(null)
 
     useImperativeHandle(
         reference,
@@ -68,51 +69,54 @@ export const TextArea = forwardRef((
             input: inputReference,
             label: labelReference,
             materialTextField: materialTextFieldReference
-        })
+        }),
+        [
+            foundationReference,
+            inputReference,
+            labelReference,
+            materialTextFieldReference
+        ]
     )
 
     useEffect(
         () => {
-            if (labelReference.current) {
-                materialTextFieldReference.current =
-                    new MDCTextField(labelReference.current)
+            if (labelReference) {
+                const materialTextFieldReference =
+                    new MDCTextField(labelReference)
 
-                foundationReference.current =
-                    materialTextFieldReference.current.getDefaultFoundation()
+                setMaterialTextFieldReference(materialTextFieldReference)
+
+                setFoundationReference(
+                    materialTextFieldReference.getDefaultFoundation()
+                )
 
                 if (typeof properties.value === 'string') {
-                    foundationReference.current.setValue(properties.value)
-                    materialTextFieldReference.current.value = properties.value
+                    foundationReference?.setValue(properties.value)
+                    materialTextFieldReference.value = properties.value
                 }
 
                 if (typeof properties.disabled === 'boolean') {
-                    foundationReference.current.setDisabled(
-                        properties.disabled
-                    )
-                    materialTextFieldReference.current.disabled =
-                        properties.disabled
+                    foundationReference?.setDisabled(properties.disabled)
+                    materialTextFieldReference.disabled = properties.disabled
                 }
 
                 if (typeof properties.invalid === 'boolean') {
-                    foundationReference.current.setValid(!properties.invalid)
-                    materialTextFieldReference.current.valid =
-                        !properties.invalid
+                    foundationReference?.setValid(!properties.invalid)
+                    materialTextFieldReference.valid = !properties.invalid
                 }
 
                 if (typeof properties.required === 'boolean')
-                    materialTextFieldReference.current.required =
-                        properties.required
+                    materialTextFieldReference.required = properties.required
 
-                foundationReference.current.setUseNativeValidation(false)
+                foundationReference?.setUseNativeValidation(false)
 
                 return () => {
-                    materialTextFieldReference.current?.destroy()
+                    materialTextFieldReference.destroy()
                 }
             }
         },
         [
-            labelReference.current,
-            materialTextFieldReference.current,
+            labelReference,
 
             properties.value,
             properties.disabled,
@@ -137,11 +141,11 @@ export const TextArea = forwardRef((
                         do clearing the textarea's input value.
                     */
                     setTimeout(() => {
-                        foundationReference.current?.autoCompleteFocus()
+                        foundationReference?.autoCompleteFocus()
                     })
                 } :
                 NOOP
-            inputReference.current?.addEventListener('input', onInput)
+            inputReference?.addEventListener('input', onInput)
 
             const onFocus = properties.children ?
                 () => {
@@ -151,22 +155,18 @@ export const TextArea = forwardRef((
                         focusing the advanced editor.
                     */
                     setTimeout(() => {
-                        foundationReference.current?.activateFocus()
+                        foundationReference?.activateFocus()
                     })
                 } :
                 NOOP
-            inputReference.current?.addEventListener('focus', onFocus)
+            inputReference?.addEventListener('focus', onFocus)
 
             return () => {
-                inputReference.current?.removeEventListener('input', onInput)
-                inputReference.current?.removeEventListener('focus', onFocus)
+                inputReference?.removeEventListener('input', onInput)
+                inputReference?.removeEventListener('focus', onFocus)
             }
         },
-        [
-            foundationReference.current,
-            inputReference.current,
-            properties.children
-        ]
+        [foundationReference, inputReference, properties.children]
     )
 
     // NOTE: Character count is only supported if maximum length is given.
@@ -178,7 +178,7 @@ export const TextArea = forwardRef((
 
     const editorContent = <>
         <textarea
-            ref={inputReference}
+            ref={setInputReference}
 
             id={id}
             name={properties.name}
@@ -186,14 +186,16 @@ export const TextArea = forwardRef((
             disabled={properties.disabled}
 
             className="mdc-text-field__input"
-            style={properties.children ?
-                {
-                    visibility: 'hidden',
-                    position: 'absolute',
-                    ...properties.styles
-                } :
+            style={useMemorizedValue(
+                properties.children ?
+                    {
+                        visibility: 'hidden',
+                        position: 'absolute',
+                        ...properties.styles
+                    } :
+                    properties.styles,
                 properties.styles
-            }
+            )}
             rows={properties.rows}
 
             aria-labelledby={`${id}-label`}
@@ -237,18 +239,23 @@ export const TextArea = forwardRef((
         }
     </>
 
-    const helpText: TextFieldHelperTextProps =
+    const helpText: TextFieldHelperTextProps = useMemorizedValue(
         typeof properties.helpText === 'object' ?
             properties.helpText as TextFieldHelperTextProps :
-            {children: properties.helpText}
+            {children: properties.helpText},
+        properties.helpText
+    )
 
     return <>
         <label
-            ref={labelReference}
-            onClick={(event) => {
-                if (properties.onLabelClick)
-                    properties.onLabelClick(event)
-            }}
+            ref={setLabelReference}
+            onClick={useMemorizedValue(
+                (event) => {
+                    if (properties.onLabelClick)
+                        properties.onLabelClick(event)
+                },
+                properties.onLabelClick
+            )}
             className={[
                 classNamePrefix,
                 'mdc-text-field',
