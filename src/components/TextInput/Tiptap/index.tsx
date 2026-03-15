@@ -25,8 +25,8 @@ import {
     ForwardedRef, forwardRef, ReactElement, useEffect, useImperativeHandle
 } from 'react'
 import Dummy from 'react-generic-dummy'
+import {useReferenceState} from 'react-generic-tools'
 
-import {useReferenceState} from '../../../helper'
 import {TextAreaProperties} from '../../../implementations/type'
 import InputEventMapper, {
     Reference as InputEventMapperReference

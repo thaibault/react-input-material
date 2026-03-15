@@ -16,6 +16,15 @@
     endregion
 */
 // region imports
+import {
+    ForwardedRef,
+    forwardRef,
+    memo as memoize,
+    ReactElement,
+    useImperativeHandle
+} from 'react'
+import {useReferenceState} from 'react-generic-tools'
+
 import {MDCMenuFoundation} from '@material/menu'
 import {
     Menu as RMWCMenu,
@@ -25,16 +34,6 @@ import {
     MenuSurfaceAnchor,
     MenuProps as RMWCMenuProps
 } from '@rmwc/menu'
-
-import {
-    ForwardedRef,
-    forwardRef,
-    memo as memoize,
-    ReactElement,
-    useImperativeHandle
-} from 'react'
-
-import {useReferenceState} from '../../helper'
 
 import {MenuProperties, MenuReference} from '../type'
 

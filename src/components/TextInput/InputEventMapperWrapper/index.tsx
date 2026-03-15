@@ -20,10 +20,10 @@
 import {
     ForwardedRef, forwardRef, ReactElement, useImperativeHandle
 } from 'react'
+import {useReferenceState} from 'react-generic-tools'
 
 import TextArea from '#implementations/TextArea'
 
-import {useReferenceState} from '../../../helper'
 import {
     EventMapperWrapperReference, TextAreaProperties, TextAreaReference
 } from '../../../implementations/type'

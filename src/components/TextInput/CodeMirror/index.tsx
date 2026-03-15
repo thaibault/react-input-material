@@ -25,7 +25,7 @@ import {
     useEffect,
     useImperativeHandle, useRef
 } from 'react'
-import {useMemorizedValue} from 'react-generic-tools'
+import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
 import {
     autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap
@@ -56,7 +56,6 @@ import {
     rectangularSelection
 } from '@codemirror/view'
 
-import {useReferenceState} from '../../../helper'
 import {TextAreaProperties} from '../../../implementations/type'
 import InputEventMapper, {
     Reference as InputEventMapperReference

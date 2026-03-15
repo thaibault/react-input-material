@@ -62,23 +62,6 @@ import {
 // endregion
 // region state
 /**
- * Use state wrapper to deal with references. It only sets a new state if the
- * given reference isn't null.
- * @param initialValue - To set state to.
- * @returns Whatever "useState" would return.
- */
-export const useReferenceState = (<T>(initialValue: T) => {
-    const [value, setValue] = useState<T>(initialValue)
-
-    return [
-        value,
-        useMemorizedValue((reference: T | null) => {
-            if (reference !== null)
-                setValue(reference)
-        })
-    ]
-}) as (typeof useState)
-/**
  * Removes all none serializable values from given data structure.
  * @param object - Mapping of values to slice.
  */

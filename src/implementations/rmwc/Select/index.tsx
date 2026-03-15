@@ -26,9 +26,7 @@ import {
     ReactElement,
     useImperativeHandle
 } from 'react'
-import {useMemorizedValue} from 'react-generic-tools'
-
-import {useReferenceState} from '../../../helper'
+import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
 import {InputReference, SelectProperties} from '../../type'
 // endregion
