@@ -25,9 +25,7 @@ import {IconSizeT} from '@rmwc/types'
 import {
     ForwardedRef, forwardRef, ReactElement, useImperativeHandle
 } from 'react'
-import {useMemorizedValue} from 'react-generic-tools'
-
-import {useReferenceState} from '../../helper'
+import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
 import {IconButtonProperties} from '../type'
 // endregion

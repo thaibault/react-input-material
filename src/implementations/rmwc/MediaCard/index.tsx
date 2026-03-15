@@ -36,14 +36,14 @@ import {
     useId,
     useImperativeHandle
 } from 'react'
+import {useReferenceState} from 'react-generic-tools'
 import GenericAnimate from 'react-generic-animate'
-
-import {useReferenceState} from '../../../helper'
 
 import {
     MediaCardProperties, MediaCardReference, MediaCardRepresentationType
 } from '../../type'
 import CircularProgress from '../CircularProgress'
+
 import cssClassNames from './style.module'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames

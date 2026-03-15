@@ -53,7 +53,7 @@ import {
 import GenericAnimate from 'react-generic-animate'
 import {GenericEvent} from 'react-generic-tools/type'
 import Dummy from 'react-generic-dummy'
-import {useMemorizedValue} from 'react-generic-tools'
+import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 import {
     TransitionChildren, TransitionProps
 } from 'react-transition-group/Transition'
@@ -82,7 +82,6 @@ import {
     renderMessage,
     translateKnownSymbols,
     triggerCallbackIfExists,
-    useReferenceState,
     wrapStateSetter
 } from '../../helper'
 import {

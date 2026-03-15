@@ -21,8 +21,8 @@ import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox'
 import {
     ForwardedRef, forwardRef, ReactElement, useImperativeHandle
 } from 'react'
+import {useReferenceState} from 'react-generic-tools'
 
-import {useReferenceState} from '../../../helper'
 import {CheckboxProperties, InputReference} from '../../type'
 import cssClassNames from './style.module'
 // endregion
