@@ -33,7 +33,7 @@ import {
     useId,
     useImperativeHandle,
     useState,
-    useRef, useCallback
+    useCallback
 } from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
@@ -128,18 +128,6 @@ export {
 export const FileInputInner = function<Type extends Value = Value>(
     props: Props<Type>, reference?: ForwardedRef<AdapterWithReferences<Type>>
 ): ReactElement {
-    // TODO
-    /*
-        NOTE: We currently end up in and endless loop if we store the input
-        reference in state like:
-
-        const [nameInputReference, setNameInputReference] =
-            useState<TextInputAdapter<string> | null>(null)
-    */
-    const nameInputReferenceAsRef =
-        useRef<TextInputAdapter<string> | null>(null)
-    const setNameInputReference = nameInputReferenceAsRef
-    const nameInputReference = nameInputReferenceAsRef.current
     // region property aggregation
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -575,6 +563,8 @@ export const FileInputInner = function<Type extends Value = Value>(
         useState<HTMLInputElement | null>(null)
     const [mediaCardReference, setMediaCardReference] =
         useState<MediaCardReference | null>(null)
+    const [nameInputReference, setNameInputReference] =
+        useState<TextInputAdapter<string> | null>(null)
 
     useImperativeHandle(
         reference,
@@ -594,127 +584,134 @@ export const FileInputInner = function<Type extends Value = Value>(
             fileInputReference,
             mediaCardReference,
             nameInputReference,
-            controlled,
-            // NOTE: State can be derived out of changes to the given value.
-            properties.value
+
+            propertiesChangedIndicator
         ]
     )
     // endregion
     const defaultID = useId()
     const id = properties.id ?? defaultID
 
-    useEffect((): void => {
-        (async (): Promise<void> => {
-            const valueChanged: Partial<Type> = {}
-            if (properties.value?.source) {
-                if (!properties.value.blob) {
-                    // Derive missing blob from given source.
-                    if (properties.value.url?.startsWith('data:'))
-                        valueChanged.blob =
-                            dataURLToBlob(properties.value.url)
-                    else if (properties.sourceToBlobOptions)
-                        valueChanged.blob = new Blob(
-                            [properties.value.source],
-                            properties.sourceToBlobOptions
-                        )
-                } else if (!properties.value.url) {
-                    const type = contentType || 'text/plain'
-                    /*
-                        Try to derive missing encoded base64 url from given
-                        blob or plain source.
-                    */
-                    valueChanged.url =
-                        `data:${type};charset=${properties.encoding};base64,` +
-                        await deriveBase64String(properties.value)
-                }
-
-                if (!properties.value.hash)
-                    valueChanged.hash =
-                        properties.hashingConfiguration.prefix +
-                        md5Hash(properties.value.source)
-            } else {
-                let blob: Blob | undefined
-                if (
-                    properties.value?.blob &&
-                    properties.value.blob instanceof Blob
-                ) {
-                    blob = properties.value.blob
-                    // Derive missing source from given blob.
-                    valueChanged.source = await (
-                        representationType === RepresentationType.TEXT ?
-                            readBinaryDataIntoText(blob, properties.encoding) :
-                            deriveBase64String(properties.value)
-                    )
-                } else if (properties.value?.url) {
-                    blob = await (properties.value.url.startsWith('data:') ?
-                        dataURLToBlob(properties.value.url) :
-                        (await fetch(properties.value.url)).blob()
-                    )
-
-                    if (representationType === RepresentationType.TEXT)
-                        // Derive missing source from given data url.
-                        valueChanged.source = await readBinaryDataIntoText(
-                            blob, properties.encoding
-                        )
-                }
-
-                if (!properties.value?.hash && blob) {
-                    /*
-                        We have a blob but no hash so far, therefore we read
-                        the file with reduced memory effort chunk by chunk
-                        having the configured size.
-                    */
-                    let currentChunk = 0
-                    const chunkSize =
-                        properties.hashingConfiguration.readChunkSizeInByte
-                    const chunks = Math.ceil(blob.size / chunkSize)
-                    const buffer = new MD5ArrayBuffer()
-                    const fileReader = new FileReader()
-
-                    const hash = await new Promise<string>((
-                        resolve, reject
-                    ) => {
-                        fileReader.onload = (event) => {
-                            buffer.append(event.target?.result as ArrayBuffer)
-                            currentChunk++
-
-                            if (currentChunk < chunks)
-                                loadNext()
-                            else
-                                resolve(buffer.end(
-                                    properties.hashingConfiguration
-                                        .binaryString
-                                ))
-                        }
-
-                        fileReader.onerror = reject
-
-                        const loadNext = () => {
-                            const start = currentChunk * chunkSize
-                            const end = ((start + chunkSize) >= blob.size) ?
-                                blob.size :
-                                start + chunkSize
-
-                            fileReader.readAsArrayBuffer(
-                                blob.slice(start, end)
+    useEffect(
+        (): void => {
+            (async (): Promise<void> => {
+                const valueChanged: Partial<Type> = {}
+                if (properties.value?.source) {
+                    if (!properties.value.blob) {
+                        // Derive missing blob from given source.
+                        if (properties.value.url?.startsWith('data:'))
+                            valueChanged.blob =
+                                dataURLToBlob(properties.value.url)
+                        else if (properties.sourceToBlobOptions)
+                            valueChanged.blob = new Blob(
+                                [properties.value.source],
+                                properties.sourceToBlobOptions
                             )
-                        }
+                    } else if (!properties.value.url) {
+                        const type = contentType || 'text/plain'
+                        /*
+                            Try to derive missing encoded base64 url from given
+                            blob or plain source.
+                        */
+                        valueChanged.url =
+                            `data:${type};charset=${properties.encoding};` +
+                            'base64,' +
+                            await deriveBase64String(properties.value)
+                    }
 
-                        loadNext()
-                    })
+                    if (!properties.value.hash)
+                        valueChanged.hash =
+                            properties.hashingConfiguration.prefix +
+                            md5Hash(properties.value.source)
+                } else {
+                    let blob: Blob | undefined
+                    if (
+                        properties.value?.blob &&
+                        properties.value.blob instanceof Blob
+                    ) {
+                        blob = properties.value.blob
+                        // Derive missing source from given blob.
+                        valueChanged.source = await (
+                            representationType === RepresentationType.TEXT ?
+                                readBinaryDataIntoText(
+                                    blob, properties.encoding
+                                ) :
+                                deriveBase64String(properties.value)
+                        )
+                    } else if (properties.value?.url) {
+                        blob = await (properties.value.url.startsWith('data:') ?
+                            dataURLToBlob(properties.value.url) :
+                            (await fetch(properties.value.url)).blob()
+                        )
 
-                    valueChanged.hash =
-                        properties.hashingConfiguration.prefix + hash
+                        if (representationType === RepresentationType.TEXT)
+                            // Derive missing source from given data url.
+                            valueChanged.source = await readBinaryDataIntoText(
+                                blob, properties.encoding
+                            )
+                    }
+
+                    if (!properties.value?.hash && blob) {
+                        /*
+                            We have a blob but no hash so far, therefore we read
+                            the file with reduced memory effort chunk by chunk
+                            having the configured size.
+                        */
+                        let currentChunk = 0
+                        const chunkSize =
+                            properties.hashingConfiguration.readChunkSizeInByte
+                        const chunks = Math.ceil(blob.size / chunkSize)
+                        const buffer = new MD5ArrayBuffer()
+                        const fileReader = new FileReader()
+
+                        const hash = await new Promise<string>((
+                            resolve, reject
+                        ) => {
+                            fileReader.onload = (event) => {
+                                buffer.append(
+                                    event.target?.result as ArrayBuffer
+                                )
+                                currentChunk++
+
+                                if (currentChunk < chunks)
+                                    loadNext()
+                                else
+                                    resolve(buffer.end(
+                                        properties.hashingConfiguration
+                                            .binaryString
+                                    ))
+                            }
+
+                            fileReader.onerror = reject
+
+                            const loadNext = () => {
+                                const start = currentChunk * chunkSize
+                                const end = ((start + chunkSize) >= blob.size) ?
+                                    blob.size :
+                                    start + chunkSize
+
+                                fileReader.readAsArrayBuffer(
+                                    blob.slice(start, end)
+                                )
+                            }
+
+                            loadNext()
+                        })
+
+                        valueChanged.hash =
+                            properties.hashingConfiguration.prefix + hash
+                    }
                 }
-            }
 
-            if (Object.keys(valueChanged).length > 0)
-                onChangeValue(valueChanged, undefined, undefined, true)
-        })()
-            .catch((reason: unknown) => {
-                console.warn(reason)
-            })
-    })
+                if (Object.keys(valueChanged).length > 0)
+                    onChangeValue(valueChanged, undefined, undefined, true)
+            })()
+                .catch((reason: unknown) => {
+                    console.warn(reason)
+                })
+        },
+        [propertiesChangedIndicator]
+    )
     useEffect(
         () => {
             if (properties.triggerInitialPropertiesConsolidation)

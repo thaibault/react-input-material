@@ -36,7 +36,7 @@ import {
     useId,
     useImperativeHandle
 } from 'react'
-import {useReferenceState} from 'react-generic-tools'
+import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 import GenericAnimate from 'react-generic-animate'
 
 import {
@@ -87,6 +87,13 @@ export const MediaCardInner = function(
         ]
     )
     // endregion
+
+    const iFrameStyles =
+        useMemorizedValue({border: 0, overflow: 'hidden'})
+    const mediaStyles = useMemorizedValue(
+        properties.url ? {backgroundImage: `url(${properties.url})`} : {},
+        properties.url
+    )
     const determineMediaContent = (): ReactNode => {
         if (properties.type === MediaCardRepresentationType.PENDING)
             return <CircularProgress size="large" />
@@ -98,7 +105,7 @@ export const MediaCardInner = function(
             return <CardMedia
                 sixteenByNine
                 className={properties.imageClassNames?.join(' ')}
-                style={{backgroundImage: `url(${properties.url})`}}
+                style={mediaStyles}
             />
 
         if (properties.type === MediaCardRepresentationType.VIDEO)
@@ -121,7 +128,7 @@ export const MediaCardInner = function(
             }>
                 <iframe
                     ref={setIFrameReference}
-                    style={{border: 0, overflow: 'hidden'}}
+                    style={iFrameStyles}
                     src={properties.url}
                 />
             </div>
