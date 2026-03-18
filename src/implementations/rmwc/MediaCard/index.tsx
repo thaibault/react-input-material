@@ -156,6 +156,8 @@ export const MediaCardInner = function(
         onBlur={properties.onBlur}
         onClick={properties.onClick}
         onFocus={properties.onFocus}
+
+        {...properties.componentProperties}
     >
         <CardPrimaryAction>
             {determineMediaContent()}
