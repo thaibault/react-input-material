@@ -342,7 +342,7 @@ export const FileInputInner = function<Type extends Value = Value>(
      * @param event - Optional event object (if not provided as first
      * argument).
      * @param _inputProperties - Current properties state.
-     * @param attachBlobProperty - Indicates whether additional data is added
+     * @param extendBlobProperties - Indicates whether additional data is added
      * through post processed data properties.
      */
     const onChangeValue = useCallback(
@@ -350,7 +350,7 @@ export const FileInputInner = function<Type extends Value = Value>(
             eventSourceOrName?: null | Partial<Type> | string | SyntheticEvent,
             event?: SyntheticEvent,
             _inputProperties?: TextInputProperties<string>,
-            attachBlobProperty = false
+            extendBlobProperties = false
         ): void => {
             if (!(properties.model.mutable && properties.model.writable))
                 return
@@ -411,10 +411,11 @@ export const FileInputInner = function<Type extends Value = Value>(
                     (
                         typeof (eventSourceOrName as Type).source ===
                             'string' ||
-                        typeof (eventSourceOrName as Type).url === 'string'
+                        typeof (eventSourceOrName as Type).url === 'string' ||
+                        typeof (eventSourceOrName as Type).hash === 'string'
                     )
                 )
-                    if (attachBlobProperty)
+                    if (extendBlobProperties)
                         properties.value = {
                             ...oldValueState.value, ...eventSourceOrName
                         } as Type
@@ -470,7 +471,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                     )
                 }
 
-                if (attachBlobProperty)
+                if (extendBlobProperties)
                     result.attachBlobProperty = true
 
                 return result
@@ -643,6 +644,8 @@ export const FileInputInner = function<Type extends Value = Value>(
                             dataURLToBlob(properties.value.url) :
                             (await fetch(properties.value.url)).blob()
                         )
+                        if (!properties.value.blob)
+                            valueChanged.blob = blob
 
                         if (representationType === RepresentationType.TEXT)
                             // Derive missing source from given data url.

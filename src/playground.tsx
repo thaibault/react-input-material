@@ -120,8 +120,9 @@ const Application = () => {
             name: 'test.txt'
         })
     const onChangeFileInputValue =
-        useMemorizedValue<(value?: FileInputValue | null) =>
-            void>(setFileInputValue)
+        useMemorizedValue<(value?: FileInputValue | null) => void>(
+            setFileInputValue
+        )
     /// endregion
     /// region selection
     interface SelectionValueType {
