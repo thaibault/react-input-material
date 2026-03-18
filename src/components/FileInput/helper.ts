@@ -17,6 +17,7 @@
     endregion
 */
 // region imports
+import {NOOP} from 'clientnode'
 import {blobToBase64String} from 'blob-util'
 import {ElementType} from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
@@ -24,8 +25,7 @@ import {useMemorizedValue} from 'react-generic-tools'
 import {
     determineValidationState as determineBaseValidationState,
     hashRegularExpression,
-    usePropertiesChangedIndicator as useBasePropertiesChangedIndicator,
-    usePropertiesChangedIndicator as useTextPropertiesChangedIndicator
+    usePropertiesChangedIndicator as useBasePropertiesChangedIndicator
 } from '../../helper'
 import {
     DefaultProperties as DefaultBaseProperties, Properties as BaseProperties
@@ -237,29 +237,34 @@ export const determineValidationState = <
 export const deriveBase64String = <Type extends Value = Value>(
     value: Type
 ): Promise<string> =>
-        value.blob ?
-            blobToBase64String(value.blob as Blob) :
-            value.source ?
-                Promise.resolve(
-                    Buffer.from(value.source).toString('base64')
-                ) :
-                Promise.reject(
-                    new Error('Base 64 string could not be determined.')
-                )
+    value.blob ?
+        blobToBase64String(value.blob as Blob) :
+        value.source ?
+            Promise.resolve(
+                Buffer.from(value.source).toString('base64')
+            ) :
+            Promise.reject(
+                new Error('Base 64 string could not be determined.')
+            )
 
 /**
  * Read text from given binary data with given encoding.
  * @param blob - Binary data object.
  * @param encoding - Encoding for reading file correctly.
+ * @param registerAbortController - Callback to register an abort controller.
  * @returns A promise holding parsed text as string.
  */
 export const readBinaryDataIntoText = (
-    blob: Blob, encoding = 'utf-8'
+    blob: Blob,
+    encoding = 'utf-8',
+    registerAbortController: (callback: () => void) => void = NOOP
 ): Promise<string> =>
     new Promise<string>((
         resolve: (value: string) => void, reject: (reason: Error) => void
     ) => {
         const fileReader = new FileReader()
+
+        registerAbortController(fileReader.abort.bind(fileReader))
 
         fileReader.onload = (event: Event) => {
             let content: string =

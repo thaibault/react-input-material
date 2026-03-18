@@ -18,7 +18,7 @@
 */
 // region imports
 import {dataURLToBlob} from 'blob-util'
-import {copy, equals, extend, mask} from 'clientnode'
+import {copy, equals, extend, mask, NOOP} from 'clientnode'
 import {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
@@ -594,8 +594,12 @@ export const FileInputInner = function<Type extends Value = Value>(
     const id = properties.id ?? defaultID
 
     useEffect(
-        (): void => {
-            (async (): Promise<void> => {
+        () => {
+            let ignore = false
+            let abortHandler = NOOP
+            const fetchAbortController = new AbortController()
+
+            ;(async (): Promise<void> => {
                 const valueChanged: Partial<Type> = {}
                 if (properties.value?.source) {
                     if (!properties.value.blob) {
@@ -635,30 +639,41 @@ export const FileInputInner = function<Type extends Value = Value>(
                         valueChanged.source = await (
                             representationType === RepresentationType.TEXT ?
                                 readBinaryDataIntoText(
-                                    blob, properties.encoding
+                                    blob,
+                                    properties.encoding,
+                                    (abortController) => {
+                                        abortHandler = abortController
+                                    }
                                 ) :
                                 deriveBase64String(properties.value)
                         )
+                        abortHandler = NOOP
                     } else if (properties.value?.url) {
                         blob = await (properties.value.url.startsWith('data:') ?
                             dataURLToBlob(properties.value.url) :
-                            (await fetch(properties.value.url)).blob()
+                            (await fetch(
+                                properties.value.url,
+                                {signal: fetchAbortController.signal}
+                            )).blob()
                         )
                         if (!properties.value.blob)
                             valueChanged.blob = blob
 
-                        if (representationType === RepresentationType.TEXT)
-                            // Derive missing source from given data url.
-                            valueChanged.source = await readBinaryDataIntoText(
-                                blob, properties.encoding
-                            )
+                        // Derive missing source from given blob.
+                        valueChanged.source = await (
+                            representationType === RepresentationType.TEXT ?
+                                readBinaryDataIntoText(
+                                    blob, properties.encoding
+                                ) :
+                                deriveBase64String({blob})
+                        )
                     }
 
                     if (!properties.value?.hash && blob) {
                         /*
-                            We have a blob but no hash so far, therefore we read
-                            the file with reduced memory effort chunk by chunk
-                            having the configured size.
+                            We have a blob but no hash so far, therefore we
+                            read the file with reduced memory effort chunk by
+                            chunk having the configured size.
                         */
                         let currentChunk = 0
                         const chunkSize =
@@ -666,6 +681,10 @@ export const FileInputInner = function<Type extends Value = Value>(
                         const chunks = Math.ceil(blob.size / chunkSize)
                         const buffer = new MD5ArrayBuffer()
                         const fileReader = new FileReader()
+
+                        abortHandler = () => {
+                            fileReader.abort()
+                        }
 
                         const hash = await new Promise<string>((
                             resolve, reject
@@ -701,17 +720,31 @@ export const FileInputInner = function<Type extends Value = Value>(
                             loadNext()
                         })
 
+                        abortHandler = NOOP
+
                         valueChanged.hash =
                             properties.hashingConfiguration.prefix + hash
                     }
                 }
 
-                if (Object.keys(valueChanged).length > 0)
+                /*
+                    eslint-disable @typescript-eslint/no-unnecessary-condition
+                */
+                if (!ignore && Object.keys(valueChanged).length > 0)
                     onChangeValue(valueChanged, undefined, undefined, true)
+                /*
+                    eslint-enable @typescript-eslint/no-unnecessary-condition
+                */
             })()
                 .catch((reason: unknown) => {
                     console.warn(reason)
                 })
+
+            return () => {
+                ignore = true
+                abortHandler()
+                fetchAbortController.abort('file hase been changed')
+            }
         },
         [propertiesChangedIndicator]
     )
@@ -748,6 +781,8 @@ export const FileInputInner = function<Type extends Value = Value>(
                     unknown as
                     RefObject<MediaCardReference>
             }
+
+            componentProperties={properties.componentProperties}
 
             id={props.id}
 
