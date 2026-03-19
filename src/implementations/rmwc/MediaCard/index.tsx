@@ -256,18 +256,8 @@ export const MediaCardInner = function(
                             ) ?
                                 <CardActionButton
                                     onClick={(event: GenericEvent) => {
-                                        if (properties.onChange) {
-                                            if (!event.detail)
-                                                event.detail = {}
-                                            ;(
-                                                event.detail as {
-                                                    currentTarget:
-                                                        HTMLElement | null
-                                                }
-                                            ).currentTarget = cardReference
-
+                                        if (properties.onChange)
                                             properties.onChange(event)
-                                        }
                                     }}
                                     ref={setDeleteButtonReference}
                                 >
