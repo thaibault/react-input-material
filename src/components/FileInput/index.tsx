@@ -334,7 +334,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                     oldValueState
             })
         },
-        [propertiesChangedIndicator]
+        [propertiesChangedIndicator, mediaCardReference]
     )
     /**
      * Triggered on any change events. Consolidates properties object and
@@ -343,7 +343,6 @@ export const FileInputInner = function<Type extends Value = Value>(
      */
     const onChange = useCallback(
         (event?: SyntheticEvent) => {
-            console.log('MEDIA', mediaCardReference)
             const customEvent = (event || {}) as
                 (
                     GenericEvent &
@@ -354,7 +353,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                 )
             customEvent.originalCurrentTarget = event?.currentTarget || null
             customEvent.currentTarget =
-                mediaCardReference as unknown as HTMLElement
+                mediaCardReference?.card as unknown as HTMLElement
 
             if (nameInputReference?.properties)
                 properties.model.fileName = nameInputReference.properties.model
@@ -440,7 +439,20 @@ export const FileInputInner = function<Type extends Value = Value>(
             setValueState((
                 oldValueState: ValueState<Type>
             ): ValueState<Type> => {
-                if (typeof eventSourceOrName === 'undefined')
+                if (
+                    typeof eventSourceOrName === 'undefined' ||
+                    eventSourceOrName !== null &&
+                    typeof eventSourceOrName === 'object' &&
+                    (eventSourceOrName as Partial<GenericEvent>).target &&
+                    !(
+                        ((eventSourceOrName as GenericEvent).target as
+                            HTMLElement
+                        ).tagName === 'INPUT' &&
+                        ((eventSourceOrName as GenericEvent).target as
+                            HTMLElement
+                        ).getAttribute('type') === 'file'
+                    )
+                )
                     // NOTE: Mark file as deleted.
                     properties.value = null
                 else if (typeof eventSourceOrName === 'string')
@@ -522,7 +534,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                 return result
             })
         },
-        [propertiesChangedIndicator]
+        [propertiesChangedIndicator, mediaCardReference]
     )
     /**
      * Triggered on click events.
@@ -601,7 +613,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                 return result
             })
         },
-        [propertiesChangedIndicator]
+        [propertiesChangedIndicator, mediaCardReference]
     )
     // endregion
     const defaultID = useId()
@@ -760,7 +772,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                 fetchAbortController.abort('file hase been changed')
             }
         },
-        [propertiesChangedIndicator]
+        [propertiesChangedIndicator, mediaCardReference]
     )
     useEffect(
         () => {
