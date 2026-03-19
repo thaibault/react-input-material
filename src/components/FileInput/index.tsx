@@ -90,6 +90,7 @@ import {
     Value,
     ValueState
 } from './type'
+import {GenericEvent} from 'react-generic-tools/type'
 
 export {
     CSS_CLASS_NAMES,
@@ -257,6 +258,37 @@ export const FileInputInner = function<Type extends Value = Value>(
             wrapStateSetter<ValueState<Type>>(setValueState, currentValueState)
     /// endregion
     // endregion
+    // region references
+    const [fileInputReference, setFileInputReference] =
+        useState<HTMLInputElement | null>(null)
+    const [mediaCardReference, setMediaCardReference] =
+        useState<MediaCardReference | null>(null)
+    const [nameInputReference, setNameInputReference] =
+        useState<TextInputAdapter<string> | null>(null)
+
+    useImperativeHandle(
+        reference,
+        (): AdapterWithReferences<Type> => ({
+            properties,
+            references: {
+                fileInput: fileInputReference,
+                mediaCard: mediaCardReference,
+                nameInput: nameInputReference
+            },
+            state: {
+                modelState: properties.model.state as ModelState,
+                ...(controlled ? {} : {value: properties.value})
+            }
+        }),
+        [
+            fileInputReference,
+            mediaCardReference,
+            nameInputReference,
+
+            propertiesChangedIndicator
+        ]
+    )
+    // endregion
     // region event handler
     /**
      * Triggered on blur events.
@@ -311,6 +343,18 @@ export const FileInputInner = function<Type extends Value = Value>(
      */
     const onChange = useCallback(
         (event?: SyntheticEvent) => {
+            const customEvent = (event || {}) as
+                (
+                    GenericEvent &
+                    {
+                        currentTarget: HTMLElement
+                        originalCurrentTarget: EventTarget | null
+                    }
+                )
+            customEvent.originalCurrentTarget = event?.currentTarget || null
+            customEvent.currentTarget =
+                mediaCardReference as unknown as HTMLElement
+
             if (nameInputReference?.properties)
                 properties.model.fileName = nameInputReference.properties.model
 
@@ -331,10 +375,10 @@ export const FileInputInner = function<Type extends Value = Value>(
             extend(true, properties, consolidatedProperties)
 
             triggerCallbackIfExists<Properties<Type>>(
-                properties, 'change', controlled, properties, event
+                properties, 'change', controlled, properties, customEvent
             )
         },
-        [propertiesChangedIndicator]
+        [propertiesChangedIndicator, mediaCardReference]
     )
     /**
      * Triggered when ever the value changes.
@@ -557,37 +601,6 @@ export const FileInputInner = function<Type extends Value = Value>(
             })
         },
         [propertiesChangedIndicator]
-    )
-    // endregion
-    // region references
-    const [fileInputReference, setFileInputReference] =
-        useState<HTMLInputElement | null>(null)
-    const [mediaCardReference, setMediaCardReference] =
-        useState<MediaCardReference | null>(null)
-    const [nameInputReference, setNameInputReference] =
-        useState<TextInputAdapter<string> | null>(null)
-
-    useImperativeHandle(
-        reference,
-        (): AdapterWithReferences<Type> => ({
-            properties,
-            references: {
-                fileInput: fileInputReference,
-                mediaCard: mediaCardReference,
-                nameInput: nameInputReference
-            },
-            state: {
-                modelState: properties.model.state as ModelState,
-                ...(controlled ? {} : {value: properties.value})
-            }
-        }),
-        [
-            fileInputReference,
-            mediaCardReference,
-            nameInputReference,
-
-            propertiesChangedIndicator
-        ]
     )
     // endregion
     const defaultID = useId()
