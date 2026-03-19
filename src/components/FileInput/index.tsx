@@ -35,7 +35,7 @@ import {
     useState,
     useCallback
 } from 'react'
-import {useMemorizedValue} from 'react-generic-tools'
+import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
@@ -260,11 +260,11 @@ export const FileInputInner = function<Type extends Value = Value>(
     // endregion
     // region references
     const [fileInputReference, setFileInputReference] =
-        useState<HTMLInputElement | null>(null)
+        useReferenceState<HTMLInputElement | null>(null)
     const [mediaCardReference, setMediaCardReference] =
-        useState<MediaCardReference | null>(null)
+        useReferenceState<MediaCardReference | null>(null)
     const [nameInputReference, setNameInputReference] =
-        useState<TextInputAdapter<string> | null>(null)
+        useReferenceState<TextInputAdapter<string> | null>(null)
 
     useImperativeHandle(
         reference,
@@ -343,6 +343,7 @@ export const FileInputInner = function<Type extends Value = Value>(
      */
     const onChange = useCallback(
         (event?: SyntheticEvent) => {
+            console.log('MEDIA', mediaCardReference)
             const customEvent = (event || {}) as
                 (
                     GenericEvent &
