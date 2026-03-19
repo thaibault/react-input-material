@@ -45,6 +45,7 @@ import {
 import CircularProgress from '../CircularProgress'
 
 import cssClassNames from './style.module'
+import {GenericEvent} from 'react-generic-tools/type'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames
 
@@ -254,9 +255,19 @@ export const MediaCardInner = function(
                                 properties.deleteButton
                             ) ?
                                 <CardActionButton
-                                    onClick={() => {
-                                        if (properties.onChange)
-                                            properties.onChange()
+                                    onClick={(event: GenericEvent) => {
+                                        if (properties.onChange) {
+                                            if (!event.detail)
+                                                event.detail = {}
+                                            ;(
+                                                event.detail as {
+                                                    currentTarget:
+                                                        HTMLElement | null
+                                                }
+                                            ).currentTarget = cardReference
+
+                                            properties.onChange(event)
+                                        }
                                     }}
                                     ref={setDeleteButtonReference}
                                 >
