@@ -73,6 +73,7 @@ import {
     propertyTypes,
     ValueState
 } from './type'
+import {useReferenceState} from 'react-generic-tools'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
@@ -419,7 +420,7 @@ export const CheckboxInner = function(
     // endregion
     // region export references
     const [inputReference, setInputReference] =
-        useState<InputReference | null>(null)
+        useReferenceState<InputReference | null>(null)
 
     useImperativeHandle(
         reference,

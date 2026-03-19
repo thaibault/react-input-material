@@ -29,7 +29,7 @@ import {
     useState
 } from 'react'
 import {GenericEvent} from 'react-generic-tools/type'
-import {useMemorizedValue} from 'react-generic-tools'
+import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
 import Icon from '#implementations/Icon'
 
@@ -329,10 +329,10 @@ export const IntervalInner = function(
         */
         setValue = createDummyStateSetter<Value>(valueState)
     // region export references
-    const [startInputReference, setStartInputReference] = useState<
+    const [startInputReference, setStartInputReference] = useReferenceState<
         TextInputAdapterWithReferences<null | number | string> | null
     >(null)
-    const [endInputReference, setEndInputReference] = useState<
+    const [endInputReference, setEndInputReference] = useReferenceState<
         TextInputAdapterWithReferences<null | number | string> | null
     >(null)
 
