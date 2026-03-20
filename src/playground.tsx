@@ -1167,13 +1167,10 @@ const Application = () => {
                     }}
                 >
                     <FileInput name="fileInput1" onChange={onChange} />
-                    {/*
                     <FileInput
                         default={useMemorizedValue({
-                            placeholder: {
-                                blob: {type: 'image/png'},
-                                url: '/placeholder/150'
-                            } as FileInputValue
+                            placeholder: {url: '/placeholder/150'} as
+                                FileInputValue
                         })}
 
                         acceptedContentTypes="text/*"
@@ -1237,10 +1234,7 @@ const Application = () => {
 
                     <FileInput
                         default={useMemorizedValue({
-                            placeholder: {
-                                blob: {type: 'image/png'},
-                                url: '/placeholder/150'
-                            }
+                            placeholder: {url: '/placeholder/150'}
                         })}
                         name="fileInputUnControlled2"
                         onChange={onChange}
@@ -1271,7 +1265,6 @@ const Application = () => {
 
                         ref={fileInputUnControlledHeadlessReference}
                     />
-                    */}
                 </div>
                 {/* endregion */}
 
