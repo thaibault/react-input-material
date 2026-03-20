@@ -18,7 +18,7 @@
 */
 // region imports
 import {dataURLToBlob} from 'blob-util'
-import {copy, equals, extend, mask, NOOP} from 'clientnode'
+import {copy, equals, extend, Logger, mask, NOOP} from 'clientnode'
 import {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
@@ -36,6 +36,7 @@ import {
     useCallback
 } from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
+import {GenericEvent} from 'react-generic-tools/type'
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
@@ -90,7 +91,6 @@ import {
     Value,
     ValueState
 } from './type'
-import {GenericEvent} from 'react-generic-tools/type'
 
 export {
     CSS_CLASS_NAMES,
@@ -107,6 +107,9 @@ export {
     preserveStaticFileBaseNameInputGenerator
 } from './helper'
 // endregion
+export const log =
+    new Logger({name: 'react-input-material-file-input-logger', level: 'warn'})
+
 /**
  * Validatable checkbox wrapper component.
  * @property displayName - Descriptive name for component to show in web
@@ -659,8 +662,21 @@ export const FileInputInner = function<Type extends Value = Value>(
                     if (
                         properties.value?.blob &&
                         properties.value.blob instanceof Blob
-                    ) {
+                    )
                         blob = properties.value.blob
+                    else if (properties.value?.url) {
+                        blob = await (properties.value.url.startsWith('data:') ?
+                            dataURLToBlob(properties.value.url) :
+                            (await fetch(
+                                properties.value.url,
+                                {signal: fetchAbortController.signal}
+                            )).blob()
+                        )
+                        if (!properties.value.blob)
+                            valueChanged.blob = blob
+                    }
+
+                    if (blob) {
                         // Derive missing source from given blob.
                         valueChanged.source = await (
                             representationType === RepresentationType.TEXT ?
@@ -671,28 +687,9 @@ export const FileInputInner = function<Type extends Value = Value>(
                                         abortHandler = abortController
                                     }
                                 ) :
-                                deriveBase64String(properties.value)
-                        )
-                        abortHandler = NOOP
-                    } else if (properties.value?.url) {
-                        blob = await (properties.value.url.startsWith('data:') ?
-                            dataURLToBlob(properties.value.url) :
-                            (await fetch(
-                                properties.value.url,
-                                {signal: fetchAbortController.signal}
-                            )).blob()
-                        )
-                        if (!properties.value.blob)
-                            valueChanged.blob = blob
-
-                        // Derive missing source from given blob.
-                        valueChanged.source = await (
-                            representationType === RepresentationType.TEXT ?
-                                readBinaryDataIntoText(
-                                    blob, properties.encoding
-                                ) :
                                 deriveBase64String({blob})
                         )
+                        abortHandler = NOOP
                     }
 
                     if (!properties.value?.hash && blob) {
@@ -763,7 +760,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                 */
             })()
                 .catch((reason: unknown) => {
-                    console.warn(reason)
+                    log.warn(reason)
                 })
 
             return () => {
@@ -772,7 +769,21 @@ export const FileInputInner = function<Type extends Value = Value>(
                 fetchAbortController.abort('file hase been changed')
             }
         },
-        [propertiesChangedIndicator, mediaCardReference]
+        [
+            properties.encoding,
+
+            properties.value?.blob,
+
+            properties.value?.hash,
+            properties.value?.source,
+            properties.value?.url,
+
+            JSON.stringify(properties.sourceToBlobOptions),
+
+            properties.hashingConfiguration.prefix,
+            properties.hashingConfiguration.readChunkSizeInByte,
+            properties.hashingConfiguration.binaryString
+        ]
     )
     useEffect(
         () => {

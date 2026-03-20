@@ -27,6 +27,7 @@ import {
     FirstParameter,
     isFunction,
     isObject,
+    Logger,
     Mapping,
     PositiveEvaluationResult,
     timeout,
@@ -60,6 +61,8 @@ import {
     ValueState
 } from './type'
 // endregion
+export const log =
+    new Logger({name: 'react-input-material-helper-logger', level: 'warn'})
 // region state
 /**
  * Removes all none serializable values from given data structure.
@@ -164,26 +167,24 @@ export const wrapStateSetter = <Type = unknown>(
     setValueState: (value: Type | ((value: Type) => Type)) => void,
     currentValueState: Type
 ): ReturnType<typeof useState>[1] =>
-        (callbackOrData: FirstParameter<ReturnType<typeof useState>[1]>) => {
-            const result: Type = (typeof callbackOrData === 'function' ?
-                (
-                    callbackOrData as (value: unknown) => Type
-                )(currentValueState) :
-                callbackOrData
-            ) as Type
+    (callbackOrData: FirstParameter<ReturnType<typeof useState>[1]>) => {
+        const result: Type = (typeof callbackOrData === 'function' ?
+            (callbackOrData as (value: unknown) => Type)(currentValueState) :
+            callbackOrData
+        ) as Type
 
-            if (!equals(
-                (
-                    result as unknown as {modelState: unknown} | undefined
-                )?.modelState,
-                (
-                    currentValueState as
-                        unknown as
-                        {modelState: unknown} | undefined
-                )?.modelState
-            ))
-                setValueState(result)
-        }
+        if (!equals(
+            (
+                result as unknown as {modelState: unknown} | undefined
+            )?.modelState,
+            (
+                currentValueState as
+                    unknown as
+                    {modelState: unknown} | undefined
+            )?.modelState
+        ))
+            setValueState(result)
+    }
 // endregion
 /**
  * Renders given template string against all properties in current
@@ -203,7 +204,7 @@ export const renderMessage = <Scope extends object = object>(
     )
 
     if (evaluated.error) {
-        console.warn(
+        log.warn(
             'Given message template could not be proceed:',
             evaluated.error
         )
@@ -247,12 +248,14 @@ export const triggerCallbackIfExists =
     }
 // region consolidation state
 /**
- * Translate known symbols in a copied and return properties object.
+ * Translate known symbols in a copied and returned properties object.
  * @param properties - Object to translate.
+ * @param copyBlobs - Determines whether to copy blobs as well.
  * @returns Transformed properties.
  */
 export const translateKnownSymbols = <Type = unknown>(
-    properties: Mapping<typeof NullSymbol | Type | typeof UndefinedSymbol>
+    properties: Mapping<typeof NullSymbol | Type | typeof UndefinedSymbol>,
+    copyBlobs = false
 ): Mapping<Type> => {
     const result: Mapping<Type> = {}
     for (const [name, value] of Object.entries(properties))
@@ -261,7 +264,7 @@ export const translateKnownSymbols = <Type = unknown>(
         else if (value === NullSymbol)
             (result[name] as unknown as null) = null
         else
-            result[name] = copy(properties[name] as Type)
+            result[name] = copy(properties[name] as Type, copyBlobs)
 
     return result
 }
