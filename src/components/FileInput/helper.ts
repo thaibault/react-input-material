@@ -100,19 +100,18 @@ export const VIDEO_CONTENT_TYPE_REGULAR_EXPRESSION = new RegExp(
 export const preserveStaticFileBaseNameInputGenerator = <
     Type extends Value = Value, MediaTag extends ElementType = 'div'
 >(
-        prototype: Props<string>,
-        {name, value}: Properties<Type, MediaTag>
-    ): Props<string> => ({
-        ...prototype,
-        disabled: true,
-        value:
-            name +
-            (value?.name?.includes('.') ?
-                value.name.substring(value.name.lastIndexOf('.'))
-                    .toLowerCase() :
-                ''
-            )
-    })
+    prototype: Props<string>, {name, value}: Properties<Type, MediaTag>
+): Props<string> => ({
+    ...prototype,
+    disabled: true,
+    value:
+        name +
+        (value?.name?.includes('.') ?
+            value.name.substring(value.name.lastIndexOf('.'))
+                .toLowerCase() :
+            ''
+        )
+})
 /**
  * Determines files content type for given file input properties.
  * @param properties - File input properties to analyze.

@@ -25,6 +25,7 @@ import {
     dateTimeFormat,
     debounce,
     extend,
+    Logger,
     LOCALES,
     Mapping,
     represent,
@@ -67,6 +68,8 @@ import {BaseProps} from './type'
 import {slicePropertiesForStateRecursively} from './helper'
 // endregion
 // region configuration
+Logger.configureAllInstances({level: 'debug'})
+
 LOCALES.push('de-DE')
 if (TextInput.transformer.currency.format)
     TextInput.transformer.currency.format.final.options = {currency: 'EUR'}
@@ -89,7 +92,7 @@ const SECTIONS = [
 const Application = () => {
     const [selectedState, setSelectedState] =
         useState<BaseProps['model'] | null>(null)
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(7)
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(5)
     const activeSection = SECTIONS[activeTabIndex]
 
     const onChange: ((properties: BaseProps) => void) =
@@ -1166,10 +1169,8 @@ const Application = () => {
                     <FileInput name="fileInput1" onChange={onChange} />
                     <FileInput
                         default={useMemorizedValue({
-                            placeholder: {
-                                blob: {type: 'image/png'},
-                                url: '/placeholder/150'
-                            } as FileInputValue
+                            placeholder: {url: '/placeholder/150'} as
+                                FileInputValue
                         })}
 
                         acceptedContentTypes="text/*"
@@ -1233,10 +1234,7 @@ const Application = () => {
 
                     <FileInput
                         default={useMemorizedValue({
-                            placeholder: {
-                                blob: {type: 'image/png'},
-                                url: '/placeholder/150'
-                            }
+                            placeholder: {url: '/placeholder/150'}
                         })}
                         name="fileInputUnControlled2"
                         onChange={onChange}
@@ -1246,7 +1244,6 @@ const Application = () => {
                         name="fileInputControlled"
                         onChange={onChange}
                         onChangeValue={onChangeFileInputValue}
-                        triggerInitialPropertiesConsolidation={true}
                         value={fileInputValue}
                     />
 
