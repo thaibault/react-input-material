@@ -1449,7 +1449,7 @@ export const TextInputInner = function<Type = unknown>(
             if (isFunction(properties.children)) {
                 const result: null | ReactElement = properties.children({
                     index,
-                    normalizedSelection: normalizedSelection,
+                    normalizedSelection,
                     properties,
                     query: properties.representation as string,
                     suggestion,
