@@ -631,7 +631,7 @@ export const FileInputInner = function<Type extends Value = Value>(
             ;(async (): Promise<void> => {
                 const valueChanged: Partial<Type> = {}
                 if (properties.value?.source) {
-                    if (!(properties.value.blob instanceof Blob)) {
+                    if (!properties.value.blob) {
                         // Derive missing blob from given source.
                         if (properties.value.url?.startsWith('data:'))
                             valueChanged.blob =
@@ -659,7 +659,19 @@ export const FileInputInner = function<Type extends Value = Value>(
                             md5Hash(properties.value.source)
                 } else {
                     let blob: Blob | undefined
-                    if (properties.value?.blob instanceof Blob)
+                    if (
+                        (properties.value?.blob as Blob | undefined)?.type &&
+                        typeof Blob !== 'undefined' &&
+                        !(properties.value?.blob instanceof Blob)
+                    )
+                        valueChanged.blob = blob = new Blob(
+                            [],
+                            {type: (properties.value?.blob as Blob).type}
+                        )
+                    else if (
+                        typeof Blob !== 'undefined' &&
+                        properties.value?.blob instanceof Blob
+                    )
                         blob = properties.value.blob
                     else if (properties.value?.url) {
                         blob = await (properties.value.url.startsWith('data:') ?
