@@ -1169,8 +1169,10 @@ const Application = () => {
                     <FileInput name="fileInput1" onChange={onChange} />
                     <FileInput
                         default={useMemorizedValue({
-                            placeholder: {url: '/placeholder/150'} as
-                                FileInputValue
+                            placeholder: {
+                                blob: {type: 'image/jpeg'},
+                                url: '/placeholder/150'
+                            } as FileInputValue
                         })}
 
                         acceptedContentTypes="text/*"
