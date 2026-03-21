@@ -63,11 +63,11 @@ export const Checkbox = forwardRef((
             checked={properties.value}
             disabled={properties.disabled}
 
-            id={properties.name}
             indeterminate={properties.indeterminate}
 
             aria-invalid={properties.invalid ? true : undefined}
 
+            id={properties.id}
             name={properties.name}
 
             onBlur={properties.onBlur}
