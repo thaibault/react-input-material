@@ -746,7 +746,11 @@ export const FileInputInner = function<Type extends Value = Value>(
                         abortHandler = NOOP
 
                         valueChanged.hash =
-                            properties.hashingConfiguration.prefix + hash
+                            properties.hashingConfiguration.prefix +
+                            (properties.hashingConfiguration.binaryString ?
+                                btoa(hash) :
+                                hash
+                            )
                     }
                 }
 
