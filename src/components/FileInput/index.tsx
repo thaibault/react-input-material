@@ -660,15 +660,6 @@ export const FileInputInner = function<Type extends Value = Value>(
                 } else {
                     let blob: Blob | undefined
                     if (
-                        (properties.value?.blob as Blob | undefined)?.type &&
-                        typeof Blob !== 'undefined' &&
-                        !(properties.value?.blob instanceof Blob)
-                    )
-                        valueChanged.blob = blob = new Blob(
-                            [],
-                            {type: (properties.value?.blob as Blob).type}
-                        )
-                    else if (
                         typeof Blob !== 'undefined' &&
                         properties.value?.blob instanceof Blob
                     )
