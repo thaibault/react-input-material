@@ -18,7 +18,15 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./components/*": "./dist/components/*",
+    "./components/Checkbox": "./dist/components/Checkbox/index.js",
+    "./components/FileInput": "./dist/components/FileInput/index.js",
+    "./components/Inputs": "./dist/components/Inputs/index.js",
+    "./components/Interval": "./dist/components/Interval/index.js",
+    "./components/TextInput": "./dist/components/TextInput/index.js",
+    "./components/WrapConfiguration": "./dist/components/Wrapper/WrapConfiguration.js",
+    "./components/WrapStrict": "./dist/components/Wrapper/WrapStrict.js",
+    "./components/WrapThemeProvider": "./dist/components/Wrapper/WrapThemeProvider.js",
+    "./components/WrapThemeTooltip": "./dist/components/Wrapper/WrapThemeTooltip.js",
     "./helper": "./dist/helper.js",
     "./type": "./dist/type.js"
   },
