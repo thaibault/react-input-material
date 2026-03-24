@@ -4,7 +4,8 @@
         "declarationDir": "dist/",
         "paths": {
             "#implementations/*": ["./src/implementations/rmwc/*"]
-        }
+        },
+        "types": ["node"]
     },
     "extends": "./node_modules/weboptimizer/tsconfig.json",
     "include": [
