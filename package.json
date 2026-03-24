@@ -16,6 +16,25 @@
   },
   "license": "CC-BY-3.0",
   "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./components/*": "./dist/components/*",
+    "./helper": "./dist/helper.js",
+    "./type": "./dist/type.js"
+  },
+  "typesVersions": {
+    "*": {
+      "components": [
+        "./dist/components"
+      ],
+      "implementations": [
+        "./dist/type"
+      ],
+      "helper": [
+        "./dist/helper"
+      ]
+    }
+  },
   "author": {
     "name": "Torben Sickert",
     "email": "info@torben.website",
@@ -78,6 +97,7 @@
     "dist/index.d.ts",
     "dist/index.js",
     "dist/implementations/rmwc/material.css",
+    "dist/implementations/type.d.ts",
     "dist/type.d.ts",
     "dist/type.js"
   ],
