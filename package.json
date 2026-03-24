@@ -18,9 +18,6 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./index.css": {
-      "style": "./dist/index.css"
-    },
     "./components/Checkbox": "./dist/components/Checkbox/index.js",
     "./components/Checkbox.css": {
       "style": "./dist/components/Checkbox/index.css"
@@ -61,6 +58,12 @@
     "./components/WrapThemeProvider": "./dist/components/Wrapper/WrapThemeProvider.js",
     "./components/WrapThemeTooltip": "./dist/components/Wrapper/WrapThemeTooltip.js",
     "./helper": "./dist/helper.js",
+    "./implementations/rmwc/material.css": {
+      "style": "./dist/implementations/rmwc/material.css"
+    },
+    "./index.css": {
+      "style": "./dist/index.css"
+    },
     "./type": "./dist/type.js"
   },
   "typesVersions": {
