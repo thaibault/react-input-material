@@ -16,7 +16,7 @@
     endregion
 */
 // region imports
-import {Mapping, Primitive, ValueOf} from 'clientnode'
+import {Mapping, Primitive} from 'clientnode'
 import {
     any,
     arrayOf,
@@ -25,12 +25,10 @@ import {
     number,
     object,
     oneOfType,
-    PropertyTypes,
     Requireable,
     shape,
     string,
-    symbol,
-    ValidationMap
+    symbol
 } from 'clientnode/property-types'
 import {
     ComponentClass,
@@ -351,9 +349,7 @@ export const propertyTypes: ValidationMapping = {
     enforceUncontrolled: boolean,
 
     initialValue: any,
-    model: shape<ValidationMap<ValueOf<typeof PropertyTypes>>>(
-        modelPropertyTypes
-    ),
+    model: shape(modelPropertyTypes),
 
     // NOTE: Overwrites model selection and corresponds to type "Selection".
     selection: oneOfType([

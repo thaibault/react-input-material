@@ -199,9 +199,7 @@ export const renderMessage = <Scope extends object = object>(
     if (typeof template !== 'string')
         return ''
 
-    const evaluated: EvaluationResult = evaluate<string, Scope>(
-        `\`${template}\``, scope
-    )
+    const evaluated: EvaluationResult = evaluate(`\`${template}\``, scope)
 
     if (evaluated.error) {
         log.warn(
@@ -298,7 +296,7 @@ export function determineInitialRepresentation<
         if (typeof candidate === 'string')
             return candidate
 
-        return formatValue<T, DP & {type: TypeDefinition}>(
+        return formatValue<T, DP>(
             {
                 ...properties,
                 type: (
@@ -435,16 +433,16 @@ export const mapPropertiesIntoModel = <
         NOTE: Default props seems not to respect nested layers to merge, so we
         have to manage this for nested model structure.
     */
-    const result: (
+    const result = extend(
+        true,
+        {model: copy(defaultModel)} as unknown as DP,
+        properties as unknown as DP
+    ) as (
         DP &
         {
             default?: unknown
             model?: {default?: unknown}
         }
-    ) = extend<DP>(
-        true,
-        {model: copy<DP['model']>(defaultModel)} as DP,
-        properties as unknown as DP
     )
     // region handle aliases
     if (result.disabled) {

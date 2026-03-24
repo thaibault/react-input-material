@@ -239,9 +239,7 @@ export const deriveBase64String = <Type extends Value = Value>(
     value.blob ?
         blobToBase64String(value.blob as Blob) :
         value.source ?
-            Promise.resolve(
-                Buffer.from(value.source).toString('base64')
-            ) :
+            Promise.resolve(Buffer.from(value.source).toString('base64')) :
             Promise.reject(
                 new Error('Base 64 string could not be determined.')
             )
