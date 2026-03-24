@@ -22,6 +22,7 @@
     "./components/Checkbox.css": {
       "style": "./dist/components/Checkbox/index.css"
     },
+    "./components/Checkbox/harness": "./dist/components/Checkbox/harness.js",
     "./components/Checkbox.module.css": {
       "style": "./dist/components/Checkbox/import.module.css"
     },
@@ -29,6 +30,7 @@
     "./components/FileInput.css": {
       "style": "./dist/components/FileInput/index.css"
     },
+    "./components/FileInput/harness": "./dist/components/FileInput/harness.js",
     "./components/FileInput.module.css": {
       "style": "./dist/components/FileInput/import.module.css"
     },
@@ -36,6 +38,7 @@
     "./components/Inputs.css": {
       "style": "./dist/components/Inputs/index.css"
     },
+    "./components/Inputs/harness": "./dist/components/Inputs/harness.js",
     "./components/Inputs.module.css": {
       "style": "./dist/components/Inputs/import.module.css"
     },
@@ -43,6 +46,7 @@
     "./components/Interval.css": {
       "style": "./dist/components/Interval/index.css"
     },
+    "./components/Interval/harness": "./dist/components/Interval/harness.js",
     "./components/Interval.module.css": {
       "style": "./dist/components/Interval/import.module.css"
     },
@@ -50,6 +54,7 @@
     "./components/TextInput.css": {
       "style": "./dist/components/TextInput/index.css"
     },
+    "./components/TextInput/harness": "./dist/components/TextInput/harness.js",
     "./components/TextInput.module.css": {
       "style": "./dist/components/TextInput/import.module.css"
     },
