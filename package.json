@@ -23,7 +23,7 @@
     "./components/Inputs": "./dist/components/Inputs/index.js",
     "./components/Interval": "./dist/components/Interval/index.js",
     "./components/TextInput": "./dist/components/TextInput/index.js",
-    "./components/WrapConfiguration": "./dist/components/Wrapper/WrapConfiguration.js",
+    "./components/WrapConfigurations": "./dist/components/Wrapper/WrapConfigurations.js",
     "./components/WrapStrict": "./dist/components/Wrapper/WrapStrict.js",
     "./components/WrapThemeProvider": "./dist/components/Wrapper/WrapThemeProvider.js",
     "./components/WrapThemeTooltip": "./dist/components/Wrapper/WrapThemeTooltip.js",
