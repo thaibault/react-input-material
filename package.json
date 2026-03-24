@@ -18,11 +18,44 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
+    "./index.css": {
+      "style": "./dist/index.css"
+    },
     "./components/Checkbox": "./dist/components/Checkbox/index.js",
+    "./components/Checkbox.css": {
+      "style": "./dist/components/Checkbox/index.css"
+    },
+    "./components/Checkbox.module.css": {
+      "style": "./dist/components/Checkbox/import.module.css"
+    },
     "./components/FileInput": "./dist/components/FileInput/index.js",
+    "./components/FileInput.css": {
+      "style": "./dist/components/FileInput/index.css"
+    },
+    "./components/FileInput.module.css": {
+      "style": "./dist/components/FileInput/import.module.css"
+    },
     "./components/Inputs": "./dist/components/Inputs/index.js",
+    "./components/Inputs.css": {
+      "style": "./dist/components/Inputs/index.css"
+    },
+    "./components/Inputs.module.css": {
+      "style": "./dist/components/Inputs/import.module.css"
+    },
     "./components/Interval": "./dist/components/Interval/index.js",
+    "./components/Interval.css": {
+      "style": "./dist/components/Interval/index.css"
+    },
+    "./components/Interval.module.css": {
+      "style": "./dist/components/Interval/import.module.css"
+    },
     "./components/TextInput": "./dist/components/TextInput/index.js",
+    "./components/TextInput.css": {
+      "style": "./dist/components/TextInput/index.css"
+    },
+    "./components/TextInput.module.css": {
+      "style": "./dist/components/TextInput/import.module.css"
+    },
     "./components/WrapConfigurations": "./dist/components/Wrapper/WrapConfigurations.js",
     "./components/WrapStrict": "./dist/components/Wrapper/WrapStrict.js",
     "./components/WrapThemeProvider": "./dist/components/Wrapper/WrapThemeProvider.js",
@@ -170,10 +203,10 @@
     "@rmwc/typography": "^14.3.5",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
-    "@tiptap/core": "^3.20.4",
-    "@tiptap/extensions": "^3.20.4",
-    "@tiptap/react": "^3.20.4",
-    "@tiptap/starter-kit": "^3.20.4",
+    "@tiptap/core": "^3.20.5",
+    "@tiptap/extensions": "^3.20.5",
+    "@tiptap/react": "^3.20.5",
+    "@tiptap/starter-kit": "^3.20.5",
     "@types/ejs": "^3.1.5",
     "@types/html-minifier": "^4.0.6",
     "@types/jquery": "^4.0.0",
