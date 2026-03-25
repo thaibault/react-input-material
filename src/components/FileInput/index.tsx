@@ -237,8 +237,9 @@ export const FileInputInner = function<Type extends Value = Value>(
         properties.
     */
     if (valueState.attachBlobProperty && valueState.value && properties.value)
-        properties.value =
-            extend<Type>(true, valueState.value, properties.value)
+        properties.value = extend<Type>(
+            true, valueState.value, properties.value
+        )
 
     /// region synchronize uncontrolled properties into state
     const currentValueState: ValueState<Type> = {
@@ -257,8 +258,7 @@ export const FileInputInner = function<Type extends Value = Value>(
     )
         setValueState(currentValueState)
     if (controlled)
-        setValueState =
-            wrapStateSetter<ValueState<Type>>(setValueState, currentValueState)
+        setValueState = wrapStateSetter(setValueState, currentValueState)
     /// endregion
     // endregion
     // region references
@@ -317,7 +317,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                 if (changed) {
                     onChange(event)
 
-                    triggerCallbackIfExists<Properties<Type>>(
+                    triggerCallbackIfExists(
                         properties,
                         'changeState',
                         controlled,
@@ -327,7 +327,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                     )
                 }
 
-                triggerCallbackIfExists<Properties<Type>>(
+                triggerCallbackIfExists(
                     properties, 'blur', controlled, event, properties
                 )
 
@@ -377,7 +377,7 @@ export const FileInputInner = function<Type extends Value = Value>(
 
             extend(true, properties, consolidatedProperties)
 
-            triggerCallbackIfExists<Properties<Type>>(
+            triggerCallbackIfExists(
                 properties, 'change', controlled, properties, customEvent
             )
         },
@@ -499,16 +499,14 @@ export const FileInputInner = function<Type extends Value = Value>(
 
                 onChange(event)
 
-                if (determineValidationState<
-                    Type, DefaultProperties<Type>
-                >(
+                if (determineValidationState<Type>(
                     properties as DefaultProperties<Type>,
                     nameInputReference?.properties?.invalid || false,
                     oldValueState.modelState
                 ))
                     stateChanged = true
 
-                triggerCallbackIfExists<Properties<Type>>(
+                triggerCallbackIfExists(
                     properties,
                     'changeValue',
                     controlled,
@@ -521,7 +519,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                     result.modelState =
                         properties.model.state as ModelState
 
-                    triggerCallbackIfExists<Properties<Type>>(
+                    triggerCallbackIfExists(
                         properties,
                         'changeState',
                         controlled,
@@ -545,7 +543,7 @@ export const FileInputInner = function<Type extends Value = Value>(
      */
     const onClick = useCallback(
         (event: ReactMouseEvent) => {
-            triggerCallbackIfExists<Properties<Type>>(
+            triggerCallbackIfExists(
                 properties, 'click', controlled, event, properties
             )
 
@@ -559,7 +557,7 @@ export const FileInputInner = function<Type extends Value = Value>(
      */
     const onFocus = useCallback(
         (event: ReactFocusEvent) => {
-            triggerCallbackIfExists<Properties<Type>>(
+            triggerCallbackIfExists(
                 properties, 'focus', controlled, event, properties
             )
 
@@ -599,7 +597,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                         modelState: properties.model.state as ModelState
                     }
 
-                    triggerCallbackIfExists<Properties<Type>>(
+                    triggerCallbackIfExists(
                         properties,
                         'changeState',
                         controlled,
@@ -609,7 +607,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                     )
                 }
 
-                triggerCallbackIfExists<Properties<Type>>(
+                triggerCallbackIfExists(
                     properties, 'touch', controlled, event, properties
                 )
 
@@ -866,7 +864,7 @@ export const FileInputInner = function<Type extends Value = Value>(
             description={properties.description}
             name={properties.name}
 
-            errorMessage={renderMessage<Properties<Type>>(
+            errorMessage={renderMessage(
                 properties.invalidContentTypePattern &&
                 properties.contentTypePatternText ||
 
