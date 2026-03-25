@@ -774,7 +774,13 @@ export const FileInputInner = function<Type extends Value = Value>(
         [
             properties.encoding,
 
-            properties.value?.blob,
+            /*
+                NOTE: It is possible to hand in a mocked blob object to define
+                type and size of remotely referenced file (e.g. by url).
+            */
+            properties.value?.blob instanceof Blob ?
+                properties.value.blob :
+                JSON.stringify(properties.value?.blob),
 
             properties.value?.hash,
             properties.value?.source,

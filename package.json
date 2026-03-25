@@ -192,7 +192,7 @@
     "@codemirror/commands": "^6.10.3",
     "@codemirror/lang-css": "^6.3.1",
     "@codemirror/lang-javascript": "^6.2.5",
-    "@codemirror/language": "^6.12.2",
+    "@codemirror/language": "^6.12.3",
     "@codemirror/lint": "^6.9.5",
     "@codemirror/search": "^6.6.0",
     "@codemirror/state": "^6.6.0",
@@ -268,7 +268,7 @@
     "typescript-eslint": "^8.57.2",
     "typescript-plugin-css-modules": "^5.2.0",
     "web-component-wrapper": "^0.0.550",
-    "weboptimizer": "^3.0.15",
+    "weboptimizer": "^3.0.16",
     "webpack-dev-server": "^5.2.3"
   },
   "peerDependencies": {
