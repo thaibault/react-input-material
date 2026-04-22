@@ -182,7 +182,6 @@
     "update:documentation": "web-documentation",
     "watch": "weboptimizer build --watch"
   },
-  "runkitExample": "require('@babel/runtime/package.json')\n\nglobalThis.window = globalThis\n\nconst {TextInput} = require('react-input-material')\n\nTextInput.webComponentAdapterWrapped",
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.6",
     "@babel/plugin-transform-proto-to-assign": "^7.27.1",
