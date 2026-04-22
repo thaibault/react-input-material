@@ -423,6 +423,9 @@
       "optional": true
     }
   },
+  "browser": {
+    "crypto": false
+  },
   "engines": {
     "node": ">=24",
     "npm": ">=11",
