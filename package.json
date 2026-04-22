@@ -517,6 +517,17 @@
     "injection": {
       "entry": {
         "__evaluate__": "2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'serve' ? ['./index.css', './playground'] : 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2].startsWith('test') ? {testBundle: './test'} : self.generic.entry"
+      },
+      "external": {
+        "implicit": {
+          "pattern": {
+            "include": {
+              "__append__": {
+                "__evaluate__": "/(?:^|\\/)playwright(?:-core)?(?:$|\\/)/"
+              }
+            }
+          }
+        }
       }
     },
     "module": {
@@ -625,11 +636,6 @@
       }
     },
     "webpack": {
-      "resolve": {
-        "fallback": {
-          "crypto": false
-        }
-      },
       "snapshot": {
         "unmanagedPaths": [
           {
