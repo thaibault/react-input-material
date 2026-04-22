@@ -26,7 +26,7 @@ Project status
 [![code coverage](https://img.shields.io/coverallsCoverage/github/thaibault/react-input-material?label=code%20coverage&style=for-the-badge)](https://coveralls.io/github/thaibault/react-input-material)
 
 [![deploy web documentation](https://img.shields.io/github/actions/workflow/status/thaibault/react-input-material/deploy-web-documentation.yaml?label=deploy%20web%20documentation&style=for-the-badge)](https://github.com/thaibault/react-input-material/actions/workflows/deploy-web-documentation.yaml)
-[![documentation website](https://img.shields.io/website-up-down-green-red/https/torben.website/react-input-material.svg?label=documentation-website&style=for-the-badge)](https://torben.website/react-input-material)
+[![documentation website](https://img.shields.io/website-up-down-green-red/https/torben.website/react-input-material.svg?label=web-documentation&style=for-the-badge)](https://torben.website/react-input-material)
 
 Use case
 --------
