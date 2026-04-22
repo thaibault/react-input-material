@@ -142,7 +142,7 @@ export const deriveMissingPropertiesFromState = <
         if (properties.model.state)
             properties.model.state = {...properties.model.state}
         else
-            properties.model.state = {} as ModelState
+            properties.model.state = {}
 
     for (const [key, value] of Object.entries(state.modelState))
         if (
@@ -435,7 +435,7 @@ export const mapPropertiesIntoModel = <
     */
     const result = extend(
         true,
-        {model: copy(defaultModel)} as unknown as DP,
+        {model: copy(defaultModel)},
         properties as unknown as DP
     ) as (
         DP &
@@ -716,8 +716,8 @@ export function normalizeSelection(
 
         selection = (selection as NormalizedSelection).sort(
             ({value: first}, {value: second}): number =>
-                (labelMapping.get(first as string) ?? 0) -
-                (labelMapping.get(second as string) ?? 0)
+                (labelMapping.get(first) ?? 0) -
+                (labelMapping.get(second) ?? 0)
         )
     } else if (!selectionIsOrdered)
         // Sort alphabetically by labels.

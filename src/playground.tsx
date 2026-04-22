@@ -1168,12 +1168,22 @@ const Application = () => {
                 >
                     <FileInput name="fileInput1" onChange={onChange} />
                     <FileInput
-                        default={useMemorizedValue({
-                            placeholder: {
-                                blob: {type: 'image/jpeg'},
-                                url: '/placeholder/150'
-                            } as FileInputValue
-                        })}
+                        default={
+                        /*
+                            eslint-disable
+                            @typescript-eslint/no-unnecessary-type-assertion
+                        */
+                            useMemorizedValue({
+                                placeholder: {
+                                    blob: {type: 'image/jpeg'},
+                                    url: '/placeholder/150'
+                                } as FileInputValue
+                            })
+                        /*
+                            eslint-enable
+                            @typescript-eslint/no-unnecessary-type-assertion
+                        */
+                        }
 
                         acceptedContentTypes="text/*"
                         contentTypePattern="^text/(?:plain|(?:x-)?csv|xml)$"
