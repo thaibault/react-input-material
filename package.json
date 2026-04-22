@@ -423,9 +423,6 @@
       "optional": true
     }
   },
-  "browser": {
-    "crypto": false
-  },
   "engines": {
     "node": ">=24",
     "npm": ">=11",
@@ -628,6 +625,11 @@
       }
     },
     "webpack": {
+      "resolve": {
+        "fallback": {
+          "crypto": false
+        }
+      },
       "snapshot": {
         "unmanagedPaths": [
           {
