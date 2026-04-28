@@ -14195,9 +14195,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-generic-animate@npm:^0.0.119":
-  version: 0.0.119
-  resolution: "react-generic-animate@npm:0.0.119"
+"react-generic-animate@npm:^0.0.120":
+  version: 0.0.120
+  resolution: "react-generic-animate@npm:0.0.120"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/react": "*"
@@ -14228,13 +14228,13 @@ __metadata:
       optional: true
     react-useanimations:
       optional: true
-  checksum: 10c0/511102e3aa5987469f7981d6c44e7e2c36e0001ecd010f44bf1eb17d50595d0163d9799cba5919784a337b3641a11e34f3f3bd54c16c61c00fc9cb259b0a5e4b
+  checksum: 10c0/f9a786c1942977aef46cffdb3c02e09f487e21fd660d5c0096b960f7dd436e94718273b85259e1c2672aa47ecf5d53c4d5fc8b366c0f3ce47afe16ff42c43259
   languageName: node
   linkType: hard
 
-"react-generic-dummy@npm:^0.0.126":
-  version: 0.0.126
-  resolution: "react-generic-dummy@npm:0.0.126"
+"react-generic-dummy@npm:^0.0.127":
+  version: 0.0.127
+  resolution: "react-generic-dummy@npm:0.0.127"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/react": "*"
@@ -14256,13 +14256,13 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/3da260135e436733a5a8f15650dc437f7c772038b150d1dfed2306d83e993950fd2b7757826b0e04872326881c5404e98d78d17f080a2626078f6b1d798ab8a7
+  checksum: 10c0/b738d5331ebb72de766615d8a7f5521b007dedadecb1ff3a016c91266be570b222a6a9a73c2544061e69109013d7551996176b61904ce9c3de447de47f6c29cb
   languageName: node
   linkType: hard
 
-"react-generic-tools@npm:^0.0.115":
-  version: 0.0.115
-  resolution: "react-generic-tools@npm:0.0.115"
+"react-generic-tools@npm:^0.0.116":
+  version: 0.0.116
+  resolution: "react-generic-tools@npm:0.0.116"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/prop-types": "*"
@@ -14285,7 +14285,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/a4149acbcf59fb18bced6ecb1e7591af77562ea2563c5d969b6a207d5de7b0d42b6366f10dce19144dbdf63c7f811bd3a27c82e547859195be98b5064c7e0cc7
+  checksum: 10c0/49b6a6d2b2be9fe61a97be797ad7c811bffd09afad0049571fb6370e6f078fe769365a27191185ca11f693acb70d859ccb998184575fe7ae1bb035454cb08e3a
   languageName: node
   linkType: hard
 
@@ -14362,9 +14362,9 @@ __metadata:
     prop-types: "npm:^15.8.1"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
-    react-generic-animate: "npm:^0.0.119"
-    react-generic-dummy: "npm:^0.0.126"
-    react-generic-tools: "npm:^0.0.115"
+    react-generic-animate: "npm:^0.0.120"
+    react-generic-dummy: "npm:^0.0.127"
+    react-generic-tools: "npm:^0.0.116"
     react-transition-group: "npm:^4.4.5"
     react-useanimations: "npm:^2.10.0"
     spark-md5: "npm:^3.0.2"
