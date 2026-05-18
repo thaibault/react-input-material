@@ -10,7 +10,7 @@
     License
     -------
 
-    This library written by Torben Sickert stand under a creative commons
+    This library written by Torben Sickert stands under a creative commons
     naming 3.0 unported license.
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
@@ -95,8 +95,8 @@ export const TextField = forwardRef((
                     onKeyUp: properties.onKeyUp,
                     /*
                         NOTE: Disabled input fields are not focusable via
-                        keyboard which makes them unreachable for blind people
-                        using e.g. screen readers. That's wgy the label gets a
+                        keyboard, which makes them unreachable for blind people
+                        using e.g., screen readers. That's why the label gets a
                         tabindex to make the input focusable.
                     */
                     'tab-index': properties.disabled ? '0' : '-1',
