@@ -11,7 +11,7 @@
     License
     -------
 
-    This library written by Torben Sickert stand under a creative commons
+    This library written by Torben Sickert stands under a creative commons
     naming 3.0 unported license.
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
@@ -1359,8 +1359,8 @@ export const TextInputInner = function<Type = unknown>(
     const textInputProperties: Partial<TextInputProperties<Type>> = {
         ref: setInputReference as unknown as RefObject<InputReference | null>,
         /*
-            NOTE: If not set label with forbidden symbols will automatically be
-            used.
+            NOTE: If not, set label with forbidden symbols will automatically
+            be used.
         */
         id,
 
@@ -1962,7 +1962,7 @@ TextInputInner.displayName = 'TextInput'
  * @property defaultProperties - Initial property configuration.
  * @property locales - Defines input formatting locales.
  * @property propTypes - Triggers reacts runtime property value checks.
- * @property strict - Indicates whether we should wrap render output in reacts
+ * @property strict - Indicates whether we should wrap render output in react's
  * strict component.
  * @property transformer - Text input data transformation specifications.
  * @property wrapped - Wrapped component.
