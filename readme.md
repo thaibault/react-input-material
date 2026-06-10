@@ -33,6 +33,10 @@ Use case
 
 Reusable material design based input field with support for (richt-)text, code,
 selections, numbers, dates and so on.
+<!--deDE:
+    Ein Eingabefeld im Material Design-Stil, das wiederverwendbar ist und (Recht-)Text, Code,
+    Auswahlen, Zahlen, Datumsangaben usw. unterstützt.
+-->
 
 <div class="wd-table-of-contents">
     <!--|deDE:Inhalt-->

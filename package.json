@@ -252,7 +252,7 @@
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-generic-animate": "^0.0.125",
+    "react-generic-animate": "^0.0.126",
     "react-generic-dummy": "^0.0.130",
     "react-generic-tools": "^0.0.120",
     "react-transition-group": "^4.4.5",

@@ -14629,9 +14629,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-generic-animate@npm:^0.0.125":
-  version: 0.0.125
-  resolution: "react-generic-animate@npm:0.0.125"
+"react-generic-animate@npm:^0.0.126":
+  version: 0.0.126
+  resolution: "react-generic-animate@npm:0.0.126"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/react": "*"
@@ -14662,7 +14662,7 @@ __metadata:
       optional: true
     react-useanimations:
       optional: true
-  checksum: 10c0/dd7612c598d6ec5b39b9b4afd84601c33ccd9d870c96ee77003af0229f9bf619c562c5187d950ba9da8abb97dc377cacc4ad515beaffe5fdb274a90cf2adb1cd
+  checksum: 10c0/fb7291c77756aac2fe9bbad150d77e9434ad04d0c7827a9909c9e2742dc96172aee0d4f8341846e106dede0b38f600e0f3798f375bf1fdb455096ef9287063c9
   languageName: node
   linkType: hard
 
@@ -14796,7 +14796,7 @@ __metadata:
     prop-types: "npm:^15.8.1"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
-    react-generic-animate: "npm:^0.0.125"
+    react-generic-animate: "npm:^0.0.126"
     react-generic-dummy: "npm:^0.0.130"
     react-generic-tools: "npm:^0.0.120"
     react-transition-group: "npm:^4.4.5"
