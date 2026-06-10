@@ -33,26 +33,44 @@ Use case
 
 Reusable material design based input field with support for (richt-)text, code,
 selections, numbers, dates and so on.
+<!--deDE:
+    Ein Eingabefeld im Material Design-Stil, das wiederverwendbar ist und
+    (Recht-)Text, Code, Auswahlen, Zahlen, Datumsangaben usw. unterstützt.
+-->
+
+<div class="wd-table-of-contents">
+    <h2 id="content">Content<!--deDE:Inhalt--></h2>
+    <!--wd-table-of-contents-->
+</div>
 
 <!--|deDE:Installation-->
 Installation
 ------------
 
-You can install via package manager, simply download the compiled version as
-zip file here and inject or request via cdn in HTML:
+You can install via package manager or simply download the compiled version as
+zip file here and inject:
 <!--deDE:
     Sie können das Paket über den Paketmanager installieren oder einfach die
-    kompilierte Version als ZIP-Datei hier herunterladen und in HTML einbinden
-    oder über ein CDN abrufen:
+    kompilierte Version als ZIP-Datei hier herunterladen und einbinden:
 -->
 
 ```bash
 npm install react-input-material
 ```
 
+```TypeScript
+import {
+    TextInput, FileInput, Checkbox, Inputs, Interval
+} from 'react-input-material'
+
+// ...
+```
+
+<!--|deDE:Beispiele-->
 Examples
 --------
 
+<!--|deDE:Einfache, unkontrollierte Eingabe-->
 ### Simple uncontrolled input
 
 ```TypeScript
@@ -67,6 +85,7 @@ const Application = () =>
     />
 ```
 
+<!--|deDE:Einfache kontrollierte Eingabe-->
 ### Simple controlled one
 
 ```TypeScript
@@ -81,6 +100,40 @@ const Application = () => {
 }
 ```
 
+<!--|deDE:Zahlen Eingabebeispiel-->
+### Number example
+
+```TypeScript
+const Application = () =>
+    <TextInput<number>
+        declaration="Number"
+        description="Place a number please."
+        name="number"
+        placeholder="100000"
+
+        maximum={200000}
+        minimum={10}
+        required
+        type="number"
+    />
+```
+
+<!--|deDE:Beispiel für einen Code-Editor-->
+### Code editor example
+
+```TypeScript
+const Application = () =>
+    <TextInput<string>
+        className="text-input--code-editor"
+
+        editor="code(js)"
+        rows={6}
+        
+        initialValue="const value = 2"
+    />
+```
+
+<!--|deDE:Komplexe Rich-Text-Eingabe-->
 ### Complex rich text input
 
 ```TypeScript
@@ -104,6 +157,126 @@ const Application = () =>
 
         onChangeValue={(value) => {
             console.log('Current value is', value)
+        }}
+    />
+```
+
+<!--|deDE:Universelle Datums-Eingabe-->
+### Universal Date input
+
+```TypeScript
+const Application = () =>
+    <TextInput<number>
+        default={
+            new Date('2025-01-01T00:00:00.000Z')
+                .getTime() / 1000
+        }
+        name="timeInput"
+        type="date"
+    />
+```
+
+<!--|deDE:Eingabe des lokalen Datums-->
+### Local date input
+
+```TypeScript
+const Application = () =>
+    <TextInput<number>
+        default="2025-01-01T23:00:00.000Z"
+        name="timeInput"
+        type="date-local"
+    />
+```
+
+<!--|deDE:Wählen Sie eine Eingabe aus-->
+### Select an input
+
+```TypeScript
+const Application = () =>
+    <TextInput<string>
+        declaration="Selection Example"
+        name="Example selection"
+        selection={['A', 'B', 'C']}
+    />
+```
+
+<!--|deDE:Wählen Sie ein Eingabefeld mit zugeordneten Bezeichnungen aus-->
+### Select an input with mapped labels
+
+```TypeScript
+const Application = () =>
+    <TextInput<string>
+        name="Another selection example"
+        required
+        selection={[
+            {value: 'A', label: 'a'},
+            {value: 'B', label: 'b'},
+            {value: 'C', label: 'c'}
+        ]}
+    />
+```
+
+<!--|deDE:Sie können Dateien auswählen und hochladen-->
+### You can select and upload files
+
+```TypeScript
+const Application = () =>
+    <FileInput name="fileInput" />
+```
+
+<!--|deDE:Checkbox-->
+### Checkbox
+
+```TypeScript
+const Application = () => <Checkbox />
+```
+
+<!--|deDE:Liste aller möglichen Eingaben-->
+### List of any inputs are possible
+
+```TypeScript
+const Application = () =>
+    <Inputs<boolean | null, CheckboxProps>
+        name="checkboxInputs"
+        default={[{
+            type: 'boolean',
+            value: false,
+            required: true,
+            showInitialValidationState: true
+        }]}
+
+        createItem={useMemorizedValue(({
+            index, item, properties: {name}
+        }: CreateItemOptions<
+            boolean | null,
+            CheckboxProps,
+            InputsProperties<boolean | null, CheckboxProps>
+        >): CheckboxProps => ({
+            ...item,
+            name: `${name}-${String(index + 1)}`
+        }))}
+
+        maximumNumber={2}
+        minimumNumber={2}
+ 
+        showInitialValidationState
+    >
+        {({properties}) => <Checkbox {...properties} />}
+    </Inputs>
+```
+
+<!--|deDE:Intervall-->
+### Interval
+
+```TypeScript
+const Application = () =>
+    <Interval
+        name="Interval example"
+        required
+        step={60}
+        value={{
+            start: {default: 120, maximum: 3600},
+            end: {default: 240, minimum: 120}
         }}
     />
 ```
