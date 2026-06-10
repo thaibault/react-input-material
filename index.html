@@ -19,7 +19,7 @@
     kompilierte Version als ZIP-Datei hier herunterladen und in HTML einbinden
     oder über ein CDN abrufen:
 --><pre><code class="language-bash">npm install react-input-material
-</code></pre><h2 id="wd-heading-examples">Examples</h2><h3 id="wd-heading-simple-uncontrolled-input">Simple uncontrolled input</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
+</code></pre><div class="wd-table-of-contents"><!--|deDE:Inhalt--><h2 id="content">Content</h2><ul><li><a href="#wd-heading-project-status">Project status</a></li><li><a href="#wd-heading-use-case">Use case</a></li><li><a href="#wd-heading-installation">Installation</a></li><li><a href="#wd-heading-examples">Examples</a></li><li><a href="#wd-heading-simple-uncontrolled-input">Simple uncontrolled input</a></li><li><a href="#wd-heading-simple-controlled-one">Simple controlled one</a></li><li><a href="#wd-heading-number-example">Number example</a></li><li><a href="#wd-heading-code-editor-example">Code editor example</a></li><li><a href="#wd-heading-complex-rich-text-input">Complex rich text input</a></li><li><a href="#wd-heading-universal-date-input">Universal Date input</a></li><li><a href="#wd-heading-local-date-input">Local date input</a></li><li><a href="#wd-heading-select-an-input">Select an input</a></li><li><a href="#wd-heading-select-an-input-with-mapped-labels">Select an input with mapped labels</a></li><li><a href="#wd-heading-you-can-select-and-upload-files">You can select and upload files</a></li><li><a href="#wd-heading-checkbox">Checkbox</a></li><li><a href="#wd-heading-list-of-any-inputs-are-possible">List of any inputs are possible</a></li><li><a href="#wd-heading-interval">Interval</a></li></ul></div><h2 id="wd-heading-examples">Examples</h2><h3 id="wd-heading-simple-uncontrolled-input">Simple uncontrolled input</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
     &lt;<span class="hljs-title class_">TextInput</span>&lt;<span class="hljs-built_in">string</span>&gt;
         name=<span class="hljs-string">"simpleInput"</span>
         onChange={<span class="hljs-function">(<span class="hljs-params">{value, invalid}</span>) =&gt;</span> {
@@ -37,6 +37,27 @@
         value = {value}
     /&gt;
 }
+</code></pre><h3 id="wd-heading-number-example">Number example</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
+    &lt;<span class="hljs-title class_">TextInput</span>&lt;<span class="hljs-built_in">number</span>&gt;
+        declaration=<span class="hljs-string">"Number"</span>
+        description=<span class="hljs-string">"Place a number please."</span>
+        name=<span class="hljs-string">"number"</span>
+        placeholder=<span class="hljs-string">"100000"</span>
+
+        maximum={<span class="hljs-number">200000</span>}
+        minimum={<span class="hljs-number">10</span>}
+        required
+        <span class="hljs-keyword">type</span>=<span class="hljs-string">"number"</span>
+    /&gt;
+</code></pre><h3 id="wd-heading-code-editor-example">Code editor example</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
+    &lt;<span class="hljs-title class_">TextInput</span>&lt;<span class="hljs-built_in">string</span>&gt;
+        className=<span class="hljs-string">"text-input--code-editor"</span>
+
+        editor=<span class="hljs-string">"code(js)"</span>
+        rows={<span class="hljs-number">6</span>}
+        
+        initialValue=<span class="hljs-string">"const value = 2"</span>
+    /&gt;
 </code></pre><h3 id="wd-heading-complex-rich-text-input">Complex rich text input</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
     &lt;<span class="hljs-title class_">TextInput</span>&lt;<span class="hljs-built_in">string</span>&gt;
         className=<span class="hljs-string">"text-input--richtext-editor"</span>
@@ -59,6 +80,78 @@
             <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Current value is'</span>, value)
         }}
     /&gt;
+</code></pre><h3 id="wd-heading-universal-date-input">Universal Date input</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
+    &lt;<span class="hljs-title class_">TextInput</span>&lt;<span class="hljs-built_in">number</span>&gt;
+        <span class="hljs-keyword">default</span>={
+            <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>(<span class="hljs-string">'2025-01-01T00:00:00.000Z'</span>)
+                .<span class="hljs-title function_">getTime</span>() / <span class="hljs-number">1000</span>
+        }
+        name=<span class="hljs-string">"timeInput"</span>
+        <span class="hljs-keyword">type</span>=<span class="hljs-string">"date"</span>
+    /&gt;
+</code></pre><h3 id="wd-heading-local-date-input">Local date input</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
+    &lt;<span class="hljs-title class_">TextInput</span>&lt;<span class="hljs-built_in">number</span>&gt;
+        <span class="hljs-keyword">default</span>=<span class="hljs-string">"2025-01-01T23:00:00.000Z"</span>
+        name=<span class="hljs-string">"timeInput"</span>
+        <span class="hljs-keyword">type</span>=<span class="hljs-string">"date-local"</span>
+    /&gt;
+</code></pre><h3 id="wd-heading-select-an-input">Select an input</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
+    &lt;<span class="hljs-title class_">TextInput</span>&lt;<span class="hljs-built_in">string</span>&gt;
+        declaration=<span class="hljs-string">"Selection Example"</span>
+        name=<span class="hljs-string">"Example selection"</span>
+        selection={[<span class="hljs-string">'A'</span>, <span class="hljs-string">'B'</span>, <span class="hljs-string">'C'</span>]}
+    /&gt;
+</code></pre><h3 id="wd-heading-select-an-input-with-mapped-labels">Select an input with mapped labels</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
+    &lt;<span class="hljs-title class_">TextInput</span>&lt;<span class="hljs-built_in">string</span>&gt;
+        name=<span class="hljs-string">"Another selection example"</span>
+        required
+        selection={[
+            {<span class="hljs-attr">value</span>: <span class="hljs-string">'A'</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">'a'</span>},
+            {<span class="hljs-attr">value</span>: <span class="hljs-string">'B'</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">'b'</span>},
+            {<span class="hljs-attr">value</span>: <span class="hljs-string">'C'</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">'c'</span>}
+        ]}
+    /&gt;
+</code></pre><h3 id="wd-heading-you-can-select-and-upload-files">You can select and upload files</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">FileInput</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"fileInput"</span> /&gt;</span></span>
+</code></pre><h3 id="wd-heading-checkbox">Checkbox</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt; <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Checkbox</span> /&gt;</span></span>
+</code></pre><h3 id="wd-heading-list-of-any-inputs-are-possible">List of any inputs are possible</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
+    &lt;<span class="hljs-title class_">Inputs</span>&lt;<span class="hljs-built_in">boolean</span> | <span class="hljs-literal">null</span>, <span class="hljs-title class_">CheckboxProps</span>&gt;
+        name=<span class="hljs-string">"checkboxInputs"</span>
+        <span class="hljs-keyword">default</span>={[{
+            <span class="hljs-attr">type</span>: <span class="hljs-string">'boolean'</span>,
+            <span class="hljs-attr">value</span>: <span class="hljs-literal">false</span>,
+            <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>,
+            <span class="hljs-attr">showInitialValidationState</span>: <span class="hljs-literal">true</span>
+        }]}
+
+        createItem={<span class="hljs-title function_">useMemorizedValue</span>(({
+            index, item, <span class="hljs-attr">properties</span>: {name}
+        }: <span class="hljs-title class_">CreateItemOptions</span>&lt;
+            <span class="hljs-built_in">boolean</span> | <span class="hljs-literal">null</span>,
+            <span class="hljs-title class_">CheckboxProps</span>,
+            <span class="hljs-title class_">InputsProperties</span>&lt;<span class="hljs-built_in">boolean</span> | <span class="hljs-literal">null</span>, <span class="hljs-title class_">CheckboxProps</span>&gt;
+        &gt;): <span class="hljs-function"><span class="hljs-params">CheckboxProps</span> =&gt;</span> ({
+            ...item,
+            <span class="hljs-attr">name</span>: <span class="hljs-string">`<span class="hljs-subst">${name}</span>-<span class="hljs-subst">${<span class="hljs-built_in">String</span>(index + <span class="hljs-number">1</span>)}</span>`</span>
+        }))}
+
+        maximumNumber={<span class="hljs-number">2</span>}
+        minimumNumber={<span class="hljs-number">2</span>}
+ 
+        showInitialValidationState
+    &gt;
+        {<span class="hljs-function">(<span class="hljs-params">{properties}</span>) =&gt;</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Checkbox</span> {<span class="hljs-attr">...properties</span>} /&gt;</span></span>}
+    &lt;/<span class="hljs-title class_">Inputs</span>&gt;
+</code></pre><h3 id="wd-heading-interval">Interval</h3><pre><code class="language-TypeScript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Application</span> = (<span class="hljs-params"></span>) =&gt;
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">Interval</span>
+        <span class="hljs-attr">name</span>=<span class="hljs-string">"Interval example"</span>
+        <span class="hljs-attr">required</span>
+        <span class="hljs-attr">step</span>=<span class="hljs-string">{60}</span>
+        <span class="hljs-attr">value</span>=<span class="hljs-string">{{</span>
+            <span class="hljs-attr">start:</span> {<span class="hljs-attr">default:</span> <span class="hljs-attr">120</span>, <span class="hljs-attr">maximum:</span> <span class="hljs-attr">3600</span>},
+            <span class="hljs-attr">end:</span> {<span class="hljs-attr">default:</span> <span class="hljs-attr">240</span>, <span class="hljs-attr">minimum:</span> <span class="hljs-attr">120</span>}
+        }}
+    /&gt;</span></span>
 </code></pre></section><section class="wd-section__inner wd-section__about-this-website" data-website-utilities-section="about-this-website"><h2 id="about-this-website">About this website<!--deDE:Impressum--><!--frFR:Mentions légales--></h2><p>Provider of<!--deDE:Anbieter von--><!--frFR:Fournisseur de--><a href="https://torben.website/react-input-material">https://torben.website/react-input-material</a>:<br>Torben Sickert<br>Waldstraße 29<br>791194 Gundelfingen i.Br.<br>Phone:<!--deDE:Tel.:--><!--frFR:Téléphone:--> <a href="tel:004917610248185">+49 (0) 176 <span>/</span> 10 248 185<br>Email:<!--deDE:E-Mail:--> </a><a href="mailto:info@torben.website">info@torben.website</a><br>Website:<!--deDE:Webseite:--><!--frFR:Site:--> <a href="https://torben.website">https://torben.website</a><br><a href="#home"><lang-replace><i class="bi bi-arrow-left"></i> home</lang-replace><lang-replacement>deDE: <i class="bi bi-arrow-left"></i> Startseite</lang-replacement><lang-replacement>frFR: <i class="bi bi-arrow-left"></i> Maison</lang-replacement></a></p><h2>Disclaimer<!--deDE:Haftungsausschluss--><!--frFR:Désistement--></h2><h3>Liability for content<!--deDE:Haftung für Inhalte--><!--frFR:Responsabilité quant au contenu--></h3><p>Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekannt werden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.</p><h3>Liability for links<!--deDE:Haftung für Links--><!--frFR:Responsabilité pour les liens--></h3><p>Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen.</p><h3>Copyright<!--deDE:Urheberrecht--><!--frFR:Droit d'auteur--></h3><p>Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet. Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen.</p><h3>Privacy Policy<!--deDE:Datenschutz--><!--frFR:Politique de confidentialité--></h3><p>Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener Daten möglich. Soweit auf unseren Seiten personenbezogene Daten (beispielsweise Name, Anschrift oder E-Mail-Adressen) erhoben werden, erfolgt dies, soweit möglich, stets auf freiwilliger Basis. Diese Daten werden ohne Ihre ausdrückliche Zustimmung nicht an Dritte weitergegeben. Wir darauf hin, dass die Datenübertragung im Internet (z.B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich. Der Nutzung von im Rahmen der Impressumspflicht veröffentlichten Kontaktdaten durch Dritte zur Übersendung von nicht ausdrücklich angeforderter Werbung und Informationsmaterialien wird hiermit ausdrücklich widersprochen. Die Betreiber der Seiten behalten sich ausdrücklich rechtliche Schritte im Falle der unverlangten Zusendung von Werbeinformationen, etwa durch Spam-Mails, vor.</p><h3>Privacy Statement for using Google Analytics<!--deDE:Datenschutzerklärung für die Nutzung von Google Analytics--><!--frFR:
         Déclaration de confidentialité de l'utilisation de Google Analytics
     --></h3><p>Diese Website benutzt Google Analytics, einen Webanalysedienst der Google Inc. ("Google"). Google Analytics verwendet sog. "Cookies", Textdateien, die auf Ihrem Computer gespeichert werden und die eine Analyse der Benutzung der Website durch Sie ermöglichen. Die durch den Cookie erzeugten Informationen über Ihre Benutzung dieser Website werden in der Regel an einen Server von Google in den USA übertragen und dort gespeichert. Im Falle der Aktivierung der IP-Anonymisierung auf dieser Webseite wird Ihre IP-Adresse von Google jedoch innerhalb von Mitgliedstaaten der Europäischen Union oder in anderen Vertragsstaaten des Abkommens über den Europäischen Wirtschaftsraum zuvor gekürzt. Nur in Ausnahmefällen wird die volle IP-Adresse an einen Server von Google in den USA übertragen und dort gekürzt. Im Auftrag des Betreibers dieser Website wird Google diese Informationen benutzen, um Ihre Nutzung der Website auszuwerten, um Reports über die Websiteaktivitäten zusammenzustellen und um weitere mit der Websitenutzung und der Internetnutzung verbundene Dienstleistungen gegenüber dem Websitebetreiber zu erbringen. Die im Rahmen von Google Analytics von Ihrem Browser übermittelte IP-Adresse wird nicht mit anderen Daten von Google zusammengeführt. Sie können die Speicherung der Cookies durch eine entsprechende Einstellung Ihrer Browser-Software verhindern; wir weisen Sie jedoch darauf hin, dass Sie in diesem Fall gegebenenfalls nicht sämtliche Funktionen dieser Website vollumfänglich werden nutzen können. Sie können darüber hinaus die Erfassung der durch das Cookie erzeugten und auf Ihre Nutzung der Website bezogenen Daten (inkl. Ihrer IP-Adresse) an Google sowie die Verarbeitung dieser Daten durch Google verhindern, indem Sie das unter dem folgenden <a href="http://tools.google.com/dlpage/gaoptout?hl=de">Link </a>verfügbare Browser-Plugin herunterladen und installieren.</p><h3>Copyright Statement</h3><p>Unless noted otherwise, all artwork on this website is protected property of the website author. Any use for commercial purpose, reproduction and publication requires the author's written permission. Commercial work created in cooperation or bound by contract with third parties are specifically marked. Respective copyrights apply.</p></section></main><footer class="wd-footer"><div class="wd-footer__inner"><p class="wu-start-up-animation-number-10">react-input-material maintained by<!--deDE:react-input-material betrieben von--><!--frFR:react-input-material exploité par--> <a href="https://torben.website">thaibault</a> · © 2026 Torben Sickert · <a href="#about-this-website">about this website<!--deDE:Impressum--><!--frFR:Mentions légales--></a></p></div></footer><a href="#top" class="wu-scroll-to-top">top<!--deDE:nach oben--><!--frFR:ascendant--></a></web-documentation><script src="index.js?md5=48cc13becbf9c3adb4f9" defer=""></script></body></html>
