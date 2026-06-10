@@ -34,37 +34,76 @@ Use case
 Reusable material design based input field with support for (richt-)text, code,
 selections, numbers, dates and so on.
 
-### Low-level component compatibility layer
+<!--|deDE:Installation-->
+Installation
+------------
 
-#### Generic
+You can install via package manager, simply download the compiled version as
+zip file here and inject or request via cdn in HTML:
+<!--deDE:
+    Sie können das Paket über den Paketmanager installieren oder einfach die
+    kompilierte Version als ZIP-Datei hier herunterladen und in HTML einbinden
+    oder über ein CDN abrufen:
+-->
 
-- Tooltip
+```bash
+npm install react-input-material
+```
 
-#### Checkbox
+Examples
+--------
 
-- Checkbox
-- Error
+### Simple uncontrolled input
 
-#### FileInput
+```TypeScript
+const Application = () =>
+    <TextInput<string>
+        name="simpleInput"
+        onChange={({value, invalid}) => {
+            console.log('Set value', value)
+            if (invalid)
+                console.log('Value is invalid!')
+        }}
+    />
+```
 
-- CircularProgress
-- MediaCard
+### Simple controlled one
 
-#### Inputs
+```TypeScript
+const Application = () => {
+    const [value, setValue] = useState<null | string>(null)
 
-- IconButton
+    return <TextInput<null | string>
+        name = "simpleInputControlled"
+        onChangeValue = {setValue}
+        value = {value}
+    />
+}
+```
 
-#### Interval
+### Complex rich text input
 
-- Icon
+```TypeScript
+const Application = () =>
+    <TextInput<string>
+        className="text-input--richtext-editor"
 
-#### TextInput
+        declaration="richtext"
+        description="Please your styled text here."
+        name="RichText"
+        placeholder="Hello Mr. Smith,<br><br>this is a Placeholder."
+        
+        editor="richtext"
+        rows={6}
+        selectableEditor
+        
+        initialValue="Hello Mr. Smith,<br><br>how are you?"
+        minimumLength={10}
+        maximumLength={100}
+        required
 
-- CircularProgress
-- Error
-- Icon
-- IconButton
-- Menu
-- Select
-- TextArea
-- TextField
+        onChangeValue={(value) => {
+            console.log('Current value is', value)
+        }}
+    />
+```
