@@ -8491,9 +8491,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clientnode@npm:4.0.1421":
-  version: 4.0.1421
-  resolution: "clientnode@npm:4.0.1421"
+"clientnode@npm:4.0.1422":
+  version: 4.0.1422
+  resolution: "clientnode@npm:4.0.1422"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/prop-types": "*"
@@ -8508,7 +8508,7 @@ __metadata:
       optional: true
     prop-types:
       optional: true
-  checksum: 10c0/85d8349c77072477fff101f541e568a3227ca290733ce35ed15df1c5f80b8ac3c201bac390535fde911423507e7aa05bfd9d59fa27c16fa2f4d41ce9df0ff163
+  checksum: 10c0/218f7acd6cf9b3c7330f5f3e585ea7e1c03d5bc483617b52fd76866326cab4a7d194b7d068c1542d6d30a12f32d809e05c5fc04499cb21a3804d93706a387b83
   languageName: node
   linkType: hard
 
@@ -14694,9 +14694,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-generic-tools@npm:^0.0.119":
-  version: 0.0.119
-  resolution: "react-generic-tools@npm:0.0.119"
+"react-generic-tools@npm:^0.0.120":
+  version: 0.0.120
+  resolution: "react-generic-tools@npm:0.0.120"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/prop-types": "*"
@@ -14719,7 +14719,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/24780b387a7f2a24a77ee43390fbe2591994e3388c446ae8dc75eec32409598e7288b69bbf9fbab2105705387f7ce081c79ae27ace7b0f83c85ed1b9c20ddf13
+  checksum: 10c0/eafc6092b9d0b587b098661f37f5e46becccd96b600da48efa6a72dec1a65586402ea3a35991c130f014ebb2d0c79b6994edf431e4b5c7e3e12ea3f001fafa19
   languageName: node
   linkType: hard
 
@@ -14775,7 +14775,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.61.0"
     "@typescript-eslint/parser": "npm:^8.61.0"
     blob-util: "npm:^2.0.2"
-    clientnode: "npm:4.0.1421"
+    clientnode: "npm:4.0.1422"
     css-loader: "npm:^7.1.4"
     cssnano: "npm:^8.0.1"
     eslint: "npm:^10.4.1"
@@ -14798,7 +14798,7 @@ __metadata:
     react-dom: "npm:^18.3.1"
     react-generic-animate: "npm:^0.0.125"
     react-generic-dummy: "npm:^0.0.130"
-    react-generic-tools: "npm:^0.0.119"
+    react-generic-tools: "npm:^0.0.120"
     react-transition-group: "npm:^4.4.5"
     react-useanimations: "npm:^2.10.0"
     spark-md5: "npm:^3.0.2"

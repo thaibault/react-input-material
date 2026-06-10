@@ -34,27 +34,34 @@ Use case
 Reusable material design based input field with support for (richt-)text, code,
 selections, numbers, dates and so on.
 
+<div class="wd-table-of-contents">
+    <!--|deDE:Inhalt-->
+    <h2 id="content">Content</h2>
+    <!--wd-table-of-contents-->
+</div>
+
 <!--|deDE:Installation-->
 Installation
 ------------
 
-You can install via package manager, simply download the compiled version as
-zip file here and inject or request via cdn in HTML:
+You can install via package manager or simply download the compiled version as
+zip file here and inject:
 <!--deDE:
     Sie können das Paket über den Paketmanager installieren oder einfach die
-    kompilierte Version als ZIP-Datei hier herunterladen und in HTML einbinden
-    oder über ein CDN abrufen:
+    kompilierte Version als ZIP-Datei hier herunterladen und einbinden:
 -->
 
 ```bash
 npm install react-input-material
 ```
 
-<div class="wd-table-of-contents">
-    <!--|deDE:Inhalt-->
-    <h2 id="content">Content</h2>
-    <!--wd-table-of-contents-->
-</div>
+```TypeScript
+import {
+    TextInput, FileInput, Checkbox, Inputs, Interval
+} from 'react-input-material'
+
+// ...
+```
 
 Examples
 --------
