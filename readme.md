@@ -34,8 +34,8 @@ Use case
 Reusable material design based input field with support for (richt-)text, code,
 selections, numbers, dates and so on.
 <!--deDE:
-    Ein Eingabefeld im Material Design-Stil, das wiederverwendbar ist und (Recht-)Text, Code,
-    Auswahlen, Zahlen, Datumsangaben usw. unterstützt.
+    Ein Eingabefeld im Material Design-Stil, das wiederverwendbar ist und
+    (Recht-)Text, Code, Auswahlen, Zahlen, Datumsangaben usw. unterstützt.
 -->
 
 <div class="wd-table-of-contents">
@@ -67,9 +67,11 @@ import {
 // ...
 ```
 
+<!--|deDE:Beispiele-->
 Examples
 --------
 
+<!--|deDE:Einfache, unkontrollierte Eingabe-->
 ### Simple uncontrolled input
 
 ```TypeScript
@@ -84,6 +86,7 @@ const Application = () =>
     />
 ```
 
+<!--|deDE:Einfache kontrollierte Eingabe-->
 ### Simple controlled one
 
 ```TypeScript
@@ -98,6 +101,7 @@ const Application = () => {
 }
 ```
 
+<!--|deDE:Zahlen Eingabebeispiel-->
 ### Number example
 
 ```TypeScript
@@ -115,6 +119,7 @@ const Application = () =>
     />
 ```
 
+<!--|deDE:Beispiel für einen Code-Editor-->
 ### Code editor example
 
 ```TypeScript
@@ -129,6 +134,7 @@ const Application = () =>
     />
 ```
 
+<!--|deDE:Komplexe Rich-Text-Eingabe-->
 ### Complex rich text input
 
 ```TypeScript
@@ -156,6 +162,7 @@ const Application = () =>
     />
 ```
 
+<!--|deDE:Universelle Datums-Eingabe-->
 ### Universal Date input
 
 ```TypeScript
@@ -170,6 +177,7 @@ const Application = () =>
     />
 ```
 
+<!--|deDE:Eingabe des lokalen Datums-->
 ### Local date input
 
 ```TypeScript
@@ -181,6 +189,7 @@ const Application = () =>
     />
 ```
 
+<!--|deDE:Wählen Sie eine Eingabe aus-->
 ### Select an input
 
 ```TypeScript
@@ -192,6 +201,7 @@ const Application = () =>
     />
 ```
 
+<!--|deDE:Wählen Sie ein Eingabefeld mit zugeordneten Bezeichnungen aus-->
 ### Select an input with mapped labels
 
 ```TypeScript
@@ -207,6 +217,7 @@ const Application = () =>
     />
 ```
 
+<!--|deDE:Sie können Dateien auswählen und hochladen-->
 ### You can select and upload files
 
 ```TypeScript
@@ -214,12 +225,14 @@ const Application = () =>
     <FileInput name="fileInput" />
 ```
 
+<!--|deDE:Checkbox-->
 ### Checkbox
 
 ```TypeScript
 const Application = () => <Checkbox />
 ```
 
+<!--|deDE:Liste aller möglichen Eingaben-->
 ### List of any inputs are possible
 
 ```TypeScript
@@ -253,6 +266,7 @@ const Application = () =>
     </Inputs>
 ```
 
+<!--|deDE:Intervall-->
 ### Interval
 
 ```TypeScript
