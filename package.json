@@ -265,7 +265,7 @@
     "typescript-eslint": "^8.61.0",
     "typescript-plugin-css-modules": "^5.2.0",
     "web-component-wrapper": "^0.0.596",
-    "web-documentation": "^1.0.34",
+    "web-documentation": "^1.0.35",
     "weboptimizer": "^3.0.24",
     "webpack-dev-server": "^5.2.4"
   },
