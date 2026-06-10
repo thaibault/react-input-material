@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c6fbf9d8-795b-4520-b797-c174e3735c9c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotChats">
+    <option name="panelChat">
+      <chat>
+        <option name="activeSessionId" value="e4ebedb6-b6b7-4dfd-b18a-6ff7dba89781" />
+        <option name="sessions">
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="e4ebedb6-b6b7-4dfd-b18a-6ff7dba89781" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="claude-opus-4.6" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+        </option>
+        <option name="type" value="PANEL" />
+      </chat>
+    </option>
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/Users/torben.sickert/local/public/project/repository/react-input-material" value="3Dtd03kpgaePrcMZAocTzooOS5h" />
+    </persistenceIdMap>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.000000000001082" />
+      <entry key="MS500" value="1.0049302671974103" />
+      <entry key="S2" value="1.4356721905181806" />
+      <entry key="S5" value="2.2359262229330836" />
+      <entry key="S10" value="2.878800059465684" />
+      <entry key="S30" value="4.738103130689472" />
+      <entry key="S60" value="9.442155408845995" />
+      <entry key="M2" value="20.64351361206905" />
+      <entry key="M5" value="44.50354003062093" />
+      <entry key="M10" value="62.35404287499705" />
+      <entry key="M15" value="70.78703480355198" />
+      <entry key="M30" value="81.62003961261337" />
+      <entry key="H1" value="88.71626772406432" />
+      <entry key="H2" value="92.99902173935612" />
+      <entry key="H4" value="95.39539228276263" />
+      <entry key="D1" value="97.54999898259794" />
+      <entry key="W1" value="97.935304279464" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.7578582832562086" />
+      <entry key="MS500" value="0.9509200353659717" />
+      <entry key="S2" value="1.4199673144495246" />
+      <entry key="S5" value="2.2260654348257334" />
+      <entry key="S10" value="2.8714862654738638" />
+      <entry key="S30" value="4.7343098391465395" />
+      <entry key="S60" value="9.438064060723429" />
+      <entry key="M2" value="20.635622706382197" />
+      <entry key="M5" value="44.49368699222456" />
+      <entry key="M10" value="62.346530380385744" />
+      <entry key="M15" value="70.78123990186745" />
+      <entry key="M30" value="81.6166755278202" />
+      <entry key="H1" value="88.71445190756313" />
+      <entry key="H2" value="92.99807777196453" />
+      <entry key="H4" value="95.39491091233175" />
+      <entry key="D1" value="97.5499174162113" />
+      <entry key="W1" value="97.93529259388853" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3Dtd03kpgaePrcMZAocTzooOS5h" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "javascript.preferred.runtime.type.id": "node",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/Users/torben.sickert/local/public/project/repository/react-input-material",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.stylelint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.stylelint": "",
+    "nodejs_package_manager_path": "yarn",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "/Users/torben.sickert/local/public/project/repository/react-input-material/node_modules/typescript/lib"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-WS-261.25134.101" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c6fbf9d8-795b-4520-b797-c174e3735c9c" name="Changes" comment="" />
+      <created>1779105077354</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1779105077354</updated>
+      <workItem from="1779105078360" duration="3000" />
+      <workItem from="1779105091259" duration="1513000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>
