@@ -160,9 +160,10 @@
     "url": "https://github.com/thaibault/react-input-material"
   },
   "scripts": {
-    "build": "yarn build:types; yarn build:plain",
-    "build:bundle": "yarn build:types; yarn build:bundle:plain",
-    "build:bundle:plain": "weboptimizer build '{__reference__: [\"target:minimal\", \"target:bundle\"]}'",
+    "build": "yarn build:types; yarn build:plain; yarn build:minimal; yarn build:bundle; yarn build:bundle:minimal",
+    "build:minimal": "weboptimizer build '{__reference__: \"target:minimal\"}'",
+    "build:bundle": "weboptimizer build '{__reference__: \"target:bundle\"}'",
+    "build:bundle:minimal": "weboptimizer build '{__reference__: [\"target:bundle\", \"target:minimal\"], \"path\": {\"target\": {\"base\": \"dist/bundle/minimal/\"}}}'",
     "build:plain": "weboptimizer build",
     "build:types": "weboptimizer build:types",
     "check": "yarn check:types; yarn lint",
@@ -215,14 +216,14 @@
     "@rmwc/typography": "^14.3.5",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
-    "@tiptap/core": "^3.26.0",
-    "@tiptap/extensions": "^3.26.0",
-    "@tiptap/react": "^3.26.0",
-    "@tiptap/starter-kit": "^3.26.0",
+    "@tiptap/core": "^3.26.1",
+    "@tiptap/extensions": "^3.26.1",
+    "@tiptap/react": "^3.26.1",
+    "@tiptap/starter-kit": "^3.26.1",
     "@types/ejs": "^3.1.5",
     "@types/html-minifier": "^4.0.6",
     "@types/jsdom": "^28.0.3",
-    "@types/node": "^25.9.2",
+    "@types/node": "^25.9.3",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@types/react-transition-group": "^4.4.12",
@@ -231,10 +232,10 @@
     "@typescript-eslint/eslint-plugin": "^8.61.0",
     "@typescript-eslint/parser": "^8.61.0",
     "blob-util": "^2.0.2",
-    "clientnode": "4.0.1422",
+    "clientnode": "4.0.1423",
     "css-loader": "^7.1.4",
-    "cssnano": "^8.0.1",
-    "eslint": "^10.4.1",
+    "cssnano": "^8.0.2",
+    "eslint": "^10.5.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-jsdoc": "^63.0.2",
     "identity-obj-proxy": "^3.0.0",
@@ -247,7 +248,7 @@
     "postcss-import": "^16.1.1",
     "postcss-loader": "^8.2.1",
     "postcss-nested": "^7.0.2",
-    "postcss-preset-env": "^11.3.0",
+    "postcss-preset-env": "^11.3.1",
     "postcss-scss": "^4.0.9",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
@@ -265,9 +266,9 @@
     "typescript-eslint": "^8.61.0",
     "typescript-plugin-css-modules": "^5.2.0",
     "web-component-wrapper": "^0.0.597",
-    "web-documentation": "^1.0.35",
+    "web-documentation": "^1.0.38",
     "weboptimizer": "^3.0.24",
-    "webpack-dev-server": "^5.2.4"
+    "webpack-dev-server": "^5.2.5"
   },
   "peerDependencies": {
     "@babel/runtime": "*",
@@ -609,6 +610,11 @@
             }
           }
         }
+      },
+      "path": {
+        "target": {
+          "base": "dist/bundle/"
+        }
       }
     },
     "target:minimal": {
@@ -632,6 +638,11 @@
           "react-useanimations$": "react-generic-dummy",
           "react-useanimations/lib/lock$": "react-generic-dummy",
           "react-useanimations/lib/plusToX$": "react-generic-dummy"
+        }
+      },
+      "path": {
+        "target": {
+          "base": "dist/minimal/"
         }
       }
     },
