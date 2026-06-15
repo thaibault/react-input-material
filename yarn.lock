@@ -14802,8 +14802,8 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript-eslint: "npm:^8.61.0"
     typescript-plugin-css-modules: "npm:^5.2.0"
-    web-component-wrapper: "npm:^0.0.600"
-    web-documentation: "npm:^1.0.38"
+    web-component-wrapper: "npm:^0.0.602"
+    web-documentation: "npm:^1.0.40"
     weboptimizer: "npm:^3.0.24"
     webpack-dev-server: "npm:^5.2.5"
   peerDependencies:
@@ -16904,9 +16904,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-component-wrapper@npm:^0.0.600":
-  version: 0.0.600
-  resolution: "web-component-wrapper@npm:0.0.600"
+"web-component-wrapper@npm:^0.0.602":
+  version: 0.0.602
+  resolution: "web-component-wrapper@npm:0.0.602"
   peerDependencies:
     "@babel/runtime": "*"
     "@types/react": "*"
@@ -16925,16 +16925,16 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/75a17a5ef12da1c564c3dc816f5bac460d79a61bfea94162cc85404f621652fffd9ad57f99bbfc8eb7a9ad594bf0d81d7c39d5095fd590144afccfc01225d5b8
+  checksum: 10c0/8aeb6886aa4fdd08a33ad8eb64ba83afad643924b96b71cec3344b62b5708e9acfa4c67f6b94f2ac73c6c1490b10cb3045c8fc6e5a4b6244bdd1d7b0b53793f0
   languageName: node
   linkType: hard
 
-"web-documentation@npm:^1.0.38":
-  version: 1.0.38
-  resolution: "web-documentation@npm:1.0.38"
+"web-documentation@npm:^1.0.40":
+  version: 1.0.40
+  resolution: "web-documentation@npm:1.0.40"
   bin:
     web-documentation: build/deploy.js
-  checksum: 10c0/4a35b78e9ae993fb3977ee9736aa2f33ee1f79db4bcdaccd5a61f4fc1430a9a287258225fd4129edfff3a4a019e8f03eae1e134419a73b49339f2529bf7dc230
+  checksum: 10c0/e9110d45bccccc0811b1970dea5701476ed3df8836a3875de98e9887c03888933040262ea57056cdc1f8534238e31deb644e17cbcf5bada92c2281040270e011
   languageName: node
   linkType: hard
 
