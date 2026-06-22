@@ -61,8 +61,7 @@ import {
     ValueState
 } from './type'
 // endregion
-export const log =
-    new Logger({name: 'react-input-material-helper-logger', level: 'warn'})
+export const log = new Logger({name: 'react-input-material.helper'})
 // region state
 /**
  * Removes all none serializable values from given data structure.

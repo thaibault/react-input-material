@@ -107,8 +107,7 @@ export {
     preserveStaticFileBaseNameInputGenerator
 } from './helper'
 // endregion
-export const log =
-    new Logger({name: 'react-input-material-file-input-logger', level: 'warn'})
+export const log = new Logger({name: 'react-input-material.file-input'})
 
 /**
  * Validatable checkbox wrapper component.
