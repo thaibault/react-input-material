@@ -550,19 +550,22 @@
         }
       },
       "optimizer": {
-        "babelMinify": {
-          "bundle": {
-            "transform": {
-              "#": "To provide a logging output we need to exclude this feature.",
-              "removeConsole": false
-            }
-          },
-          "#": "Avoids TypeError: Cannot read property 'removeBinding' of null.",
-          "module": null
-        },
         "#": "We have to add disable \"mergeRules\" since it removes some needed css directives otherwise.",
         "cssnano": {
           "__evaluate__": "self.debug ? null : {preset: [optionalRequire('cssnano-preset-default'), {autoprefixer: false, discardUnused: !self.library, mergeRules: false}]}"
+        },
+        "terser": {
+          "terserOptions": {
+            "compress": {
+              "#": "To provide a logging output we need to exclude this feature.",
+              "drop_console": {
+                "__evaluate__": "false"
+              },
+              "drop_debugger": {
+                "__evaluate__": "false"
+              }
+            }
+          }
         }
       },
       "preprocessor": {
@@ -572,14 +575,6 @@
               "pre": {
                 "__append__": "require('postcss-nested')"
               }
-            }
-          }
-        },
-        "javaScript": {
-          "options": {
-            "presets": {
-              "#": "TODO: Remove \"@babel/react\" options when updated to babel 8. NOTE: We have to disable module export/import transformation to allow tree shaking by the final (minimizer).",
-              "__evaluate__": "[['@babel/react', {runtime: 'automatic'}], ['@babel/preset-env', {loose: true, modules: false, targets: self.targetTechnology === 'node' ? {node: 'current'} : {browsers: self.generic.supportedBrowsers, node: 'current'}}], '@babel/typescript'].concat((self.debug || !self.module.optimizer.babelMinify.module || 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'document') ? [] : [['minify', self.module.optimizer.babelMinify.module]])"
             }
           }
         }
