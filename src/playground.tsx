@@ -17,54 +17,52 @@
     endregion
 */
 // region imports
-import {EditorView as CodeEditorIndicator} from '@codemirror/view'
-import {EditorContent as RichTextEditorIndicator} from '@tiptap/react'
-import {Tab, TabBar} from '@rmwc/tabs'
-
-import {
-    dateTimeFormat,
-    debounce,
-    extend,
-    Logger,
-    LOCALES,
-    Mapping,
-    represent,
-    timeout
-} from 'clientnode'
-
-import {createRef, ReactNode, useState} from 'react'
-import {createRoot} from 'react-dom/client'
-import {useMemorizedValue} from 'react-generic-tools'
-
-import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
-import {
+import type {Mapping} from 'clientnode'
+import type {
     AdapterWithReferences,
     ChildrenOptions,
     Properties as FileInputProperties,
     Props as FileInputProps,
     Value as FileInputValue
 } from './components/FileInput/type'
-import {Props as CheckboxProps} from './components/Checkbox/type'
+
 import {
-    Properties as TextInputProperties,
-    Props as TextInputProps,
-    SuggestionCreatorOptions
-} from './components/TextInput/type'
-import {
+    dateTimeFormat, debounce, extend, Logger, LOCALES, represent, timeout
+} from 'clientnode'
+import type {ReactNode} from 'react'
+
+import type {Props as CheckboxProps} from './components/Checkbox/type'
+import type {
     CreateItemOptions,
     CreatePrototypeOptions,
     Properties as InputsProperties,
     PartialModel as InputsPartialModel
 } from './components/Inputs/type'
-import {
+import type {
     Configuration as IntervalConfiguration,
     Properties as IntervalProperties,
     Props as IntervalProps,
     Value as IntervalValue,
     PartialModel as IntervalPartialModel
 } from './components/Interval/type'
+import type {
+    Properties as TextInputProperties,
+    Props as TextInputProps,
+    SuggestionCreatorOptions
+} from './components/TextInput/type'
+
+import type {BaseProps} from './type'
+
+import {createRef, useState} from 'react'
+import {createRoot} from 'react-dom/client'
+import {useMemorizedValue} from 'react-generic-tools'
+
+import {EditorView as CodeEditorIndicator} from '@codemirror/view'
+import {EditorContent as RichTextEditorIndicator} from '@tiptap/react'
+import {Tab, TabBar} from '@rmwc/tabs'
+
+import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
 import {Checkbox, FileInput, TextInput, Inputs, Interval} from './index'
-import {BaseProps} from './type'
 import {slicePropertiesForStateRecursively} from './helper'
 // endregion
 // region configuration

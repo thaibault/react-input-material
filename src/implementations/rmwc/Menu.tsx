@@ -16,29 +16,19 @@
     endregion
 */
 // region imports
-import {
-    ForwardedRef,
-    forwardRef,
-    memo as memoize,
-    ReactElement,
-    useImperativeHandle
-} from 'react'
+import type {ForwardedRef, ReactElement} from 'react'
+
+import type {MDCMenuFoundation} from '@material/menu'
+import type {MenuApi, MenuProps as RMWCMenuProps} from '@rmwc/menu'
+
+import type {MenuProperties, MenuReference} from '../type'
+
+import {forwardRef, memo as memoize, useImperativeHandle} from 'react'
 import {useReferenceState} from 'react-generic-tools'
 
-import {MDCMenuFoundation} from '@material/menu'
-import {
-    Menu as RMWCMenu,
-    MenuApi,
-    MenuItem,
-    MenuSurface,
-    MenuSurfaceAnchor,
-    MenuProps as RMWCMenuProps
-} from '@rmwc/menu'
-
-import {MenuProperties, MenuReference} from '../type'
+import {MenuItem, MenuSurface, MenuSurfaceAnchor} from '@rmwc/menu'
 
 import CircularProgress from './CircularProgress'
-
 // endregion
 export interface Reference extends MenuReference {
     surfaceAnchor: HTMLDivElement | null

@@ -16,8 +16,8 @@
     endregion
 */
 // region imports
-import {Mapping} from 'clientnode'
-import {
+import type {Mapping} from 'clientnode'
+import type {
     FocusEvent as ReactFocusEvent,
     KeyboardEvent as ReactKeyboardEvent,
     MouseEvent as ReactMouseEvent,
@@ -26,10 +26,10 @@ import {
     ReactNode,
     SyntheticEvent
 } from 'react'
-import {GenericEvent} from 'react-generic-tools/type'
+import type {GenericEvent} from 'react-generic-tools/type'
 
-import {NativeType} from '../components/TextInput/type'
-import {NormalizedSelection} from '../type'
+import type {NativeType} from '../components/TextInput/type'
+import type {NormalizedSelection} from '../type'
 // endregion
 // region exports
 export type IconStrategy =
