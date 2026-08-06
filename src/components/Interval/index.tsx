@@ -61,9 +61,9 @@ import WrapConfigurations from '../Wrapper/WrapConfigurations'
 /*
 "namedExport" version of css-loader:
 
-import {intervalClassName, intervalDisabledClassName} from './style.module'
+import {intervalClassName, intervalDisabledClassName} from './styke.module.css'
 */
-import cssClassNames from './style.module'
+import cssClassNames from './styke.module.css'
 import {defaultProperties, propertyTypes} from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames

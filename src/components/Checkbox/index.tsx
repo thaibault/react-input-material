@@ -74,7 +74,7 @@ import {
 } from '../../helper'
 import {defaultModelState as baseDefaultModelState} from '../../type'
 
-import cssClassNames from './style.module'
+import cssClassNames from './styke.module.css'
 import {defaultProperties, propertyTypes} from './type'
 import {useReferenceState} from 'react-generic-tools'
 // endregion

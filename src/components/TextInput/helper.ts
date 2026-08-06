@@ -52,9 +52,9 @@ import {
     textInputEditorLabelClassName,
     textInputSuggestionsClassName,
     textInputSuggestionsPendingClassName
-} from './style.module'
+} from './styke.module.css'
  */
-import cssClassNames from './style.module'
+import cssClassNames from './styke.module.css'
 import {useMemorizedValue} from 'react-generic-tools'
 // endregion
 // region constants

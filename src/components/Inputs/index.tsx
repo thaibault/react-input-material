@@ -72,9 +72,9 @@ import {
     inputsItemDisabledClassName,
     inputsItemInputClassName,
     inputsItemRemoveClassName
-} from './style.module'
+} from './styke.module.css'
 */
-import cssClassNames from './style.module'
+import cssClassNames from './styke.module.css'
 
 import WrapConfigurations from '../Wrapper/WrapConfigurations'
 import {

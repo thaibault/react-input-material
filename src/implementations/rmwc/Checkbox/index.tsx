@@ -27,7 +27,7 @@ import {useReferenceState} from 'react-generic-tools'
 
 import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox'
 
-import cssClassNames from './style.module'
+import cssClassNames from './styke.module.css'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 

@@ -187,7 +187,6 @@
     "@babel/eslint-parser": "^8.0.1",
     "@babel/plugin-transform-proto-to-assign": "^8.0.1",
     "@babel/preset-react": "^8.0.1",
-    "@babel/runtime": "^8.0.0",
     "@codemirror/autocomplete": "^6.20.3",
     "@codemirror/commands": "^6.10.4",
     "@codemirror/lang-css": "^6.3.1",
@@ -271,7 +270,7 @@
     "webpack-dev-server": "^6.0.0"
   },
   "peerDependencies": {
-    "@babel/runtime": "*",
+    "@babel/preset-react": "*",
     "@codemirror/autocomplete": "*",
     "@codemirror/commands": "*",
     "@codemirror/lang-css": "*",
@@ -309,7 +308,7 @@
     "tslib": "*"
   },
   "peerDependenciesMeta": {
-    "@babel/runtime": {
+    "@babel/preset-react": {
       "optional": true
     },
     "@codemirror/autocomplete": {
@@ -579,6 +578,17 @@
             }
           }
         }
+      },
+      "javaScript": {
+        "options": {
+          "presets": {
+            "#": "NOTE: We disable module export/import transformation to allow tree shaking by the final (minimizer).",
+            "__evaluate__": "[['@babel/preset-env', {targets: self.generic.isWeb ? {browsers: self.generic.supportedBrowsers, node: packageConfiguration.engines.node.replace(/>?=?([0-9]+)/, '$1')} : {node: packageConfiguration.engines.node.replace(/>?=?([0-9]+)/, '$1')}}], '@babel/preset-typescript']"
+          },
+          "overrides": {
+            "__evaluate__": "[{test: /\\.(jsx|tsx)$/u, presets: [['@babel/preset-react', {runtime: 'automatic'}]]}]"
+          }
+        }
       }
     },
     "path": {
@@ -594,17 +604,6 @@
         "externalLibrary": {
           "dynamic": true,
           "normal": true
-        }
-      },
-      "module": {
-        "preprocessor": {
-          "javaScript": {
-            "options": {
-              "plugins": {
-                "__remove__": "@babel/plugin-transform-runtime"
-              }
-            }
-          }
         }
       },
       "path": {

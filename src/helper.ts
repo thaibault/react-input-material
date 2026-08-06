@@ -26,6 +26,15 @@ import type {
 } from 'clientnode'
 import type {ReactNode} from 'react'
 
+import type {DateTimeRepresentation} from './components/Interval/type'
+import type {
+    DataTransformSpecification as TextInputDataTransformSpecification,
+    DefaultProperties as TextInputDefaultProperties,
+    FormatSpecifications as TextInputFormatSpecifications,
+    DataTransformation as TextInputDataTransformation,
+    Props as TextInputProps,
+    Transformer as TextInputTransformer
+} from './components/TextInput/type'
 import type {
     BaseModel,
     BaseProperties,
@@ -55,16 +64,7 @@ import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
 import {useState} from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
 
-import {DateTimeRepresentation} from './components/Interval/type'
-import TextInput from './components/TextInput'
-import {
-    DataTransformSpecification as TextInputDataTransformSpecification,
-    DefaultProperties as TextInputDefaultProperties,
-    FormatSpecifications as TextInputFormatSpecifications,
-    DataTransformation as TextInputDataTransformation,
-    Props as TextInputProps,
-    Transformer as TextInputTransformer
-} from './components/TextInput/type'
+import TextInput from './components/TextInput/index'
 // endregion
 export const log = new Logger({name: 'react-input-material.helper'})
 // region state

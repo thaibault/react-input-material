@@ -1600,13 +1600,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "@babel/runtime@npm:8.0.0"
-  checksum: 10c0/450857cf52b3a3935d4aad505277201361c86185dad3bdd2ae083d78b76c6265c7fc7610e170c80de1b825d5bfdcfb50697f0853fff922b2661c91cff1fbbd81
-  languageName: node
-  linkType: hard
-
 "@babel/template@npm:^7.27.2":
   version: 7.29.7
   resolution: "@babel/template@npm:7.29.7"
@@ -14025,7 +14018,6 @@ __metadata:
     "@babel/eslint-parser": "npm:^8.0.1"
     "@babel/plugin-transform-proto-to-assign": "npm:^8.0.1"
     "@babel/preset-react": "npm:^8.0.1"
-    "@babel/runtime": "npm:^8.0.0"
     "@codemirror/autocomplete": "npm:^6.20.3"
     "@codemirror/commands": "npm:^6.10.4"
     "@codemirror/lang-css": "npm:^6.3.1"
@@ -14108,7 +14100,7 @@ __metadata:
     weboptimizer: "npm:^4.0.53"
     webpack-dev-server: "npm:^6.0.0"
   peerDependencies:
-    "@babel/runtime": "*"
+    "@babel/preset-react": "*"
     "@codemirror/autocomplete": "*"
     "@codemirror/commands": "*"
     "@codemirror/lang-css": "*"
@@ -14145,7 +14137,7 @@ __metadata:
     spark-md5: "*"
     tslib: "*"
   peerDependenciesMeta:
-    "@babel/runtime":
+    "@babel/preset-react":
       optional: true
     "@codemirror/autocomplete":
       optional: true

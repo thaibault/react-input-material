@@ -51,9 +51,9 @@ import {
     fileInputIframeWrapperPaddingClassName,
     fileInputNativeClassName,
     fileInputTextRepresentationClassName
-} from './style.module'
+} from './styke.module.css'
 */
-import cssClassNames from './style.module'
+import cssClassNames from './styke.module.css'
 import {RepresentationType as RepresentationType} from './type'
 // endregion
 // region constants
