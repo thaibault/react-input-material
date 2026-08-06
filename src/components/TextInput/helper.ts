@@ -17,27 +17,30 @@
     endregion
 */
 // region imports
-import {KeyboardEvent} from 'react'
+import type {KeyboardEvent} from 'react'
+
+import type {EditorOptions} from '@tiptap/core'
+
+import type {
+    DefaultProperties as DefaultBaseProperties, Properties as BaseProperties
+} from '../../type'
+
+import type {
+    DefaultProperties as DefaultProperties,
+    ModelState as ModelState,
+    Properties
+} from './type'
+
 import Dummy from 'react-generic-dummy'
 import UseAnimationsType from 'react-useanimations'
 import LockAnimation from 'react-useanimations/lib/lock'
 import PlusToXAnimation from 'react-useanimations/lib/plusToX'
-
-import type {EditorOptions} from '@tiptap/core'
 
 import {
     determineValidationState as determineBaseValidationState,
     hashRegularExpression,
     usePropertiesChangedIndicator as useBasePropertiesChangedIndicator
 } from '../../helper'
-import {
-    DefaultProperties as DefaultBaseProperties, Properties as BaseProperties
-} from '../../type'
-
-import {
-    DefaultProperties as DefaultProperties, ModelState as ModelState,
-    Properties
-} from './type'
 /*
 "namedExport" version of css-loader:
 

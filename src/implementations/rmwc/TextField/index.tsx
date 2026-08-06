@@ -16,17 +16,18 @@
     endregion
 */
 // region imports
-import {MDCTextFieldFoundation} from '@material/textfield'
+import type {Mapping} from 'clientnode'
+import type {ForwardedRef, ReactElement} from 'react'
+
+import type {MDCTextFieldFoundation} from '@material/textfield'
+
+import type {InputReference, TextFieldProperties} from '../../type'
+
 import {TextField as RMWCTextField} from '@rmwc/textfield'
 
-import {Mapping} from 'clientnode'
-
-import {
-    ForwardedRef, forwardRef, ReactElement, useImperativeHandle
-} from 'react'
+import {forwardRef, useImperativeHandle} from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
-import {InputReference, TextFieldProperties} from '../../type'
 import Icon from '../Icon'
 
 import cssClassNames from './style.module'

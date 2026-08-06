@@ -16,10 +16,24 @@
     endregion
 */
 // region imports
-import {LanguageSupport} from '@codemirror/language'
-import {JSONContent} from '@tiptap/core'
+import type {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode'
+import type {
+    FocusEvent as ReactFocusEvent,
+    ForwardRefExoticComponent,
+    KeyboardEvent,
+    MouseEvent,
+    ReactElement,
+    ReactNode,
+    RefAttributes
+} from 'react'
+import type {GenericEvent} from 'react-generic-tools/type'
+import type {
+    ComponentAdapter, ValidationMapping
+} from 'web-component-wrapper/type'
 
-import {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode'
+import type {LanguageSupport} from '@codemirror/language'
+import type {JSONContent} from '@tiptap/core'
+
 import BasePropertyTypes, {
     any,
     arrayOf,
@@ -32,48 +46,44 @@ import BasePropertyTypes, {
     string,
     symbol
 } from 'clientnode/property-types'
-import {
-    FocusEvent as ReactFocusEvent,
-    ForwardRefExoticComponent,
-    KeyboardEvent,
-    MouseEvent,
-    ReactElement,
-    ReactNode,
-    RefAttributes
-} from 'react'
-import {GenericEvent} from 'react-generic-tools/type'
-import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
 
-import {ChainedCommands, type EditorOptions, Extensions} from '@tiptap/core'
-import {EditorEvents} from '@tiptap/react'
-import {StarterKitOptions} from '@tiptap/starter-kit'
+import type {
+    ChainedCommands, type EditorOptions, Extensions
+} from '@tiptap/core'
+import type {EditorEvents} from '@tiptap/react'
+import type {StarterKitOptions} from '@tiptap/starter-kit'
 
-import {
+import type {
     IconProperties,
-    InputReference, SelectProperties,
-    TextAreaProperties, TextFieldProperties
+    InputReference,
+    SelectProperties,
+    TextAreaProperties,
+    TextFieldProperties
 } from '../../implementations/type'
-import {
+import type {
     BaseModel,
-    defaultModel as baseDefaultModel,
-    defaultModelState as baseDefaultModelState,
-    defaultProperties as baseDefaultProperties,
     NormalizedSelection,
     ModelState as BaseModelState,
-    modelStatePropertyTypes as baseModelStatePropertyTypes,
     Properties as BaseProperties,
-    propertyTypes as basePropertyTypes,
     SelectionDefinition,
     State as BaseState,
     StaticWebComponent,
     ValueState as BaseValueState
 } from '../../type'
 
-import {
+import type {
     Reference as InputEventMapperReference
 } from './InputEventMapperWrapper'
-import {Reference as CodeMirrorReference} from './CodeMirror'
-import {Reference as TipTapReference} from './Tiptap'
+import type {Reference as CodeMirrorReference} from './CodeMirror'
+import type {Reference as TipTapReference} from './Tiptap'
+
+import {
+    defaultModel as baseDefaultModel,
+    defaultModelState as baseDefaultModelState,
+    defaultProperties as baseDefaultProperties,
+    modelStatePropertyTypes as baseModelStatePropertyTypes,
+    propertyTypes as basePropertyTypes
+} from '../../type'
 // endregion
 // region data transformation
 export type Transformer<T = unknown> = (

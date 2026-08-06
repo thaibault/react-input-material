@@ -3,7 +3,8 @@
 /** @module harness */
 'use strict'
 
-import {Locator} from 'playwright-core'
+import type {Locator} from 'playwright-core'
+
 import {formatEndUserTime} from 'react-generic-tools/endToEndTestHelper'
 
 import {textInput} from '../TextInput/harness'

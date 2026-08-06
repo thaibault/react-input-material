@@ -17,26 +17,46 @@
     endregion
 */
 // region imports
-import {copy, extend, isFunction, Mapping} from 'clientnode'
-import {GenericEvent} from 'react-generic-tools/type'
-import {
-    createRef,
+import type {Mapping} from 'clientnode'
+import type {
     ForwardedRef,
-    forwardRef,
-    memo as memoize,
     ReactElement,
     ReactNode,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
-    SyntheticEvent,
+    SyntheticEvent
+} from 'react'
+import type {GenericEvent} from 'react-generic-tools/type'
+import type {
+    ComponentAdapter, PropertiesValidationMap
+} from 'web-component-wrapper/type'
+
+import type {ValueState} from '../../type'
+
+import type {Props as TextInputProps} from '../TextInput/type'
+
+import type {
+    DefaultProperties,
+    Adapter,
+    AdapterWithReferences,
+    Component,
+    Model,
+    ModelState,
+    Properties,
+    PropertiesItem,
+    Props
+} from './type'
+
+import {copy, extend, isFunction} from 'clientnode'
+import {
+    createRef,
+    forwardRef,
+    memo as memoize,
     useImperativeHandle,
     useEffect,
     useState,
     useRef
 } from 'react'
-import {
-    ComponentAdapter, PropertiesValidationMap
-} from 'web-component-wrapper/type'
 
 import IconButton from '#implementations/IconButton'
 
@@ -65,25 +85,9 @@ import {
     translateKnownSymbols,
     triggerCallbackIfExists
 } from '../../helper'
-import {
-    defaultProperties as baseDefaultProperties, ValueState
-} from '../../type'
-import {Props as TextInputProps} from '../TextInput/type'
+import {defaultProperties as baseDefaultProperties} from '../../type'
 
-import {
-    defaultProperties,
-    DefaultProperties,
-    propertyTypes,
-    renderProperties,
-    Adapter,
-    AdapterWithReferences,
-    Component,
-    Model,
-    ModelState,
-    Properties,
-    PropertiesItem,
-    Props
-} from './type'
+import {defaultProperties, propertyTypes, renderProperties} from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper

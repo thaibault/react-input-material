@@ -16,11 +16,13 @@
     endregion
 */
 // region imports
+import type {ForwardedRef, ReactElement} from 'react'
+
+import type {ErrorProperties} from '../type'
+
 import {Theme} from '@rmwc/theme'
 
-import {ForwardedRef, forwardRef, ReactElement} from 'react'
-
-import {ErrorProperties} from '../type'
+import {forwardRef} from 'react'
 // endregion
 export const Error = forwardRef((
     {children, applyToChildren}: ErrorProperties,

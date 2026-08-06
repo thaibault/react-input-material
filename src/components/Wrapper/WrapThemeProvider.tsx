@@ -17,8 +17,11 @@
     endregion
 */
 // region imports
-import {FunctionComponent, ReactElement} from 'react'
-import {ThemeProvider, ThemeProviderProps} from '@rmwc/theme'
+import type {FunctionComponent, ReactElement} from 'react'
+
+import type {ThemeProviderProps} from '@rmwc/theme'
+
+import {ThemeProvider} from '@rmwc/theme'
 // endregion
 /**
  * Wraps a theme provider to given element if a configuration is provided.

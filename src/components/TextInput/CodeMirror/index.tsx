@@ -17,14 +17,17 @@
     endregion
 */
 // region imports
-import {
-    FocusEvent,
-    ForwardedRef,
-    forwardRef,
-    ReactElement,
-    useEffect,
-    useImperativeHandle, useRef
-} from 'react'
+import type {FocusEvent, ForwardedRef, ReactElement} from 'react'
+import type {Extension, Transaction} from '@codemirror/state'
+
+import type {TextAreaProperties} from '../../../implementations/type'
+
+import type {
+    Reference as InputEventMapperReference
+} from '../InputEventMapperWrapper'
+import type {CodeMirrorProps, EditorReference} from '../type'
+
+import {forwardRef, useEffect, useImperativeHandle, useRef} from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
 import {
@@ -41,7 +44,7 @@ import {
 } from '@codemirror/language'
 import {lintKeymap} from '@codemirror/lint'
 import {searchKeymap, highlightSelectionMatches} from '@codemirror/search'
-import {EditorState, Extension, Text, Transaction} from '@codemirror/state'
+import {EditorState, Text} from '@codemirror/state'
 import {
     crosshairCursor,
     drawSelection,
@@ -56,12 +59,8 @@ import {
     rectangularSelection
 } from '@codemirror/view'
 
-import {TextAreaProperties} from '../../../implementations/type'
-import InputEventMapper, {
-    Reference as InputEventMapperReference
-} from '../InputEventMapperWrapper'
+import InputEventMapper from '../InputEventMapperWrapper'
 import cssClassNames from '../style.module'
-import {CodeMirrorProps, EditorReference} from '../type'
 // endregion
 export const BASIC_KEYMAPS: Array<KeyBinding> =
     autocompletion as typeof autocompletion | undefined ?

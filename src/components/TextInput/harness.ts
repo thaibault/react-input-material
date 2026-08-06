@@ -3,8 +3,9 @@
 /** @module harness */
 'use strict'
 
+import type {Locator} from 'playwright-core'
+
 import {timeout} from 'clientnode'
-import {Locator} from 'playwright-core'
 
 export const textInput = (parent: Locator) => {
     const inputNode = parent.locator('input, textarea')

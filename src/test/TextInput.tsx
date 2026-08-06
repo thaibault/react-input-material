@@ -14,15 +14,15 @@
     endregion
 */
 // region imports
+import type {AnyFunction} from 'clientnode'
+
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
-import {AnyFunction} from 'clientnode'
 import {testEach} from 'clientnode/test-helper'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
 import TextInput, {
     CSS_CLASS_NAMES, suggestionMatches
 } from '../components/TextInput'
-
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 

@@ -17,17 +17,17 @@
     endregion
 */
 // region imports
-import {useMemorizedValue} from 'react-generic-tools'
+import type {ChainedCommands, Editor} from '@tiptap/core'
 
-import {ChainedCommands, Editor} from '@tiptap/core'
+import type {RichTextEditorButtonProps} from '../type'
+
+import {useMemorizedValue} from 'react-generic-tools'
 
 import {createContext, useContext} from 'react'
 
 import IconButton from '#implementations/IconButton'
 
 import WrapTooltip from '../../Wrapper/WrapTooltip'
-
-import {RichTextEditorButtonProps} from '../type'
 // endregion
 const EditorContext = createContext<Editor | null>(null)
 

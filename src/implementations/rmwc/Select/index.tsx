@@ -16,19 +16,17 @@
     endregion
 */
 // region imports
-import {MDCSelectFoundation} from '@material/select'
-import {OptionsType, Select as RMWCSelect} from '@rmwc/select'
+import type {ForwardedRef, ReactElement} from 'react'
 
-import {
-    ForwardedRef,
-    forwardRef,
-    memo as memoize,
-    ReactElement,
-    useImperativeHandle
-} from 'react'
+import type {MDCSelectFoundation} from '@material/select'
+import type {OptionsType} from '@rmwc/select'
+
+import type {Select as RMWCSelect} from '@rmwc/select'
+
+import type {InputReference, SelectProperties} from '../../type'
+
+import {forwardRef, memo as memoize, useImperativeHandle} from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
-
-import {InputReference, SelectProperties} from '../../type'
 // endregion
 export const SelectInner = function<Type = unknown>(
     properties: SelectProperties<Type>,

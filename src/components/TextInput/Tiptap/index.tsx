@@ -17,22 +17,27 @@
     endregion
 */
 // region imports
+import type {ForwardedRef, ReactElement} from 'react'
+
+import type {EditorEvents} from '@tiptap/react'
+
+import type {TextAreaProperties} from '../../../implementations/type'
+
+import type {
+    Reference as InputEventMapperReference
+} from '../InputEventMapperWrapper'
+import type {EditorReference, TiptapProps} from '../type'
+
 import {CharacterCount} from '@tiptap/extensions'
-import {EditorContent, EditorEvents, useEditor} from '@tiptap/react'
+import {EditorContent, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
-import {
-    ForwardedRef, forwardRef, ReactElement, useEffect, useImperativeHandle
-} from 'react'
+import {forwardRef, useEffect, useImperativeHandle} from 'react'
 import Dummy from 'react-generic-dummy'
 import {useReferenceState} from 'react-generic-tools'
 
-import {TextAreaProperties} from '../../../implementations/type'
-import InputEventMapper, {
-    Reference as InputEventMapperReference
-} from '../InputEventMapperWrapper'
+import InputEventMapper from '../InputEventMapperWrapper'
 import cssClassNames from '../style.module'
-import {EditorReference, TiptapProps} from '../type'
 
 import MenuBar from './MenuBar'
 import {useMemorizedValue} from 'react-generic-tools'

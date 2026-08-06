@@ -16,7 +16,27 @@
     endregion
 */
 // region imports
-import {Mapping, ValueOf} from 'clientnode'
+import type {Mapping, ValueOf} from 'clientnode'
+import type {
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject
+} from 'react'
+import type {GenericEvent} from 'react-generic-tools/type'
+import type {
+    ComponentAdapter, PropertiesValidationMap
+} from 'web-component-wrapper/type'
+
+import type {IconProperties} from '../../implementations/type'
+import type {
+    Component as BaseComponent, ModelState as BaseModelState
+} from '../../type'
+import type {
+    AdapterWithReferences as TextInputAdapterWithReferences,
+    Model as TextInputModel,
+    Properties as TextInputProperties,
+    Props as TextInputProps
+} from '../TextInput/type'
+
 import BasePropertyTypes, {
     number,
     oneOfType,
@@ -26,27 +46,10 @@ import BasePropertyTypes, {
     ValidationMap,
     Validator
 } from 'clientnode/property-types'
-import {
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject
-} from 'react'
-import {GenericEvent} from 'react-generic-tools/type'
-import {
-    ComponentAdapter, PropertiesValidationMap
-} from 'web-component-wrapper/type'
 
-import {IconProperties} from '../../implementations/type'
-import {
-    defaultModelState as baseDefaultModelState,
-    Component as BaseComponent,
-    ModelState as BaseModelState
-} from '../../type'
+import {defaultModelState as baseDefaultModelState} from '../../type'
 import {
     defaultInputModel as defaultTextInputModel,
-    AdapterWithReferences as TextInputAdapterWithReferences,
-    Model as TextInputModel,
-    Properties as TextInputProperties,
-    Props as TextInputProps,
     propertyTypes as textInputPropertyTypes
 } from '../TextInput/type'
 // endregion

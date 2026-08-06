@@ -3,8 +3,8 @@
 /** @module harness */
 'use strict'
 
-import {FirstParameter} from 'clientnode'
-import {FileChooser, Locator, Page} from 'playwright-core'
+import type {FirstParameter} from 'clientnode'
+import type {FileChooser, Locator, Page} from 'playwright-core'
 
 import textInput from '../TextInput/harness'
 
