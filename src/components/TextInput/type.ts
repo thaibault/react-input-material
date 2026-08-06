@@ -71,9 +71,9 @@ import type {
 
 import type {
     Reference as InputEventMapperReference
-} from './InputEventMapperWrapper'
-import type {Reference as CodeMirrorReference} from './CodeMirror'
-import type {Reference as TipTapReference} from './Tiptap'
+} from './InputEventMapperWrapper/index'
+import type {Reference as CodeMirrorReference} from './CodeMirror/index'
+import type {Reference as TipTapReference} from './Tiptap/index'
 
 import {
     defaultModel as baseDefaultModel,

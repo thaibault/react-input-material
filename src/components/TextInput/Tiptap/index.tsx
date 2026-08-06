@@ -25,7 +25,7 @@ import type {TextAreaProperties} from '../../../implementations/type'
 
 import type {
     Reference as InputEventMapperReference
-} from '../InputEventMapperWrapper'
+} from '../InputEventMapperWrapper/index'
 import type {EditorReference, TiptapProps} from '../type'
 
 import {CharacterCount} from '@tiptap/extensions'
@@ -36,7 +36,7 @@ import {forwardRef, useEffect, useImperativeHandle} from 'react'
 import Dummy from 'react-generic-dummy'
 import {useReferenceState} from 'react-generic-tools'
 
-import InputEventMapper from '../InputEventMapperWrapper'
+import InputEventMapper from '../InputEventMapperWrapper/index'
 import cssClassNames from '../style.module.css'
 
 import MenuBar from './MenuBar'

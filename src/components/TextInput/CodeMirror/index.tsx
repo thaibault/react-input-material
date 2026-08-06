@@ -24,7 +24,7 @@ import type {TextAreaProperties} from '../../../implementations/type'
 
 import type {
     Reference as InputEventMapperReference
-} from '../InputEventMapperWrapper'
+} from '../InputEventMapperWrapper/index'
 import type {CodeMirrorProps, EditorReference} from '../type'
 
 import {forwardRef, useEffect, useImperativeHandle, useRef} from 'react'
@@ -59,7 +59,7 @@ import {
     rectangularSelection
 } from '@codemirror/view'
 
-import InputEventMapper from '../InputEventMapperWrapper'
+import InputEventMapper from '../InputEventMapperWrapper/index'
 import cssClassNames from '../style.module.css'
 // endregion
 export const BASIC_KEYMAPS: Array<KeyBinding> =

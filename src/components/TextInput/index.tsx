@@ -51,8 +51,8 @@ import type {
     TypeTextInputProperties
 } from '../../implementations/type'
 
-import type {Reference as CodeMirrorReference} from './CodeMirror'
-import type {Reference as TipTapReference} from './Tiptap'
+import type {Reference as CodeMirrorReference} from './CodeMirror/index'
+import type {Reference as TipTapReference} from './Tiptap/index'
 
 import type {
     AdapterWithReferences,
@@ -127,8 +127,8 @@ import {
 import WrapConfigurations from '../Wrapper/WrapConfigurations'
 import WrapTooltip from '../Wrapper/WrapTooltip'
 
-import CodeEditorComponent from './CodeMirror'
-import RichTextEditorComponent from './Tiptap'
+import CodeEditorComponent from './CodeMirror/index'
+import RichTextEditorComponent from './Tiptap/index'
 import {
     CSS_CLASS_NAMES,
     determineValidationState,
