@@ -18,14 +18,15 @@
 // region imports
 import type {ForwardedRef, ReactElement} from 'react'
 
-import type {
-    CircularProgress as RMWCCircularProgress
-} from '@rmwc/circular-progress'
 import type {IconSizeT} from '@rmwc/types'
 
 import type {CircularProgressProperties} from '../type'
 
 import {forwardRef} from 'react'
+
+import {
+    CircularProgress as RMWCCircularProgress
+} from '@rmwc/circular-progress'
 // endregion
 export const CircularProgress = forwardRef((
     {componentProperties, size}: CircularProgressProperties,

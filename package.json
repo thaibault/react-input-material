@@ -224,8 +224,8 @@
     "@types/html-minifier": "^4.0.6",
     "@types/jsdom": "^28.0.3",
     "@types/node": "^26.1.2",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
     "@types/react-transition-group": "^4.4.12",
     "@types/spark-md5": "^3.0.5",
     "@types/webpack-env": "^1.18.8",
@@ -574,7 +574,7 @@
           "additional": {
             "plugins": {
               "pre": {
-                "__append__": "require('postcss-nested')"
+                "__append__": "module.optionalImport('postcss-nested').then((module) => module?.default)"
               }
             }
           }

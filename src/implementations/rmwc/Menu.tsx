@@ -26,7 +26,9 @@ import type {MenuProperties, MenuReference} from '../type'
 import {forwardRef, memo as memoize, useImperativeHandle} from 'react'
 import {useReferenceState} from 'react-generic-tools'
 
-import {MenuItem, MenuSurface, MenuSurfaceAnchor} from '@rmwc/menu'
+import {
+    Menu as RMWCMenu, MenuItem, MenuSurface, MenuSurfaceAnchor
+} from '@rmwc/menu'
 
 import CircularProgress from './CircularProgress'
 // endregion
