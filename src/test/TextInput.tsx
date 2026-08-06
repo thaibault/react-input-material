@@ -36,7 +36,7 @@ const TIMESTAMP_TRANSFORMER = {
 const TIMEZONE_OFFSET_IN_SECONDS =
     -1 * new Date(1970, 0, 1).getTimezoneOffset() * 60
 
-describe('TextInput', () => {
+describe('TextInput/index', () => {
     testEach<typeof suggestionMatches>(
         'suggestionMatches',
         suggestionMatches,

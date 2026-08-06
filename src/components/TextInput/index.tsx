@@ -1960,7 +1960,7 @@ export const TextInputInner = function<Type = unknown>(
     /// endregion
 }
 // NOTE: This is useful in react dev tools.
-TextInputInner.displayName = 'TextInput'
+TextInputInner.displayName = 'TextInput/index'
 /**
  * Wrapping web component compatible react component.
  * @property defaultModelState - Initial model state.

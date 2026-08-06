@@ -30,7 +30,7 @@ import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
 import Icon from '../Icon'
 
-import cssClassNames from './styke.module.css'
+import cssClassNames from './style.module.css'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames
 

@@ -40,7 +40,7 @@ import {MediaCardRepresentationType} from '../../type'
 
 import CircularProgress from '../CircularProgress'
 
-import cssClassNames from './styke.module.css'
+import cssClassNames from './style.module.css'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames
 

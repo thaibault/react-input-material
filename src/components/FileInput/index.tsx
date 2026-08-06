@@ -77,7 +77,7 @@ import {
 } from '../../helper'
 import {MediaCardRepresentationType} from '../../implementations/type'
 
-import TextInput from '../TextInput'
+import TextInput from '../TextInput/index'
 import {WrapConfigurations} from '../Wrapper/WrapConfigurations'
 
 import {

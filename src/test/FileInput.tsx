@@ -17,7 +17,7 @@
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
-import FileInput from '../components/FileInput'
+import FileInput from '../components/FileInput/index'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 

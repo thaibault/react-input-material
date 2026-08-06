@@ -37,7 +37,7 @@ import Dummy from 'react-generic-dummy'
 import {useReferenceState} from 'react-generic-tools'
 
 import InputEventMapper from '../InputEventMapperWrapper'
-import cssClassNames from '../styke.module.css'
+import cssClassNames from '../style.module.css'
 
 import MenuBar from './MenuBar'
 import {useMemorizedValue} from 'react-generic-tools'

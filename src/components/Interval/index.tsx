@@ -54,16 +54,16 @@ import {
     triggerCallbackIfExists
 } from '../../helper'
 
-import TextInput from '../TextInput'
+import TextInput from '../TextInput/index'
 import {usePropertiesChangedIndicator} from '../TextInput/helper'
 import WrapConfigurations from '../Wrapper/WrapConfigurations'
 
 /*
 "namedExport" version of css-loader:
 
-import {intervalClassName, intervalDisabledClassName} from './styke.module.css'
+import {intervalClassName, intervalDisabledClassName} from './style.module.css'
 */
-import cssClassNames from './styke.module.css'
+import cssClassNames from './style.module.css'
 import {defaultProperties, propertyTypes} from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames

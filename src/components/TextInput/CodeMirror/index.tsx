@@ -60,7 +60,7 @@ import {
 } from '@codemirror/view'
 
 import InputEventMapper from '../InputEventMapperWrapper'
-import cssClassNames from '../styke.module.css'
+import cssClassNames from '../style.module.css'
 // endregion
 export const BASIC_KEYMAPS: Array<KeyBinding> =
     autocompletion as typeof autocompletion | undefined ?

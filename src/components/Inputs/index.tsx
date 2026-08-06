@@ -60,7 +60,7 @@ import {
 
 import IconButton from '#implementations/IconButton'
 
-import TextInput from '../TextInput'
+import TextInput from '../TextInput/index'
 /*
 "namedExport" version of css-loader:
 
@@ -72,9 +72,9 @@ import {
     inputsItemDisabledClassName,
     inputsItemInputClassName,
     inputsItemRemoveClassName
-} from './styke.module.css'
+} from './style.module.css'
 */
-import cssClassNames from './styke.module.css'
+import cssClassNames from './style.module.css'
 
 import WrapConfigurations from '../Wrapper/WrapConfigurations'
 import {

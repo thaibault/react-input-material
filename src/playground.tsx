@@ -61,7 +61,9 @@ import {EditorView as CodeEditorIndicator} from '@codemirror/view'
 import {EditorContent as RichTextEditorIndicator} from '@tiptap/react'
 import {Tab, TabBar} from '@rmwc/tabs'
 
-import {preserveStaticFileBaseNameInputGenerator} from './components/FileInput'
+import {
+    preserveStaticFileBaseNameInputGenerator
+} from './components/FileInput/index'
 import {Checkbox, FileInput, TextInput, Inputs, Interval} from './index'
 import {slicePropertiesForStateRecursively} from './helper'
 // endregion

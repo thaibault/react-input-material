@@ -16,11 +16,11 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-export {Checkbox} from './components/Checkbox'
-export {FileInput} from './components/FileInput'
-export {Interval} from './components/Interval'
-export {Inputs} from './components/Inputs'
-export {TextInput} from './components/TextInput'
+export {Checkbox} from './components/Checkbox/index'
+export {FileInput} from './components/FileInput/index'
+export {Interval} from './components/Interval/index'
+export {Inputs} from './components/Inputs/index'
+export {TextInput} from './components/TextInput/index'
 
 export {WrapConfigurations} from './components/Wrapper/WrapConfigurations'
 export {WrapStrict} from './components/Wrapper/WrapStrict'
