@@ -29,7 +29,6 @@ import type {
     DefaultProperties as DefaultProperties,
     ModelState as ModelState,
     Value,
-    RepresentationType as RepresentationType,
     Properties
 } from './type'
 
@@ -55,6 +54,7 @@ import {
 } from './style.module'
 */
 import cssClassNames from './style.module'
+import {RepresentationType as RepresentationType} from './type'
 // endregion
 // region constants
 export const CSS_CLASS_NAMES = cssClassNames

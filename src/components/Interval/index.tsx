@@ -32,7 +32,6 @@ import type {
     AdapterWithReferences,
     Component,
     DateTimeRepresentation,
-    defaultProperties,
     IntervalTextInputProps,
     ModelState,
     Properties,
@@ -65,7 +64,7 @@ import WrapConfigurations from '../Wrapper/WrapConfigurations'
 import {intervalClassName, intervalDisabledClassName} from './style.module'
 */
 import cssClassNames from './style.module'
-import {propertyTypes} from './type'
+import {defaultProperties, propertyTypes} from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper

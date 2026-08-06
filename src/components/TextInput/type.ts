@@ -47,9 +47,7 @@ import BasePropertyTypes, {
     symbol
 } from 'clientnode/property-types'
 
-import type {
-    ChainedCommands, type EditorOptions, Extensions
-} from '@tiptap/core'
+import type {ChainedCommands, EditorOptions, Extensions} from '@tiptap/core'
 import type {EditorEvents} from '@tiptap/react'
 import type {StarterKitOptions} from '@tiptap/starter-kit'
 

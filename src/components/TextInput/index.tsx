@@ -60,17 +60,13 @@ import type {
     Component,
     DataTransformation,
     DataTransformSpecification,
-    defaultModelState,
     DefaultProperties,
-    defaultProperties,
     EditorReference,
     Model,
     ModelState,
     NativeType,
     Properties,
-    propertyTypes,
     Props,
-    renderProperties,
     State,
     TiptapProperties as RichTextEditorProperties,
     ValueState
@@ -145,6 +141,9 @@ import {
     usePropertiesChangedIndicator
 } from './helper'
 import TRANSFORMER from './transformer'
+import {
+    defaultModelState, defaultProperties, propertyTypes, renderProperties
+} from './type'
 // endregion
 export {
     CODE_EDITOR_OPTIONS,

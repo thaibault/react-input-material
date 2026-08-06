@@ -45,7 +45,6 @@ import type {
     ModelState,
     Properties,
     Props,
-    RepresentationType,
     Value,
     ValueState
 } from './type'
@@ -95,7 +94,8 @@ import {
     defaultModelState,
     defaultProperties,
     propertyTypes,
-    renderProperties
+    renderProperties,
+    RepresentationType
 } from './type'
 
 export {

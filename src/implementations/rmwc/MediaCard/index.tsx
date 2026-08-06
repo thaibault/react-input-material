@@ -19,9 +19,7 @@
 import type {ForwardedRef, ReactElement, ReactNode} from 'react'
 import type {GenericEvent} from 'react-generic-tools/type'
 
-import type {
-    MediaCardProperties, MediaCardReference, MediaCardRepresentationType
-} from '../../type'
+import type {MediaCardProperties, MediaCardReference} from '../../type'
 
 import {Typography} from '@rmwc/typography'
 import {Theme} from '@rmwc/theme'
@@ -37,6 +35,8 @@ import {
 import {forwardRef, memo as memoize, useId, useImperativeHandle} from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 import GenericAnimate from 'react-generic-animate'
+
+import {MediaCardRepresentationType} from '../../type'
 
 import CircularProgress from '../CircularProgress'
 

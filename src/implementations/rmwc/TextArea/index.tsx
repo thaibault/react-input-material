@@ -16,7 +16,7 @@
     endregion
 */
 // region imports
-import type {Mapping, NOOP} from 'clientnode'
+import type {Mapping} from 'clientnode'
 import type  {ForwardedRef, ReactElement} from 'react'
 
 import type {MDCTextFieldFoundation} from '@material/textfield'
@@ -24,6 +24,7 @@ import type {TextFieldHelperTextProps} from '@rmwc/textfield'
 
 import type {TextAreaProperties, TextAreaReference} from '../../type'
 
+import {NOOP} from 'clientnode'
 import {forwardRef, useEffect, useId, useImperativeHandle} from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
