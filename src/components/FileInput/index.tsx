@@ -17,18 +17,44 @@
     endregion
 */
 // region imports
-import {dataURLToBlob} from 'blob-util'
-import {copy, equals, extend, Logger, mask, NOOP} from 'clientnode'
-import {
+import type {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
-    forwardRef,
-    memo as memoize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
-    SyntheticEvent,
+    SyntheticEvent
+} from 'react'
+import type {GenericEvent} from 'react-generic-tools/type'
+import type {PropertiesValidationMap} from 'web-component-wrapper/type'
+
+import type {MediaCardReference} from '../../implementations/type'
+
+import type {
+    Adapter as TextInputAdapter,
+    Properties as TextInputProperties,
+    Props as TextInputProps
+} from '../TextInput/type'
+
+import type {
+    AdapterWithReferences,
+    Component,
+    DefaultProperties,
+    Model,
+    ModelState,
+    Properties,
+    Props,
+    RepresentationType,
+    Value,
+    ValueState
+} from './type'
+
+import {dataURLToBlob} from 'blob-util'
+import {copy, equals, extend, Logger, mask, NOOP} from 'clientnode'
+import {
+    forwardRef,
+    memo as memoize,
     useEffect,
     useId,
     useImperativeHandle,
@@ -36,9 +62,7 @@ import {
     useCallback
 } from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
-import {GenericEvent} from 'react-generic-tools/type'
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
-import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
 import MediaCard from '#implementations/MediaCard'
 
@@ -52,17 +76,9 @@ import {
     triggerCallbackIfExists,
     wrapStateSetter
 } from '../../helper'
-import {
-    MediaCardReference,
-    MediaCardRepresentationType
-} from '../../implementations/type'
+import {MediaCardRepresentationType} from '../../implementations/type'
 
 import TextInput from '../TextInput'
-import {
-    Adapter as TextInputAdapter,
-    Properties as TextInputProperties,
-    Props as TextInputProps
-} from '../TextInput/type'
 import {WrapConfigurations} from '../Wrapper/WrapConfigurations'
 
 import {
@@ -75,21 +91,11 @@ import {
     usePropertiesChangedIndicator
 } from './helper'
 import {
-    AdapterWithReferences,
-    Component,
     defaultFileNameInputProperties,
     defaultModelState,
-    DefaultProperties,
     defaultProperties,
-    Model,
-    ModelState,
-    Properties,
     propertyTypes,
-    Props,
-    renderProperties,
-    RepresentationType,
-    Value,
-    ValueState
+    renderProperties
 } from './type'
 
 export {

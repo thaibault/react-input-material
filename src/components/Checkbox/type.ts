@@ -16,20 +16,25 @@
     endregion
 */
 // region imports
-import {boolean, string} from 'clientnode/property-types'
-import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
-
-import {
+import type {
+    ComponentAdapter, ValidationMapping
+} from 'web-component-wrapper/type'
+import type {
     BaseModel,
-    defaultModel as baseDefaultModel,
-    defaultProperties as baseDefaultProperties,
     Component as BaseComponent,
     ModelState as BaseModelState,
-    modelStatePropertyTypes as baseModelStatePropertyTypes,
     Properties as BaseProperties,
-    propertyTypes as basePropertyTypes,
     State as BaseState,
     ValueState as BaseValueState
+} from '../../type'
+
+import {boolean, string} from 'clientnode/property-types'
+
+import {
+    defaultModel as baseDefaultModel,
+    defaultProperties as baseDefaultProperties,
+    modelStatePropertyTypes as baseModelStatePropertyTypes,
+    propertyTypes as basePropertyTypes
 } from '../../type'
 // endregion
 export interface Properties extends BaseProperties<boolean | null> {

@@ -17,24 +17,42 @@
     endregion
 */
 // region imports
-import {copy, equals, extend} from 'clientnode'
-
-import {
+import type {
     FocusEvent as ReactFocusEvent,
-    forwardRef,
     ForwardRefRenderFunction,
-    memo as memoize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
-    SyntheticEvent,
+    SyntheticEvent
+} from 'react'
+import type {GenericEvent} from 'react-generic-tools/type'
+
+import type {InputReference} from '../../implementations/type'
+import type {
+    DefaultProperties as BaseDefaultProperties, Properties as BaseProperties
+} from '../../type'
+
+import type {
+    Adapter,
+    Component,
+    DefaultProperties,
+    ModelState,
+    Properties,
+    Props,
+    ValueState
+} from './type'
+
+import {copy, equals, extend} from 'clientnode'
+
+import {
+    forwardRef,
+    memo as memoize,
     useEffect,
     useImperativeHandle,
     useState,
     useCallback
 } from 'react'
-import {GenericEvent} from 'react-generic-tools/type'
 
 import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
@@ -54,25 +72,10 @@ import {
     usePropertiesChangedIndicator,
     wrapStateSetter
 } from '../../helper'
-import {InputReference} from '../../implementations/type'
-import {
-    defaultModelState as baseDefaultModelState,
-    DefaultProperties as BaseDefaultProperties,
-    Properties as BaseProperties
-} from '../../type'
+import {defaultModelState as baseDefaultModelState} from '../../type'
 
 import cssClassNames from './style.module'
-import {
-    Adapter,
-    Component,
-    DefaultProperties,
-    defaultProperties,
-    ModelState,
-    Properties,
-    Props,
-    propertyTypes,
-    ValueState
-} from './type'
+import {defaultProperties, propertyTypes} from './type'
 import {useReferenceState} from 'react-generic-tools'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
