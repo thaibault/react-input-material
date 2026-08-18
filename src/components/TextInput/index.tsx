@@ -72,8 +72,8 @@ import type {
     ValueState
 } from './type'
 
-import {javascript} from '@codemirror/lang-javascript'
 import {css} from '@codemirror/lang-css'
+import {javascript} from '@codemirror/lang-javascript'
 
 import {
     camelCaseToDelimited,

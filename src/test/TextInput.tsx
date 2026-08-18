@@ -22,7 +22,7 @@ import prepareTestEnvironment from 'react-generic-tools/testHelper'
 
 import TextInput, {
     CSS_CLASS_NAMES, suggestionMatches
-} from '../components/TextInput'
+} from '../components/TextInput/index'
 // endregion
 const {render} = prepareTestEnvironment(beforeEach, afterEach)
 

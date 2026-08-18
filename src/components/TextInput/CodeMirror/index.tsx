@@ -19,6 +19,7 @@
 // region imports
 import type {FocusEvent, ForwardedRef, ReactElement} from 'react'
 import type {Extension, Transaction} from '@codemirror/state'
+import type {KeyBinding} from '@codemirror/view'
 
 import type {TextAreaProperties} from '../../../implementations/type'
 
@@ -31,7 +32,7 @@ import {forwardRef, useEffect, useImperativeHandle, useRef} from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
 import {
-    autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap
+    autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap
 } from '@codemirror/autocomplete'
 import {defaultKeymap, history, historyKeymap} from '@codemirror/commands'
 import {
@@ -43,7 +44,7 @@ import {
     syntaxHighlighting
 } from '@codemirror/language'
 import {lintKeymap} from '@codemirror/lint'
-import {searchKeymap, highlightSelectionMatches} from '@codemirror/search'
+import {highlightSelectionMatches, searchKeymap} from '@codemirror/search'
 import {EditorState, Text} from '@codemirror/state'
 import {
     crosshairCursor,
@@ -53,7 +54,6 @@ import {
     highlightActiveLine,
     highlightActiveLineGutter,
     highlightSpecialChars,
-    KeyBinding,
     keymap,
     lineNumbers,
     rectangularSelection
