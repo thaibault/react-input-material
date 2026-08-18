@@ -15,53 +15,62 @@
     "url": "https://github.com/thaibault/react-input-material/issues"
   },
   "license": "CC-BY-3.0",
-  "main": "dist/index.js",
+  "author": {
+    "email": "info@torben.website",
+    "name": "Torben Sickert",
+    "url": "https://torben.website"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thaibault/react-input-material"
+  },
+  "type": "module",
   "exports": {
     ".": "./dist/index.js",
     "./components/Checkbox": "./dist/components/Checkbox/index.js",
     "./components/Checkbox.css": {
       "style": "./dist/components/Checkbox/index.css"
     },
-    "./components/Checkbox/harness": "./dist/components/Checkbox/harness.js",
     "./components/Checkbox.module.css": {
       "style": "./dist/components/Checkbox/import.module.css"
     },
+    "./components/Checkbox/harness": "./dist/components/Checkbox/harness.js",
     "./components/Checkbox/type": "./dist/components/Checkbox/type.js",
     "./components/FileInput": "./dist/components/FileInput/index.js",
     "./components/FileInput.css": {
       "style": "./dist/components/FileInput/index.css"
     },
-    "./components/FileInput/harness": "./dist/components/FileInput/harness.js",
     "./components/FileInput.module.css": {
       "style": "./dist/components/FileInput/import.module.css"
     },
+    "./components/FileInput/harness": "./dist/components/FileInput/harness.js",
     "./components/FileInput/type": "./dist/components/FileInput/type.js",
     "./components/Inputs": "./dist/components/Inputs/index.js",
     "./components/Inputs.css": {
       "style": "./dist/components/Inputs/index.css"
     },
-    "./components/Inputs/harness": "./dist/components/Inputs/harness.js",
     "./components/Inputs.module.css": {
       "style": "./dist/components/Inputs/import.module.css"
     },
+    "./components/Inputs/harness": "./dist/components/Inputs/harness.js",
     "./components/Inputs/type": "./dist/components/Inputs/type.js",
     "./components/Interval": "./dist/components/Interval/index.js",
     "./components/Interval.css": {
       "style": "./dist/components/Interval/index.css"
     },
-    "./components/Interval/harness": "./dist/components/Interval/harness.js",
     "./components/Interval.module.css": {
       "style": "./dist/components/Interval/import.module.css"
     },
+    "./components/Interval/harness": "./dist/components/Interval/harness.js",
     "./components/Interval/type": "./dist/components/Interval/type.js",
     "./components/TextInput": "./dist/components/TextInput/index.js",
     "./components/TextInput.css": {
       "style": "./dist/components/TextInput/index.css"
     },
-    "./components/TextInput/harness": "./dist/components/TextInput/harness.js",
     "./components/TextInput.module.css": {
       "style": "./dist/components/TextInput/import.module.css"
     },
+    "./components/TextInput/harness": "./dist/components/TextInput/harness.js",
     "./components/TextInput/type": "./dist/components/TextInput/type.js",
     "./components/WrapConfigurations": "./dist/components/Wrapper/WrapConfigurations.js",
     "./components/WrapStrict": "./dist/components/Wrapper/WrapStrict.js",
@@ -76,23 +85,19 @@
     },
     "./type": "./dist/type.js"
   },
+  "main": "dist/index.js",
   "typesVersions": {
     "*": {
       "components": [
         "./dist/components"
       ],
-      "implementations": [
-        "./dist/type"
-      ],
       "helper": [
         "./dist/helper"
+      ],
+      "implementations": [
+        "./dist/type"
       ]
     }
-  },
-  "author": {
-    "name": "Torben Sickert",
-    "email": "info@torben.website",
-    "url": "https://torben.website"
   },
   "files": [
     "dist/components/Checkbox/harness.d.ts",
@@ -155,15 +160,12 @@
     "dist/type.d.ts",
     "dist/type.js"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/thaibault/react-input-material"
-  },
+  "sideEffects": false,
   "scripts": {
     "build": "yarn build:types; yarn build:plain; yarn build:minimal; yarn build:bundle; yarn build:bundle:minimal",
-    "build:minimal": "weboptimizer build '{__reference__: \"target:minimal\"}'",
     "build:bundle": "weboptimizer build '{__reference__: \"target:bundle\"}'",
     "build:bundle:minimal": "weboptimizer build '{__reference__: [\"target:bundle\", \"target:minimal\", \"target:bundle:minimal\"]}'",
+    "build:minimal": "weboptimizer build '{__reference__: \"target:minimal\"}'",
     "build:plain": "weboptimizer build",
     "build:types": "weboptimizer build:types",
     "check": "yarn check:types; yarn lint",
@@ -423,18 +425,16 @@
       "optional": true
     }
   },
-  "engines": {
-    "node": ">=24",
-    "npm": ">=11",
-    "yarn": ">=4"
-  },
   "resolutions": {
     "@rmwc/ripple@npm:14.3.5": "patch:@rmwc/ripple@npm%3A14.3.5#~/.yarn/patches/@rmwc-ripple-npm-14.3.5-9657693602.patch",
     "globals@npm:^14.0.0": "patch:globals@npm%3A11.12.0#~/.yarn/patches/globals-npm-11.12.0-1fa7f41a6c.patch",
     "globals@npm:^9.18.0": "patch:globals@npm%3A11.12.0#~/.yarn/patches/globals-npm-11.12.0-1fa7f41a6c.patch"
   },
-  "sideEffects": false,
-  "type": "module",
+  "engines": {
+    "node": ">=24",
+    "npm": ">=11",
+    "yarn": ">=4"
+  },
   "webDocumentation": {
     "languages": [
       "deDE",
@@ -485,10 +485,6 @@
         "./components/FileInput/import.module": "./implementations/rmwc/MediaCard/import.module",
         "./components/FileInput/index": "./components/FileInput/index",
         "./components/FileInput/type": "./components/FileInput/type",
-        "./components/TextInput/harness": "./components/TextInput/harness",
-        "./components/TextInput/import.module": "./implementations/rmwc/TextField/import.module",
-        "./components/TextInput/index": "./components/TextInput/index",
-        "./components/TextInput/type": "./components/TextInput/type",
         "./components/Inputs/harness": "./components/Inputs/harness",
         "./components/Inputs/import.module": "./implementations/rmwc/Inputs/import.module",
         "./components/Inputs/index": "./components/Inputs/index",
@@ -497,6 +493,10 @@
         "./components/Interval/import.module": "./implementations/rmwc/Interval/import.module",
         "./components/Interval/index": "./components/Interval/index",
         "./components/Interval/type": "./components/Interval/type",
+        "./components/TextInput/harness": "./components/TextInput/harness",
+        "./components/TextInput/import.module": "./implementations/rmwc/TextField/import.module",
+        "./components/TextInput/index": "./components/TextInput/index",
+        "./components/TextInput/type": "./components/TextInput/type",
         "./components/Wrapper/WrapConfigurations": "./components/Wrapper/WrapConfigurations",
         "./components/Wrapper/WrapStrict": "./components/Wrapper/WrapStrict",
         "./components/Wrapper/WrapThemeProvider": "./components/Wrapper/WrapThemeProvider",
@@ -582,12 +582,12 @@
         },
         "javaScript": {
           "options": {
+            "overrides": {
+              "__evaluate__": "[{test: /\\.(jsx|tsx)$/u, presets: [['@babel/preset-react', {runtime: 'automatic'}]]}]"
+            },
             "presets": {
               "#": "NOTE: We disable module export/import transformation to allow tree shaking by the final (minimizer).",
               "__evaluate__": "[['@babel/preset-env', {targets: self.generic.isWeb ? {browsers: self.generic.supportedBrowsers, node: packageConfiguration.engines.node.replace(/>?=?([0-9]+)/, '$1')} : {node: packageConfiguration.engines.node.replace(/>?=?([0-9]+)/, '$1')}}], '@babel/preset-typescript']"
-            },
-            "overrides": {
-              "__evaluate__": "[{test: /\\.(jsx|tsx)$/u, presets: [['@babel/preset-react', {runtime: 'automatic'}]]}]"
             }
           }
         }
@@ -614,6 +614,13 @@
         }
       }
     },
+    "target:bundle:minimal": {
+      "path": {
+        "target": {
+          "base": "dist/bundle/minimal/"
+        }
+      }
+    },
     "target:minimal": {
       "module": {
         "aliases": {
@@ -624,13 +631,13 @@
           "@codemirror/commands": {
             "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
           },
-          "@codemirror/language": {
-            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
-          },
           "@codemirror/lang-css": {
             "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
           },
           "@codemirror/lang-javascript": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@codemirror/language": {
             "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
           },
           "@codemirror/lint": {
@@ -668,13 +675,6 @@
       "path": {
         "target": {
           "base": "dist/minimal/"
-        }
-      }
-    },
-    "target:bundle:minimal": {
-      "path": {
-        "target": {
-          "base": "dist/bundle/minimal/"
         }
       }
     },
