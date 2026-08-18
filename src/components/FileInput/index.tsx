@@ -137,6 +137,14 @@ export const log = new Logger({name: 'react-input-material.file-input'})
 export const FileInputInner = function<Type extends Value = Value>(
     props: Props<Type>, reference?: ForwardedRef<AdapterWithReferences<Type>>
 ): ReactElement {
+    // region references initialization
+    const [fileInputReference, setFileInputReference] =
+        useReferenceState<HTMLInputElement | null>(null)
+    const [mediaCardReference, setMediaCardReference] =
+        useReferenceState<MediaCardReference | null>(null)
+    const [nameInputReference, setNameInputReference] =
+        useReferenceState<TextInputAdapter<string> | null>(null)
+    // endregion
     // region property aggregation
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -267,13 +275,6 @@ export const FileInputInner = function<Type extends Value = Value>(
     /// endregion
     // endregion
     // region references
-    const [fileInputReference, setFileInputReference] =
-        useReferenceState<HTMLInputElement | null>(null)
-    const [mediaCardReference, setMediaCardReference] =
-        useReferenceState<MediaCardReference | null>(null)
-    const [nameInputReference, setNameInputReference] =
-        useReferenceState<TextInputAdapter<string> | null>(null)
-
     useImperativeHandle(
         reference,
         (): AdapterWithReferences<Type> => ({

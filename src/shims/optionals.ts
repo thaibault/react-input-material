@@ -5,42 +5,42 @@
 
 import Dummy from 'react-generic-dummy'
 
-const UNDEFINED = undefined
+const MOCK_RESULT = undefined
 
 export default Dummy
 
 export const Tooltip = Dummy
 
-export const CharacterCount = UNDEFINED
-export const EditorContent = UNDEFINED
-export const EditorState = UNDEFINED
-export const EditorView = UNDEFINED
-export const Text = UNDEFINED
-export const autocompletion = UNDEFINED
-export const bracketMatching = UNDEFINED
-export const closeBrackets = UNDEFINED
-export const closeBracketsKeymap = UNDEFINED
-export const completionKeymap = UNDEFINED
-export const crosshairCursor = UNDEFINED
-export const css = UNDEFINED
-export const defaultHighlightStyle = UNDEFINED
-export const defaultKeymap = UNDEFINED
-export const drawSelection = UNDEFINED
-export const dropCursor = UNDEFINED
-export const foldGutter = UNDEFINED
-export const foldKeymap = UNDEFINED
-export const highlightActiveLine = UNDEFINED
-export const highlightActiveLineGutter = UNDEFINED
-export const highlightSelectionMatches = UNDEFINED
-export const highlightSpecialChars = UNDEFINED
-export const history = UNDEFINED
-export const historyKeymap = UNDEFINED
-export const indentOnInput = UNDEFINED
-export const javascript = UNDEFINED
-export const keymap = UNDEFINED
-export const lineNumbers = UNDEFINED
-export const lintKeymap = UNDEFINED
-export const rectangularSelection = UNDEFINED
-export const searchKeymap = UNDEFINED
-export const syntaxHighlighting = UNDEFINED
-export const useEditor = UNDEFINED
+export const CharacterCount = MOCK_RESULT
+export const EditorContent = MOCK_RESULT
+export const EditorState = MOCK_RESULT
+export const EditorView = MOCK_RESULT
+export const Text = MOCK_RESULT
+export const autocompletion = MOCK_RESULT
+export const bracketMatching = MOCK_RESULT
+export const closeBrackets = MOCK_RESULT
+export const closeBracketsKeymap = MOCK_RESULT
+export const completionKeymap = MOCK_RESULT
+export const crosshairCursor = MOCK_RESULT
+export const css = MOCK_RESULT
+export const defaultHighlightStyle = MOCK_RESULT
+export const defaultKeymap = MOCK_RESULT
+export const drawSelection = MOCK_RESULT
+export const dropCursor = MOCK_RESULT
+export const foldGutter = MOCK_RESULT
+export const foldKeymap = MOCK_RESULT
+export const highlightActiveLine = MOCK_RESULT
+export const highlightActiveLineGutter = MOCK_RESULT
+export const highlightSelectionMatches = MOCK_RESULT
+export const highlightSpecialChars = MOCK_RESULT
+export const history = MOCK_RESULT
+export const historyKeymap = MOCK_RESULT
+export const indentOnInput = MOCK_RESULT
+export const javascript = MOCK_RESULT
+export const keymap = MOCK_RESULT
+export const lineNumbers = MOCK_RESULT
+export const lintKeymap = MOCK_RESULT
+export const rectangularSelection = MOCK_RESULT
+export const searchKeymap = MOCK_RESULT
+export const syntaxHighlighting = MOCK_RESULT
+export const useEditor = MOCK_RESULT
