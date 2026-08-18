@@ -17,29 +17,17 @@
     endregion
 */
 // region imports
-import {
-    capitalize,
-    copy,
-    equals,
-    evaluate,
+import type {
     EvaluationResult,
-    extend,
     FirstParameter,
-    isFunction,
-    isObject,
-    Logger,
     Mapping,
     PositiveEvaluationResult,
-    timeout,
     ValueOf
 } from 'clientnode'
-import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
-import {ReactNode, useState} from 'react'
-import {useMemorizedValue} from 'react-generic-tools'
+import type {ReactNode} from 'react'
 
-import {DateTimeRepresentation} from './components/Interval/type'
-import TextInput from './components/TextInput'
-import {
+import type {DateTimeRepresentation} from './components/Interval/type'
+import type {
     DataTransformSpecification as TextInputDataTransformSpecification,
     DefaultProperties as TextInputDefaultProperties,
     FormatSpecifications as TextInputFormatSpecifications,
@@ -47,7 +35,7 @@ import {
     Props as TextInputProps,
     Transformer as TextInputTransformer
 } from './components/TextInput/type'
-import {
+import type {
     BaseModel,
     BaseProperties,
     BaseProps,
@@ -60,9 +48,25 @@ import {
     TypeDefinition,
     ValueState
 } from './type'
+
+import {
+    capitalize,
+    copy,
+    equals,
+    evaluate,
+    extend,
+    isFunction,
+    isObject,
+    Logger,
+    timeout
+} from 'clientnode'
+import {NullSymbol, UndefinedSymbol} from 'clientnode/property-types'
+import {useState} from 'react'
+import {useMemorizedValue} from 'react-generic-tools'
+
+import TextInput from './components/TextInput/index'
 // endregion
-export const log =
-    new Logger({name: 'react-input-material-helper-logger', level: 'warn'})
+export const log = new Logger({name: 'react-input-material.helper'})
 // region state
 /**
  * Removes all none serializable values from given data structure.

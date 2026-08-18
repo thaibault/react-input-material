@@ -17,18 +17,22 @@
     endregion
 */
 // region imports
-import {
-    FocusEvent,
-    ForwardedRef,
-    forwardRef,
-    ReactElement,
-    useEffect,
-    useImperativeHandle, useRef
-} from 'react'
+import type {FocusEvent, ForwardedRef, ReactElement} from 'react'
+import type {Extension, Transaction} from '@codemirror/state'
+import type {KeyBinding} from '@codemirror/view'
+
+import type {TextAreaProperties} from '../../../implementations/type'
+
+import type {
+    Reference as InputEventMapperReference
+} from '../InputEventMapperWrapper/index'
+import type {CodeMirrorProps, EditorReference} from '../type'
+
+import {forwardRef, useEffect, useImperativeHandle, useRef} from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
 import {
-    autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap
+    autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap
 } from '@codemirror/autocomplete'
 import {defaultKeymap, history, historyKeymap} from '@codemirror/commands'
 import {
@@ -40,8 +44,8 @@ import {
     syntaxHighlighting
 } from '@codemirror/language'
 import {lintKeymap} from '@codemirror/lint'
-import {searchKeymap, highlightSelectionMatches} from '@codemirror/search'
-import {EditorState, Extension, Text, Transaction} from '@codemirror/state'
+import {highlightSelectionMatches, searchKeymap} from '@codemirror/search'
+import {EditorState, Text} from '@codemirror/state'
 import {
     crosshairCursor,
     drawSelection,
@@ -50,18 +54,13 @@ import {
     highlightActiveLine,
     highlightActiveLineGutter,
     highlightSpecialChars,
-    KeyBinding,
     keymap,
     lineNumbers,
     rectangularSelection
 } from '@codemirror/view'
 
-import {TextAreaProperties} from '../../../implementations/type'
-import InputEventMapper, {
-    Reference as InputEventMapperReference
-} from '../InputEventMapperWrapper'
-import cssClassNames from '../style.module'
-import {CodeMirrorProps, EditorReference} from '../type'
+import InputEventMapper from '../InputEventMapperWrapper/index'
+import cssClassNames from '../style.module.css'
 // endregion
 export const BASIC_KEYMAPS: Array<KeyBinding> =
     autocompletion as typeof autocompletion | undefined ?

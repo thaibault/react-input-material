@@ -17,8 +17,63 @@
     endregion
 */
 // region imports
-import {javascript} from '@codemirror/lang-javascript'
+import type {Mapping} from 'clientnode'
+import type {
+    FocusEvent as ReactFocusEvent,
+    ForwardedRef,
+    KeyboardEvent as ReactKeyboardEvent,
+    MouseEvent as ReactMouseEvent,
+    ReactElement,
+    ReactNode,
+    SyntheticEvent,
+    // NOTE: can be "RefObject" directly when migrated to react19.
+    MutableRefObject as RefObject
+} from 'react'
+import type {GenericEvent} from 'react-generic-tools/type'
+import type {
+    TransitionChildren, TransitionProps
+} from 'react-transition-group/Transition'
+import type {PropertiesValidationMap} from 'web-component-wrapper/type'
+
+import type {
+    NormalizedSelection, SelectionDefinition, TypeDefinition
+} from '../../type'
+
+import type {
+    IconProperties,
+    InputReference,
+    LowLevelBaseComponentProperties,
+    MenuReference,
+    TextAreaProperties,
+    TextAreaReference,
+    TextFieldProperties,
+    TextInputProperties,
+    TypeTextInputProperties
+} from '../../implementations/type'
+
+import type {Reference as CodeMirrorReference} from './CodeMirror/index'
+import type {Reference as TipTapReference} from './Tiptap/index'
+
+import type {
+    AdapterWithReferences,
+    CodeMirrorProperties as CodeEditorProperties,
+    Component,
+    DataTransformation,
+    DataTransformSpecification,
+    DefaultProperties,
+    EditorReference,
+    Model,
+    ModelState,
+    NativeType,
+    Properties,
+    Props,
+    State,
+    TiptapProperties as RichTextEditorProperties,
+    ValueState
+} from './type'
+
 import {css} from '@codemirror/lang-css'
+import {javascript} from '@codemirror/lang-javascript'
 
 import {
     camelCaseToDelimited,
@@ -28,22 +83,12 @@ import {
     isFunction,
     isObject,
     LOCALES,
-    Mapping,
     mark
 } from 'clientnode'
 
 import {
-    FocusEvent as ReactFocusEvent,
     forwardRef,
-    ForwardedRef,
-    KeyboardEvent as ReactKeyboardEvent,
     memo as memoize,
-    MouseEvent as ReactMouseEvent,
-    ReactElement,
-    ReactNode,
-    SyntheticEvent,
-    // NOTE: can be "RefObject" directly when migrated to react19.
-    MutableRefObject as RefObject,
     useCallback,
     useEffect,
     useId,
@@ -51,14 +96,8 @@ import {
     useState
 } from 'react'
 import GenericAnimate from 'react-generic-animate'
-import {GenericEvent} from 'react-generic-tools/type'
 import Dummy from 'react-generic-dummy'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
-import {
-    TransitionChildren, TransitionProps
-} from 'react-transition-group/Transition'
-
-import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
 import Error from '#implementations/Error'
 import Icon from '#implementations/Icon'
@@ -84,28 +123,12 @@ import {
     triggerCallbackIfExists,
     wrapStateSetter
 } from '../../helper'
-import {
-    NormalizedSelection, SelectionDefinition, TypeDefinition
-} from '../../type'
-import {
-    IconProperties,
-    InputReference,
-    LowLevelBaseComponentProperties,
-    MenuReference,
-    TextAreaProperties,
-    TextAreaReference,
-    TextFieldProperties,
-    TextInputProperties,
-    TypeTextInputProperties
-} from '../../implementations/type'
 
 import WrapConfigurations from '../Wrapper/WrapConfigurations'
 import WrapTooltip from '../Wrapper/WrapTooltip'
 
-import CodeEditorComponent, {
-    Reference as CodeMirrorReference
-} from './CodeMirror'
-import RichTextEditorComponent, {Reference as TipTapReference} from './Tiptap'
+import CodeEditorComponent from './CodeMirror/index'
+import RichTextEditorComponent from './Tiptap/index'
 import {
     CSS_CLASS_NAMES,
     determineValidationState,
@@ -117,28 +140,10 @@ import {
     UseAnimations,
     usePropertiesChangedIndicator
 } from './helper'
-import {
-    AdapterWithReferences,
-    CodeMirrorProperties as CodeEditorProperties,
-    Component,
-    DataTransformation,
-    DataTransformSpecification,
-    defaultModelState,
-    DefaultProperties,
-    defaultProperties,
-    EditorReference,
-    Model,
-    ModelState,
-    NativeType,
-    Properties,
-    propertyTypes,
-    Props,
-    renderProperties,
-    State,
-    TiptapProperties as RichTextEditorProperties,
-    ValueState
-} from './type'
 import TRANSFORMER from './transformer'
+import {
+    defaultModelState, defaultProperties, propertyTypes, renderProperties
+} from './type'
 // endregion
 export {
     CODE_EDITOR_OPTIONS,
@@ -1955,7 +1960,7 @@ export const TextInputInner = function<Type = unknown>(
     /// endregion
 }
 // NOTE: This is useful in react dev tools.
-TextInputInner.displayName = 'TextInput'
+TextInputInner.displayName = 'TextInput/index'
 /**
  * Wrapping web component compatible react component.
  * @property defaultModelState - Initial model state.

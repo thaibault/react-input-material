@@ -17,12 +17,12 @@
     endregion
 */
 // region imports
-import {FunctionComponent, ReactElement} from 'react'
-import Dummy from 'react-generic-dummy'
+import type {FunctionComponent, ReactElement} from 'react'
+import type Dummy from 'react-generic-dummy'
+
+import type {Properties} from '../../type'
 
 import Tooltip from '#implementations/Tooltip'
-
-import {Properties} from '../../type'
 // endregion
 export const isDummy: boolean =
     !(Tooltip as typeof Tooltip | undefined) ||

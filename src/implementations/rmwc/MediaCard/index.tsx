@@ -16,6 +16,11 @@
     endregion
 */
 // region imports
+import type {ForwardedRef, ReactElement, ReactNode} from 'react'
+import type {GenericEvent} from 'react-generic-tools/type'
+
+import type {MediaCardProperties, MediaCardReference} from '../../type'
+
 import {Typography} from '@rmwc/typography'
 import {Theme} from '@rmwc/theme'
 import {
@@ -27,25 +32,15 @@ import {
     CardPrimaryAction
 } from '@rmwc/card'
 
-import {
-    ForwardedRef,
-    forwardRef,
-    memo as memoize,
-    ReactElement,
-    ReactNode,
-    useId,
-    useImperativeHandle
-} from 'react'
+import {forwardRef, memo as memoize, useId, useImperativeHandle} from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 import GenericAnimate from 'react-generic-animate'
 
-import {
-    MediaCardProperties, MediaCardReference, MediaCardRepresentationType
-} from '../../type'
+import {MediaCardRepresentationType} from '../../type'
+
 import CircularProgress from '../CircularProgress'
 
-import cssClassNames from './style.module'
-import {GenericEvent} from 'react-generic-tools/type'
+import cssClassNames from './style.module.css'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames
 

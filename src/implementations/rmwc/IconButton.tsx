@@ -16,18 +16,18 @@
     endregion
 */
 // region imports
-import {MDCIconButtonToggleFoundation} from '@material/icon-button'
-import {
-    IconButton as RMWCIconButton, IconButtonOnChangeEventT
-} from '@rmwc/icon-button'
-import {IconSizeT} from '@rmwc/types'
+import type {ForwardedRef, ReactElement} from 'react'
 
-import {
-    ForwardedRef, forwardRef, ReactElement, useImperativeHandle
-} from 'react'
+import type {MDCIconButtonToggleFoundation} from '@material/icon-button'
+import type {IconButtonOnChangeEventT} from '@rmwc/icon-button'
+import type {IconSizeT} from '@rmwc/types'
+
+import type {IconButtonProperties} from '../type'
+
+import {IconButton as RMWCIconButton} from '@rmwc/icon-button'
+
+import {forwardRef, useImperativeHandle} from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
-
-import {IconButtonProperties} from '../type'
 // endregion
 export const IconButton = forwardRef((
     properties: IconButtonProperties, reference?: ForwardedRef<unknown>

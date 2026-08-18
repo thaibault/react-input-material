@@ -16,23 +16,21 @@
     endregion
 */
 // region imports
-import {Mapping, NOOP} from 'clientnode'
-import {
-    ForwardedRef,
-    forwardRef,
-    ReactElement,
-    useEffect,
-    useId,
-    useImperativeHandle
-} from 'react'
+import type {Mapping} from 'clientnode'
+import type  {ForwardedRef, ReactElement} from 'react'
+
+import type {MDCTextFieldFoundation} from '@material/textfield'
+import type {TextFieldHelperTextProps} from '@rmwc/textfield'
+
+import type {TextAreaProperties, TextAreaReference} from '../../type'
+
+import {NOOP} from 'clientnode'
+import {forwardRef, useEffect, useId, useImperativeHandle} from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
-import {MDCTextField, MDCTextFieldFoundation} from '@material/textfield'
-import {TextFieldHelperTextProps} from '@rmwc/textfield'
+import {MDCTextField} from '@material/textfield'
 
-import {TextAreaProperties, TextAreaReference} from '../../type'
-
-import cssClassNames from './style.module'
+import cssClassNames from './style.module.css'
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames
 

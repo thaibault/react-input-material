@@ -17,16 +17,16 @@
     endregion
 */
 // region imports
-import {
-    ForwardedRef, forwardRef, ReactElement, useImperativeHandle
-} from 'react'
+import type {ForwardedRef, ReactElement} from 'react'
+
+import type {
+    EventMapperWrapperReference, TextAreaProperties, TextAreaReference
+} from '../../../implementations/type'
+
+import {forwardRef, useImperativeHandle} from 'react'
 import {useReferenceState} from 'react-generic-tools'
 
 import TextArea from '#implementations/TextArea'
-
-import {
-    EventMapperWrapperReference, TextAreaProperties, TextAreaReference
-} from '../../../implementations/type'
 // endregion
 export type Reference = EventMapperWrapperReference<Partial<TextAreaReference>>
 

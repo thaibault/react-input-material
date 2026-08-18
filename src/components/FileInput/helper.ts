@@ -17,9 +17,23 @@
     endregion
 */
 // region imports
+import type {ElementType} from 'react'
+
+import type {
+    DefaultProperties as DefaultBaseProperties, Properties as BaseProperties
+} from '../../type'
+
+import type {Props} from '../TextInput/type'
+
+import type {
+    DefaultProperties as DefaultProperties,
+    ModelState as ModelState,
+    Value,
+    Properties
+} from './type'
+
 import {NOOP} from 'clientnode'
 import {blobToBase64String} from 'blob-util'
-import {ElementType} from 'react'
 import {useMemorizedValue} from 'react-generic-tools'
 
 import {
@@ -27,11 +41,6 @@ import {
     hashRegularExpression,
     usePropertiesChangedIndicator as useBasePropertiesChangedIndicator
 } from '../../helper'
-import {
-    DefaultProperties as DefaultBaseProperties, Properties as BaseProperties
-} from '../../type'
-
-import {Props} from '../TextInput/type'
 
 /*
 "namedExport" version of css-loader:
@@ -42,17 +51,10 @@ import {
     fileInputIframeWrapperPaddingClassName,
     fileInputNativeClassName,
     fileInputTextRepresentationClassName
-} from './style.module'
+} from './style.module.css'
 */
-import cssClassNames from './style.module'
-
-import {
-    DefaultProperties as DefaultProperties,
-    ModelState as ModelState,
-    Value,
-    RepresentationType as RepresentationType,
-    Properties
-} from './type'
+import cssClassNames from './style.module.css'
+import {RepresentationType as RepresentationType} from './type'
 // endregion
 // region constants
 export const CSS_CLASS_NAMES = cssClassNames

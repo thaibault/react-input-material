@@ -14,11 +14,12 @@
     endregion
 */
 // region imports
-import {Mapping} from 'clientnode'
+import type {Mapping} from 'clientnode'
+import type {TestHookResult} from 'react-generic-tools/type'
+
 import {testEach} from 'clientnode/test-helper'
 import {useMemorizedValue} from 'react-generic-tools'
 import prepareTestEnvironment from 'react-generic-tools/testHelper'
-import {TestHookResult} from 'react-generic-tools/type'
 
 import {afterEach, beforeEach, describe, expect, test} from '@jest/globals'
 

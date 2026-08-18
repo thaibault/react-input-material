@@ -16,11 +16,11 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
-export {Checkbox} from './components/Checkbox'
-export {FileInput} from './components/FileInput'
-export {Interval} from './components/Interval'
-export {Inputs} from './components/Inputs'
-export {TextInput} from './components/TextInput'
+export {Checkbox} from './components/Checkbox/index'
+export {FileInput} from './components/FileInput/index'
+export {Interval} from './components/Interval/index'
+export {Inputs} from './components/Inputs/index'
+export {TextInput} from './components/TextInput/index'
 
 export {WrapConfigurations} from './components/Wrapper/WrapConfigurations'
 export {WrapStrict} from './components/Wrapper/WrapStrict'
@@ -28,9 +28,9 @@ export {WrapThemeProvider} from './components/Wrapper/WrapThemeProvider'
 export {WrapTooltip} from './components/Wrapper/WrapTooltip'
 
 export * from './helper'
-export * from './type'
-export * as CheckboxTypes from './components/Checkbox/type'
-export * as FileInputTypes from './components/FileInput/type'
-export * as IntervalTypes from './components/Interval/type'
-export * as InputsTypes from './components/Inputs/type'
-export * as TextInputTypes from './components/TextInput/type'
+export type * from './type'
+export type * as CheckboxTypes from './components/Checkbox/type'
+export type * as FileInputTypes from './components/FileInput/type'
+export type * as IntervalTypes from './components/Interval/type'
+export type * as InputsTypes from './components/Inputs/type'
+export type * as TextInputTypes from './components/TextInput/type'

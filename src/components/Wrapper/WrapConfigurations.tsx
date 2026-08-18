@@ -17,12 +17,8 @@
     endregion
 */
 // region imports
-import {Theme} from '@rmwc/theme'
-import {ThemePropT} from '@rmwc/types'
-
-import {AnyFunction, FirstParameter} from 'clientnode'
-import {
-    forwardRef,
+import type {AnyFunction, FirstParameter} from 'clientnode'
+import type {
     ForwardRefRenderFunction,
     FunctionComponent,
     PropsWithoutRef,
@@ -31,10 +27,17 @@ import {
     MutableRefObject as RefObject
 } from 'react'
 
+import type {ThemePropT} from '@rmwc/types'
+
+import type {ConfigurationProperties} from '../../type'
+
+import {Theme} from '@rmwc/theme'
+
+import {forwardRef} from 'react'
+
 import {WrapStrict} from './WrapStrict'
 import {WrapThemeProvider} from './WrapThemeProvider'
 import {WrapTooltip} from './WrapTooltip'
-import {ConfigurationProperties} from '../../type'
 //  endregion
 /**
  * Wraps a theme provider, strict wrapper and tooltip to given element if

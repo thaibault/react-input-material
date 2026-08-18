@@ -16,19 +16,20 @@
     endregion
 */
 // region imports
-import {Tooltip as RMWCTooltip} from '@rmwc/tooltip'
-import {Typography} from '@rmwc/typography'
-
-import {
+import type {
     ForwardedRef,
-    forwardRef,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
     ReactElement
 } from 'react'
-import Dummy from 'react-generic-dummy'
+import type Dummy from 'react-generic-dummy'
 
-import {TooltipProperties} from '../type'
+import type {TooltipProperties} from '../type'
+
+import {Tooltip as RMWCTooltip} from '@rmwc/tooltip'
+import {Typography} from '@rmwc/typography'
+
+import {forwardRef} from 'react'
 // endregion
 export const isDummy: boolean =
     !(RMWCTooltip as typeof Tooltip | undefined) ||

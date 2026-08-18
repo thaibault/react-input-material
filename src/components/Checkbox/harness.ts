@@ -3,7 +3,7 @@
 /** @module harness */
 'use strict'
 
-import {Locator} from 'playwright-core'
+import type {Locator} from 'playwright-core'
 
 export const checkboxInput = (parent: Locator) => {
     const inputNode = parent.locator('input')

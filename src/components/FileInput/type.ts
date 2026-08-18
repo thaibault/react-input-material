@@ -16,7 +16,37 @@
     endregion
 */
 // region imports
-import {identity, Mapping, ValueOf} from 'clientnode'
+import type {Mapping, ValueOf} from 'clientnode'
+import type {
+    ElementType,
+    ForwardRefExoticComponent,
+    ReactElement,
+    ReactNode,
+    RefAttributes
+} from 'react'
+import type {
+    ComponentAdapter, ValidationMapping
+} from 'web-component-wrapper/type'
+
+import type {MediaCardReference} from '../../implementations/type'
+import type {
+    BaseModel,
+    ModelState as BaseModelState,
+    Pattern,
+    Properties as BaseProperties,
+    State as BaseState,
+    StaticWebComponent,
+    ValueState as BaseValueState
+} from '../../type'
+
+import type {
+    Adapter as TextInputAdapter,
+    Model as TextInputModel,
+    Props as TextInputProps,
+    PartialModel as PartialTextInputModel
+} from '../TextInput/type'
+
+import {identity} from 'clientnode'
 import BasePropertyTypes, {
     arrayOf,
     boolean,
@@ -30,41 +60,20 @@ import BasePropertyTypes, {
     symbol,
     ValidationMap
 } from 'clientnode/property-types'
-import {
-    ElementType,
-    ForwardRefExoticComponent,
-    ReactElement,
-    ReactNode,
-    RefAttributes
-} from 'react'
 
-import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
-
-import {MediaCardReference} from '../../implementations/type'
 import {
-    BaseModel,
     defaultModel as baseDefaultModel,
     defaultModelState as baseDefaultModelState,
     defaultProperties as baseDefaultProperties,
     modelPropertyTypes as baseModelPropertyTypes,
-    ModelState as BaseModelState,
     modelStatePropertyTypes as baseModelStatePropertyTypes,
-    Pattern,
-    Properties as BaseProperties,
-    propertyTypes as basePropertyTypes,
-    State as BaseState,
-    StaticWebComponent,
-    ValueState as BaseValueState
+    propertyTypes as basePropertyTypes
 } from '../../type'
 
 import {
     defaultInputModel as defaultTextInputModel,
     defaultProperties as defaultTextInputProperties,
-    Adapter as TextInputAdapter,
-    Model as TextInputModel,
-    propertyTypes as textInputPropertyTypes,
-    Props as TextInputProps,
-    PartialModel as PartialTextInputModel
+    propertyTypes as textInputPropertyTypes
 } from '../TextInput/type'
 // endregion
 export enum RepresentationType {

@@ -17,7 +17,9 @@
     endregion
 */
 // region imports
-import {FunctionComponent, ReactElement, ReactNode, StrictMode} from 'react'
+import type {FunctionComponent, ReactElement, ReactNode} from 'react'
+
+import {StrictMode} from 'react'
 // endregion
 /**
  * Generic strict wrapper component.

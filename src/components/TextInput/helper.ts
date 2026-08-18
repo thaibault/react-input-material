@@ -17,27 +17,31 @@
     endregion
 */
 // region imports
-import {KeyboardEvent} from 'react'
-import Dummy from 'react-generic-dummy'
-import UseAnimationsType from 'react-useanimations'
-import LockAnimation from 'react-useanimations/lib/lock'
-import PlusToXAnimation from 'react-useanimations/lib/plusToX'
+import type {KeyboardEvent} from 'react'
 
 import type {EditorOptions} from '@tiptap/core'
+
+import type {
+    DefaultProperties as DefaultBaseProperties, Properties as BaseProperties
+} from '../../type'
+
+import type {
+    DefaultProperties as DefaultProperties,
+    ModelState as ModelState,
+    Properties
+} from './type'
+
+import Dummy from 'react-generic-dummy'
+import ReactUseAnimations from 'react-useanimations'
+import ReactUseAnimationsLockAnimation from 'react-useanimations/lib/lock'
+import ReactUseAnimationsPlusToXAnimation from
+    'react-useanimations/lib/plusToX'
 
 import {
     determineValidationState as determineBaseValidationState,
     hashRegularExpression,
     usePropertiesChangedIndicator as useBasePropertiesChangedIndicator
 } from '../../helper'
-import {
-    DefaultProperties as DefaultBaseProperties, Properties as BaseProperties
-} from '../../type'
-
-import {
-    DefaultProperties as DefaultProperties, ModelState as ModelState,
-    Properties
-} from './type'
 /*
 "namedExport" version of css-loader:
 
@@ -49,9 +53,9 @@ import {
     textInputEditorLabelClassName,
     textInputSuggestionsClassName,
     textInputSuggestionsPendingClassName
-} from './style.module'
+} from './style.module.css'
  */
-import cssClassNames from './style.module'
+import cssClassNames from './style.module.css'
 import {useMemorizedValue} from 'react-generic-tools'
 // endregion
 // region constants
@@ -62,25 +66,32 @@ export const IS_BROWSER = !(
     typeof window === 'undefined'
 )
 export const UseAnimations: (
-    null | typeof Dummy | typeof UseAnimationsType | undefined
+    null | typeof Dummy | typeof ReactUseAnimations | undefined
 ) = IS_BROWSER ?
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    (require('react-useanimations') as
-        {default: null | typeof Dummy | typeof UseAnimationsType} | null
+    (
+        ReactUseAnimations as
+            unknown as
+            {default: null | typeof ReactUseAnimations}
     )?.default :
     null
-export const lockAnimation: null | typeof LockAnimation | undefined =
+export const lockAnimation: (
+    null | typeof ReactUseAnimationsLockAnimation | undefined
+) =
     IS_BROWSER ?
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        (require('react-useanimations/lib/lock') as
-            {default: null | typeof LockAnimation} | null
-        )?.default : null
-export const plusToXAnimation: null | typeof PlusToXAnimation | undefined =
+        (ReactUseAnimationsLockAnimation as
+            unknown as
+            {default: null | typeof ReactUseAnimationsLockAnimation}
+        )?.default :
+        null
+export const plusToXAnimation: (
+    null | typeof ReactUseAnimationsPlusToXAnimation | undefined
+) =
     IS_BROWSER ?
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        (require('react-useanimations/lib/plusToX') as
-            {default: null | typeof PlusToXAnimation} | null
-        )?.default : null
+        (ReactUseAnimationsPlusToXAnimation as
+            unknown as
+            {default: null | typeof ReactUseAnimationsPlusToXAnimation}
+        )?.default :
+        null
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames
 // region code editor configuration

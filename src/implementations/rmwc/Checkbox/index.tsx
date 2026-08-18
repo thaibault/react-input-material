@@ -16,15 +16,18 @@
     endregion
 */
 // region imports
-import {MDCCheckboxFoundation} from '@material/checkbox'
-import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox'
-import {
-    ForwardedRef, forwardRef, ReactElement, useImperativeHandle
-} from 'react'
+import type {ForwardedRef, ReactElement} from 'react'
+
+import type {MDCCheckboxFoundation} from '@material/checkbox'
+
+import type {CheckboxProperties, InputReference} from '../../type'
+
+import {forwardRef, useImperativeHandle} from 'react'
 import {useReferenceState} from 'react-generic-tools'
 
-import {CheckboxProperties, InputReference} from '../../type'
-import cssClassNames from './style.module'
+import {Checkbox as RMWCCheckbox} from '@rmwc/checkbox'
+
+import cssClassNames from './style.module.css'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 

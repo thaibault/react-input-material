@@ -17,18 +17,32 @@
     endregion
 */
 // region imports
+import type {ForwardedRef, ReactElement, RefObject} from 'react'
+import type {GenericEvent} from 'react-generic-tools/type'
+
+import type {IconProperties} from '../../implementations/type'
+
+import type {
+    Properties as TextInputProperties,
+    AdapterWithReferences as TextInputAdapterWithReferences
+} from '../TextInput/type'
+
+import type {
+    Adapter,
+    AdapterWithReferences,
+    Component,
+    DateTimeRepresentation,
+    IntervalTextInputProps,
+    ModelState,
+    Properties,
+    Props,
+    Value
+} from './type'
+
 import {copy, extend, mask} from 'clientnode'
 import {
-    ForwardedRef,
-    forwardRef,
-    memo as memoize,
-    ReactElement,
-    RefObject,
-    useCallback,
-    useImperativeHandle,
-    useState
+    forwardRef, memo as memoize, useCallback, useImperativeHandle, useState
 } from 'react'
-import {GenericEvent} from 'react-generic-tools/type'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
 
 import Icon from '#implementations/Icon'
@@ -39,36 +53,18 @@ import {
     translateKnownSymbols,
     triggerCallbackIfExists
 } from '../../helper'
-import {IconProperties} from '../../implementations/type'
 
-import TextInput from '../TextInput'
+import TextInput from '../TextInput/index'
 import {usePropertiesChangedIndicator} from '../TextInput/helper'
-import {
-    Properties as TextInputProperties,
-    AdapterWithReferences as TextInputAdapterWithReferences
-} from '../TextInput/type'
 import WrapConfigurations from '../Wrapper/WrapConfigurations'
 
 /*
 "namedExport" version of css-loader:
 
-import {intervalClassName, intervalDisabledClassName} from './style.module'
+import {intervalClassName, intervalDisabledClassName} from './style.module.css'
 */
-import cssClassNames from './style.module'
-
-import {
-    Adapter,
-    AdapterWithReferences,
-    Component,
-    DateTimeRepresentation,
-    defaultProperties,
-    IntervalTextInputProps,
-    ModelState,
-    Properties,
-    propertyTypes,
-    Props,
-    Value
-} from './type'
+import cssClassNames from './style.module.css'
+import {defaultProperties, propertyTypes} from './type'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper

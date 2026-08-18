@@ -16,9 +16,8 @@
     endregion
 */
 // region imports
-import {ValueOf} from 'clientnode'
-import BasePropertyTypes, {func, number} from 'clientnode/property-types'
-import {
+import type {ValueOf} from 'clientnode'
+import type {
     ForwardRefExoticComponent,
     ReactElement,
     ReactNode,
@@ -26,22 +25,32 @@ import {
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject
 } from 'react'
-import {ComponentAdapter, ValidationMapping} from 'web-component-wrapper/type'
+import type {
+    ComponentAdapter, ValidationMapping
+} from 'web-component-wrapper/type'
 
-import {
-    modelStatePropertyTypes as textInputModelStatePropertyTypes,
+import type {
+    BaseModel,
+    ModelState as BaseModelState,
+    Properties as BaseProperties,
+    State as BaseState,
+    StaticWebComponent
+} from '../../type'
+
+import type {
     Properties as TextInputProperties,
     Props as TextInputProps
 } from '../TextInput/type'
+
+import BasePropertyTypes, {func, number} from 'clientnode/property-types'
+
 import {
-    BaseModel,
+    modelStatePropertyTypes as textInputModelStatePropertyTypes
+} from '../TextInput/type'
+import {
     defaultModel as baseDefaultModel,
     defaultProperties as baseDefaultProperties,
-    ModelState as BaseModelState,
-    Properties as BaseProperties,
-    propertyTypes as basePropertyTypes,
-    State as BaseState,
-    StaticWebComponent
+    propertyTypes as basePropertyTypes
 } from '../../type'
 // endregion
 export interface PropertiesItem<T, TS = unknown> {

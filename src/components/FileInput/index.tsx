@@ -17,18 +17,43 @@
     endregion
 */
 // region imports
-import {dataURLToBlob} from 'blob-util'
-import {copy, equals, extend, Logger, mask, NOOP} from 'clientnode'
-import {
+import type {
     FocusEvent as ReactFocusEvent,
     ForwardedRef,
-    forwardRef,
-    memo as memoize,
     MouseEvent as ReactMouseEvent,
     ReactElement,
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject,
-    SyntheticEvent,
+    SyntheticEvent
+} from 'react'
+import type {GenericEvent} from 'react-generic-tools/type'
+import type {PropertiesValidationMap} from 'web-component-wrapper/type'
+
+import type {MediaCardReference} from '../../implementations/type'
+
+import type {
+    Adapter as TextInputAdapter,
+    Properties as TextInputProperties,
+    Props as TextInputProps
+} from '../TextInput/type'
+
+import type {
+    AdapterWithReferences,
+    Component,
+    DefaultProperties,
+    Model,
+    ModelState,
+    Properties,
+    Props,
+    Value,
+    ValueState
+} from './type'
+
+import {dataURLToBlob} from 'blob-util'
+import {copy, equals, extend, Logger, mask, NOOP} from 'clientnode'
+import {
+    forwardRef,
+    memo as memoize,
     useEffect,
     useId,
     useImperativeHandle,
@@ -36,9 +61,7 @@ import {
     useCallback
 } from 'react'
 import {useMemorizedValue, useReferenceState} from 'react-generic-tools'
-import {GenericEvent} from 'react-generic-tools/type'
 import {ArrayBuffer as MD5ArrayBuffer, hash as md5Hash} from 'spark-md5'
-import {PropertiesValidationMap} from 'web-component-wrapper/type'
 
 import MediaCard from '#implementations/MediaCard'
 
@@ -52,17 +75,9 @@ import {
     triggerCallbackIfExists,
     wrapStateSetter
 } from '../../helper'
-import {
-    MediaCardReference,
-    MediaCardRepresentationType
-} from '../../implementations/type'
+import {MediaCardRepresentationType} from '../../implementations/type'
 
-import TextInput from '../TextInput'
-import {
-    Adapter as TextInputAdapter,
-    Properties as TextInputProperties,
-    Props as TextInputProps
-} from '../TextInput/type'
+import TextInput from '../TextInput/index'
 import {WrapConfigurations} from '../Wrapper/WrapConfigurations'
 
 import {
@@ -75,21 +90,12 @@ import {
     usePropertiesChangedIndicator
 } from './helper'
 import {
-    AdapterWithReferences,
-    Component,
     defaultFileNameInputProperties,
     defaultModelState,
-    DefaultProperties,
     defaultProperties,
-    Model,
-    ModelState,
-    Properties,
     propertyTypes,
-    Props,
     renderProperties,
-    RepresentationType,
-    Value,
-    ValueState
+    RepresentationType
 } from './type'
 
 export {
@@ -107,8 +113,7 @@ export {
     preserveStaticFileBaseNameInputGenerator
 } from './helper'
 // endregion
-export const log =
-    new Logger({name: 'react-input-material-file-input-logger', level: 'warn'})
+export const log = new Logger({name: 'react-input-material.file-input'})
 
 /**
  * Validatable checkbox wrapper component.
@@ -132,6 +137,14 @@ export const log =
 export const FileInputInner = function<Type extends Value = Value>(
     props: Props<Type>, reference?: ForwardedRef<AdapterWithReferences<Type>>
 ): ReactElement {
+    // region references initialization
+    const [fileInputReference, setFileInputReference] =
+        useReferenceState<HTMLInputElement | null>(null)
+    const [mediaCardReference, setMediaCardReference] =
+        useReferenceState<MediaCardReference | null>(null)
+    const [nameInputReference, setNameInputReference] =
+        useReferenceState<TextInputAdapter<string> | null>(null)
+    // endregion
     // region property aggregation
     /**
      * Calculate external properties (a set of all configurable properties).
@@ -262,13 +275,6 @@ export const FileInputInner = function<Type extends Value = Value>(
     /// endregion
     // endregion
     // region references
-    const [fileInputReference, setFileInputReference] =
-        useReferenceState<HTMLInputElement | null>(null)
-    const [mediaCardReference, setMediaCardReference] =
-        useReferenceState<MediaCardReference | null>(null)
-    const [nameInputReference, setNameInputReference] =
-        useReferenceState<TextInputAdapter<string> | null>(null)
-
     useImperativeHandle(
         reference,
         (): AdapterWithReferences<Type> => ({

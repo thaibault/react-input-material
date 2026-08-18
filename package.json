@@ -163,7 +163,7 @@
     "build": "yarn build:types; yarn build:plain; yarn build:minimal; yarn build:bundle; yarn build:bundle:minimal",
     "build:minimal": "weboptimizer build '{__reference__: \"target:minimal\"}'",
     "build:bundle": "weboptimizer build '{__reference__: \"target:bundle\"}'",
-    "build:bundle:minimal": "weboptimizer build '{__reference__: [\"target:bundle\", \"target:minimal\"], \"path\": {\"target\": {\"base\": \"dist/bundle/minimal/\"}}}'",
+    "build:bundle:minimal": "weboptimizer build '{__reference__: [\"target:bundle\", \"target:minimal\", \"target:bundle:minimal\"]}'",
     "build:plain": "weboptimizer build",
     "build:types": "weboptimizer build:types",
     "check": "yarn check:types; yarn lint",
@@ -184,22 +184,21 @@
     "watch": "weboptimizer build --watch"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.29.7",
-    "@babel/plugin-transform-proto-to-assign": "^7.29.7",
-    "@babel/preset-react": "^7.29.7",
-    "@babel/runtime": "^7.29.7",
+    "@babel/eslint-parser": "^8.0.1",
+    "@babel/plugin-transform-proto-to-assign": "^8.0.1",
+    "@babel/preset-react": "^8.0.1",
     "@codemirror/autocomplete": "^6.20.3",
-    "@codemirror/commands": "^6.10.3",
+    "@codemirror/commands": "^6.10.4",
     "@codemirror/lang-css": "^6.3.1",
     "@codemirror/lang-javascript": "^6.2.5",
-    "@codemirror/language": "^6.12.3",
+    "@codemirror/language": "^6.12.4",
     "@codemirror/lint": "^6.9.7",
-    "@codemirror/search": "^6.7.0",
-    "@codemirror/state": "^6.6.0",
-    "@codemirror/view": "^6.43.1",
+    "@codemirror/search": "^6.7.1",
+    "@codemirror/state": "^6.7.1",
+    "@codemirror/view": "^6.43.8",
     "@emotion/react": "^11.14.0",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.60.0",
+    "@playwright/test": "^1.62.1",
     "@rmwc/card": "^14.3.5",
     "@rmwc/checkbox": "^14.3.5",
     "@rmwc/circular-progress": "^14.3.5",
@@ -216,62 +215,62 @@
     "@rmwc/typography": "^14.3.5",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
-    "@tiptap/core": "^3.26.1",
-    "@tiptap/extensions": "^3.26.1",
-    "@tiptap/react": "^3.26.1",
-    "@tiptap/starter-kit": "^3.26.1",
+    "@tiptap/core": "^3.30.1",
+    "@tiptap/extensions": "^3.30.1",
+    "@tiptap/react": "^3.30.1",
+    "@tiptap/starter-kit": "^3.30.1",
     "@types/ejs": "^3.1.5",
     "@types/html-minifier": "^4.0.6",
-    "@types/jsdom": "^28.0.3",
-    "@types/node": "^25.9.3",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.2.0",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@types/react-transition-group": "^4.4.12",
     "@types/spark-md5": "^3.0.5",
     "@types/webpack-env": "^1.18.8",
-    "@typescript-eslint/eslint-plugin": "^8.61.0",
-    "@typescript-eslint/parser": "^8.61.0",
+    "@typescript-eslint/eslint-plugin": "^8.67.0",
+    "@typescript-eslint/parser": "^8.67.0",
     "blob-util": "^2.0.2",
-    "clientnode": "4.0.1423",
+    "clientnode": "4.0.1484",
     "css-loader": "^7.1.4",
-    "cssnano": "^8.0.2",
-    "eslint": "^10.5.0",
+    "cssnano": "^8.0.5",
+    "eslint": "^10.8.1",
     "eslint-config-google": "^0.14.0",
-    "eslint-plugin-jsdoc": "^63.0.2",
+    "eslint-plugin-jsdoc": "^64.2.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^30.4.2",
     "jsdoc": "^4.0.5",
     "material-components-web": "^14.0.0",
     "material-icons": "^1.13.14",
     "mini-css-extract-plugin": "^2.10.2",
-    "postcss": "8.5.15",
-    "postcss-import": "^16.1.1",
+    "postcss": "8.5.26",
+    "postcss-import": "^17.0.0",
     "postcss-loader": "^8.2.1",
-    "postcss-nested": "^7.0.2",
-    "postcss-preset-env": "^11.3.1",
+    "postcss-nested": "^8.0.1",
+    "postcss-preset-env": "^11.3.2",
     "postcss-scss": "^4.0.9",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-generic-animate": "^0.0.126",
-    "react-generic-dummy": "^0.0.130",
-    "react-generic-tools": "^0.0.120",
+    "react-generic-animate": "^0.0.130",
+    "react-generic-dummy": "^0.0.134",
+    "react-generic-tools": "^0.0.124",
     "react-transition-group": "^4.4.5",
     "react-useanimations": "^2.10.0",
     "spark-md5": "^3.0.2",
     "style-loader": "^4.0.0",
-    "stylelint": "^17.13.0",
+    "stylelint": "^17.14.1",
     "stylelint-config-standard": "^40.0.0",
     "tslib": "^2.8.1",
-    "typescript-eslint": "^8.61.0",
+    "typescript-eslint": "^8.67.0",
     "typescript-plugin-css-modules": "^5.2.0",
-    "web-component-wrapper": "^0.0.597",
-    "web-documentation": "^1.0.38",
-    "weboptimizer": "^3.0.24",
-    "webpack-dev-server": "^5.2.5"
+    "web-component-wrapper": "^0.0.611",
+    "web-documentation": "^1.0.45",
+    "weboptimizer": "^4.0.53",
+    "webpack-dev-server": "^6.0.0"
   },
   "peerDependencies": {
-    "@babel/runtime": "*",
+    "@babel/preset-react": "*",
     "@codemirror/autocomplete": "*",
     "@codemirror/commands": "*",
     "@codemirror/lang-css": "*",
@@ -309,7 +308,7 @@
     "tslib": "*"
   },
   "peerDependenciesMeta": {
-    "@babel/runtime": {
+    "@babel/preset-react": {
       "optional": true
     },
     "@codemirror/autocomplete": {
@@ -435,6 +434,7 @@
     "globals@npm:^9.18.0": "patch:globals@npm%3A11.12.0#~/.yarn/patches/globals-npm-11.12.0-1fa7f41a6c.patch"
   },
   "sideEffects": false,
+  "type": "module",
   "webDocumentation": {
     "languages": [
       "deDE",
@@ -534,9 +534,11 @@
     "module": {
       "aliases": {
         "#": "Not yet working since it is hidden by parents having overflow hidden.",
-        "@rmwc/tooltip": "react-generic-dummy",
+        "@rmwc/tooltip": {
+          "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+        },
         "#implementations": {
-          "__evaluate__": "path.resolve(self.path.context, self.path.base, self.path.source.base, 'implementations/rmwc')"
+          "__evaluate__": "path.resolve(self.path.source.base, 'implementations/rmwc')"
         }
       },
       "cascadingStyleSheet": {
@@ -550,19 +552,22 @@
         }
       },
       "optimizer": {
-        "babelMinify": {
-          "bundle": {
-            "transform": {
-              "#": "To provide a logging output we need to exclude this feature.",
-              "removeConsole": false
-            }
-          },
-          "#": "Avoids TypeError: Cannot read property 'removeBinding' of null.",
-          "module": null
-        },
         "#": "We have to add disable \"mergeRules\" since it removes some needed css directives otherwise.",
         "cssnano": {
-          "__evaluate__": "self.debug ? null : {preset: [optionalRequire('cssnano-preset-default'), {autoprefixer: false, discardUnused: !self.library, mergeRules: false}]}"
+          "__await_evaluate__": "module.optionalImport('cssnano-preset-default').then((module) => self.debug ? null : {preset: [module?.default, {autoprefixer: false, discardUnused: !self.library, mergeRules: false}]})"
+        },
+        "terser": {
+          "terserOptions": {
+            "compress": {
+              "#": "To provide a logging output we need to exclude this feature.",
+              "drop_console": {
+                "__evaluate__": "false"
+              },
+              "drop_debugger": {
+                "__evaluate__": "false"
+              }
+            }
+          }
         }
       },
       "preprocessor": {
@@ -570,7 +575,7 @@
           "additional": {
             "plugins": {
               "pre": {
-                "__append__": "require('postcss-nested')"
+                "__append__": "module.optionalImport('postcss-nested').then((module) => module?.default)"
               }
             }
           }
@@ -578,8 +583,11 @@
         "javaScript": {
           "options": {
             "presets": {
-              "#": "TODO: Remove \"@babel/react\" options when updated to babel 8. NOTE: We have to disable module export/import transformation to allow tree shaking by the final (minimizer).",
-              "__evaluate__": "[['@babel/react', {runtime: 'automatic'}], ['@babel/preset-env', {loose: true, modules: false, targets: self.targetTechnology === 'node' ? {node: 'current'} : {browsers: self.generic.supportedBrowsers, node: 'current'}}], '@babel/typescript'].concat((self.debug || !self.module.optimizer.babelMinify.module || 2 < self.givenCommandLineArguments.length && self.givenCommandLineArguments[2] === 'document') ? [] : [['minify', self.module.optimizer.babelMinify.module]])"
+              "#": "NOTE: We disable module export/import transformation to allow tree shaking by the final (minimizer).",
+              "__evaluate__": "[['@babel/preset-env', {targets: self.generic.isWeb ? {browsers: self.generic.supportedBrowsers, node: packageConfiguration.engines.node.replace(/>?=?([0-9]+)/, '$1')} : {node: packageConfiguration.engines.node.replace(/>?=?([0-9]+)/, '$1')}}], '@babel/preset-typescript']"
+            },
+            "overrides": {
+              "__evaluate__": "[{test: /\\.(jsx|tsx)$/u, presets: [['@babel/preset-react', {runtime: 'automatic'}]]}]"
             }
           }
         }
@@ -600,17 +608,6 @@
           "normal": true
         }
       },
-      "module": {
-        "preprocessor": {
-          "javaScript": {
-            "options": {
-              "plugins": {
-                "__remove__": "@babel/plugin-transform-runtime"
-              }
-            }
-          }
-        }
-      },
       "path": {
         "target": {
           "base": "dist/bundle/"
@@ -621,20 +618,48 @@
       "module": {
         "aliases": {
           "#": "Remove unneeded optional dependencies.",
-          "@codemirror/autocomplete": "react-generic-dummy",
-          "@codemirror/commands": "react-generic-dummy",
-          "@codemirror/language": "react-generic-dummy",
-          "@codemirror/lang-css": "react-generic-dummy",
-          "@codemirror/lang-javascript": "react-generic-dummy",
-          "@codemirror/lint": "react-generic-dummy",
-          "@codemirror/search": "react-generic-dummy",
-          "@codemirror/state": "react-generic-dummy",
-          "@codemirror/view": "react-generic-dummy",
-          "@rmwc/tooltip": "react-generic-dummy",
-          "@tiptap/core$": "react-generic-dummy",
-          "@tiptap/extensions$": "react-generic-dummy",
-          "@tiptap/react$": "react-generic-dummy",
-          "@tiptap/starter-kit$": "react-generic-dummy",
+          "@codemirror/autocomplete": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@codemirror/commands": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@codemirror/language": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@codemirror/lang-css": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@codemirror/lang-javascript": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@codemirror/lint": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@codemirror/search": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@codemirror/state": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@codemirror/view": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@rmwc/tooltip": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@tiptap/core$": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@tiptap/extensions$": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@tiptap/react$": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
+          "@tiptap/starter-kit$": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
+          },
           "react-useanimations$": "react-generic-dummy",
           "react-useanimations/lib/lock$": "react-generic-dummy",
           "react-useanimations/lib/plusToX$": "react-generic-dummy"
@@ -643,6 +668,13 @@
       "path": {
         "target": {
           "base": "dist/minimal/"
+        }
+      }
+    },
+    "target:bundle:minimal": {
+      "path": {
+        "target": {
+          "base": "dist/bundle/minimal/"
         }
       }
     },

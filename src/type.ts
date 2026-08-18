@@ -16,7 +16,24 @@
     endregion
 */
 // region imports
-import {Mapping, Primitive} from 'clientnode'
+import type {Mapping, Primitive} from 'clientnode'
+import type {
+    ComponentClass,
+    FocusEvent,
+    ForwardRefExoticComponent,
+    FunctionComponent,
+    MouseEvent,
+    ReactElement,
+    RefAttributes
+} from 'react'
+import type {GenericEvent} from 'react-generic-tools/type'
+import type {
+    ComponentAdapter,
+    StaticWebComponent as StaticBaseWebComponent,
+    ValidationMapping
+} from 'web-component-wrapper/type'
+import type {ThemeProviderProps} from '@rmwc/theme'
+
 import {
     any,
     arrayOf,
@@ -30,22 +47,6 @@ import {
     string,
     symbol
 } from 'clientnode/property-types'
-import {
-    ComponentClass,
-    FocusEvent,
-    ForwardRefExoticComponent,
-    FunctionComponent,
-    MouseEvent,
-    ReactElement,
-    RefAttributes
-} from 'react'
-import {GenericEvent} from 'react-generic-tools/type'
-import {
-    ComponentAdapter,
-    StaticWebComponent as StaticBaseWebComponent,
-    ValidationMapping
-} from 'web-component-wrapper/type'
-import {ThemeProviderProps} from '@rmwc/theme'
 // endregion
 // region exports
 /// region generic
@@ -130,7 +131,7 @@ export interface BaseProperties<T = unknown>
     extends
 CommonBaseModel<T>, ModelState {
     className: Array<string> | string
-    // NOTE: We want to avoid a collision with html's native "style" property.
+    // NOTE: We want to avoid a collision with HTML's native "style" property.
     styles: Mapping
     themeConfiguration: ThemeProviderProps['options']
 
