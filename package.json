@@ -83,6 +83,7 @@
     "./index.css": {
       "style": "./dist/index.css"
     },
+    "./shims/optionals": "./dist/shims/optionals.js",
     "./type": "./dist/type.js"
   },
   "main": "dist/index.js",
@@ -157,6 +158,7 @@
     "dist/index.js",
     "dist/implementations/rmwc/material.css",
     "dist/implementations/type.d.ts",
+    "dist/shims",
     "dist/type.d.ts",
     "dist/type.js"
   ],
@@ -507,6 +509,7 @@
           "./index.css",
           "./index.ts"
         ],
+        "shims/optionals": "./shims/optionals",
         "type": "./type"
       },
       "supportedBrowsers": [
