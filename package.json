@@ -1,6 +1,6 @@
 {
   "name": "react-input-material",
-  "version": "0.0.831",
+  "version": "0.0.832",
   "description": "Reusable material design based input field with support for (richt-)text, code, selections, numbers, dates and so on.",
   "keywords": [
     "form-field",
@@ -526,7 +526,6 @@
         "aliases": {
           "react-useanimations/lib/lock": "react-useanimations/lib/lock/index.js",
           "react-useanimations/lib/plusToX": "react-useanimations/lib/plusToX/index.js",
-
           "^.+/node_modules/.+(?:\\.css)?$": {
             "^(.+)(?:\\.css)?$": "?$1.compiled.css"
           }
