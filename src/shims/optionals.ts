@@ -3,20 +3,29 @@
 /** @module reactGenericDummy */
 'use strict'
 
-import Dummy from 'react-generic-dummy'
-
 const MOCK_RESULT = undefined
 
-export default Dummy
+// @rmwc/tooltip
+export const Tooltip = MOCK_RESULT
 
-export const Tooltip = Dummy
-
+// @tiptap/extensions
 export const CharacterCount = MOCK_RESULT
+
+// @tiptap/react
 export const EditorContent = MOCK_RESULT
+export const useEditor = MOCK_RESULT
+
+// @codemirror/state
 export const EditorState = MOCK_RESULT
-export const EditorView = MOCK_RESULT
 export const Text = MOCK_RESULT
+
+// @codemirror/view
+export const EditorView = MOCK_RESULT
+
+// @codemirror/autocomplete
 export const autocompletion = MOCK_RESULT
+
+// @codemirror/language
 export const bracketMatching = MOCK_RESULT
 export const closeBrackets = MOCK_RESULT
 export const closeBracketsKeymap = MOCK_RESULT
@@ -33,10 +42,6 @@ export const highlightActiveLine = MOCK_RESULT
 export const highlightActiveLineGutter = MOCK_RESULT
 export const highlightSelectionMatches = MOCK_RESULT
 export const highlightSpecialChars = MOCK_RESULT
-// NOTE: We need to alias the history export to avoid a name mangeling.
-const optionalsHistory = MOCK_RESULT
-export {optionalsHistory as history}
-export const historyKeymap = MOCK_RESULT
 export const indentOnInput = MOCK_RESULT
 export const javascript = MOCK_RESULT
 export const keymap = MOCK_RESULT
@@ -45,4 +50,10 @@ export const lintKeymap = MOCK_RESULT
 export const rectangularSelection = MOCK_RESULT
 export const searchKeymap = MOCK_RESULT
 export const syntaxHighlighting = MOCK_RESULT
-export const useEditor = MOCK_RESULT
+
+// @codemirror/commands
+// NOTE: We need to alias the history export to avoid a name mangeling.
+const optionalsHistory = MOCK_RESULT
+export {optionalsHistory as history}
+export const historyKeymap = MOCK_RESULT
+
