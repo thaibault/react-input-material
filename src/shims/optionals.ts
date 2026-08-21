@@ -33,7 +33,9 @@ export const highlightActiveLine = MOCK_RESULT
 export const highlightActiveLineGutter = MOCK_RESULT
 export const highlightSelectionMatches = MOCK_RESULT
 export const highlightSpecialChars = MOCK_RESULT
-export const history = MOCK_RESULT
+// NOTE: We need to alias the history export to avoid a name mangeling.
+const optionalsHistory = MOCK_RESULT
+export {optionalsHistory as history}
 export const historyKeymap = MOCK_RESULT
 export const indentOnInput = MOCK_RESULT
 export const javascript = MOCK_RESULT
