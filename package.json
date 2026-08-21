@@ -237,7 +237,7 @@
     "blob-util": "^2.0.2",
     "clientnode": "4.0.1484",
     "css-loader": "^7.1.4",
-    "cssnano": "^8.0.6",
+    "cssnano": "^8.0.7",
     "eslint": "^10.8.1",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-jsdoc": "^64.2.1",
@@ -555,8 +555,8 @@
         }
       },
       "optimizer": {
-        "#": "We have to add disable \"mergeRules\" since it removes some needed css directives otherwise.",
         "cssnano": {
+          "#": "We have to add disable \"mergeRules\" since it removes some needed css directives otherwise.",
           "__await_evaluate__": "module.optionalImport('cssnano-preset-default').then((module) => self.debug ? null : {preset: [module?.default, {autoprefixer: false, discardUnused: !self.library, mergeRules: false}]})"
         },
         "terser": {
@@ -587,10 +587,6 @@
           "options": {
             "overrides": {
               "__evaluate__": "[{test: /\\.(jsx|tsx)$/u, presets: [['@babel/preset-react', {runtime: 'automatic'}]]}]"
-            },
-            "presets": {
-              "#": "NOTE: We disable module export/import transformation to allow tree shaking by the final (minimizer).",
-              "__evaluate__": "[['@babel/preset-env', {targets: self.generic.isWeb ? {browsers: self.generic.supportedBrowsers, node: packageConfiguration.engines.node.replace(/>?=?([0-9]+)/, '$1')} : {node: packageConfiguration.engines.node.replace(/>?=?([0-9]+)/, '$1')}}], '@babel/preset-typescript']"
             }
           }
         }
