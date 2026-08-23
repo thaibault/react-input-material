@@ -89,14 +89,8 @@
   "main": "dist/index.js",
   "typesVersions": {
     "*": {
-      "components": [
-        "./dist/components"
-      ],
-      "helper": [
-        "./dist/helper"
-      ],
-      "implementations": [
-        "./dist/type"
+      "*": [
+        "./dist/*"
       ]
     }
   },
@@ -237,7 +231,7 @@
     "blob-util": "^2.0.2",
     "clientnode": "4.0.1484",
     "css-loader": "^7.1.4",
-    "cssnano": "^8.0.7",
+    "cssnano": "^8.0.8",
     "eslint": "^10.9.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-jsdoc": "^64.2.1",
