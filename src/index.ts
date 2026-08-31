@@ -16,6 +16,13 @@
     See https://creativecommons.org/licenses/by/3.0/deed.de
     endregion
 */
+export type * from './type'
+export type * as CheckboxTypes from './components/Checkbox/type'
+export type * as FileInputTypes from './components/FileInput/type'
+export type * as IntervalTypes from './components/Interval/type'
+export type * as InputsTypes from './components/Inputs/type'
+export type * as TextInputTypes from './components/TextInput/type'
+
 export {Checkbox} from './components/Checkbox/index'
 export {FileInput} from './components/FileInput/index'
 export {Interval} from './components/Interval/index'
@@ -28,9 +35,14 @@ export {WrapThemeProvider} from './components/Wrapper/WrapThemeProvider'
 export {WrapTooltip} from './components/Wrapper/WrapTooltip'
 
 export * from './helper'
-export type * from './type'
-export type * as CheckboxTypes from './components/Checkbox/type'
-export type * as FileInputTypes from './components/FileInput/type'
-export type * as IntervalTypes from './components/Interval/type'
-export type * as InputsTypes from './components/Inputs/type'
-export type * as TextInputTypes from './components/TextInput/type'
+
+export {
+    baseModelPropertyTypes,
+    modelStatePropertyTypes,
+    modelPropertyTypes,
+    propertyTypes,
+    defaultModelState,
+    defaultModel,
+    defaultProperties
+} from './type'
+
