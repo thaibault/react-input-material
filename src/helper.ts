@@ -171,24 +171,26 @@ export const wrapStateSetter = <Type = unknown>(
     setValueState: (value: Type | ((value: Type) => Type)) => void,
     currentValueState: Type
 ): ReturnType<typeof useState>[1] =>
-    (callbackOrData: FirstParameter<ReturnType<typeof useState>[1]>) => {
-        const result: Type = (typeof callbackOrData === 'function' ?
-            (callbackOrData as (value: unknown) => Type)(currentValueState) :
-            callbackOrData
-        ) as Type
+        (callbackOrData: FirstParameter<ReturnType<typeof useState>[1]>) => {
+            const result: Type = (typeof callbackOrData === 'function' ?
+                (callbackOrData as (value: unknown) => Type)(
+                    currentValueState
+                ) :
+                callbackOrData
+            ) as Type
 
-        if (!equals(
-            (
-                result as unknown as {modelState: unknown} | undefined
-            )?.modelState,
-            (
-                currentValueState as
-                    unknown as
-                    {modelState: unknown} | undefined
-            )?.modelState
-        ))
-            setValueState(result)
-    }
+            if (!equals(
+                (
+                    result as unknown as {modelState: unknown} | undefined
+                )?.modelState,
+                (
+                    currentValueState as
+                        unknown as
+                        {modelState: unknown} | undefined
+                )?.modelState
+            ))
+                setValueState(result)
+        }
 // endregion
 /**
  * Renders given template string against all properties in current
@@ -860,18 +862,18 @@ export const hashRegularExpression = (expression: RegExp) => (
 export const usePropertiesChangedIndicator = <Type = unknown>(
     properties: Properties<Type>
 ) =>
-    useMemorizedValue(
-        {},
+        useMemorizedValue(
+            {},
 
-        JSON.stringify(properties),
+            JSON.stringify(properties),
 
-        properties.onChange,
-        properties.onChangeShowDeclaration,
-        properties.onChangeState,
-        properties.onChangeValue,
+            properties.onChange,
+            properties.onChangeShowDeclaration,
+            properties.onChangeState,
+            properties.onChangeValue,
 
-        properties.onBlur,
-        properties.onClick,
-        properties.onFocus,
-        properties.onTouch
-    )
+            properties.onBlur,
+            properties.onClick,
+            properties.onFocus,
+            properties.onTouch
+        )
