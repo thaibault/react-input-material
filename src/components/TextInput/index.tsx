@@ -1474,12 +1474,16 @@ export const TextInputInner = function<Type = unknown>(
                 )
             ) {
                 const marked = (mark(
-                    suggestion,
+                    String(suggestion),
                     (
                         properties.representation as string | null
                     )?.split(' ') || '',
                     {
                         marker: (foundWord: string): Array<string> =>
+                            /*
+                                Just indicate a marked word by wrapping a
+                                single element with an array.
+                            */
                             [foundWord],
                         skipTagDelimitedParts: null
                     }
