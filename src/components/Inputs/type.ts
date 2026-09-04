@@ -17,6 +17,7 @@
 */
 // region imports
 import type {ValueOf} from 'clientnode'
+import type BasePropertyTypes from 'clientnode/property-types'
 import type {
     ForwardRefExoticComponent,
     ReactElement,
@@ -42,7 +43,7 @@ import type {
     Props as TextInputProps
 } from '../TextInput/type'
 
-import BasePropertyTypes, {func, number} from 'clientnode/property-types'
+import {func, number} from 'clientnode/property-types'
 
 import {
     modelStatePropertyTypes as textInputModelStatePropertyTypes

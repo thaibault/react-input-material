@@ -17,6 +17,8 @@
 */
 // region imports
 import type {Mapping, ValueOf} from 'clientnode'
+import type BasePropertyTypes from 'clientnode/property-types'
+import type {Requireable, ValidationMap} from 'clientnode/property-types'
 import type {
     ElementType,
     ForwardRefExoticComponent,
@@ -47,18 +49,8 @@ import type {
 } from '../TextInput/type'
 
 import {identity} from 'clientnode'
-import BasePropertyTypes, {
-    arrayOf,
-    boolean,
-    func,
-    number,
-    object,
-    oneOfType,
-    Requireable,
-    shape,
-    string,
-    symbol,
-    ValidationMap
+import {
+    arrayOf, boolean, func, number, object, oneOfType, shape, string, symbol
 } from 'clientnode/property-types'
 
 import {

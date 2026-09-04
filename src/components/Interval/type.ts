@@ -17,6 +17,8 @@
 */
 // region imports
 import type {Mapping, ValueOf} from 'clientnode'
+import type BasePropertyTypes from 'clientnode/property-types'
+import type {ValidationMap, Validator} from 'clientnode/property-types'
 import type {
     // NOTE: can be "RefObject" directly when migrated to react19.
     MutableRefObject as RefObject
@@ -37,14 +39,8 @@ import type {
     Props as TextInputProps
 } from '../TextInput/type'
 
-import BasePropertyTypes, {
-    number,
-    oneOfType,
-    shape,
-    string,
-    symbol,
-    ValidationMap,
-    Validator
+import {
+    number, oneOfType, shape, string, symbol
 } from 'clientnode/property-types'
 
 import {defaultModelState as baseDefaultModelState} from '../../type'

@@ -17,6 +17,8 @@
 */
 // region imports
 import type {Mapping, PlainObject, RecursivePartial, ValueOf} from 'clientnode'
+import type BasePropertyTypes from 'clientnode/property-types'
+import type {Requireable} from 'clientnode/property-types'
 import type {
     FocusEvent as ReactFocusEvent,
     ForwardRefExoticComponent,
@@ -34,17 +36,8 @@ import type {
 import type {LanguageSupport} from '@codemirror/language'
 import type {JSONContent} from '@tiptap/core'
 
-import BasePropertyTypes, {
-    any,
-    arrayOf,
-    boolean,
-    func,
-    number,
-    object,
-    oneOfType,
-    Requireable,
-    string,
-    symbol
+import {
+    any, arrayOf, boolean, func, number, object, oneOfType, string, symbol
 } from 'clientnode/property-types'
 
 import type {ChainedCommands, EditorOptions, Extensions} from '@tiptap/core'
