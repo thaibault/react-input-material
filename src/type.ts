@@ -17,6 +17,7 @@
 */
 // region imports
 import type {Mapping, Primitive} from 'clientnode'
+import type {Requireable} from 'clientnode/property-types'
 import type {
     ComponentClass,
     FocusEvent,
@@ -42,7 +43,6 @@ import {
     number,
     object,
     oneOfType,
-    Requireable,
     shape,
     string,
     symbol
