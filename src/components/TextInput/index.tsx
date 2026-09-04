@@ -1474,7 +1474,7 @@ export const TextInputInner = function<Type = unknown>(
                 )
             ) {
                 const marked = (mark(
-                    suggestion,
+                    String(suggestion),
                     (
                         properties.representation as string | null
                     )?.split(' ') || '',
