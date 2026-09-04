@@ -8019,7 +8019,7 @@ __metadata:
 
 "clientnode@file:../clientnode::locator=react-input-material%40workspace%3A.":
   version: 4.0.1505
-  resolution: "clientnode@file:../clientnode#../clientnode::hash=637467&locator=react-input-material%40workspace%3A."
+  resolution: "clientnode@file:../clientnode#../clientnode::hash=c14517&locator=react-input-material%40workspace%3A."
   peerDependencies:
     "@types/prop-types": "*"
     node-fetch: "*"
@@ -8031,7 +8031,7 @@ __metadata:
       optional: true
     prop-types:
       optional: true
-  checksum: 10c0/87b10a1ff73167c13dec0d579c04b3bc415c6b3ecf642fec122f6427422534996629c7d1b113ed4d0a1709697c1fd096986243f507ba7d17dc1b8f47a47103c4
+  checksum: 10c0/d0886a32c77b77f6ba53c3c0c7d4c4e64451b921d60774045ec672fb6bd2719eb69c7a9534dcaf7e0886fd161a76a901ab51967165f37c67f1dd4869e72c1de6
   languageName: node
   linkType: hard
 
