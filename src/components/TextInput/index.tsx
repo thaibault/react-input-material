@@ -1480,6 +1480,10 @@ export const TextInputInner = function<Type = unknown>(
                     )?.split(' ') || '',
                     {
                         marker: (foundWord: string): Array<string> =>
+                            /*
+                                Just indicate a marked word by wrapping a
+                                single element with an array.
+                            */
                             [foundWord],
                         skipTagDelimitedParts: null
                     }
