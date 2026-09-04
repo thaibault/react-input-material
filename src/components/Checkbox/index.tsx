@@ -27,6 +27,7 @@ import type {
     SyntheticEvent
 } from 'react'
 import type {GenericEvent} from 'react-generic-tools/type'
+import type {PropertiesValidationMap} from 'web-component-wrapper/type'
 
 import type {InputReference} from '../../implementations/type'
 import type {
@@ -44,7 +45,6 @@ import type {
 } from './type'
 
 import {copy, equals, extend} from 'clientnode'
-
 import {
     forwardRef,
     memo as memoize,
@@ -53,8 +53,7 @@ import {
     useState,
     useCallback
 } from 'react'
-
-import {PropertiesValidationMap} from 'web-component-wrapper/type'
+import {useReferenceState} from 'react-generic-tools'
 
 import LowLevelCheckbox from '#implementations/Checkbox'
 import Error from '#implementations/Error'
@@ -76,7 +75,6 @@ import {defaultModelState as baseDefaultModelState} from '../../type'
 
 import cssClassNames from './style.module.css'
 import {defaultProperties, propertyTypes} from './type'
-import {useReferenceState} from 'react-generic-tools'
 // endregion
 const CSS_CLASS_NAMES = cssClassNames
 // region helper
