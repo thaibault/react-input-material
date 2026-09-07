@@ -205,7 +205,7 @@ export const renderMessage = <Scope extends object = object>(
     if (typeof template !== 'string')
         return ''
 
-    const evaluated: EvaluationResult = evaluate(`\`${template}\``, scope)
+    const evaluated: EvaluationResult = evaluate(`\`${template}\``, {scope})
 
     if (evaluated.error) {
         log.warn(
