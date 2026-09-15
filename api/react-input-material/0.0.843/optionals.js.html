@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: optionals.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: optionals.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>if(typeof window==='undefined'||window===null)var window=(typeof globalThis==='undefined'||globalThis===null)?{}:globalThis;/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	const __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	// define getter/value functions for harmony exports
+/******/ 	__webpack_require__.d = (exports, definition) => {
+/******/ 		if(Array.isArray(definition)) {
+/******/ 			var i = 0;
+/******/ 			while(i &lt; definition.length) {
+/******/ 				var key = definition[i++];
+/******/ 				var binding = definition[i++];
+/******/ 				var descriptor = binding === 0 ? { enumerable: true, value: definition[i++] } : { enumerable: true, get: binding };
+/******/ 				if(!__webpack_require__.o(exports, key)) Object.defineProperty(exports, key, descriptor);
+/******/ 			}
+/******/ 		} else {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) &amp;&amp; !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		}
+/******/ 	};
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop));
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = (exports) => {
+/******/ 		Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/ 	
+/************************************************************************/
+let __webpack_exports__ = {};
+__webpack_require__.r(__webpack_exports__);
+// #!/usr/bin/env babel-node
+// -*- coding: utf-8 -*-
+/** @module reactGenericDummy */const MOCK_RESULT=undefined;// @rmwc/tooltip
+const Tooltip=MOCK_RESULT;// @tiptap/extensions
+const CharacterCount=MOCK_RESULT;// @tiptap/react
+const EditorContent=MOCK_RESULT;const useEditor=MOCK_RESULT;// @codemirror/state
+const EditorState=MOCK_RESULT;const Text=MOCK_RESULT;// @codemirror/view
+const EditorView=MOCK_RESULT;// @codemirror/autocomplete
+const autocompletion=MOCK_RESULT;// @codemirror/language
+const bracketMatching=MOCK_RESULT;const closeBrackets=MOCK_RESULT;const closeBracketsKeymap=MOCK_RESULT;const completionKeymap=MOCK_RESULT;const crosshairCursor=MOCK_RESULT;const css=MOCK_RESULT;const defaultHighlightStyle=MOCK_RESULT;const defaultKeymap=MOCK_RESULT;const drawSelection=MOCK_RESULT;const dropCursor=MOCK_RESULT;const foldGutter=MOCK_RESULT;const foldKeymap=MOCK_RESULT;const highlightActiveLine=MOCK_RESULT;const highlightActiveLineGutter=MOCK_RESULT;const highlightSelectionMatches=MOCK_RESULT;const highlightSpecialChars=MOCK_RESULT;const indentOnInput=MOCK_RESULT;const javascript=MOCK_RESULT;const keymap=MOCK_RESULT;const lineNumbers=MOCK_RESULT;const lintKeymap=MOCK_RESULT;const rectangularSelection=MOCK_RESULT;const searchKeymap=MOCK_RESULT;const syntaxHighlighting=MOCK_RESULT;// @codemirror/commands
+// NOTE: We need to alias the history export to avoid a name mangeling.
+const optionalsHistory=MOCK_RESULT;const historyKeymap=MOCK_RESULT;
+/* harmony export */ __webpack_require__.d(__webpack_exports__, [
+/* harmony export */   "CharacterCount", 0, /* binding */ CharacterCount,
+/* harmony export */   "EditorContent", 0, /* binding */ EditorContent,
+/* harmony export */   "EditorState", 0, /* binding */ EditorState,
+/* harmony export */   "EditorView", 0, /* binding */ EditorView,
+/* harmony export */   "Text", 0, /* binding */ Text,
+/* harmony export */   "Tooltip", 0, /* binding */ Tooltip,
+/* harmony export */   "autocompletion", 0, /* binding */ autocompletion,
+/* harmony export */   "bracketMatching", 0, /* binding */ bracketMatching,
+/* harmony export */   "closeBrackets", 0, /* binding */ closeBrackets,
+/* harmony export */   "closeBracketsKeymap", 0, /* binding */ closeBracketsKeymap,
+/* harmony export */   "completionKeymap", 0, /* binding */ completionKeymap,
+/* harmony export */   "crosshairCursor", 0, /* binding */ crosshairCursor,
+/* harmony export */   "css", 0, /* binding */ css,
+/* harmony export */   "defaultHighlightStyle", 0, /* binding */ defaultHighlightStyle,
+/* harmony export */   "defaultKeymap", 0, /* binding */ defaultKeymap,
+/* harmony export */   "drawSelection", 0, /* binding */ drawSelection,
+/* harmony export */   "dropCursor", 0, /* binding */ dropCursor,
+/* harmony export */   "foldGutter", 0, /* binding */ foldGutter,
+/* harmony export */   "foldKeymap", 0, /* binding */ foldKeymap,
+/* harmony export */   "highlightActiveLine", 0, /* binding */ highlightActiveLine,
+/* harmony export */   "highlightActiveLineGutter", 0, /* binding */ highlightActiveLineGutter,
+/* harmony export */   "highlightSelectionMatches", 0, /* binding */ highlightSelectionMatches,
+/* harmony export */   "highlightSpecialChars", 0, /* binding */ highlightSpecialChars,
+/* harmony export */   "history", 0, /* binding */ optionalsHistory,
+/* harmony export */   "historyKeymap", 0, /* binding */ historyKeymap,
+/* harmony export */   "indentOnInput", 0, /* binding */ indentOnInput,
+/* harmony export */   "javascript", 0, /* binding */ javascript,
+/* harmony export */   "keymap", 0, /* binding */ keymap,
+/* harmony export */   "lineNumbers", 0, /* binding */ lineNumbers,
+/* harmony export */   "lintKeymap", 0, /* binding */ lintKeymap,
+/* harmony export */   "rectangularSelection", 0, /* binding */ rectangularSelection,
+/* harmony export */   "searchKeymap", 0, /* binding */ searchKeymap,
+/* harmony export */   "syntaxHighlighting", 0, /* binding */ syntaxHighlighting,
+/* harmony export */   "useEditor", 0, /* binding */ useEditor
+/* harmony export */ ]);
+
+((((((((((((((((((((((((((((window.componentsCheckboxHarness = window.componentsCheckboxHarness || {}).componentsCheckboxImportModule = window.componentsCheckboxHarness.componentsCheckboxImportModule || {}).componentsCheckboxIndex = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex || {}).componentsCheckboxType = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType || {}).componentsFileInputHarness = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness || {}).componentsFileInputImportModule = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule || {}).componentsFileInputIndex = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex || {}).componentsFileInputType = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType || {}).componentsInputsHarness = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness || {}).componentsInputsImportModule = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule || {}).componentsInputsIndex = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex || {}).componentsInputsType = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType || {}).componentsIntervalHarness = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness || {}).componentsIntervalImportModule = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule || {}).componentsIntervalIndex = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex || {}).componentsIntervalType = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType || {}).componentsTextInputHarness = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness || {}).componentsTextInputImportModule = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness.componentsTextInputImportModule || {}).componentsTextInputIndex = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness.componentsTextInputImportModule.componentsTextInputIndex || {}).componentsTextInputType = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness.componentsTextInputImportModule.componentsTextInputIndex.componentsTextInputType || {}).componentsWrapperWrapConfigurations = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness.componentsTextInputImportModule.componentsTextInputIndex.componentsTextInputType.componentsWrapperWrapConfigurations || {}).componentsWrapperWrapStrict = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness.componentsTextInputImportModule.componentsTextInputIndex.componentsTextInputType.componentsWrapperWrapConfigurations.componentsWrapperWrapStrict || {}).componentsWrapperWrapThemeProvider = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness.componentsTextInputImportModule.componentsTextInputIndex.componentsTextInputType.componentsWrapperWrapConfigurations.componentsWrapperWrapStrict.componentsWrapperWrapThemeProvider || {}).componentsWrapperWrapTooltip = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness.componentsTextInputImportModule.componentsTextInputIndex.componentsTextInputType.componentsWrapperWrapConfigurations.componentsWrapperWrapStrict.componentsWrapperWrapThemeProvider.componentsWrapperWrapTooltip || {}).implementationsRmwcMaterial = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness.componentsTextInputImportModule.componentsTextInputIndex.componentsTextInputType.componentsWrapperWrapConfigurations.componentsWrapperWrapStrict.componentsWrapperWrapThemeProvider.componentsWrapperWrapTooltip.implementationsRmwcMaterial || {}).helper = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness.componentsTextInputImportModule.componentsTextInputIndex.componentsTextInputType.componentsWrapperWrapConfigurations.componentsWrapperWrapStrict.componentsWrapperWrapThemeProvider.componentsWrapperWrapTooltip.implementationsRmwcMaterial.helper || {}).index = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness.componentsTextInputImportModule.componentsTextInputIndex.componentsTextInputType.componentsWrapperWrapConfigurations.componentsWrapperWrapStrict.componentsWrapperWrapThemeProvider.componentsWrapperWrapTooltip.implementationsRmwcMaterial.helper.index || {}).shimsOptionals = window.componentsCheckboxHarness.componentsCheckboxImportModule.componentsCheckboxIndex.componentsCheckboxType.componentsFileInputHarness.componentsFileInputImportModule.componentsFileInputIndex.componentsFileInputType.componentsInputsHarness.componentsInputsImportModule.componentsInputsIndex.componentsInputsType.componentsIntervalHarness.componentsIntervalImportModule.componentsIntervalIndex.componentsIntervalType.componentsTextInputHarness.componentsTextInputImportModule.componentsTextInputIndex.componentsTextInputType.componentsWrapperWrapConfigurations.componentsWrapperWrapStrict.componentsWrapperWrapThemeProvider.componentsWrapperWrapTooltip.implementationsRmwcMaterial.helper.index.shimsOptionals || {}).type = __webpack_exports__;
+/******/ })()
+;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-reactGenericDummy.html">reactGenericDummy</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Tue Sep 15 2026 21:18:01 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
