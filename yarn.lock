@@ -14013,7 +14013,7 @@ __metadata:
     typescript-plugin-css-modules: "npm:^5.2.0"
     web-component-wrapper: "npm:^0.0.614"
     web-documentation: "npm:^1.0.57"
-    weboptimizer: "npm:^4.0.84"
+    weboptimizer: "npm:^4.0.85"
     webpack: "npm:5.111.0"
     webpack-cli: "npm:7.2.3"
     webpack-dev-server: "npm:^6.0.0"
@@ -15880,9 +15880,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"weboptimizer@npm:^4.0.84":
-  version: 4.0.84
-  resolution: "weboptimizer@npm:4.0.84"
+"weboptimizer@npm:^4.0.85":
+  version: 4.0.85
+  resolution: "weboptimizer@npm:4.0.85"
   dependencies:
     "@babel/core": "npm:^8.0.5"
     "@babel/plugin-proposal-decorators": "npm:^8.0.2"
@@ -16028,7 +16028,7 @@ __metadata:
       optional: true
   bin:
     weboptimizer: index.js
-  checksum: 10c0/2760659b971b431a25496c2bdbe2beb295c3ee898f263ba6d6aaa25ed78f135a4c39ca2a540b37a7f0463456668ff1c51ead01722e34ead4bd24cde2411ee315
+  checksum: 10c0/644e41fd3912139e809a00ef605649ef76ab0f0245f53442a91f0f44139fc809076236458b6d4c805a58c85467ba398d0eea7d5280c7409a11f5e045275dd49a
   languageName: node
   linkType: hard
 
