@@ -768,7 +768,7 @@ export const FileInputInner = function<Type extends Value = Value>(
                 */
             })()
                 .catch((reason: unknown) => {
-                    log.warn(reason)
+                    void log.warn(reason)
                 })
 
             return () => {

@@ -208,7 +208,7 @@ export const renderMessage = <Scope extends object = object>(
     const evaluated: EvaluationResult = evaluate(`\`${template}\``, {scope})
 
     if (evaluated.error) {
-        log.warn(
+        void log.warn(
             'Given message template could not be proceed:',
             evaluated.error
         )
