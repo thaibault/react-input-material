@@ -226,7 +226,7 @@ export const TextInputInner = function<Type = unknown>(
                         plusToXAnimation
                     ) ?
                         <UseAnimations
-                            animation={plusToXAnimation} reverse={true}
+                            animation={plusToXAnimation} active={true}
                         /> :
                         <Icon icon="clear" />
                     }
@@ -279,7 +279,7 @@ export const TextInputInner = function<Type = unknown>(
                 ) ?
                     <UseAnimations
                         animation={lockAnimation}
-                        reverse={!properties.hidden}
+                        active={!properties.hidden}
                     /> :
                     properties.hidden ? 'lock_open' : 'lock',
 

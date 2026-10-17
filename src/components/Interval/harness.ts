@@ -5,7 +5,7 @@
 
 import type {Locator} from 'playwright-core'
 
-import {formatEndUserTime} from 'react-generic-tools/endToEndTestHelper'
+import {formatEndUserTime} from 'react-generic-tools/endToEndTestHelper.js'
 
 import {textInput} from '../TextInput/harness'
 
