@@ -16,7 +16,7 @@ test(
 
         // when
         await fileInputHarness.fillFiles(
-            page, resolve(__dirname, 'example.jpg')
+            page, resolve(import.meta.dirname, 'example.jpg')
         )
 
         // then

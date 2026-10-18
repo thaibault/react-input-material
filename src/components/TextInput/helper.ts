@@ -71,8 +71,8 @@ export const UseAnimations: (
     (
         ReactUseAnimations as
             unknown as
-            {default: null | typeof ReactUseAnimations}
-    )?.default :
+            {default?: null | typeof ReactUseAnimations}
+    )?.default ?? ReactUseAnimations :
     null
 export const lockAnimation: (
     null | typeof ReactUseAnimationsLockAnimation | undefined
@@ -80,8 +80,8 @@ export const lockAnimation: (
     IS_BROWSER ?
         (ReactUseAnimationsLockAnimation as
             unknown as
-            {default: null | typeof ReactUseAnimationsLockAnimation}
-        )?.default :
+            {default?: null | typeof ReactUseAnimationsLockAnimation}
+        )?.default ?? ReactUseAnimationsLockAnimation :
         null
 export const plusToXAnimation: (
     null | typeof ReactUseAnimationsPlusToXAnimation | undefined
@@ -89,8 +89,8 @@ export const plusToXAnimation: (
     IS_BROWSER ?
         (ReactUseAnimationsPlusToXAnimation as
             unknown as
-            {default: null | typeof ReactUseAnimationsPlusToXAnimation}
-        )?.default :
+            {default?: null | typeof ReactUseAnimationsPlusToXAnimation}
+        )?.default ?? ReactUseAnimationsPlusToXAnimation :
         null
 // endregion
 export const CSS_CLASS_NAMES = cssClassNames
