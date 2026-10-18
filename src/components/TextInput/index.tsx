@@ -217,7 +217,15 @@ export const TextInputInner = function<Type = unknown>(
             }
 
             const hide =
-                equals(properties.value, properties.default) as boolean
+                equals(properties.value, properties.default) as boolean ||
+                [null, undefined].includes(properties.value) &&
+                [null, undefined].includes(properties.default)
+            if (properties.name === 'simpleInput4')
+            console.log(
+                'A',
+                properties.name,
+                hide
+            )
             return {
                 icon: <GenericAnimate in={!hide}>
                     {(
@@ -226,7 +234,8 @@ export const TextInputInner = function<Type = unknown>(
                         plusToXAnimation
                     ) ?
                         <UseAnimations
-                            animation={plusToXAnimation} active={true}
+                            animation={plusToXAnimation}
+                            active={Boolean(properties.value)}
                         /> :
                         <Icon icon="clear" />
                     }
@@ -278,8 +287,7 @@ export const TextInputInner = function<Type = unknown>(
                     lockAnimation
                 ) ?
                     <UseAnimations
-                        animation={lockAnimation}
-                        active={!properties.hidden}
+                        animation={lockAnimation} active={!properties.hidden}
                     /> :
                     properties.hidden ? 'lock_open' : 'lock',
 
