@@ -19,18 +19,32 @@ export const textInput = (parent: Locator) => {
     const richtextEditorButton =
         parent.locator('.text-input__richtext-editor-button')
 
+    /*
+        NOTE: The plain input is animated out (and unmounted afterwards) while
+        the editor (which brings its own hidden textarea) is already mounted.
+        So wait until only one input node remains.
+    */
+    const waitForSingleInput = async () => {
+        while (await inputNode.count() > 1)
+            await timeout(20)
+    }
+
     const result = {
         main: parent,
         inputNode,
         richInputNode,
 
         activateCodeEditor: async () => {
-            if (await richInputNode.count() === 0)
+            if (await richInputNode.count() === 0) {
                 await codeEditorButton.click()
+                await waitForSingleInput()
+            }
         },
         activateRichtextEditor: async () => {
-            if (await richInputNode.count() === 0)
+            if (await richInputNode.count() === 0) {
                 await richtextEditorButton.click()
+                await waitForSingleInput()
+            }
         },
 
         getOptions: async () => {

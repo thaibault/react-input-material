@@ -13485,9 +13485,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-generic-tools@npm:^0.0.130":
-  version: 0.0.130
-  resolution: "react-generic-tools@npm:0.0.130"
+"react-generic-tools@npm:^0.0.135":
+  version: 0.0.135
+  resolution: "react-generic-tools@npm:0.0.135"
   peerDependencies:
     "@babel/preset-react": "*"
     "@types/prop-types": "*"
@@ -13510,7 +13510,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/bae1908928f577236af3a14667a8b8bc99fcfbc6ac1fbfd90a6c1793a35f8971722a4e1a7f96b4724dd94ffb98f0cc4017c5f85567c7b45d5d2047c60ee608e8
+  checksum: 10c0/af4ce79d6011e22caf1eb077b4887eb033e3122ed1f3f1120efbc157bd9388bd4e42956e5232037d3797cb118fe949ee09a1e9a9ab173a2070ca3eb43ad9ba24
   languageName: node
   linkType: hard
 
@@ -13588,7 +13588,7 @@ __metadata:
     react-dom: "npm:^18.3.1"
     react-generic-animate: "npm:^0.0.137"
     react-generic-dummy: "npm:^0.0.139"
-    react-generic-tools: "npm:^0.0.130"
+    react-generic-tools: "npm:^0.0.135"
     react-transition-group: "npm:^4.4.5"
     react-useanimations: "npm:^3.1.1"
     spark-md5: "npm:^3.0.2"
