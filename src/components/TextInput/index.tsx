@@ -218,8 +218,8 @@ export const TextInputInner = function<Type = unknown>(
 
             const hide =
                 equals(properties.value, properties.default) as boolean ||
-                [null, undefined].includes(properties.value) &&
-                [null, undefined].includes(properties.default)
+                [null, undefined].includes(properties.value as null) &&
+                [null, undefined].includes(properties.default as null)
             if (properties.name === 'simpleInput4')
             console.log(
                 'A',
