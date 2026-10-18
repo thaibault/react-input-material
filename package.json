@@ -35,6 +35,7 @@
       "style": "./dist/components/Checkbox/import.module.css"
     },
     "./components/Checkbox/harness": "./dist/components/Checkbox/harness.js",
+    "./components/Checkbox/harness.js": "./dist/components/Checkbox/harness.js",
     "./components/Checkbox/type": "./dist/components/Checkbox/type.js",
     "./components/FileInput": "./dist/components/FileInput/index.js",
     "./components/FileInput.css": {
@@ -44,6 +45,7 @@
       "style": "./dist/components/FileInput/import.module.css"
     },
     "./components/FileInput/harness": "./dist/components/FileInput/harness.js",
+    "./components/FileInput/harness.js": "./dist/components/FileInput/harness.js",
     "./components/FileInput/type": "./dist/components/FileInput/type.js",
     "./components/Inputs": "./dist/components/Inputs/index.js",
     "./components/Inputs.css": {
@@ -53,6 +55,7 @@
       "style": "./dist/components/Inputs/import.module.css"
     },
     "./components/Inputs/harness": "./dist/components/Inputs/harness.js",
+    "./components/Inputs/harness.js": "./dist/components/Inputs/harness.js",
     "./components/Inputs/type": "./dist/components/Inputs/type.js",
     "./components/Interval": "./dist/components/Interval/index.js",
     "./components/Interval.css": {
@@ -62,6 +65,7 @@
       "style": "./dist/components/Interval/import.module.css"
     },
     "./components/Interval/harness": "./dist/components/Interval/harness.js",
+    "./components/Interval/harness.js": "./dist/components/Interval/harness.js",
     "./components/Interval/type": "./dist/components/Interval/type.js",
     "./components/TextInput": "./dist/components/TextInput/index.js",
     "./components/TextInput.css": {
@@ -71,6 +75,7 @@
       "style": "./dist/components/TextInput/import.module.css"
     },
     "./components/TextInput/harness": "./dist/components/TextInput/harness.js",
+    "./components/TextInput/harness.js": "./dist/components/TextInput/harness.js",
     "./components/TextInput/type": "./dist/components/TextInput/type.js",
     "./components/WrapConfigurations": "./dist/components/Wrapper/WrapConfigurations.js",
     "./components/WrapStrict": "./dist/components/Wrapper/WrapStrict.js",
@@ -193,7 +198,7 @@
     "react-dom": "^18.3.1",
     "react-generic-animate": "^0.0.137",
     "react-generic-dummy": "^0.0.139",
-    "react-generic-tools": "^0.0.130",
+    "react-generic-tools": "^0.0.135",
     "react-transition-group": "^4.4.5",
     "react-useanimations": "^3.1.1",
     "spark-md5": "^3.0.2",
