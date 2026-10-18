@@ -28,6 +28,30 @@ export const textInput = (parent: Locator) => {
         while (await inputNode.count() > 1)
             await timeout(20)
     }
+    /*
+        NOTE: Opening and closing the menu is animated. Clicking again before
+        the animation has finished toggles the menu back, so wait until the
+        requested state has settled before clicking again.
+    */
+    const animatingMenuNode = menuNode.and(parent.locator(
+        '.mdc-menu-surface--animating-open, ' +
+        '.mdc-menu-surface--animating-closed'
+    ))
+    const setMenuOpen = async (open: boolean) => {
+        while (await result.isMenuOpen() !== open) {
+            await selectedItemNode.click()
+
+            let tries = 50
+            while (
+                tries-- > 0 &&
+                (
+                    await animatingMenuNode.count() > 0 ||
+                    await result.isMenuOpen() !== open
+                )
+            )
+                await timeout(20)
+        }
+    }
 
     const result = {
         main: parent,
@@ -73,25 +97,17 @@ export const textInput = (parent: Locator) => {
                 return
             }
 
-            while (!(await result.isMenuOpen())) {
-                await selectedItemNode.click()
-                await timeout(20)
-            }
+            await setMenuOpen(true)
             for (const listNode of await optionListNode.elementHandles())
                 if (await listNode.textContent() === valueRepresentation) {
-                    if (await result.inputValue() !== valueRepresentation)
-                        while (
-                            await result.inputValue() !== valueRepresentation
-                        ) {
-                            await listNode.click()
-                            await timeout(20)
-                        }
+                    while (await result.inputValue() !== valueRepresentation) {
+                        await setMenuOpen(true)
+                        await listNode.click()
+                        await timeout(20)
+                    }
                     break
                 }
-            while (await result.isMenuOpen()) {
-                await selectedItemNode.click()
-                await timeout(20)
-            }
+            await setMenuOpen(false)
         },
         inputValue: async () => {
             if (await inputNode.count() > 0)
