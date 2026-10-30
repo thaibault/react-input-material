@@ -210,7 +210,7 @@
     "typescript-plugin-css-modules": "^5.3.0",
     "web-component-wrapper": "^0.0.619",
     "web-documentation": "^1.0.64",
-    "weboptimizer": "^4.0.91",
+    "weboptimizer": "^4.0.96",
     "webpack": "5.112.2",
     "webpack-cli": "7.2.3",
     "webpack-dev-server": "^6.1.0"
