@@ -290,8 +290,13 @@ describe('TextInput/index', () => {
 
         [
             // E.g. will result at 9 o'clock in germany.
-            '0' +
-            `${String(new Date('1970-01-01T08:00:00.000Z').getHours())}:00`,
+            ((): string => {
+                const dateTime = new Date('1970-01-01T08:00:00.000Z')
+
+                return [dateTime.getHours(), dateTime.getMinutes()]
+                    .map((value: number) => String(value).padStart(2, '0'))
+                    .join(':')
+            })(),
             Date.parse('1970-01-01T08:00:00.000Z') / 1000,
             TRANSFORMER,
             {step: 60}
@@ -307,7 +312,11 @@ describe('TextInput/index', () => {
                 // E.g. will result at 8 o'clock in germany.
                 ((): number => {
                     const zeroDateTime = new Date(0)
-                    zeroDateTime.setHours(9)
+                    /*
+                        NOTE: Minutes have to be reset as well since local
+                        epoch is not a full hour in every time zone.
+                    */
+                    zeroDateTime.setHours(9, 0)
                     return zeroDateTime.getTime() / 1000
                 })(),
                 '09:00'
