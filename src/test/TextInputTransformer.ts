@@ -96,6 +96,10 @@ describe('TextInput/transformer', () => {
         [8 * 60 ** 2 + 30, '1970-01-01T08:00:30', TIMESTAMP_TRANSFORMER],
         [8 * 60 ** 2, '1970-01-01T08:00:00.000Z', TIMESTAMP_TRANSFORMER],
         [0, 'a1', TIMESTAMP_TRANSFORMER],
+        // Arbitrary text should not be interpreted as a date in year 2000.
+        [0, 'abc', TIMESTAMP_TRANSFORMER],
+        [0, '', TIMESTAMP_TRANSFORMER],
+        [0, '-', TIMESTAMP_TRANSFORMER],
         [10, new Date(10 * 1000), TIMESTAMP_TRANSFORMER],
         [Infinity, Infinity, TIMESTAMP_TRANSFORMER],
         [-Infinity, -Infinity, TIMESTAMP_TRANSFORMER],
@@ -133,6 +137,10 @@ describe('TextInput/transformer', () => {
             TIMESTAMP_TRANSFORMER
         ],
         [0, 'a1', TIMESTAMP_TRANSFORMER],
+        // Arbitrary text should not be interpreted as a date in year 2000.
+        [0, 'abc', TIMESTAMP_TRANSFORMER],
+        [0, '', TIMESTAMP_TRANSFORMER],
+        [0, '-', TIMESTAMP_TRANSFORMER],
         [10, new Date(10 * 1000), TIMESTAMP_TRANSFORMER],
         [Infinity, Infinity, TIMESTAMP_TRANSFORMER],
         [
