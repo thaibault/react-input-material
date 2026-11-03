@@ -35,6 +35,18 @@ const convertEdgeValueToString = (
 
     return null
 }
+/*
+    Matches native date time input representations ("YYYY-MM-DDTHH:MM" with
+    optional seconds) which have to be completed to utc date time strings.
+    NOTE: Completing arbitrary strings is not an option since the legacy date
+    parser interprets any text suffixed with ".000Z" as a date in year 2000.
+*/
+const DATE_TIME_INPUT_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/
+const parseDateTimeInputAsUTC = (value: string): number => {
+    const match = DATE_TIME_INPUT_PATTERN.exec(value)
+
+    return match ? Date.parse(`${value}${match[1] ? '' : ':00'}.000Z`) : NaN
+}
 const utcSecondsToISOString = (value: number): string =>
     (new Date(Math.round(value * 1000))).toISOString()
 const normalizeDateRepresentation = (
@@ -139,18 +151,14 @@ export const TRANSFORMER: DataTransformation = {
             value = normalizeDateRepresentation(value)
 
             if (typeof value === 'string') {
-                let parsedDate = Date.parse(`${value}:00.000Z`)
-                let modifiedParsing = isNaN(parsedDate)
+                let parsedDate = parseDateTimeInputAsUTC(value)
+                const modifiedParsing = isNaN(parsedDate)
                 if (modifiedParsing) {
-                    parsedDate = Date.parse(`${value}.000Z`)
-                    modifiedParsing = isNaN(parsedDate)
-                    if (modifiedParsing) {
-                        parsedDate = Date.parse(value)
-                        if (isNaN(parsedDate))
-                            value = parseFloat(value)
-                        else
-                            value = parsedDate / 1000
-                    }
+                    parsedDate = Date.parse(value)
+                    if (isNaN(parsedDate))
+                        value = parseFloat(value)
+                    else
+                        value = parsedDate / 1000
                 }
                 if (!modifiedParsing)
                     value = parsedDate / 1000
@@ -209,18 +217,14 @@ export const TRANSFORMER: DataTransformation = {
             value = normalizeDateRepresentation(value)
 
             if (typeof value === 'string') {
-                let parsedDate = Date.parse(`${value}:00.000Z`)
-                let modifiedParsing = isNaN(parsedDate)
+                let parsedDate = parseDateTimeInputAsUTC(value)
+                const modifiedParsing = isNaN(parsedDate)
                 if (modifiedParsing) {
-                    parsedDate = Date.parse(`${value}.000Z`)
-                    modifiedParsing = isNaN(parsedDate)
-                    if (modifiedParsing) {
-                        parsedDate = Date.parse(value)
-                        if (isNaN(parsedDate))
-                            value = parseFloat(value)
-                        else
-                            value = parsedDate / 1000
-                    }
+                    parsedDate = Date.parse(value)
+                    if (isNaN(parsedDate))
+                        value = parseFloat(value)
+                    else
+                        value = parsedDate / 1000
                 }
                 /*
                     NOTE: If needed to adapt formatted date time
