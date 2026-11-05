@@ -385,8 +385,7 @@
       "deDE",
       "enUS"
     ],
-    "tagline": "Do not refactor input fields anymore.<!--deDE:Nie wieder Eingabefelder anpassen.-->",
-    "trackingCode": "TODO"
+    "tagline": "Do not refactor input fields anymore.<!--deDE:Nie wieder Eingabefelder anpassen.-->"
   },
   "webOptimizer": {
     "commandLine": {
