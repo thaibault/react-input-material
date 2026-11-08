@@ -63,7 +63,7 @@ endregion */
     .file-input__iframe-wrapper--padding {
         /*
             Dummy value to avoid removing this class name during static
-            optimisation.
+            optimization.
         */
         visibility: visible;
     }
