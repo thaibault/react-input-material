@@ -24,7 +24,7 @@ Project Status
 [![lint](https://img.shields.io/github/actions/workflow/status/thaibault/react-input-material/lint.yaml?label=lint&style=for-the-badge)](https://github.com/thaibault/react-input-material/actions/workflows/lint.yaml)
 [![test](https://img.shields.io/github/actions/workflow/status/thaibault/react-input-material/test-coverage-report.yaml?label=test&style=for-the-badge)](https://github.com/thaibault/react-input-material/actions/workflows/test-coverage-report.yaml)
 
-[![code coverage](https://img.shields.io/coverallsCoverage/github/thaibault/react-input-material?label=code%20coverage&style=for-the-badge)](https://coveralls.io/github/thaibault/react-input-material)
+[![code coverage](https://img.shields.io/coverallsCoverage/github/thaibault/react-input-material?label=code%20coverage&style=for-the-badge)](https://coveralls.io/github/thaibault/react-input-material?branch=main)
 
 [![deploy web documentation](https://img.shields.io/github/actions/workflow/status/thaibault/react-input-material/deploy-web-documentation.yaml?label=deploy%20web%20documentation&style=for-the-badge)](https://github.com/thaibault/react-input-material/actions/workflows/deploy-web-documentation.yaml)
 [![web documentation](https://img.shields.io/website-up-down-green-red/https/tsickert.com/react-input-material.svg?label=web-documentation&style=for-the-badge)](https://tsickert.com/react-input-material)
