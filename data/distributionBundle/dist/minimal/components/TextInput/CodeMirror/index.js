@@ -1,0 +1,228 @@
+if(typeof window==='undefined'||window===null)var window=(typeof globalThis==='undefined'||globalThis===null)?{}:globalThis;import "core-js/modules/es.array.includes.js";
+import { forwardRef as __WEBPACK_EXTERNAL_MODULE_react_forwardRef__, useEffect as __WEBPACK_EXTERNAL_MODULE_react_useEffect__, useId as __WEBPACK_EXTERNAL_MODULE_react_useId__, useImperativeHandle as __WEBPACK_EXTERNAL_MODULE_react_useImperativeHandle__, useRef as __WEBPACK_EXTERNAL_MODULE_react_useRef__ } from "react";
+import { useMemorizedValue as __WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__, useReferenceState as __WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__ } from "react-generic-tools";
+import { NOOP as __WEBPACK_EXTERNAL_MODULE_clientnode_NOOP__ } from "clientnode";
+import { MDCTextField as __WEBPACK_EXTERNAL_MODULE__material_textfield_48c3b72f_MDCTextField__ } from "@material/textfield";
+import { Fragment as __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_Fragment__, jsx as __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__, jsxs as __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsxs__ } from "react/jsx-runtime";
+/******/ var __webpack_modules__ = ({
+
+/***/ 11:
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   $K: function() { return /* binding */ lineNumbers; },
+/* harmony export */   $t: function() { return /* binding */ EditorState; },
+/* harmony export */   $w: function() { return /* binding */ lintKeymap; },
+/* harmony export */   A: function() { return /* binding */ dropCursor; },
+/* harmony export */   AH: function() { return /* binding */ css; },
+/* harmony export */   Bc: function() { return /* binding */ closeBracketsKeymap; },
+/* harmony export */   D4: function() { return /* binding */ rectangularSelection; },
+/* harmony export */   EY: function() { return /* binding */ Text; },
+/* harmony export */   Eo: function() { return /* binding */ searchKeymap; },
+/* harmony export */   HJ: function() { return /* binding */ crosshairCursor; },
+/* harmony export */   Lv: function() { return /* binding */ foldGutter; },
+/* harmony export */   Lz: function() { return /* binding */ EditorView; },
+/* harmony export */   N$: function() { return /* binding */ highlightSpecialChars; },
+/* harmony export */   OO: function() { return /* binding */ completionKeymap; },
+/* harmony export */   Q2: function() { return /* binding */ javascript; },
+/* harmony export */   SG: function() { return /* binding */ bracketMatching; },
+/* harmony export */   VH: function() { return /* binding */ drawSelection; },
+/* harmony export */   WD: function() { return /* binding */ indentOnInput; },
+/* harmony export */   Wu: function() { return /* binding */ highlightActiveLineGutter; },
+/* harmony export */   Zt: function() { return /* binding */ defaultHighlightStyle; },
+/* harmony export */   b6: function() { return /* binding */ optionalsHistory; },
+/* harmony export */   cL: function() { return /* binding */ historyKeymap; },
+/* harmony export */   dz: function() { return /* binding */ highlightActiveLine; },
+/* harmony export */   f7: function() { return /* binding */ foldKeymap; },
+/* harmony export */   gN: function() { return /* binding */ highlightSelectionMatches; },
+/* harmony export */   pw: function() { return /* binding */ defaultKeymap; },
+/* harmony export */   w4: function() { return /* binding */ keymap; },
+/* harmony export */   wm: function() { return /* binding */ closeBrackets; },
+/* harmony export */   y9: function() { return /* binding */ syntaxHighlighting; },
+/* harmony export */   yU: function() { return /* binding */ autocompletion; }
+/* harmony export */ });
+/* unused harmony exports Tooltip, CharacterCount, EditorContent, useEditor */
+// #!/usr/bin/env babel-node
+// -*- coding: utf-8 -*-
+/** @module reactGenericDummy */var MOCK_RESULT=undefined;// @rmwc/tooltip
+var Tooltip=(/* unused pure expression or super */ null && (MOCK_RESULT));// @tiptap/extensions
+var CharacterCount=(/* unused pure expression or super */ null && (MOCK_RESULT));// @tiptap/react
+var EditorContent=(/* unused pure expression or super */ null && (MOCK_RESULT));var useEditor=(/* unused pure expression or super */ null && (MOCK_RESULT));// @codemirror/state
+var EditorState=MOCK_RESULT;var Text=MOCK_RESULT;// @codemirror/view
+var EditorView=MOCK_RESULT;// @codemirror/autocomplete
+var autocompletion=MOCK_RESULT;// @codemirror/language
+var bracketMatching=MOCK_RESULT;var closeBrackets=MOCK_RESULT;var closeBracketsKeymap=MOCK_RESULT;var completionKeymap=MOCK_RESULT;var crosshairCursor=MOCK_RESULT;var css=MOCK_RESULT;var defaultHighlightStyle=MOCK_RESULT;var defaultKeymap=MOCK_RESULT;var drawSelection=MOCK_RESULT;var dropCursor=MOCK_RESULT;var foldGutter=MOCK_RESULT;var foldKeymap=MOCK_RESULT;var highlightActiveLine=MOCK_RESULT;var highlightActiveLineGutter=MOCK_RESULT;var highlightSelectionMatches=MOCK_RESULT;var highlightSpecialChars=MOCK_RESULT;var indentOnInput=MOCK_RESULT;var javascript=MOCK_RESULT;var keymap=MOCK_RESULT;var lineNumbers=MOCK_RESULT;var lintKeymap=MOCK_RESULT;var rectangularSelection=MOCK_RESULT;var searchKeymap=MOCK_RESULT;var syntaxHighlighting=MOCK_RESULT;// @codemirror/commands
+// NOTE: We need to alias the history export to avoid a name mangeling.
+var optionalsHistory=MOCK_RESULT;var historyKeymap=MOCK_RESULT;
+
+/***/ })
+
+/******/ });
+/************************************************************************/
+/******/ // The module cache
+/******/ var __webpack_module_cache__ = {};
+/******/ 
+/******/ // The require function
+/******/ function __webpack_require__(moduleId) {
+/******/ 	// Check if module is in cache
+/******/ 	var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 	if (cachedModule !== undefined) {
+/******/ 		return cachedModule.exports;
+/******/ 	}
+/******/ 	// Create a new module (and put it into the cache)
+/******/ 	var module = __webpack_module_cache__[moduleId] = {
+/******/ 		// no module.id needed
+/******/ 		// no module.loaded needed
+/******/ 		exports: {}
+/******/ 	};
+/******/ 
+/******/ 	// Execute the module function
+/******/ 	__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 
+/******/ 	// Return the exports of the module
+/******/ 	return module.exports;
+/******/ }
+/******/ 
+/************************************************************************/
+/******/ /* webpack/runtime/define property getters */
+/******/ !function() {
+/******/ 	// define getter/value functions for harmony exports
+/******/ 	__webpack_require__.d = function(exports, definition) {
+/******/ 		if(Array.isArray(definition)) {
+/******/ 			var i = 0;
+/******/ 			while(i < definition.length) {
+/******/ 				var key = definition[i++];
+/******/ 				var binding = definition[i++];
+/******/ 				if(!__webpack_require__.o(exports, key)) {
+/******/ 					if(binding === 0) {
+/******/ 						Object.defineProperty(exports, key, { enumerable: true, value: definition[i++] });
+/******/ 					} else {
+/******/ 						Object.defineProperty(exports, key, { enumerable: true, get: binding });
+/******/ 					}
+/******/ 				} else if(binding === 0) { i++; }
+/******/ 			}
+/******/ 		} else {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		}
+/******/ 	};
+/******/ }();
+/******/ 
+/******/ /* webpack/runtime/hasOwnProperty shorthand */
+/******/ !function() {
+/******/ 	__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
+/******/ }();
+/******/ 
+/************************************************************************/
+
+;// external "core-js/modules/es.array.includes.js"
+
+;// external "react"
+
+;// external "react-generic-tools"
+
+// EXTERNAL MODULE: ./src/shims/optionals.ts
+var optionals = __webpack_require__(11);
+;// external "clientnode"
+
+;// external "@material/textfield"
+
+;// ./src/implementations/rmwc/TextArea/style.module.css
+// extracted by mini-css-extract-plugin
+/* harmony default export */ var style_module = ({"textInput":"text-input","codeEditor":"code-editor","mdcTextFieldDisabled":"mdc-text-field--disabled","cmEditor":"cm-editor","richtextEditor":"richtext-editor","richtextEditorBar":"richtext-editor__bar","richtextEditorMenuBar":"richtext-editor-menu-bar","mdcIconButtonChecked":"mdc-icon-button--checked","mdcTextFieldCharacterCounter":"mdc-text-field-character-counter","mdcTextFieldWithInternalCounter":"mdc-text-field--with-internal-counter"});
+;// external "react/jsx-runtime"
+
+;// ./src/implementations/rmwc/TextArea/index.tsx
+// -*- coding: utf-8 -*-
+/** @module TextArea *//* !
+    region header
+    [Project page](https://tsickert.com/react-material-input)
+
+    Copyright Torben Sickert (info["~at~"]tsickert.com) 16.12.2012
+
+    License
+    -------
+
+    This library written by Torben Sickert stands under a creative commons
+    naming 3.0 unported license.
+    See https://creativecommons.org/licenses/by/3.0/deed.de
+    endregion
+*/// region imports
+function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)}function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function _slicedToArray(e,i){return _iterableToArrayLimit(e,i)||_unsupportedIterableToArray(e,i)||_nonIterableRest()}function _nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return _arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?_arrayLikeToArray(t,e):void 0}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function _iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
+var CSS_CLASS_NAMES=style_module;var OUTLINED=false;var TextArea=/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_forwardRef__(function(properties,reference){var _properties$id,_properties$className,_properties$component,_properties$component2,_properties$helpText;var defaultID=__WEBPACK_EXTERNAL_MODULE_react_useId__();var id=(_properties$id=properties.id)!==null&&_properties$id!==void 0?_properties$id:defaultID;var classNamePrefix=(_properties$className=properties.classNamePrefix)!==null&&_properties$className!==void 0?_properties$className:"text-area";var _useReferenceState=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState2=_slicedToArray(_useReferenceState,2),inputReference=_useReferenceState2[0],setInputReference=_useReferenceState2[1];var _useReferenceState3=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState4=_slicedToArray(_useReferenceState3,2),materialTextFieldReference=_useReferenceState4[0],setMaterialTextFieldReference=_useReferenceState4[1];var _useReferenceState5=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState6=_slicedToArray(_useReferenceState5,2),labelReference=_useReferenceState6[0],setLabelReference=_useReferenceState6[1];var _useReferenceState7=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState8=_slicedToArray(_useReferenceState7,2),foundationReference=_useReferenceState8[0],setFoundationReference=_useReferenceState8[1];__WEBPACK_EXTERNAL_MODULE_react_useImperativeHandle__(reference,function(){return{foundation:foundationReference,input:inputReference,label:labelReference,materialTextField:materialTextFieldReference}},[foundationReference,inputReference,labelReference,materialTextFieldReference]);__WEBPACK_EXTERNAL_MODULE_react_useEffect__(function(){if(labelReference){var _materialTextFieldReference=new __WEBPACK_EXTERNAL_MODULE__material_textfield_48c3b72f_MDCTextField__(labelReference);setMaterialTextFieldReference(_materialTextFieldReference);setFoundationReference(_materialTextFieldReference.getDefaultFoundation());if(typeof properties.value==="string"){foundationReference===null||foundationReference===void 0||foundationReference.setValue(properties.value);_materialTextFieldReference.value=properties.value}if(typeof properties.disabled==="boolean"){foundationReference===null||foundationReference===void 0||foundationReference.setDisabled(properties.disabled);_materialTextFieldReference.disabled=properties.disabled}if(typeof properties.invalid==="boolean"){foundationReference===null||foundationReference===void 0||foundationReference.setValid(!properties.invalid);_materialTextFieldReference.valid=!properties.invalid}if(typeof properties.required==="boolean")_materialTextFieldReference.required=properties.required;foundationReference===null||foundationReference===void 0||foundationReference.setUseNativeValidation(false);return function(){_materialTextFieldReference.destroy()}}},[labelReference,properties.value,properties.disabled,properties.invalid,properties.required,properties.minimumLength,properties.maximumLength]);/*
+       NOTE: Applying the event listeners declaratively do not work to observe
+       events triggered by advanced editors manually.
+    */__WEBPACK_EXTERNAL_MODULE_react_useEffect__(function(){var onInput=properties.children?function(){/*
+                        Since we do not operate on the native textarea element
+                        we need to make sure that we stay in focus state when
+                        do clearing the textarea's input value.
+                    */setTimeout(function(){foundationReference===null||foundationReference===void 0||foundationReference.autoCompleteFocus()})}:__WEBPACK_EXTERNAL_MODULE_clientnode_NOOP__;inputReference===null||inputReference===void 0||inputReference.addEventListener("input",onInput);var onFocus=properties.children?function(){/*
+                        Since we do not operate on the native textarea element
+                        we need to make sure that we maintain focus state when
+                        focusing the advanced editor.
+                    */setTimeout(function(){foundationReference===null||foundationReference===void 0||foundationReference.activateFocus()})}:__WEBPACK_EXTERNAL_MODULE_clientnode_NOOP__;inputReference===null||inputReference===void 0||inputReference.addEventListener("focus",onFocus);return function(){inputReference===null||inputReference===void 0||inputReference.removeEventListener("input",onInput);inputReference===null||inputReference===void 0||inputReference.removeEventListener("focus",onFocus)}},[foundationReference,inputReference,properties.children]);// NOTE: Character count is only supported if maximum length is given.
+var isMaximumLength=typeof properties.maximumLength==="number"&&!isNaN(properties.maximumLength)&&properties.maximumLength!==Infinity&&properties.maximumLength>=0;var editorContent=/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsxs__(__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_Fragment__,{children:[/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__("textarea",_objectSpread({ref:setInputReference,id:id,name:properties.name,disabled:properties.disabled,className:"mdc-text-field__input",style:__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__(properties.children?_objectSpread({visibility:"hidden",position:"absolute"},properties.styles):properties.styles,properties.styles),rows:properties.rows,"aria-labelledby":"".concat(id,"-label"),"aria-controls":"".concat(id,"-helper"),"aria-describedby":"".concat(id,"-helper"),readOnly:Boolean(properties.children),value:properties.value,minLength:properties.minimumLength,maxLength:properties.maximumLength,onChange:properties.onChange,onClick:properties.onClick,onBlur:properties.onBlur,onFocus:properties.onFocus,onKeyUp:properties.onKeyUp,onKeyDown:properties.onKeyDown},properties.domNodeProperties)),properties.children,properties.barContentSlot?/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsxs__("div",{className:"".concat(classNamePrefix,"__bar"),children:[properties.barContentSlot,properties.characterCount&&isMaximumLength?/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__("div",{className:"mdc-text-field-character-counter"}):""]}):properties.characterCount&&isMaximumLength?/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__("div",{className:"mdc-text-field-character-counter"}):""]});var helpText=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__(_typeof(properties.helpText)==="object"?properties.helpText:{children:properties.helpText},properties.helpText);return/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsxs__(__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_Fragment__,{children:[/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsxs__("label",{ref:setLabelReference,onClick:__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__(function(event){if(properties.onLabelClick)properties.onLabelClick(event)},properties.onLabelClick),className:[classNamePrefix,"mdc-text-field","mdc-text-field--textarea"].concat(properties.value===""?"mdc-text-field--textarea":"".concat(classNamePrefix,"--has-content")).concat(properties.disabled?"mdc-text-field--disabled":[])/*
+                    eslint-disable @typescript-eslint/no-unnecessary-condition
+                */.concat(OUTLINED?"mdc-text-field--outlined":"mdc-text-field--filled")/*
+                    eslint-enable @typescript-eslint/no-unnecessary-condition
+                */.concat(properties.characterCount&&isMaximumLength?"mdc-text-field--with-internal-counter":[]).concat(properties.invalid?"mdc-text-field--invalid":[]).join(" "),children:[((_properties$component=properties.componentProperties)===null||_properties$component===void 0?void 0:_properties$component.ripple)!==false&&!properties.children?/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__("span",{className:"mdc-text-field__ripple"}):"",/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__("span",{className:"mdc-floating-label",id:"".concat(id,"-label"),children:properties.label}),properties.resizeable?/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__("span",{className:"mdc-text-field__resizer",children:editorContent}):editorContent,((_properties$component2=properties.componentProperties)===null||_properties$component2===void 0?void 0:_properties$component2.ripple)!==false?/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__("span",{className:"mdc-line-ripple"}):""]}),helpText.children?/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__("div",{className:"mdc-text-field-helper-line",children:/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__("div",{className:["mdc-text-field-helper-text"].concat(helpText.persistent?"mdc-text-field-helper-text--persistent":[]).join(" "),id:"".concat(id,"-helper"),children:(_properties$helpText=properties.helpText)!==null&&_properties$helpText!==void 0&&_properties$helpText.children?properties.helpText.children:properties.helpText})}):""]})})// NOTE: We need to refer classes to avoid loosing them due to tree shacking.
+;TextArea.CSS_CLASS_NAMES=CSS_CLASS_NAMES;/* harmony default export */ var rmwc_TextArea = (TextArea);
+;// ./src/components/TextInput/InputEventMapperWrapper/index.tsx
+// #!/usr/bin/env babel-node
+// -*- coding: utf-8 -*-
+/** @module TextInput *//* !
+    region header
+    [Project page](https://tsickert.com/react-material-input)
+
+    Copyright Torben Sickert (info["~at~"]tsickert.com) 16.12.2012
+
+    License
+    -------
+
+    This library written by Torben Sickert stands under a creative commons
+    naming 3.0 unported license.
+    See https://creativecommons.org/licenses/by/3.0/deed.de
+    endregion
+*/// region imports
+function InputEventMapperWrapper_typeof(o){"@babel/helpers - typeof";return InputEventMapperWrapper_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},InputEventMapperWrapper_typeof(o)}function InputEventMapperWrapper_ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function InputEventMapperWrapper_objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?InputEventMapperWrapper_ownKeys(Object(o),!0).forEach(function(t){InputEventMapperWrapper_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):InputEventMapperWrapper_ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function InputEventMapperWrapper_defineProperty(r,t,o){return(t=InputEventMapperWrapper_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function InputEventMapperWrapper_toPropertyKey(r){var o=InputEventMapperWrapper_toPrimitive(r,"string");return"symbol"==InputEventMapperWrapper_typeof(o)?o:o+""}function InputEventMapperWrapper_toPrimitive(t,e){if("object"!=InputEventMapperWrapper_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=InputEventMapperWrapper_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function InputEventMapperWrapper_slicedToArray(e,i){return InputEventMapperWrapper_iterableToArrayLimit(e,i)||InputEventMapperWrapper_unsupportedIterableToArray(e,i)||InputEventMapperWrapper_nonIterableRest()}function InputEventMapperWrapper_nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function InputEventMapperWrapper_unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return InputEventMapperWrapper_arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?InputEventMapperWrapper_arrayLikeToArray(t,e):void 0}}function InputEventMapperWrapper_arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function InputEventMapperWrapper_iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
+var Index=/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_forwardRef__(function(properties,reference){var _useReferenceState=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState2=InputEventMapperWrapper_slicedToArray(_useReferenceState,2),inputReference=_useReferenceState2[0],setInputReference=_useReferenceState2[1];__WEBPACK_EXTERNAL_MODULE_react_useImperativeHandle__(reference,function(){return{input:inputReference,/*
+                The event mapper can be used by the consuming parent component
+                to synchronize an instantiated editor with the native textarea
+                element here.
+            */eventMapper:{blur:function blur(event){if(inputReference!==null&&inputReference!==void 0&&inputReference.input){var syntheticEvent=new Event("blur");syntheticEvent.detail=event;inputReference.input.dispatchEvent(syntheticEvent)}},focus:function focus(event){if(inputReference!==null&&inputReference!==void 0&&inputReference.input){var syntheticEvent=new Event("focus");syntheticEvent.detail=event;inputReference.input.dispatchEvent(syntheticEvent)}},input:function input(value,event){if(inputReference!==null&&inputReference!==void 0&&inputReference.input){var syntheticEvent=new Event("input");syntheticEvent.detail=event;inputReference.input.value=String(value);inputReference.input.dispatchEvent(syntheticEvent)}}}}},[inputReference,inputReference===null||inputReference===void 0?void 0:inputReference.input]);return/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__(rmwc_TextArea,InputEventMapperWrapper_objectSpread(InputEventMapperWrapper_objectSpread({ref:setInputReference},properties),{},{children:properties.children}))});/* harmony default export */ var InputEventMapperWrapper = (Index);
+;// ./src/components/TextInput/style.module.css
+// extracted by mini-css-extract-plugin
+/* harmony default export */ var TextInput_style_module = ({"textInput":"text-input","textInputCodeEditorButton":"text-input__code-editor-button","textInputRichtextEditorButton":"text-input__richtext-editor-button","textInputSuggestions":"text-input__suggestions","textInputSuggestionsPending":"text-input__suggestions--pending","textInputSuggestionsSuggestion":"text-input__suggestions__suggestion","textInputSuggestionsSuggestionMark":"text-input__suggestions__suggestion__mark","codeEditor":"code-editor","cmContent":"cm-content","cmActiveLine":"cm-activeLine","cmGutters":"cm-gutters","cmActiveLineGutter":"cm-activeLineGutter","cmFocused":"cm-focused","codeEditorHasContent":"code-editor--has-content","codeEditorView":"code-editor__view","richtextEditor":"richtext-editor","richtextEditorBar":"richtext-editor__bar","richtextEditorMenuBar":"richtext-editor-menu-bar","richtextEditorView":"richtext-editor__view","tiptap":"tiptap"});
+;// ./src/components/TextInput/CodeMirror/index.tsx
+// #!/usr/bin/env babel-node
+// -*- coding: utf-8 -*-
+/** @module TextInput *//* !
+    region header
+    [Project page](https://tsickert.com/react-material-input)
+
+    Copyright Torben Sickert (info["~at~"]tsickert.com) 16.12.2012
+
+    License
+    -------
+
+    This library written by Torben Sickert stands under a creative commons
+    naming 3.0 unported license.
+    See https://creativecommons.org/licenses/by/3.0/deed.de
+    endregion
+*/// region imports
+function CodeMirror_typeof(o){"@babel/helpers - typeof";return CodeMirror_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},CodeMirror_typeof(o)}function CodeMirror_ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function CodeMirror_objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?CodeMirror_ownKeys(Object(o),!0).forEach(function(t){CodeMirror_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):CodeMirror_ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function CodeMirror_defineProperty(r,t,o){return(t=CodeMirror_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function CodeMirror_toPropertyKey(r){var o=CodeMirror_toPrimitive(r,"string");return"symbol"==CodeMirror_typeof(o)?o:o+""}function CodeMirror_toPrimitive(t,e){if("object"!=CodeMirror_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=CodeMirror_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function CodeMirror_slicedToArray(e,i){return CodeMirror_iterableToArrayLimit(e,i)||CodeMirror_unsupportedIterableToArray(e,i)||CodeMirror_nonIterableRest()}function CodeMirror_nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function CodeMirror_iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};function _toConsumableArray(a){return _arrayWithoutHoles(a)||_iterableToArray(a)||CodeMirror_unsupportedIterableToArray(a)||_nonIterableSpread()}function _nonIterableSpread(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function CodeMirror_unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return CodeMirror_arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?CodeMirror_arrayLikeToArray(t,e):void 0}}function _iterableToArray(r){var e="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){for(var t,o=[],a=e.call(r);!(t=a.next()).done;)o.push(t.value);return o}}function _arrayWithoutHoles(a){if(Array.isArray(a))return CodeMirror_arrayLikeToArray(a)}function CodeMirror_arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n};// endregion
+var BASIC_KEYMAPS=optionals/* autocompletion */.yU?[].concat(_toConsumableArray(optionals/* closeBracketsKeymap */.Bc),_toConsumableArray(optionals/* defaultKeymap */.pw),_toConsumableArray(optionals/* searchKeymap */.Eo),_toConsumableArray(optionals/* historyKeymap */.cL),_toConsumableArray(optionals/* foldKeymap */.f7),_toConsumableArray(optionals/* completionKeymap */.OO),_toConsumableArray(optionals/* lintKeymap */.$w)):[];var BASIC_EXTENSIONS=optionals/* EditorView */.Lz?[(0,optionals/* lineNumbers */.$K)(),(0,optionals/* highlightActiveLineGutter */.Wu)(),(0,optionals/* highlightSpecialChars */.N$)(),(0,optionals/* history */.b6)(),(0,optionals/* foldGutter */.Lv)(),(0,optionals/* drawSelection */.VH)(),(0,optionals/* dropCursor */.A)(),optionals/* EditorState */.$t.allowMultipleSelections.of(true),(0,optionals/* indentOnInput */.WD)(),(0,optionals/* syntaxHighlighting */.y9)(optionals/* defaultHighlightStyle */.Zt,{fallback:true}),(0,optionals/* bracketMatching */.SG)(),(0,optionals/* closeBrackets */.wm)(),(0,optionals/* autocompletion */.yU)(),(0,optionals/* rectangularSelection */.D4)(),(0,optionals/* crosshairCursor */.HJ)(),(0,optionals/* highlightActiveLine */.dz)(),(0,optionals/* highlightSelectionMatches */.gN)(),optionals/* keymap */.w4.of(BASIC_KEYMAPS)]:[];var CodeMirror_CSS_CLASS_NAMES=TextInput_style_module;/**
+ * Determines code language support for given mode name.
+ * @param name - Mode name to determine language support for.
+ * @returns Language support or "undefined" if not supported.
+ */var determineMode=function determineMode(name){if(!name)return undefined;if(optionals/* javascript */.Q2&&["js","jsx","ts","tsx","script","javascript","typescript"].includes(name.toLowerCase()))return (0,optionals/* javascript */.Q2)({jsx:true,typescript:true});if(optionals/* css */.AH&&["css","style","styles","cascadingstylesheet","cascadingstylesheets"].includes(name.toLowerCase()))return (0,optionals/* css */.AH)()};var CodeMirror_Index=/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_forwardRef__(function(properties,reference){var _properties$value,_properties$editor,_properties$editor$mo,_properties$editor2,_properties$editor3,_inputEventMapperRefe;if(!(optionals/* autocompletion */.yU&&optionals/* history */.b6&&optionals/* syntaxHighlighting */.y9&&optionals/* lintKeymap */.$w&&optionals/* searchKeymap */.Eo&&optionals/* EditorState */.$t&&optionals/* EditorView */.Lz))throw Error("Missing codemirror dependencies.");var value=(_properties$value=properties.value)!==null&&_properties$value!==void 0?_properties$value:"";var modeName=(_properties$editor=properties.editor)===null||_properties$editor===void 0?void 0:_properties$editor.modeName;var mode=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__((_properties$editor$mo=(_properties$editor2=properties.editor)===null||_properties$editor2===void 0?void 0:_properties$editor2.mode)!==null&&_properties$editor$mo!==void 0?_properties$editor$mo:determineMode(modeName),(_properties$editor3=properties.editor)===null||_properties$editor3===void 0?void 0:_properties$editor3.mode,modeName);var _useReferenceState=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState2=CodeMirror_slicedToArray(_useReferenceState,2),inputEventMapperReference=_useReferenceState2[0],setInputEventMapperReference=_useReferenceState2[1];var _useReferenceState3=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState4=CodeMirror_slicedToArray(_useReferenceState3,2),editorView=_useReferenceState4[0],setEditorView=_useReferenceState4[1];var _useReferenceState5=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState6=CodeMirror_slicedToArray(_useReferenceState5,2),editorViewReference=_useReferenceState6[0],setEditorViewReference=_useReferenceState6[1];__WEBPACK_EXTERNAL_MODULE_react_useImperativeHandle__(reference,function(){return{input:inputEventMapperReference,editorView:editorView,editorViewReference:editorViewReference}},[inputEventMapperReference,editorView,editorViewReference]);/*
+        NOTE: We do need to store the input event mapper reference in a ref
+        here, because otherwise we would need to re-initialize the editor on
+        every change of the input event mapper reference, which would cause a
+        lot of performance issues and also cause the editor to lose focus on
+        every change of the input event mapper reference.
+     */var internalInputEventMapperReference=__WEBPACK_EXTERNAL_MODULE_react_useRef__(inputEventMapperReference);internalInputEventMapperReference.current=inputEventMapperReference;__WEBPACK_EXTERNAL_MODULE_react_useEffect__(function(){if(!editorViewReference)return;var state=optionals/* EditorState */.$t.create({doc:String(value),extensions:[BASIC_EXTENSIONS,optionals/* EditorState */.$t.changeFilter.of(function(transaction){var newValue=transaction.state.doc.toString();if(transaction.startState.doc.toString()!==newValue){var _internalInputEventMa;if(properties.maximumLength!==undefined&&newValue.length>properties.maximumLength)return false;if(properties.disabled)return true;(_internalInputEventMa=internalInputEventMapperReference.current)===null||_internalInputEventMa===void 0||_internalInputEventMa.eventMapper.input(newValue,{transaction:transaction});if(properties.onChange)properties.onChange(newValue)}return true}),mode!==null&&mode!==void 0?mode:[]]});setEditorView(new optionals/* EditorView */.Lz({state:state,parent:editorViewReference}));return function(){if(editorView){editorView.destroy();setEditorView(null)}}},[editorViewReference,mode===null||mode===void 0?void 0:mode.language.name]);__WEBPACK_EXTERNAL_MODULE_react_useEffect__(function(){if(editorView&&properties.value!==editorView.state.doc.toString())editorView.state.update({changes:{from:0,insert:optionals/* Text */.EY.empty}},{changes:{from:0,insert:String(properties.value)}})},[editorView,properties.value]);var textAreaDomNode=inputEventMapperReference===null||inputEventMapperReference===void 0||(_inputEventMapperRefe=inputEventMapperReference.input)===null||_inputEventMapperRefe===void 0?void 0:_inputEventMapperRefe.input;__WEBPACK_EXTERNAL_MODULE_react_useEffect__(function(){var resizeObserver=new ResizeObserver(function(){var clientHeight=textAreaDomNode===null||textAreaDomNode===void 0?void 0:textAreaDomNode.clientHeight;if(editorViewReference&&clientHeight){var scrollableViewNode=editorViewReference.querySelector(".cm-scroller");if(scrollableViewNode){var newHeightValue=String(clientHeight)+"px";editorViewReference.style.height=newHeightValue;scrollableViewNode.style.height=newHeightValue;return}}});if(textAreaDomNode)resizeObserver.observe(textAreaDomNode);return function(){resizeObserver.disconnect()}},[editorViewReference,textAreaDomNode]);return/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__(InputEventMapperWrapper,CodeMirror_objectSpread(CodeMirror_objectSpread({},properties),{},{ref:setInputEventMapperReference,value:value,classNamePrefix:CodeMirror_CSS_CLASS_NAMES.codeEditor,onLabelClick:__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__(function(){editorViewReference===null||editorViewReference===void 0||editorViewReference.focus()},editorViewReference),children:/*#__PURE__*/__WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1_jsx__("div",{ref:setEditorViewReference,onBlur:__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__(function(event){inputEventMapperReference===null||inputEventMapperReference===void 0||inputEventMapperReference.eventMapper.blur(event);if(properties.onBlur)properties.onBlur(event)},inputEventMapperReference===null||inputEventMapperReference===void 0?void 0:inputEventMapperReference.eventMapper.blur,properties.onBlur),onFocus:__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__(function(event){inputEventMapperReference===null||inputEventMapperReference===void 0||inputEventMapperReference.eventMapper.focus(event);if(properties.onFocus)properties.onFocus(event)},inputEventMapperReference===null||inputEventMapperReference===void 0?void 0:inputEventMapperReference.eventMapper.focus,properties.onFocus),className:"".concat(CodeMirror_CSS_CLASS_NAMES.codeEditorView," mdc-text-field__input")})}))});/* harmony default export */ var CodeMirror = (CodeMirror_Index);
+export { BASIC_EXTENSIONS, BASIC_KEYMAPS, CodeMirror_CSS_CLASS_NAMES as CSS_CLASS_NAMES, CodeMirror_Index as Index, CodeMirror as default, determineMode };
