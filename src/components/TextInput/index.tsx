@@ -72,9 +72,6 @@ import type {
     ValueState
 } from './type'
 
-import {css} from '@codemirror/lang-css'
-import {javascript} from '@codemirror/lang-javascript'
-
 import {
     camelCaseToDelimited,
     copy,
@@ -88,7 +85,9 @@ import {
 
 import {
     forwardRef,
+    lazy,
     memo as memoize,
+    Suspense,
     useCallback,
     useEffect,
     useId,
@@ -127,8 +126,6 @@ import {
 import WrapConfigurations from '../Wrapper/WrapConfigurations'
 import WrapTooltip from '../Wrapper/WrapTooltip'
 
-import CodeEditorComponent from './CodeMirror/index'
-import RichTextEditorComponent from './Tiptap/index'
 import {
     CSS_CLASS_NAMES,
     determineValidationState,
@@ -157,6 +154,18 @@ export {
     TIPTAP_DEFAULT_OPTIONS
 } from './helper'
 export const INPUT_TRANSFORMER = TRANSFORMER
+/*
+    NOTE: Editors (and their heavy dependencies) are only loaded when an input
+    really needs them. They are referenced via their public package entry
+    points to remain separate modules in the final bundle (instead of
+    internal chunks which could not be resolved by consumers).
+*/
+const CodeEditorComponent = lazy(() =>
+    import('react-input-material/components/TextInput/CodeMirror')
+)
+const RichTextEditorComponent = lazy(() =>
+    import('react-input-material/components/TextInput/Tiptap')
+)
 
 /**
  * Generic text input wrapper component which automatically determines a useful
@@ -1732,33 +1741,12 @@ export const TextInputInner = function<Type = unknown>(
             const modeName = properties.editor.substring(
                 'code('.length, properties.editor.length - 1
             )
-            if (modeName) {
-                editorProperties.editor = {}
-                if (
-                    javascript as (object | undefined) &&
-                    [
-                        'js', 'jsx',
-                        'ts', 'tsx',
-                        'script', 'javascript',
-                        'typescript'
-                    ]
-                        .includes(modeName.toLowerCase())
-                )
-                    (editorProperties as CodeEditorProperties).editor.mode =
-                        javascript({jsx: true, typescript: true})
-                else if (
-                    css as (object | undefined) &&
-                    [
-                        'css',
-                        'style',
-                        'styles',
-                        'cascadingstylesheet',
-                        'cascadingstylesheets'
-                    ].includes(modeName.toLowerCase())
-                )
-                    (editorProperties as CodeEditorProperties).editor.mode =
-                        css()
-            }
+            if (modeName)
+                /*
+                    NOTE: The code editor determines its language support to
+                    load it only when needed.
+                */
+                editorProperties.editor = {modeName}
         } else
             editorProperties.editor = TIPTAP_DEFAULT_OPTIONS
     // region main markup
@@ -1806,7 +1794,7 @@ export const TextInputInner = function<Type = unknown>(
                 isSelection
             )}
             {isAdvancedEditor ?
-                isCodeEditor ?
+                <Suspense fallback="">{isCodeEditor ?
                     wrapAnimationConditionally(
                         <CodeEditorComponent
                             {...textInputProperties}
@@ -1853,7 +1841,8 @@ export const TextInputInner = function<Type = unknown>(
                                 unknown as
                                 RefObject<TipTapReference>
                         }
-                    /> :
+                    />
+                }</Suspense> :
                 ''
             }
             {wrapAnimationConditionally(
