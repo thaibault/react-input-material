@@ -41,6 +41,7 @@ import {
     getRepresentationFromValueSelection,
     getValueFromSelection,
     hashRegularExpression,
+    log,
     mapPropertiesIntoModel,
     normalizeSelection,
     parseValue,
@@ -139,9 +140,22 @@ describe('helper', (): void => {
 
         ['', null, {}],
         ['', 1, {}],
-        ['Hello World', 'Hello ${name}', {name: 'World'}],
-        ['', 'Hello ${', {}]
+        ['Hello World', 'Hello ${name}', {name: 'World'}]
     )
+    test('renderMessage warns about invalid templates', () => {
+        const warn = jest.spyOn(log, 'warn').mockImplementation(() =>
+            Promise.resolve()
+        )
+
+        expect(renderMessage('Hello ${', {})).toStrictEqual('')
+        expect(warn).toHaveBeenCalledTimes(1)
+        expect(warn).toHaveBeenCalledWith(
+            'Given message template could not be proceed:',
+            expect.any(String)
+        )
+
+        warn.mockRestore()
+    })
     test('triggerCallbackIfExists', async () => {
         const onChange = jest.fn()
         const properties = {model: {}, onChange} as unknown as
