@@ -1,0 +1,84 @@
+import type { ValueOf } from 'clientnode';
+import type BasePropertyTypes from 'clientnode/property-types';
+import type { GenericEvent } from 'react-generic-tools/type';
+import type { ComponentAdapter, PropertiesValidationMap } from 'web-component-wrapper/type';
+import type { IconProperties } from '../../implementations/type';
+import type { Component as BaseComponent, ModelState as BaseModelState } from '../../type';
+import type { AdapterWithReferences as TextInputAdapterWithReferences, Model as TextInputModel, Properties as TextInputProperties, Props as TextInputProps } from '../TextInput/type';
+export type DateTimeRepresentation = number | string;
+export interface Value {
+    end?: DateTimeRepresentation | null;
+    start?: DateTimeRepresentation | null;
+}
+export type IntervalTextInputModel = Omit<TextInputModel<DateTimeRepresentation | null>, 'maximum' | 'minimum'> & {
+    maximum: DateTimeRepresentation;
+    minimum: DateTimeRepresentation;
+};
+export type IntervalTextInputProps = Omit<TextInputProps<DateTimeRepresentation | null>, 'maximum' | 'minimum'> & {
+    maximum: DateTimeRepresentation;
+    minimum: DateTimeRepresentation;
+};
+export interface Configuration {
+    end: Partial<IntervalTextInputModel> | Partial<IntervalTextInputProps>;
+    start: Partial<IntervalTextInputModel> | Partial<IntervalTextInputProps>;
+}
+export type ModelState = BaseModelState;
+export interface Model {
+    name: string;
+    state?: ModelState;
+    value: {
+        end: IntervalTextInputModel;
+        start: IntervalTextInputModel;
+    };
+}
+export interface Properties extends Omit<TextInputProperties<DateTimeRepresentation | null>, 'icon' | 'model' | 'onChange' | 'onChangeValue' | 'value'> {
+    icon: IconProperties;
+    model: Model;
+    onChange: (properties: this, event?: GenericEvent) => void;
+    onChangeValue: (value: Value | null, event?: GenericEvent) => void;
+    value: Configuration;
+}
+type PartialValue = Partial<Omit<TextInputModel<DateTimeRepresentation | null>, 'value'>> & {
+    value: DateTimeRepresentation | null;
+};
+export type PartialModel = Partial<Omit<Properties['model'], 'state' | 'value'>> & {
+    value?: {
+        end?: PartialValue;
+        start?: PartialValue;
+    };
+    state?: Partial<ModelState>;
+};
+export type Props = Omit<TextInputProps<DateTimeRepresentation | null>, 'icon' | 'model' | 'onChange' | 'onChangeValue' | 'value'> & Partial<{
+    end: Partial<Omit<TextInputProps<DateTimeRepresentation | null>, 'maximum' | 'minimum'> & {
+        maximum: DateTimeRepresentation;
+        minimum: DateTimeRepresentation;
+    }>;
+    start: Partial<Omit<TextInputProps<DateTimeRepresentation | null>, 'maximum' | 'minimum'> & {
+        maximum: DateTimeRepresentation;
+        minimum: DateTimeRepresentation;
+    }>;
+    icon: IconProperties | string;
+    model?: PartialModel;
+    onChange: Properties['onChange'];
+    onChangeValue: Properties['onChangeValue'];
+    value?: Configuration | Value | null;
+}>;
+export type DefaultProperties = Omit<Props, 'model'> & {
+    model: Model;
+};
+export type PropertyTypes = {
+    [key in keyof Properties]: ValueOf<typeof BasePropertyTypes>;
+};
+export type Adapter = ComponentAdapter<Properties, {
+    value?: Value | null;
+}>;
+export interface AdapterWithReferences extends Adapter {
+    references: {
+        end: (TextInputAdapterWithReferences<DateTimeRepresentation | null> | null);
+        start: (TextInputAdapterWithReferences<DateTimeRepresentation | null> | null);
+    };
+}
+export type Component<ComponentType> = BaseComponent<Configuration | Value | null, ComponentType, Props, ModelState, DefaultProperties, Adapter>;
+export declare const propertyTypes: PropertiesValidationMap;
+export declare const defaultProperties: DefaultProperties;
+export {};
