@@ -68,6 +68,10 @@
     "./components/Interval/harness.js": "./dist/components/Interval/harness.js",
     "./components/Interval/type": "./dist/components/Interval/type.js",
     "./components/TextInput": "./dist/components/TextInput/index.js",
+    "./components/TextInput/CodeMirror": "./dist/components/TextInput/CodeMirror/index.js",
+    "./components/TextInput/CodeMirror.js": "./dist/components/TextInput/CodeMirror/index.js",
+    "./components/TextInput/Tiptap": "./dist/components/TextInput/Tiptap/index.js",
+    "./components/TextInput/Tiptap.js": "./dist/components/TextInput/Tiptap/index.js",
     "./components/TextInput.css": {
       "style": "./dist/components/TextInput/index.css"
     },
@@ -437,10 +441,12 @@
         "./components/Interval/import.module": "./implementations/rmwc/Interval/import.module",
         "./components/Interval/index": "./components/Interval/index",
         "./components/Interval/type": "./components/Interval/type",
+        "./components/TextInput/CodeMirror/index": "./components/TextInput/CodeMirror/index",
         "./components/TextInput/harness": "./components/TextInput/harness",
         "./components/TextInput/import.module": "./implementations/rmwc/TextField/import.module",
         "./components/TextInput/index": "./components/TextInput/index",
         "./components/TextInput/type": "./components/TextInput/type",
+        "./components/TextInput/Tiptap/index": "./components/TextInput/Tiptap/index",
         "./components/Wrapper/WrapConfigurations": "./components/Wrapper/WrapConfigurations",
         "./components/Wrapper/WrapStrict": "./components/Wrapper/WrapStrict",
         "./components/Wrapper/WrapThemeProvider": "./components/Wrapper/WrapThemeProvider",
@@ -489,6 +495,12 @@
         },
         "#implementations": {
           "__evaluate__": "path.resolve(self.path.source.base, 'implementations/rmwc')"
+        },
+        "react-input-material/components/TextInput/CodeMirror$": {
+          "__evaluate__": "2 < self.givenCommandLineArguments.length && (self.givenCommandLineArguments[2] === 'serve' || self.givenCommandLineArguments[2].startsWith('test')) ? path.resolve(self.path.source.base, 'components/TextInput/CodeMirror/index') : 'react-input-material/components/TextInput/CodeMirror'"
+        },
+        "react-input-material/components/TextInput/Tiptap$": {
+          "__evaluate__": "2 < self.givenCommandLineArguments.length && (self.givenCommandLineArguments[2] === 'serve' || self.givenCommandLineArguments[2].startsWith('test')) ? path.resolve(self.path.source.base, 'components/TextInput/Tiptap/index') : 'react-input-material/components/TextInput/Tiptap'"
         }
       },
       "cascadingStyleSheet": {
@@ -552,6 +564,17 @@
         "externalLibrary": {
           "dynamic": true,
           "normal": true
+        }
+      },
+      "module": {
+        "aliases": {
+          "#": "Bundles include the (otherwise lazily loaded) editors from source.",
+          "react-input-material/components/TextInput/CodeMirror$": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'components/TextInput/CodeMirror/index')"
+          },
+          "react-input-material/components/TextInput/Tiptap$": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'components/TextInput/Tiptap/index')"
+          }
         }
       },
       "path": {

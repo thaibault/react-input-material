@@ -18,6 +18,7 @@
 */
 // region imports
 import type {FocusEvent, ForwardedRef, ReactElement} from 'react'
+import type {LanguageSupport} from '@codemirror/language'
 import type {Extension, Transaction} from '@codemirror/state'
 import type {KeyBinding} from '@codemirror/view'
 
@@ -35,6 +36,8 @@ import {
     autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap
 } from '@codemirror/autocomplete'
 import {defaultKeymap, history, historyKeymap} from '@codemirror/commands'
+import {css} from '@codemirror/lang-css'
+import {javascript} from '@codemirror/lang-javascript'
 import {
     bracketMatching,
     defaultHighlightStyle,
@@ -99,6 +102,39 @@ export const BASIC_EXTENSIONS: Extension =
         []
 export const CSS_CLASS_NAMES = cssClassNames
 
+/**
+ * Determines code language support for given mode name.
+ * @param name - Mode name to determine language support for.
+ * @returns Language support or "undefined" if not supported.
+ */
+export const determineMode = (name?: string): LanguageSupport | undefined => {
+    if (!name)
+        return undefined
+
+    if (
+        javascript as (object | undefined) &&
+        [
+            'js', 'jsx',
+            'ts', 'tsx',
+            'script', 'javascript',
+            'typescript'
+        ].includes(name.toLowerCase())
+    )
+        return javascript({jsx: true, typescript: true})
+
+    if (
+        css as (object | undefined) &&
+        [
+            'css',
+            'style',
+            'styles',
+            'cascadingstylesheet',
+            'cascadingstylesheets'
+        ].includes(name.toLowerCase())
+    )
+        return css()
+}
+
 export interface Reference extends EditorReference {
     editorView: EditorView | null
     editorViewReference: HTMLDivElement | null
@@ -119,6 +155,13 @@ export const Index = forwardRef((
         throw Error('Missing codemirror dependencies.')
 
     const value = properties.value ?? ''
+
+    const modeName = properties.editor?.modeName
+    const mode = useMemorizedValue(
+        properties.editor?.mode ?? determineMode(modeName),
+        properties.editor?.mode,
+        modeName
+    )
 
     const [inputEventMapperReference, setInputEventMapperReference] =
         useReferenceState<InputEventMapperReference | null>(null)
@@ -180,7 +223,7 @@ export const Index = forwardRef((
 
                         return true
                     }),
-                    properties.editor?.mode ? properties.editor.mode : []
+                    mode ?? []
                 ]
             })
 
@@ -196,7 +239,7 @@ export const Index = forwardRef((
                 }
             }
         },
-        [editorViewReference, properties.editor?.mode?.language.name]
+        [editorViewReference, mode?.language.name]
     )
 
     useEffect(

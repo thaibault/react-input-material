@@ -201,6 +201,8 @@ export interface CodeMirrorProperties extends
 
     editor: {
         mode?: LanguageSupport
+        // Name of a supported mode (e.g. "css") to load on demand.
+        modeName?: string
     }
 }
 export type CodeMirrorProps = Partial<CodeMirrorProperties>
