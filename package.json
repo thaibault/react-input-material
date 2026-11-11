@@ -386,8 +386,9 @@
   },
   "webDocumentation": {
     "languages": [
+      "enUS",
       "deDE",
-      "enUS"
+      "frFR"
     ],
     "tagline": "Do not refactor input fields anymore.<!--deDE:Nie wieder Eingabefelder anpassen.-->"
   },
