@@ -13798,6 +13798,7 @@ __metadata:
     "@codemirror/view": "npm:^6.43.15"
     "@emotion/react": "npm:^11.14.0"
     "@eslint/js": "npm:^10.0.1"
+    "@material/textfield": "npm:^14.0.0"
     "@playwright/test": "npm:^1.65.0"
     "@rmwc/card": "npm:^14.3.5"
     "@rmwc/checkbox": "npm:^14.3.5"
@@ -13882,11 +13883,14 @@ __metadata:
     "@codemirror/search": "*"
     "@codemirror/state": "*"
     "@codemirror/view": "*"
+    "@material/textfield": "*"
     "@rmwc/card": "*"
     "@rmwc/checkbox": "*"
     "@rmwc/circular-progress": "*"
     "@rmwc/formfield": "*"
+    "@rmwc/icon": "*"
     "@rmwc/icon-button": "*"
+    "@rmwc/menu": "*"
     "@rmwc/select": "*"
     "@rmwc/textfield": "*"
     "@rmwc/theme": "*"
@@ -13905,8 +13909,12 @@ __metadata:
     core-js: "*"
     material-components-web: "*"
     material-icons: "*"
+    prop-types: "*"
     react: "*"
     react-dom: "*"
+    react-generic-animate: "*"
+    react-generic-dummy: "*"
+    react-generic-tools: "*"
     spark-md5: "*"
     tslib: "*"
   peerDependenciesMeta:
@@ -13930,6 +13938,8 @@ __metadata:
       optional: true
     "@codemirror/view":
       optional: true
+    "@material/textfield":
+      optional: true
     "@rmwc/card":
       optional: true
     "@rmwc/checkbox":
@@ -13938,7 +13948,11 @@ __metadata:
       optional: true
     "@rmwc/formfield":
       optional: true
+    "@rmwc/icon":
+      optional: true
     "@rmwc/icon-button":
+      optional: true
+    "@rmwc/menu":
       optional: true
     "@rmwc/select":
       optional: true
@@ -13976,9 +13990,17 @@ __metadata:
       optional: true
     material-icons:
       optional: true
+    prop-types:
+      optional: true
     react:
       optional: true
     react-dom:
+      optional: true
+    react-generic-animate:
+      optional: true
+    react-generic-dummy:
+      optional: true
+    react-generic-tools:
       optional: true
     react-transition-group:
       optional: true

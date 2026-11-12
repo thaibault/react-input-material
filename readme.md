@@ -135,6 +135,41 @@ import {
 } from 'react-input-material'
 ```
 
+<!--|deDE:Build-Varianten-->
+<!--|frFR:Variantes de build-->
+### Build variants
+
+Instead of installing all libraries above you can use a variant which
+already contains them. Only "react", "react-dom" and the icon font
+"material-icons" have to be installed then. Each variant offers the same
+paths as the default one below its own prefix, e.g.
+"react-input-material/bundle/components/TextInput" or
+"react-input-material/bundle/index.css":
+<!--deDE:
+    Statt alle oben genannten Bibliotheken zu installieren, können Sie eine
+    Variante verwenden, die sie bereits enthält. Dann müssen nur "react",
+    "react-dom" und die Icon-Schrift "material-icons" installiert sein. Jede
+    Variante bietet unterhalb ihres eigenen Präfixes dieselben Pfade wie die
+    Standardvariante, z. B.
+    "react-input-material/bundle/components/TextInput" oder
+    "react-input-material/bundle/index.css":
+-->
+<!--frFR:
+    Au lieu d'installer toutes les bibliothèques ci-dessus, vous pouvez
+    utiliser une variante qui les contient déjà. Seuls "react", "react-dom"
+    et la police d'icônes "material-icons" doivent alors être installés.
+    Chaque variante propose sous son propre préfixe les mêmes chemins que la
+    variante par défaut, par exemple
+    "react-input-material/bundle/components/TextInput" ou
+    "react-input-material/bundle/index.css":
+-->
+
+- "react-input-material/bundle": Everything included, also both editors.<!--deDE:"react-input-material/bundle": Alles enthalten, auch beide Editoren.--><!--frFR:"react-input-material/bundle": Tout est inclus, y compris les deux éditeurs.-->
+- "react-input-material/bundle/minimal": Everything included except the
+  editors, tooltips and animated icons, so it is much smaller.<!--deDE:"react-input-material/bundle/minimal": Alles enthalten außer den Editoren, Tooltips und animierten Icons, daher deutlich kleiner.--><!--frFR:"react-input-material/bundle/minimal": Tout est inclus sauf les éditeurs, les infobulles et les icônes animées, la variante est donc nettement plus légère.-->
+- "react-input-material/minimal": Like the default variant, but without
+  editors, tooltips and animated icons and their libraries.<!--deDE:"react-input-material/minimal": Wie die Standardvariante, aber ohne Editoren, Tooltips und animierte Icons sowie deren Bibliotheken.--><!--frFR:"react-input-material/minimal": Comme la variante par défaut, mais sans éditeurs, infobulles ni icônes animées et sans leurs bibliothèques.-->
+
 <!--|deDE:Optionale Funktionen-->
 <!--|frFR:Fonctionnalités optionnelles-->
 ### Optional features
