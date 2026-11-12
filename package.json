@@ -1080,7 +1080,9 @@
         "base": "src/"
       },
       "target": {
-        "base": "dist/"
+        "base": "dist/",
+        "#": "Lazy chunks are loaded via native \"import()\" which needs a resolvable (non bare) specifier.",
+        "public": "auto"
       }
     },
     "target:bundle": {

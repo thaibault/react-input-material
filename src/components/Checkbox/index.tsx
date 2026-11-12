@@ -450,7 +450,7 @@ export const CheckboxInner = function(
     return <WrapConfigurations
         strict={Checkbox.strict}
         themeConfiguration={properties.themeConfiguration}
-        tooltip={properties.tooltip}
+        tooltip={properties.tooltip ?? properties.declaration}
     >
         <LowLevelCheckbox
             value={Boolean(properties.value)}
