@@ -84,7 +84,7 @@
     "./components/WrapConfigurations": "./dist/components/Wrapper/WrapConfigurations.js",
     "./components/WrapStrict": "./dist/components/Wrapper/WrapStrict.js",
     "./components/WrapThemeProvider": "./dist/components/Wrapper/WrapThemeProvider.js",
-    "./components/WrapThemeTooltip": "./dist/components/Wrapper/WrapThemeTooltip.js",
+    "./components/WrapTooltip": "./dist/components/Wrapper/WrapTooltip.js",
     "./helper": "./dist/helper.js",
     "./implementations/rmwc/material.css": {
       "style": "./dist/implementations/rmwc/material.css"
@@ -93,7 +93,499 @@
       "style": "./dist/index.css"
     },
     "./shims/optionals": "./dist/shims/optionals.js",
-    "./type": "./dist/type.js"
+    "./type": "./dist/type.js",
+    "./minimal": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/minimal/index.js"
+    },
+    "./minimal/components/Checkbox": {
+      "types": "./dist/components/Checkbox/index.d.ts",
+      "default": "./dist/minimal/components/Checkbox/index.js"
+    },
+    "./minimal/components/Checkbox.css": {
+      "style": "./dist/minimal/components/Checkbox/index.css"
+    },
+    "./minimal/components/Checkbox.module.css": {
+      "style": "./dist/minimal/components/Checkbox/import.module.css"
+    },
+    "./minimal/components/Checkbox/harness": {
+      "types": "./dist/components/Checkbox/harness.d.ts",
+      "default": "./dist/minimal/components/Checkbox/harness.js"
+    },
+    "./minimal/components/Checkbox/harness.js": {
+      "types": "./dist/components/Checkbox/harness.d.ts",
+      "default": "./dist/minimal/components/Checkbox/harness.js"
+    },
+    "./minimal/components/Checkbox/type": {
+      "types": "./dist/components/Checkbox/type.d.ts",
+      "default": "./dist/minimal/components/Checkbox/type.js"
+    },
+    "./minimal/components/FileInput": {
+      "types": "./dist/components/FileInput/index.d.ts",
+      "default": "./dist/minimal/components/FileInput/index.js"
+    },
+    "./minimal/components/FileInput.css": {
+      "style": "./dist/minimal/components/FileInput/index.css"
+    },
+    "./minimal/components/FileInput.module.css": {
+      "style": "./dist/minimal/components/FileInput/import.module.css"
+    },
+    "./minimal/components/FileInput/harness": {
+      "types": "./dist/components/FileInput/harness.d.ts",
+      "default": "./dist/minimal/components/FileInput/harness.js"
+    },
+    "./minimal/components/FileInput/harness.js": {
+      "types": "./dist/components/FileInput/harness.d.ts",
+      "default": "./dist/minimal/components/FileInput/harness.js"
+    },
+    "./minimal/components/FileInput/type": {
+      "types": "./dist/components/FileInput/type.d.ts",
+      "default": "./dist/minimal/components/FileInput/type.js"
+    },
+    "./minimal/components/Inputs": {
+      "types": "./dist/components/Inputs/index.d.ts",
+      "default": "./dist/minimal/components/Inputs/index.js"
+    },
+    "./minimal/components/Inputs.css": {
+      "style": "./dist/minimal/components/Inputs/index.css"
+    },
+    "./minimal/components/Inputs.module.css": {
+      "style": "./dist/minimal/components/Inputs/import.module.css"
+    },
+    "./minimal/components/Inputs/harness": {
+      "types": "./dist/components/Inputs/harness.d.ts",
+      "default": "./dist/minimal/components/Inputs/harness.js"
+    },
+    "./minimal/components/Inputs/harness.js": {
+      "types": "./dist/components/Inputs/harness.d.ts",
+      "default": "./dist/minimal/components/Inputs/harness.js"
+    },
+    "./minimal/components/Inputs/type": {
+      "types": "./dist/components/Inputs/type.d.ts",
+      "default": "./dist/minimal/components/Inputs/type.js"
+    },
+    "./minimal/components/Interval": {
+      "types": "./dist/components/Interval/index.d.ts",
+      "default": "./dist/minimal/components/Interval/index.js"
+    },
+    "./minimal/components/Interval.css": {
+      "style": "./dist/minimal/components/Interval/index.css"
+    },
+    "./minimal/components/Interval.module.css": {
+      "style": "./dist/minimal/components/Interval/import.module.css"
+    },
+    "./minimal/components/Interval/harness": {
+      "types": "./dist/components/Interval/harness.d.ts",
+      "default": "./dist/minimal/components/Interval/harness.js"
+    },
+    "./minimal/components/Interval/harness.js": {
+      "types": "./dist/components/Interval/harness.d.ts",
+      "default": "./dist/minimal/components/Interval/harness.js"
+    },
+    "./minimal/components/Interval/type": {
+      "types": "./dist/components/Interval/type.d.ts",
+      "default": "./dist/minimal/components/Interval/type.js"
+    },
+    "./minimal/components/TextInput": {
+      "types": "./dist/components/TextInput/index.d.ts",
+      "default": "./dist/minimal/components/TextInput/index.js"
+    },
+    "./minimal/components/TextInput/CodeMirror": {
+      "types": "./dist/components/TextInput/CodeMirror/index.d.ts",
+      "default": "./dist/minimal/components/TextInput/CodeMirror/index.js"
+    },
+    "./minimal/components/TextInput/CodeMirror.js": {
+      "types": "./dist/components/TextInput/CodeMirror/index.d.ts",
+      "default": "./dist/minimal/components/TextInput/CodeMirror/index.js"
+    },
+    "./minimal/components/TextInput/Tiptap": {
+      "types": "./dist/components/TextInput/Tiptap/index.d.ts",
+      "default": "./dist/minimal/components/TextInput/Tiptap/index.js"
+    },
+    "./minimal/components/TextInput/Tiptap.js": {
+      "types": "./dist/components/TextInput/Tiptap/index.d.ts",
+      "default": "./dist/minimal/components/TextInput/Tiptap/index.js"
+    },
+    "./minimal/components/TextInput.css": {
+      "style": "./dist/minimal/components/TextInput/index.css"
+    },
+    "./minimal/components/TextInput.module.css": {
+      "style": "./dist/minimal/components/TextInput/import.module.css"
+    },
+    "./minimal/components/TextInput/harness": {
+      "types": "./dist/components/TextInput/harness.d.ts",
+      "default": "./dist/minimal/components/TextInput/harness.js"
+    },
+    "./minimal/components/TextInput/harness.js": {
+      "types": "./dist/components/TextInput/harness.d.ts",
+      "default": "./dist/minimal/components/TextInput/harness.js"
+    },
+    "./minimal/components/TextInput/type": {
+      "types": "./dist/components/TextInput/type.d.ts",
+      "default": "./dist/minimal/components/TextInput/type.js"
+    },
+    "./minimal/components/WrapConfigurations": {
+      "types": "./dist/components/Wrapper/WrapConfigurations.d.ts",
+      "default": "./dist/minimal/components/Wrapper/WrapConfigurations.js"
+    },
+    "./minimal/components/WrapStrict": {
+      "types": "./dist/components/Wrapper/WrapStrict.d.ts",
+      "default": "./dist/minimal/components/Wrapper/WrapStrict.js"
+    },
+    "./minimal/components/WrapThemeProvider": {
+      "types": "./dist/components/Wrapper/WrapThemeProvider.d.ts",
+      "default": "./dist/minimal/components/Wrapper/WrapThemeProvider.js"
+    },
+    "./minimal/components/WrapTooltip": {
+      "types": "./dist/components/Wrapper/WrapTooltip.d.ts",
+      "default": "./dist/minimal/components/Wrapper/WrapTooltip.js"
+    },
+    "./minimal/helper": {
+      "types": "./dist/helper.d.ts",
+      "default": "./dist/minimal/helper.js"
+    },
+    "./minimal/implementations/rmwc/material.css": {
+      "style": "./dist/minimal/implementations/rmwc/material.css"
+    },
+    "./minimal/index.css": {
+      "style": "./dist/minimal/index.css"
+    },
+    "./minimal/shims/optionals": {
+      "types": "./dist/shims/optionals.d.ts",
+      "default": "./dist/minimal/shims/optionals.js"
+    },
+    "./minimal/type": {
+      "types": "./dist/type.d.ts",
+      "default": "./dist/minimal/type.js"
+    },
+    "./bundle": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/bundle/index.js"
+    },
+    "./bundle/components/Checkbox": {
+      "types": "./dist/components/Checkbox/index.d.ts",
+      "default": "./dist/bundle/components/Checkbox/index.js"
+    },
+    "./bundle/components/Checkbox.css": {
+      "style": "./dist/bundle/components/Checkbox/index.css"
+    },
+    "./bundle/components/Checkbox.module.css": {
+      "style": "./dist/bundle/components/Checkbox/import.module.css"
+    },
+    "./bundle/components/Checkbox/harness": {
+      "types": "./dist/components/Checkbox/harness.d.ts",
+      "default": "./dist/bundle/components/Checkbox/harness.js"
+    },
+    "./bundle/components/Checkbox/harness.js": {
+      "types": "./dist/components/Checkbox/harness.d.ts",
+      "default": "./dist/bundle/components/Checkbox/harness.js"
+    },
+    "./bundle/components/Checkbox/type": {
+      "types": "./dist/components/Checkbox/type.d.ts",
+      "default": "./dist/bundle/components/Checkbox/type.js"
+    },
+    "./bundle/components/FileInput": {
+      "types": "./dist/components/FileInput/index.d.ts",
+      "default": "./dist/bundle/components/FileInput/index.js"
+    },
+    "./bundle/components/FileInput.css": {
+      "style": "./dist/bundle/components/FileInput/index.css"
+    },
+    "./bundle/components/FileInput.module.css": {
+      "style": "./dist/bundle/components/FileInput/import.module.css"
+    },
+    "./bundle/components/FileInput/harness": {
+      "types": "./dist/components/FileInput/harness.d.ts",
+      "default": "./dist/bundle/components/FileInput/harness.js"
+    },
+    "./bundle/components/FileInput/harness.js": {
+      "types": "./dist/components/FileInput/harness.d.ts",
+      "default": "./dist/bundle/components/FileInput/harness.js"
+    },
+    "./bundle/components/FileInput/type": {
+      "types": "./dist/components/FileInput/type.d.ts",
+      "default": "./dist/bundle/components/FileInput/type.js"
+    },
+    "./bundle/components/Inputs": {
+      "types": "./dist/components/Inputs/index.d.ts",
+      "default": "./dist/bundle/components/Inputs/index.js"
+    },
+    "./bundle/components/Inputs.css": {
+      "style": "./dist/bundle/components/Inputs/index.css"
+    },
+    "./bundle/components/Inputs.module.css": {
+      "style": "./dist/bundle/components/Inputs/import.module.css"
+    },
+    "./bundle/components/Inputs/harness": {
+      "types": "./dist/components/Inputs/harness.d.ts",
+      "default": "./dist/bundle/components/Inputs/harness.js"
+    },
+    "./bundle/components/Inputs/harness.js": {
+      "types": "./dist/components/Inputs/harness.d.ts",
+      "default": "./dist/bundle/components/Inputs/harness.js"
+    },
+    "./bundle/components/Inputs/type": {
+      "types": "./dist/components/Inputs/type.d.ts",
+      "default": "./dist/bundle/components/Inputs/type.js"
+    },
+    "./bundle/components/Interval": {
+      "types": "./dist/components/Interval/index.d.ts",
+      "default": "./dist/bundle/components/Interval/index.js"
+    },
+    "./bundle/components/Interval.css": {
+      "style": "./dist/bundle/components/Interval/index.css"
+    },
+    "./bundle/components/Interval.module.css": {
+      "style": "./dist/bundle/components/Interval/import.module.css"
+    },
+    "./bundle/components/Interval/harness": {
+      "types": "./dist/components/Interval/harness.d.ts",
+      "default": "./dist/bundle/components/Interval/harness.js"
+    },
+    "./bundle/components/Interval/harness.js": {
+      "types": "./dist/components/Interval/harness.d.ts",
+      "default": "./dist/bundle/components/Interval/harness.js"
+    },
+    "./bundle/components/Interval/type": {
+      "types": "./dist/components/Interval/type.d.ts",
+      "default": "./dist/bundle/components/Interval/type.js"
+    },
+    "./bundle/components/TextInput": {
+      "types": "./dist/components/TextInput/index.d.ts",
+      "default": "./dist/bundle/components/TextInput/index.js"
+    },
+    "./bundle/components/TextInput/CodeMirror": {
+      "types": "./dist/components/TextInput/CodeMirror/index.d.ts",
+      "default": "./dist/bundle/components/TextInput/CodeMirror/index.js"
+    },
+    "./bundle/components/TextInput/CodeMirror.js": {
+      "types": "./dist/components/TextInput/CodeMirror/index.d.ts",
+      "default": "./dist/bundle/components/TextInput/CodeMirror/index.js"
+    },
+    "./bundle/components/TextInput/Tiptap": {
+      "types": "./dist/components/TextInput/Tiptap/index.d.ts",
+      "default": "./dist/bundle/components/TextInput/Tiptap/index.js"
+    },
+    "./bundle/components/TextInput/Tiptap.js": {
+      "types": "./dist/components/TextInput/Tiptap/index.d.ts",
+      "default": "./dist/bundle/components/TextInput/Tiptap/index.js"
+    },
+    "./bundle/components/TextInput.css": {
+      "style": "./dist/bundle/components/TextInput/index.css"
+    },
+    "./bundle/components/TextInput.module.css": {
+      "style": "./dist/bundle/components/TextInput/import.module.css"
+    },
+    "./bundle/components/TextInput/harness": {
+      "types": "./dist/components/TextInput/harness.d.ts",
+      "default": "./dist/bundle/components/TextInput/harness.js"
+    },
+    "./bundle/components/TextInput/harness.js": {
+      "types": "./dist/components/TextInput/harness.d.ts",
+      "default": "./dist/bundle/components/TextInput/harness.js"
+    },
+    "./bundle/components/TextInput/type": {
+      "types": "./dist/components/TextInput/type.d.ts",
+      "default": "./dist/bundle/components/TextInput/type.js"
+    },
+    "./bundle/components/WrapConfigurations": {
+      "types": "./dist/components/Wrapper/WrapConfigurations.d.ts",
+      "default": "./dist/bundle/components/Wrapper/WrapConfigurations.js"
+    },
+    "./bundle/components/WrapStrict": {
+      "types": "./dist/components/Wrapper/WrapStrict.d.ts",
+      "default": "./dist/bundle/components/Wrapper/WrapStrict.js"
+    },
+    "./bundle/components/WrapThemeProvider": {
+      "types": "./dist/components/Wrapper/WrapThemeProvider.d.ts",
+      "default": "./dist/bundle/components/Wrapper/WrapThemeProvider.js"
+    },
+    "./bundle/components/WrapTooltip": {
+      "types": "./dist/components/Wrapper/WrapTooltip.d.ts",
+      "default": "./dist/bundle/components/Wrapper/WrapTooltip.js"
+    },
+    "./bundle/helper": {
+      "types": "./dist/helper.d.ts",
+      "default": "./dist/bundle/helper.js"
+    },
+    "./bundle/implementations/rmwc/material.css": {
+      "style": "./dist/bundle/implementations/rmwc/material.css"
+    },
+    "./bundle/index.css": {
+      "style": "./dist/bundle/index.css"
+    },
+    "./bundle/shims/optionals": {
+      "types": "./dist/shims/optionals.d.ts",
+      "default": "./dist/bundle/shims/optionals.js"
+    },
+    "./bundle/type": {
+      "types": "./dist/type.d.ts",
+      "default": "./dist/bundle/type.js"
+    },
+    "./bundle/minimal": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/bundle/minimal/index.js"
+    },
+    "./bundle/minimal/components/Checkbox": {
+      "types": "./dist/components/Checkbox/index.d.ts",
+      "default": "./dist/bundle/minimal/components/Checkbox/index.js"
+    },
+    "./bundle/minimal/components/Checkbox.css": {
+      "style": "./dist/bundle/minimal/components/Checkbox/index.css"
+    },
+    "./bundle/minimal/components/Checkbox.module.css": {
+      "style": "./dist/bundle/minimal/components/Checkbox/import.module.css"
+    },
+    "./bundle/minimal/components/Checkbox/harness": {
+      "types": "./dist/components/Checkbox/harness.d.ts",
+      "default": "./dist/bundle/minimal/components/Checkbox/harness.js"
+    },
+    "./bundle/minimal/components/Checkbox/harness.js": {
+      "types": "./dist/components/Checkbox/harness.d.ts",
+      "default": "./dist/bundle/minimal/components/Checkbox/harness.js"
+    },
+    "./bundle/minimal/components/Checkbox/type": {
+      "types": "./dist/components/Checkbox/type.d.ts",
+      "default": "./dist/bundle/minimal/components/Checkbox/type.js"
+    },
+    "./bundle/minimal/components/FileInput": {
+      "types": "./dist/components/FileInput/index.d.ts",
+      "default": "./dist/bundle/minimal/components/FileInput/index.js"
+    },
+    "./bundle/minimal/components/FileInput.css": {
+      "style": "./dist/bundle/minimal/components/FileInput/index.css"
+    },
+    "./bundle/minimal/components/FileInput.module.css": {
+      "style": "./dist/bundle/minimal/components/FileInput/import.module.css"
+    },
+    "./bundle/minimal/components/FileInput/harness": {
+      "types": "./dist/components/FileInput/harness.d.ts",
+      "default": "./dist/bundle/minimal/components/FileInput/harness.js"
+    },
+    "./bundle/minimal/components/FileInput/harness.js": {
+      "types": "./dist/components/FileInput/harness.d.ts",
+      "default": "./dist/bundle/minimal/components/FileInput/harness.js"
+    },
+    "./bundle/minimal/components/FileInput/type": {
+      "types": "./dist/components/FileInput/type.d.ts",
+      "default": "./dist/bundle/minimal/components/FileInput/type.js"
+    },
+    "./bundle/minimal/components/Inputs": {
+      "types": "./dist/components/Inputs/index.d.ts",
+      "default": "./dist/bundle/minimal/components/Inputs/index.js"
+    },
+    "./bundle/minimal/components/Inputs.css": {
+      "style": "./dist/bundle/minimal/components/Inputs/index.css"
+    },
+    "./bundle/minimal/components/Inputs.module.css": {
+      "style": "./dist/bundle/minimal/components/Inputs/import.module.css"
+    },
+    "./bundle/minimal/components/Inputs/harness": {
+      "types": "./dist/components/Inputs/harness.d.ts",
+      "default": "./dist/bundle/minimal/components/Inputs/harness.js"
+    },
+    "./bundle/minimal/components/Inputs/harness.js": {
+      "types": "./dist/components/Inputs/harness.d.ts",
+      "default": "./dist/bundle/minimal/components/Inputs/harness.js"
+    },
+    "./bundle/minimal/components/Inputs/type": {
+      "types": "./dist/components/Inputs/type.d.ts",
+      "default": "./dist/bundle/minimal/components/Inputs/type.js"
+    },
+    "./bundle/minimal/components/Interval": {
+      "types": "./dist/components/Interval/index.d.ts",
+      "default": "./dist/bundle/minimal/components/Interval/index.js"
+    },
+    "./bundle/minimal/components/Interval.css": {
+      "style": "./dist/bundle/minimal/components/Interval/index.css"
+    },
+    "./bundle/minimal/components/Interval.module.css": {
+      "style": "./dist/bundle/minimal/components/Interval/import.module.css"
+    },
+    "./bundle/minimal/components/Interval/harness": {
+      "types": "./dist/components/Interval/harness.d.ts",
+      "default": "./dist/bundle/minimal/components/Interval/harness.js"
+    },
+    "./bundle/minimal/components/Interval/harness.js": {
+      "types": "./dist/components/Interval/harness.d.ts",
+      "default": "./dist/bundle/minimal/components/Interval/harness.js"
+    },
+    "./bundle/minimal/components/Interval/type": {
+      "types": "./dist/components/Interval/type.d.ts",
+      "default": "./dist/bundle/minimal/components/Interval/type.js"
+    },
+    "./bundle/minimal/components/TextInput": {
+      "types": "./dist/components/TextInput/index.d.ts",
+      "default": "./dist/bundle/minimal/components/TextInput/index.js"
+    },
+    "./bundle/minimal/components/TextInput/CodeMirror": {
+      "types": "./dist/components/TextInput/CodeMirror/index.d.ts",
+      "default": "./dist/bundle/minimal/components/TextInput/CodeMirror/index.js"
+    },
+    "./bundle/minimal/components/TextInput/CodeMirror.js": {
+      "types": "./dist/components/TextInput/CodeMirror/index.d.ts",
+      "default": "./dist/bundle/minimal/components/TextInput/CodeMirror/index.js"
+    },
+    "./bundle/minimal/components/TextInput/Tiptap": {
+      "types": "./dist/components/TextInput/Tiptap/index.d.ts",
+      "default": "./dist/bundle/minimal/components/TextInput/Tiptap/index.js"
+    },
+    "./bundle/minimal/components/TextInput/Tiptap.js": {
+      "types": "./dist/components/TextInput/Tiptap/index.d.ts",
+      "default": "./dist/bundle/minimal/components/TextInput/Tiptap/index.js"
+    },
+    "./bundle/minimal/components/TextInput.css": {
+      "style": "./dist/bundle/minimal/components/TextInput/index.css"
+    },
+    "./bundle/minimal/components/TextInput.module.css": {
+      "style": "./dist/bundle/minimal/components/TextInput/import.module.css"
+    },
+    "./bundle/minimal/components/TextInput/harness": {
+      "types": "./dist/components/TextInput/harness.d.ts",
+      "default": "./dist/bundle/minimal/components/TextInput/harness.js"
+    },
+    "./bundle/minimal/components/TextInput/harness.js": {
+      "types": "./dist/components/TextInput/harness.d.ts",
+      "default": "./dist/bundle/minimal/components/TextInput/harness.js"
+    },
+    "./bundle/minimal/components/TextInput/type": {
+      "types": "./dist/components/TextInput/type.d.ts",
+      "default": "./dist/bundle/minimal/components/TextInput/type.js"
+    },
+    "./bundle/minimal/components/WrapConfigurations": {
+      "types": "./dist/components/Wrapper/WrapConfigurations.d.ts",
+      "default": "./dist/bundle/minimal/components/Wrapper/WrapConfigurations.js"
+    },
+    "./bundle/minimal/components/WrapStrict": {
+      "types": "./dist/components/Wrapper/WrapStrict.d.ts",
+      "default": "./dist/bundle/minimal/components/Wrapper/WrapStrict.js"
+    },
+    "./bundle/minimal/components/WrapThemeProvider": {
+      "types": "./dist/components/Wrapper/WrapThemeProvider.d.ts",
+      "default": "./dist/bundle/minimal/components/Wrapper/WrapThemeProvider.js"
+    },
+    "./bundle/minimal/components/WrapTooltip": {
+      "types": "./dist/components/Wrapper/WrapTooltip.d.ts",
+      "default": "./dist/bundle/minimal/components/Wrapper/WrapTooltip.js"
+    },
+    "./bundle/minimal/helper": {
+      "types": "./dist/helper.d.ts",
+      "default": "./dist/bundle/minimal/helper.js"
+    },
+    "./bundle/minimal/implementations/rmwc/material.css": {
+      "style": "./dist/bundle/minimal/implementations/rmwc/material.css"
+    },
+    "./bundle/minimal/index.css": {
+      "style": "./dist/bundle/minimal/index.css"
+    },
+    "./bundle/minimal/shims/optionals": {
+      "types": "./dist/shims/optionals.d.ts",
+      "default": "./dist/bundle/minimal/shims/optionals.js"
+    },
+    "./bundle/minimal/type": {
+      "types": "./dist/type.d.ts",
+      "default": "./dist/bundle/minimal/type.js"
+    }
   },
   "main": "dist/index.js",
   "typesVersions": {
@@ -146,6 +638,7 @@
     "@codemirror/view": "^6.43.15",
     "@emotion/react": "^11.14.0",
     "@eslint/js": "^10.0.1",
+    "@material/textfield": "^14.0.0",
     "@playwright/test": "^1.65.0",
     "@rmwc/card": "^14.3.5",
     "@rmwc/checkbox": "^14.3.5",
@@ -231,11 +724,14 @@
     "@codemirror/search": "*",
     "@codemirror/state": "*",
     "@codemirror/view": "*",
+    "@material/textfield": "*",
     "@rmwc/card": "*",
     "@rmwc/checkbox": "*",
     "@rmwc/circular-progress": "*",
     "@rmwc/formfield": "*",
+    "@rmwc/icon": "*",
     "@rmwc/icon-button": "*",
+    "@rmwc/menu": "*",
     "@rmwc/select": "*",
     "@rmwc/textfield": "*",
     "@rmwc/theme": "*",
@@ -254,8 +750,12 @@
     "core-js": "*",
     "material-components-web": "*",
     "material-icons": "*",
+    "prop-types": "*",
     "react": "*",
     "react-dom": "*",
+    "react-generic-animate": "*",
+    "react-generic-dummy": "*",
+    "react-generic-tools": "*",
     "spark-md5": "*",
     "tslib": "*"
   },
@@ -290,6 +790,9 @@
     "@codemirror/view": {
       "optional": true
     },
+    "@material/textfield": {
+      "optional": true
+    },
     "@rmwc/card": {
       "optional": true
     },
@@ -302,7 +805,13 @@
     "@rmwc/formfield": {
       "optional": true
     },
+    "@rmwc/icon": {
+      "optional": true
+    },
     "@rmwc/icon-button": {
+      "optional": true
+    },
+    "@rmwc/menu": {
       "optional": true
     },
     "@rmwc/select": {
@@ -359,10 +868,22 @@
     "material-icons": {
       "optional": true
     },
+    "prop-types": {
+      "optional": true
+    },
     "react": {
       "optional": true
     },
     "react-dom": {
+      "optional": true
+    },
+    "react-generic-animate": {
+      "optional": true
+    },
+    "react-generic-dummy": {
+      "optional": true
+    },
+    "react-generic-tools": {
       "optional": true
     },
     "react-transition-group": {
@@ -563,6 +1084,20 @@
       }
     },
     "target:bundle": {
+      "injection": {
+        "#": "Keep react external so that bundled components use the application's react instance.",
+        "external": {
+          "implicit": {
+            "pattern": {
+              "include": {
+                "__append__": {
+                  "__evaluate__": "/^react(?:-dom)?(?:$|\\/)/"
+                }
+              }
+            }
+          }
+        }
+      },
       "inPlace": {
         "externalLibrary": {
           "dynamic": true,
@@ -596,7 +1131,13 @@
     "target:minimal": {
       "module": {
         "aliases": {
-          "#": "Remove unneeded optional dependencies.",
+          "#": "Remove unneeded optional dependencies. Lazily loaded editors have to use the shims as well instead of the full published editors.",
+          "react-input-material/components/TextInput/CodeMirror$": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'components/TextInput/CodeMirror/index')"
+          },
+          "react-input-material/components/TextInput/Tiptap$": {
+            "__evaluate__": "path.resolve(self.path.source.base, 'components/TextInput/Tiptap/index')"
+          },
           "@codemirror/autocomplete": {
             "__evaluate__": "path.resolve(self.path.source.base, 'shims/optionals')"
           },
