@@ -13,7 +13,7 @@
             ]
         }
     },
-    "extends": "./node_modules/weboptimizer/tsconfig.json",
+    "extends": "weboptimizer/tsconfig.json",
     "include": [
         "src/*.d.ts",
         "src/**/*.d.ts",
