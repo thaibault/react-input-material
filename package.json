@@ -1043,15 +1043,17 @@
           "#": "We have to add disable \"mergeRules\" since it removes some needed css directives otherwise.",
           "__async_evaluate__": "self.debug ? null : {preset: ['default', {autoprefixer: false, discardUnused: !self.library, mergeRules: false}]}"
         },
-        "terser": {
-          "terserOptions": {
-            "compress": {
-              "#": "To provide a logging output we need to exclude this feature.",
-              "drop_console": {
-                "__evaluate__": "false"
-              },
-              "drop_debugger": {
-                "__evaluate__": "false"
+        "javaScript": {
+          "minify": {
+            "options": {
+              "compress": {
+                "#": "To provide a logging output we need to exclude this feature.",
+                "drop_console": {
+                  "__evaluate__": "false"
+                },
+                "drop_debugger": {
+                  "__evaluate__": "false"
+                }
               }
             }
           }
