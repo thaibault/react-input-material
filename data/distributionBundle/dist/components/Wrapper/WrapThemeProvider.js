@@ -2,7 +2,7 @@ if(typeof window==='undefined'||window===null)var window=(typeof globalThis==='u
 import * as __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__ from "react/jsx-runtime";
 /******/ var __webpack_modules__ = ({
 
-/***/ 5:
+/***/ 9:
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
 var x = function(y) {
@@ -13,7 +13,7 @@ module.exports = x({ ["ThemeProvider"]: function() { return __WEBPACK_EXTERNAL_M
 
 /***/ }),
 
-/***/ 0:
+/***/ 4:
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
 var x = function(y) {
@@ -88,8 +88,8 @@ var __webpack_exports__ = {};
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   R: function() { return /* binding */ WrapThemeProvider; }
 /* harmony export */ });
-/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
+/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
 /** @module WrapThemeProvider *//* !
@@ -102,8 +102,8 @@ var __webpack_exports__ = {};
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 // endregion

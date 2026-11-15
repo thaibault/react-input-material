@@ -1,4 +1,8 @@
 if(typeof window==='undefined'||window===null)var window=(typeof globalThis==='undefined'||globalThis===null)?{}:globalThis;import * as __WEBPACK_EXTERNAL_MODULE__rmwc_typography_185e7768__ from "@rmwc/typography";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_array_push_js_baa3ea94__ from "core-js/modules/es.array.push.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_iterator_constructor_js_833f4df9__ from "core-js/modules/es.iterator.constructor.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_iterator_filter_js_abae28b4__ from "core-js/modules/es.iterator.filter.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_iterator_for_each_js_2628f2dd__ from "core-js/modules/es.iterator.for-each.js";
 import * as __WEBPACK_EXTERNAL_MODULE_react__ from "react";
 import * as __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__ from "react/jsx-runtime";
 import { CharacterCount as __WEBPACK_EXTERNAL_MODULE__tiptap_extensions_a8df0a89_CharacterCount__ } from "@tiptap/extensions";
@@ -17,7 +21,7 @@ var x = function(y) {
 	var x = {}; __webpack_require__.d(x, y); return x
 } 
 var y = function(x) { return function() { return x; }; }
-module.exports = x({ ["Fragment"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.Fragment; }, ["jsx"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.jsx; }, ["jsxs"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.jsxs; } });
+module.exports = x({  });
 
 /***/ }),
 /* 1 */
@@ -27,17 +31,57 @@ var x = function(y) {
 	var x = {}; __webpack_require__.d(x, y); return x
 } 
 var y = function(x) { return function() { return x; }; }
+module.exports = x({  });
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({  });
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({  });
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({ ["Fragment"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.Fragment; }, ["jsx"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.jsx; }, ["jsxs"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.jsxs; } });
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
 module.exports = x({ ["createContext"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.createContext; }, ["forwardRef"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.forwardRef; }, ["useContext"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useContext; }, ["useEffect"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useEffect; }, ["useId"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useId; }, ["useImperativeHandle"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useImperativeHandle; } });
 
 /***/ }),
-/* 2 */,
-/* 3 */,
-/* 4 */,
-/* 5 */,
 /* 6 */,
 /* 7 */,
 /* 8 */,
-/* 9 */
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */,
+/* 13 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -48,14 +92,22 @@ __webpack_require__.d(__webpack_exports__, {
 
 // UNUSED EXPORTS: WrapTooltip, isDummy
 
+// EXTERNAL MODULE: external "core-js/modules/es.array.push.js"
+var es_array_push_js_ = __webpack_require__(1);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.constructor.js"
+var es_iterator_constructor_js_ = __webpack_require__(0);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.filter.js"
+var es_iterator_filter_js_ = __webpack_require__(2);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.for-each.js"
+var es_iterator_for_each_js_ = __webpack_require__(3);
 // EXTERNAL MODULE: ./src/shims/optionals.ts
-var optionals = __webpack_require__(13);
+var optionals = __webpack_require__(18);
 // EXTERNAL MODULE: external "@rmwc/typography"
-var typography_ = __webpack_require__(12);
+var typography_ = __webpack_require__(17);
 // EXTERNAL MODULE: external "react"
-var external_react_ = __webpack_require__(1);
+var external_react_ = __webpack_require__(5);
 // EXTERNAL MODULE: external "react/jsx-runtime"
-var jsx_runtime_ = __webpack_require__(0);
+var jsx_runtime_ = __webpack_require__(4);
 ;// ./src/implementations/rmwc/Tooltip.tsx
 // -*- coding: utf-8 -*-
 /** @module Tooltip *//* !
@@ -68,8 +120,8 @@ var jsx_runtime_ = __webpack_require__(0);
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)}function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)};// endregion
@@ -87,8 +139,8 @@ var isDummy=!optionals/* Tooltip */.m_||Boolean(optionals/* Tooltip */.m_.isDumm
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 // endregion
@@ -102,9 +154,10 @@ var WrapTooltip_isDummy=!rmwc_Tooltip||Boolean(rmwc_Tooltip.isDummy);/**
  */var WrapTooltip=function WrapTooltip(_ref){var children=_ref.children,value=_ref.value;if(typeof value==="string")return/*#__PURE__*/(0,jsx_runtime_.jsx)(rmwc_Tooltip,{value:value,children:children});return/*#__PURE__*/(0,jsx_runtime_.jsx)(jsx_runtime_.Fragment,{children:children})};/* harmony default export */ var Wrapper_WrapTooltip = (WrapTooltip);
 
 /***/ }),
-/* 10 */,
-/* 11 */,
-/* 12 */
+/* 14 */,
+/* 15 */,
+/* 16 */,
+/* 17 */
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
 var x = function(y) {
@@ -114,7 +167,7 @@ var y = function(x) { return function() { return x; }; }
 module.exports = x({ ["Typography"]: function() { return __WEBPACK_EXTERNAL_MODULE__rmwc_typography_185e7768__.Typography; } });
 
 /***/ }),
-/* 13 */
+/* 18 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -196,6 +249,14 @@ var optionalsHistory=(/* unused pure expression or super */ null && (MOCK_RESULT
 /******/ 
 /************************************************************************/
 
+// EXTERNAL MODULE: external "core-js/modules/es.array.push.js"
+var es_array_push_js_ = __webpack_require__(1);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.constructor.js"
+var es_iterator_constructor_js_ = __webpack_require__(0);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.filter.js"
+var es_iterator_filter_js_ = __webpack_require__(2);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.for-each.js"
+var es_iterator_for_each_js_ = __webpack_require__(3);
 ;// external "@tiptap/extensions"
 
 ;// external "@tiptap/react"
@@ -203,7 +264,7 @@ var optionalsHistory=(/* unused pure expression or super */ null && (MOCK_RESULT
 ;// external "@tiptap/starter-kit"
 
 // EXTERNAL MODULE: external "react"
-var external_react_ = __webpack_require__(1);
+var external_react_ = __webpack_require__(5);
 ;// external "react-generic-dummy"
 
 ;// external "react-generic-tools"
@@ -216,7 +277,7 @@ var external_react_ = __webpack_require__(1);
 // extracted by mini-css-extract-plugin
 /* harmony default export */ var style_module = ({"textInput":"text-input","codeEditor":"code-editor","mdcTextFieldDisabled":"mdc-text-field--disabled","cmEditor":"cm-editor","richtextEditor":"richtext-editor","richtextEditorBar":"richtext-editor__bar","richtextEditorMenuBar":"richtext-editor-menu-bar","mdcIconButtonChecked":"mdc-icon-button--checked","mdcTextFieldCharacterCounter":"mdc-text-field-character-counter","mdcTextFieldWithInternalCounter":"mdc-text-field--with-internal-counter"});
 // EXTERNAL MODULE: external "react/jsx-runtime"
-var jsx_runtime_ = __webpack_require__(0);
+var jsx_runtime_ = __webpack_require__(4);
 ;// ./src/implementations/rmwc/TextArea/index.tsx
 // -*- coding: utf-8 -*-
 /** @module TextArea *//* !
@@ -229,8 +290,8 @@ var jsx_runtime_ = __webpack_require__(0);
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)}function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function _slicedToArray(e,i){return _iterableToArrayLimit(e,i)||_unsupportedIterableToArray(e,i)||_nonIterableRest()}function _nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return _arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?_arrayLikeToArray(t,e):void 0}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function _iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
@@ -265,11 +326,11 @@ var isMaximumLength=typeof properties.maximumLength==="number"&&!isNaN(propertie
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
-function InputEventMapperWrapper_typeof(o){"@babel/helpers - typeof";return InputEventMapperWrapper_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},InputEventMapperWrapper_typeof(o)}function InputEventMapperWrapper_ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function InputEventMapperWrapper_objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?InputEventMapperWrapper_ownKeys(Object(o),!0).forEach(function(t){InputEventMapperWrapper_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):InputEventMapperWrapper_ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function InputEventMapperWrapper_defineProperty(r,t,o){return(t=InputEventMapperWrapper_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function InputEventMapperWrapper_toPropertyKey(r){var o=InputEventMapperWrapper_toPrimitive(r,"string");return"symbol"==InputEventMapperWrapper_typeof(o)?o:o+""}function InputEventMapperWrapper_toPrimitive(t,e){if("object"!=InputEventMapperWrapper_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=InputEventMapperWrapper_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function InputEventMapperWrapper_slicedToArray(e,i){return InputEventMapperWrapper_iterableToArrayLimit(e,i)||InputEventMapperWrapper_unsupportedIterableToArray(e,i)||InputEventMapperWrapper_nonIterableRest()}function InputEventMapperWrapper_nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function InputEventMapperWrapper_unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return InputEventMapperWrapper_arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?InputEventMapperWrapper_arrayLikeToArray(t,e):void 0}}function InputEventMapperWrapper_arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function InputEventMapperWrapper_iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
+function InputEventMapperWrapper_typeof(o){"@babel/helpers - typeof";return InputEventMapperWrapper_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},InputEventMapperWrapper_typeof(o)};function InputEventMapperWrapper_ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function InputEventMapperWrapper_objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?InputEventMapperWrapper_ownKeys(Object(o),!0).forEach(function(t){InputEventMapperWrapper_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):InputEventMapperWrapper_ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function InputEventMapperWrapper_defineProperty(r,t,o){return(t=InputEventMapperWrapper_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function InputEventMapperWrapper_toPropertyKey(r){var o=InputEventMapperWrapper_toPrimitive(r,"string");return"symbol"==InputEventMapperWrapper_typeof(o)?o:o+""}function InputEventMapperWrapper_toPrimitive(t,e){if("object"!=InputEventMapperWrapper_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=InputEventMapperWrapper_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function InputEventMapperWrapper_slicedToArray(e,i){return InputEventMapperWrapper_iterableToArrayLimit(e,i)||InputEventMapperWrapper_unsupportedIterableToArray(e,i)||InputEventMapperWrapper_nonIterableRest()}function InputEventMapperWrapper_nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function InputEventMapperWrapper_unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return InputEventMapperWrapper_arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?InputEventMapperWrapper_arrayLikeToArray(t,e):void 0}}function InputEventMapperWrapper_arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function InputEventMapperWrapper_iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
 var Index=/*#__PURE__*/(0,external_react_.forwardRef)(function(properties,reference){var _useReferenceState=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState2=InputEventMapperWrapper_slicedToArray(_useReferenceState,2),inputReference=_useReferenceState2[0],setInputReference=_useReferenceState2[1];(0,external_react_.useImperativeHandle)(reference,function(){return{input:inputReference,/*
                 The event mapper can be used by the consuming parent component
                 to synchronize an instantiated editor with the native textarea
@@ -292,14 +353,14 @@ var Index=/*#__PURE__*/(0,external_react_.forwardRef)(function(properties,refere
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
-function IconButton_typeof(o){"@babel/helpers - typeof";return IconButton_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},IconButton_typeof(o)}function IconButton_ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function IconButton_objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?IconButton_ownKeys(Object(o),!0).forEach(function(t){IconButton_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):IconButton_ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function IconButton_defineProperty(r,t,o){return(t=IconButton_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function IconButton_toPropertyKey(r){var o=IconButton_toPrimitive(r,"string");return"symbol"==IconButton_typeof(o)?o:o+""}function IconButton_toPrimitive(t,e){if("object"!=IconButton_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=IconButton_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function IconButton_slicedToArray(e,i){return IconButton_iterableToArrayLimit(e,i)||IconButton_unsupportedIterableToArray(e,i)||IconButton_nonIterableRest()}function IconButton_nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function IconButton_unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return IconButton_arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?IconButton_arrayLikeToArray(t,e):void 0}}function IconButton_arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function IconButton_iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
+function IconButton_typeof(o){"@babel/helpers - typeof";return IconButton_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},IconButton_typeof(o)};function IconButton_ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function IconButton_objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?IconButton_ownKeys(Object(o),!0).forEach(function(t){IconButton_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):IconButton_ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function IconButton_defineProperty(r,t,o){return(t=IconButton_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function IconButton_toPropertyKey(r){var o=IconButton_toPrimitive(r,"string");return"symbol"==IconButton_typeof(o)?o:o+""}function IconButton_toPrimitive(t,e){if("object"!=IconButton_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=IconButton_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function IconButton_slicedToArray(e,i){return IconButton_iterableToArrayLimit(e,i)||IconButton_unsupportedIterableToArray(e,i)||IconButton_nonIterableRest()}function IconButton_nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function IconButton_unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return IconButton_arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?IconButton_arrayLikeToArray(t,e):void 0}}function IconButton_arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function IconButton_iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
 var IconButton=/*#__PURE__*/(0,external_react_.forwardRef)(function(properties,reference){var _properties$size,_properties$className,_properties$component;var _useReferenceState=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState2=IconButton_slicedToArray(_useReferenceState,2),baseReference=_useReferenceState2[0],setBaseReference=_useReferenceState2[1];var _useReferenceState3=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState4=IconButton_slicedToArray(_useReferenceState3,2),foundationReference=_useReferenceState4[0],setFoundationReference=_useReferenceState4[1];(0,external_react_.useImperativeHandle)(reference,function(){return{base:baseReference,foundation:foundationReference}},[baseReference,foundationReference]);var size=(_properties$size=properties.size)===null||_properties$size===void 0?void 0:_properties$size.replace("extra-small","xsmall").replace("extra-large","xlarge");var fallbackComponentProperties=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__({});return/*#__PURE__*/(0,jsx_runtime_.jsx)(__WEBPACK_EXTERNAL_MODULE__rmwc_icon_button_347be2b6_IconButton__,IconButton_objectSpread({checked:properties.value,disabled:properties.disabled,className:(_properties$className=properties.classNames)===null||_properties$className===void 0?void 0:_properties$className.join(" "),style:properties.styles,icon:__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__({icon:properties.icon,size:size,strategy:properties.strategy},properties.icon,size,properties.strategy),onIcon:__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__({icon:properties.onIcon||properties.icon,size:size,strategy:properties.strategy},properties.onIcon,properties.icon,size,properties.strategy),onClick:properties.onClick,onChange:properties.onChange,ref:setBaseReference,foundationRef:setFoundationReference},(_properties$component=properties.componentProperties)!==null&&_properties$component!==void 0?_properties$component:fallbackComponentProperties))});/* harmony default export */ var rmwc_IconButton = (IconButton);
 // EXTERNAL MODULE: ./src/components/Wrapper/WrapTooltip.tsx + 1 modules
-var WrapTooltip = __webpack_require__(9);
+var WrapTooltip = __webpack_require__(13);
 ;// ./src/components/TextInput/Tiptap/MenuBar.tsx
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
@@ -313,8 +374,8 @@ var WrapTooltip = __webpack_require__(9);
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 // endregion
@@ -332,10 +393,10 @@ var EditorContext=/*#__PURE__*/(0,external_react_.createContext)(null);var Butto
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
-function Tiptap_typeof(o){"@babel/helpers - typeof";return Tiptap_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},Tiptap_typeof(o)}function Tiptap_ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function Tiptap_objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?Tiptap_ownKeys(Object(o),!0).forEach(function(t){Tiptap_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):Tiptap_ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function Tiptap_defineProperty(r,t,o){return(t=Tiptap_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function Tiptap_toPropertyKey(r){var o=Tiptap_toPrimitive(r,"string");return"symbol"==Tiptap_typeof(o)?o:o+""}function Tiptap_toPrimitive(t,e){if("object"!=Tiptap_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=Tiptap_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function _toConsumableArray(a){return _arrayWithoutHoles(a)||_iterableToArray(a)||Tiptap_unsupportedIterableToArray(a)||_nonIterableSpread()}function _nonIterableSpread(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _iterableToArray(r){var e="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){for(var t,o=[],a=e.call(r);!(t=a.next()).done;)o.push(t.value);return o}}function _arrayWithoutHoles(a){if(Array.isArray(a))return Tiptap_arrayLikeToArray(a)}function Tiptap_slicedToArray(e,i){return Tiptap_iterableToArrayLimit(e,i)||Tiptap_unsupportedIterableToArray(e,i)||Tiptap_nonIterableRest()}function Tiptap_nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function Tiptap_unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return Tiptap_arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?Tiptap_arrayLikeToArray(t,e):void 0}}function Tiptap_arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function Tiptap_iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
+function Tiptap_typeof(o){"@babel/helpers - typeof";return Tiptap_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},Tiptap_typeof(o)};function Tiptap_ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function Tiptap_objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?Tiptap_ownKeys(Object(o),!0).forEach(function(t){Tiptap_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):Tiptap_ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function Tiptap_defineProperty(r,t,o){return(t=Tiptap_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function Tiptap_toPropertyKey(r){var o=Tiptap_toPrimitive(r,"string");return"symbol"==Tiptap_typeof(o)?o:o+""}function Tiptap_toPrimitive(t,e){if("object"!=Tiptap_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=Tiptap_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function _toConsumableArray(a){return _arrayWithoutHoles(a)||_iterableToArray(a)||Tiptap_unsupportedIterableToArray(a)||_nonIterableSpread()}function _nonIterableSpread(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _iterableToArray(r){var e="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){for(var t,o=[],a=e.call(r);!(t=a.next()).done;)o.push(t.value);return o}}function _arrayWithoutHoles(a){if(Array.isArray(a))return Tiptap_arrayLikeToArray(a)}function Tiptap_slicedToArray(e,i){return Tiptap_iterableToArrayLimit(e,i)||Tiptap_unsupportedIterableToArray(e,i)||Tiptap_nonIterableRest()}function Tiptap_nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function Tiptap_unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return Tiptap_arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?Tiptap_arrayLikeToArray(t,e):void 0}}function Tiptap_arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function Tiptap_iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
 var Tiptap_CSS_CLASS_NAMES=TextInput_style_module;var VIEW_CONTENT_OFFSET_IN_PX=8;var Tiptap_Index=/*#__PURE__*/(0,external_react_.forwardRef)(function(properties,reference){var _properties$value,_properties$editor,_properties$editor2,_properties$editor3,_inputEventMapperRefe;if(!__WEBPACK_EXTERNAL_MODULE__tiptap_react_1196518f_useEditor__||__WEBPACK_EXTERNAL_MODULE__tiptap_starter_kit_35f0d10a_default__.isDummy)throw Error("Missing tiptap dependencies.");var value=(_properties$value=properties.value)!==null&&_properties$value!==void 0?_properties$value:"";var _useReferenceState=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState2=Tiptap_slicedToArray(_useReferenceState,2),inputEventMapperReference=_useReferenceState2[0],setInputEventMapperReference=_useReferenceState2[1];var _useReferenceState3=__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useReferenceState__(null),_useReferenceState4=Tiptap_slicedToArray(_useReferenceState3,2),editorViewReference=_useReferenceState4[0],setEditorViewReference=_useReferenceState4[1];(0,external_react_.useImperativeHandle)(reference,function(){return{input:inputEventMapperReference,editorViewReference:editorViewReference}},[inputEventMapperReference,editorViewReference]);var extensions=((_properties$editor=properties.editor)===null||_properties$editor===void 0?void 0:_properties$editor.extensions)||[].concat(_toConsumableArray(properties.maximumLength===undefined?[]:[__WEBPACK_EXTERNAL_MODULE__tiptap_extensions_a8df0a89_CharacterCount__.configure({limit:properties.maximumLength})]),[__WEBPACK_EXTERNAL_MODULE__tiptap_starter_kit_35f0d10a_default__.configure(((_properties$editor2=properties.editor)===null||_properties$editor2===void 0?void 0:_properties$editor2.starterKitOptions)||{})]);var editor=__WEBPACK_EXTERNAL_MODULE__tiptap_react_1196518f_useEditor__(Tiptap_objectSpread({extensions:extensions,editable:!properties.disabled,content:String(value),onBlur:function onBlur(editorEvent){inputEventMapperReference===null||inputEventMapperReference===void 0||inputEventMapperReference.eventMapper.blur(editorEvent);if(properties.onBlur)properties.onBlur(editorEvent)},onFocus:function onFocus(editorEvent){inputEventMapperReference===null||inputEventMapperReference===void 0||inputEventMapperReference.eventMapper.focus(editorEvent);if(properties.onFocus)properties.onFocus(editorEvent)},onUpdate:function onUpdate(editorEvent){var html=editorEvent.editor.getHTML();inputEventMapperReference===null||inputEventMapperReference===void 0||inputEventMapperReference.eventMapper.input(html==="<p></p>"?"":html,editorEvent);if(properties.onChange)properties.onChange(html,{contentTree:editorEvent.editor.getJSON()})}},((_properties$editor3=properties.editor)===null||_properties$editor3===void 0?void 0:_properties$editor3.options)||{}));var htmlContent=editor.getHTML();var clientHeight=inputEventMapperReference===null||inputEventMapperReference===void 0||(_inputEventMapperRefe=inputEventMapperReference.input)===null||_inputEventMapperRefe===void 0||(_inputEventMapperRefe=_inputEventMapperRefe.input)===null||_inputEventMapperRefe===void 0?void 0:_inputEventMapperRefe.clientHeight;(0,external_react_.useEffect)(function(){if(editorViewReference&&clientHeight)editorViewReference.style.height=String(clientHeight+VIEW_CONTENT_OFFSET_IN_PX)+"px"},[editorViewReference,clientHeight]);return/*#__PURE__*/(0,jsx_runtime_.jsx)(InputEventMapperWrapper,Tiptap_objectSpread(Tiptap_objectSpread({},properties),{},{ref:setInputEventMapperReference,barContentSlot:/*#__PURE__*/(0,jsx_runtime_.jsx)(MenuBar,{editor:editor}),value:htmlContent==="<p></p>"?"":htmlContent,classNamePrefix:Tiptap_CSS_CLASS_NAMES.richtextEditor,onLabelClick:__WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958_useMemorizedValue__(function(){editor.chain().focus().run()},editor),children:/*#__PURE__*/(0,jsx_runtime_.jsx)(__WEBPACK_EXTERNAL_MODULE__tiptap_react_1196518f_EditorContent__,{className:"".concat(Tiptap_CSS_CLASS_NAMES.richtextEditorView," mdc-text-field__input"),editor:editor,innerRef:setEditorViewReference})}))});/* harmony default export */ var Tiptap = (Tiptap_Index);
 export { Tiptap_CSS_CLASS_NAMES as CSS_CLASS_NAMES, Tiptap_Index as Index, VIEW_CONTENT_OFFSET_IN_PX, Tiptap as default };

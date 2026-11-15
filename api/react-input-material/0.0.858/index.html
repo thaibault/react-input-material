@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3>react-input-material 0.0.858</h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><!-- !/usr/bin/env markdown
+-*- coding: utf-8 -*-
+region header
+Copyright Torben Sickert (info["~at~"]tsickert.com) 16.12.2012
+
+License
+-------
+
+This library written by Torben Sickert stands under a creative commons naming
+4.0 international license.
+See https://creativecommons.org/licenses/by/4.0/deed.de
+endregion -->
+<!--|deDE:Projektstatus-->
+<!--|frFR:Statut du projet-->
+<h2>Project Status</h2>
+<p><a href="https://www.npmjs.com/package/react-input-material"><img src="https://img.shields.io/npm/v/react-input-material?color=%23d55e5d&amp;label=npm%20package%20version&amp;logoColor=%23d55e5d&amp;style=for-the-badge" alt="npm"></a>
+<a href="https://www.npmjs.com/package/react-input-material"><img src="https://img.shields.io/npm/dy/react-input-material.svg?style=for-the-badge" alt="npm downloads"></a></p>
+<p><a href="https://github.com/thaibault/react-input-material/actions/workflows/build.yaml"><img src="https://img.shields.io/github/actions/workflow/status/thaibault/react-input-material/build.yaml?style=for-the-badge" alt="build"></a>
+<a href="https://github.com/thaibault/react-input-material/actions/workflows/build-package-and-push.yaml"><img src="https://img.shields.io/github/actions/workflow/status/thaibault/react-input-material/build-package-and-push.yaml?label=build%20push%20package&amp;style=for-the-badge" alt="build push package"></a></p>
+<p><a href="https://github.com/thaibault/react-input-material/actions/workflows/check-types.yaml"><img src="https://img.shields.io/github/actions/workflow/status/thaibault/react-input-material/check-types.yaml?label=check%20types&amp;style=for-the-badge" alt="check types"></a>
+<a href="https://github.com/thaibault/react-input-material/actions/workflows/lint.yaml"><img src="https://img.shields.io/github/actions/workflow/status/thaibault/react-input-material/lint.yaml?label=lint&amp;style=for-the-badge" alt="lint"></a>
+<a href="https://github.com/thaibault/react-input-material/actions/workflows/test-coverage-report.yaml"><img src="https://img.shields.io/github/actions/workflow/status/thaibault/react-input-material/test-coverage-report.yaml?label=test&amp;style=for-the-badge" alt="test"></a></p>
+<p><a href="https://coveralls.io/github/thaibault/react-input-material"><img src="https://img.shields.io/coverallsCoverage/github/thaibault/react-input-material?label=code%20coverage&amp;style=for-the-badge" alt="code coverage"></a></p>
+<p><a href="https://github.com/thaibault/react-input-material/actions/workflows/deploy-web-documentation.yaml"><img src="https://img.shields.io/github/actions/workflow/status/thaibault/react-input-material/deploy-web-documentation.yaml?label=deploy%20web%20documentation&amp;style=for-the-badge" alt="deploy web documentation"></a>
+<a href="https://tsickert.com/react-input-material"><img src="https://img.shields.io/website-up-down-green-red/https/tsickert.com/react-input-material.svg?label=web-documentation&amp;style=for-the-badge" alt="web documentation"></a></p>
+<!--|deDE:Einsatzmöglichkeiten-->
+<!--|frFR:Cas d'utilisation-->
+<h2>Use case</h2>
+<p>Form inputs for React in Material Design, built on
+<a href="https://rmwc.io">RMWC</a>. One &quot;TextInput&quot; component covers plain and multiline
+text, numbers, currencies, dates and times, selections with search and
+suggestions, a code editor and a rich text editor. Further components handle
+checkboxes, files, time intervals and lists of inputs. All of them share the
+same model: declare constraints like &quot;required&quot;, &quot;minimum&quot; or &quot;pattern&quot; and
+the component validates, shows messages and reports value and validation
+state to you.</p>
+<!--deDE:
+    Formulareingaben für React im Material Design, aufgebaut auf
+    [RMWC](https://rmwc.io). Eine einzige Komponente "TextInput" deckt
+    einfachen und mehrzeiligen Text, Zahlen, Währungen, Datums- und
+    Zeitangaben, Auswahlen mit Suche und Vorschlägen, einen Code-Editor und
+    einen Rich-Text-Editor ab. Weitere Komponenten behandeln Checkboxen,
+    Dateien, Zeitintervalle und Listen von Eingaben. Alle teilen dasselbe
+    Modell: Sie deklarieren Bedingungen wie "required", "minimum" oder
+    "pattern", und die Komponente validiert, zeigt Meldungen an und meldet
+    Ihnen Wert und Validierungszustand.
+-->
+<!--frFR:
+    Des champs de formulaire pour React en Material Design, basés sur
+    [RMWC](https://rmwc.io). Un seul composant "TextInput" couvre le texte
+    simple et multiligne, les nombres, les devises, les dates et heures, les
+    sélections avec recherche et suggestions, un éditeur de code et un éditeur
+    de texte enrichi. D'autres composants gèrent les cases à cocher, les
+    fichiers, les intervalles de temps et les listes de champs. Tous partagent
+    le même modèle: déclarez des contraintes comme "required", "minimum" ou
+    "pattern" et le composant valide, affiche des messages et vous transmet la
+    valeur et l'état de validation.
+-->
+<p>Features included:</p>
+<!--deDE:Enthaltene Funktionen:-->
+<!--frFR:Fonctionnalités incluses:-->
+<ul>
+<li>&quot;TextInput&quot;: Text, numbers, currencies, dates, times, selections, code and
+rich text.<!--deDE:"TextInput": Text, Zahlen, Währungen, Datum, Uhrzeit, Auswahlen, Code und Rich Text.--><!--frFR:"TextInput": Texte, nombres, devises, dates, heures, sélections, code et texte enrichi.--></li>
+<li>&quot;Checkbox&quot;, &quot;FileInput&quot; with preview, &quot;Interval&quot; for time ranges and
+&quot;Inputs&quot; for dynamic lists of any input.<!--deDE:"Checkbox", "FileInput" mit Vorschau, "Interval" für Zeiträume und "Inputs" für dynamische Listen beliebiger Eingaben.--><!--frFR:"Checkbox", "FileInput" avec aperçu, "Interval" pour les plages horaires et "Inputs" pour des listes dynamiques de champs quelconques.--></li>
+<li>Declarative validation with customizable messages.<!--deDE:Deklarative Validierung mit anpassbaren Meldungen.--><!--frFR:Validation déclarative avec messages personnalisables.--></li>
+<li>Controlled and uncontrolled usage.<!--deDE:Kontrollierte und unkontrollierte Verwendung.--><!--frFR:Utilisation contrôlée et non contrôlée.--></li>
+<li>Editors are loaded lazily on first use.<!--deDE:Editoren werden erst bei der ersten Verwendung geladen.--><!--frFR:Les éditeurs ne sont chargés qu'à la première utilisation.--></li>
+<li>Theming, tooltips and Playwright harnesses for end-to-end tests.<!--deDE:Theming, Tooltips und Playwright-Harnesses für End-to-End-Tests.--><!--frFR:Thèmes, infobulles et harnais Playwright pour les tests de bout en bout.--></li>
+</ul>
+<div class="wd-table-of-contents">
+    <h2 id="content">Content<!--deDE:Inhalt--><!--frFR:Contenu--></h2>
+    <!--wd-table-of-contents-->
+</div>
+<h2>Installation</h2>
+<p>Install the package together with the libraries it builds on:</p>
+<!--deDE:
+    Installieren Sie das Paket zusammen mit den Bibliotheken, auf denen es
+    aufbaut:
+-->
+<!--frFR:
+    Installez le paquet avec les bibliothèques sur lesquelles il repose:
+-->
+<pre class="prettyprint source lang-bash"><code>npm install \
+    react-input-material \
+    clientnode core-js prop-types react react-dom \
+    react-generic-animate react-generic-dummy react-generic-tools \
+    react-transition-group react-useanimations blob-util spark-md5 \
+    material-icons \
+    @rmwc/card @rmwc/checkbox @rmwc/circular-progress @rmwc/icon \
+    @rmwc/icon-button @rmwc/menu @rmwc/select @rmwc/textfield @rmwc/theme \
+    @rmwc/typography
+</code></pre>
+<p>Include the styles and the icon font once, e.g. in your main stylesheet:</p>
+<!--deDE:
+    Binden Sie die Styles und die Icon-Schrift einmal ein, z. B. in Ihrem
+    Haupt-Stylesheet:
+-->
+<!--frFR:
+    Intégrez les styles et la police d'icônes une fois, par exemple dans
+    votre feuille de style principale:
+-->
+<pre class="prettyprint source lang-CSS"><code>@import &quot;material-icons/iconfont/material-icons.css&quot;;
+@import &quot;react-input-material/index.css&quot;;
+</code></pre>
+<p>Then use the components:</p>
+<!--deDE:Danach verwenden Sie die Komponenten:-->
+<!--frFR:Utilisez ensuite les composants:-->
+<pre class="prettyprint source lang-TypeScript"><code>import {
+    Checkbox, FileInput, Inputs, Interval, TextInput
+} from 'react-input-material'
+</code></pre>
+<!--|deDE:Build-Varianten-->
+<!--|frFR:Variantes de build-->
+<h3>Build variants</h3>
+<p>Instead of installing all libraries above you can use a variant which
+already contains them. Only &quot;react&quot;, &quot;react-dom&quot; and the icon font
+&quot;material-icons&quot; have to be installed then. Each variant offers the same
+paths as the default one below its own prefix, e.g.
+&quot;react-input-material/bundle/components/TextInput&quot; or
+&quot;react-input-material/bundle/index.css&quot;:</p>
+<!--deDE:
+    Statt alle oben genannten Bibliotheken zu installieren, können Sie eine
+    Variante verwenden, die sie bereits enthält. Dann müssen nur "react",
+    "react-dom" und die Icon-Schrift "material-icons" installiert sein. Jede
+    Variante bietet unterhalb ihres eigenen Präfixes dieselben Pfade wie die
+    Standardvariante, z. B.
+    "react-input-material/bundle/components/TextInput" oder
+    "react-input-material/bundle/index.css":
+-->
+<!--frFR:
+    Au lieu d'installer toutes les bibliothèques ci-dessus, vous pouvez
+    utiliser une variante qui les contient déjà. Seuls "react", "react-dom"
+    et la police d'icônes "material-icons" doivent alors être installés.
+    Chaque variante propose sous son propre préfixe les mêmes chemins que la
+    variante par défaut, par exemple
+    "react-input-material/bundle/components/TextInput" ou
+    "react-input-material/bundle/index.css":
+-->
+<ul>
+<li>&quot;react-input-material/bundle&quot;: Everything included, also both editors.<!--deDE:"react-input-material/bundle": Alles enthalten, auch beide Editoren.--><!--frFR:"react-input-material/bundle": Tout est inclus, y compris les deux éditeurs.--></li>
+<li>&quot;react-input-material/bundle/minimal&quot;: Everything included except the
+editors, tooltips and animated icons, so it is much smaller.<!--deDE:"react-input-material/bundle/minimal": Alles enthalten außer den Editoren, Tooltips und animierten Icons, daher deutlich kleiner.--><!--frFR:"react-input-material/bundle/minimal": Tout est inclus sauf les éditeurs, les infobulles et les icônes animées, la variante est donc nettement plus légère.--></li>
+<li>&quot;react-input-material/minimal&quot;: Like the default variant, but without
+editors, tooltips and animated icons and their libraries.<!--deDE:"react-input-material/minimal": Wie die Standardvariante, aber ohne Editoren, Tooltips und animierte Icons sowie deren Bibliotheken.--><!--frFR:"react-input-material/minimal": Comme la variante par défaut, mais sans éditeurs, infobulles ni icônes animées et sans leurs bibliothèques.--></li>
+</ul>
+<!--|deDE:Optionale Funktionen-->
+<!--|frFR:Fonctionnalités optionnelles-->
+<h3>Optional features</h3>
+<p>Some features need additional packages:</p>
+<!--deDE:Einige Funktionen benötigen zusätzliche Pakete:-->
+<!--frFR:Certaines fonctionnalités nécessitent des paquets supplémentaires:-->
+<ul>
+<li>Tooltips: &quot;@rmwc/tooltip&quot;.<!--deDE:Tooltips: "@rmwc/tooltip".--><!--frFR:Infobulles: "@rmwc/tooltip".--></li>
+<li>Code editor: &quot;@codemirror/autocomplete&quot;, &quot;@codemirror/commands&quot;,
+&quot;@codemirror/lang-css&quot;, &quot;@codemirror/lang-javascript&quot;,
+&quot;@codemirror/language&quot;, &quot;@codemirror/lint&quot;, &quot;@codemirror/search&quot;,
+&quot;@codemirror/state&quot; and &quot;@codemirror/view&quot;.<!--deDE:Code-Editor: "@codemirror/autocomplete", "@codemirror/commands", "@codemirror/lang-css", "@codemirror/lang-javascript", "@codemirror/language", "@codemirror/lint", "@codemirror/search", "@codemirror/state" und "@codemirror/view".--><!--frFR:Éditeur de code: "@codemirror/autocomplete", "@codemirror/commands", "@codemirror/lang-css", "@codemirror/lang-javascript", "@codemirror/language", "@codemirror/lint", "@codemirror/search", "@codemirror/state" et "@codemirror/view".--></li>
+<li>Rich text editor: &quot;@tiptap/core&quot;, &quot;@tiptap/extensions&quot;, &quot;@tiptap/react&quot; and
+&quot;@tiptap/starter-kit&quot;.<!--deDE:Rich-Text-Editor: "@tiptap/core", "@tiptap/extensions", "@tiptap/react" und "@tiptap/starter-kit".--><!--frFR:Éditeur de texte enrichi: "@tiptap/core", "@tiptap/extensions", "@tiptap/react" et "@tiptap/starter-kit".--></li>
+</ul>
+<p>If you do not install the packages of a feature, point them to the included
+empty shim so that your bundler can still resolve them. The feature is then
+left out. Example for the rich text editor with webpack, the code editor and
+tooltip packages work the same way:</p>
+<!--deDE:
+    Installieren Sie die Pakete einer Funktion nicht, verweisen Sie sie auf
+    den enthaltenen leeren Platzhalter, damit Ihr Bundler sie trotzdem
+    auflösen kann. Die Funktion wird dann weggelassen. Beispiel für den
+    Rich-Text-Editor mit webpack, die Pakete des Code-Editors und der
+    Tooltips funktionieren genauso:
+-->
+<!--frFR:
+    Si vous n'installez pas les paquets d'une fonctionnalité, faites-les
+    pointer vers le substitut vide inclus afin que votre bundler puisse
+    toujours les résoudre. La fonctionnalité est alors omise. Exemple pour
+    l'éditeur de texte enrichi avec webpack, les paquets de l'éditeur de code
+    et des infobulles fonctionnent de la même manière:
+-->
+<pre class="prettyprint source lang-JavaScript"><code>export default {
+    resolve: {
+        alias: {
+            '@tiptap/core$': 'react-input-material/shims/optionals',
+            '@tiptap/extensions$': 'react-input-material/shims/optionals',
+            '@tiptap/react$': 'react-input-material/shims/optionals',
+            '@tiptap/starter-kit$': 'react-generic-dummy'
+        }
+    }
+}
+</code></pre>
+<!--|deDE:Grundlagen-->
+<!--|frFR:Notions de base-->
+<h2>Basics</h2>
+<p>Each input reports its state via callbacks. &quot;onChangeValue&quot; receives the new
+value, &quot;onChange&quot; receives all current properties including &quot;value&quot;, &quot;valid&quot;,
+&quot;invalid&quot;, &quot;dirty&quot; and &quot;touched&quot;:</p>
+<!--deDE:
+    Jede Eingabe meldet ihren Zustand über Callbacks. "onChangeValue" erhält
+    den neuen Wert, "onChange" alle aktuellen Eigenschaften einschließlich
+    "value", "valid", "invalid", "dirty" und "touched":
+-->
+<!--frFR:
+    Chaque champ signale son état via des callbacks. "onChangeValue" reçoit
+    la nouvelle valeur, "onChange" toutes les propriétés actuelles, y compris
+    "value", "valid", "invalid", "dirty" et "touched":
+-->
+<!--|deDE:Einfache, unkontrollierte Eingabe-->
+<!--|frFR:Champ simple non contrôlé-->
+<h3>Simple uncontrolled input</h3>
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () =>
+    &lt;TextInput&lt;string>
+        name=&quot;simpleInput&quot;
+        onChange={({value, invalid}) => {
+            console.log('Set value', value)
+            if (invalid)
+                console.log('Value is invalid!')
+        }}
+    />
+</code></pre>
+<!--|deDE:Einfache kontrollierte Eingabe-->
+<!--|frFR:Champ simple contrôlé-->
+<h3>Simple controlled input</h3>
+<p>Pass &quot;value&quot; to control the input yourself. Use &quot;initialValue&quot; or &quot;default&quot;
+to only set a starting value:</p>
+<!--deDE:
+    Übergeben Sie "value", um die Eingabe selbst zu kontrollieren. Mit
+    "initialValue" oder "default" setzen Sie nur einen Startwert:
+-->
+<!--frFR:
+    Passez "value" pour contrôler le champ vous-même. Utilisez
+    "initialValue" ou "default" pour ne définir qu'une valeur de départ:
+-->
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () => {
+    const [value, setValue] = useState&lt;null | string>(null)
+
+    return &lt;TextInput&lt;null | string>
+        name=&quot;simpleInputControlled&quot;
+        onChangeValue={setValue}
+        value={value}
+    />
+}
+</code></pre>
+<!--|deDE:Gemeinsame Eigenschaften-->
+<!--|frFR:Propriétés communes-->
+<h3>Common properties</h3>
+<ul>
+<li>&quot;name&quot;, &quot;declaration&quot; (label), &quot;description&quot; and &quot;placeholder&quot;.<!--deDE:"name", "declaration" (Beschriftung), "description" und "placeholder".--><!--frFR:"name", "declaration" (libellé), "description" et "placeholder".--></li>
+<li>&quot;required&quot;, &quot;minimum&quot;, &quot;maximum&quot;, &quot;minimumLength&quot;, &quot;maximumLength&quot;,
+&quot;pattern&quot; and &quot;invertedPattern&quot; for validation, each with a matching
+&quot;...Text&quot; property to customize the message.<!--deDE:"required", "minimum", "maximum", "minimumLength", "maximumLength", "pattern" und "invertedPattern" zur Validierung, jeweils mit einer passenden Eigenschaft "...Text", um die Meldung anzupassen.--><!--frFR:"required", "minimum", "maximum", "minimumLength", "maximumLength", "pattern" et "invertedPattern" pour la validation, chacune avec une propriété "...Text" correspondante pour personnaliser le message.--></li>
+<li>&quot;showInitialValidationState&quot;: Shows validation errors before the user
+touched the input.<!--deDE:"showInitialValidationState": Zeigt Validierungsfehler, bevor der Benutzer die Eingabe berührt hat.--><!--frFR:"showInitialValidationState": Affiche les erreurs de validation avant que l'utilisateur n'ait touché le champ.--></li>
+<li>&quot;disabled&quot;, &quot;tooltip&quot;, &quot;leadingIcon&quot; and &quot;trailingIcon&quot;.<!--deDE:"disabled", "tooltip", "leadingIcon" und "trailingIcon".--><!--frFR:"disabled", "tooltip", "leadingIcon" et "trailingIcon".--></li>
+<li>&quot;type&quot;: &quot;string&quot; (default), &quot;number&quot;, &quot;integer&quot;, &quot;float&quot;, &quot;currency&quot;,
+&quot;boolean&quot;, &quot;date&quot;, &quot;date-local&quot;, &quot;datetime&quot;, &quot;datetime-local&quot;, &quot;time&quot;,
+&quot;time-local&quot;, &quot;week&quot;, &quot;month&quot; or &quot;range&quot;.<!--deDE:"type": "string" (Standard), "number", "integer", "float", "currency", "boolean", "date", "date-local", "datetime", "datetime-local", "time", "time-local", "week", "month" oder "range".--><!--frFR:"type": "string" (par défaut), "number", "integer", "float", "currency", "boolean", "date", "date-local", "datetime", "datetime-local", "time", "time-local", "week", "month" ou "range".--></li>
+<li>&quot;model&quot;: All of the above as one object, e.g. generated from a backend
+schema.<!--deDE:"model": All das oben Genannte als ein Objekt, z. B. aus einem Backend-Schema erzeugt.--><!--frFR:"model": Tout ce qui précède sous forme d'un seul objet, par exemple généré à partir d'un schéma backend.--></li>
+</ul>
+<!--|deDE:Beispiele-->
+<!--|frFR:Exemples-->
+<h2>Examples</h2>
+<!--|deDE:Zahlen-->
+<!--|frFR:Nombres-->
+<h3>Numbers</h3>
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () =>
+    &lt;TextInput&lt;number>
+        declaration=&quot;Number&quot;
+        description=&quot;Place a number please.&quot;
+        name=&quot;number&quot;
+        placeholder=&quot;100000&quot;
+
+        maximum={200000}
+        minimum={10}
+        required
+        type=&quot;number&quot;
+    />
+</code></pre>
+<!--|deDE:Universelle Datums-Eingabe-->
+<!--|frFR:Saisie de date universelle-->
+<h3>Universal date input</h3>
+<p>Dates are handled as seconds since 1970 in UTC:</p>
+<!--deDE:Datumsangaben werden als Sekunden seit 1970 in UTC behandelt:-->
+<!--frFR:Les dates sont traitées en secondes depuis 1970 en UTC:-->
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () =>
+    &lt;TextInput&lt;number>
+        default={
+            new Date('2025-01-01T00:00:00.000Z')
+                .getTime() / 1000
+        }
+        name=&quot;timeInput&quot;
+        type=&quot;date&quot;
+    />
+</code></pre>
+<!--|deDE:Eingabe des lokalen Datums-->
+<!--|frFR:Saisie de la date locale-->
+<h3>Local date input</h3>
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () =>
+    &lt;TextInput&lt;string>
+        default=&quot;2025-01-01T23:00:00.000Z&quot;
+        name=&quot;timeInput&quot;
+        type=&quot;date-local&quot;
+    />
+</code></pre>
+<!--|deDE:Auswahl-->
+<!--|frFR:Sélection-->
+<h3>Selection</h3>
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () =>
+    &lt;TextInput&lt;string>
+        declaration=&quot;Selection Example&quot;
+        name=&quot;Example selection&quot;
+        selection={['A', 'B', 'C']}
+    />
+</code></pre>
+<!--|deDE:Auswahl mit zugeordneten Beschriftungen-->
+<!--|frFR:Sélection avec libellés associés-->
+<h3>Selection with mapped labels</h3>
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () =>
+    &lt;TextInput&lt;string>
+        name=&quot;Another selection example&quot;
+        required
+        selection={[
+            {value: 'A', label: 'a'},
+            {value: 'B', label: 'b'},
+            {value: 'C', label: 'c'}
+        ]}
+    />
+</code></pre>
+<!--|deDE:Suche mit Vorschlägen-->
+<!--|frFR:Recherche avec suggestions-->
+<h3>Search with suggestions</h3>
+<p>&quot;suggestionCreator&quot; may return suggestions directly or as promise, e.g. from a
+server. Running requests are aborted via the given &quot;abortController&quot; when the
+query changes:</p>
+<!--deDE:
+    "suggestionCreator" kann Vorschläge direkt oder als Promise liefern, z. B.
+    von einem Server. Laufende Anfragen werden über den übergebenen
+    "abortController" abgebrochen, wenn sich die Suche ändert:
+-->
+<!--frFR:
+    "suggestionCreator" peut retourner des suggestions directement ou sous
+    forme de promesse, par exemple depuis un serveur. Les requêtes en cours
+    sont annulées via l'"abortController" fourni lorsque la recherche change:
+-->
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () =>
+    &lt;TextInput&lt;string>
+        name=&quot;person&quot;
+        searchSelection
+        suggestionCreator={async ({abortController, query}) =>
+            query.length &lt; 3 ?
+                [] :
+                (await fetch(
+                    `/api/people?query=${encodeURIComponent(query)}`,
+                    {signal: abortController.signal}
+                )).json()
+        }
+    />
+</code></pre>
+<!--|deDE:Code-Editor-->
+<!--|frFR:Éditeur de code-->
+<h3>Code editor</h3>
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () =>
+    &lt;TextInput&lt;string>
+        className=&quot;text-input--code-editor&quot;
+
+        editor=&quot;code(js)&quot;
+        rows={6}
+
+        initialValue=&quot;const value = 2&quot;
+    />
+</code></pre>
+<!--|deDE:Rich-Text-Eingabe-->
+<!--|frFR:Saisie de texte enrichi-->
+<h3>Rich text input</h3>
+<p>With &quot;selectableEditor&quot; the user can switch between the editor and a plain
+text area:</p>
+<!--deDE:
+    Mit "selectableEditor" kann der Benutzer zwischen dem Editor und einem
+    einfachen Textfeld wechseln:
+-->
+<!--frFR:
+    Avec "selectableEditor", l'utilisateur peut basculer entre l'éditeur et
+    une simple zone de texte:
+-->
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () =>
+    &lt;TextInput&lt;string>
+        className=&quot;text-input--richtext-editor&quot;
+
+        declaration=&quot;richtext&quot;
+        description=&quot;Please your styled text here.&quot;
+        name=&quot;RichText&quot;
+        placeholder=&quot;Hello Mr. Smith,&lt;br>&lt;br>this is a Placeholder.&quot;
+
+        editor=&quot;richtext&quot;
+        rows={6}
+        selectableEditor
+
+        initialValue=&quot;Hello Mr. Smith,&lt;br>&lt;br>how are you?&quot;
+        minimumLength={10}
+        maximumLength={100}
+        required
+
+        onChangeValue={(value) => {
+            console.log('Current value is', value)
+        }}
+    />
+</code></pre>
+<!--|deDE:Dateien auswählen und hochladen-->
+<!--|frFR:Sélectionner et téléverser des fichiers-->
+<h3>Selecting and uploading files</h3>
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () =>
+    &lt;FileInput name=&quot;fileInput&quot; />
+</code></pre>
+<!--|deDE:Checkbox-->
+<!--|frFR:Case à cocher-->
+<h3>Checkbox</h3>
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () => &lt;Checkbox name=&quot;accepted&quot; required />
+</code></pre>
+<!--|deDE:Listen beliebiger Eingaben-->
+<!--|frFR:Listes de champs quelconques-->
+<h3>Lists of any inputs</h3>
+<p>&quot;Inputs&quot; renders a list where the user adds and removes entries. The child
+function renders each entry:</p>
+<!--deDE:
+    "Inputs" stellt eine Liste dar, in der der Benutzer Einträge hinzufügt
+    und entfernt. Die Kindfunktion stellt jeden Eintrag dar:
+-->
+<!--frFR:
+    "Inputs" affiche une liste dans laquelle l'utilisateur ajoute et retire
+    des entrées. La fonction enfant affiche chaque entrée:
+-->
+<pre class="prettyprint source lang-TypeScript"><code>import type {CheckboxTypes, InputsTypes} from 'react-input-material'
+
+import {Checkbox, Inputs} from 'react-input-material'
+import {useMemorizedValue} from 'react-generic-tools'
+
+const Application = () =>
+    &lt;Inputs&lt;boolean | null, CheckboxTypes.Props>
+        model={useMemorizedValue({
+            default: [{
+                type: 'boolean',
+                value: false,
+                required: true,
+                showInitialValidationState: true
+            }],
+            name: 'checkboxInputs'
+        })}
+
+        createItem={useMemorizedValue(({
+            index, item, properties: {name}
+        }: InputsTypes.CreateItemOptions&lt;
+            boolean | null,
+            CheckboxTypes.Props,
+            InputsTypes.Properties&lt;boolean | null, CheckboxTypes.Props>
+        >): CheckboxTypes.Props => ({
+            ...item,
+            name: `${name}-${String(index + 1)}`
+        }))}
+
+        maximumNumber={2}
+        minimumNumber={2}
+
+        showInitialValidationState
+    >
+        {({properties}) => &lt;Checkbox {...properties} />}
+    &lt;/Inputs>
+</code></pre>
+<!--|deDE:Intervall-->
+<!--|frFR:Intervalle-->
+<h3>Interval</h3>
+<p>Start and end are times of day in seconds since midnight:</p>
+<!--deDE:Start und Ende sind Uhrzeiten in Sekunden seit Mitternacht:-->
+<!--frFR:
+    Le début et la fin sont des heures exprimées en secondes depuis minuit:
+-->
+<pre class="prettyprint source lang-TypeScript"><code>const Application = () =>
+    &lt;Interval
+        name=&quot;Interval example&quot;
+        required
+        step={60}
+        value={{
+            start: {default: 120, maximum: 3600},
+            end: {default: 240, minimum: 120}
+        }}
+    />
+</code></pre>
+<!--|deDE:Theming und Tooltips-->
+<!--|frFR:Thèmes et infobulles-->
+<h2>Theming and tooltips</h2>
+<p>Every component accepts &quot;themeConfiguration&quot; with
+<a href="https://rmwc.io/theme">RMWC theme options</a> and &quot;tooltip&quot; with a text to show
+on hover. &quot;WrapConfigurations&quot; applies both to any other content:</p>
+<!--deDE:
+    Jede Komponente akzeptiert "themeConfiguration" mit
+    [RMWC-Theme-Optionen](https://rmwc.io/theme) und "tooltip" mit einem
+    Text, der beim Überfahren angezeigt wird. "WrapConfigurations" wendet
+    beides auf beliebigen anderen Inhalt an:
+-->
+<!--frFR:
+    Chaque composant accepte "themeConfiguration" avec les
+    [options de thème RMWC](https://rmwc.io/theme) et "tooltip" avec un texte
+    affiché au survol. "WrapConfigurations" applique les deux à n'importe
+    quel autre contenu:
+-->
+<pre class="prettyprint source lang-TypeScript"><code>&lt;TextInput
+    name=&quot;email&quot;
+    themeConfiguration={{primary: '#d55e5d'}}
+    tooltip=&quot;We never share your address.&quot;
+/>
+</code></pre>
+<!--|deDE:End-to-End-Tests-->
+<!--|frFR:Tests de bout en bout-->
+<h2>End-to-end tests</h2>
+<p>Each component comes with a <a href="https://playwright.dev">Playwright</a> harness
+which hides its internal structure from your tests:</p>
+<!--deDE:
+    Jede Komponente bringt ein [Playwright](https://playwright.dev)-Harness
+    mit, das ihre interne Struktur vor Ihren Tests verbirgt:
+-->
+<!--frFR:
+    Chaque composant est accompagné d'un harnais
+    [Playwright](https://playwright.dev) qui masque sa structure interne à
+    vos tests:
+-->
+<pre class="prettyprint source lang-TypeScript"><code>import textInput from 'react-input-material/components/TextInput/harness'
+
+const email = textInput(page.locator('.email'))
+
+await email.fill('mail@example.com')
+expect(await email.inputValue()).toBe('mail@example.com')
+</code></pre>
+<!--|deDE:Entwicklung-->
+<!--|frFR:Développement-->
+<h2>Development</h2>
+<pre class="prettyprint source lang-bash"><code>yarn install
+yarn start
+yarn test
+yarn test:end-to-end
+</code></pre>
+<p>&quot;yarn start&quot; serves a playground with all components. The end-to-end tests
+expect it to be running.</p>
+<!--deDE:
+    "yarn start" stellt eine Spielwiese mit allen Komponenten bereit. Die
+    End-to-End-Tests setzen voraus, dass sie läuft.
+-->
+<!--frFR:
+    "yarn start" sert un terrain de jeu avec tous les composants. Les tests
+    de bout en bout supposent qu'il est lancé.
+--></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-reactGenericDummy.html">reactGenericDummy</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Sun Nov 15 2026 14:25:24 GMT+0100 (Mitteleuropäische Normalzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

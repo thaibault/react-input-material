@@ -1,5 +1,9 @@
 if(typeof window==='undefined'||window===null)var window=(typeof globalThis==='undefined'||globalThis===null)?{}:globalThis;import * as __WEBPACK_EXTERNAL_MODULE__rmwc_theme_fde39321__ from "@rmwc/theme";
 import * as __WEBPACK_EXTERNAL_MODULE__rmwc_typography_185e7768__ from "@rmwc/typography";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_array_push_js_baa3ea94__ from "core-js/modules/es.array.push.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_iterator_constructor_js_833f4df9__ from "core-js/modules/es.iterator.constructor.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_iterator_filter_js_abae28b4__ from "core-js/modules/es.iterator.filter.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_iterator_for_each_js_2628f2dd__ from "core-js/modules/es.iterator.for-each.js";
 import * as __WEBPACK_EXTERNAL_MODULE_react__ from "react";
 import * as __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__ from "react/jsx-runtime";
 /******/ var __webpack_modules__ = ([
@@ -10,7 +14,7 @@ var x = function(y) {
 	var x = {}; __webpack_require__.d(x, y); return x
 } 
 var y = function(x) { return function() { return x; }; }
-module.exports = x({ ["Fragment"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.Fragment; }, ["jsx"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.jsx; } });
+module.exports = x({  });
 
 /***/ }),
 /* 1 */
@@ -20,13 +24,54 @@ var x = function(y) {
 	var x = {}; __webpack_require__.d(x, y); return x
 } 
 var y = function(x) { return function() { return x; }; }
+module.exports = x({  });
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({  });
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({  });
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({ ["Fragment"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.Fragment; }, ["jsx"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.jsx; } });
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
 module.exports = x({ ["StrictMode"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.StrictMode; }, ["forwardRef"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.forwardRef; } });
 
 /***/ }),
-/* 2 */,
-/* 3 */,
-/* 4 */,
-/* 5 */
+/* 6 */,
+/* 7 */,
+/* 8 */,
+/* 9 */,
+/* 10 */
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
 var x = function(y) {
@@ -36,10 +81,9 @@ var y = function(x) { return function() { return x; }; }
 module.exports = x({ ["Theme"]: function() { return __WEBPACK_EXTERNAL_MODULE__rmwc_theme_fde39321__.Theme; }, ["ThemeProvider"]: function() { return __WEBPACK_EXTERNAL_MODULE__rmwc_theme_fde39321__.ThemeProvider; } });
 
 /***/ }),
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */
+/* 11 */,
+/* 12 */,
+/* 13 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -50,14 +94,22 @@ __webpack_require__.d(__webpack_exports__, {
 
 // UNUSED EXPORTS: default, isDummy
 
+// EXTERNAL MODULE: external "core-js/modules/es.array.push.js"
+var es_array_push_js_ = __webpack_require__(1);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.constructor.js"
+var es_iterator_constructor_js_ = __webpack_require__(0);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.filter.js"
+var es_iterator_filter_js_ = __webpack_require__(2);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.for-each.js"
+var es_iterator_for_each_js_ = __webpack_require__(3);
 // EXTERNAL MODULE: ./src/shims/optionals.ts
-var optionals = __webpack_require__(11);
+var optionals = __webpack_require__(15);
 // EXTERNAL MODULE: external "@rmwc/typography"
-var typography_ = __webpack_require__(13);
+var typography_ = __webpack_require__(18);
 // EXTERNAL MODULE: external "react"
-var external_react_ = __webpack_require__(1);
+var external_react_ = __webpack_require__(5);
 // EXTERNAL MODULE: external "react/jsx-runtime"
-var jsx_runtime_ = __webpack_require__(0);
+var jsx_runtime_ = __webpack_require__(4);
 ;// ./src/implementations/rmwc/Tooltip.tsx
 // -*- coding: utf-8 -*-
 /** @module Tooltip *//* !
@@ -70,8 +122,8 @@ var jsx_runtime_ = __webpack_require__(0);
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)}function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)};// endregion
@@ -89,8 +141,8 @@ var isDummy=!optionals/* Tooltip */.m_||Boolean(optionals/* Tooltip */.m_.isDumm
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 // endregion
@@ -104,8 +156,8 @@ var WrapTooltip_isDummy=!rmwc_Tooltip||Boolean(rmwc_Tooltip.isDummy);/**
  */var WrapTooltip=function WrapTooltip(_ref){var children=_ref.children,value=_ref.value;if(typeof value==="string")return/*#__PURE__*/(0,jsx_runtime_.jsx)(rmwc_Tooltip,{value:value,children:children});return/*#__PURE__*/(0,jsx_runtime_.jsx)(jsx_runtime_.Fragment,{children:children})};/* harmony default export */ var Wrapper_WrapTooltip = ((/* unused pure expression or super */ null && (WrapTooltip)));
 
 /***/ }),
-/* 10 */,
-/* 11 */
+/* 14 */,
+/* 15 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -126,8 +178,9 @@ var bracketMatching=(/* unused pure expression or super */ null && (MOCK_RESULT)
 var optionalsHistory=(/* unused pure expression or super */ null && (MOCK_RESULT));var historyKeymap=(/* unused pure expression or super */ null && (MOCK_RESULT));
 
 /***/ }),
-/* 12 */,
-/* 13 */
+/* 16 */,
+/* 17 */,
+/* 18 */
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
 var x = function(y) {
@@ -137,15 +190,17 @@ var y = function(x) { return function() { return x; }; }
 module.exports = x({ ["Typography"]: function() { return __WEBPACK_EXTERNAL_MODULE__rmwc_typography_185e7768__.Typography; } });
 
 /***/ }),
-/* 14 */,
-/* 15 */
+/* 19 */,
+/* 20 */,
+/* 21 */,
+/* 22 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   g: function() { return /* binding */ WrapStrict; }
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
 /** @module wrap-strict *//* !
@@ -158,8 +213,8 @@ module.exports = x({ ["Typography"]: function() { return __WEBPACK_EXTERNAL_MODU
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 // endregion
@@ -173,14 +228,14 @@ module.exports = x({ ["Typography"]: function() { return __WEBPACK_EXTERNAL_MODU
  */var WrapStrict=function WrapStrict(_ref){var children=_ref.children,strict=_ref.strict;return strict?/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(react__WEBPACK_IMPORTED_MODULE_0__.StrictMode,{children:children}):/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.Fragment,{children:children})};/* unused harmony default export */ var __WEBPACK_DEFAULT_EXPORT__ = ((/* unused pure expression or super */ null && (WrapStrict)));
 
 /***/ }),
-/* 16 */
+/* 23 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   R: function() { return /* binding */ WrapThemeProvider; }
 /* harmony export */ });
-/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
+/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
 /** @module WrapThemeProvider *//* !
@@ -193,8 +248,8 @@ module.exports = x({ ["Typography"]: function() { return __WEBPACK_EXTERNAL_MODU
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 // endregion
@@ -275,12 +330,16 @@ var __webpack_exports__ = {};
 /* harmony export */   Es: function() { return /* binding */ WrapConfigurations; },
 /* harmony export */   zb: function() { return /* binding */ createWrapConfigurationsComponent; }
 /* harmony export */ });
-/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var _WrapStrict_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(15);
-/* harmony import */ var _WrapThemeProvider_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(16);
-/* harmony import */ var _WrapTooltip_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(0);
+/* harmony import */ var core_js_modules_es_array_push_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var core_js_modules_es_iterator_constructor_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
+/* harmony import */ var core_js_modules_es_iterator_filter_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
+/* harmony import */ var core_js_modules_es_iterator_for_each_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3);
+/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(10);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(5);
+/* harmony import */ var _WrapStrict_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(22);
+/* harmony import */ var _WrapThemeProvider_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(23);
+/* harmony import */ var _WrapTooltip_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(13);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(4);
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
 /** @module WrapConfigurations *//* !
@@ -293,8 +352,8 @@ var __webpack_exports__ = {};
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)}var _excluded=["strict","theme","themeConfiguration","tooltip","wrap"];function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function _objectWithoutProperties(t,r){if(null==t)return{};var o,n,i=_objectWithoutPropertiesLoose(t,r);if(Object.getOwnPropertySymbols){var l=Object.getOwnPropertySymbols(t);for(n=0;n<l.length;n++)o=l[n],-1===r.indexOf(o)&&{}.propertyIsEnumerable.call(t,o)&&(i[o]=t[o])}return i}function _objectWithoutPropertiesLoose(r,e){if(null==r)return{};var t={};for(var n in r)if({}.hasOwnProperty.call(r,n)){if(-1!==e.indexOf(n))continue;t[n]=r[n]}return t};//  endregion
@@ -310,7 +369,7 @@ function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof 
  * component by merging the theme styles directly onto it. Useful when you
  * don't want to mess with layout.
  * @returns Wrapped content.
- */var WrapConfigurations=function WrapConfigurations(_ref){var children=_ref.children,strict=_ref.strict,themeConfiguration=_ref.themeConfiguration,tooltip=_ref.tooltip,wrap=_ref.wrap;return/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_WrapStrict_js__WEBPACK_IMPORTED_MODULE_2__/* .WrapStrict */ .g,{strict:Boolean(strict),children:/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_WrapTooltip_js__WEBPACK_IMPORTED_MODULE_4__/* .WrapTooltip */ .Et,{value:tooltip,children:/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_WrapThemeProvider_js__WEBPACK_IMPORTED_MODULE_3__/* .WrapThemeProvider */ .R,{configuration:themeConfiguration,wrap:wrap,children:children})})})};/**
+ */var WrapConfigurations=function WrapConfigurations(_ref){var children=_ref.children,strict=_ref.strict,themeConfiguration=_ref.themeConfiguration,tooltip=_ref.tooltip,wrap=_ref.wrap;return/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_WrapStrict_js__WEBPACK_IMPORTED_MODULE_6__/* .WrapStrict */ .g,{strict:Boolean(strict),children:/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_WrapTooltip_js__WEBPACK_IMPORTED_MODULE_8__/* .WrapTooltip */ .Et,{value:tooltip,children:/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_WrapThemeProvider_js__WEBPACK_IMPORTED_MODULE_7__/* .WrapThemeProvider */ .R,{configuration:themeConfiguration,wrap:wrap,children:children})})})};/**
  * Component factory to dynamically create a wrapped component.
  * @param WrappedComponent - Component to wrap.
  * @param options - Options configure wrapping.
@@ -319,6 +378,6 @@ function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof 
  * @param options.withThemeWrapper - Indicates whether all theme configurations
  * should be provided.
  * @returns Created wrapped component.
- */function createWrapConfigurationsComponent(WrappedComponent,options){if(options===void 0){options={}}var component=function component(_ref2,reference){var strict=_ref2.strict,theme=_ref2.theme,themeConfiguration=_ref2.themeConfiguration,tooltip=_ref2.tooltip,wrap=_ref2.wrap,properties=_objectWithoutProperties(_ref2,_excluded);var wrapped=/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(WrappedComponent,_objectSpread({},_objectSpread(_objectSpread(_objectSpread({},properties),options.withReference===false?{}:reference?{ref:reference}:{}),options.withThemeWrapper&&theme?{theme:theme}:{})));return/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(WrapConfigurations,{strict:strict,themeConfiguration:themeConfiguration,tooltip:tooltip,wrap:wrap,children:options.withThemeWrapper&&theme?/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_rmwc_theme__WEBPACK_IMPORTED_MODULE_0__.Theme,{use:theme,wrap:wrap,children:wrapped}):wrapped})};return options.withReference?/*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)(component):component}/* harmony default export */ __webpack_exports__.Ay = (WrapConfigurations);
+ */function createWrapConfigurationsComponent(WrappedComponent,options){if(options===void 0){options={}}var component=function component(_ref2,reference){var strict=_ref2.strict,theme=_ref2.theme,themeConfiguration=_ref2.themeConfiguration,tooltip=_ref2.tooltip,wrap=_ref2.wrap,properties=_objectWithoutProperties(_ref2,_excluded);var wrapped=/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(WrappedComponent,_objectSpread({},_objectSpread(_objectSpread(_objectSpread({},properties),options.withReference===false?{}:reference?{ref:reference}:{}),options.withThemeWrapper&&theme?{theme:theme}:{})));return/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(WrapConfigurations,{strict:strict,themeConfiguration:themeConfiguration,tooltip:tooltip,wrap:wrap,children:options.withThemeWrapper&&theme?/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_rmwc_theme__WEBPACK_IMPORTED_MODULE_4__.Theme,{use:theme,wrap:wrap,children:wrapped}):wrapped})};return options.withReference?/*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_5__.forwardRef)(component):component}/* harmony default export */ __webpack_exports__.Ay = (WrapConfigurations);
 var __webpack_exports__default = __webpack_exports__.Ay;
 export { WrapConfigurations, createWrapConfigurationsComponent, __webpack_exports__default as default };

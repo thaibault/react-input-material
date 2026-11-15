@@ -1,4 +1,7 @@
-if(typeof window==='undefined'||window===null)var window=(typeof globalThis==='undefined'||globalThis===null)?{}:globalThis;import { timeout as __WEBPACK_EXTERNAL_MODULE_clientnode_timeout__ } from "clientnode";
+if(typeof window==='undefined'||window===null)var window=(typeof globalThis==='undefined'||globalThis===null)?{}:globalThis;import "core-js/modules/es.array.push.js";
+import { timeout as __WEBPACK_EXTERNAL_MODULE_clientnode_timeout__ } from "clientnode";
+
+;// external "core-js/modules/es.array.push.js"
 
 ;// external "clientnode"
 

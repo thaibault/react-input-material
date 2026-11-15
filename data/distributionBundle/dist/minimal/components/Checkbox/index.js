@@ -4,6 +4,14 @@ import * as __WEBPACK_EXTERNAL_MODULE__rmwc_typography_185e7768__ from "@rmwc/ty
 import * as __WEBPACK_EXTERNAL_MODULE_clientnode__ from "clientnode";
 import * as __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__ from "clientnode/property-types";
 import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_array_includes_js_66c3fd7d__ from "core-js/modules/es.array.includes.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_array_push_js_baa3ea94__ from "core-js/modules/es.array.push.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_iterator_constructor_js_833f4df9__ from "core-js/modules/es.iterator.constructor.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_iterator_filter_js_abae28b4__ from "core-js/modules/es.iterator.filter.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_iterator_for_each_js_2628f2dd__ from "core-js/modules/es.iterator.for-each.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_iterator_some_js_c8a39cc8__ from "core-js/modules/es.iterator.some.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_json_stringify_js_ab8145f9__ from "core-js/modules/es.json.stringify.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_map_get_or_insert_computed_js_7751ea4f__ from "core-js/modules/es.map.get-or-insert-computed.js";
+import * as __WEBPACK_EXTERNAL_MODULE_core_js_modules_es_map_get_or_insert_js_7d374552__ from "core-js/modules/es.map.get-or-insert.js";
 import * as __WEBPACK_EXTERNAL_MODULE_react__ from "react";
 import * as __WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958__ from "react-generic-tools";
 import * as __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__ from "react/jsx-runtime";
@@ -16,7 +24,7 @@ var x = function(y) {
 	var x = {}; __webpack_require__.d(x, y); return x
 } 
 var y = function(x) { return function() { return x; }; }
-module.exports = x({ ["Fragment"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.Fragment; }, ["jsx"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.jsx; } });
+module.exports = x({  });
 
 /***/ }),
 /* 1 */
@@ -26,7 +34,7 @@ var x = function(y) {
 	var x = {}; __webpack_require__.d(x, y); return x
 } 
 var y = function(x) { return function() { return x; }; }
-module.exports = x({ ["StrictMode"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.StrictMode; }, ["forwardRef"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.forwardRef; }, ["memo"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.memo; }, ["useCallback"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useCallback; }, ["useEffect"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useEffect; }, ["useImperativeHandle"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useImperativeHandle; }, ["useState"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useState; } });
+module.exports = x({  });
 
 /***/ }),
 /* 2 */
@@ -36,7 +44,7 @@ var x = function(y) {
 	var x = {}; __webpack_require__.d(x, y); return x
 } 
 var y = function(x) { return function() { return x; }; }
-module.exports = x({ ["NullSymbol"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.NullSymbol; }, ["UndefinedSymbol"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.UndefinedSymbol; }, ["any"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.any; }, ["arrayOf"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.arrayOf; }, ["boolean"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.boolean; }, ["func"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.func; }, ["number"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.number; }, ["object"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.object; }, ["oneOfType"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.oneOfType; }, ["shape"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.shape; }, ["string"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.string; }, ["symbol"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.symbol; } });
+module.exports = x({  });
 
 /***/ }),
 /* 3 */
@@ -46,10 +54,60 @@ var x = function(y) {
 	var x = {}; __webpack_require__.d(x, y); return x
 } 
 var y = function(x) { return function() { return x; }; }
-module.exports = x({ ["useMemorizedValue"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958__.useMemorizedValue; }, ["useReferenceState"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958__.useReferenceState; } });
+module.exports = x({  });
 
 /***/ }),
 /* 4 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({ ["Fragment"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.Fragment; }, ["jsx"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_jsx_runtime_00f484c1__.jsx; } });
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({ ["StrictMode"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.StrictMode; }, ["forwardRef"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.forwardRef; }, ["memo"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.memo; }, ["useCallback"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useCallback; }, ["useEffect"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useEffect; }, ["useImperativeHandle"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useImperativeHandle; }, ["useState"]: function() { return __WEBPACK_EXTERNAL_MODULE_react__.useState; } });
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({ ["useMemorizedValue"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958__.useMemorizedValue; }, ["useReferenceState"]: function() { return __WEBPACK_EXTERNAL_MODULE_react_generic_tools_67824958__.useReferenceState; } });
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({ ["NullSymbol"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.NullSymbol; }, ["UndefinedSymbol"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.UndefinedSymbol; }, ["any"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.any; }, ["arrayOf"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.arrayOf; }, ["boolean"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.boolean; }, ["func"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.func; }, ["number"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.number; }, ["object"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.object; }, ["oneOfType"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.oneOfType; }, ["shape"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.shape; }, ["string"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.string; }, ["symbol"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode_property_types_4789ebe2__.symbol; } });
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({ ["Logger"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.Logger; }, ["capitalize"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.capitalize; }, ["copy"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.copy; }, ["equals"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.equals; }, ["extend"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.extend; }, ["timeout"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.timeout; } });
+
+/***/ }),
+/* 9 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -60,7 +118,11 @@ module.exports = x({ ["useMemorizedValue"]: function() { return __WEBPACK_EXTERN
 /* harmony export */   m8: function() { return /* binding */ defaultModelState; }
 /* harmony export */ });
 /* unused harmony exports PrimitiveTypes, baseModelPropertyTypes, modelPropertyTypes */
-/* harmony import */ var clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
+/* harmony import */ var core_js_modules_es_array_push_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var core_js_modules_es_iterator_constructor_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
+/* harmony import */ var core_js_modules_es_iterator_filter_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
+/* harmony import */ var core_js_modules_es_iterator_for_each_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3);
+/* harmony import */ var clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
 // -*- coding: utf-8 -*-
 /** @module type *//* !
     region header
@@ -72,8 +134,8 @@ module.exports = x({ ["useMemorizedValue"]: function() { return __WEBPACK_EXTERN
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)}function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)};// endregion
@@ -85,8 +147,8 @@ var PrimitiveTypes=(/* unused pure expression or super */ null && (["boolean","D
 //// region state
 //// endregion
 //// region constants
-var baseModelPropertyTypes={name:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string,declaration:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string,description:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string,default:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.any,// NOTE: Corresponds to type "SelectionDefinition".
-selection:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string])),(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.shape)({label:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string,value:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string])})),clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.object]),/*
+var baseModelPropertyTypes={name:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string,declaration:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string,description:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string,default:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.any,// NOTE: Corresponds to type "SelectionDefinition".
+selection:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string])),(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.shape)({label:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string,value:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string])})),clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.object]),/*
         NOTE: Not yet working:
 
         type: oneOf([
@@ -111,14 +173,14 @@ selection:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([
             'text',
             'url'
         ])
-    */type:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string,value:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.any};var modelStatePropertyTypes={dirty:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.symbol]),pristine:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.symbol]),touched:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.symbol]),untouched:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.symbol]),focused:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.symbol]),visited:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.symbol]),invalid:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.symbol]),invalidRequired:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.symbol]),valid:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.symbol])};var modelPropertyTypes=_objectSpread(_objectSpread({},baseModelPropertyTypes),{},{emptyEqualsNull:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,trim:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,invertedPattern:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.object,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string])),clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.object,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string]),pattern:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.object,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string])),clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.object,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string]),maximum:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string]),minimum:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string]),maximumLength:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.number,minimumLength:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.number,mutable:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,writable:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,state:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.shape)(modelStatePropertyTypes)});var propertyTypes=_objectSpread(_objectSpread(_objectSpread({},baseModelPropertyTypes),modelStatePropertyTypes),{},{className:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.arrayOf)(clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string),clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string]),styles:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.object,themeConfiguration:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.object,disabled:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,enforceUncontrolled:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,initialValue:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.any,model:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.shape)(modelPropertyTypes),// NOTE: Overwrites model selection and corresponds to type "Selection".
-selection:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string]))),(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string])),(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.shape)({label:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string,value:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string])})),clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.object]),onChange:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.func,onChangeValue:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.func,onChangeShowDeclaration:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.func,onChangeState:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.func,onClick:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.func,onFocus:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.func,onTouch:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.func,required:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,requiredText:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string,componentProperties:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.object,domNodeProperties:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.object,showDeclaration:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.symbol]),showInitialValidationState:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,showValidationState:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,/*
+    */type:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string,value:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.any};var modelStatePropertyTypes={dirty:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.symbol]),pristine:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.symbol]),touched:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.symbol]),untouched:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.symbol]),focused:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.symbol]),visited:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.symbol]),invalid:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.symbol]),invalidRequired:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.symbol]),valid:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.symbol])};var modelPropertyTypes=_objectSpread(_objectSpread({},baseModelPropertyTypes),{},{emptyEqualsNull:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,trim:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,invertedPattern:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.object,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string])),clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.object,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string]),pattern:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.object,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string])),clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.object,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string]),maximum:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string]),minimum:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string]),maximumLength:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.number,minimumLength:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.number,mutable:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,writable:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,state:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.shape)(modelStatePropertyTypes)});var propertyTypes=_objectSpread(_objectSpread(_objectSpread({},baseModelPropertyTypes),modelStatePropertyTypes),{},{className:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.arrayOf)(clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string),clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string]),styles:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.object,themeConfiguration:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.object,disabled:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,enforceUncontrolled:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,initialValue:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.any,model:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.shape)(modelPropertyTypes),// NOTE: Overwrites model selection and corresponds to type "Selection".
+selection:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string]))),(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string])),(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.arrayOf)((0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.shape)({label:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string,value:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.number,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string])})),clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.object]),onChange:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.func,onChangeValue:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.func,onChangeShowDeclaration:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.func,onChangeState:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.func,onClick:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.func,onFocus:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.func,onTouch:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.func,required:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,requiredText:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string,componentProperties:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.object,domNodeProperties:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.object,showDeclaration:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.oneOfType)([clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.symbol]),showInitialValidationState:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,showValidationState:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,/*
         NOTE: Not yet working:
         tooltip?: string | TooltipProps
         trailingIcon?:
             string |
              (IconOptions & {tooltip?: string | TooltipProps})
-    */tooltip:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.any});var defaultModelState={dirty:false,pristine:true,focused:false,visited:false,invalid:false,invalidRequired:false,valid:true,touched:false,untouched:true};var defaultModel={declaration:"",description:"",name:"NO_NAME_DEFINED",emptyEqualsNull:true,pattern:undefined,invertedPattern:undefined,maximum:Infinity,minimum:-Infinity,maximumLength:Infinity,minimumLength:0,mutable:true,/*
+    */tooltip:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.any});var defaultModelState={dirty:false,pristine:true,focused:false,visited:false,invalid:false,invalidRequired:false,valid:true,touched:false,untouched:true};var defaultModel={declaration:"",description:"",name:"NO_NAME_DEFINED",emptyEqualsNull:true,pattern:undefined,invertedPattern:undefined,maximum:Infinity,minimum:-Infinity,maximumLength:Infinity,minimumLength:0,mutable:true,/*
         NOTE: We do not want to shadow "default" here:
         value: null,
     */writable:true,nullable:true,state:_objectSpread({},defaultModelState),trim:true,type:"string"};/*
@@ -129,7 +191,7 @@ selection:(0,clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.oneOfType)([
 // endregion
 
 /***/ }),
-/* 5 */
+/* 10 */
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
 var x = function(y) {
@@ -139,17 +201,7 @@ var y = function(x) { return function() { return x; }; }
 module.exports = x({ ["Theme"]: function() { return __WEBPACK_EXTERNAL_MODULE__rmwc_theme_fde39321__.Theme; }, ["ThemeProvider"]: function() { return __WEBPACK_EXTERNAL_MODULE__rmwc_theme_fde39321__.ThemeProvider; } });
 
 /***/ }),
-/* 6 */
-/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
-
-var x = function(y) {
-	var x = {}; __webpack_require__.d(x, y); return x
-} 
-var y = function(x) { return function() { return x; }; }
-module.exports = x({ ["Logger"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.Logger; }, ["capitalize"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.capitalize; }, ["copy"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.copy; }, ["equals"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.equals; }, ["extend"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.extend; }, ["timeout"]: function() { return __WEBPACK_EXTERNAL_MODULE_clientnode__.timeout; } });
-
-/***/ }),
-/* 7 */
+/* 11 */
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
 var x = function(y) {
@@ -159,7 +211,7 @@ var y = function(x) { return function() { return x; }; }
 module.exports = x({  });
 
 /***/ }),
-/* 8 */
+/* 12 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -179,17 +231,33 @@ __webpack_require__.d(__webpack_exports__, {
 // UNUSED EXPORTS: createDummyStateSetter, determineInitialRepresentation, formatDateTimeAsConfigured, formatValue, getLabelAndValues, getRepresentationFromValueSelection, getValueFromSelection, hashRegularExpression, log, normalizeSelection, parseValue, renderMessage, slicePropertiesForState, slicePropertiesForStateRecursively
 
 // EXTERNAL MODULE: external "core-js/modules/es.array.includes.js"
-var es_array_includes_js_ = __webpack_require__(7);
+var es_array_includes_js_ = __webpack_require__(11);
+// EXTERNAL MODULE: external "core-js/modules/es.array.push.js"
+var es_array_push_js_ = __webpack_require__(1);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.constructor.js"
+var es_iterator_constructor_js_ = __webpack_require__(0);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.filter.js"
+var es_iterator_filter_js_ = __webpack_require__(2);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.for-each.js"
+var es_iterator_for_each_js_ = __webpack_require__(3);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.some.js"
+var es_iterator_some_js_ = __webpack_require__(16);
+// EXTERNAL MODULE: external "core-js/modules/es.json.stringify.js"
+var es_json_stringify_js_ = __webpack_require__(24);
+// EXTERNAL MODULE: external "core-js/modules/es.map.get-or-insert.js"
+var es_map_get_or_insert_js_ = __webpack_require__(20);
+// EXTERNAL MODULE: external "core-js/modules/es.map.get-or-insert-computed.js"
+var es_map_get_or_insert_computed_js_ = __webpack_require__(21);
 ;// external "core-js/modules/es.regexp.flags.js"
 
 // EXTERNAL MODULE: external "clientnode"
-var external_clientnode_ = __webpack_require__(6);
+var external_clientnode_ = __webpack_require__(8);
 // EXTERNAL MODULE: external "clientnode/property-types"
-var property_types_ = __webpack_require__(2);
+var property_types_ = __webpack_require__(7);
 // EXTERNAL MODULE: external "react"
-var external_react_ = __webpack_require__(1);
+var external_react_ = __webpack_require__(5);
 // EXTERNAL MODULE: external "react-generic-tools"
-var external_react_generic_tools_ = __webpack_require__(3);
+var external_react_generic_tools_ = __webpack_require__(6);
 ;// ./src/helper.ts
 /* unused harmony import specifier */ var isFunction;
 /* unused harmony import specifier */ var isObject;
@@ -209,8 +277,8 @@ var external_react_generic_tools_ = __webpack_require__(3);
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 function _createForOfIteratorHelper(e,t){var _n="undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(!_n){if(Array.isArray(e)||(_n=_unsupportedIterableToArray(e))||t&&e&&"number"==typeof e.length){_n&&(e=_n);var o=0,F=function F(){};return{s:F,n:function n(){return o>=e.length?{done:!0}:{done:!1,value:e[o++]}},e:function e(r){throw r},f:F}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var a,u,i=!0;return{s:function s(){_n=_n.call(e)},n:function n(){i=!0;var r=_n.next();return r.done?{done:!0}:{value:r.value,done:i=!1}},e:function e(r){a=!0,u=r},f:function f(){try{i||null==_n.return||_n.return()}finally{if(a)throw u}}}};function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)}function _slicedToArray(e,i){return _iterableToArrayLimit(e,i)||_unsupportedIterableToArray(e,i)||_nonIterableRest()}function _nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return _arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?_arrayLikeToArray(t,e):void 0}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function _iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
@@ -363,7 +431,7 @@ return selection}/// endregion
 var hashRegularExpression=function hashRegularExpression(expression){return expression.source+"||"+expression.flags.split("").sort().join("")};var usePropertiesChangedIndicator=function usePropertiesChangedIndicator(properties){return (0,external_react_generic_tools_.useMemorizedValue)({},JSON.stringify(properties),properties.onChange,properties.onChangeShowDeclaration,properties.onChangeState,properties.onChangeValue,properties.onBlur,properties.onClick,properties.onFocus,properties.onTouch)};
 
 /***/ }),
-/* 9 */
+/* 13 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -374,14 +442,22 @@ __webpack_require__.d(__webpack_exports__, {
 
 // UNUSED EXPORTS: default, isDummy
 
+// EXTERNAL MODULE: external "core-js/modules/es.array.push.js"
+var es_array_push_js_ = __webpack_require__(1);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.constructor.js"
+var es_iterator_constructor_js_ = __webpack_require__(0);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.filter.js"
+var es_iterator_filter_js_ = __webpack_require__(2);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.for-each.js"
+var es_iterator_for_each_js_ = __webpack_require__(3);
 // EXTERNAL MODULE: ./src/shims/optionals.ts
-var optionals = __webpack_require__(11);
+var optionals = __webpack_require__(15);
 // EXTERNAL MODULE: external "@rmwc/typography"
-var typography_ = __webpack_require__(13);
+var typography_ = __webpack_require__(18);
 // EXTERNAL MODULE: external "react"
-var external_react_ = __webpack_require__(1);
+var external_react_ = __webpack_require__(5);
 // EXTERNAL MODULE: external "react/jsx-runtime"
-var jsx_runtime_ = __webpack_require__(0);
+var jsx_runtime_ = __webpack_require__(4);
 ;// ./src/implementations/rmwc/Tooltip.tsx
 // -*- coding: utf-8 -*-
 /** @module Tooltip *//* !
@@ -394,8 +470,8 @@ var jsx_runtime_ = __webpack_require__(0);
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)}function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)};// endregion
@@ -413,8 +489,8 @@ var isDummy=!optionals/* Tooltip */.m_||Boolean(optionals/* Tooltip */.m_.isDumm
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 // endregion
@@ -428,8 +504,8 @@ var WrapTooltip_isDummy=!rmwc_Tooltip||Boolean(rmwc_Tooltip.isDummy);/**
  */var WrapTooltip=function WrapTooltip(_ref){var children=_ref.children,value=_ref.value;if(typeof value==="string")return/*#__PURE__*/(0,jsx_runtime_.jsx)(rmwc_Tooltip,{value:value,children:children});return/*#__PURE__*/(0,jsx_runtime_.jsx)(jsx_runtime_.Fragment,{children:children})};/* harmony default export */ var Wrapper_WrapTooltip = ((/* unused pure expression or super */ null && (WrapTooltip)));
 
 /***/ }),
-/* 10 */,
-/* 11 */
+/* 14 */,
+/* 15 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -450,7 +526,17 @@ var bracketMatching=(/* unused pure expression or super */ null && (MOCK_RESULT)
 var optionalsHistory=(/* unused pure expression or super */ null && (MOCK_RESULT));var historyKeymap=(/* unused pure expression or super */ null && (MOCK_RESULT));
 
 /***/ }),
-/* 12 */
+/* 16 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({  });
+
+/***/ }),
+/* 17 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -460,12 +546,16 @@ var optionalsHistory=(/* unused pure expression or super */ null && (MOCK_RESULT
 /* unused harmony import specifier */ var Theme;
 /* unused harmony import specifier */ var forwardRef;
 /* unused harmony import specifier */ var _jsx;
-/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var _WrapStrict_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(15);
-/* harmony import */ var _WrapThemeProvider_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(16);
-/* harmony import */ var _WrapTooltip_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(0);
+/* harmony import */ var core_js_modules_es_array_push_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var core_js_modules_es_iterator_constructor_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
+/* harmony import */ var core_js_modules_es_iterator_filter_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
+/* harmony import */ var core_js_modules_es_iterator_for_each_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3);
+/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(10);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(5);
+/* harmony import */ var _WrapStrict_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(22);
+/* harmony import */ var _WrapThemeProvider_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(23);
+/* harmony import */ var _WrapTooltip_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(13);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(4);
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
 /** @module WrapConfigurations *//* !
@@ -478,8 +568,8 @@ var optionalsHistory=(/* unused pure expression or super */ null && (MOCK_RESULT
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)}var _excluded=(/* unused pure expression or super */ null && (["strict","theme","themeConfiguration","tooltip","wrap"]));function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function _objectWithoutProperties(t,r){if(null==t)return{};var o,n,i=_objectWithoutPropertiesLoose(t,r);if(Object.getOwnPropertySymbols){var l=Object.getOwnPropertySymbols(t);for(n=0;n<l.length;n++)o=l[n],-1===r.indexOf(o)&&{}.propertyIsEnumerable.call(t,o)&&(i[o]=t[o])}return i}function _objectWithoutPropertiesLoose(r,e){if(null==r)return{};var t={};for(var n in r)if({}.hasOwnProperty.call(r,n)){if(-1!==e.indexOf(n))continue;t[n]=r[n]}return t};//  endregion
@@ -495,7 +585,7 @@ function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof 
  * component by merging the theme styles directly onto it. Useful when you
  * don't want to mess with layout.
  * @returns Wrapped content.
- */var WrapConfigurations=function WrapConfigurations(_ref){var children=_ref.children,strict=_ref.strict,themeConfiguration=_ref.themeConfiguration,tooltip=_ref.tooltip,wrap=_ref.wrap;return/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_WrapStrict_js__WEBPACK_IMPORTED_MODULE_2__/* .WrapStrict */ .g,{strict:Boolean(strict),children:/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_WrapTooltip_js__WEBPACK_IMPORTED_MODULE_4__/* .WrapTooltip */ .Et,{value:tooltip,children:/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_WrapThemeProvider_js__WEBPACK_IMPORTED_MODULE_3__/* .WrapThemeProvider */ .R,{configuration:themeConfiguration,wrap:wrap,children:children})})})};/**
+ */var WrapConfigurations=function WrapConfigurations(_ref){var children=_ref.children,strict=_ref.strict,themeConfiguration=_ref.themeConfiguration,tooltip=_ref.tooltip,wrap=_ref.wrap;return/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_WrapStrict_js__WEBPACK_IMPORTED_MODULE_6__/* .WrapStrict */ .g,{strict:Boolean(strict),children:/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_WrapTooltip_js__WEBPACK_IMPORTED_MODULE_8__/* .WrapTooltip */ .Et,{value:tooltip,children:/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_WrapThemeProvider_js__WEBPACK_IMPORTED_MODULE_7__/* .WrapThemeProvider */ .R,{configuration:themeConfiguration,wrap:wrap,children:children})})})};/**
  * Component factory to dynamically create a wrapped component.
  * @param WrappedComponent - Component to wrap.
  * @param options - Options configure wrapping.
@@ -507,7 +597,7 @@ function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof 
  */function createWrapConfigurationsComponent(WrappedComponent,options){if(options===void 0){options={}}var component=function component(_ref2,reference){var strict=_ref2.strict,theme=_ref2.theme,themeConfiguration=_ref2.themeConfiguration,tooltip=_ref2.tooltip,wrap=_ref2.wrap,properties=_objectWithoutProperties(_ref2,_excluded);var wrapped=/*#__PURE__*/_jsx(WrappedComponent,_objectSpread({},_objectSpread(_objectSpread(_objectSpread({},properties),options.withReference===false?{}:reference?{ref:reference}:{}),options.withThemeWrapper&&theme?{theme:theme}:{})));return/*#__PURE__*/_jsx(WrapConfigurations,{strict:strict,themeConfiguration:themeConfiguration,tooltip:tooltip,wrap:wrap,children:options.withThemeWrapper&&theme?/*#__PURE__*/_jsx(Theme,{use:theme,wrap:wrap,children:wrapped}):wrapped})};return options.withReference?/*#__PURE__*/forwardRef(component):component}/* unused harmony default export */ var __WEBPACK_DEFAULT_EXPORT__ = ((/* unused pure expression or super */ null && (WrapConfigurations)));
 
 /***/ }),
-/* 13 */
+/* 18 */
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
 var x = function(y) {
@@ -517,15 +607,35 @@ var y = function(x) { return function() { return x; }; }
 module.exports = x({ ["Typography"]: function() { return __WEBPACK_EXTERNAL_MODULE__rmwc_typography_185e7768__.Typography; } });
 
 /***/ }),
-/* 14 */,
-/* 15 */
+/* 19 */,
+/* 20 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({  });
+
+/***/ }),
+/* 21 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({  });
+
+/***/ }),
+/* 22 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   g: function() { return /* binding */ WrapStrict; }
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
 /** @module wrap-strict *//* !
@@ -538,8 +648,8 @@ module.exports = x({ ["Typography"]: function() { return __WEBPACK_EXTERNAL_MODU
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 // endregion
@@ -553,14 +663,14 @@ module.exports = x({ ["Typography"]: function() { return __WEBPACK_EXTERNAL_MODU
  */var WrapStrict=function WrapStrict(_ref){var children=_ref.children,strict=_ref.strict;return strict?/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(react__WEBPACK_IMPORTED_MODULE_0__.StrictMode,{children:children}):/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.Fragment,{children:children})};/* unused harmony default export */ var __WEBPACK_DEFAULT_EXPORT__ = ((/* unused pure expression or super */ null && (WrapStrict)));
 
 /***/ }),
-/* 16 */
+/* 23 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   R: function() { return /* binding */ WrapThemeProvider; }
 /* harmony export */ });
-/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
+/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
 /** @module WrapThemeProvider *//* !
@@ -573,8 +683,8 @@ module.exports = x({ ["Typography"]: function() { return __WEBPACK_EXTERNAL_MODU
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 // endregion
@@ -590,18 +700,34 @@ module.exports = x({ ["Typography"]: function() { return __WEBPACK_EXTERNAL_MODU
  */var WrapThemeProvider=function WrapThemeProvider(_ref){var children=_ref.children,configuration=_ref.configuration,wrap=_ref.wrap;return configuration?/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(_rmwc_theme__WEBPACK_IMPORTED_MODULE_0__.ThemeProvider,{options:configuration,wrap:wrap!==false,children:children}):children};/* unused harmony default export */ var __WEBPACK_DEFAULT_EXPORT__ = ((/* unused pure expression or super */ null && (WrapThemeProvider)));
 
 /***/ }),
-/* 17 */,
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */
+/* 24 */
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+var x = function(y) {
+	var x = {}; __webpack_require__.d(x, y); return x
+} 
+var y = function(x) { return function() { return x; }; }
+module.exports = x({  });
+
+/***/ }),
+/* 25 */,
+/* 26 */,
+/* 27 */,
+/* 28 */,
+/* 29 */,
+/* 30 */,
+/* 31 */,
+/* 32 */,
+/* 33 */,
+/* 34 */,
+/* 35 */,
+/* 36 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* unused harmony export Error */
-/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(0);
+/* harmony import */ var _rmwc_theme__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
 // -*- coding: utf-8 -*-
 /** @module Error *//* !
     region header
@@ -613,19 +739,16 @@ module.exports = x({ ["Typography"]: function() { return __WEBPACK_EXTERNAL_MODU
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 // endregion
 var Error=/*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)(function(_ref,reference){var children=_ref.children,applyToChildren=_ref.applyToChildren;return/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_rmwc_theme__WEBPACK_IMPORTED_MODULE_0__.Theme,{ref:reference,use:"error",wrap:applyToChildren,children:children})});/* harmony default export */ __webpack_exports__.A = (Error);
 
 /***/ }),
-/* 23 */,
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */
+/* 37 */,
+/* 38 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -633,8 +756,12 @@ var Error=/*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)(functio
 /* harmony export */   Pl: function() { return /* binding */ propertyTypes; }
 /* harmony export */ });
 /* unused harmony export defaultModel */
-/* harmony import */ var clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var _type_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
+/* harmony import */ var core_js_modules_es_array_push_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var core_js_modules_es_iterator_constructor_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
+/* harmony import */ var core_js_modules_es_iterator_filter_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
+/* harmony import */ var core_js_modules_es_iterator_for_each_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3);
+/* harmony import */ var clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
+/* harmony import */ var _type_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
 // -*- coding: utf-8 -*-
 /** @module type *//* !
     region header
@@ -646,16 +773,16 @@ var Error=/*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)(functio
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
 function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)}function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)};// endregion
 // region constants
-var propertyTypes=_objectSpread(_objectSpread(_objectSpread({},_type_js__WEBPACK_IMPORTED_MODULE_1__/* .propertyTypes */ .Pl),_type_js__WEBPACK_IMPORTED_MODULE_1__/* .modelStatePropertyTypes */ .Zl),{},{checked:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.boolean,id:clientnode_property_types__WEBPACK_IMPORTED_MODULE_0__.string});var defaultModel=_objectSpread(_objectSpread({},_type_js__WEBPACK_IMPORTED_MODULE_1__/* .defaultModel */ .$I),{},{default:false,type:"boolean",value:false});/*
+var propertyTypes=_objectSpread(_objectSpread(_objectSpread({},_type_js__WEBPACK_IMPORTED_MODULE_5__/* .propertyTypes */ .Pl),_type_js__WEBPACK_IMPORTED_MODULE_5__/* .modelStatePropertyTypes */ .Zl),{},{checked:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.boolean,id:clientnode_property_types__WEBPACK_IMPORTED_MODULE_4__.string});var defaultModel=_objectSpread(_objectSpread({},_type_js__WEBPACK_IMPORTED_MODULE_5__/* .defaultModel */ .$I),{},{default:false,type:"boolean",value:false});/*
     NOTE: Avoid setting any properties already defined in model here since they
     would permanently shadow them.
-*/var defaultProperties=_objectSpread(_objectSpread({},_type_js__WEBPACK_IMPORTED_MODULE_1__/* .defaultProperties */ .L6),{},{default:false,model:_objectSpread({},defaultModel),requiredText:"Please check this field."});// endregion
+*/var defaultProperties=_objectSpread(_objectSpread({},_type_js__WEBPACK_IMPORTED_MODULE_5__/* .defaultProperties */ .L6),{},{default:false,model:_objectSpread({},defaultModel),requiredText:"Please check this field."});// endregion
 
 /***/ })
 /******/ ]);
@@ -719,19 +846,27 @@ var propertyTypes=_objectSpread(_objectSpread(_objectSpread({},_type_js__WEBPACK
 /******/ 
 /************************************************************************/
 
+// EXTERNAL MODULE: external "core-js/modules/es.array.push.js"
+var es_array_push_js_ = __webpack_require__(1);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.constructor.js"
+var es_iterator_constructor_js_ = __webpack_require__(0);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.filter.js"
+var es_iterator_filter_js_ = __webpack_require__(2);
+// EXTERNAL MODULE: external "core-js/modules/es.iterator.for-each.js"
+var es_iterator_for_each_js_ = __webpack_require__(3);
 // EXTERNAL MODULE: external "clientnode"
-var external_clientnode_ = __webpack_require__(6);
+var external_clientnode_ = __webpack_require__(8);
 // EXTERNAL MODULE: external "react"
-var external_react_ = __webpack_require__(1);
+var external_react_ = __webpack_require__(5);
 // EXTERNAL MODULE: external "react-generic-tools"
-var external_react_generic_tools_ = __webpack_require__(3);
+var external_react_generic_tools_ = __webpack_require__(6);
 ;// external "@rmwc/checkbox"
 
 ;// ./src/implementations/rmwc/Checkbox/style.module.css
 // extracted by mini-css-extract-plugin
 /* harmony default export */ var style_module = ({"checkbox":"checkbox","checkboxInvalid":"checkbox--invalid"});
 // EXTERNAL MODULE: external "react/jsx-runtime"
-var jsx_runtime_ = __webpack_require__(0);
+var jsx_runtime_ = __webpack_require__(4);
 ;// ./src/implementations/rmwc/Checkbox/index.tsx
 // -*- coding: utf-8 -*-
 /** @module Checkbox *//* !
@@ -744,25 +879,25 @@ var jsx_runtime_ = __webpack_require__(0);
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
-function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)}function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function _toConsumableArray(a){return _arrayWithoutHoles(a)||_iterableToArray(a)||_unsupportedIterableToArray(a)||_nonIterableSpread()}function _nonIterableSpread(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _iterableToArray(r){var e="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){for(var t,o=[],a=e.call(r);!(t=a.next()).done;)o.push(t.value);return o}}function _arrayWithoutHoles(a){if(Array.isArray(a))return _arrayLikeToArray(a)}function _slicedToArray(e,i){return _iterableToArrayLimit(e,i)||_unsupportedIterableToArray(e,i)||_nonIterableRest()}function _nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return _arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?_arrayLikeToArray(t,e):void 0}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function _iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
+function _typeof(o){"@babel/helpers - typeof";return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof(o)};function ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function _objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?ownKeys(Object(o),!0).forEach(function(t){_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function _defineProperty(r,t,o){return(t=_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function _toPropertyKey(r){var o=_toPrimitive(r,"string");return"symbol"==_typeof(o)?o:o+""}function _toPrimitive(t,e){if("object"!=_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function _toConsumableArray(a){return _arrayWithoutHoles(a)||_iterableToArray(a)||_unsupportedIterableToArray(a)||_nonIterableSpread()}function _nonIterableSpread(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _iterableToArray(r){var e="undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){for(var t,o=[],a=e.call(r);!(t=a.next()).done;)o.push(t.value);return o}}function _arrayWithoutHoles(a){if(Array.isArray(a))return _arrayLikeToArray(a)}function _slicedToArray(e,i){return _iterableToArrayLimit(e,i)||_unsupportedIterableToArray(e,i)||_nonIterableRest()}function _nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function _unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return _arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?_arrayLikeToArray(t,e):void 0}}function _arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function _iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
 var CSS_CLASS_NAMES=style_module;var Checkbox=/*#__PURE__*/(0,external_react_.forwardRef)(function(properties,reference){var _properties$className;var _useReferenceState=(0,external_react_generic_tools_.useReferenceState)(null),_useReferenceState2=_slicedToArray(_useReferenceState,2),baseReference=_useReferenceState2[0],setBaseReference=_useReferenceState2[1];var _useReferenceState3=(0,external_react_generic_tools_.useReferenceState)(null),_useReferenceState4=_slicedToArray(_useReferenceState3,2),foundationReference=_useReferenceState4[0],setFoundationReference=_useReferenceState4[1];var _useReferenceState5=(0,external_react_generic_tools_.useReferenceState)(null),_useReferenceState6=_slicedToArray(_useReferenceState5,2),inputReference=_useReferenceState6[0],setInputReference=_useReferenceState6[1];(0,external_react_.useImperativeHandle)(reference,function(){return{base:baseReference,foundation:foundationReference,input:inputReference}},[baseReference,foundationReference,inputReference]);return/*#__PURE__*/(0,jsx_runtime_.jsx)("div",{className:_toConsumableArray((_properties$className=properties.classNames)!==null&&_properties$className!==void 0?_properties$className:[]).concat(properties.invalid?CSS_CLASS_NAMES.checkboxInvalid:[]).join(" "),style:properties.styles,children:/*#__PURE__*/(0,jsx_runtime_.jsx)(__WEBPACK_EXTERNAL_MODULE__rmwc_checkbox_562c9657_Checkbox__,_objectSpread(_objectSpread({checked:properties.value,disabled:properties.disabled,indeterminate:properties.indeterminate,"aria-invalid":properties.invalid?true:undefined,id:properties.id,name:properties.name,onBlur:properties.onBlur,onChange:properties.onChange,onClick:properties.onClick,onFocus:properties.onFocus,value:String(properties.value),ref:setBaseReference,foundationRef:setFoundationReference,inputRef:setInputReference},properties.componentProperties),{},{children:properties.children}))})});/* harmony default export */ var rmwc_Checkbox = (Checkbox);
 // EXTERNAL MODULE: ./src/implementations/rmwc/Error.tsx
-var Error = __webpack_require__(22);
+var Error = __webpack_require__(36);
 // EXTERNAL MODULE: ./src/components/Wrapper/WrapConfigurations.tsx
-var WrapConfigurations = __webpack_require__(12);
+var WrapConfigurations = __webpack_require__(17);
 // EXTERNAL MODULE: ./src/helper.ts + 1 modules
-var helper = __webpack_require__(8);
+var helper = __webpack_require__(12);
 // EXTERNAL MODULE: ./src/type.ts
-var type = __webpack_require__(4);
+var type = __webpack_require__(9);
 ;// ./src/components/Checkbox/style.module.css
 // extracted by mini-css-extract-plugin
 /* harmony default export */ var Checkbox_style_module = ({"checkbox":"checkbox"});
 // EXTERNAL MODULE: ./src/components/Checkbox/type.ts
-var Checkbox_type = __webpack_require__(27);
+var Checkbox_type = __webpack_require__(38);
 ;// ./src/components/Checkbox/index.tsx
 // #!/usr/bin/env babel-node
 // -*- coding: utf-8 -*-
@@ -776,11 +911,11 @@ var Checkbox_type = __webpack_require__(27);
     -------
 
     This library written by Torben Sickert stands under a creative commons
-    naming 3.0 unported license.
-    See https://creativecommons.org/licenses/by/3.0/deed.de
+    naming 4.0 international license.
+    See https://creativecommons.org/licenses/by/4.0/deed.de
     endregion
 */// region imports
-function Checkbox_typeof(o){"@babel/helpers - typeof";return Checkbox_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},Checkbox_typeof(o)}function Checkbox_ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function Checkbox_objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?Checkbox_ownKeys(Object(o),!0).forEach(function(t){Checkbox_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):Checkbox_ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function Checkbox_defineProperty(r,t,o){return(t=Checkbox_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function Checkbox_toPropertyKey(r){var o=Checkbox_toPrimitive(r,"string");return"symbol"==Checkbox_typeof(o)?o:o+""}function Checkbox_toPrimitive(t,e){if("object"!=Checkbox_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=Checkbox_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function Checkbox_slicedToArray(e,i){return Checkbox_iterableToArrayLimit(e,i)||Checkbox_unsupportedIterableToArray(e,i)||Checkbox_nonIterableRest()}function Checkbox_nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function Checkbox_unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return Checkbox_arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?Checkbox_arrayLikeToArray(t,e):void 0}}function Checkbox_arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function Checkbox_iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
+function Checkbox_typeof(o){"@babel/helpers - typeof";return Checkbox_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},Checkbox_typeof(o)};function Checkbox_ownKeys(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);r&&(o=o.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,o)}return t}function Checkbox_objectSpread(r){for(var t=1;t<arguments.length;t++){var o=null!=arguments[t]?arguments[t]:{};t%2?Checkbox_ownKeys(Object(o),!0).forEach(function(t){Checkbox_defineProperty(r,t,o[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(o)):Checkbox_ownKeys(Object(o)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(o,e))})}return r}function Checkbox_defineProperty(r,t,o){return(t=Checkbox_toPropertyKey(t))in r?Object.defineProperty(r,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):r[t]=o,r}function Checkbox_toPropertyKey(r){var o=Checkbox_toPrimitive(r,"string");return"symbol"==Checkbox_typeof(o)?o:o+""}function Checkbox_toPrimitive(t,e){if("object"!=Checkbox_typeof(t)||!t)return t;var r;if("undefined"!=typeof Symbol&&void 0!==(r=t[Symbol.toPrimitive])){var i=r.call(t,e||"default");if("object"!=Checkbox_typeof(i))return i;throw new TypeError("@@toPrimitive must return a primitive value.")}return("string"===e?String:Number)(t)}function Checkbox_slicedToArray(e,i){return Checkbox_iterableToArrayLimit(e,i)||Checkbox_unsupportedIterableToArray(e,i)||Checkbox_nonIterableRest()}function Checkbox_nonIterableRest(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function Checkbox_unsupportedIterableToArray(t,e){if(t){if("string"==typeof t)return Checkbox_arrayLikeToArray(t,e);var o={}.toString.call(t).slice(8,-1);return"Object"===o&&t.constructor&&(o=t.constructor.name),"Map"===o||"Set"===o?Array.from(t):"Arguments"===o||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o)?Checkbox_arrayLikeToArray(t,e):void 0}}function Checkbox_arrayLikeToArray(r,a){(null==a||a>r.length)&&(a=r.length);for(var e=0,n=Array(a);e<a;e++)n[e]=r[e];return n}function Checkbox_iterableToArrayLimit(r,t){var e=null==r?null:"undefined"!=typeof Symbol&&r[Symbol.iterator]||r["@@iterator"];if(Array.isArray(r)&&(null==e||e===("undefined"!=typeof Symbol&&[][Symbol.iterator])||e===[]["@@iterator"]))return r;if(null!=e){var l,n,i,a,u=[],o=!0,f=!1;try{if(i=(e=e.call(r)).next,0===t){if(Object(e)!==e)return;o=!1}else for(;!(o=(l=i.call(e)).done)&&(u.push(l.value),u.length!==t);o=!0);}catch(r){f=!0,n=r}finally{try{if(!o&&null!=e.return&&(a=e.return(),Object(a)!==a))return}finally{if(f)throw n}}return u}};// endregion
 var Checkbox_CSS_CLASS_NAMES=Checkbox_style_module;// region helper
 /**
  * Derives validation state from provided properties and state.
@@ -806,7 +941,7 @@ var Checkbox_CSS_CLASS_NAMES=Checkbox_style_module;// region helper
  * @param props - Given components properties.
  * @param reference - Reference object to forward internal state.
  * @returns React elements.
- */var CheckboxInner=function CheckboxInner(props,reference){var _givenProps$model;// region property aggregation
+ */var CheckboxInner=function CheckboxInner(props,reference){var _givenProps$model,_properties$tooltip;// region property aggregation
 /**
      * Calculate external properties (a set of all configurable properties).
      * @param properties - Properties to merge.
@@ -851,7 +986,7 @@ var givenProps=(0,helper/* translateKnownSymbols */.F_)(props);var initialValue=
 // region export references
 var _useReferenceState=(0,external_react_generic_tools_.useReferenceState)(null),_useReferenceState2=Checkbox_slicedToArray(_useReferenceState,2),inputReference=_useReferenceState2[0],setInputReference=_useReferenceState2[1];(0,external_react_.useImperativeHandle)(reference,function(){return{properties:properties,reference:inputReference,state:Checkbox_objectSpread({modelState:properties.model.state},controlled?{}:{value:properties.value})}},[propertiesChangedIndicator,inputReference]);// endregion
 (0,external_react_.useEffect)(function(){if(properties.triggerInitialPropertiesConsolidation)onChange()},[]);// region render
-return/*#__PURE__*/(0,jsx_runtime_.jsx)(WrapConfigurations/* WrapConfigurations */.Es,{strict:Checkbox_Checkbox.strict,themeConfiguration:properties.themeConfiguration,tooltip:properties.tooltip,children:/*#__PURE__*/(0,jsx_runtime_.jsx)(rmwc_Checkbox,{value:Boolean(properties.value),disabled:properties.disabled,invalid:properties.invalid&&properties.showValidationState&&(properties.showInitialValidationState||properties.visited),indeterminate:properties.value===null,id:properties.id||properties.name,name:properties.name,ref:setInputReference,classNames:[Checkbox_CSS_CLASS_NAMES.checkbox].concat(properties.className),styles:properties.styles,onBlur:onBlur,onChange:onChangeValue,onClick:onClick,onFocus:onFocus,componentProperties:properties.componentProperties,domNodeProperties:properties.domNodeProperties,children:properties.invalid&&properties.showValidationState&&(properties.showInitialValidationState||properties.visited)?/*#__PURE__*/(0,jsx_runtime_.jsx)(Error/* default */.A,{children:properties.description||properties.name}):properties.description||properties.name})});// endregion
+return/*#__PURE__*/(0,jsx_runtime_.jsx)(WrapConfigurations/* WrapConfigurations */.Es,{strict:Checkbox_Checkbox.strict,themeConfiguration:properties.themeConfiguration,tooltip:(_properties$tooltip=properties.tooltip)!==null&&_properties$tooltip!==void 0?_properties$tooltip:properties.declaration||undefined,children:/*#__PURE__*/(0,jsx_runtime_.jsx)(rmwc_Checkbox,{value:Boolean(properties.value),disabled:properties.disabled,invalid:properties.invalid&&properties.showValidationState&&(properties.showInitialValidationState||properties.visited),indeterminate:properties.value===null,id:properties.id||properties.name,name:properties.name,ref:setInputReference,classNames:[Checkbox_CSS_CLASS_NAMES.checkbox].concat(properties.className),styles:properties.styles,onBlur:onBlur,onChange:onChangeValue,onClick:onClick,onFocus:onFocus,componentProperties:properties.componentProperties,domNodeProperties:properties.domNodeProperties,children:properties.invalid&&properties.showValidationState&&(properties.showInitialValidationState||properties.visited)?/*#__PURE__*/(0,jsx_runtime_.jsx)(Error/* default */.A,{children:properties.description||properties.name}):properties.description||properties.name})});// endregion
 };// NOTE: This is useful in react dev tools.
 CheckboxInner.displayName="Checkbox";/**
  * Wrapping web component compatible react component.
