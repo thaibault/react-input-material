@@ -655,7 +655,7 @@
     "@rmwc/tooltip": "^14.3.5",
     "@rmwc/touch-target": "^14.3.5",
     "@rmwc/typography": "^14.3.5",
-    "@stylistic/eslint-plugin": "^6.0.0",
+    "@stylistic/eslint-plugin": "^6.0.1",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
     "@tiptap/core": "^3.34.0",
     "@tiptap/extensions": "^3.34.0",
