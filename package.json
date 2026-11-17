@@ -709,7 +709,7 @@
     "typescript-plugin-css-modules": "^5.3.0",
     "web-component-wrapper": "^0.0.624",
     "web-documentation": "^1.0.77",
-    "weboptimizer": "^4.0.122",
+    "weboptimizer": "^4.0.123",
     "webpack": "5.112.2",
     "webpack-cli": "7.3.1",
     "webpack-dev-server": "^6.1.0"
@@ -1021,7 +1021,6 @@
         "#implementations": {
           "__evaluate__": "path.resolve(self.path.source.base, 'implementations/rmwc')"
         },
-        "react-generic-animate/index.css$": "react-generic-animate/dist/index.css",
         "react-input-material/components/TextInput/CodeMirror$": {
           "__evaluate__": "2 < self.givenCommandLineArguments.length && (self.givenCommandLineArguments[2] === 'serve' || self.givenCommandLineArguments[2].startsWith('test')) ? path.resolve(self.path.source.base, 'components/TextInput/CodeMirror/index') : 'react-input-material/components/TextInput/CodeMirror'"
         },

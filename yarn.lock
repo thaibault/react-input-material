@@ -9102,6 +9102,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"enhanced-resolve@npm:^5.26.0":
+  version: 5.27.0
+  resolution: "enhanced-resolve@npm:5.27.0"
+  dependencies:
+    graceful-fs: "npm:^4.2.4"
+    tapable: "npm:^2.3.3"
+  checksum: 10c0/13bf96a1d49fdd752b8583c3f93e8afeca88f8e6ec9c5db7335d06b292839010ea66583d6dffe56728c6ec4491d840d393b8f44bbe02dcdb87645a3f891c65c3
+  languageName: node
+  linkType: hard
+
 "entities@npm:^2.0.0":
   version: 2.2.0
   resolution: "entities@npm:2.2.0"
@@ -13719,7 +13729,7 @@ __metadata:
     typescript-plugin-css-modules: "npm:^5.3.0"
     web-component-wrapper: "npm:^0.0.624"
     web-documentation: "npm:^1.0.77"
-    weboptimizer: "npm:^4.0.122"
+    weboptimizer: "npm:^4.0.123"
     webpack: "npm:5.112.2"
     webpack-cli: "npm:7.3.1"
     webpack-dev-server: "npm:^6.1.0"
@@ -15485,9 +15495,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"weboptimizer@npm:^4.0.122":
-  version: 4.0.122
-  resolution: "weboptimizer@npm:4.0.122"
+"weboptimizer@npm:^4.0.123":
+  version: 4.0.123
+  resolution: "weboptimizer@npm:4.0.123"
   dependencies:
     "@babel/plugin-proposal-decorators": "npm:^8.0.2"
     "@babel/plugin-transform-class-properties": "npm:^8.0.1"
@@ -15501,6 +15511,7 @@ __metadata:
     babel-plugin-transform-rewrite-imports: "npm:^1.5.4"
     clientnode: "npm:4.0.1532"
     ejs: "npm:^7.0.2"
+    enhanced-resolve: "npm:^5.26.0"
     exports-loader: "npm:^5.0.0"
     extract-loader: "npm:^5.1.0"
     glob-all: "npm:^3.3.1"
@@ -15629,7 +15640,7 @@ __metadata:
       optional: true
   bin:
     weboptimizer: dist/index.js
-  checksum: 10c0/881f8648ac0574d49e55c4e70ff24b0c0f62c46af8920bdbf15ffd0a56bc81fc58a9ab9f2a900bd1be4be54eeaf8a958b678661ffa4a208405bf5afbbefc3002
+  checksum: 10c0/b9daf1471331c5f9b6551a14cb2622bf4c93bd1c023cca33f7970e791a2d84e8515c0e962260cac88cfd3ed6e4939895c3698853fca0800210822d23c6d605bd
   languageName: node
   linkType: hard
 
