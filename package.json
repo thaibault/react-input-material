@@ -695,7 +695,7 @@
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-generic-animate": "^0.0.143",
+    "react-generic-animate": "^0.0.144",
     "react-generic-dummy": "^0.0.143",
     "react-generic-tools": "^0.0.141",
     "react-transition-group": "^4.4.5",
@@ -1021,6 +1021,7 @@
         "#implementations": {
           "__evaluate__": "path.resolve(self.path.source.base, 'implementations/rmwc')"
         },
+        "react-generic-animate/index.css$": "react-generic-animate/dist/index.css",
         "react-input-material/components/TextInput/CodeMirror$": {
           "__evaluate__": "2 < self.givenCommandLineArguments.length && (self.givenCommandLineArguments[2] === 'serve' || self.givenCommandLineArguments[2].startsWith('test')) ? path.resolve(self.path.source.base, 'components/TextInput/CodeMirror/index') : 'react-input-material/components/TextInput/CodeMirror'"
         },

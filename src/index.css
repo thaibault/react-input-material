@@ -10,7 +10,7 @@ This library written by Torben Sickert stands under a creative commons naming
 4.0 international license.
 See https://creativecommons.org/licenses/by/4.0/deed.de
  endregion */
-@import "react-generic-animate/dist/index.css";
+@import "react-generic-animate/index.css";
 
 @import "./implementations/rmwc/MediaCard/import.module.css";
 /*
